@@ -292,8 +292,8 @@ void SaveGame()
     sav.hundreds = (g_100s >= 0) ? g_100s + 1 : g_100s;
     sav.coins = uint32_t(Coins);
     sav.points = uint32_t(Score);
-    sav.worldPosX = WorldPlayer[1].Location.X;
-    sav.worldPosY = WorldPlayer[1].Location.Y;
+    sav.worldPosX = (int)WorldPlayer[1].Location.X;
+    sav.worldPosY = (int)WorldPlayer[1].Location.Y;
 
     for(A = 1; A <= 5; A++)
     {

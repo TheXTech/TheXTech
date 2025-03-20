@@ -2123,7 +2123,7 @@ void UpdateMacro()
                             level[Player[1].Section].Width;
             double focusY = Player[1].Location.Y + Player[1].Location.Height / 2;
 
-            g_levelScreenFader.setupFader(2, 0, 65, ScreenFader::S_CIRCLE, true, focusX, focusY, 1);
+            g_levelScreenFader.setupFader(2, 0, 65, ScreenFader::S_CIRCLE, true, (int)focusX, (int)focusY, 1);
 
             if(canTrack)
                 g_levelScreenFader.setTrackedFocus(&Player[1].Location.X,

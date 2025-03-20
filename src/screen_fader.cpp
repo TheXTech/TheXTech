@@ -149,9 +149,9 @@ void ScreenFader::update()
     if(m_focusSet)
     {
         if(m_focusTrackX)
-            m_focusX = *m_focusTrackX + m_focusOffsetX;
+            m_focusX = (int)(*m_focusTrackX + m_focusOffsetX);
         if(m_focusTrackY)
-            m_focusY = *m_focusTrackY + m_focusOffsetY;
+            m_focusY = (int)(*m_focusTrackY + m_focusOffsetY);
     }
 
     if(m_current_fade < m_target_fade)
@@ -207,8 +207,8 @@ void ScreenFader::draw(bool fullscreen)
 
     if(m_focusSet && m_focusScreen > 0 && m_focusScreen <= c_vScreenCount)
     {
-        focusX += vScreen[m_focusScreen].X;
-        focusY += vScreen[m_focusScreen].Y;
+        focusX += (int)vScreen[m_focusScreen].X;
+        focusY += (int)vScreen[m_focusScreen].Y;
 
         if(fullscreen)
         {

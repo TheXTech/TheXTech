@@ -210,8 +210,8 @@ void SetSection(int i)
         editor_section_toast = 66;
     }
 
-    last_vScreenY[curSection] = vScreen[1].Y;
-    last_vScreenX[curSection] = vScreen[1].X;
+    last_vScreenY[curSection] = (int)vScreen[1].Y;
+    last_vScreenX[curSection] = (int)vScreen[1].X;
     curSection = i;
     vScreen[1].Y = last_vScreenY[curSection];
     vScreen[1].X = last_vScreenX[curSection];
@@ -219,8 +219,8 @@ void SetSection(int i)
 
 void EditorBackup()
 {
-    last_vScreenY[curSection] = vScreen[1].Y;
-    last_vScreenX[curSection] = vScreen[1].X;
+    last_vScreenY[curSection] = (int)vScreen[1].Y;
+    last_vScreenX[curSection] = (int)vScreen[1].X;
     for(int i = 0; i <= maxSections; i++)
     {
         last_vScreenX_b[i] = last_vScreenX[i];
@@ -367,8 +367,8 @@ void UpdateEditor()
 
         // if(ScrollDelay <= 0)
         {
-            int to_scroll_x = scroll_buffer_x / scroll_required;
-            int to_scroll_y = scroll_buffer_y / scroll_required;
+            int to_scroll_x = (int)(scroll_buffer_x / scroll_required);
+            int to_scroll_y = (int)(scroll_buffer_y / scroll_required);
 
             if(to_scroll_x)
             {
@@ -535,8 +535,8 @@ void UpdateEditor()
                     {
                         LevelBlock block;
                         block.id = EditorCursor.Block.Type;
-                        block.w = EditorCursor.Location.Width;
-                        block.h = EditorCursor.Location.Height;
+                        block.w = (int)EditorCursor.Location.Width;
+                        block.h = (int)EditorCursor.Location.Height;
                         block.invisible = EditorCursor.Block.Invis;
                         block.slippery = EditorCursor.Block.Slippy;
                         block.layer = GetL(EditorCursor.Block.Layer);
@@ -1570,8 +1570,8 @@ void UpdateEditor()
 
                 if(CanPlace)
                 {
-                    EditorCursor.WorldArea.Location.X = EditorCursor.Location.X;
-                    EditorCursor.WorldArea.Location.Y = EditorCursor.Location.Y;
+                    EditorCursor.WorldArea.Location.X = (int)EditorCursor.Location.X;
+                    EditorCursor.WorldArea.Location.Y = (int)EditorCursor.Location.Y;
                     numWorldAreas++;
                     WorldArea[numWorldAreas] = EditorCursor.WorldArea;
                     MouseRelease = false;
@@ -2289,8 +2289,8 @@ void SetCursor()
     {
         EditorCursor.Location.Height = 32;
         EditorCursor.Location.Width = 32;
-        EditorCursor.WorldArea.Location.X = EditorCursor.Location.X;
-        EditorCursor.WorldArea.Location.Y = EditorCursor.Location.Y;
+        EditorCursor.WorldArea.Location.X = (int)EditorCursor.Location.X;
+        EditorCursor.WorldArea.Location.Y = (int)EditorCursor.Location.Y;
 
         if(EditorCursor.WorldArea.Location.Width < 32)
             EditorCursor.WorldArea.Location.Width = 32;
@@ -2709,8 +2709,8 @@ void UpdateInteract()
     EditorCursor.InteractMode = 0;
     EditorCursor.InteractFlags = 0;
     EditorCursor.InteractIndex = 0;
-    EditorCursor.InteractX = EditorCursor.Location.X;
-    EditorCursor.InteractY = EditorCursor.Location.Y;
+    EditorCursor.InteractX = (int)EditorCursor.Location.X;
+    EditorCursor.InteractY = (int)EditorCursor.Location.Y;
 
      if(!select_mode && !erase_mode)
         return;

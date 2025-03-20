@@ -2455,7 +2455,10 @@ void PlayerFrame(Player_t &p)
                 if(p.Location.SpeedX != 0)
                 {
                     if(p.Effect == PLREFF_NORMAL)
-                        p.YoshiBFrameCount += 1 + (std::abs(p.Location.SpeedX * 0.7));
+                    {
+                        // FIXME: does this narrowing logic match VB6?
+                        p.YoshiBFrameCount += 1 + (int)(std::abs(p.Location.SpeedX * 0.7));
+                    }
 
                     if((p.Direction == -1 && p.Location.SpeedX > 0) || (p.Direction == 1 && p.Location.SpeedX < 0))
                         p.YoshiBFrameCount = 24;
@@ -2574,15 +2577,15 @@ void PlayerFrame(Player_t &p)
 
             if(!p.Duck || p.MountSpecial > 0)
             {
-                p.MountOffsetY -= (72 - p.Location.Height);
-                p.YoshiBY -= (72 - p.Location.Height);
-                p.YoshiTY -= (72 - p.Location.Height);
+                p.MountOffsetY -= (72 - (int)p.Location.Height);
+                p.YoshiBY -= (72 - (int)p.Location.Height);
+                p.YoshiTY -= (72 - (int)p.Location.Height);
             }
             else
             {
-                p.MountOffsetY -= (64 - p.Location.Height);
-                p.YoshiBY -= (64 - p.Location.Height);
-                p.YoshiTY -= (64 - p.Location.Height);
+                p.MountOffsetY -= (64 - (int)p.Location.Height);
+                p.YoshiBY -= (64 - (int)p.Location.Height);
+                p.YoshiTY -= (64 - (int)p.Location.Height);
             }
 
             p.YoshiBX -= 4;

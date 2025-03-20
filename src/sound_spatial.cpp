@@ -32,10 +32,10 @@ void Sound_ResolveSpatialMod(uint8_t& left, uint8_t& right, int l, int t, int r,
     {
         const vScreen_t& vscreen = vScreen[screen.vScreen_refs[vscreen_i]];
 
-        int vscreen_l = -vscreen.X;
+        int vscreen_l = -(int)vscreen.X;
         int vscreen_r = vscreen_l + vscreen.Width;
         int vscreen_c = vscreen_l + vscreen.Width / 2;
-        int vscreen_t = -vscreen.Y;
+        int vscreen_t = -(int)vscreen.Y;
         int vscreen_b = vscreen_t + vscreen.Height;
 
         int l_dist = (r < vscreen_l) ? vscreen_l - r

@@ -637,7 +637,7 @@ bool Mouse_Render(bool mouse, bool render)
         if(SharedCursor.X < sX || SharedCursor.X >= sX + width / 2)
             return false;
 
-        int cur_mouse_line = (SharedCursor.Y - sY) / line;
+        int cur_mouse_line = ((int)SharedCursor.Y - sY) / line;
         int cur_mouse_item = cur_scroll + cur_mouse_line - first_display_row;
 
         if(SharedCursor.Primary && cur_mouse_item == (int)cur_item && MenuMouseRelease)

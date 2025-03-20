@@ -263,9 +263,9 @@ void s_delay_pipe_exit(int A)
         {
             // wait for player to warp
             if(warp_vertical)
-                frames_before += o_p.Location.Height;
+                frames_before += (int)o_p.Location.Height;
             else
-                frames_before += o_p.Location.Width;
+                frames_before += (int)o_p.Location.Width;
 
             // pause between players
             frames_before += 70;
@@ -324,7 +324,7 @@ void PlayerEffectWarpPipe(int A)
             p.Location.Y += 1;
             p.Location.X = warp_enter.X + (warp_enter.Width - p.Location.Width) / 2;
 
-            leftToGoal = ((warp_enter.Y + warp_enter.Height) - p.Location.Y) + 0.5;
+            leftToGoal = (int)(warp_enter.Y + warp_enter.Height - p.Location.Y + 0.5);
 
             if(p.Location.Y > warp_enter.Y + warp_enter.Height + 8)
             {
@@ -348,7 +348,7 @@ void PlayerEffectWarpPipe(int A)
             p.Location.Y -= 1;
             p.Location.X = warp_enter.X + (warp_enter.Width - p.Location.Width) / 2;
 
-            leftToGoal = ((p.Location.Y + p.Location.Height) - warp_enter.Y) + 0.5;
+            leftToGoal = (int)(p.Location.Y + p.Location.Height - warp_enter.Y + 0.5);
 
             if(p.Location.Y + p.Location.Height + 8 < warp_enter.Y)
             {
@@ -378,7 +378,7 @@ void PlayerEffectWarpPipe(int A)
             p.Location.Y = warp_enter.Y + warp_enter.Height - p.Location.Height - 2;
             p.Location.X -= 0.5;
 
-            leftToGoal = (((p.Location.X + p.Location.Width) - warp_enter.X) * 2) + 0.5;
+            leftToGoal = (int)((p.Location.X + p.Location.Width - warp_enter.X) * 2 + 0.5);
 
             if(p.Location.X + p.Location.Width + 8 < warp_enter.X)
             {
@@ -411,7 +411,7 @@ void PlayerEffectWarpPipe(int A)
             p.Location.Y = warp_enter.Y + warp_enter.Height - p.Location.Height - 2;
             p.Location.X += 0.5;
 
-            leftToGoal = (((warp_enter.X + warp_enter.Width) - p.Location.X) * 2) + 0.5;
+            leftToGoal = (int)((warp_enter.X + warp_enter.Width - p.Location.X) * 2 + 0.5);
 
             if(p.Location.X > warp_enter.X + warp_enter.Width + 8)
             {

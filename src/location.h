@@ -132,7 +132,7 @@ struct PlayerStart_t
 //End Type
 
     inline PlayerStart_t() = default;
-    inline PlayerStart_t(const Location_t& loc) : X(loc.X), Y(loc.Y), Height(loc.Height), Width(loc.Width) {}
+    inline PlayerStart_t(const Location_t& loc) : X((int32_t)loc.X), Y((int32_t)loc.Y), Height((int32_t)loc.Height), Width((int32_t)loc.Width) {}
 
     inline bool isNull() const
     {

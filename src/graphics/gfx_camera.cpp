@@ -59,13 +59,13 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
     if(g_config.small_screen_cam && screen.W < c_screen.W && !NoTurnBack[p.Section])
     {
         int16_t max_offsetX = 360;
-        if(max_offsetX > vscreen.Width - p.Location.Width * 4)
-            max_offsetX = vscreen.Width - p.Location.Width * 4;
+        if(max_offsetX > vscreen.Width - (int)p.Location.Width * 4)
+            max_offsetX = vscreen.Width - (int)p.Location.Width * 4;
 
         if(max_offsetX > c_screen.W - screen.W)
             max_offsetX = c_screen.W - screen.W;
 
-        int16_t lookX_target = max_offsetX * p.Location.SpeedX * 1.5 / Physics.PlayerRunSpeed;
+        int16_t lookX_target = (int)(max_offsetX * p.Location.SpeedX * 1.5 / Physics.PlayerRunSpeed);
         if(lookX_target > max_offsetX)
             lookX_target = max_offsetX;
         if(lookX_target < -max_offsetX)
@@ -254,7 +254,7 @@ void DrawSmallScreenCam(vScreen_t& vscreen)
         color = XTColorF(0.0f, 0.0f, 0.0f, 0.3f);
     }
 
-    color.a *= rate;
+    color.a = int(rate * color.a);
 
     if(GFX.Camera.inited)
         XRender::renderTextureBasic(CamX, CamY, GFX.Camera, color);

@@ -623,8 +623,8 @@ bool Update_qScreen(int Z, double camRate, double resizeRate)
     double camRateX = camRate;
     double camRateY = camRate;
 
-    int resizeRateX = resizeRate;
-    int resizeRateY = resizeRate;
+    int resizeRateX = int(resizeRate);
+    int resizeRateY = int(resizeRate);
 
     double camFramesX = std::abs(vScreen[Z].X - qScreenLoc[Z].X) / camRateX;
     double camFramesY = std::abs(vScreen[Z].Y - qScreenLoc[Z].Y) / camRateY;
@@ -669,11 +669,11 @@ bool Update_qScreen(int Z, double camRate, double resizeRate)
     camRateX = std::abs(vScreen[Z].X - qScreenLoc[Z].X) / qFramesX;
     camRateY = std::abs(vScreen[Z].Y - qScreenLoc[Z].Y) / qFramesY;
 
-    resizeRateX = std::abs(vScreen[Z].Width - qScreenLoc[Z].Width) / qFramesX;
-    resizeRateY = std::abs(vScreen[Z].Height - qScreenLoc[Z].Height) / qFramesY;
+    resizeRateX = (int)(std::abs(vScreen[Z].Width - qScreenLoc[Z].Width) / qFramesX);
+    resizeRateY = (int)(std::abs(vScreen[Z].Height - qScreenLoc[Z].Height) / qFramesY);
 
-    int screenRateX = std::abs(vScreen[Z].ScreenLeft - qScreenLoc[Z].ScreenLeft) / qFramesX;
-    int screenRateY = std::abs(vScreen[Z].ScreenTop - qScreenLoc[Z].ScreenTop) / qFramesY;
+    int screenRateX = (int)(std::abs(vScreen[Z].ScreenLeft - qScreenLoc[Z].ScreenLeft) / qFramesX);
+    int screenRateY = (int)(std::abs(vScreen[Z].ScreenTop - qScreenLoc[Z].ScreenTop) / qFramesY);
 
     if(vScreen[Z].X < qScreenLoc[Z].X - camRateX)
         qScreenLoc[Z].X -= camRateX;

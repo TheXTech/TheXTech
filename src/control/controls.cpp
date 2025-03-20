@@ -888,7 +888,7 @@ bool Update(bool check_lost_devices)
         if(SharedCursor.X >= 0 && SharedCursor.Y >= 0)
         {
             int window_x, window_y;
-            XRender::mapFromScreen(SharedCursor.X, SharedCursor.Y, &window_x, &window_y);
+            XRender::mapFromScreen((int)SharedCursor.X, (int)SharedCursor.Y, &window_x, &window_y);
             XWindow::placeCursor(window_x, window_y);
         }
     }

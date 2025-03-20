@@ -1268,7 +1268,7 @@ resume_TriggerLast:
             tempLocation = NPC[A].Location;
             if(NPC[A].Type == NPCID_LONG_PLANT_DOWN)
             {
-                int npcH = NPC[A].Location.Height;
+                int npcH = (int)NPC[A].Location.Height;
                 for(C = 0; C <= npcH; C += 32)
                 {
                     if(NPC[A].Location.Height - C > 16)
@@ -1280,7 +1280,7 @@ resume_TriggerLast:
             }
             else
             {
-                int npcH = NPC[A].Location.Height;
+                int npcH = (int)NPC[A].Location.Height;
                 for(C = 0; C <= npcH; C += 32)
                 {
                     if(NPC[A].Location.Height - C > 16)
