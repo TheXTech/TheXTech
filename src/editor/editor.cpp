@@ -343,10 +343,8 @@ void UpdateEditor()
         else
             ScrollRelease = true;
 
-        if(std::fmod((vScreen[1].Y + 8), 32) != 0.0)
-            vScreen[1].Y = static_cast<int>(floor(static_cast<double>(vScreen[1].Y / 32))) * 32 - 8;
-        if(std::fmod(vScreen[1].X, 32) != 0.0)
-            vScreen[1].X = static_cast<int>(floor(static_cast<double>(vScreen[1].X / 32))) * 32;
+        vScreen[1].Y = SDL_floor((((vScreen[1].Y + 8) / 32))) * 32 - 8;
+        vScreen[1].X = SDL_floor(((vScreen[1].X / 32))) * 32;
     }
     else
     {
@@ -800,9 +798,9 @@ void UpdateEditor()
                     int A = EditorCursor.InteractIndex;
 
                     if(iRand(2) == 0)
-                        NPC[A].Location.SpeedX = double(Physics.NPCShellSpeed / 2);
+                        NPC[A].Location.SpeedX = Physics.NPCShellSpeed / 2;
                     else
-                        NPC[A].Location.SpeedX = -double(Physics.NPCShellSpeed / 2);
+                        NPC[A].Location.SpeedX = -Physics.NPCShellSpeed / 2;
 
                     NPC[A].DefaultType = NPCID_NULL;
                     if(NPC[A]->IsABonus || NPC[A]->IsACoin)
@@ -2395,9 +2393,9 @@ void HideCursor()
 {
     // printf("Hiding cursor...\n");
     EditorCursor.Location.X = vScreen[1].X - 800;
-    EditorCursor.X = float(vScreen[1].X - 800);
+    EditorCursor.X = EditorCursor.Location.X;
     EditorCursor.Location.Y = vScreen[1].Y - 600;
-    EditorCursor.Y = float(vScreen[1].Y - 600);
+    EditorCursor.Y = EditorCursor.Location.Y;
     HasCursor = false;
     EditorControls.ScrollDown = false;
     EditorControls.ScrollRight = false;
@@ -3154,13 +3152,13 @@ void MouseMove(float X, float Y, bool /*nCur*/)
         A = SingleCoop;
     else if(l_screen->Type == 5 && vScreen[2].Visible)
     {
-        if(X < float(vScreen[2].TargetX() + vScreen[2].Width))
+        if(X < vScreen[2].TargetX() + vScreen[2].Width)
         {
-            if(X > float(vScreen[2].TargetX()))
+            if(X > vScreen[2].TargetX())
             {
-                if(Y < float(vScreen[2].TargetY() + vScreen[2].Height))
+                if(Y < vScreen[2].TargetY() + vScreen[2].Height)
                 {
-                    if(Y > float(vScreen[2].TargetY()))
+                    if(Y > vScreen[2].TargetY())
                         A = 2;
                 }
             }
@@ -3184,18 +3182,16 @@ void MouseMove(float X, float Y, bool /*nCur*/)
 
     if(EditorCursor.Mode == OptCursor_t::LVL_ERASER || EditorCursor.Mode == OptCursor_t::LVL_SELECT /*|| frmLevelEditor::chkAlign.Value == 0*/)
     {
-        EditorCursor.Location.X = double(X) - vScreen[A].X;
-        EditorCursor.Location.Y = double(Y) - vScreen[A].Y;
+        EditorCursor.Location.X = X - vScreen[A].X;
+        EditorCursor.Location.Y = Y - vScreen[A].Y;
         PositionCursor();
     }
     else
     {
         if(MagicHand)
         {
-            if(std::fmod((vScreen[A].Y + 8), 32) != 0.0)
-                vScreen[A].Y = static_cast<int>(floor(static_cast<double>(vScreen[A].Y / 32))) * 32 - 8;
-            if(std::fmod(vScreen[A].X, 32) != 0.0)
-                vScreen[A].X = static_cast<int>(floor(static_cast<double>(vScreen[A].X / 32))) * 32;
+            vScreen[A].Y = SDL_floor((((vScreen[A].Y + 8) / 32))) * 32 - 8;
+            vScreen[A].X = SDL_floor(((vScreen[A].X / 32))) * 32;
         }
 
         // 16x16 alignment

@@ -361,11 +361,11 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
                                             Player[A].Location.Y = Block[B].Location.Y + (Block[B].Location.Height * Slope) - Player[A].Location.Height - 0.1;
 
-                                            if(Player[A].Location.SpeedY > Player[A].Location.SpeedX * (Block[B].Location.Height / static_cast<double>(Block[B].Location.Width)) * BlockSlope[Block[B].Type] || !Player[A].Slide)
+                                            if(Player[A].Location.SpeedY > Player[A].Location.SpeedX * (Block[B].Location.Height / Block[B].Location.Width) * BlockSlope[Block[B].Type] || !Player[A].Slide)
                                             {
                                                 if(!Player[A].WetFrame)
                                                 {
-                                                    cursed_value_C = Player[A].Location.SpeedX * (Block[B].Location.Height / static_cast<double>(Block[B].Location.Width)) * BlockSlope[Block[B].Type];
+                                                    cursed_value_C = Player[A].Location.SpeedX * (Block[B].Location.Height / Block[B].Location.Width) * BlockSlope[Block[B].Type];
                                                     Player[A].Location.SpeedY = cursed_value_C;
                                                     if(Player[A].Location.SpeedY > 0 && !Player[A].Slide && Player[A].Mount != 1 && Player[A].Mount != 2)
                                                         Player[A].Location.SpeedY = Player[A].Location.SpeedY * 4;
@@ -753,7 +753,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
     {
         if(Player[A].Location.SpeedY > 0)
         {
-            float C = Player[A].Location.SpeedX * (Block[oldSlope].Location.Height / static_cast<double>(Block[oldSlope].Location.Width)) * BlockSlope[Block[oldSlope].Type];
+            float C = Player[A].Location.SpeedX * (Block[oldSlope].Location.Height / Block[oldSlope].Location.Width) * BlockSlope[Block[oldSlope].Type];
             if(C > 0)
                 Player[A].Location.SpeedY = C;
         }

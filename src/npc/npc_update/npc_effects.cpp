@@ -260,11 +260,11 @@ static inline void NPCEffectLogic_Warp(int A)
     else if(NPC[A].Effect3 == 2)
     {
         if(NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_LIFE_S3 || NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 || NPC[A].Type == NPCID_LIFE_S1 || NPC[A].Type == NPCID_LIFE_S4 || NPC[A].Type == NPCID_BRUTE_SQUISHED || NPC[A].Type == NPCID_BIG_MOLE)
-            NPC[A].Location.X -= double(Physics.NPCMushroomSpeed);
+            NPC[A].Location.X -= Physics.NPCMushroomSpeed;
         else if(NPC[A]->CanWalkOn)
             NPC[A].Location.X -= 1;
         else
-            NPC[A].Location.X -= double(Physics.NPCWalkingSpeed);
+            NPC[A].Location.X -= Physics.NPCWalkingSpeed;
 
         if(NPC[A].Location.X + NPC[A].Location.Width <= NPC[A].SpecialX)
         {
@@ -276,11 +276,11 @@ static inline void NPCEffectLogic_Warp(int A)
     else if(NPC[A].Effect3 == 4)
     {
         if(NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_LIFE_S3 || NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 || NPC[A].Type == NPCID_LIFE_S1 || NPC[A].Type == NPCID_LIFE_S4 || NPC[A].Type == NPCID_BRUTE_SQUISHED || NPC[A].Type == NPCID_BIG_MOLE)
-            NPC[A].Location.X += double(Physics.NPCMushroomSpeed);
+            NPC[A].Location.X += Physics.NPCMushroomSpeed;
         else if(NPC[A]->CanWalkOn)
             NPC[A].Location.X += 1;
         else
-            NPC[A].Location.X += double(Physics.NPCWalkingSpeed);
+            NPC[A].Location.X += Physics.NPCWalkingSpeed;
 
         if(NPC[A].Location.X >= NPC[A].SpecialX)
         {

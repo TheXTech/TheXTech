@@ -46,15 +46,15 @@ bool n00bCollision(const Location_t &Loc1, const Location_t &Loc2)
     bool tempn00bCollision = false;
     float EZ = 2.f;
 
-    if(float(Loc2.Width) >= 32 - EZ * 2 && float(Loc2.Height) >= 32 - EZ * 2)
+    if(Loc2.Width >= 32 - EZ * 2 && Loc2.Height >= 32 - EZ * 2)
     {
-        if(float(Loc1.Y) + float(Loc1.Height) - EZ >= float(Loc2.Y))
+        if(Loc1.Y + Loc1.Height - EZ >= Loc2.Y)
         {
-            if(float(Loc1.Y) + EZ <= float(Loc2.Y) + float(Loc2.Height))
+            if(Loc1.Y + EZ <= Loc2.Y + Loc2.Height)
             {
-                if(float(Loc1.X) + EZ <= float(Loc2.X + Loc2.Width))
+                if(Loc1.X + EZ <= Loc2.X + Loc2.Width)
                 {
-                    if(float(Loc1.X) + float(Loc1.Width) - EZ >= float(Loc2.X))
+                    if(Loc1.X + Loc1.Width - EZ >= Loc2.X)
                     {
                         tempn00bCollision = true;
                     }
@@ -133,13 +133,13 @@ bool WarpCollision(const Location_t &Loc1, const SpeedlessLocation_t &entrance, 
         Y2 = 32;
     }
 
-    if(float(Loc1.X) <= float(entrance.X) + float(entrance.Width) + X2)
+    if(Loc1.X <= entrance.X + entrance.Width + X2)
     {
-        if(float(Loc1.X) + float(Loc1.Width) >= float(entrance.X) + X2)
+        if(Loc1.X + Loc1.Width >= entrance.X + X2)
         {
-            if(float(Loc1.Y) <= float(entrance.Y) + float(entrance.Height) + Y2)
+            if(Loc1.Y <= entrance.Y + entrance.Height + Y2)
             {
-                if(float(Loc1.Y) + float(Loc1.Height) >= float(entrance.Y) + Y2)
+                if(Loc1.Y + Loc1.Height >= entrance.Y + Y2)
                 {
                     hasCollision = true;
                 }

@@ -5029,7 +5029,7 @@ void SpecialNPC(int A)
                     NPC[numNPCs].Location.X = NPC[A].Location.X + (NPC[A].Location.Width - NPC[numNPCs].Location.Width) / 2;
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + 8;
 
-                    NPC[numNPCs].Location.SpeedX = (1 + dRand() * 2) * double(NPC[numNPCs].Direction);
+                    NPC[numNPCs].Location.SpeedX = (1 + dRand() * 2) * NPC[numNPCs].Direction;
                     NPC[numNPCs].Location.SpeedY = -7;
 
                     NPC[numNPCs].Variant = NPC[A].Variant;

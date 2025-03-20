@@ -140,9 +140,9 @@ int e_CursorX, e_CursorY;
 void DisableCursorNew()
 {
     EditorCursor.Location.X = vScreen[1].X - 800;
-    EditorCursor.X = float(vScreen[1].X - 800);
+    EditorCursor.X = EditorCursor.Location.X;
     EditorCursor.Location.Y = vScreen[1].Y - 600;
-    EditorCursor.Y = float(vScreen[1].Y - 600);
+    EditorCursor.Y = EditorCursor.Location.Y;
     HasCursor = false;
 
     e_CursorX = -50;
@@ -2217,7 +2217,7 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
     {
         DisableCursorNew();
         WorldName = TextEntryScreen::Run(g_editorStrings.worldName, WorldName);
-        MouseMove((float)SharedCursor.X, (float)SharedCursor.Y);
+        MouseMove(SharedCursor.X, SharedCursor.Y);
     }
 
     SuperPrintR(mode, g_editorStrings.worldName, 3, 54, 42);
@@ -2289,7 +2289,7 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
     {
         DisableCursorNew();
         WorldCredits[m_special_subpage + 1] = TextEntryScreen::Run(fmt::format_ne(g_editorStrings.worldCreditIndex, m_special_subpage + 1), WorldCredits[m_special_subpage + 1]);
-        MouseMove((float)SharedCursor.X, (float)SharedCursor.Y);
+        MouseMove(SharedCursor.X, SharedCursor.Y);
         for(int i = SDL_max(numWorldCredits, m_special_subpage + 1); i > 0; --i) // Find the last non-empty line
         {
             if(!WorldCredits[m_special_subpage + 1].empty())
@@ -3082,7 +3082,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
                     std::string new_name = TextEntryScreen::Run(g_editorStrings.layersPromptLayerName, Layer[l].Name);
                     if(!new_name.empty())
                         RenameLayer(l, new_name);
-                    MouseMove((float)SharedCursor.X, (float)SharedCursor.Y);
+                    MouseMove(SharedCursor.X, SharedCursor.Y);
                 }
 
                 // shift up
@@ -3164,7 +3164,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
                     numLayers ++;
                 }
 
-                MouseMove((float)SharedCursor.X, (float)SharedCursor.Y);
+                MouseMove(SharedCursor.X, SharedCursor.Y);
             }
         }
     }

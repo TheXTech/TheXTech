@@ -46,7 +46,7 @@ void NPCWalkingLogic(int A, const double tempHit, const int tempHitBlock, float 
 
             if(NPC[A].Slope > 0)
             {
-                NPC[A].Location.SpeedY = NPC[A].Location.SpeedX * (Block[NPC[A].Slope].Location.Height / static_cast<double>(Block[NPC[A].Slope].Location.Width)) * BlockSlope[Block[NPC[A].Slope].Type];
+                NPC[A].Location.SpeedY = NPC[A].Location.SpeedX * (Block[NPC[A].Slope].Location.Height / Block[NPC[A].Slope].Location.Width) * BlockSlope[Block[NPC[A].Slope].Type];
                 if(NPC[A].Location.SpeedY < 0)
                     NPC[A].Location.SpeedY = 0;
             }
@@ -84,7 +84,7 @@ void NPCWalkingLogic(int A, const double tempHit, const int tempHitBlock, float 
 
             if(NPC[A].Slope > 0)
             {
-                NPC[A].Location.SpeedY = NPC[A].Location.SpeedX * (Block[NPC[A].Slope].Location.Height / static_cast<double>(Block[NPC[A].Slope].Location.Width)) * BlockSlope[Block[NPC[A].Slope].Type];
+                NPC[A].Location.SpeedY = NPC[A].Location.SpeedX * (Block[NPC[A].Slope].Location.Height / Block[NPC[A].Slope].Location.Width) * BlockSlope[Block[NPC[A].Slope].Type];
                 if(NPC[A].Location.SpeedY < 0)
                     NPC[A].Location.SpeedY = 0;
             }
@@ -203,7 +203,7 @@ void NPCWalkingLogic(int A, const double tempHit, const int tempHitBlock, float 
         NPC[A].Location.SpeedY = 0;
         if(NPC[A].Slope > 0)
         {
-            NPC[A].Location.SpeedY = NPC[A].Location.SpeedX * (Block[NPC[A].Slope].Location.Height / static_cast<double>(Block[NPC[A].Slope].Location.Width)) * BlockSlope[Block[NPC[A].Slope].Type];
+            NPC[A].Location.SpeedY = NPC[A].Location.SpeedX * (Block[NPC[A].Slope].Location.Height / Block[NPC[A].Slope].Location.Width) * BlockSlope[Block[NPC[A].Slope].Type];
             if(NPC[A].Location.SpeedY < 0)
                 NPC[A].Location.SpeedY = 0;
         }
@@ -328,7 +328,7 @@ void NPCWalkingLogic(int A, const double tempHit, const int tempHitBlock, float 
             NPC[A].Location.SpeedY = 0;
             if(NPC[A].Slope > 0)
             {
-                NPC[A].Location.SpeedY = NPC[A].Location.SpeedX * (Block[NPC[A].Slope].Location.Height / static_cast<double>(Block[NPC[A].Slope].Location.Width)) * BlockSlope[Block[NPC[A].Slope].Type];
+                NPC[A].Location.SpeedY = NPC[A].Location.SpeedX * (Block[NPC[A].Slope].Location.Height / Block[NPC[A].Slope].Location.Width) * BlockSlope[Block[NPC[A].Slope].Type];
                 if(NPC[A].Location.SpeedY < 0)
                     NPC[A].Location.SpeedY = 0;
             }
@@ -354,7 +354,7 @@ void NPCWalkingLogic(int A, const double tempHit, const int tempHitBlock, float 
             NPC[A].Location.SpeedY = 0;
             if(NPC[A].Slope > 0 && !NPC[A]->IsAShell && NPC[A].Type != NPCID_SLIDE_BLOCK)
             {
-                NPC[A].Location.SpeedY = NPC[A].Location.SpeedX * (Block[NPC[A].Slope].Location.Height / static_cast<double>(Block[NPC[A].Slope].Location.Width)) * BlockSlope[Block[NPC[A].Slope].Type];
+                NPC[A].Location.SpeedY = NPC[A].Location.SpeedX * (Block[NPC[A].Slope].Location.Height / Block[NPC[A].Slope].Location.Width) * BlockSlope[Block[NPC[A].Slope].Type];
                 if(NPC[A].Location.SpeedY < 0)
                     NPC[A].Location.SpeedY = 0;
             }

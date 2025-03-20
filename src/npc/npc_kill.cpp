@@ -39,7 +39,7 @@
 
 #include "main/game_loop_interrupt.h"
 
-static void s_makeSparkles(const NPC_t& npc, double speed_random, double speed_mult)
+static void s_makeSparkles(const NPC_t& npc, int speed_random, double speed_mult)
 {
     NewEffect(EFFID_SMOKE_S3, npc.Location);
 

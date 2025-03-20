@@ -727,9 +727,9 @@ static void read_NPCs()
                 diverged_minor = true;
             }
 
-            if(!fEqual((float)D, n.Direction))
+            if(D != n.Direction)
             {
-                pLogWarning("NPC[%d].Direction diverged (old %f, new %f; type %d) at frame %" PRId64 ".", i, D, n.Direction, n.Type, frame_no);
+                pLogWarning("NPC[%d].Direction diverged (old %f, new %d; type %d) at frame %" PRId64 ".", i, D, n.Direction, n.Type, frame_no);
                 diverged_minor = true;
             }
 

@@ -1571,10 +1571,10 @@ resume:
     {
         if(AutoX[A] != 0.0f || AutoY[A] != 0.0f)
         {
-            level[A].X += double(AutoX[A]);
-            level[A].Width += double(AutoX[A]);
-            level[A].Y += double(AutoY[A]);
-            level[A].Height += double(AutoY[A]);
+            level[A].X += AutoX[A];
+            level[A].Width += AutoX[A];
+            level[A].Y += AutoY[A];
+            level[A].Height += AutoY[A];
             if(level[A].Width > LevelREAL[A].Width)
             {
                 level[A].Width = LevelREAL[A].Width;
@@ -1714,8 +1714,8 @@ void UpdateLayers()
         {
             // if(!(FreezeLayers && Layer[A].EffectStop))
             {
-                Layer[A].OffsetX += double(Layer[A].SpeedX);
-                Layer[A].OffsetY += double(Layer[A].SpeedY);
+                Layer[A].OffsetX += Layer[A].SpeedX;
+                Layer[A].OffsetY += Layer[A].SpeedY;
 
                 Layer[A].ApplySpeedX = Layer[A].SpeedX;
                 Layer[A].ApplySpeedY = Layer[A].SpeedY;
@@ -1751,10 +1751,10 @@ void UpdateLayers()
                 {
                     // if(Block[B].Layer == Layer[A].Name)
                     //{
-                    Block[B].Location.X += double(Layer[A].SpeedX);
-                    Block[B].Location.Y += double(Layer[A].SpeedY);
-                    Block[B].Location.SpeedX = double(Layer[A].SpeedX);
-                    Block[B].Location.SpeedY = double(Layer[A].SpeedY);
+                    Block[B].Location.X += Layer[A].SpeedX;
+                    Block[B].Location.Y += Layer[A].SpeedY;
+                    Block[B].Location.SpeedX = Layer[A].SpeedX;
+                    Block[B].Location.SpeedY = Layer[A].SpeedY;
 
                     if(Block[B].Type >= BLKID_CONVEYOR_L_START && Block[B].Type <= BLKID_CONVEYOR_L_END)
                         Block[B].Location.SpeedX += -0.8;
@@ -1774,8 +1774,8 @@ void UpdateLayers()
                 {
                     // if(Background[B].Layer == Layer[A].Name)
                     //{
-                    Background[B].Location.X += double(Layer[A].SpeedX);
-                    Background[B].Location.Y += double(Layer[A].SpeedY);
+                    Background[B].Location.X += Layer[A].SpeedX;
+                    Background[B].Location.Y += Layer[A].SpeedY;
 
                     if(inactive)
                         treeBackgroundUpdateLayer(A, B);
@@ -1789,8 +1789,8 @@ void UpdateLayers()
                 {
                     // if(Water[B].Layer == Layer[A].Name)
                     //{
-                    Water[B].Location.X += double(Layer[A].SpeedX);
-                    Water[B].Location.Y += double(Layer[A].SpeedY);
+                    Water[B].Location.X += Layer[A].SpeedX;
+                    Water[B].Location.Y += Layer[A].SpeedY;
 
                     if(inactive)
                         treeWaterUpdateLayer(A, B);
@@ -1801,8 +1801,8 @@ void UpdateLayers()
                 {
                     // if(NPC[B].Layer == Layer[A].Name)
                     {
-                        NPC[B].DefaultLocationX += double(Layer[A].SpeedX);
-                        NPC[B].DefaultLocationY += double(Layer[A].SpeedY);
+                        NPC[B].DefaultLocationX += Layer[A].SpeedX;
+                        NPC[B].DefaultLocationY += Layer[A].SpeedY;
 
                         if(!NPC[B].Active || NPC[B].Generator || NPC[B].Effect != NPCEFF_NORMAL ||
                            NPC[B]->IsACoin || NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_STONE_S3 ||
@@ -1814,13 +1814,13 @@ void UpdateLayers()
                         {
                             if(NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPCID_HOMING_BALL_GEN)
                             {
-                                NPC[B].Location.SpeedX = double(Layer[A].SpeedX);
-                                NPC[B].Location.SpeedY = double(Layer[A].SpeedY);
+                                NPC[B].Location.SpeedX = Layer[A].SpeedX;
+                                NPC[B].Location.SpeedY = Layer[A].SpeedY;
                             }
                             else if(NPC[B]->IsAVine)
                             {
-                                NPC[B].Location.SpeedX = double(Layer[A].SpeedX);
-                                NPC[B].Location.SpeedY = double(Layer[A].SpeedY);
+                                NPC[B].Location.SpeedX = Layer[A].SpeedX;
+                                NPC[B].Location.SpeedY = Layer[A].SpeedY;
                             }
 
                             if(!NPC[B].Active)
@@ -1844,8 +1844,8 @@ void UpdateLayers()
                             }
                             else
                             {
-                                NPC[B].Location.X += double(Layer[A].SpeedX);
-                                NPC[B].Location.Y += double(Layer[A].SpeedY);
+                                NPC[B].Location.X += Layer[A].SpeedX;
+                                NPC[B].Location.Y += Layer[A].SpeedY;
                             }
 
                             if(NPC[B].Effect == NPCEFF_WARP)
@@ -1853,9 +1853,9 @@ void UpdateLayers()
                                 // specialY/X store the NPC's destination position
                                 // this previously changed Effect2
                                 if(NPC[B].Effect3 == 1 || NPC[B].Effect3 == 3)
-                                    NPC[B].SpecialY += double(Layer[A].SpeedY);
+                                    NPC[B].SpecialY += Layer[A].SpeedY;
                                 else
-                                    NPC[B].SpecialX += double(Layer[A].SpeedX);
+                                    NPC[B].SpecialX += Layer[A].SpeedX;
                             }
 
                             if(!NPC[B].Active)
@@ -1876,10 +1876,10 @@ void UpdateLayers()
 
                 for(int B : Layer[A].warps)
                 {
-                    Warp[B].Entrance.X += double(Layer[A].SpeedX);
-                    Warp[B].Entrance.Y += double(Layer[A].SpeedY);
-                    Warp[B].Exit.X += double(Layer[A].SpeedX);
-                    Warp[B].Exit.Y += double(Layer[A].SpeedY);
+                    Warp[B].Entrance.X += Layer[A].SpeedX;
+                    Warp[B].Entrance.Y += Layer[A].SpeedY;
+                    Warp[B].Exit.X += Layer[A].SpeedX;
+                    Warp[B].Exit.Y += Layer[A].SpeedY;
                 }
             }
         }

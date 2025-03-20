@@ -918,8 +918,8 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
         {
             npcALoc = newLoc(NPC[A].Location.X - (NPC[A]->WidthGFX - NPC[A].Location.Width) / 2.0,
                                   NPC[A].Location.Y,
-                                  static_cast<double>(NPC[A]->WidthGFX),
-                                  static_cast<double>(NPC[A]->THeight));
+                                  NPC[A]->WidthGFX,
+                                  NPC[A]->THeight);
             has_ALoc = true;
             can_check = true;
         }
@@ -928,8 +928,8 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
         {
             npcALoc = newLoc(NPC[A].Location.X - (NPC[A]->WidthGFX - NPC[A].Location.Width) / 2.0,
                                   NPC[A].Location.Y,
-                                  static_cast<double>(NPC[A]->WidthGFX),
-                                  static_cast<double>(NPC[A]->THeight));
+                                  NPC[A]->WidthGFX,
+                                  NPC[A]->THeight);
 
             has_ALoc = true;
             can_check = true;
@@ -2248,8 +2248,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
                         auto warpNpcLoc = newLoc(hNpc.Location.X - (hNpc->WidthGFX - hNpc.Location.Width) / 2.0,
                                                  hNpc.Location.Y,
-                                                 static_cast<double>(hNpc->WidthGFX),
-                                                 static_cast<double>(hNpc->THeight));
+                                                 hNpc->WidthGFX,
+                                                 hNpc->THeight);
 
                         if((vScreenCollision(Z, hNpc.Location) || vScreenCollision(Z, warpNpcLoc)) && !hNpc.Hidden && (i == 0 || hNpc.Type != NPCID_ICE_CUBE))
                         {

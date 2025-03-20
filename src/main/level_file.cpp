@@ -763,10 +763,10 @@ bool OpenLevel_Block(void* userdata, LevelBlock& b)
 
         block = Block_t();
 
-        block.Location.X = double(b.x);
-        block.Location.Y = double(b.y);
-        block.Location.Height = double(b.h);
-        block.Location.Width = double(b.w);
+        block.Location.X = b.x;
+        block.Location.Y = b.y;
+        block.Location.Height = b.h;
+        block.Location.Width = b.w;
 
         // don't allow improper rects
         if(block.Location.Width < 0)
@@ -849,8 +849,8 @@ bool OpenLevel_Background(void* userdata, LevelBGO& b)
 
         bgo = Background_t();
 
-        bgo.Location.X = double(b.x);
-        bgo.Location.Y = double(b.y);
+        bgo.Location.X = b.x;
+        bgo.Location.Y = b.y;
         bgo.Type = int(b.id);
 
         if(IF_OUTRANGE(bgo.Type, 1, maxBackgroundType)) // Drop ID to 1 for BGOs of out of range IDs

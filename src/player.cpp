@@ -3471,7 +3471,7 @@ void PlayerDismount(const int A)
 
         s_makeVehicleMount(A);
 
-        Player[A].Location.SpeedY = double(Physics.PlayerJumpVelocity) - tempSpeed;
+        Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - tempSpeed;
         Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
         Player[A].Location.Width = Physics.PlayerWidth[Player[A].Character][Player[A].State];
         Player[A].Location.X = Player[A].Location.X + 64 - Physics.PlayerWidth[Player[A].Character][Player[A].State] / 2;
@@ -4558,7 +4558,7 @@ void WaterCheck(const int A)
         if(p.Location.SpeedY < 0 && (p.Controls.AltJump || p.Controls.Jump) && !p.Controls.Down)
         {
             p.Jump = 12;
-            p.Location.SpeedY = double(Physics.PlayerJumpVelocity);
+            p.Location.SpeedY = Physics.PlayerJumpVelocity;
         }
     }
     else if(p.Wet == 2 && p.Quicksand == 0)

@@ -390,8 +390,8 @@ void LoadGame()
     Coins = int(sav.coins);
     Score = int(sav.points);
     BeatTheGame = sav.gameCompleted;
-    WorldPlayer[1].Location.X = double(sav.worldPosX);
-    WorldPlayer[1].Location.Y = double(sav.worldPosY);
+    WorldPlayer[1].Location.X = sav.worldPosX;
+    WorldPlayer[1].Location.Y = sav.worldPosY;
 
     if(Lives > 99)
         Lives = 99;

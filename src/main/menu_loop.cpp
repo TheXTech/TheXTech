@@ -281,7 +281,7 @@ static void updateIntroLevelActivity()
             p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
             p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
             p.Location.X = level[p.Section].X - A * 48;
-            p.Location.SpeedX = double(Physics.PlayerRunSpeed);
+            p.Location.SpeedX = Physics.PlayerRunSpeed;
             p.Location.Y = level[p.Section].Height - p.Location.Height - 33;
 
             do

@@ -177,18 +177,18 @@ void worldCheckSection(WorldPlayer_t& wp)
     s_worldCheckSection(wp, wp.Location);
 }
 
-static inline double getWPHeight()
+static inline int getWPHeight()
 {
     switch(WorldPlayer[1].Type)
     {
     case 3:
-        return 44.0;
+        return 44;
         break;
     case 4:
-        return 40.0;
+        return 40;
         break;
     default:
-        return 32.0;
+        return 32;
         break;
     }
 }
@@ -210,14 +210,14 @@ void worldResetSection()
 //    return WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - getWPHeight();
 //}
 
-static inline double getWorldPlayerCenterX()
+static inline int getWorldPlayerCenterX()
 {
-    return WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2;
+    return (int)(WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2);
 }
 
-static inline double getWorldPlayerCenterY()
+static inline int getWorldPlayerCenterY()
 {
-    return WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - getWPHeight() / 2;
+    return (int)(WorldPlayer[1].Location.Y + WorldPlayer[1].Location.Height) - 10 - getWPHeight() / 2;
 }
 
 void WorldLoop()

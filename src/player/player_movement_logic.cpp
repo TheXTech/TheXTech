@@ -37,9 +37,9 @@ void PlayerMovementX(int A, float& cursed_value_C)
                 (Player[A].Location.SpeedX > 0 && BlockSlope[Block[Player[A].Slope].Type] == -1) ||
                 (Player[A].Location.SpeedX < 0 && BlockSlope[Block[Player[A].Slope].Type] == 1)
                 )
-            speedVar = (float)(1 - Block[Player[A].Slope].Location.Height / Block[Player[A].Slope].Location.Width / 2);
+            speedVar = (1 - Block[Player[A].Slope].Location.Height / Block[Player[A].Slope].Location.Width / 2);
         else if(!Player[A].Slide)
-            speedVar = (float)(1 + (Block[Player[A].Slope].Location.Height / Block[Player[A].Slope].Location.Width / 4));
+            speedVar = (1 + (Block[Player[A].Slope].Location.Height / Block[Player[A].Slope].Location.Width / 4));
     }
 
     if(Player[A].Stoned) // if statue form reset to normal

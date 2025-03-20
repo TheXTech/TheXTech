@@ -571,7 +571,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                         HitSpot = 1;
 
                                                         // Fireballs dont go up steep slopes
-                                                        if(Block[B].Location.Height / static_cast<double>(Block[B].Location.Width) >= 1 && ((BlockSlope[Block[B].Type] == -1 && NPC[A].Location.SpeedX > 0) || (BlockSlope[Block[B].Type] == 1 && NPC[A].Location.SpeedX < 0)))
+                                                        if(Block[B].Location.Height / Block[B].Location.Width >= 1 && ((BlockSlope[Block[B].Type] == -1 && NPC[A].Location.SpeedX > 0) || (BlockSlope[Block[B].Type] == 1 && NPC[A].Location.SpeedX < 0)))
                                                         {
                                                             if((NPC[A].Type == NPCID_PLR_FIREBALL && NPC[A].Special != 2 && NPC[A].Special != 3) || (NPC[A].Type == NPCID_PLR_ICEBALL && NPC[A].Special == 5))
                                                             {
@@ -584,9 +584,9 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
                                                         if(NPC[A]->IsAShell || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1) || NPC[A].Type == NPCID_ICE_CUBE)
                                                         {
-                                                            if(NPC[A].Location.SpeedY > NPC[A].Location.SpeedX * (Block[B].Location.Height / static_cast<double>(Block[B].Location.Width)) * BlockSlope[Block[B].Type])
+                                                            if(NPC[A].Location.SpeedY > NPC[A].Location.SpeedX * (Block[B].Location.Height / Block[B].Location.Width) * BlockSlope[Block[B].Type])
                                                             {
-                                                                NPC[A].Location.SpeedY = NPC[A].Location.SpeedX * (Block[B].Location.Height / static_cast<double>(Block[B].Location.Width)) * BlockSlope[Block[B].Type];
+                                                                NPC[A].Location.SpeedY = NPC[A].Location.SpeedX * (Block[B].Location.Height / Block[B].Location.Width) * BlockSlope[Block[B].Type];
                                                                 HitSpot = 0;
                                                                 if(NPC[A].Location.SpeedY > 0)
                                                                     NPC[A].Location.SpeedY = 0;
@@ -900,9 +900,9 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                             if(Block[B].tempBlockVehiclePlr == 0)
                                             {
                                                 if(Block[B].tempBlockNpcType > 0)
-                                                    NPC[A].BeltSpeed += float(Block[B].Location.SpeedX * C) * blk_npc_tr.Speedvar;
+                                                    NPC[A].BeltSpeed += (Block[B].Location.SpeedX * C) * blk_npc_tr.Speedvar;
                                                 else
-                                                    NPC[A].BeltSpeed += float(Block[B].Location.SpeedX * C);
+                                                    NPC[A].BeltSpeed += (Block[B].Location.SpeedX * C);
 
                                                 beltCount += static_cast<float>(C);
                                             }
