@@ -67,6 +67,18 @@ struct Location_t
         Y += Height - new_height;
         Height = new_height;
     }
+
+    // sees how far this location's center is to the right of the other location
+    inline double minus_center_x(const Location_t& o) const
+    {
+        return X - o.X + (Width - o.Width) / 2;
+    }
+
+    // sees how far this location's center is below the other location
+    inline double minus_center_y(const Location_t& o) const
+    {
+        return Y - o.Y + (Height - o.Height) / 2;
+    }
 };
 
 //NEW: 'Holds location information for an object without speed at integer coordinates, with width / height values below 32767

@@ -65,11 +65,11 @@ void NPC_t::ResetLocation()
 
 double NPCPlayerTargetDist(const NPC_t& npc, const Player_t& player)
 {
-    double dx = (npc.Location.X + npc.Location.Width / 2) - (player.Location.X + player.Location.Width / 2);
+    double dx = npc.Location.minus_center_x(player.Location);
 
     if(g_config.fix_multiplayer_targeting)
     {
-        double dy = (npc.Location.Y + npc.Location.Height / 2) - (player.Location.Y + player.Location.Height / 2);
+        double dy = npc.Location.minus_center_y(player.Location);
         return (dx * dx) + (dy * dy);
     }
     else
@@ -1620,8 +1620,8 @@ void NPCSpecial(int A)
 
                 NPC[numNPCs].Location.SpeedX = 4 * NPC[numNPCs].Direction;
 
-                double dist_x = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2) - (Player[npc.Special5].Location.X + Player[npc.Special5].Location.Width / 2);
-                double dist_y = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2) - (Player[npc.Special5].Location.Y + Player[npc.Special5].Location.Height / 2);
+                double dist_x = NPC[numNPCs].Location.minus_center_x(Player[npc.Special5].Location);
+                double dist_y = NPC[numNPCs].Location.minus_center_y(Player[npc.Special5].Location);
 
                 NPC[numNPCs].Location.SpeedY = dist_y / dist_x * NPC[numNPCs].Location.SpeedX;
                 if(NPC[numNPCs].Location.SpeedY > 2)
@@ -1989,8 +1989,8 @@ void NPCSpecial(int A)
 
                 int ip = NPCTargetPlayer(npc);
 
-                double dist_x = (npc.Location.X + npc.Location.Width / 2) - (Player[ip].Location.X + Player[ip].Location.Width / 2);
-                double dist_y = (npc.Location.Y + npc.Location.Height / 2) - (Player[ip].Location.Y + Player[ip].Location.Height / 2);
+                double dist_x = npc.Location.minus_center_x(Player[ip].Location);
+                double dist_y = npc.Location.minus_center_y(Player[ip].Location);
                 double dist = std::sqrt(std::pow(dist_x, 2) + std::pow(dist_y, 2));
                 dist_x = -dist_x / dist;
                 dist_y = -dist_y / dist;
@@ -2835,8 +2835,8 @@ void NPCSpecial(int A)
                     NPC[numNPCs].Location.Y = npc.Location.Y + 19;
                     NPC[numNPCs].Location.SpeedX = 4 * NPC[numNPCs].Direction;
 
-                    double dist_x = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2) - (Player[npc.Special5].Location.X + Player[npc.Special5].Location.Width / 2);
-                    double dist_y = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2) - (Player[npc.Special5].Location.Y + Player[npc.Special5].Location.Height / 2);
+                    double dist_x = NPC[numNPCs].Location.minus_center_x(Player[npc.Special5].Location);
+                    double dist_y = NPC[numNPCs].Location.minus_center_y(Player[npc.Special5].Location);
                     NPC[numNPCs].Location.SpeedY = dist_y / dist_x * NPC[numNPCs].Location.SpeedX;
                     if(NPC[numNPCs].Location.SpeedY > 1)
                         NPC[numNPCs].Location.SpeedY = 1;

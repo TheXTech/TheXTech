@@ -558,13 +558,16 @@ void NPCSpecialMaybeHeld(int A)
                         NPC[numNPCs].Location.X = NPC[A].Location.X + 54;
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + 19;
                     NPC[numNPCs].Location.SpeedX = 4 * NPC[numNPCs].Direction;
-                    double C = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2) - (Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2);
-                    double D = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2) - (Player[NPC[A].Special5].Location.Y + Player[NPC[A].Special5].Location.Height / 2);
+
+                    double C = NPC[numNPCs].Location.minus_center_x(Player[NPC[A].Special5].Location);
+                    double D = NPC[numNPCs].Location.minus_center_y(Player[NPC[A].Special5].Location);
                     NPC[numNPCs].Location.SpeedY = D / C * NPC[numNPCs].Location.SpeedX;
+
                     if(NPC[numNPCs].Location.SpeedY > 1)
                         NPC[numNPCs].Location.SpeedY = 1;
                     else if(NPC[numNPCs].Location.SpeedY < -1)
                         NPC[numNPCs].Location.SpeedY = -1;
+
                     syncLayers_NPC(numNPCs);
                     PlaySoundSpatial(SFX_BigFireball, NPC[A].Location);
                 }
