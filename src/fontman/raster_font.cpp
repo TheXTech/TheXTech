@@ -239,16 +239,13 @@ void RasterFont::loadFontMap(const std::string& fontmap_ini)
         char32_t ch = ucharX[0];
         //qDebug()<<"=char=" << ch << "=id="<<charPosX.toInt()<<charPosY.toInt()<<"=";
         RasChar rch;
-        float l, t;
         try
         {
             rch.tx              =  &fontTexture;
-            l                   =  std::stof(charPosY.c_str()) / m_matrixWidth;
+            rch.x               =  static_cast<int16_t>(std::stoi(charPosY.c_str()) * fontTexture.w / m_matrixWidth);
             rch.padding_left    = (ucharX.size() > 1) ? char2int(ucharX[1]) : 0;
             rch.padding_right   = (ucharX.size() > 2) ? char2int(ucharX[2]) : 0;
-            t                   =  std::stof(charPosX.c_str()) / m_matrixHeight;
-            rch.x               =  static_cast<int16_t>(fontTexture.w * l);
-            rch.y               =  static_cast<int16_t>(fontTexture.h * t);
+            rch.y               =  static_cast<int16_t>(std::stoi(charPosX.c_str()) * fontTexture.h / m_matrixHeight);
             rch.valid = true;
         }
         catch(std::exception &e)
