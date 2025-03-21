@@ -298,26 +298,26 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
     }
 }
 
-void DrawBottomAnchoredBackground(int S, int Z, int A, int offset = 0, int expected_height = 0, int tile_top = 0, double h_parallax = 0.5, bool no_bg = false, bool anim = false)
+void DrawBottomAnchoredBackground(int S, int Z, int A, int offset = 0, int expected_height = 0, int tile_top = 0, int h_parallax_num = 2, bool no_bg = false, bool anim = false)
 {
     const auto& sect = LevelREAL[S];
     const Screen_t& screen = Screens[vScreen[Z].screen_ref];
-    double camX = vScreen[Z].CameraAddX();
-    double camY = vScreen[Z].CameraAddY();
+    int camX = vScreen[Z].CameraAddX();
+    int camY = vScreen[Z].CameraAddY();
 
     if(!no_bg)
         DrawBackgroundColor(A, Z, false);
 
-    double frameH = GFXBackground2[A].h;
+    int frameH = GFXBackground2[A].h;
     if(anim)
-        frameH = GFXBackground2[A].h / 4.0;
+        frameH = GFXBackground2[A].h / 4;
 
-    Location_t tempLocation;
+    TinyLocation_t tempLocation;
 
-    int horiz_reps = ((sect.Width - sect.X) * h_parallax + screen.W) / GFXBackground2[A].w + 1;
+    int horiz_reps = ((sect.Width - sect.X) * h_parallax_num / 4 + screen.W) / GFXBackground2[A].w + 1;
     for(int B = 0; B <= horiz_reps; B++)
     {
-        tempLocation.X = sect.X + ((B * GFXBackground2[A].w) - (camX + vScreen[Z].Left + sect.X) * h_parallax);
+        tempLocation.X = sect.X + ((B * GFXBackground2[A].w) - (camX + vScreen[Z].Left + sect.X) * h_parallax_num / 4);
         tempLocation.Y = sect.Height - frameH - offset;
 
         tempLocation.Height = frameH;
@@ -327,13 +327,13 @@ void DrawBottomAnchoredBackground(int S, int Z, int A, int offset = 0, int expec
         {
             if(anim)
             {
-                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y,
+                XRender::renderTextureBasic(camX + tempLocation.X, camY + tempLocation.Y,
                     GFXBackground2[A].w, tempLocation.Height,
                     GFXBackground2[A], 0, frameH * SpecialFrame[3]);
             }
             else
             {
-                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y,
+                XRender::renderTextureBasic(camX + tempLocation.X, camY + tempLocation.Y,
                     GFXBackground2[A].w, tempLocation.Height,
                     GFXBackground2[A], 0, 0);
             }
@@ -358,13 +358,13 @@ void DrawBottomAnchoredBackground(int S, int Z, int A, int offset = 0, int expec
             {
                 if(anim)
                 {
-                    XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y,
+                    XRender::renderTextureBasic(camX + tempLocation.X, camY + tempLocation.Y,
                         GFXBackground2[A].w, tempLocation.Height,
                         GFXBackground2[A], 0, frameH * SpecialFrame[3]);
                 }
                 else
                 {
-                    XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y,
+                    XRender::renderTextureBasic(camX + tempLocation.X, camY + tempLocation.Y,
                         GFXBackground2[A].w, tempLocation.Height,
                         GFXBackground2[A], 0, 0);
                 }
@@ -429,7 +429,7 @@ void DrawBackground(int S, int Z)
     A = 2; // Clouds
     if(Background2[S] == 1 || Background2[S] == 2 || Background2[S] == 22)
     {
-        DrawBottomAnchoredBackground(S, Z, A, 500, 0, 0, 0.75);
+        DrawBottomAnchoredBackground(S, Z, A, 500, 0, 0, 3);
     }
 
     if(Background2[S] == 13)
@@ -440,13 +440,13 @@ void DrawBackground(int S, int Z)
     A = 1; // Blocks
     if(Background2[S] == 1)
     {
-        DrawBottomAnchoredBackground(S, Z, A, 0, -1, 0, 0.5, true);
+        DrawBottomAnchoredBackground(S, Z, A, 0, -1, 0, 2, true);
     }
 
     A = 3; // Hills
     if(Background2[S] == 2)
     {
-        DrawBottomAnchoredBackground(S, Z, A, 0, -1, 0, 0.5, true);
+        DrawBottomAnchoredBackground(S, Z, A, 0, -1, 0, 2, true);
     }
 
     A = 4; // Castle
@@ -501,7 +501,7 @@ void DrawBackground(int S, int Z)
     A = 10; // Night 2
     if(Background2[S] == 9)
     {
-        DrawBottomAnchoredBackground(S, Z, A, 0, -1, 0, 0.5, true);
+        DrawBottomAnchoredBackground(S, Z, A, 0, -1, 0, 2, true);
     }
 
     A = 11; // Overworld
@@ -575,7 +575,7 @@ void DrawBackground(int S, int Z)
     A = 22; // SMB3 Waterfall
     if(Background2[S] == 22)
     {
-        DrawBottomAnchoredBackground(S, Z, A, 0, -1, 0, 0.5, true, true);
+        DrawBottomAnchoredBackground(S, Z, A, 0, -1, 0, 2, true, true);
     }
 
     A = 23; // SMB3 Tank
@@ -668,7 +668,7 @@ void DrawBackground(int S, int Z)
     A = 36; // Snow Clouds
     if(Background2[S] == 35 || Background2[S] == 37)
     {
-        DrawBottomAnchoredBackground(S, Z, A, 500, 0, 0, 0.75);
+        DrawBottomAnchoredBackground(S, Z, A, 500, 0, 0, 3);
     }
 
     if(Background2[S] == 36)
@@ -679,13 +679,13 @@ void DrawBackground(int S, int Z)
     A = 35; // SMB 3 Snow Trees
     if(Background2[S] == 35)
     {
-        DrawBottomAnchoredBackground(S, Z, A, 0, -1, 0, 0.5, true);
+        DrawBottomAnchoredBackground(S, Z, A, 0, -1, 0, 2, true);
     }
 
     A = 37; // SMB 3 Snow Hills
     if(Background2[S] == 37)
     {
-        DrawBottomAnchoredBackground(S, Z, A, 0, -1, 0, 0.5, true);
+        DrawBottomAnchoredBackground(S, Z, A, 0, -1, 0, 2, true);
     }
 
     A = 38; // SMB3 Cave with Sky
