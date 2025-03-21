@@ -1983,12 +1983,18 @@ void NPCSpecial(int A)
 
         if(npc.Special >= 1)
         {
-            double B = 1 - (npc.Special / 45.0);
-            double C = B * 0.5;
-            B *= 15;
-            C *= 15;
-            npc.Location.X = npc.DefaultLocationX + dRand() * B - dRand() * C;
-            npc.Location.Y = npc.DefaultLocationY + dRand() * B - dRand() * C;
+            // double B = 1 - (npc.Special / 45.0);
+            // double C = B * 0.5;
+            // B *= 15;
+            // C *= 15;
+            // npc.Location.X = npc.DefaultLocationX + dRand() * B - dRand() * C;
+            // npc.Location.Y = npc.DefaultLocationY + dRand() * B - dRand() * C;
+
+            int time_left = 45 - npc.Special;
+
+            npc.Location.X = npc.DefaultLocationX + (dRand() * 2 - dRand()) * time_left / 6;
+            npc.Location.Y = npc.DefaultLocationY + (dRand() * 2 - dRand()) * time_left / 6;
+
             npc.Special += 1;
             if(npc.Special >= 45)
                 npc.Special = 0;
@@ -2462,9 +2468,10 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].TimeLeft = 50;
                 NPC[numNPCs].Location.SpeedY = -7;
-                NPC[numNPCs].Location.SpeedX = 7 * NPC[numNPCs].Direction;
                 NPC[numNPCs].Location.SpeedY += dRand() * 6 - 3;
-                NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * (1 - (npc.Special3 / 140.0));
+                NPC[numNPCs].Location.SpeedX = 7 * NPC[numNPCs].Direction;
+                NPC[numNPCs].Location.SpeedX *= (140 - npc.Special3);
+                NPC[numNPCs].Location.SpeedX /= 140;
 
                 syncLayers_NPC(numNPCs);
             }
