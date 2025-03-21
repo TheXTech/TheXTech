@@ -2529,7 +2529,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
             XTColor cn;
             s_get_NPC_tint(A, cn);
             if(NPC[A].Type == NPCID_MEDAL && g_curLevelMedals.gotten(NPC[A].Variant - 1))
-                cn.a *= 0.5f;
+                cn.a /= 2;
 
             int drawX_no_offset = camX + s_round2int(NPC[A].Location.X);
             int drawY = camY + s_round2int(NPC[A].Location.Y) + NPC[A]->FrameOffsetY;
