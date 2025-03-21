@@ -25,6 +25,7 @@
 #include "effect.h"
 #include "eff_id.h"
 
+#include "player/player_update_priv.h"
 #include "npc/npc_cockpit_bits.h"
 
 void PlayerMovementX(int A, float& cursed_value_C)
@@ -925,13 +926,7 @@ void PlayerMovementY(int A)
             )
             {
                 if(iRand(10) == 0)
-                {
-                    NewEffect(EFFID_SPARKLE, newLoc(Player[A].Location.X - 8 + dRand() * (Player[A].Location.Width + 16) - 4,
-                                         Player[A].Location.Y - 8 + dRand() * (Player[A].Location.Height + 16)), 1, 0, ShadowMode);
-                    Effect[numEffects].Location.SpeedX = (dRand() * 0.5) - 0.25;
-                    Effect[numEffects].Location.SpeedY = (dRand() * 0.5) - 0.25;
-                    Effect[numEffects].Frame = 1;
-                }
+                    p_PlayerMakeFlySparkle(Player[A].Location);
             }
         }
     }

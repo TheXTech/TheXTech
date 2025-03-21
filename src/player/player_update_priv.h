@@ -23,6 +23,8 @@
 #ifndef PLAYER_UPDATE_PRIV_H
 #define PLAYER_UPDATE_PRIV_H
 
+void p_PlayerMakeFlySparkle(const Location_t& loc, int Frame = 1);
+
 // most of these routines were originally part of UpdatePlayer
 void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, const bool movingBlock, const int floorBlock, const float oldSpeedY);
 

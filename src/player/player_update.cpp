@@ -50,6 +50,17 @@
 #include "main/game_loop_interrupt.h"
 
 
+void p_PlayerMakeFlySparkle(const Location_t& loc, int Frame)
+{
+    NewEffect(EFFID_SPARKLE,
+        newLoc(loc.X - 8 + dRand() * (loc.Width + 16) - 4,
+            loc.Y - 8 + dRand() * (loc.Height + 16)),
+        1, 0, ShadowMode);
+    Effect[numEffects].Location.SpeedX = (dRand() * 0.5) - 0.25;
+    Effect[numEffects].Location.SpeedY = (dRand() * 0.5) - 0.25;
+    Effect[numEffects].Frame = Frame;
+}
+
 bool UpdatePlayer()
 {
     switch(g_gameLoopInterrupt.site)
@@ -359,14 +370,7 @@ bool UpdatePlayer()
                         )
                 {
                     if(iRand(4) == 0)
-                    {
-                        NewEffect(EFFID_SPARKLE,
-                                  newLoc(Player[A].Location.X - 8 + dRand() * (Player[A].Location.Width + 16) - 4,
-                                                  Player[A].Location.Y - 8 + dRand() * (Player[A].Location.Height + 16)),
-                                                  1, 0, ShadowMode);
-                        Effect[numEffects].Location.SpeedX = (dRand() * 0.5) - 0.25;
-                        Effect[numEffects].Location.SpeedY = (dRand() * 0.5) - 0.25;
-                    }
+                        p_PlayerMakeFlySparkle(Player[A].Location, 0);
                 }
 
                 Tanooki(A); // tanooki suit code
