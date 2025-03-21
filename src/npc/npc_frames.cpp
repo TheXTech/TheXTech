@@ -29,6 +29,13 @@
 
 #include "main/trees.h"
 
+static void s_makeHeavySparkle(const NPC_t& n, int offY)
+{
+    NewEffect(EFFID_SPARKLE, newLoc(n.Location.X + n.Location.Width / 2 - 4, n.Location.Y + n.Location.Height / 2 - offY), 1, 0, n.Shadow);
+    Effect[numEffects].Location.SpeedX = dRand() - 0.5;
+    Effect[numEffects].Location.SpeedY = dRand() - 0.5;
+}
+
 
 void NPCFrames(int A)
 {
@@ -925,14 +932,7 @@ void NPCFrames(int A)
         }
 
         if(iRand(4) == 0)
-        {
-            NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2 - 4, NPC[A].Location.Y + NPC[A].Location.Height / 2 - 4), 1, 0, NPC[A].Shadow);
-            Effect[numEffects].Location.SpeedX = dRand() - 0.5;
-            Effect[numEffects].Location.SpeedY = dRand() - 0.5;
-        }
-
-
-
+            s_makeHeavySparkle(NPC[A], 4);
     }
     else if(NPC[A].Type == NPCID_PLR_HEAVY) // Mario Hammer
     {
@@ -940,6 +940,7 @@ void NPCFrames(int A)
         if(NPC[A].FrameCount >= 4)
         {
             NPC[A].FrameCount = 0;
+
             if(NPC[A].Location.SpeedX > 0)
             {
                 NPC[A].Frame += 1;
@@ -964,18 +965,18 @@ void NPCFrames(int A)
                 else
                     NPC[A].Location.Y += 12;
             }
+
             if(NPC[A].Frame > 3)
                 NPC[A].Frame = 0;
             else if(NPC[A].Frame < 0)
                 NPC[A].Frame = 3;
-            NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2 - 8, NPC[A].Location.Y + NPC[A].Location.Height / 2 - 8), 1, 0, NPC[A].Shadow);
-            Effect[numEffects].Location.SpeedX = dRand() - 0.5;
-            Effect[numEffects].Location.SpeedY = dRand() - 0.5;
-        }
 
-        treeNPCUpdate(A);
-        if(NPC[A].tempBlock > 0)
-            treeNPCSplitTempBlock(A);
+            treeNPCUpdate(A);
+            if(NPC[A].tempBlock > 0)
+                treeNPCSplitTempBlock(A);
+
+            s_makeHeavySparkle(NPC[A], 8);
+        }
     }
     else if(NPC[A].Type == NPCID_FLY_CARRY_FODDER) // smw paragoomba
     {
@@ -1079,6 +1080,7 @@ void NPCFrames(int A)
             NPC[A].FrameCount = 0;
             NPC[A].Frame = 0;
         }
+
         NPC[A].Special3 += 1;
         if(NPC[A].Special3 < 4)
         {}
@@ -1088,12 +1090,9 @@ void NPCFrames(int A)
             NPC[A].Frame += 6;
         else // If .Special3 >= 16 Then
             NPC[A].Special3 = 0;
+
         if(iRand(100) >= 92)
-        {
-            NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2 - 4, NPC[A].Location.Y + NPC[A].Location.Height / 2 - 6), 1, 0, NPC[A].Shadow);
-            Effect[numEffects].Location.SpeedX = dRand() - 0.5;
-            Effect[numEffects].Location.SpeedY = dRand() - 0.5;
-        }
+            s_makeHeavySparkle(NPC[A], 6);
     }
     else if(NPC[A].Type == NPCID_ITEM_BURIED)
         NPC[A].Frame = SpecialFrame[5];
