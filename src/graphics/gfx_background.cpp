@@ -54,7 +54,7 @@ void DrawBackgroundColor(int A, int Z, bool lower = false)
 }
 
 // draws backgrounds _, _, _, _, _
-void DrawTopAnchoredBackground(int S, int Z, int A, int offset = 32, int expected_height = 0, int tile_bottom = 0, int h_num = 1, int h_den = 2)
+void DrawTopAnchoredBackground(int S, int Z, int A, int offset = 32, int expected_height = 0, int tile_bottom = 0, int h_num = 2)
 {
     DrawBackgroundColor(A, Z, true);
     int camX = vScreen[Z].CameraAddX();
@@ -65,7 +65,7 @@ void DrawTopAnchoredBackground(int S, int Z, int A, int offset = 32, int expecte
 
     int camX_levelX = camX + levelX;
     int Left = vScreen[Z].Left;
-    int offsetX = (camX_levelX * (h_den - h_num) - Left * h_num) / h_den;
+    int offsetX = (camX_levelX * (4 - h_num) - Left * h_num) / 4;
 
     int offsetY = sect.Y - offset + camY;
     if(GameMenu && offsetY > 0)
@@ -102,7 +102,7 @@ void DrawTopAnchoredBackground(int S, int Z, int A, int offset = 32, int expecte
     }
 }
 
-void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, int tile_bottom = 0, int tile_top = 0, bool flip_tile = false, int h_num = 1, int h_den = 2, bool anim = false)
+void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, int tile_bottom = 0, int tile_top = 0, bool flip_tile = false, int h_num = 2, bool anim = false)
 {
     const auto& sect = LevelREAL[S];
     const Screen_t& screen = Screens[vScreen[Z].screen_ref];
@@ -159,7 +159,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
     int camX_levelX = camX + sect.X;
     int Left = vScreen[Z].Left;
 
-    int offsetX = (camX_levelX * (h_den - h_num) - Left * h_num) / h_den;
+    int offsetX = (camX_levelX * (4 - h_num) - Left * h_num) / 4;
 
     for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
     {
@@ -434,7 +434,7 @@ void DrawBackground(int S, int Z)
 
     if(Background2[S] == 13)
     {
-        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 3, 4);
+        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 3);
     }
 
     A = 1; // Blocks
@@ -495,7 +495,7 @@ void DrawBackground(int S, int Z)
     A = 9; // Night
     if(Background2[S] == 8 || Background2[S] == 9)
     {
-        DrawCenterAnchoredBackground(S, Z, A, -1, 0, 0, false, 3, 4);
+        DrawCenterAnchoredBackground(S, Z, A, -1, 0, 0, false, 3);
     }
 
     A = 10; // Night 2
@@ -551,7 +551,7 @@ void DrawBackground(int S, int Z)
     A = 18; // SMW ghost house
     if(Background2[S] == 18)
     {
-        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 1, 2, true);
+        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 2, true);
     }
 
     A = 19; // smw forest
@@ -632,13 +632,13 @@ void DrawBackground(int S, int Z)
     A = 29; // SMW Night
     if(Background2[S] == 29)
     {
-        DrawCenterAnchoredBackground(S, Z, A, -1, 0, 0, false, 1, 2, true);
+        DrawCenterAnchoredBackground(S, Z, A, -1, 0, 0, false, 2, true);
     }
 
     A = 30; // SMW Cave
     if(Background2[S] == 30)
     {
-        DrawCenterAnchoredBackground(S, Z, A, 3456, 0, 0, true, 1, 2, true);
+        DrawCenterAnchoredBackground(S, Z, A, 3456, 0, 0, true, 2, true);
     }
 
     A = 31; // SMW Hills 2
@@ -673,7 +673,7 @@ void DrawBackground(int S, int Z)
 
     if(Background2[S] == 36)
     {
-        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 3, 4);
+        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 3);
     }
 
     A = 35; // SMB 3 Snow Trees
@@ -892,7 +892,7 @@ void DrawBackground(int S, int Z)
     if(Background2[S] == 42)
     {
         // safe to tile top 546px and bottom 160px of vanilla asset
-        DrawCenterAnchoredBackground(S, Z, A, 3456, 160, 546, false, 1, 2, true);
+        DrawCenterAnchoredBackground(S, Z, A, 3456, 160, 546, false, 2, true);
     }
 
     A = 43; // SMW Castle 2
@@ -1309,7 +1309,7 @@ void DrawBackground(int S, int Z)
     A = 55; // SMW Water
     if(Background2[S] == 55)
     {
-        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 1, 2, true);
+        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 2, true);
     }
 
     A = 56; // SMB3 Water
@@ -1401,6 +1401,6 @@ void DrawBackground(int S, int Z)
     if(Background2[S] == 58)
     {
         // can loop top 600px and bottom 128px of vanilla asset
-        DrawCenterAnchoredBackground(S, Z, A, 3584, 128, 600, false, 1, 2, true);
+        DrawCenterAnchoredBackground(S, Z, A, 3584, 128, 600, false, 2, true);
     }
 }
