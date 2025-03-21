@@ -1680,8 +1680,13 @@ void NPCSpecial(int A)
         {
             npc.Killed = 9;
             NPCQueues::Killed.push_back(A);
+        }
 
-            for(int i = 1; i <= 4; i++)
+        // unified sparkle code (previously there was a 1-4 loop above, and the iRand(2) code was below)
+        for(int i = 1; i <= 5; i++)
+        {
+            if((i < 5 && npc.Special == 40)
+                || (i == 5 && iRand(2) == 0))
             {
                 tempLocation.Height = EffectHeight[EFFID_SPARKLE];
                 tempLocation.Width = EffectWidth[EFFID_SPARKLE];
@@ -1690,27 +1695,21 @@ void NPCSpecial(int A)
                 tempLocation.X = npc.Location.X + dRand() * 16 - EffectWidth[EFFID_SPARKLE] / 2.0 - 4; // + .Location.SpeedX
                 tempLocation.Y = npc.Location.Y + dRand() * 4 - EffectHeight[EFFID_SPARKLE] / 2.0 - 2;
                 NewEffect(EFFID_SPARKLE, tempLocation);
-                Effect[numEffects].Location.SpeedX = npc.Location.SpeedX * 0.3 + dRand() * 2 - 1;
-                Effect[numEffects].Location.SpeedY = dRand() * 1 - 0.5;
-                Effect[numEffects].Frame = iRand(3);
+
+                if(i < 5)
+                {
+                    Effect[numEffects].Location.SpeedX = npc.Location.SpeedX * 0.3 + dRand() * 2 - 1;
+                    Effect[numEffects].Location.SpeedY = dRand() * 1 - 0.5;
+                    Effect[numEffects].Frame = iRand(3);
+                }
+                else
+                {
+                    Effect[numEffects].Location.SpeedX = npc.Location.SpeedX * 0.15;
+                    Effect[numEffects].Location.SpeedY = npc.Location.SpeedY; // + Rnd * 2 - 1
+                    Effect[numEffects].Frame = iRand(2) + 1;
+                }
             }
         }
-
-        if(iRand(2) == 0)
-        {
-            tempLocation.Height = EffectHeight[EFFID_SPARKLE];
-            tempLocation.Width = EffectWidth[EFFID_SPARKLE];
-            tempLocation.SpeedX = 0;
-            tempLocation.SpeedY = 0;
-            tempLocation.X = npc.Location.X + dRand() * 16 - EffectWidth[EFFID_SPARKLE] / 2.0 - 4; // + .Location.SpeedX
-            tempLocation.Y = npc.Location.Y + dRand() * 4 - EffectHeight[EFFID_SPARKLE] / 2.0 - 2;
-            NewEffect(EFFID_SPARKLE, tempLocation);
-            Effect[numEffects].Location.SpeedX = npc.Location.SpeedX * 0.15;
-            Effect[numEffects].Location.SpeedY = npc.Location.SpeedY; // + Rnd * 2 - 1
-            Effect[numEffects].Frame = iRand(2) + 1;
-        }
-
-
     }
     else if(npc.Type == NPCID_BOMBER_BOSS) // mouser
     {
@@ -5263,28 +5262,17 @@ void SpecialNPC(int A)
             }
         }
 
-        if(NPC[A].Special == 0)
+        // unified sparkle timer
+        NPC[A].Special4 += 1;
+        if(NPC[A].Special4 >= ((NPC[A].Special == 0) ? 5 : 10))
         {
-            NPC[A].Special4 += 1;
-            if(NPC[A].Special4 >= 5)
-            {
-                NPC[A].Special4 = 0;
-                NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + dRand() * NPC[A].Location.Width - 2, NPC[A].Location.Y + dRand() * NPC[A].Location.Height));
-                Effect[numEffects].Location.SpeedX = dRand() - 0.5;
-                Effect[numEffects].Location.SpeedY = dRand() - 0.5;
-            }
-        }
-        else
-        {
-            NPC[A].Special4 += 1;
-            if(NPC[A].Special4 >= 10)
-            {
-                NPC[A].Special4 = 0;
-                NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + dRand() * NPC[A].Location.Width - 2, NPC[A].Location.Y + dRand() * NPC[A].Location.Height));
-                Effect[numEffects].Location.SpeedX = dRand() - 0.5;
-                Effect[numEffects].Location.SpeedY = dRand() - 0.5;
+            NPC[A].Special4 = 0;
+            NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + dRand() * NPC[A].Location.Width - 2, NPC[A].Location.Y + dRand() * NPC[A].Location.Height));
+            Effect[numEffects].Location.SpeedX = dRand() - 0.5;
+            Effect[numEffects].Location.SpeedY = dRand() - 0.5;
+
+            if(NPC[A].Special != 0)
                 Effect[numEffects].Frame = 1;
-            }
         }
 
         if(NPC[A].Special2 == 0)
