@@ -255,7 +255,7 @@ void RenderPowerInfo(int player, int bx, int by, int bw, int bh, uint8_t alpha, 
         status_info = XPower::devicePowerStatus();
 
     // don't draw segments for states without battery info
-    if(status_info.power_status == XPower::StatusInfo::POWER_WIRED || status_info.power_level == XPower::StatusInfo::POWER_UNKNOWN)
+    if(status_info.power_status == XPower::StatusInfo::POWER_WIRED || status_info.power_status == XPower::StatusInfo::POWER_UNKNOWN)
         status_info.power_level = 0.0f;
 
     if(status_info.power_status != XPower::StatusInfo::POWER_DISABLED)
