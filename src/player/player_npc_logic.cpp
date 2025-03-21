@@ -478,16 +478,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 else if(Player[A].StandingOnNPC == B)
                                 {
                                     // if standing on 2 or more NPCs find out the best one to stand on
-                                    float C = NPC[floorNpc1].Location.X + NPC[floorNpc1].Location.Width * 0.5;
-                                    float D = NPC[floorNpc2].Location.X + NPC[floorNpc2].Location.Width * 0.5;
-                                    C += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
-                                    D += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
-
-                                    if(C < 0)
-                                        C = -C;
-
-                                    if(D < 0)
-                                        D = -D;
+                                    float C = std::abs(NPC[floorNpc1].Location.minus_center_x(Player[A].Location));
+                                    float D = std::abs(NPC[floorNpc2].Location.minus_center_x(Player[A].Location));
 
                                     if(C < D)
                                         floorNpc2 = B;
@@ -1046,16 +1038,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
     {
         if(NPC[floorNpc1].Location.Y == NPC[floorNpc2].Location.Y)
         {
-            float C = NPC[floorNpc1].Location.X + NPC[floorNpc1].Location.Width * 0.5;
-            float D = NPC[floorNpc2].Location.X + NPC[floorNpc2].Location.Width * 0.5;
-            C += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
-            D += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
-
-            if(C < 0)
-                C = -C;
-
-            if(D < 0)
-                D = -D;
+            float C = std::abs(NPC[floorNpc1].Location.minus_center_x(Player[A].Location));
+            float D = std::abs(NPC[floorNpc2].Location.minus_center_x(Player[A].Location));
 
             if(C < D)
                 B = floorNpc1;
