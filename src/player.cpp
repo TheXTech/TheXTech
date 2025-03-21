@@ -3383,9 +3383,9 @@ void PlayerDismount(const int A)
 
     double tempSpeed;
     if(Player[A].Location.SpeedX > 0)
-        tempSpeed = Player[A].Location.SpeedX * 0.2; // tempSpeed gives the player a height boost when jumping while running, based off their SpeedX
+        tempSpeed = Player[A].Location.SpeedX / 5; // tempSpeed gives the player a height boost when jumping while running, based off their SpeedX
     else
-        tempSpeed = -Player[A].Location.SpeedX * 0.2;
+        tempSpeed = -Player[A].Location.SpeedX / 5;
 
     // jump out of boot
     if(Player[A].Mount == 1)
@@ -5191,19 +5191,19 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
             }
             if(NPC[p.HoldingNPC].Type == NPCID_BOMB && NPC[p.HoldingNPC].Location.SpeedX != 0)
             {
-                NPC[p.HoldingNPC].Location.SpeedX += p.Location.SpeedX * 0.5;
+                NPC[p.HoldingNPC].Location.SpeedX += p.Location.SpeedX / 2;
                 if(p.StandingOnNPC != 0)
                     NPC[p.HoldingNPC].Location.SpeedX += NPC[p.StandingOnNPC].Location.SpeedX;
             }
             if(NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL && NPC[p.HoldingNPC].Special == 4) // give toad fireballs a little spunk
             {
                 if(NPC[p.HoldingNPC].Location.SpeedY < 0)
-                    NPC[p.HoldingNPC].Location.SpeedY = NPC[p.HoldingNPC].Location.SpeedY * 1.1;
+                    NPC[p.HoldingNPC].Location.SpeedY += NPC[p.HoldingNPC].Location.SpeedY / 10;
             }
             if(NPC[p.HoldingNPC].Type == NPCID_CHAR3_HEAVY)
             {
                 if(p.Location.SpeedX != 0 && NPC[p.HoldingNPC].Location.SpeedX != 0)
-                    NPC[p.HoldingNPC].Location.SpeedX += p.Location.SpeedX * 0.5;
+                    NPC[p.HoldingNPC].Location.SpeedX += p.Location.SpeedX / 2;
             }
 
             // this block was misleadingly left-indented in VB6, but its nesting in C++ is accurate to its nesting in VB6, and now I'm fixing the indentation to match the nesting -- ds-sloth

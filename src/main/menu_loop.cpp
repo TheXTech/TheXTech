@@ -151,7 +151,7 @@ static void updateIntroLevelActivity()
         {
             if(p.FireBallCD == 0 && !p.RunRelease)
             {
-                tempLocation.Width = 38 + p.Location.SpeedX * 0.5;
+                tempLocation.Width = 38 + p.Location.SpeedX / 2;
                 tempLocation.Height = p.Location.Height - 8;
                 tempLocation.Y = p.Location.Y + 4;
                 tempLocation.X = p.Location.X + p.Location.Width;

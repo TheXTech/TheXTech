@@ -353,7 +353,7 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[A].Type != NPCID_GEM_5)
                 NPC[A].Type = NPCID_GEM_1;
-            NPC[A].Location.SpeedX = (1 + dRand() * 0.5) * Player[C].Direction;
+            NPC[A].Location.SpeedX = (1 + dRand() / 2) * Player[C].Direction;
             NPC[A].Location.SpeedY = -5;
             if(iRand(20) < 3)
                 NPC[A].Type = NPCID_GEM_5;
@@ -1969,7 +1969,7 @@ void NPCHit(int A, int B, int C)
                     NPC[A].Location.SpeedY = -5;
                     NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01;
                     NPC[A].Projectile = true;
-                    NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.5;
+                    NPC[A].Location.SpeedX /= 2;
                 }
             }
             else if(NPC[A].Type == NPCID_SATURN && B == 5)
@@ -1988,7 +1988,7 @@ void NPCHit(int A, int B, int C)
                     NPC[A].Immune = 30;
                     NPC[A].Projectile = true;
                     NPC[A].Location.SpeedY = -5;
-                    NPC[A].Location.SpeedX = (NPC[C].Location.SpeedX + NPC[A].Location.SpeedX) * 0.5;
+                    NPC[A].Location.SpeedX = (NPC[C].Location.SpeedX + NPC[A].Location.SpeedX) / 2;
                     if(NPC[A].Location.SpeedX < 1.2 && NPC[A].Location.SpeedX > -1.2)
                     {
                         if(NPC[C].Direction == -1)

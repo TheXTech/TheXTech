@@ -222,8 +222,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 for(int C = 1; C <= 10; ++C)
                                 {
                                     NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[B].Location, NPC[B].Special);
-                                    Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[B].Location.SpeedX * 0.1;
-                                    Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[B].Location.SpeedY * 0.1;
+                                    Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[B].Location.SpeedX / 10;
+                                    Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[B].Location.SpeedY / 10;
                                     if(Effect[numEffects].Frame == 0)
                                         Effect[numEffects].Frame = -iRand(3);
                                     else
@@ -1101,7 +1101,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
             if(Player[A].Controls.Down)
             {
                 Player[A].Jump = 0;
-                Player[A].Location.SpeedY = Physics.PlayerJumpVelocity * 0.5;
+                Player[A].Location.SpeedY = Physics.PlayerJumpVelocity / 2;
             }
 
             B = 0;

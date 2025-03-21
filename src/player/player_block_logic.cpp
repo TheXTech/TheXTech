@@ -863,7 +863,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                     if(Player[A].Controls.Down)
                     {
                         Player[A].Jump = 0;
-                        Player[A].Location.SpeedY = Physics.PlayerJumpVelocity * 0.5;
+                        Player[A].Location.SpeedY = Physics.PlayerJumpVelocity / 2;
                     }
                 }
             }
@@ -961,7 +961,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                 if(Player[A].Controls.Down)
                 {
                     Player[A].Jump = 0;
-                    Player[A].Location.SpeedY = Physics.PlayerJumpVelocity * 0.5;
+                    Player[A].Location.SpeedY = Physics.PlayerJumpVelocity / 2;
                 }
             }
         }

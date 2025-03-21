@@ -53,7 +53,7 @@ void GetvScreen(vScreen_t& vscreen)
     // this check is new because players can now respawn in 1P mode through DropAdd
     double pLocY = (p.Effect == PLREFF_RESPAWN) ? p.RespawnY : pLoc.Y;
 
-    vscreen.X = -pLoc.X + (vscreen.Width * 0.5) - pLoc.Width / 2.0;
+    vscreen.X = -pLoc.X + (vscreen.Width - pLoc.Width) / 2;
     vscreen.Y = -pLocY + (vscreen.Height * 0.5) - vScreenYOffset - pLoc.Height;
 
     ProcessSmallScreenCam(vscreen);
@@ -148,8 +148,8 @@ void GetvScreenAverage(vScreen_t& vscreen)
     double use_width  = SDL_min(static_cast<double>(screen.W), section.Width  - section.X);
     double use_height = SDL_min(static_cast<double>(screen.H), section.Height - section.Y);
 
-    vscreen.X = (vscreen.X / B) + (use_width * 0.5);
-    vscreen.Y = (vscreen.Y / B) + (use_height * 0.5) - vScreenYOffset;
+    vscreen.X = (vscreen.X / B) + (use_width / 2);
+    vscreen.Y = (vscreen.Y / B) + (use_height / 2) - vScreenYOffset;
 
     // allow some overscan (needed for 3DS)
     int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetCameraOverscanX : 0;
@@ -214,8 +214,8 @@ void GetvScreenAverage2(vScreen_t& vscreen)
     double use_width  = SDL_min(static_cast<double>(screen.W), section.Width  - section.X);
     double use_height = SDL_min(static_cast<double>(screen.H), section.Height - section.Y);
 
-    vscreen.X = (vscreen.X / B) + (use_width * 0.5);
-    vscreen.Y = (vscreen.Y / B) + (use_height * 0.5) - vScreenYOffset;
+    vscreen.X = (vscreen.X / B) + (use_width / 2);
+    vscreen.Y = (vscreen.Y / B) + (use_height / 2) - vScreenYOffset;
 }
 
 // Get the average screen position for all players for ScreenType 3
@@ -354,8 +354,8 @@ void GetvScreenAverage3(vScreen_t& vscreen)
     use_width  = SDL_min(use_width,  section.Width  - section.X);
     use_height = SDL_min(use_height, section.Height - section.Y);
 
-    vscreen.X = -(l + r) / 2 + (use_width * 0.5);
-    vscreen.Y = mean_Y + (use_height * 0.5) - vScreenYOffset;
+    vscreen.X = (use_width - (l + r)) / 2;
+    vscreen.Y = mean_Y + (use_height / 2) - vScreenYOffset;
 
     // allow some overscan (needed for 3DS)
     int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetCameraOverscanX : 0;
@@ -480,8 +480,8 @@ void GetPlayerScreen(double W, double H, const Player_t& p, double& left, double
 
     double pHeight = (p.Mount != 2) ? pLoc.Height : 0;
 
-    left = -pLoc.X + (W * 0.5) - pLoc.Width / 2.0;
-    top = -pLoc.Y + (H * 0.5) - vScreenYOffset - pHeight;
+    left = -pLoc.X + (W - pLoc.Width) / 2;
+    top = -pLoc.Y + (H / 2) - vScreenYOffset - pHeight;
 
     // limit to level bounds
     if(-left < level[p.Section].X)
@@ -790,8 +790,8 @@ void GetvScreenCredits(vScreen_t& vscreen)
     double use_width  = SDL_min((double)vscreen.Width,  section.Width  - section.X);
     double use_height = SDL_min((double)vscreen.Height, section.Height - section.Y);
 
-    vscreen.X = (vscreen.X / B) + (use_width * 0.5);
-    vscreen.Y = (vscreen.Y / B) + (use_height * 0.5) - vScreenYOffset;
+    vscreen.X = (vscreen.X / B) + (use_width / 2);
+    vscreen.Y = (vscreen.Y / B) + (use_height / 2) - vScreenYOffset;
 
     if(-vscreen.X < section.X)
         vscreen.X = -section.X;

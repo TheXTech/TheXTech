@@ -1050,7 +1050,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
 
             if(B == 1 || B == 3)
                 ne.Location.SpeedX = -ne.Location.SpeedX;
-            ne.Location.SpeedX += ((dRand() * 0.5) - 0.25);
+            ne.Location.SpeedX += (dRand() / 2 - 0.25);
             ne.Location.SpeedY += (dRand() - 0.5);
             if(B == 1)
                 ne.Frame = 0;

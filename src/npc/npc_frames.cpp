@@ -1672,16 +1672,16 @@ void NPCFrames(int A)
                             tempLocation.X = NPC[A].Location.X + dRand() * 16 - EffectWidth[EFFID_SPARKLE] / 2.0 - 4 - NPC[A].Location.SpeedX * 3;
                             tempLocation.Y = NPC[A].Location.Y + dRand() * 16 - EffectHeight[EFFID_SPARKLE] / 2.0 - 4;
                             NewEffect(EFFID_SPARKLE, tempLocation);
-                            Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.5;
-                            Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY * 0.5;
+                            Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX / 2;
+                            Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY / 2;
                             Effect[numEffects].Frame = iRand(3);
                         }
                     }
                     else if(iRand(5) >= 3)
                     {
                         NewEffect_IceSparkle(NPC[A], tempLocation);
-                        Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.25;
-                        Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY * 0.25;
+                        Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX / 4;
+                        Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY / 4;
                         Effect[numEffects].Frame = iRand(3);
                     }
                 }

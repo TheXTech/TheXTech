@@ -696,7 +696,7 @@ bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &refere
         return false;
     }
 
-    double refX = referenceLoc.X + referenceLoc.Width * 0.5;
+    double refX = referenceLoc.X + referenceLoc.Width / 2;
 
     // Break tie based on which of blocks intersects the center point
     bool oldIntersects = referenceLoc.X >= oldBlock.Location.X && referenceLoc.X + referenceLoc.Width <= oldBlock.Location.X + oldBlock.Location.Width;
@@ -714,8 +714,8 @@ bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &refere
     }
 
     // Break tie based on x-proximity
-    double newBlockDist = abs((newBlock.Location.X + newBlock.Location.Width * 0.5) - refX);
-    double oldBlockDist = abs((oldBlock.Location.X + oldBlock.Location.Width * 0.5) - refX);
+    double newBlockDist = abs((newBlock.Location.X + newBlock.Location.Width / 2) - refX);
+    double oldBlockDist = abs((oldBlock.Location.X + oldBlock.Location.Width / 2) - refX);
 
     if(newBlockDist < oldBlockDist)
     {

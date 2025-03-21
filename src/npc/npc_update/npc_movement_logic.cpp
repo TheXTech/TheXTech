@@ -427,7 +427,7 @@ void NPCMovementLogic(int A, float& speedVar)
             if(NPC[A].Special5 == 1)
             {
                 if(NPC[A].Location.Y > NPC[A].DefaultLocationY)
-                    NPC[A].Location.SpeedY = -4 - (NPC[A].Location.Y - NPC[A].DefaultLocationY) * 0.02;
+                    NPC[A].Location.SpeedY = -4 - (NPC[A].Location.Y - NPC[A].DefaultLocationY) / 50;
                 else
                     NPC[A].Special5 = 0;
             }
@@ -461,7 +461,7 @@ void NPCMovementLogic(int A, float& speedVar)
                 if(NPC[A]->IsFish && NPC[A].Special == 4 && !NPC[A].Projectile)
                     NPC[A].Location.SpeedX = 0;
                 if(NPC[A].Wet == 2 && (NPC[A].Type == NPCID_RAFT))
-                    NPC[A].Location.SpeedY += -Physics.NPCGravity * 0.5;
+                    NPC[A].Location.SpeedY += -Physics.NPCGravity / 2;
                 else if(NPC[A].Wet == 2 && NPC[A]->IsFish && NPC[A].Special != 2 && !NPC[A].Projectile) // Fish cheep
                 {
                     if((NPC[A].Location.X < NPC[A].DefaultLocationX - 100 && NPC[A].Direction == -1) || (NPC[A].Location.X > NPC[A].DefaultLocationX + 100 && NPC[A].Direction == 1))

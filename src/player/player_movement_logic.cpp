@@ -55,10 +55,10 @@ void PlayerMovementX(int A, float& cursed_value_C)
     // modify speedvar to slow the player down under water
     if(Player[A].Wet > 0)
     {
-        if(Player[A].Location.SpeedY == 0.0 || Player[A].Slope > 0 || Player[A].StandingOnNPC != 0)
-            speedVar = (float)(speedVar * 0.25f); // if walking go really slow
+        if(Player[A].Location.SpeedY == 0 || Player[A].Slope > 0 || Player[A].StandingOnNPC != 0)
+            speedVar /= 4; // if walking go really slow
         else
-            speedVar = (float)(speedVar * 0.5f); // if swimming go slower faster the walking
+            speedVar /= 2; // if swimming go slower faster the walking
     }
 
 
@@ -157,7 +157,7 @@ void PlayerMovementX(int A, float& cursed_value_C)
                 else if(Player[A].Character == 4) // toad
                     Player[A].Location.SpeedX += dir * (0.05 * 0.175);
 
-                Player[A].Location.SpeedX += dir * 0.1 * speedVar;
+                Player[A].Location.SpeedX += dir * speedVar / 10;
             }
             // running
             else
@@ -170,9 +170,9 @@ void PlayerMovementX(int A, float& cursed_value_C)
                     Player[A].Location.SpeedX += dir * (0.025 * 0.175);
 
                 if(Player[A].Character == 5) // Link
-                    Player[A].Location.SpeedX += dir * 0.025 * speedVar;
+                    Player[A].Location.SpeedX += dir * speedVar / 40;
                 else // Mario
-                    Player[A].Location.SpeedX += dir * 0.05 * speedVar;
+                    Player[A].Location.SpeedX += dir * speedVar / 20;
             }
 
             // turning around
@@ -254,9 +254,9 @@ void PlayerMovementX(int A, float& cursed_value_C)
     {
         // smooth run->walk deceleration
         // (note: this is an SMBX 1.3 bug, the correct expression would be Physics.PlayerWalkSpeed * speedVar + 0.1)
-        if(Player[A].Location.SpeedX > Physics.PlayerWalkSpeed + 0.1 * speedVar)
+        if(Player[A].Location.SpeedX > Physics.PlayerWalkSpeed + speedVar / 10)
             Player[A].Location.SpeedX -= 0.1;
-        else if(Player[A].Location.SpeedX < -Physics.PlayerWalkSpeed - 0.1 * speedVar)
+        else if(Player[A].Location.SpeedX < -Physics.PlayerWalkSpeed - speedVar / 10)
             Player[A].Location.SpeedX += 0.1;
         else if(std::abs(Player[A].Location.SpeedX) > Physics.PlayerWalkSpeed * speedVar)
         {
@@ -363,7 +363,7 @@ void PlayerSlideMovementX(int A)
     {
         // Angle = 1 / (Block[Player[A].Slope].Location.Width / Block[Player[A].Slope].Location.Height);
         double Angle = Block[Player[A].Slope].Location.Height / Block[Player[A].Slope].Location.Width;
-        double slideSpeed = 0.1 * Angle * BlockSlope[Block[Player[A].Slope].Type];
+        double slideSpeed = Angle * BlockSlope[Block[Player[A].Slope].Type] / 10;
 
         if(slideSpeed > 0 && Player[A].Location.SpeedX < 0)
             Player[A].Location.SpeedX += slideSpeed * 2;
@@ -473,9 +473,9 @@ void PlayerMovementY(int A)
     {
         double tempSpeed;
         if(Player[A].Location.SpeedX > 0)
-            tempSpeed = Player[A].Location.SpeedX * 0.2; // tempSpeed gives the player a height boost when jumping while running, based off his SpeedX
+            tempSpeed = Player[A].Location.SpeedX / 5; // tempSpeed gives the player a height boost when jumping while running, based off his SpeedX
         else
-            tempSpeed = -Player[A].Location.SpeedX * 0.2;
+            tempSpeed = -Player[A].Location.SpeedX / 5;
 
         if(Player[A].ShellSurf) // this code modifies the jump based on him riding a shell
         {
@@ -563,7 +563,7 @@ void PlayerMovementY(int A)
             }
             else if(Player[A].CanFly2)
             {
-                if(Player[A].Location.SpeedY > Physics.PlayerJumpVelocity * 0.5)
+                if(Player[A].Location.SpeedY > Physics.PlayerJumpVelocity / 2)
                 {
                     Player[A].Location.SpeedY -= 1;
                     Player[A].CanPound = true;
@@ -604,8 +604,8 @@ void PlayerMovementY(int A)
             {
                 NewEffect(EFFID_SPARKLE, tempLocation);
                 Effect[numEffects].Location.SpeedX = (dRand() * 3) - 1.5;
-                Effect[numEffects].Location.SpeedY = (dRand() * 0.5) + (1.5 - std::abs(Effect[numEffects].Location.SpeedX)) * 0.5;
-                Effect[numEffects].Location.SpeedX += -Player[A].Location.SpeedX * 0.2;
+                Effect[numEffects].Location.SpeedY = (dRand() / 2) + (1.5 - std::abs(Effect[numEffects].Location.SpeedX)) / 2;
+                Effect[numEffects].Location.SpeedX += -Player[A].Location.SpeedX / 5;
             }
         }
     }
@@ -648,7 +648,7 @@ void PlayerMovementY(int A)
                 tempLocation.X = Player[A].Location.X - 4 + dRand() * (Player[A].Location.Width - 8) + 4 - 8 * Player[A].Direction;
                 NewEffect(EFFID_SPARKLE, tempLocation, 1, 0, ShadowMode);
                 Effect[numEffects].Frame = iRand(3);
-                Effect[numEffects].Location.SpeedY = (Player[A].Location.Y + Player[A].Location.Height + NPC[Player[A].StandingOnNPC].Location.Height / 32.0 - tempLocation.Y + 12) * 0.05;
+                Effect[numEffects].Location.SpeedY = (Player[A].Location.Y + Player[A].Location.Height + NPC[Player[A].StandingOnNPC].Location.Height / 32 - tempLocation.Y + 12) / 20;
             }
         }
 
@@ -667,9 +667,9 @@ void PlayerMovementY(int A)
     {
         double tempSpeed;
         if(Player[A].Location.SpeedX > 0)
-            tempSpeed = Player[A].Location.SpeedX * 0.2;
+            tempSpeed = Player[A].Location.SpeedX / 5;
         else
-            tempSpeed = -Player[A].Location.SpeedX * 0.2;
+            tempSpeed = -Player[A].Location.SpeedX / 5;
 
         if((Player[A].Vine > 0 || Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0 || MultiHop) && Player[A].CanAltJump) // Player Jumped
         {
@@ -735,7 +735,7 @@ void PlayerMovementY(int A)
         }
         else if(Player[A].CanFly2)
         {
-            if(Player[A].Location.SpeedY > Physics.PlayerJumpVelocity * 0.5)
+            if(Player[A].Location.SpeedY > Physics.PlayerJumpVelocity / 2)
             {
                 Player[A].Location.SpeedY -= 1;
                 Player[A].CanPound = true;
@@ -954,7 +954,7 @@ void PlayerSwimMovementY(int A)
         }
     }
 
-    Player[A].Location.SpeedY += Physics.PlayerGravity * 0.1;
+    Player[A].Location.SpeedY += Physics.PlayerGravity / 10;
 
     if(Player[A].Location.SpeedY >= 3) // Terminal Velocity in water
         Player[A].Location.SpeedY = 3;
@@ -963,7 +963,7 @@ void PlayerSwimMovementY(int A)
     {
         if(Player[A].Controls.Left || Player[A].Controls.Right)
         {
-            if(Player[A].Location.SpeedY == Physics.PlayerGravity * 0.1 || Player[A].Slope > 0 || (Player[A].StandingOnNPC != 0 && Player[A].Location.Y + Player[A].Location.Height >= NPC[Player[A].StandingOnNPC].Location.Y - NPC[Player[A].StandingOnNPC].Location.SpeedY))
+            if(Player[A].Location.SpeedY == Physics.PlayerGravity / 10 || Player[A].Slope > 0 || (Player[A].StandingOnNPC != 0 && Player[A].Location.Y + Player[A].Location.Height >= NPC[Player[A].StandingOnNPC].Location.Y - NPC[Player[A].StandingOnNPC].Location.SpeedY))
             {
                 if(Player[A].Controls.Left && Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX - NPC[Player[A].StandingOnNPC].BeltSpeed <= 0)
                     Player[A].Location.SpeedY = -1.1 + NPC[Player[A].StandingOnNPC].Location.SpeedY;
@@ -986,7 +986,7 @@ void PlayerSwimMovementY(int A)
 
         if(Player[A].Controls.Jump && Player[A].MountSpecial == 1 && Player[A].CanJump)
         {
-            Player[A].Location.SpeedY = Physics.PlayerGravity * 0.1;
+            Player[A].Location.SpeedY = Physics.PlayerGravity / 10;
             Player[A].MountSpecial = 0;
             Player[A].StandUp = true;
         }
@@ -997,7 +997,7 @@ void PlayerSwimMovementY(int A)
 
     if(Player[A].SwimCount == 0)
     {
-        if(Player[A].Mount != 1 || Player[A].Location.SpeedY == Physics.PlayerGravity * 0.1 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0)
+        if(Player[A].Mount != 1 || Player[A].Location.SpeedY == Physics.PlayerGravity / 10 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0)
         {
             if((Player[A].Controls.Jump && Player[A].CanJump) ||
                (Player[A].Controls.AltJump && Player[A].CanAltJump))
@@ -1019,17 +1019,17 @@ void PlayerSwimMovementY(int A)
                 // If .Location.SpeedY = 0 Then .Location.Y += -1
                 if(Player[A].Controls.Down)
                 {
-                    if(Player[A].Location.SpeedY >= Physics.PlayerJumpVelocity * 0.2)
+                    if(Player[A].Location.SpeedY >= Physics.PlayerJumpVelocity / 5)
                     {
-                        Player[A].Location.SpeedY += Physics.PlayerJumpVelocity * 0.2;
-                        if(Player[A].Location.SpeedY < Physics.PlayerJumpVelocity * 0.2)
-                            Player[A].Location.SpeedY = Physics.PlayerJumpVelocity * 0.2;
+                        Player[A].Location.SpeedY += Physics.PlayerJumpVelocity / 5;
+                        if(Player[A].Location.SpeedY < Physics.PlayerJumpVelocity / 5)
+                            Player[A].Location.SpeedY = Physics.PlayerJumpVelocity / 5;
                     }
                 }
                 else
                 {
                     if(Player[A].Controls.Up)
-                        Player[A].Location.SpeedY += Physics.PlayerJumpVelocity * 0.5;
+                        Player[A].Location.SpeedY += Physics.PlayerJumpVelocity / 2;
                     else
                         Player[A].Location.SpeedY += Physics.PlayerJumpVelocity * 0.4;
 
@@ -1038,7 +1038,7 @@ void PlayerSwimMovementY(int A)
                 }
 
                 if(Player[A].Location.SpeedY > 0)
-                    Player[A].Location.SpeedY = Physics.PlayerJumpVelocity * 0.2;
+                    Player[A].Location.SpeedY = Physics.PlayerJumpVelocity / 5;
 
                 PlaySoundSpatial(SFX_Swim, Player[A].Location);
             }

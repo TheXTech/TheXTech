@@ -306,7 +306,7 @@ resume_TriggerLast:
                 NPC[numNPCs].TailCD = 10;
                 NPC[numNPCs].Special = 1;
                 NPC[numNPCs].Location.SpeedY = -5;
-                NPC[numNPCs].Location.SpeedX = (1 + dRand() * 0.5) * NPC[A].Direction;
+                NPC[numNPCs].Location.SpeedX = (1 + dRand() / 2) * NPC[A].Direction;
                 syncLayers_NPC(numNPCs);
                 CheckSectionNPC(numNPCs);
             }
@@ -1322,8 +1322,8 @@ resume_TriggerLast:
                     else
                         NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[A].Location, NPC[A].Special, 0, NPC[A].Shadow);
 
-                    Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[A].Location.SpeedX * 0.1;
-                    Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[A].Location.SpeedY * 0.1;
+                    Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[A].Location.SpeedX / 10;
+                    Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[A].Location.SpeedY / 10;
                 }
                 if((NPC[A].Type == NPCID_PLR_FIREBALL && NPC[A].Special == 5) || NPC[A].Type == NPCID_PET_FIRE)
                     NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location, 1, 0, NPC[A].Shadow);

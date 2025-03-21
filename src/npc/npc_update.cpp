@@ -1074,7 +1074,7 @@ interrupt_Activation:
                     else if(NPC[A]->IsFish && NPC[A].Special == 2)
                     {
                         NPC[A].Location.Y = level[Player[NPC[A].JustActivated].Section].Height - 0.1;
-                        NPC[A].Location.SpeedX = (1 + (NPC[A].Location.Y - NPC[A].DefaultLocationY) * 0.005) * NPC[A].Direction;
+                        NPC[A].Location.SpeedX = (1 + (NPC[A].Location.Y - NPC[A].DefaultLocationY) / 200) * NPC[A].Direction;
                         NPC[A].Special5 = 1;
                         treeNPCUpdate(A);
                         if(NPC[A].tempBlock > 0)
@@ -1277,17 +1277,17 @@ interrupt_Activation:
                 if(NPC[A].Type == NPCID_ICE_CUBE)
                 {
                     NPC[A].Projectile = true;
-                    Physics.NPCGravity = -Physics.NPCGravityReal * 0.2;
+                    Physics.NPCGravity = -Physics.NPCGravityReal / 5;
                 }
                 else
-                    Physics.NPCGravity = Physics.NPCGravityReal * 0.2;
+                    Physics.NPCGravity = Physics.NPCGravityReal / 5;
 
                 if(NPC[A].Type == NPCID_FLIPPED_RAINBOW_SHELL && NPC[A].Special4 == 1)
                     NPC[A].Special5 = 0;
                 else if(!NPC[A]->IsFish && NPC[A].Type != NPCID_RAFT && NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_WALL_SPARK && NPC[A].Type != NPCID_WALL_TURTLE)
-                    speedVar = (float)(speedVar * 0.5);
+                    speedVar /= 2;
                 else if(NPC[A]->IsFish && NPC[A].Special == 2 && NPC[A].Location.SpeedY > 0)
-                    speedVar = (float)(speedVar * 0.5);
+                    speedVar /= 2;
 
                 if(NPC[A].Location.SpeedY >= 3) // Terminal Velocity in water
                     NPC[A].Location.SpeedY = 3;

@@ -416,9 +416,9 @@ void PlayerThrowBall(const int A)
     if(p.Controls.Up)
     {
         if(p.StandingOnNPC != 0)
-            NPC[numNPCs].Location.SpeedY += NPC[p.StandingOnNPC].Location.SpeedY * 0.1;
+            NPC[numNPCs].Location.SpeedY += NPC[p.StandingOnNPC].Location.SpeedY / 10;
         else
-            NPC[numNPCs].Location.SpeedY += p.Location.SpeedY * 0.1;
+            NPC[numNPCs].Location.SpeedY += p.Location.SpeedY / 10;
 
         NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.9;
     }

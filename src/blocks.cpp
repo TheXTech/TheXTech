@@ -319,7 +319,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     nLoc.SpeedY = -(dRand() * 4) - 3;
                     if(HitDown)
                     {
-                        nLoc.SpeedY = -nLoc.SpeedY * 0.5;
+                        nLoc.SpeedY = -nLoc.SpeedY / 2;
                         nLoc.Y = b.Location.Y + b.Location.Height;
                     }
 

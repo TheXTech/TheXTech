@@ -105,10 +105,10 @@ void PlayerFairyMovementY(int A)
     else if(Player[A].FairyCD != 0 || Player[A].Location.SpeedY < -0.1 || Player[A].Controls.Down)
     {
         if(Player[A].Location.SpeedY < 3)
-            Player[A].Location.SpeedY += Physics.PlayerGravity * 0.05;
+            Player[A].Location.SpeedY += Physics.PlayerGravity / 20;
         if(Player[A].Location.SpeedY < 0)
-            Player[A].Location.SpeedY += Physics.PlayerGravity * 0.05;
-        Player[A].Location.SpeedY += Physics.PlayerGravity * 0.1;
+            Player[A].Location.SpeedY += Physics.PlayerGravity / 20;
+        Player[A].Location.SpeedY += Physics.PlayerGravity / 10;
         if(Player[A].Controls.Down)
             Player[A].Location.SpeedY += 0.05;
     }

@@ -56,8 +56,8 @@ void p_PlayerMakeFlySparkle(const Location_t& loc, int Frame)
         newLoc(loc.X - 8 + dRand() * (loc.Width + 16) - 4,
             loc.Y - 8 + dRand() * (loc.Height + 16)),
         1, 0, ShadowMode);
-    Effect[numEffects].Location.SpeedX = (dRand() * 0.5) - 0.25;
-    Effect[numEffects].Location.SpeedY = (dRand() * 0.5) - 0.25;
+    Effect[numEffects].Location.SpeedX = (dRand() / 2) - 0.25;
+    Effect[numEffects].Location.SpeedY = (dRand() / 2) - 0.25;
     Effect[numEffects].Frame = Frame;
 }
 
@@ -286,7 +286,7 @@ bool UpdatePlayer()
                 {
                     Player[A].Slide = false;
                     if(Player[A].Location.SpeedY >= 0)
-                        Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.5;
+                        Player[A].Location.SpeedX = Player[A].Location.SpeedX / 2;
                 }
 
                 // Apply movement -- this is where the actual movement happens

@@ -969,7 +969,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                     if(NPC[A]->IsAShell || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1) || NPC[A].Type == NPCID_ICE_CUBE)
                                                     {
                                                         if(NPC[A].Slope == 0)
-                                                            NPC[A].Location.SpeedY = -NPC[A].Location.SpeedY * 0.5;
+                                                            NPC[A].Location.SpeedY = -NPC[A].Location.SpeedY / 2;
                                                         for(int C = 1; C <= numPlayers; C++)
                                                         {
                                                             if(Player[C].StandingOnNPC == A)
@@ -1111,7 +1111,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                            NPC[A].Type != NPCID_BOMB && NPC[A].Type != NPCID_SATURN && NPC[A].Type != NPCID_FLIPPED_RAINBOW_SHELL && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK &&
                                            !((NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D))) // walldeath stuff
                                         {
-                                            NPC[A].Location.SpeedX = Physics.NPCShellSpeed * 0.5 * NPC[A].Direction;
+                                            NPC[A].Location.SpeedX = Physics.NPCShellSpeed / 2 * NPC[A].Direction;
                                             if(NPCIsVeggie(NPC[A]))
                                                 NPC[A].Projectile = true;
                                             else if(NPC[A].Type == NPCID_WALK_BOMB_S2)

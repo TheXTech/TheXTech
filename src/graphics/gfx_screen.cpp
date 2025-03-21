@@ -354,7 +354,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
 
                     vscreena.TempDelay = 200;
                     vscreena.TempY = 0;
-                    vscreena.tempX = -vscreen1.X + check_W * 0.5 - p.Location.X - p.Location.Width * 0.5;
+                    vscreena.tempX = -vscreen1.X + check_W * 0.5 - p.Location.X - p.Location.Width / 2;
                 }
                 vscreen2.Visible = true;
                 screen.DType = 3;
@@ -385,7 +385,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
 
                     vscreena.TempDelay = 200;
                     vscreena.TempY = 0;
-                    vscreena.tempX = -vscreen1.X + check_W * 0.5 - p.Location.X - p.Location.Width * 0.5;
+                    vscreena.tempX = -vscreen1.X + check_W * 0.5 - p.Location.X - p.Location.Width / 2;
                 }
                 vscreen2.Visible = true;
                 screen.DType = 4;

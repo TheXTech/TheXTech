@@ -102,9 +102,9 @@ void UpdatePlayerTimeToLive(int A)
             const vScreen_t& vscreen = screen.vScreen(screen.active_begin() + 1);
             A1 = (Player[B].Location.X - Player[A].Location.X) + (Player[B].Location.Width - Player[A].Location.Width) / 2;
             if(!g_config.multiplayer_pause_controls)
-                B1 = (float)((-vscreen.Y + vscreen.Height * 0.5) - Player[A].Location.Y);
+                B1 = ((-vscreen.Y + vscreen.Height / 2) - Player[A].Location.Y);
             else
-                B1 = (float)((-vscreen.Y + vscreen.Height * 0.5) - Player[A].Location.Y - Player[A].Location.Height);
+                B1 = ((-vscreen.Y + vscreen.Height / 2) - Player[A].Location.Y - Player[A].Location.Height);
         }
         else if(normal_multiplayer)
         {
@@ -117,11 +117,11 @@ void UpdatePlayerTimeToLive(int A)
         else
         {
             const vScreen_t& vscreen = screen.vScreen(screen.active_begin() + 1);
-            A1 = (float)((-vscreen.X + vscreen.Width * 0.5) - (Player[A].Location.X + Player[A].Location.Width / 2));
+            A1 = ((-vscreen.X + vscreen.Width / 2) - (Player[A].Location.X + Player[A].Location.Width / 2));
             if(!g_config.multiplayer_pause_controls)
-                B1 = (float)((-vscreen.Y + vscreen.Height * 0.5) - Player[A].Location.Y);
+                B1 = ((-vscreen.Y + vscreen.Height / 2) - Player[A].Location.Y);
             else
-                B1 = (float)((-vscreen.Y + vscreen.Height * 0.5) - Player[A].Location.Y - Player[A].Location.Height);
+                B1 = ((-vscreen.Y + vscreen.Height / 2) - Player[A].Location.Y - Player[A].Location.Height);
         }
 
         float C1 = std::sqrt((A1 * A1) + (B1 * B1));

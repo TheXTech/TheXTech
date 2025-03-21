@@ -2686,7 +2686,7 @@ void NPCSpecial(int A)
             if(!tempBool)
             {
                 if(npc.Type == NPCID_PLATFORM_S3 && npc.Wet == 2)
-                    npc.Location.SpeedY -= Physics.NPCGravity * 0.25;
+                    npc.Location.SpeedY -= Physics.NPCGravity / 4;
                 else
                     npc.Location.SpeedY += Physics.NPCGravity;
             }
@@ -3328,8 +3328,8 @@ void SpecialNPC(int A)
                             for(int Ci = 1; Ci <= 10; Ci++)
                             {
                                 NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[A].Location, NPC[A].Special);
-                                Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[A].Location.SpeedX * 0.1;
-                                Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[A].Location.SpeedY * 0.1;
+                                Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[A].Location.SpeedX / 10;
+                                Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[A].Location.SpeedY / 10;
 
                                 if(Effect[numEffects].Frame == 0)
                                     Effect[numEffects].Frame = -iRand(3);
@@ -3388,21 +3388,21 @@ void SpecialNPC(int A)
                 NPC[A].Location.SpeedX += 0.5;
         }
 
-        NPC[A].Location.SpeedX += (playerHCenter - npcHCenter) * 0.0005;
+        NPC[A].Location.SpeedX += (playerHCenter - npcHCenter) / 2000;
 
         if(NPC[A].Location.Y + NPC[A].Location.Height / 2 > playerVCenter)
         {
             NPC[A].Location.SpeedY -= 0.2;
             if(NPC[A].Location.SpeedY > 0 && NPC[A].Direction != NPC[A].Special4)
-                NPC[A].Location.SpeedY += -std::abs(NPC[A].Location.SpeedY) * 0.04;
+                NPC[A].Location.SpeedY += -std::abs(NPC[A].Location.SpeedY) / 25;
         }
         else if(NPC[A].Location.Y + NPC[A].Location.Height / 2 < playerVCenter)
         {
             NPC[A].Location.SpeedY += 0.2;
             if(NPC[A].Location.SpeedY < 0 && NPC[A].Direction != NPC[A].Special4)
-                NPC[A].Location.SpeedY += std::abs(NPC[A].Location.SpeedY) * 0.04;
+                NPC[A].Location.SpeedY += std::abs(NPC[A].Location.SpeedY) / 25;
         }
-        NPC[A].Location.SpeedY += (playerVCenter - NPC[A].Location.Y + NPC[A].Location.Height / 2) * 0.004;
+        NPC[A].Location.SpeedY += (playerVCenter - NPC[A].Location.Y + NPC[A].Location.Height / 2) / 250;
 
 
         bool picked_up = false;
@@ -5018,7 +5018,7 @@ void SpecialNPC(int A)
                     if(NPC[numNPCs]->IsACoin)
                     {
                         NPC[numNPCs].Special = 1;
-                        NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.5;
+                        NPC[numNPCs].Location.SpeedX /= 2;
                     }
 
                     // commented out in SMBX 1.3
@@ -5513,7 +5513,7 @@ void SpecialNPC(int A)
 
                     if(NPC[A].Special3 == 1 && NPC[A].Wet == 0)
                     {
-                        NPC[A].Location.SpeedY = -(NPC[A].Location.Y - Player[B].Location.Y + Player[B].Location.Height / 2) * 0.05 + dRand() * 4 - 2;
+                        NPC[A].Location.SpeedY = -(NPC[A].Location.Y - Player[B].Location.Y + Player[B].Location.Height / 2) / 20 + dRand() * 4 - 2;
                         if(NPC[A].Location.SpeedY < -9)
                             NPC[A].Location.SpeedY = -9;
                         NPC[A].Special3 = 0;
