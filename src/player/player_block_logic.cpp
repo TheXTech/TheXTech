@@ -548,15 +548,9 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                         }
                                         else
                                         {
-                                            cursed_value_C = Block[B].Location.X + Block[B].Location.Width * 0.5;
-                                            float D = Block[floorBlock].Location.X + Block[floorBlock].Location.Width * 0.5;
+                                            cursed_value_C = std::abs(Block[B].Location.minus_center_x(Player[A].Location));
+                                            float D = std::abs(Block[floorBlock].Location.minus_center_x(Player[A].Location));
 
-                                            cursed_value_C += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
-                                            D += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
-                                            if(cursed_value_C < 0)
-                                                cursed_value_C = -cursed_value_C;
-                                            if(D < 0)
-                                                D = -D;
                                             if(cursed_value_C < D)
                                                 floorBlock = B;
                                         }
@@ -1003,16 +997,8 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
     if(ceilingBlock2 != 0) // Hitting a block from below
     {
-        float C = Block[ceilingBlock1].Location.X + Block[ceilingBlock1].Location.Width * 0.5;
-        float D = Block[ceilingBlock2].Location.X + Block[ceilingBlock2].Location.Width * 0.5;
-        C += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
-        D += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
-
-        if(C < 0)
-            C = -C;
-
-        if(D < 0)
-            D = -D;
+        float C = std::abs(Block[ceilingBlock1].Location.minus_center_x(Player[A].Location));
+        float D = std::abs(Block[ceilingBlock2].Location.minus_center_x(Player[A].Location));
 
         if(C < D)
             ceilingBlock = ceilingBlock1;
