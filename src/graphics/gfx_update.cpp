@@ -1671,9 +1671,10 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
                             {
                                 if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section && vScreenCollision(Z, Player[B].Location))
                                 {
-                                    if(C == 0 || std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                                    double dx = std::abs(Player[A].Location.minus_center_x(Player[B].Location));
+                                    if(C == 0 || dx < C)
                                     {
-                                        C = std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                                        C = dx;
                                         D = B;
                                     }
                                 }
@@ -1685,9 +1686,10 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
                                 {
                                     if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section)
                                     {
-                                        if(C == 0 || std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                                        double dx = std::abs(Player[A].Location.minus_center_x(Player[B].Location));
+                                        if(C == 0 || dx < C)
                                         {
-                                            C = std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                                            C = dx;
                                             D = B;
                                         }
                                     }
