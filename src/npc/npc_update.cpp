@@ -1510,11 +1510,7 @@ interrupt_Activation:
                             if(iRand(100) >= 93)
                             {
                                 Location_t tempLocation;
-                                tempLocation.Height = EffectHeight[EFFID_SPARKLE];
-                                tempLocation.Width = EffectWidth[EFFID_SPARKLE];
-                                tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2 + dRand() * NPC[A].Location.Width - 4;
-                                tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2 + dRand() * NPC[A].Location.Height - 4;
-                                NewEffect(EFFID_SPARKLE, tempLocation);
+                                NewEffect_IceSparkle(NPC[A], tempLocation);
                             }
                         }
                     }

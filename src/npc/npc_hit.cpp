@@ -150,13 +150,7 @@ void NPCHit(int A, int B, int C)
             NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
             for(C = 1; C <= 20; C++)
             {
-                tempLocation.Height = EffectHeight[EFFID_SPARKLE];
-                tempLocation.Width = EffectWidth[EFFID_SPARKLE];
-                tempLocation.SpeedX = 0;
-                tempLocation.SpeedY = 0;
-                tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2 + dRand() * NPC[A].Location.Width - 4;
-                tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2 + dRand() * NPC[A].Location.Height - 4;
-                NewEffect(EFFID_SPARKLE, tempLocation);
+                NewEffect_IceSparkle(NPC[A], tempLocation);
                 Effect[numEffects].Location.SpeedX = dRand() * 2 - 1;
                 Effect[numEffects].Location.SpeedY = dRand() * 2 - 1;
                 Effect[numEffects].Frame = iRand(3);

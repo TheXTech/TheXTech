@@ -1951,6 +1951,17 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
     }
 }
 
+void NewEffect_IceSparkle(const NPC_t& n, Location_t& tempLocation)
+{
+    tempLocation.Height = EffectHeight[EFFID_SPARKLE];
+    tempLocation.Width = EffectWidth[EFFID_SPARKLE];
+    tempLocation.SpeedX = 0;
+    tempLocation.SpeedY = 0;
+    tempLocation.X = n.Location.X - tempLocation.Width / 2 + dRand() * n.Location.Width - 4;
+    tempLocation.Y = n.Location.Y - tempLocation.Height / 2 + dRand() * n.Location.Height - 4;
+    NewEffect(EFFID_SPARKLE, tempLocation, 1, 0, n.Shadow);
+}
+
 // Remove the effect
 void KillEffect(int A)
 {

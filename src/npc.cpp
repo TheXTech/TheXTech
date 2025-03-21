@@ -3506,30 +3506,12 @@ void SpecialNPC(int A)
         // if(NPC[A].Type == NPCID_ICE_CUBE && NPC[A].Special == 3)
         //     NPC[A].BeltSpeed = 0;
 
+        // two chances to make a sparkle: 7 frames out of 100 when stationary, and 1 frame out of 5 when thrown
         if(iRand(100) >= 93)
-        {
-            tempLocation.Height = EffectHeight[EFFID_SPARKLE];
-            tempLocation.Width = EffectWidth[EFFID_SPARKLE];
-            tempLocation.SpeedX = 0;
-            tempLocation.SpeedY = 0;
-            tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2 + dRand() * NPC[A].Location.Width - 4;
-            tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2 + dRand() * NPC[A].Location.Height - 4;
-            NewEffect(EFFID_SPARKLE, tempLocation);
-        }
+            NewEffect_IceSparkle(NPC[A], tempLocation);
 
-        if(NPC[A].Projectile)
-        {
-            if(iRand(5) == 0)
-            {
-                tempLocation.Height = EffectHeight[EFFID_SPARKLE];
-                tempLocation.Width = EffectWidth[EFFID_SPARKLE];
-                tempLocation.SpeedX = 0;
-                tempLocation.SpeedY = 0;
-                tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2 + dRand() * NPC[A].Location.Width - 4;
-                tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2 + dRand() * NPC[A].Location.Height - 4;
-                NewEffect(EFFID_SPARKLE, tempLocation);
-            }
-        }
+        if(NPC[A].Projectile && iRand(5) == 0)
+            NewEffect_IceSparkle(NPC[A], tempLocation);
     }
     else if(NPC[A].Type == NPCID_SQUID_S3 || NPC[A].Type == NPCID_SQUID_S1) // Blooper
     {
