@@ -423,7 +423,7 @@ public:
 NPC_Draw_Queue_t NPC_Draw_Queue[maxLocalPlayers] = {NPC_Draw_Queue_t(), NPC_Draw_Queue_t()};
 
 constexpr int NPC_intro_length = 8;
-constexpr float NPC_shade_opacity = 0.4f;
+constexpr uint8_t NPC_shade_opacity = 100;
 constexpr size_t NPC_intro_count_MAX = 32;
 
 uint8_t NPC_intro_count = 0;
@@ -476,9 +476,9 @@ static inline void s_get_NPC_tint(int A, XTColor& cn)
             {
                 if(NPC_intro_frame[i] >= 0)
                 {
-                    float coord = NPC_intro_frame[i] / (float)NPC_intro_length;
-                    cn = XTColorF(coord, coord, coord);
-                    cn.a = XTColor::from_float(NPC_shade_opacity + coord * (1.0f - NPC_shade_opacity));
+                    uint8_t c = uint8_t(256 * NPC_intro_frame[i] / NPC_intro_length);
+                    uint8_t a_add = uint8_t((256 - NPC_shade_opacity) * NPC_intro_frame[i] / NPC_intro_length);
+                    cn = XTColor(c, c, c, NPC_shade_opacity + a_add);
                     return;
                 }
                 break;
