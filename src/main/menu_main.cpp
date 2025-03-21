@@ -1728,7 +1728,7 @@ bool mainMenuUpdate()
                     }
                     // block invalid speedrun continuation
                     else if(MenuCursor >= 0 && MenuCursor <= c_menuItemSavesEndList
-                        && g_config.speedrun_mode != 0 && g_config.speedrun_mode != -SaveSlotInfo[MenuCursor + 1].ConfigDefaults
+                        && (int)g_config.speedrun_mode != 0 && g_config.speedrun_mode != -SaveSlotInfo[MenuCursor + 1].ConfigDefaults
                         && (SaveSlotInfo[MenuCursor + 1].ConfigDefaults != 0 || SaveSlotInfo[MenuCursor + 1].Progress >= 0))
                     {
                         PlaySoundMenu(SFX_BlockHit);
@@ -2084,9 +2084,9 @@ static void s_drawGameSaves(int MenuX, int MenuY)
         if(save_configs == 0 && A == MenuCursor + 1 && (MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P))
         {
             save_configs = s_episode_playstyle + 1;
-            if(s_episode_speedrun_mode != 0)
+            if((int)s_episode_speedrun_mode != 0)
                 save_configs = -s_episode_speedrun_mode;
-            if(g_config.speedrun_mode != 0)
+            if((int)g_config.speedrun_mode != 0)
                 save_configs = -g_config.speedrun_mode;
         }
 
@@ -2148,7 +2148,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
     int infobox_y = MenuY + 145 + c_menuSavesOffsetY;
 
     // forbid incompatible speedrun
-    if(g_config.speedrun_mode != 0 && g_config.speedrun_mode != -info.ConfigDefaults
+    if((int)g_config.speedrun_mode != 0 && g_config.speedrun_mode != -info.ConfigDefaults
         && (info.ConfigDefaults != 0 || info.Progress >= 0))
     {
         XRender::renderRect(XRender::TargetW / 2 - 240, infobox_y, 480, 68, XTColorF(0, 0, 0, 1.0f));
