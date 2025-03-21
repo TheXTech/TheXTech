@@ -20,6 +20,7 @@ Changelog for 1.3.7.1-dev
 -Fix TheXTech 1.3.6.1 bug where setting width or height to 0 in npc.txt would prevent the NPC from spawning (this affected the boss of Hall of Masks in MM4) (@ds-sloth)
 -Fix TheXTech 1.3.6.1 bug where colored platform NPCs could mistakenly trigger activation events (this affected The Sinister Side in SRW) (@ds-sloth)
 -Fix SMBX 1.3 crash caused by freezing a bubble when the NPC with index 3 is an ice ball (@ds-sloth)
+-Fix TheXTech 1.3.1 inaccuracy where certain internal values were not rounded correctly (@ds-sloth)
 
 Changelog for 1.3.7
 -Fix vanilla peculiarity where medals were sometimes not collected when killed, guarded by "fix-medal-kill" [Modern Mode] (@ds-sloth, thanks to @Superbloxen for the report)

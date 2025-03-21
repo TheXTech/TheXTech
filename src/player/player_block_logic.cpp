@@ -583,7 +583,8 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                     Player[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.01;
                                     tempSlope2 = B;
                                     tempHit2 = true;
-                                    blockPushX = Block[B].Location.SpeedX;
+                                    // IMPORTANT: this case was truncation until v1.3.7.1-dev. Confirm that changing to VB6 rounding does not cause any issues.
+                                    blockPushX = vb6Round(Block[B].Location.SpeedX);
                                     if(Player[A].Mount == 2)
                                         Player[A].mountBump = -Player[A].mountBump + Player[A].Location.X;
                                     Player[A].Pinched.Left2 = 2;
@@ -602,7 +603,8 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                 Player[A].Location.X = Block[B].Location.X - Player[A].Location.Width - 0.01;
                                 tempSlope2 = B;
                                 tempHit2 = true;
-                                blockPushX = Block[B].Location.SpeedX;
+                                // IMPORTANT: this case was truncation until v1.3.7.1-dev. Confirm that changing to VB6 rounding does not cause any issues.
+                                blockPushX = vb6Round(Block[B].Location.SpeedX);
                                 if(Player[A].Mount == 2)
                                     Player[A].mountBump = -Player[A].mountBump + Player[A].Location.X;
                                 Player[A].Pinched.Right4 = 2;

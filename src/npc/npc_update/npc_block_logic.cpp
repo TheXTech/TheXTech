@@ -908,7 +908,8 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
                                             if(((NPC[A]->StandsOnPlayer && !NPC[A].Projectile) || (NPC[A]->IsAShell && NPC[A].Location.SpeedX == 0.0)) && Block[B].tempBlockVehiclePlr > 0)
                                             {
-                                                NPC[A].vehicleYOffset = Block[B].tempBlockVehicleYOffset + NPC[A].Location.Height;
+                                                // IMPORTANT: this case was truncation until v1.3.7.1-dev. Confirm that changing to VB6 rounding does not cause any issues.
+                                                NPC[A].vehicleYOffset = Block[B].tempBlockVehicleYOffset + vb6Round(NPC[A].Location.Height);
                                                 NPC[A].vehiclePlr = Block[B].tempBlockVehiclePlr;
                                                 if(NPC[A].vehiclePlr == 0 && Block[B].tempBlockNpcType == NPCID_VEHICLE)
                                                     NPC[A].TimeLeft = 100;
