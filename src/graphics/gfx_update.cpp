@@ -3301,7 +3301,7 @@ void UpdateGraphicsMeta()
         SuperPrint(std::to_string(PrintFPS), 1, XRender::TargetOverscanX + 8, 8, {0, 255, 0});
 
     if(g_VanillaCam && (XRender::TargetW > 800 || XRender::TargetH > 600) && GFX.Camera.inited)
-        XRender::renderTexture(XRender::TargetW - XRender::TargetOverscanX - GFX.Camera.w - 4, XRender::TargetH - GFX.Camera.h - 4, GFX.Camera);
+        XRender::renderTextureBasic(XRender::TargetW - XRender::TargetOverscanX - GFX.Camera.w - 4, XRender::TargetH - GFX.Camera.h - 4, GFX.Camera);
 
     g_stats.print();
 
