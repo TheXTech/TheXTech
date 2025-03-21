@@ -1870,13 +1870,14 @@ int EditorNPCFrame(const NPCID A, vbint_t& C, int N)
                 if(!Player[D].Dead && Player[D].Section == NPC[N].Section && Player[D].Character != 3 &&
                     Player[D].Character != 4 && Player[D].TimeToLive == 0)
                 {
-                    if(E == 0 || std::abs(NPC[N].Location.X + NPC[N].Location.Width / 2.0 -
-                                          (Player[D].Location.X + Player[D].Location.Width / 2.0)) +
-                                 std::abs(NPC[N].Location.Y + NPC[N].Location.Height / 2.0 -
-                                          (Player[D].Location.Y + Player[D].Location.Height / 2.0)) < D)
+                    // this logic is expensive and broken but must be kept because this NPC's frame affects the RNG state (via effect spawning)
+                    int dist = (int)(std::abs(NPC[N].Location.minus_center_x(Player[D].Location))
+                        + std::abs(NPC[N].Location.minus_center_y(Player[D].Location)));
+
+                    // dist should get compared to E, but instead it's compared to D
+                    if(E == 0 || dist < D)
                     {
-                        E = CInt(std::abs(NPC[N].Location.X + NPC[N].Location.Width / 2.0 - (Player[D].Location.X + Player[D].Location.Width / 2.0)) +
-                                 std::abs(NPC[N].Location.Y + NPC[N].Location.Height / 2.0 - (Player[D].Location.Y + Player[D].Location.Height / 2.0)));
+                        E = dist;
                         if(Player[D].Character == 5)
                             ret = 1;
                         else
