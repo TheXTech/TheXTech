@@ -2447,8 +2447,8 @@ void PlayerFrame(Player_t &p)
                 {
                     if(p.Effect == PLREFF_NORMAL)
                     {
-                        // FIXME: does this narrowing logic match VB6?
-                        p.YoshiBFrameCount += 1 + (int)(std::abs(p.Location.SpeedX * 0.7));
+                        // IMPORTANT: this case was truncation until v1.3.7.1-dev. Confirm that changing to VB6 rounding does not cause any issues.
+                        p.YoshiBFrameCount += 1 + vb6Round(std::abs(p.Location.SpeedX * 0.7));
                     }
 
                     if((p.Direction == -1 && p.Location.SpeedX > 0) || (p.Direction == 1 && p.Location.SpeedX < 0))

@@ -601,8 +601,8 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                     tempSlope2 = B;
                                     tempHit2 = true;
 
-                                    // FIXME: is truncation really the correct behavior here? that's what TheXTech has always done.
-                                    blockPushX = (int)(Block[B].Location.SpeedX);
+                                    // IMPORTANT: this case was truncation until v1.3.7.1-dev. Confirm that changing to VB6 rounding does not cause any issues.
+                                    blockPushX = vb6Round(Block[B].Location.SpeedX);
                                 }
                             }
                             else if(HitSpot == 3) // hit the block from below
