@@ -5474,7 +5474,7 @@ void PlayerEffects(const int A)
                 p.State = 2;
                 if(p.Mount == 0)
                 {
-                    p.Location.X += -Physics.PlayerWidth[p.Character][2] * 0.5 + Physics.PlayerWidth[p.Character][1] * 0.5;
+                    p.Location.X += (-Physics.PlayerWidth[p.Character][2] + Physics.PlayerWidth[p.Character][1]) / 2;
                     p.Location.Y += -Physics.PlayerHeight[p.Character][2] + Physics.PlayerHeight[p.Character][1];
                     p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
                     p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
@@ -5494,7 +5494,7 @@ void PlayerEffects(const int A)
                 p.State = 1;
                 if(p.Mount == 0)
                 {
-                    p.Location.X += -Physics.PlayerWidth[p.Character][1] * 0.5 + Physics.PlayerWidth[p.Character][2] * 0.5;
+                    p.Location.X += (-Physics.PlayerWidth[p.Character][1] + Physics.PlayerWidth[p.Character][2]) / 2;
                     p.Location.Y += -Physics.PlayerHeight[p.Character][1] + Physics.PlayerHeight[p.Character][2];
                     p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
                     p.Location.Height = Physics.PlayerHeight[p.Character][1];
@@ -5541,7 +5541,7 @@ void PlayerEffects(const int A)
                 }
                 else if(p.Mount != 2)
                 {
-                    p.Location.X += -Physics.PlayerWidth[p.Character][2] * 0.5 + Physics.PlayerWidth[p.Character][1] * 0.5;
+                    p.Location.X += (-Physics.PlayerWidth[p.Character][2] + Physics.PlayerWidth[p.Character][1]) / 2;
                     p.Location.Y += -Physics.PlayerHeight[p.Character][2] + Physics.PlayerHeight[p.Character][1];
                     p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
                     p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
@@ -5556,7 +5556,7 @@ void PlayerEffects(const int A)
                 }
                 else if(p.Mount != 2)
                 {
-                    p.Location.X += -Physics.PlayerWidth[p.Character][1] * 0.5 + Physics.PlayerWidth[p.Character][2] * 0.5;
+                    p.Location.X += (-Physics.PlayerWidth[p.Character][1] + Physics.PlayerWidth[p.Character][2]) / 2;
                     p.Location.Y += -Physics.PlayerHeight[p.Character][1] + Physics.PlayerHeight[p.Character][2];
                     p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
                     p.Location.Height = Physics.PlayerHeight[p.Character][1];
@@ -5570,7 +5570,7 @@ void PlayerEffects(const int A)
                 p.State = 1;
                 if(p.Mount != 2)
                 {
-                    p.Location.X += -Physics.PlayerWidth[p.Character][1] * 0.5 + Physics.PlayerWidth[p.Character][2] * 0.5;
+                    p.Location.X += (-Physics.PlayerWidth[p.Character][1] + Physics.PlayerWidth[p.Character][2]) / 2;
                     p.Location.Y += -Physics.PlayerHeight[p.Character][1] + Physics.PlayerHeight[p.Character][2];
                     p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
                     p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
@@ -5740,7 +5740,7 @@ void PlayerEffects(const int A)
 
                 if(p.Mount == 0)
                 {
-                    p.Location.X += -Physics.PlayerWidth[p.Character][2] * 0.5 + Physics.PlayerWidth[p.Character][1] * 0.5;
+                    p.Location.X += (-Physics.PlayerWidth[p.Character][2] + Physics.PlayerWidth[p.Character][1]) / 2;
                     p.Location.Y += -Physics.PlayerHeight[p.Character][2] + Physics.PlayerHeight[p.Character][1];
                     p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
                     p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
@@ -5884,11 +5884,11 @@ void PlayerEffects(const int A)
 
         p.Frame = 1;
 
-        if(p.Effect2 == 0.0)
+        if(p.Effect2 == 0)
         {
             if(p.State == 1 && p.Mount == 0)
             {
-                p.Location.X += -Physics.PlayerWidth[p.Character][2] * 0.5 + Physics.PlayerWidth[p.Character][1] * 0.5;
+                p.Location.X += (-Physics.PlayerWidth[p.Character][2] + Physics.PlayerWidth[p.Character][1]) / 2;
                 p.Location.Y += -Physics.PlayerHeight[p.Character][2] + Physics.PlayerHeight[p.Character][1];
                 p.State = target_state;
                 p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
