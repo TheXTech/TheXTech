@@ -579,7 +579,7 @@ bool OpenWorld_Post(const WorldLoad& load)
             if((FileRelease <= 20 && ll.Type == 1) || (FileRelease > 20 && ll.Start))
             {
                 WorldPlayer[1].Type = 1;
-                WorldPlayer[1].Location = static_cast<Location_t>(WorldLevel[A].Location);
+                WorldPlayer[1].Location = WorldLevel[A].Location;
                 break;
             }
         }

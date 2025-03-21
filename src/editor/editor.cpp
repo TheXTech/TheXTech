@@ -666,7 +666,7 @@ void UpdateEditor()
                 {
                     MouseRelease = false;
 
-                    IntegerLocation_t& iLoc = WorldArea[EditorCursor.InteractIndex].Location;
+                    TinyLocation_t& iLoc = WorldArea[EditorCursor.InteractIndex].Location;
                     InteractResize(iLoc, 32, 32);
                 }
                 else if(EditorCursor.InteractMode == OptCursor_t::WLD_AREA) // World map areas
@@ -2928,7 +2928,7 @@ void UpdateInteract()
         // world map music
         if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_MUSIC))
         {
-            for(int A : treeWorldMusicQuery(EditorCursor.Location, SORTMODE_NONE))
+            for(int A : treeWorldMusicQuery(static_cast<TinyLocation_t>(EditorCursor.Location), SORTMODE_NONE))
             {
                 if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location))
                 {
@@ -2943,7 +2943,7 @@ void UpdateInteract()
         // world paths
         if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_PATHS))
         {
-            for(int A : treeWorldPathQuery(EditorCursor.Location, SORTMODE_NONE))
+            for(int A : treeWorldPathQuery(static_cast<TinyLocation_t>(EditorCursor.Location), SORTMODE_NONE))
             {
                 if(CursorCollision(EditorCursor.Location, WorldPath[A].Location))
                 {
@@ -2962,7 +2962,7 @@ void UpdateInteract()
             // it's a good thing that the sentinel's scope ends quickly,
             // otherwise it would take a long time for the result vector
             // to rejoin the pool. -- ds-sloth
-            auto sentinel = treeWorldSceneQuery(EditorCursor.Location, SORTMODE_ID);
+            auto sentinel = treeWorldSceneQuery(static_cast<TinyLocation_t>(EditorCursor.Location), SORTMODE_ID);
             for(auto i = sentinel.end(); i > sentinel.begin();)
             {
                 int A = *(--i);
@@ -2980,7 +2980,7 @@ void UpdateInteract()
         // world levels
         if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_LEVELS))
         {
-            for(int A : treeWorldLevelQuery(EditorCursor.Location, SORTMODE_NONE))
+            for(int A : treeWorldLevelQuery(static_cast<TinyLocation_t>(EditorCursor.Location), SORTMODE_NONE))
             {
                 if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location))
                 {
@@ -2995,7 +2995,7 @@ void UpdateInteract()
         // world tiles
         if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_TILES))
         {
-            for(int A : treeWorldTileQuery(EditorCursor.Location, SORTMODE_NONE))
+            for(int A : treeWorldTileQuery(static_cast<TinyLocation_t>(EditorCursor.Location), SORTMODE_NONE))
             {
                 if(CursorCollision(EditorCursor.Location, Tile[A].Location))
                 {

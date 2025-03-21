@@ -32,8 +32,6 @@
 std::vector<BaseRef_t> treeresult_vec[MAX_TREEQUERY_DEPTH] = {std::vector<BaseRef_t>(400), std::vector<BaseRef_t>(400), std::vector<BaseRef_t>(50), std::vector<BaseRef_t>(50)};
 ptrdiff_t cur_treeresult_vec = 0;
 
-const double s_gridSize = 4;
-
 static std::unique_ptr<table_t<TileRef_t>> s_worldTilesTree;
 static std::unique_ptr<table_t<SceneRef_t>> s_worldSceneTree;
 static std::unique_ptr<table_t<WorldPathRef_t>> s_worldPathTree;
@@ -92,17 +90,17 @@ void treeRemove(Arr &p, ItemRef_t obj)
 
 template<class ItemRef_t>
 TreeResult_Sentinel<ItemRef_t> treeWorldQuery(std::unique_ptr<table_t<ItemRef_t>> &p,
-    double Left, double Top, double Right, double Bottom, int sort_mode)
+    int Left, int Top, int Right, int Bottom, int sort_mode)
 {
     TreeResult_Sentinel<ItemRef_t> result;
 
     if(!p.get())
         return result;
 
-    p->query(*result.i_vec, newLoc(Left - s_gridSize,
-                                  Top - s_gridSize,
-                                  (Right - Left) + s_gridSize * 2,
-                                  (Bottom - Top) + s_gridSize * 2));
+    p->query(*result.i_vec, rect_external(Left,
+                                  Right,
+                                  Top,
+                                  Bottom));
 
     if(sort_mode == SORTMODE_ID)
     {
@@ -149,7 +147,7 @@ void treeWorldTileRemove(TileRef_t obj)
     treeRemove(s_worldTilesTree, obj);
 }
 
-TreeResult_Sentinel<TileRef_t> treeWorldTileQuery(double Left, double Top, double Right, double Bottom, int sort_mode, double margin)
+TreeResult_Sentinel<TileRef_t> treeWorldTileQuery(int Left, int Top, int Right, int Bottom, int sort_mode, int margin)
 {
     return treeWorldQuery(s_worldTilesTree,
                    Left - margin,
@@ -159,7 +157,7 @@ TreeResult_Sentinel<TileRef_t> treeWorldTileQuery(double Left, double Top, doubl
                    sort_mode);
 }
 
-TreeResult_Sentinel<TileRef_t> treeWorldTileQuery(const Location_t &loc, int sort_mode, double margin)
+TreeResult_Sentinel<TileRef_t> treeWorldTileQuery(const TinyLocation_t &loc, int sort_mode, int margin)
 {
     return treeWorldQuery(s_worldTilesTree,
                    loc.X - margin,
@@ -187,7 +185,7 @@ void treeWorldSceneRemove(SceneRef_t obj)
     treeRemove(s_worldSceneTree, obj);
 }
 
-TreeResult_Sentinel<SceneRef_t> treeWorldSceneQuery(double Left, double Top, double Right, double Bottom, int sort_mode, double margin)
+TreeResult_Sentinel<SceneRef_t> treeWorldSceneQuery(int Left, int Top, int Right, int Bottom, int sort_mode, int margin)
 {
     return treeWorldQuery(s_worldSceneTree,
                    Left - margin,
@@ -197,7 +195,7 @@ TreeResult_Sentinel<SceneRef_t> treeWorldSceneQuery(double Left, double Top, dou
                    sort_mode);
 }
 
-TreeResult_Sentinel<SceneRef_t> treeWorldSceneQuery(const Location_t &loc, int sort_mode, double margin)
+TreeResult_Sentinel<SceneRef_t> treeWorldSceneQuery(const TinyLocation_t &loc, int sort_mode, int margin)
 {
     return treeWorldQuery(s_worldSceneTree,
                    loc.X - margin,
@@ -225,8 +223,8 @@ void treeWorldPathRemove(WorldPathRef_t obj)
     treeRemove(s_worldPathTree, obj);
 }
 
-TreeResult_Sentinel<WorldPathRef_t> treeWorldPathQuery(double Left, double Top, double Right, double Bottom,
-                        int sort_mode, double margin)
+TreeResult_Sentinel<WorldPathRef_t> treeWorldPathQuery(int Left, int Top, int Right, int Bottom,
+                        int sort_mode, int margin)
 {
     return treeWorldQuery(s_worldPathTree,
                    Left - margin,
@@ -236,7 +234,7 @@ TreeResult_Sentinel<WorldPathRef_t> treeWorldPathQuery(double Left, double Top, 
                    sort_mode);
 }
 
-TreeResult_Sentinel<WorldPathRef_t> treeWorldPathQuery(const Location_t &loc, int sort_mode, double margin)
+TreeResult_Sentinel<WorldPathRef_t> treeWorldPathQuery(const TinyLocation_t &loc, int sort_mode, int margin)
 {
     return treeWorldQuery(s_worldPathTree,
                    loc.X - margin,
@@ -263,8 +261,8 @@ void treeWorldLevelRemove(WorldLevelRef_t obj)
     treeRemove(s_worldLevelTree, obj);
 }
 
-TreeResult_Sentinel<WorldLevelRef_t> treeWorldLevelQuery(double Left, double Top, double Right, double Bottom,
-                         int sort_mode, double margin)
+TreeResult_Sentinel<WorldLevelRef_t> treeWorldLevelQuery(int Left, int Top, int Right, int Bottom,
+                         int sort_mode, int margin)
 {
     return treeWorldQuery(s_worldLevelTree,
                    Left - margin,
@@ -274,7 +272,7 @@ TreeResult_Sentinel<WorldLevelRef_t> treeWorldLevelQuery(double Left, double Top
                    sort_mode);
 }
 
-TreeResult_Sentinel<WorldLevelRef_t> treeWorldLevelQuery(const Location_t &loc, int sort_mode, double margin)
+TreeResult_Sentinel<WorldLevelRef_t> treeWorldLevelQuery(const TinyLocation_t &loc, int sort_mode, int margin)
 {
     return treeWorldQuery(s_worldLevelTree,
                    loc.X - margin,
@@ -302,9 +300,9 @@ void treeWorldMusicRemove(WorldMusicRef_t obj)
     treeRemove(s_worldMusicTree, obj);
 }
 
-TreeResult_Sentinel<WorldMusicRef_t> treeWorldMusicQuery(double Left, double Top, double Right, double Bottom,
+TreeResult_Sentinel<WorldMusicRef_t> treeWorldMusicQuery(int Left, int Top, int Right, int Bottom,
                          int sort_mode,
-                         double margin)
+                         int margin)
 {
     return treeWorldQuery(s_worldMusicTree,
                    Left - margin,
@@ -314,9 +312,9 @@ TreeResult_Sentinel<WorldMusicRef_t> treeWorldMusicQuery(double Left, double Top
                    sort_mode);
 }
 
-TreeResult_Sentinel<WorldMusicRef_t> treeWorldMusicQuery(const Location_t &loc,
+TreeResult_Sentinel<WorldMusicRef_t> treeWorldMusicQuery(const TinyLocation_t &loc,
                          int sort_mode,
-                         double margin)
+                         int margin)
 {
     return treeWorldQuery(s_worldMusicTree,
                    loc.X - margin,

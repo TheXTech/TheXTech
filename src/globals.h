@@ -1169,7 +1169,7 @@ struct WorldMusic_t
 //! NEW: a camera zone for the world map
 struct WorldArea_t
 {
-    IntegerLocation_t Location;
+    TinyLocation_t Location;
 };
 
 //Public Type EditorCursor 'The editor's cursor
@@ -1233,7 +1233,7 @@ struct EditorCursor_t
 struct WorldPlayer_t
 {
 //    Location As Location
-    Location_t Location;
+    TinyLocation_t Location;
 //    Type As Integer
     int Type = 0;
 //    Frame As Integer

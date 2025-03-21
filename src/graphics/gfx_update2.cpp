@@ -254,10 +254,10 @@ void UpdateGraphics2(bool skipRepaint)
     int camX = vScreen[Z].CameraAddX() + XRender::TargetOverscanX;
     int camY = vScreen[Z].CameraAddY();
 
-    double sLeft = -vScreen[Z].X - 2 * XRender::TargetOverscanX;
-    double sTop = -vScreen[Z].Y;
-    double sRight = -vScreen[Z].X + vScreen[Z].Width + 2 * XRender::TargetOverscanX;
-    double sBottom = -vScreen[Z].Y + vScreen[Z].Height;
+    int sLeft = -camX - 2 * XRender::TargetOverscanX;
+    int sTop = -camY;
+    int sRight = -camX + vScreen[Z].Width + 2 * XRender::TargetOverscanX;
+    int sBottom = -camY + vScreen[Z].Height;
 
     {
         Location_t sView;

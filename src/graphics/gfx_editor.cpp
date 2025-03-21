@@ -768,7 +768,7 @@ void DrawEditorWorld()
         XRender::renderTextureBasic(X, Y, GFX.ECursor[2]);
 
         // show coordinates of nearby level for help making warps
-        for(WorldLevel_t* t : treeWorldLevelQuery(newLoc(EditorCursor.Location.X, EditorCursor.Location.Y, 1, 1), SORTMODE_NONE))
+        for(WorldLevel_t* t : treeWorldLevelQuery(TinyLocation_t{(int)EditorCursor.Location.X, (int)EditorCursor.Location.Y, 1, 1}, SORTMODE_NONE))
         {
             WorldLevel_t &lvl = *t;
             if(CursorCollision(EditorCursor.Location, lvl.Location))

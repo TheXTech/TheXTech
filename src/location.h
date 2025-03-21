@@ -90,6 +90,7 @@ struct TinyLocation_t
     int16_t Width = 0;
 
     inline TinyLocation_t() = default;
+    inline TinyLocation_t(int32_t X, int32_t Y, int16_t Width, int16_t Height) : X(X), Y(Y), Height(Height), Width(Width) {}
     inline explicit TinyLocation_t(const Location_t& loc) : X(loc.X), Y(loc.Y), Height(loc.Height), Width(loc.Width) {}
 
     inline explicit operator Location_t() const
