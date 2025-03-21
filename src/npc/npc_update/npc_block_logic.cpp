@@ -1212,15 +1212,8 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
             winningBlock = tempBlockHit1;
         else
         {
-            double C = Block[tempBlockHit1].Location.X + Block[tempBlockHit1].Location.Width * 0.5;
-            double D = Block[tempBlockHit2].Location.X + Block[tempBlockHit2].Location.Width * 0.5;
-            C -= (NPC[A].Location.X + NPC[A].Location.Width * 0.5);
-            D -= (NPC[A].Location.X + NPC[A].Location.Width * 0.5);
-
-            if(C < 0)
-                C = -C;
-            if(D < 0)
-                D = -D;
+            double C = std::abs(Block[tempBlockHit1].Location.minus_center_x(NPC[A].Location));
+            double D = std::abs(Block[tempBlockHit2].Location.minus_center_x(NPC[A].Location));
 
             if(C < D)
                 winningBlock = tempBlockHit1;
