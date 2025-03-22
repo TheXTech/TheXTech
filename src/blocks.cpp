@@ -267,7 +267,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
             for(int B : treeBlockQuery(query_loc, SORTMODE_NONE))
             {
-                if(B != A && !Block[B].Hidden && !(BlockOnlyHitspot1[Block[B].Type] && !BlockIsSizable[Block[B].Type]))
+                if(B != A && !Block[B].Hidden && !BlockOnlyHitspot1[Block[B].Type] && !BlockIsSizable[Block[B].Type])
                 {
                     // if(CheckCollision(Block[B].Location, newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30)))
                     if(CheckCollision(Block[B].Location, query_loc))
@@ -313,13 +313,13 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     auto &nLoc = nn.Location;
                     nLoc.Width = nn->TWidth;
                     nLoc.Height = nn->THeight;
-                    nLoc.X = b.Location.X + b.Location.Width / 2.0 - nLoc.Width / 2.0;
+                    nLoc.X = b.Location.X + (b.Location.Width - nLoc.Width) / 2;
                     nLoc.Y = b.Location.Y - nLoc.Height - 0.01;
                     nLoc.SpeedX = dRand() * 3 - 1.5;
                     nLoc.SpeedY = -(dRand() * 4) - 3;
                     if(HitDown)
                     {
-                        nLoc.SpeedY = -nLoc.SpeedY * 0.5;
+                        nLoc.SpeedY = -nLoc.SpeedY / 2;
                         nLoc.Y = b.Location.Y + b.Location.Height;
                     }
 
@@ -389,9 +389,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
                 nn.Location.Width = nn->TWidth;
                 nn.Location.Height = nn->THeight;
-                nn.Location.X = b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0;
+                nn.Location.X = b.Location.X + (b.Location.Width - nn.Location.Width) / 2;
                 nn.Location.Y = b.Location.Y - nn.Location.Height - 0.01;
-                nn.Location.SpeedX = dRand() * 3.0 - 1.5;
+                nn.Location.SpeedX = dRand() * 3 - 1.5;
                 nn.Location.SpeedY = -(dRand() * 4) - 3;
                 nn.Special = 1;
                 nn.Immune = 20;
@@ -582,7 +582,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
 
             nn.Location.Height = 0;
-            nn.Location.X = (b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0);
+            nn.Location.X = (b.Location.X + (b.Location.Width - nn.Location.Width) / 2);
             nn.Location.SpeedX = 0;
             nn.Location.SpeedY = 0;
 
@@ -688,7 +688,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             Player[tempPlayer].Location.Height = Physics.PlayerHeight[Player[tempPlayer].Character][Player[tempPlayer].State];
             Player[tempPlayer].Frame = 1;
             Player[tempPlayer].Dead = false;
-            Player[tempPlayer].Location.X = b.Location.X + b.Location.Width * 0.5 - Player[tempPlayer].Location.Width * 0.5;
+            Player[tempPlayer].Location.X = b.Location.X + (b.Location.Width - Player[tempPlayer].Location.Width) / 2;
             if(!HitDown)
             {
                 Player[tempPlayer].Location.Y = b.Location.Y - 0.1 - Player[tempPlayer].Location.Height;
@@ -720,7 +720,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         nn.Location = b.Location;
         nn.Location.Width = nn->TWidth;
         nn.Location.Height = nn->THeight;
-        nn.Location.X += (b.Location.Width - nn.Location.Width) / 2.0;
+        nn.Location.X += (b.Location.Width - nn.Location.Width) / 2;
         nn.Location.Y -= 0.01;
         nn.DefaultLocationX = nn.Location.X;
         nn.DefaultLocationY = nn.Location.Y;
@@ -1306,7 +1306,7 @@ bool UpdateBlocks()
                                 syncLayersTrees_Block_SetHidden(A);
 
                                 if(!b.Hidden) // -V547 // False positive: the b.Hidden gets changed inside syncLayersTrees_Block_SetHidden() call
-                                    NewEffect(EFFID_SMOKE_S3, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2));
+                                    NewEffect(EFFID_SMOKE_S3_CENTER, b.Location);
                             }
                             else
                             {
@@ -1316,7 +1316,7 @@ bool UpdateBlocks()
                             if(b.Type != b.DefaultType || b.Special != b.DefaultSpecial)
                             {
                                 if(b.Type != b.DefaultType)
-                                    NewEffect(EFFID_SMOKE_S3, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2));
+                                    NewEffect(EFFID_SMOKE_S3_CENTER, b.Location);
                                 b.Special = b.DefaultSpecial;
                                 b.Type = b.DefaultType;
                             }
@@ -1486,15 +1486,9 @@ resume_TriggerHit:
                     {
                         if(ShakeCollision(Player[B].Location, ib))
                         {
-                            if(!BlockIsSizable[ib.Type] && !BlockOnlyHitspot1[ib.Type])
+                            if((!BlockIsSizable[ib.Type] && !BlockOnlyHitspot1[ib.Type]) || (ib.Location.Y + 1 >= Player[B].Location.Y + Player[B].Location.Height - 1))
                             {
-                                Player[B].Location.SpeedY = double(Physics.PlayerJumpVelocity);
-                                Player[B].StandUp = true;
-                                PlaySoundSpatial(SFX_Stomp, Player[B].Location);
-                            }
-                            else if(ib.Location.Y + 1 >= Player[B].Location.Y + Player[B].Location.Height - 1)
-                            {
-                                Player[B].Location.SpeedY = double(Physics.PlayerJumpVelocity);
+                                Player[B].Location.SpeedY = Physics.PlayerJumpVelocity;
                                 Player[B].StandUp = true;
                                 PlaySoundSpatial(SFX_Stomp, Player[B].Location);
                             }
@@ -1577,12 +1571,34 @@ resume_SwitchOff:
             if(PSwitch(false))
                 return true;
 
-            StopMusic();
-            StartMusic(Player[PSwitchPlayer].Section);
+            SwitchEndResumeMusic();
         }
     }
 
     return false;
+}
+
+void SwitchEndResumeMusic()
+{
+    StopMusic();
+
+    int switch_player_section = Player[PSwitchPlayer].Section;
+
+#ifndef THEXTECH_ENABLE_SDL_NET
+    // originally, just used section of the player that triggered the switch
+    StartMusic(switch_player_section);
+#else
+    // now, prefer that section if it's onscreen, but fallback to section of first onscreen player
+    for(int i = l_screen->player_count - 1; i >= 0; i--)
+    {
+        int pi_section = Player[l_screen->players[i]].Section;
+        if(i == 0 || pi_section == switch_player_section)
+        {
+            StartMusic(pi_section);
+            return;
+        }
+    }
+#endif
 }
 
 bool PSwitch(bool enabled)
@@ -1641,7 +1657,7 @@ bool PSwitch(bool enabled)
                     nb.Location = NPC[A].Location;
                     nb.Location.Width = BlockWidth[nb.Type];
                     nb.Location.Height = BlockHeight[nb.Type];
-                    nb.Location.X += (NPC[A].Location.Width - nb.Location.Width) / 2.0;
+                    nb.Location.X += (NPC[A].Location.Width - nb.Location.Width) / 2;
                     nb.Location.SpeedX = 0;
                     nb.Location.SpeedY = 0;
                     nb.Special = 0;
@@ -1703,7 +1719,7 @@ bool PSwitch(bool enabled)
                     nn.Location.SpeedY = 0;
                     nn.Location.Width = nn->TWidth;
                     nn.Location.Height = nn->THeight;
-                    nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2.0;
+                    nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2;
                     nn.DefaultLocationX = nn.Location.X;
                     nn.DefaultLocationY = nn.Location.Y;
                     nn.DefaultType = nn.Type;
@@ -1761,7 +1777,7 @@ bool PSwitch(bool enabled)
                     nb.Location.SpeedY = 0;
                     nb.Location.Width = BlockWidth[nb.Type];
                     nb.Location.Height = BlockHeight[nb.Type];
-                    nb.Location.X += (NPC[A].Location.Width - nb.Location.Width) / 2.0;
+                    nb.Location.X += (NPC[A].Location.Width - nb.Location.Width) / 2;
                     nb.Special = 0;
                     nb.Kill = false;
 
@@ -1809,7 +1825,7 @@ bool PSwitch(bool enabled)
                     nn.Location.SpeedY = 0;
                     nn.Location.Width = nn->TWidth;
                     nn.Location.Height = nn->THeight;
-                    nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2.0;
+                    nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2;
                     nn.DefaultLocationX = nn.Location.X;
                     nn.DefaultLocationY = nn.Location.Y;
                     nn.DefaultType = nn.Type;
@@ -2003,7 +2019,7 @@ void PowBlock()
             if(NPC[A]->IsACoin)
             {
                 NPC[A].Special = 1;
-                NPC[A].Location.SpeedX = (dRand() * 1.0) - 0.5;
+                NPC[A].Location.SpeedX = dRand() - 0.5;
             }
         }
     }

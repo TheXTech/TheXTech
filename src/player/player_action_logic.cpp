@@ -122,7 +122,7 @@ void PlayerShootChar5Beam(int A)
     NPC[numNPCs].Projectile = true;
     NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
     NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-    NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 + (40 * Player[A].Direction) - 8;
+    NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2 + (40 * Player[A].Direction) - 8;
 
     if(!Player[A].Duck)
     {
@@ -148,6 +148,7 @@ void PlayerShootChar5Beam(int A)
     if(NPC[numNPCs].Type == NPCID_PLR_FIREBALL)
         NPC[numNPCs].Frame = 16;
 
+    // kill item if it is inside a wall next frame
     NPC[numNPCs].WallDeath = 5;
     NPC[numNPCs].Location.SpeedY = 0;
     NPC[numNPCs].Location.SpeedX = 5 * Player[A].Direction + (Player[A].Location.SpeedX / 3);
@@ -181,7 +182,7 @@ void PlayerThrowBomb(int A)
 
     if(p.Duck && (p.Location.SpeedY == 0 || p.Slope > 0 || p.StandingOnNPC != 0))
     {
-        NPC[numNPCs].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+        NPC[numNPCs].Location.X = p.Location.X + (p.Location.Width - NPC[numNPCs].Location.Width) / 2;
         NPC[numNPCs].Location.Y = p.Location.Y + p.Location.Height - NPC[numNPCs].Location.Height;
         NPC[numNPCs].Location.SpeedX = 0;
         NPC[numNPCs].Location.SpeedY = 0;
@@ -189,7 +190,7 @@ void PlayerThrowBomb(int A)
     }
     else
     {
-        NPC[numNPCs].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+        NPC[numNPCs].Location.X = p.Location.X + (p.Location.Width - NPC[numNPCs].Location.Width) / 2;
         NPC[numNPCs].Location.Y = p.Location.Y;
         NPC[numNPCs].Location.SpeedX = 5 * p.Direction;
         NPC[numNPCs].Location.SpeedY = -6;
@@ -325,7 +326,7 @@ void PlayerThrowHeavy(const int A)
     }
 
     if(p.Character == 4)
-        NPC[numNPCs].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+        NPC[numNPCs].Location.X = p.Location.X + (p.Location.Width - NPC[numNPCs].Location.Width) / 2;
 
     syncLayers_NPC(numNPCs);
     CheckSectionNPC(numNPCs);
@@ -362,7 +363,6 @@ void PlayerThrowBall(const int A)
     NPC[numNPCs].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State];
     NPC[numNPCs].Active = true;
     NPC[numNPCs].TimeLeft = 100;
-    NPC[numNPCs].Location.SpeedY = 20;
     NPC[numNPCs].CantHurt = 100;
     NPC[numNPCs].CantHurtPlayer = A;
     NPC[numNPCs].Special = p.Character;
@@ -398,56 +398,40 @@ void PlayerThrowBall(const int A)
 
     if(p.State == 7)
     {
-        NPC[numNPCs].Location.SpeedY = 5;
-
-        if(p.Controls.Up)
-        {
-            if(p.StandingOnNPC != 0)
-                NPC[numNPCs].Location.SpeedY = -8 + NPC[p.StandingOnNPC].Location.SpeedY * 0.1;
-            else
-                NPC[numNPCs].Location.SpeedY = -8 + p.Location.SpeedY * 0.1;
-
-            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.9;
-        }
-
-        if(FlameThrower)
-        {
-            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.5;
-            NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY * 1.5;
-        }
-
-        if(p.StandingOnNPC != 0)
-            NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX / 3.5) + NPC[p.StandingOnNPC].Location.SpeedX / 3.5;
-
         PlaySoundSpatial(SFX_Iceball, p.Location);
+
+        NPC[numNPCs].Location.SpeedY = (p.Controls.Up) ? -8 : 5;
         NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.8;
     }
     else
     {
+        PlaySoundSpatial(SFX_Fireball, p.Location);
+
+        NPC[numNPCs].Location.SpeedY = (p.Controls.Up) ? -6 : 20;
+
         if(NPC[numNPCs].Special == 2)
             NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.85;
-
-        if(p.Controls.Up)
-        {
-            if(p.StandingOnNPC != 0)
-                NPC[numNPCs].Location.SpeedY = -6 + NPC[p.StandingOnNPC].Location.SpeedY * 0.1;
-            else
-                NPC[numNPCs].Location.SpeedY = -6 + p.Location.SpeedY * 0.1;
-
-            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.9;
-        }
-
-        if(FlameThrower)
-        {
-            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.5;
-            NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY * 1.5;
-        }
-
-        if(p.StandingOnNPC != 0)
-            NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX / 3.5) + NPC[p.StandingOnNPC].Location.SpeedX / 3.5;
-
-        PlaySoundSpatial(SFX_Fireball, p.Location);
     }
+
+    if(p.Controls.Up)
+    {
+        if(p.StandingOnNPC != 0)
+            NPC[numNPCs].Location.SpeedY += NPC[p.StandingOnNPC].Location.SpeedY / 10;
+        else
+            NPC[numNPCs].Location.SpeedY += p.Location.SpeedY / 10;
+
+        NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.9;
+    }
+
+    if(FlameThrower)
+    {
+        NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.5;
+        NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY * 1.5;
+    }
+
+    if(p.StandingOnNPC != 0)
+        NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX + NPC[p.StandingOnNPC].Location.SpeedX) / 3.5;
+
 }
 
 void PowerUps(const int A)

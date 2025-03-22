@@ -5,6 +5,11 @@ if(POLICY CMP0069) # Allow CMAKE_INTERPROCEDURAL_OPTIMIZATION (lto) to be set
     set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
 endif()
 
+if(POLICY CMP0079) # Allow linking subprojects against each other
+    cmake_policy(SET CMP0079 NEW)
+    set(CMAKE_POLICY_DEFAULT_CMP0079 NEW)
+endif()
+
 project(TheXTech LANGUAGES C CXX)
 
 include(CheckCCompilerFlag)
@@ -196,6 +201,8 @@ option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 option(THEXTECH_ENABLE_LUAU "Enable luau build testing" OFF)
 option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
+
+option(THEXTECH_ENABLE_SDL_NET "Enable SDL_net build testing" OFF)
 
 option(THEXTECH_ENABLE_EDITOR "Enable runtime support for editor features" ON)
 
@@ -627,6 +634,16 @@ if(THEXTECH_BUILD_GL_DESKTOP_MODERN AND THEXTECH_USE_ANGLE_TRANSLATOR)
     target_link_libraries(A2XT_Int INTERFACE angle_shader_translator)
 endif()
 
+if(THEXTECH_ENABLE_SDL_NET)
+    message("== Building SDL_net... but it doesn't do anything! ==")
+    set(SDL_NET_PGE_DEPENDENT_BUILD ON)
+    add_subdirectory(3rdparty/SDL_net EXCLUDE_FROM_ALL)
+    target_link_libraries(SDL2_net PRIVATE A2XT_Int)
+    target_compile_definitions(A2XT_Int INTERFACE
+        -DTHEXTECH_ENABLE_SDL_NET
+    )
+endif()
+
 if(THEXTECH_ENABLE_LUAU)
     message("== Building Luau... but it doesn't do anything! ==")
     add_subdirectory(3rdparty/luau EXCLUDE_FROM_ALL)
@@ -670,7 +687,6 @@ target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
 
 set(LIB_SRC
     lib/util.cpp
-    lib/fader.cpp
     lib/Graphics/image_size.cpp
     lib/Graphics/size.cpp
     lib/Archives/archives_rwops.cpp
@@ -730,6 +746,12 @@ if(THEXTECH_ENABLE_INTEGRATOR)
             lib/Integrator/int_discorcrpc.cpp
         )
     endif()
+endif()
+
+if(THEXTECH_ENABLE_SDL_NET)
+    list(APPEND LIB_SRC
+        src/main/client.cpp
+        src/main/client_methods.cpp)
 endif()
 
 if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT NINTENDO_SWITCH AND NOT VITA AND NOT PGE_MIN_PORT)
@@ -1458,6 +1480,10 @@ endif()
 
 target_include_directories(thextech PRIVATE ${A2XT_INCS})
 target_link_libraries(thextech PRIVATE A2XT_Int)
+
+if(THEXTECH_ENABLE_SDL_NET)
+    target_link_libraries(thextech PRIVATE SDL2_net)
+endif()
 
 if(RANGE_ARR_USE_HEAP)
     target_compile_definitions(thextech PRIVATE -DRANGE_ARR_USE_HEAP)

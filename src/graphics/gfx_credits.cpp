@@ -56,15 +56,16 @@ static XTColor s_alphaFromY(int y)
 
 void DrawCredits()
 {
-    XRender::renderRect(0, 0, XRender::TargetW, Maths::iRound(CreditChop), {0, 0, 0});
-    XRender::renderRect(0, XRender::TargetH - Maths::iRound(CreditChop), XRender::TargetW, std::ceil(CreditChop), {0, 0, 0});
+    // CreditChop and CreditOffsetY were previously floats, now they are ints measured in tenths
+    XRender::renderRect(0, 0, XRender::TargetW, (CreditChop + 5) / 10, {0, 0, 0});
+    XRender::renderRect(0, XRender::TargetH - (CreditChop + 5) / 10, XRender::TargetW, (CreditChop + 5) / 10, {0, 0, 0});
 
     // previously hardcoded to 100
     int shrink = vScreen[1].Top;
 
-    if(CreditChop > shrink)
+    if(CreditChop > shrink * 10)
     {
-        int chop = CreditChop - shrink;
+        int chop = (CreditChop + 5) / 10 - shrink;
         int chop_max = (XRender::TargetH / 2) - shrink;
         uint8_t alpha = 255 * chop / chop_max;
         XRender::renderRect(0, 0, XRender::TargetW, XRender::TargetH, {0, 0, 0, alpha});
@@ -77,7 +78,7 @@ void DrawCredits()
     {
         auto &c = Credit[A];
         auto &l = c.Location;
-        auto bottom = l.Y + l.Height + int(CreditOffsetY);
+        auto bottom = l.Y + l.Height + CreditOffsetY / 10;
         if(bottom >= 0)
             break; // found!
     }
@@ -87,7 +88,7 @@ void DrawCredits()
     {
         auto &c = Credit[A];
         auto &l = c.Location;
-        auto y = l.Y + int(CreditOffsetY);
+        auto y = l.Y + CreditOffsetY / 10;
 
         if(y > XRender::TargetH)
             break; // Nothing also to draw

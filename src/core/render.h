@@ -725,6 +725,21 @@ void renderTextureBasic(float xDst, float yDst, StdPicture &tx,
                            XTColor color = XTColor()) = delete;
 
 /*!
+ * \brief Draws a sizable block
+ * \param xDst left x coordinate of block (in viewport coordinates)
+ * \param yDst top y coordinate of block (in viewport coordinates)
+ * \param wDst width of block
+ * \param hDst height of block
+ * \param tx Block texture
+ */
+E_INLINE void renderSizableBlock(int xDst, int yDst, int wDst, int hDst, StdPicture &tx) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->renderSizableBlock(xDst, yDst, wDst, hDst, tx);
+}
+#endif
+
+/*!
  * \brief Draws the particle system at a particular camera offset
  * \param tx Source particle system
  * \param camX current camera X position (same as vScreenX)

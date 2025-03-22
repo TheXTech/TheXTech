@@ -18,6 +18,20 @@ std::string md5::string_to_hash(const std::string &input)
     return out;
 }
 
+uint32_t md5::string_to_u32(const std::string &input)
+{
+    md5::md5_t h;
+
+    h.process((const void*)input.c_str(), (int)input.size());
+    h.finish();
+
+    uint8_t out[16];
+
+    h.get_sig(out);
+
+    return out[0] | ((uint32_t)out[1] << 8) | ((uint32_t)out[2] << 16) | ((uint32_t)out[3] << 24);
+}
+
 std::string md5::file_to_hash(const std::string &filePath)
 {
     char block[BLOCK_SIZE];

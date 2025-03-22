@@ -29,6 +29,7 @@
 #include "../player.h"
 #include "../game_main.h"
 #include "../core/events.h"
+#include "main/game_globals.h"
 #include "../config.h"
 #include "../layers.h"
 
@@ -136,7 +137,7 @@ void DropBonus(int A)
     double CenterX = -vscreen.X + vscreen.Width / 2;
 
     // place NPC at HUD
-    NPC[numNPCs].Location.X = CenterX + hud_offset - NPC[numNPCs].Location.Width / 2.0;
+    NPC[numNPCs].Location.X = CenterX + hud_offset - NPC[numNPCs].Location.Width / 2;
     NPC[numNPCs].Location.Y = ScreenTop + 16 + 12;
 
     // finish initializing the NPC
@@ -201,13 +202,15 @@ static void s_MovePlayersToExit(int got_exit_A)
         auto& p_C = Player[C];
 
         p_C.Section = p_A.Section;
-        p_C.Location.Y = p_A.Location.Y + p_A.Location.Height      - p_C.Location.Height;
-        p_C.Location.X = p_A.Location.X + p_A.Location.Width / 2.0 - p_C.Location.Width / 2.0;
+        p_C.Location.Y = p_A.Location.Y + p_A.Location.Height - p_C.Location.Height;
+        p_C.Location.X = p_A.Location.X + (p_A.Location.Width - p_C.Location.Width) / 2;
         p_C.Location.SpeedX = 0;
         p_C.Location.SpeedY = 0;
         p_C.Effect = PLREFF_WAITING;
         p_C.Effect2 = -got_exit_A;
     }
+
+    clearScreenFaders();
 }
 
 void CollectMedal(const NPC_t& medal)
@@ -295,10 +298,10 @@ void TouchBonus(int A, int B)
             // swap location
             double touched_X = p_touched.Location.X;
             double touched_Y = p_touched.Location.Y;
-            p_touched.Location.X = p_target.Location.X + p_target.Location.Width / 2.0  - p_touched.Location.Width / 2.0;
-            p_touched.Location.Y = p_target.Location.Y + p_target.Location.Height       - p_touched.Location.Height;
-            p_target.Location.X  = touched_X           + p_touched.Location.Width / 2.0 - p_target.Location.Width / 2.0;
-            p_target.Location.Y  = touched_Y           + p_touched.Location.Height      - p_target.Location.Height;
+            p_touched.Location.X = p_target.Location.X + (p_target.Location.Width  - p_touched.Location.Width) / 2;
+            p_touched.Location.Y = p_target.Location.Y + p_target.Location.Height  - p_touched.Location.Height;
+            p_target.Location.X  = touched_X           + (p_touched.Location.Width - p_target.Location.Width) / 2;
+            p_target.Location.Y  = touched_Y           + p_touched.Location.Height - p_target.Location.Height;
 
             // swap some variables
             std::swap(p_touched.Direction, p_target.Direction);
@@ -394,15 +397,27 @@ void TouchBonus(int A, int B)
         {
             RumbleForPowerup(A);
 
-            if(Player[A].Duck)
-                UnDuck(Player[A]);
+            // UnDuck checks Duck internally, so let's call it directly
+            // if(Player[A].Duck)
+            //     UnDuck(Player[A]);
+
+            int BackupGrabTime = Player[A].GrabTime;
+
+            // force UnDuck to work, fixes a vanilla downwards clip while ducking
+            if(g_config.fix_player_grab_clip && Player[A].Character >= 3)
+                Player[A].GrabTime = 0;
+
+            UnDuck(Player[A]);
+
+            Player[A].GrabTime = BackupGrabTime;
 
             Player[A].StateNPC = NPC[B].Type;
             Player[A].Frame = 1;
             Player[A].Effect = PLREFF_TURN_BIG;
 
-            if(Player[A].Mount > 0)
-                UnDuck(Player[A]);
+            // Duck already unset above
+            // if(Player[A].Mount > 0)
+            //     UnDuck(Player[A]);
 
             PlaySoundSpatial(SFX_PlayerGrow, NPC[B].Location);
         }
@@ -419,40 +434,31 @@ void TouchBonus(int A, int B)
         || NPC[B].Type == NPCID_ICE_POWER_S3 || NPC[B].Type == NPCID_ICE_POWER_S4
         || NPC[B].Type == NPCID_LEAF_POWER || NPC[B].Type == NPCID_STATUE_POWER || NPC[B].Type == NPCID_HEAVY_POWER)
     {
-        int target_state = 2;
-        PlayerEffect target_effect = PLREFF_TURN_BIG;
+        int target_state = PLR_STATE_BIG;
+        PlayerEffect target_effect = PLREFF_TURN_TO_STATE;
         bool reset_effect2 = true;
         int use_sfx = sfx_transform_item;
 
         if(NPC[B].Type == NPCID_FIRE_POWER_S3 || NPC[B].Type == NPCID_FIRE_POWER_S1 || NPC[B].Type == NPCID_FIRE_POWER_S4)
         {
-            target_state = 3;
-            target_effect = PLREFF_TURN_FIRE;
+            target_state = PLR_STATE_FIRE;
+            target_effect = PLREFF_GROW_TO_STATE;
             reset_effect2 = false;
             use_sfx = sfx_grow_item;
         }
         else if(NPC[B].Type == NPCID_ICE_POWER_S3 || NPC[B].Type == NPCID_ICE_POWER_S4)
         {
-            target_state = 7;
-            target_effect = PLREFF_TURN_ICE;
+            target_state = PLR_STATE_ICE;
+            target_effect = PLREFF_GROW_TO_STATE;
             reset_effect2 = false;
             use_sfx = sfx_grow_item;
         }
         else if(NPC[B].Type == NPCID_LEAF_POWER)
-        {
-            target_state = 4;
-            target_effect = PLREFF_TURN_LEAF;
-        }
+            target_state = PLR_STATE_LEAF;
         else if(NPC[B].Type == NPCID_STATUE_POWER)
-        {
-            target_state = 5;
-            target_effect = PLREFF_TURN_STATUE;
-        }
+            target_state = PLR_STATE_STATUE;
         else if(NPC[B].Type == NPCID_HEAVY_POWER)
-        {
-            target_state = 6;
-            target_effect = PLREFF_TURN_HEAVY;
-        }
+            target_state = PLR_STATE_HEAVY;
 
         UpdatePlayerBonus(A, NPC[B].Type);
         Player[A].StateNPC = NPC[B].Type;
@@ -460,8 +466,18 @@ void TouchBonus(int A, int B)
         if(Player[A].State != target_state)
         {
             RumbleForPowerup(A);
+
+            // fixes a vanilla downwards clip that happens even if the player is just ducking (not even digging)
+            if(g_config.fix_player_grab_clip && Player[A].State == 1 && Player[A].Character >= 3 && reset_effect2)
+            {
+                int BackupGrabTime = Player[A].GrabTime;
+                Player[A].GrabTime = 0;
+                UnDuck(Player[A]);
+                Player[A].GrabTime = BackupGrabTime;
+            }
+
             Player[A].Frame = 1;
-            Player[A].Effect = target_effect;
+            Player[A].Effect = (PlayerEffect)(target_effect + target_state);
 
             if(reset_effect2)
                 Player[A].Effect2 = 0;

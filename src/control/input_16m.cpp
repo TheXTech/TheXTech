@@ -185,9 +185,9 @@ bool InputMethod_16M::Update(int player, Controls_t& c, CursorControls_t& m, Edi
         int key2 = p->m_editor_keys2[i];
 
         if(key != null_key && BIT(key) & keys_held)
-            *scroll[i] += 10.0;
+            *scroll[i] += 10;
         else if(key2 != null_key && BIT(key2) & keys_held)
-            *scroll[i] += 10.0;
+            *scroll[i] += 10;
     }
 
     bool cursor[4];
@@ -208,16 +208,16 @@ bool InputMethod_16M::Update(int player, Controls_t& c, CursorControls_t& m, Edi
             m.Y = XRender::TargetH / 2;
 
         if(cursor[3])
-            m.X += 16.0;
+            m.X += 16;
 
         if(cursor[2])
-            m.X -= 16.0;
+            m.X -= 16;
 
         if(cursor[1])
-            m.Y += 16.0;
+            m.Y += 16;
 
         if(cursor[0])
-            m.Y -= 16.0;
+            m.Y -= 16;
 
         if(m.X < 0)
             m.X = 0;

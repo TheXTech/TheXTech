@@ -64,6 +64,9 @@ void NPCCollide(int A)
     //     return;
     // }
 
+    // These NPC types prevent all physics updates and make it so that NPCCollide can never be called. They are removed now.
+    // NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPCID_FIRE_CHAIN
+
     // NPC properties that block collision query
     if(NPC[A].Inert || NPC[A].Generator)
         return;
@@ -73,13 +76,12 @@ void NPCCollide(int A)
         return;
 
     // NPC types that prevent collision query
-    if(NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_GRN_BOOT
+    if(NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_GRN_BOOT
         || NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_FALL_BLOCK_RED || NPC[A].Type == NPCID_VEHICLE || NPC[A].Type == NPCID_CONVEYOR
         || (NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M) || NPC[A].Type == NPCID_SPIT_GUY_BALL
         || NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_FALL_BLOCK_BROWN
         || NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_WALL_TURTLE
-        || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT
-        || NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPCID_FIRE_CHAIN || NPC[A].Type == NPCID_QUAD_BALL
+        || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == NPCID_QUAD_BALL
         || NPC[A].Type == NPCID_FLY_BLOCK || NPC[A].Type == NPCID_FLY_CANNON || NPC[A].Type == NPCID_FIRE_BOSS_FIRE
         || NPC[A].Type == NPCID_DOOR_MAKER || NPC[A].Type == NPCID_MAGIC_DOOR)
     {
@@ -331,7 +333,7 @@ void NPCCollide(int A)
 
                         if(NPC[A].CantHurt < 25)
                             NPC[A].Special = 1;
-                        if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > NPC[B].Location.X + NPC[B].Location.Width / 2.0)
+                        if(NPC[A].Location.to_right_of(NPC[B].Location))
                         {
                             NPC[B].Location.X = NPC[A].Location.X - NPC[B].Location.Width - 1;
                             NPC[B].Direction = 1;
@@ -488,7 +490,7 @@ void NPCCollide(int A)
 
             if(NPCIsAParaTroopa(NPC[A]) && NPCIsAParaTroopa(NPC[B]))
             {
-                if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > NPC[B].Location.X + NPC[B].Location.Width / 2.0)
+                if(NPC[A].Location.to_right_of(NPC[B].Location))
                     NPC[A].Location.SpeedX += 0.05;
                 else
                     NPC[A].Location.SpeedX -= 0.05;
@@ -513,7 +515,7 @@ void NPCCollide(int A)
                         if((NPC[A].Direction == 1  && NPC[A].Location.X + NPC[A].Location.Width < NPC[B].Location.X + 4) ||
                            (NPC[A].Direction == -1 && NPC[A].Location.X > NPC[B].Location.X + NPC[B].Location.Width - 4))
                         {
-                            if(NPC[B].Location.SpeedX == 0.0 && NPC[B].Effect == NPCEFF_NORMAL)
+                            if(NPC[B].Location.SpeedX == 0 && NPC[B].Effect == NPCEFF_NORMAL)
                             {
                                 NPC[A].Special = 10;
                                 Player[numPlayers + 1].Direction = NPC[A].Direction;
@@ -646,12 +648,12 @@ void NPCCollideHeld(int A)
 
         if(NPC[B].Killed > 0)
         {
-            NPC[B].Location.SpeedX = Physics.NPCShellSpeed * 0.5 * -Player[NPC[A].HoldingPlayer].Direction;
+            NPC[B].Location.SpeedX = Physics.NPCShellSpeed / 2 * -Player[NPC[A].HoldingPlayer].Direction;
             NPCHit(A, 5, B);
         }
 
         if(NPC[A].Killed > 0)
-            NPC[A].Location.SpeedX = Physics.NPCShellSpeed * 0.5 * Player[NPC[A].HoldingPlayer].Direction;
+            NPC[A].Location.SpeedX = Physics.NPCShellSpeed / 2 * Player[NPC[A].HoldingPlayer].Direction;
 
         if(!g_config.fix_held_item_cancel || NPC[A].Killed || NPC[B].Killed)
             break;

@@ -155,9 +155,7 @@ void PlayerChar5Logic(int A)
         {
             Player[A].SwordPoke = 0;
             Player[A].Duck = true;
-            Player[A].Location.Y += Player[A].Location.Height;
-            Player[A].Location.Height = Physics.PlayerDuckHeight[Player[A].Character][Player[A].State];
-            Player[A].Location.Y += -Player[A].Location.Height;
+            Player[A].Location.set_height_floor(Physics.PlayerDuckHeight[Player[A].Character][Player[A].State]);
         }
         // Link stands when falling
         else if(Player[A].Duck && Player[A].Location.SpeedY > Physics.PlayerGravity && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0)
@@ -197,9 +195,7 @@ void PlayerChar5StabLogic(int A)
                 if(p.Controls.Down && !p.Duck && p.Mount == 0)
                 {
                     p.Duck = true;
-                    p.Location.Y += p.Location.Height;
-                    p.Location.Height = Physics.PlayerDuckHeight[p.Character][p.State];
-                    p.Location.Y += -p.Location.Height;
+                    p.Location.set_height_floor(Physics.PlayerDuckHeight[p.Character][p.State]);
                 }
                 else if(!p.Controls.Down && p.Duck)
                     UnDuck(Player[A]);

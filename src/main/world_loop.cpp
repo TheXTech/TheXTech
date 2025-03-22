@@ -36,11 +36,12 @@
 #include "../core/events.h"
 #include "../config.h"
 #include "gfx.h"
-#include "world_globals.h"
-#include "level_file.h"
-#include "speedrunner.h"
-#include "screen_quickreconnect.h"
-#include "screen_connect.h"
+#include "message.h"
+#include "main/world_globals.h"
+#include "main/level_file.h"
+#include "main/speedrunner.h"
+#include "main/screen_quickreconnect.h"
+#include "main/screen_connect.h"
 #include "main/game_strings.h"
 #include "graphics/gfx_world.h"
 
@@ -65,6 +66,7 @@ void worldWaitForFade(int waitTicks)
         if(canProceedFrame())
         {
             computeFrameTime1();
+            Controls::Update(false);
             // FIXME: strip logic out of UpdateGraphics2
             UpdateGraphics2();
             UpdateSound();
@@ -96,18 +98,18 @@ void g_playWorldMusic(WorldMusic_t &mus)
 }
 
 // returns size of largest box centered around loc contained in s
-static inline double s_worldSectionArea(WorldAreaRef_t s, const Location_t& loc)
+static inline int s_worldSectionArea(WorldAreaRef_t s, const TinyLocation_t& loc)
 {
-    double fX = loc.X + loc.Width / 2;
-    double fY = loc.Y + loc.Height / 2;
+    int fX = loc.X + loc.Width / 2;
+    int fY = loc.Y + loc.Height / 2;
 
-    double side_x = SDL_min(fX - s->Location.X, s->Location.X + s->Location.Width - fX);
-    double side_y = SDL_min(fY - s->Location.Y, s->Location.Y + s->Location.Height - fY);
+    int side_x = SDL_min(fX - s->Location.X, s->Location.X + s->Location.Width - fX);
+    int side_y = SDL_min(fY - s->Location.Y, s->Location.Y + s->Location.Height - fY);
 
     return side_x * side_y;
 }
 
-static inline bool s_worldUpdateMusic(const Location_t &loc)
+static inline bool s_worldUpdateMusic(const TinyLocation_t &loc)
 {
     bool ret = false;
 
@@ -127,19 +129,19 @@ static inline bool s_worldUpdateMusic(const Location_t &loc)
     return ret;
 }
 
-static void s_worldCheckSection(WorldPlayer_t& wp, const Location_t& loc)
+static void s_worldCheckSection(WorldPlayer_t& wp, const TinyLocation_t& loc)
 {
     int best_section = 0;
-    double best_section_area = 0;
-    double best_wasted_area = 0;
+    int best_section_area = 0;
+    int best_wasted_area = 0;
 
     for(int A = 1; A <= numWorldAreas; A++)
     {
         WorldArea_t &area = WorldArea[A];
-        if(CheckCollision(loc, static_cast<Location_t>(area.Location)))
+        if(CheckCollision(loc, area.Location))
         {
-            double section_area = s_worldSectionArea(A, loc);
-            double wasted_area = area.Location.Width * area.Location.Height - section_area;
+            int section_area = s_worldSectionArea(A, loc);
+            int wasted_area = area.Location.Width * area.Location.Height - section_area;
 
             if(section_area >= best_section_area && (section_area > best_section_area || wasted_area < best_wasted_area))
             {
@@ -157,9 +159,11 @@ static void s_worldCheckSection(WorldPlayer_t& wp, const Location_t& loc)
         // enable a qScreen to the new section
         if(!qScreen)
         {
+            const int Z = l_screen->vScreen_refs[0];
+
             qScreen = true;
             g_worldPlayCamSound = true;
-            qScreenLoc[1] = vScreen[1];
+            qScreenLoc[Z] = vScreen[Z];
 
             // move camera quickly for transitions!
             if(g_worldCamSpeed < 4)
@@ -173,18 +177,18 @@ void worldCheckSection(WorldPlayer_t& wp)
     s_worldCheckSection(wp, wp.Location);
 }
 
-static inline double getWPHeight()
+static inline int getWPHeight()
 {
     switch(WorldPlayer[1].Type)
     {
     case 3:
-        return 44.0;
+        return 44;
         break;
     case 4:
-        return 40.0;
+        return 40;
         break;
     default:
-        return 32.0;
+        return 32;
         break;
     }
 }
@@ -193,7 +197,7 @@ void worldResetSection()
 {
     worldCheckSection(WorldPlayer[1]);
     qScreen = false;
-    GetvScreenWorld(vScreen[1]);
+    GetvScreenWorld(l_screen->vScreen(1));
 }
 
 //static inline double getWorldPlayerX()
@@ -206,19 +210,20 @@ void worldResetSection()
 //    return WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - getWPHeight();
 //}
 
-static inline double getWorldPlayerCenterX()
+static inline int getWorldPlayerCenterX()
 {
-    return WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2;
+    return (int)(WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2);
 }
 
-static inline double getWorldPlayerCenterY()
+static inline int getWorldPlayerCenterY()
 {
-    return WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - getWPHeight() / 2;
+    return (int)(WorldPlayer[1].Location.Y + WorldPlayer[1].Location.Height) - 10 - getWPHeight() / 2;
 }
 
 void WorldLoop()
 {
     bool musicReset = false;
+    const int Z = l_screen->vScreen_refs[0];
 
     if(GamePaused != PauseCode::None)
     {
@@ -238,9 +243,9 @@ void WorldLoop()
         SingleCoop = 1;
 
     // remove any temporary path focus
-    vScreen[1].TempDelay = 0;
-    vScreen[1].tempX = 0;
-    vScreen[1].TempY = 0;
+    vScreen[Z].TempDelay = 0;
+    vScreen[Z].tempX = 0;
+    vScreen[Z].TempY = 0;
 
     // disable cloned player mode
     if(g_ClonedPlayerMode)
@@ -269,7 +274,7 @@ void WorldLoop()
     {
         QuickReconnectScreen::g_active = true;
 
-        if(g_config.allow_drop_add)
+        if(g_config.allow_drop_add && XMessage::GetStatus() == XMessage::Status::local)
             PauseGame(PauseCode::DropAdd, 0);
     }
 
@@ -405,7 +410,7 @@ void WorldLoop()
 
 resume_from_pause:
 
-        Location_t tempLocation = WorldPlayer[1].Location;
+        TinyLocation_t tempLocation = WorldPlayer[1].Location;
         tempLocation.Width -= 8;
         tempLocation.Height -= 8;
         tempLocation.X += 4;
@@ -626,13 +631,18 @@ resume_from_pause:
                             StopMusic();
                             PlaySound(SFX_LevelSelect);
 
+                            // NOTE: this is TheXTech's timing. For TAS Mode 3: SMBX 1.3's timing waits 33 fewer frames (33 * 15.6 fewer ms).
+                            int GameThingTicks = 1000;
+
                             if(g_config.EnableInterLevelFade)
                             {
                                 g_worldScreenFader.setupFader(2, 0, 65, ScreenFader::S_RECT,
                                                               true,
-                                                              getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
+                                                              getWorldPlayerCenterX(), getWorldPlayerCenterY(), l_screen->vScreen_refs[0]);
                                 worldWaitForFade();
                             }
+                            else
+                                GameThingTicks += (33 * 156 / 10);
 
                             SoundPause[SFX_Slide] = 200;
                             curWorldLevel = t;
@@ -649,7 +659,7 @@ resume_from_pause:
                                 ErrorQuit = true;
                             }
 
-                            GameThing(1000, 3);
+                            GameThing(GameThingTicks, 3);
 
                             break;
                         }
@@ -664,7 +674,7 @@ resume_from_pause:
                             );
                         }
                     }
-                    else if(int(lvl.WarpX) != -1 || int(lvl.WarpY) != -1)
+                    else if(lvl.WarpX != -1 || lvl.WarpY != -1)
                     {
                         musicReset = true;
                         StopMusic();
@@ -678,16 +688,16 @@ resume_from_pause:
                         {
                             g_worldScreenFader.setupFader(3, 0, 65, ScreenFader::S_RECT,
                                                           true,
-                                                          getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
+                                                          getWorldPlayerCenterX(), getWorldPlayerCenterY(), l_screen->vScreen_refs[0]);
                             worldWaitForFade(65);
                         }
                         else
                             worldWaitForFade(65);
 
                         // Moved from above
-                        if(int(lvl.WarpX) != -1)
+                        if(lvl.WarpX != -1)
                             WorldPlayer[1].Location.X = lvl.WarpX;
-                        if(int(lvl.WarpY) != -1)
+                        if(lvl.WarpY != -1)
                             WorldPlayer[1].Location.Y = lvl.WarpY;
 
                         worldResetSection();
@@ -710,7 +720,7 @@ resume_from_pause:
                         {
                             g_worldScreenFader.setupFader(3, 65, 0, ScreenFader::S_RECT,
                                                           true,
-                                                          getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
+                                                          getWorldPlayerCenterX(), getWorldPlayerCenterY(), l_screen->vScreen_refs[0]);
                         }
 //                        resetFrameTimer();
                     }
@@ -840,7 +850,7 @@ resume_from_pause:
 
 void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
 {
-    Location_t tempLocation;
+    TinyLocation_t tempLocation;
 //    int A = 0;
 
     bool hit = false;
@@ -848,7 +858,7 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     // Up
     if(Direction == 1 || Direction == 5)
     {
-        tempLocation = static_cast<Location_t>(Lvl.Location);
+        tempLocation = Lvl.Location;
         tempLocation.X +=  4;
         tempLocation.Y +=  4;
         tempLocation.Width -= 8;
@@ -876,7 +886,7 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     // Left
     if(Direction == 2 || Direction == 5)
     {
-        tempLocation = static_cast<Location_t>(Lvl.Location);
+        tempLocation = Lvl.Location;
         tempLocation.X += 4;
         tempLocation.Y += 4;
         tempLocation.Width -= 8;
@@ -904,7 +914,7 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     // Down
     if(Direction == 3 || Direction == 5)
     {
-        tempLocation = static_cast<Location_t>(Lvl.Location);
+        tempLocation = Lvl.Location;
         tempLocation.X += 4;
         tempLocation.Y += 4;
         tempLocation.Width -= 8;
@@ -932,7 +942,7 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     // Right
     if(Direction == 4 || Direction == 5)
     {
-        tempLocation = static_cast<Location_t>(Lvl.Location);
+        tempLocation = Lvl.Location;
         tempLocation.X += 4;
         tempLocation.Y += 4;
         tempLocation.Width -= 8;
@@ -961,7 +971,10 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     if(g_config.EnableInterLevelFade && hit && !Skp)
     {
         qScreen = true;
-        qScreenLoc[1] = vScreen[1];
+
+        const int Z = l_screen->vScreen_refs[0];
+        qScreenLoc[Z] = vScreen[Z];
+
         if(g_worldCamSpeed < 8)
             g_worldCamSpeed = 8;
     }
@@ -972,7 +985,7 @@ void PlayerPath(WorldPlayer_t &p)
     if(p.LevelIndex)
         return;
 
-    Location_t tempLocation = p.Location;
+    TinyLocation_t tempLocation = p.Location;
 
     tempLocation.X += 4;
     tempLocation.Y += 4;
@@ -1048,11 +1061,13 @@ void PlayerPath(WorldPlayer_t &p)
 
 void PathPath(WorldPath_t &Pth, bool Skp)
 {
+    const int Z = l_screen->vScreen_refs[0];
+
     //int A = 0;
     int B = 0;
 
-    Location_t tempLocation;
-    tempLocation = static_cast<Location_t>(Pth.Location);
+    TinyLocation_t tempLocation;
+    tempLocation = Pth.Location;
     tempLocation.X += 4;
     tempLocation.Y += 4;
     tempLocation.Width -= 8;
@@ -1074,19 +1089,19 @@ void PathPath(WorldPath_t &Pth, bool Skp)
         Pth.Active = true;
 
         // set a temporary vScreen focus
-        vScreen[1].tempX = Pth.Location.X + Pth.Location.Width / 2.0;
-        vScreen[1].TempY = Pth.Location.Y + Pth.Location.Height / 2.0;
-        vScreen[1].TempDelay = 1;
+        vScreen[Z].tempX = Pth.Location.X + Pth.Location.Width / 2;
+        vScreen[Z].TempY = Pth.Location.Y + Pth.Location.Height / 2;
+        vScreen[Z].TempDelay = 1;
 
         // update section (no cam sound)
-        s_worldCheckSection(WorldPlayer[1], static_cast<Location_t>(Pth.Location));
+        s_worldCheckSection(WorldPlayer[1], Pth.Location);
         g_worldPlayCamSound = false;
 
         // force qScreen in modern mode
         if(g_config.EnableInterLevelFade)
         {
             qScreen = true;
-            qScreenLoc[1] = vScreen[1];
+            qScreenLoc[Z] = vScreen[Z];
         }
         // fully disable otherwise
         else
@@ -1156,19 +1171,19 @@ void PathPath(WorldPath_t &Pth, bool Skp)
                     if(!Skp)
                     {
                         // set a temporary vScreen focus
-                        vScreen[1].tempX = lev.Location.X + lev.Location.Width / 2.0;
-                        vScreen[1].TempY = lev.Location.Y + lev.Location.Height / 2.0;
-                        vScreen[1].TempDelay = 1;
+                        vScreen[Z].tempX = lev.Location.X + lev.Location.Width / 2;
+                        vScreen[Z].TempY = lev.Location.Y + lev.Location.Height / 2;
+                        vScreen[Z].TempDelay = 1;
 
                         // update world map section (no cam sound)
-                        s_worldCheckSection(WorldPlayer[1], static_cast<Location_t>(lev.Location));
+                        s_worldCheckSection(WorldPlayer[1], lev.Location);
                         g_worldPlayCamSound = false;
 
                         // force qScreen in modern mode
                         if(g_config.EnableInterLevelFade)
                         {
                             qScreen = true;
-                            qScreenLoc[1] = vScreen[1];
+                            qScreenLoc[Z] = vScreen[Z];
                         }
                         // fully disable it otherwise
                         else
@@ -1196,6 +1211,7 @@ void PathWait()
         XEvents::doEvents();
         if(canProceedFrame())
         {
+            Controls::Update(false);
             speedRun_tick();
             UpdateGraphics2();
             UpdateSound();

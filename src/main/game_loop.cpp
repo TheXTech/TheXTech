@@ -57,6 +57,7 @@
 #include "main/record.h"
 #include "menu_main.h"
 #include "change_res.h"
+#include "message.h"
 #include "screen_pause.h"
 #include "screen_connect.h"
 #include "screen_options.h"
@@ -91,6 +92,7 @@ void updateScreenFaders()
         g_levelVScreenFader[s].update();
 }
 
+#if 0
 void levelWaitForFade()
 {
     while(!g_levelScreenFader.isComplete() && GameIsActive)
@@ -111,6 +113,7 @@ void levelWaitForFade()
             PGE_Delay(1);
     }
 }
+#endif
 
 void editorWaitForFade()
 {
@@ -161,8 +164,7 @@ void GameLoop()
             case GameLoopInterrupt::UpdateNPCs_Activation_Generator:
             case GameLoopInterrupt::UpdateNPCs_Activation_Self:
             case GameLoopInterrupt::UpdateNPCs_Activation_Chain:
-            case GameLoopInterrupt::UpdateNPCs_FreezeNPCs_KillNPC:
-            case GameLoopInterrupt::UpdateNPCs_Normal_KillNPC:
+            case GameLoopInterrupt::UpdateNPCs_KillNPC:
                 goto resume_UpdateNPCs;
             case GameLoopInterrupt::UpdateEvents:
                 goto resume_UpdateEvents;
@@ -224,7 +226,7 @@ resume_IntroEvents:
     {
         QuickReconnectScreen::g_active = true;
 
-        if(g_config.allow_drop_add && !TestLevel)
+        if(g_config.allow_drop_add && !TestLevel && XMessage::GetStatus() == XMessage::Status::local)
             PauseGame(PauseCode::DropAdd, 0);
     }
 
@@ -688,11 +690,6 @@ void PauseLoop()
         if(LevelSelect)
             qScreen = Update_qScreen(1);
     }
-    else if(GamePaused == PauseCode::PauseScreen)
-    {
-        if(PauseScreen::Logic(s_pauseLoopState.pause_player))
-            pause_done = true;
-    }
     else if(GamePaused == PauseCode::Message)
     {
         if(MessageScreen_Logic(s_pauseLoopState.pause_player))
@@ -703,20 +700,29 @@ void PauseLoop()
         if(PromptScreen::Logic())
             pause_done = true;
     }
-    else if(GamePaused == PauseCode::DropAdd)
+    else
     {
-        if(ConnectScreen::Logic())
+        // Check messages from the main pause screen first, then everything else. Important for catching delayed messages.
+        if(PauseScreen::Logic())
+        {
+            s_pauseLoopState.pause_stack_depth = 0;
             pause_done = true;
-    }
-    else if(GamePaused == PauseCode::Options)
-    {
-        if(OptionsScreen::Logic())
-            pause_done = true;
-    }
-    else if(GamePaused == PauseCode::TextEntry)
-    {
-        if(TextEntryScreen::Logic())
-            pause_done = true;
+        }
+        else if(GamePaused == PauseCode::DropAdd)
+        {
+            if(ConnectScreen::Logic())
+                pause_done = true;
+        }
+        else if(GamePaused == PauseCode::Options)
+        {
+            if(OptionsScreen::Logic())
+                pause_done = true;
+        }
+        else if(GamePaused == PauseCode::TextEntry)
+        {
+            if(TextEntryScreen::Logic())
+                pause_done = true;
+        }
     }
 
     g_microStats.end_frame();
@@ -758,13 +764,13 @@ static void s_PauseFinish(int stack_level)
 
         if(PSwitchTime > 0)
             ResumeMusic();
-    }
 
-    // prevent unexpected button presses
-    for(int i = 1; i <= numPlayers; i++)
-    {
-        Player[i].UnStart = false;
-        Player[i].CanJump = false;
+        // prevent unexpected button presses
+        for(int i = 1; i <= numPlayers; i++)
+        {
+            Player[i].UnStart = false;
+            Player[i].CanJump = false;
+        }
     }
 
     MenuCursorCanMove = false;

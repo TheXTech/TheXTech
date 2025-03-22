@@ -390,7 +390,7 @@ void SetLayerSpeed(layerindex_t L, double SpeedX, double SpeedY, bool EffectStop
         Defective = false;
 
     // relatively simple code to set the layer's speed
-    if(SpeedX != 0.0 || SpeedY != 0.0 || Defective)
+    if(SpeedX != 0 || SpeedY != 0 || Defective)
     {
         Layer[L].SpeedX = SpeedX;
         Layer[L].SpeedY = SpeedY;
@@ -403,7 +403,7 @@ void SetLayerSpeed(layerindex_t L, double SpeedX, double SpeedY, bool EffectStop
 
 
     // relatively more complex code to stop the layer -- first check that it's necessary (note: this check prevents an infinite recursion)
-    if(Layer[L].SpeedX == 0.0f && Layer[L].SpeedY == 0.0f)
+    if(Layer[L].SpeedX == 0 && Layer[L].SpeedY == 0)
         return;
 
 
@@ -452,7 +452,6 @@ void ShowLayer(layerindex_t L, bool NoEffect)
 
     int A = 0;
     int B = 0;
-    Location_t tempLocation;
 
     Layer[L].Hidden = false;
     if(L == LAYER_DESTROYED_BLOCKS)
@@ -466,12 +465,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
         if(NPC[A].Hidden)
         {
             if(!NoEffect && !NPC[A].Generator)
-            {
-                tempLocation = NPC[A].Location;
-                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(EFFID_SMOKE_S3, tempLocation);
-            }
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
 
             if(!LevelEditor)
             {
@@ -544,12 +538,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
         if(Block[A].Hidden)
         {
             if(!NoEffect && !Block[A].Invis)
-            {
-                tempLocation = Block[A].Location;
-                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(EFFID_SMOKE_S3, tempLocation);
-            }
+                NewEffect(EFFID_SMOKE_S3_CENTER, Block[A].Location);
         }
         Block[A].Hidden = false;
 
@@ -564,12 +553,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
         if(Background[A].Hidden)
         {
             if(!NoEffect)
-            {
-                tempLocation = static_cast<Location_t>(Background[A].Location);
-                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(EFFID_SMOKE_S3, tempLocation);
-            }
+                NewEffect(EFFID_SMOKE_S3_CENTER, static_cast<Location_t>(Background[A].Location));
         }
         Background[A].Hidden = false;
     }
@@ -606,8 +590,6 @@ void HideLayer(layerindex_t L, bool NoEffect)
     if(L == LAYER_NONE)
         return;
 
-    Location_t tempLocation;
-
     Layer[L].Hidden = true;
 
     for(int A : Layer[L].NPCs)
@@ -615,12 +597,7 @@ void HideLayer(layerindex_t L, bool NoEffect)
         if(!NPC[A].Hidden)
         {
             if(!NoEffect && !NPC[A].Generator)
-            {
-                tempLocation = NPC[A].Location;
-                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(EFFID_SMOKE_S3, tempLocation);
-            }
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
         }
 
         NPC[A].Hidden = true;
@@ -637,12 +614,7 @@ void HideLayer(layerindex_t L, bool NoEffect)
         if(!Block[A].Hidden)
         {
             if(!NoEffect && !Block[A].Invis)
-            {
-                tempLocation = Block[A].Location;
-                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(EFFID_SMOKE_S3, tempLocation);
-            }
+                NewEffect(EFFID_SMOKE_S3_CENTER, Block[A].Location);
         }
         Block[A].Hidden = true;
     }
@@ -655,12 +627,7 @@ void HideLayer(layerindex_t L, bool NoEffect)
         if(!Background[A].Hidden)
         {
             if(!NoEffect)
-            {
-                tempLocation = static_cast<Location_t>(Background[A].Location);
-                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(EFFID_SMOKE_S3, tempLocation);
-            }
+                NewEffect(EFFID_SMOKE_S3_CENTER, static_cast<Location_t>(Background[A].Location));
         }
         Background[A].Hidden = true;
     }
@@ -895,7 +862,7 @@ static inline void s_testPlayersInSection(const Screen_t& screen, int B, bool do
                                     warped_plr = C;
 
                                     Player[C].Section = B;
-                                    Player[C].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[C].Location.Width / 2.0;
+                                    Player[C].Location.X = Player[D].Location.X + (Player[D].Location.Width - Player[C].Location.Width) / 2;
                                     Player[C].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[C].Location.Height;
                                     Player[C].Effect = PLREFF_NO_COLLIDE;
                                     Player[C].Effect2 = D;
@@ -1069,8 +1036,8 @@ static inline bool s_initModernQScreen(Screen_t& screen, const int B, const Spee
             // the next code is designed to avoid needing a qScreen if it wouldn't have occurred in the original game
             bool use_new_resize = true;
 
-            double old_w = qScreenLoc[Z_i].Width;
-            double old_h = qScreenLoc[Z_i].Height;
+            int old_w = qScreenLoc[Z_i].Width;
+            int old_h = qScreenLoc[Z_i].Height;
             double old_x = qScreenLoc[Z_i].X;
             double old_y = qScreenLoc[Z_i].Y;
 
@@ -1266,8 +1233,8 @@ eventindex_t ProcEvent_Safe(bool is_resume, eventindex_t index, int whichPlayer,
             musicChanged = true;
         }
 
-        if(musicChanged && (B == Player[1].Section || (numPlayers == 2 && B == Player[2].Section)))
-            StartMusic(B);
+        if(musicChanged)
+            StartMusicIfOnscreen(B);
 
         /* Background change */
         if(s.background_id == EventSection_t::LESet_ResetDefault)
@@ -1285,18 +1252,18 @@ eventindex_t ProcEvent_Safe(bool is_resume, eventindex_t index, int whichPlayer,
             AutoY[B] = s.autoscroll_y;
         }
 
-        bool is_reset = int(s.position.X) == EventSection_t::LESet_ResetDefault;
+        bool is_reset = (s.position.X == EventSection_t::LESet_ResetDefault);
 
         /* Resize the section boundaries */
         if(is_reset && !g_config.modern_section_change)
         {
-            level[B] = LevelREAL[B];
+            level[B] = static_cast<SpeedlessLocation_t>(LevelREAL[B]);
             UpdateSectionOverlaps(B);
         }
-        else if(int(s.position.X) != EventSection_t::LESet_Nothing)
+        else if(s.position.X != EventSection_t::LESet_Nothing)
         {
             tempLevel = level[B];
-            newLevel = (is_reset) ? LevelREAL[B] : s.position;
+            newLevel = static_cast<SpeedlessLocation_t>((is_reset) ? LevelREAL[B] : s.position);
             level[B] = newLevel;
             UpdateSectionOverlaps(B);
 
@@ -1364,7 +1331,7 @@ eventindex_t ProcEvent_Safe(bool is_resume, eventindex_t index, int whichPlayer,
 
         SetLayerSpeed(B, evt.SpeedX, evt.SpeedY, true);
 
-        if(Layer[B].SpeedX == 0.f && Layer[B].SpeedY == 0.f)
+        if(Layer[B].SpeedX == 0 && Layer[B].SpeedY == 0)
         {
             // eventually, only re-join tables the first time the event has been triggered in a level
             treeBlockJoinLayer(B);
@@ -1392,7 +1359,7 @@ eventindex_t ProcEvent_Safe(bool is_resume, eventindex_t index, int whichPlayer,
             if(!autoScrollerChanged)
             {
                 // Do set the autoscrool when non-zero values only, don't zero by other autoruns
-                if((evt.AutoX != 0.0 || evt.AutoY != 0.0) && IF_INRANGE(evt.AutoSection, 0, maxSections))
+                if((evt.AutoX != 0 || evt.AutoY != 0) && IF_INRANGE(evt.AutoSection, 0, maxSections))
                 {
                     AutoX[evt.AutoSection] = evt.AutoX;
                     AutoY[evt.AutoSection] = evt.AutoY;
@@ -1457,7 +1424,7 @@ event_resume:
     // tempBool = false;
     if(evt.TriggerEvent != EVENT_NONE)
     {
-        if(std::round(evt.TriggerDelay) == 0.0)
+        if(evt.TriggerDelay == 0)
         {
             // for(B = 0; B <= maxEvents; B++)
             // {
@@ -1482,6 +1449,7 @@ event_resume:
         {
             newEventNum++;
             NewEvent[newEventNum] = evt.TriggerEvent;
+            // note: this should be rounded towards even, this is non-trivial to implement as integer logic even though all variables involved are integers
             newEventDelay[newEventNum] = vb6Round(evt.TriggerDelay * 6.5);
             newEventPlayer[newEventNum] = static_cast<uint8_t>(whichPlayer);
         }
@@ -1601,12 +1569,12 @@ resume:
 
     for(int A = 0; A < numSections; A++)
     {
-        if(AutoX[A] != 0.0f || AutoY[A] != 0.0f)
+        if(AutoX[A] != 0 || AutoY[A] != 0)
         {
-            level[A].X += double(AutoX[A]);
-            level[A].Width += double(AutoX[A]);
-            level[A].Y += double(AutoY[A]);
-            level[A].Height += double(AutoY[A]);
+            level[A].X += AutoX[A];
+            level[A].Width += AutoX[A];
+            level[A].Y += AutoY[A];
+            level[A].Height += AutoY[A];
             if(level[A].Width > LevelREAL[A].Width)
             {
                 level[A].Width = LevelREAL[A].Width;
@@ -1709,7 +1677,7 @@ void UpdateLayers()
         Layer[A].ApplySpeedY = 0;
 
         // only consider non-empty, moving layers
-        if(Layer[A].Name.empty() || (Layer[A].SpeedX == 0.f && Layer[A].SpeedY == 0.f))
+        if(Layer[A].Name.empty() || (Layer[A].SpeedX == 0 && Layer[A].SpeedY == 0))
             continue;
 
         // the layer does not move
@@ -1746,15 +1714,15 @@ void UpdateLayers()
         {
             // if(!(FreezeLayers && Layer[A].EffectStop))
             {
-                Layer[A].OffsetX += double(Layer[A].SpeedX);
-                Layer[A].OffsetY += double(Layer[A].SpeedY);
+                Layer[A].OffsetX += Layer[A].SpeedX;
+                Layer[A].OffsetY += Layer[A].SpeedY;
 
                 Layer[A].ApplySpeedX = Layer[A].SpeedX;
                 Layer[A].ApplySpeedY = Layer[A].SpeedY;
 
                 // no longer needed thanks to block quadtree, but used to reproduce some buggy behaviors
                 // move the sort invalidation out of the loop over blocks
-                if(!Layer[A].blocks.empty() && Layer[A].SpeedX != 0.f && g_config.emulate_classic_block_order)
+                if(!Layer[A].blocks.empty() && Layer[A].SpeedX != 0 && g_config.emulate_classic_block_order)
                 {
                     if(BlocksSorted)
                         BlocksSorted = false;
@@ -1783,10 +1751,10 @@ void UpdateLayers()
                 {
                     // if(Block[B].Layer == Layer[A].Name)
                     //{
-                    Block[B].Location.X += double(Layer[A].SpeedX);
-                    Block[B].Location.Y += double(Layer[A].SpeedY);
-                    Block[B].Location.SpeedX = double(Layer[A].SpeedX);
-                    Block[B].Location.SpeedY = double(Layer[A].SpeedY);
+                    Block[B].Location.X += Layer[A].SpeedX;
+                    Block[B].Location.Y += Layer[A].SpeedY;
+                    Block[B].Location.SpeedX = Layer[A].SpeedX;
+                    Block[B].Location.SpeedY = Layer[A].SpeedY;
 
                     if(Block[B].Type >= BLKID_CONVEYOR_L_START && Block[B].Type <= BLKID_CONVEYOR_L_END)
                         Block[B].Location.SpeedX += -0.8;
@@ -1806,8 +1774,8 @@ void UpdateLayers()
                 {
                     // if(Background[B].Layer == Layer[A].Name)
                     //{
-                    Background[B].Location.X += double(Layer[A].SpeedX);
-                    Background[B].Location.Y += double(Layer[A].SpeedY);
+                    Background[B].Location.X += Layer[A].SpeedX;
+                    Background[B].Location.Y += Layer[A].SpeedY;
 
                     if(inactive)
                         treeBackgroundUpdateLayer(A, B);
@@ -1821,8 +1789,8 @@ void UpdateLayers()
                 {
                     // if(Water[B].Layer == Layer[A].Name)
                     //{
-                    Water[B].Location.X += double(Layer[A].SpeedX);
-                    Water[B].Location.Y += double(Layer[A].SpeedY);
+                    Water[B].Location.X += Layer[A].SpeedX;
+                    Water[B].Location.Y += Layer[A].SpeedY;
 
                     if(inactive)
                         treeWaterUpdateLayer(A, B);
@@ -1833,8 +1801,8 @@ void UpdateLayers()
                 {
                     // if(NPC[B].Layer == Layer[A].Name)
                     {
-                        NPC[B].DefaultLocationX += double(Layer[A].SpeedX);
-                        NPC[B].DefaultLocationY += double(Layer[A].SpeedY);
+                        NPC[B].DefaultLocationX += Layer[A].SpeedX;
+                        NPC[B].DefaultLocationY += Layer[A].SpeedY;
 
                         if(!NPC[B].Active || NPC[B].Generator || NPC[B].Effect != NPCEFF_NORMAL ||
                            NPC[B]->IsACoin || NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_STONE_S3 ||
@@ -1846,13 +1814,13 @@ void UpdateLayers()
                         {
                             if(NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPCID_HOMING_BALL_GEN)
                             {
-                                NPC[B].Location.SpeedX = double(Layer[A].SpeedX);
-                                NPC[B].Location.SpeedY = double(Layer[A].SpeedY);
+                                NPC[B].Location.SpeedX = Layer[A].SpeedX;
+                                NPC[B].Location.SpeedY = Layer[A].SpeedY;
                             }
                             else if(NPC[B]->IsAVine)
                             {
-                                NPC[B].Location.SpeedX = double(Layer[A].SpeedX);
-                                NPC[B].Location.SpeedY = double(Layer[A].SpeedY);
+                                NPC[B].Location.SpeedX = Layer[A].SpeedX;
+                                NPC[B].Location.SpeedY = Layer[A].SpeedY;
                             }
 
                             if(!NPC[B].Active)
@@ -1876,8 +1844,8 @@ void UpdateLayers()
                             }
                             else
                             {
-                                NPC[B].Location.X += double(Layer[A].SpeedX);
-                                NPC[B].Location.Y += double(Layer[A].SpeedY);
+                                NPC[B].Location.X += Layer[A].SpeedX;
+                                NPC[B].Location.Y += Layer[A].SpeedY;
                             }
 
                             if(NPC[B].Effect == NPCEFF_WARP)
@@ -1885,9 +1853,9 @@ void UpdateLayers()
                                 // specialY/X store the NPC's destination position
                                 // this previously changed Effect2
                                 if(NPC[B].Effect3 == 1 || NPC[B].Effect3 == 3)
-                                    NPC[B].SpecialY += double(Layer[A].SpeedY);
+                                    NPC[B].SpecialY += Layer[A].SpeedY;
                                 else
-                                    NPC[B].SpecialX += double(Layer[A].SpeedX);
+                                    NPC[B].SpecialX += Layer[A].SpeedX;
                             }
 
                             if(!NPC[B].Active)
@@ -1908,10 +1876,10 @@ void UpdateLayers()
 
                 for(int B : Layer[A].warps)
                 {
-                    Warp[B].Entrance.X += double(Layer[A].SpeedX);
-                    Warp[B].Entrance.Y += double(Layer[A].SpeedY);
-                    Warp[B].Exit.X += double(Layer[A].SpeedX);
-                    Warp[B].Exit.Y += double(Layer[A].SpeedY);
+                    Warp[B].Entrance.X += Layer[A].SpeedX;
+                    Warp[B].Entrance.Y += Layer[A].SpeedY;
+                    Warp[B].Exit.X += Layer[A].SpeedX;
+                    Warp[B].Exit.Y += Layer[A].SpeedY;
                 }
             }
         }

@@ -25,6 +25,7 @@
 #include "graphics.h"
 #include "sound.h"
 #include "game_main.h"
+#include "message.h"
 #include "main/screen_asset_pack.h"
 #include "core/render.h"
 #include "core/window.h"
@@ -120,7 +121,7 @@ void UpdateInternalRes()
     int canon_w = l_screen->canonical_screen().W;
     int canon_h = l_screen->canonical_screen().H;
 
-    if(!g_config.allow_multires && !ignore_compat)
+    if((!g_config.allow_multires && !ignore_compat) || (XMessage::GetStatus() != XMessage::Status::local))
     {
         if((req_w != 0 && req_w < canon_w) || (req_h != 0 && req_h < canon_h))
         {
@@ -276,7 +277,12 @@ void UpdateInternalRes()
 #endif
 
     // DONE: above should tweak render target resolution. This should tweak game's screen resolution.
-    if(ignore_compat || (g_config.allow_multires && g_config.dynamic_camera_logic))
+    if(XMessage::GetStatus() != XMessage::Status::local)
+    {
+        l_screen->W = canon_w;
+        l_screen->H = canon_h;
+    }
+    else if(ignore_compat || (g_config.allow_multires && g_config.dynamic_camera_logic))
     {
         l_screen->W = XRender::TargetW;
         l_screen->H = XRender::TargetH;

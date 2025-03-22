@@ -79,6 +79,18 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                         else
                             HitSpot = EasyModeCollision(Player[A].Location, NPC[B].Location, NPC[B]->CanWalkOn); // find the hitspot when in a shoe or on a yoshi
 
+                        if(GameOutro)
+                            HitSpot = 0;
+
+                        if(NPC[B].Inert) // if the npc is friendly then you can't touch it
+                        {
+                            HitSpot = 0;
+                            if(NPC[B].Text != STRINGINDEX_NONE && Player[A].Controls.Up && !FreezeNPCs)
+                                MessageNPC = B;
+                        }
+
+                        // BEGIN type-based "onCollidePlayer" logic
+
                         if(!NPC[B].Inert)
                         {
                             // battlemode stuff
@@ -192,139 +204,11 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                             HitSpot = 0;
                         }
 
-                        if(GameOutro)
-                            HitSpot = 0;
-
                         if(NPC[B].Type == NPCID_HEAVY_THROWN && NPC[B].CantHurt > 0)
                             HitSpot = 0;
 
                         if(NPC[B].Type == NPCID_ITEM_POD && HitSpot == 1)
                             HitSpot = 0;
-
-                        if(NPC[B].Inert) // if the npc is friendly then you can't touch it
-                        {
-                            HitSpot = 0;
-                            if(NPC[B].Text != STRINGINDEX_NONE && Player[A].Controls.Up && !FreezeNPCs)
-                                MessageNPC = B;
-                        }
-
-                        if(Player[A].Stoned && HitSpot != 1) // if you are a statue then SLAM into the npc
-                        {
-                            if(Player[A].Location.SpeedX > 3 || Player[A].Location.SpeedX < -3)
-                                NPCHit(B, 3, B);
-                        }
-
-                        // the following code is for spin jumping and landing on things as yoshi/shoe
-                        if(Player[A].Mount == 1 || Player[A].Mount == 3 || Player[A].SpinJump ||
-                           (Player[A].Stoned && !NPC[B]->CanWalkOn))
-                        {
-                            if(HitSpot == 1)
-                            {
-                                if(Player[A].Mount == 1 || Player[A].Mount == 2 || Player[A].Stoned)
-                                    NPCHit(B, 8, A);
-                                else if(!(NPC[B].Type == NPCID_FIRE_PLANT || NPC[B].Type == NPCID_QUAD_SPITTER || NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_LAVABUBBLE ||
-                                          NPC[B].Type == NPCID_SPIKY_S3 || NPC[B].Type == NPCID_SPIKY_S4 || NPC[B].Type == NPCID_SPIKY_BALL_S4 || NPC[B].Type == NPCID_BOTTOM_PLANT ||
-                                          NPC[B].Type == NPCID_SIDE_PLANT || NPC[B].Type == NPCID_CRAB || NPC[B].Type == NPCID_FLY || NPC[B].Type == NPCID_BIG_PLANT ||
-                                          NPC[B].Type == NPCID_PLANT_S1 || NPC[B].Type == NPCID_VILLAIN_S1 || NPC[B].Type == NPCID_WALL_BUG || NPC[B].Type == NPCID_WALL_TURTLE ||
-                                          NPC[B].Type == NPCID_SICK_BOSS || NPC[B].Type == NPCID_WALK_PLANT || NPC[B].Type == NPCID_JUMP_PLANT) && !NPC[B]->CanWalkOn)
-                                {
-                                    if(Player[A].Wet > 0 && (NPC[B]->IsFish || NPC[B].Type == NPCID_SQUID_S3 || NPC[B].Type == NPCID_SQUID_S1))
-                                    {
-                                    }
-                                    else
-                                        NPCHit(B, 8, A);
-                                }
-
-                                if(NPC[B].Killed == 8 || NPC[B]->IsFish || NPC[B].Type == NPCID_SAW ||
-                                   NPC[B].Type == NPCID_STONE_S3 || NPC[B].Type == NPCID_STONE_S4 || NPC[B].Type == NPCID_GHOST_S3 ||
-                                   NPC[B].Type == NPCID_GHOST_FAST || NPC[B].Type == NPCID_GHOST_S4 || NPC[B].Type == NPCID_BIG_GHOST ||
-                                   NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_LAVABUBBLE || NPC[B].Type == NPCID_SPIKY_S3 ||
-                                   NPC[B].Type == NPCID_BOTTOM_PLANT || NPC[B].Type == NPCID_SIDE_PLANT || NPC[B].Type == NPCID_CRAB ||
-                                   NPC[B].Type == NPCID_FLY || NPC[B].Type == NPCID_BIG_PLANT || NPC[B].Type == NPCID_PLANT_S1 ||
-                                   NPC[B].Type == NPCID_VILLAIN_S1 || NPC[B].Type == NPCID_WALL_BUG || NPC[B].Type == NPCID_WALL_TURTLE ||
-                                   NPC[B].Type == NPCID_SICK_BOSS || NPC[B].Type == NPCID_LAVA_MONSTER || NPC[B].Type == NPCID_FIRE_PLANT ||
-                                   NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_WALK_PLANT || NPC[B].Type == NPCID_QUAD_SPITTER ||
-                                   NPC[B].Type == NPCID_SPIKY_S4 || NPC[B].Type == NPCID_SPIKY_BALL_S4 || NPC[B].Type == NPCID_JUMP_PLANT) // tap
-                                {
-                                    if(NPC[B].Killed == 8 && Player[A].Mount == 1 && Player[A].MountType == 2)
-                                    {
-                                        numNPCs++;
-                                        NPC[numNPCs] = NPC_t();
-                                        NPC[numNPCs].Active = true;
-                                        NPC[numNPCs].TimeLeft = 100;
-                                        NPC[numNPCs].Section = Player[A].Section;
-                                        NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
-                                        NPC[numNPCs].Special = Player[A].Character;
-                                        NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-                                        NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-                                        NPC[numNPCs].Location.Y = Player[A].Location.Height + Player[A].Location.Y - NPC[numNPCs].Location.Height;
-                                        NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-                                        NPC[numNPCs].Location.SpeedX = 4;
-                                        NPC[numNPCs].Location.SpeedY = 10;
-                                        syncLayers_NPC(numNPCs);
-                                        numNPCs++;
-                                        NPC[numNPCs] = NPC_t();
-                                        NPC[numNPCs].Active = true;
-                                        NPC[numNPCs].TimeLeft = 100;
-                                        NPC[numNPCs].Section = Player[A].Section;
-                                        NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
-                                        NPC[numNPCs].Special = Player[A].Character;
-                                        NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-                                        NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-                                        NPC[numNPCs].Location.Y = Player[A].Location.Height + Player[A].Location.Y - NPC[numNPCs].Location.Height;
-                                        NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-                                        NPC[numNPCs].Location.SpeedX = -4;
-                                        NPC[numNPCs].Location.SpeedY = 10;
-                                        syncLayers_NPC(numNPCs);
-                                    }
-
-                                    if(NPC[B].Killed == 0 && Player[A].SpinJump == 0)
-                                        PlaySoundSpatial(SFX_Stomp, Player[A].Location);
-
-                                    Player[A].ForceHitSpot3 = true;
-                                    if(HitSpot == 1 && !(Player[A].GroundPound && NPC[B].Killed == 8))
-                                    {
-                                        tempHit = true;
-                                        tempLocation.Y = NPC[B].Location.Y - Player[A].Location.Height;
-                                        if(Player[A].SpinJump)
-                                        {
-                                            if(NPC[B].Killed > 0)
-                                            {
-                                                if(Player[A].Controls.Down)
-                                                    tempHit = false;
-                                                else
-                                                    spinKill = true;
-                                            }
-                                            else
-                                                PlaySoundSpatial(SFX_Stomp, Player[A].Location);
-                                        }
-                                    }
-                                    HitSpot = 0;
-                                }
-                            }
-                        }
-                        else if(Player[A].Mount == 2)
-                        {
-                            if(NPC[B].vehiclePlr == A)
-                                HitSpot = 0;
-                            else if(!(NPC[B].Type == NPCID_BULLET && NPC[B].CantHurt > 0))
-                            {
-                                if((NPC[B].Location.Y + NPC[B].Location.Height > Player[A].Location.Y + 18 && HitSpot != 3) || HitSpot == 1)
-                                {
-                                    NPCHit(B, 8, A);
-                                    if(NPC[B].Killed == 8)
-                                        HitSpot = 0;
-
-                                    if(NPC[B].Type == NPCID_WALK_BOMB_S2 || NPC[B].Type == NPCID_WALK_BOMB_S3 || NPC[B].Type == NPCID_LIT_BOMB_S3)
-                                    {
-                                        NPCHit(B, 3, B);
-                                        if(NPC[B].Killed == 3)
-                                            HitSpot = 0;
-                                    }
-
-                                }
-                            }
-                        }
 
                         // ' Fireball immune for ducking in the hammer suit
                         if((Player[A].State == 6 && Player[A].Duck && Player[A].Mount == 0 && Player[A].Character != 5) || (Player[A].Mount == 1 && Player[A].MountType == 2))
@@ -338,8 +222,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 for(int C = 1; C <= 10; ++C)
                                 {
                                     NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[B].Location, NPC[B].Special);
-                                    Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[B].Location.SpeedX * 0.1;
-                                    Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[B].Location.SpeedY * 0.1;
+                                    Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[B].Location.SpeedX / 10;
+                                    Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[B].Location.SpeedY / 10;
                                     if(Effect[numEffects].Frame == 0)
                                         Effect[numEffects].Frame = -iRand(3);
                                     else
@@ -445,7 +329,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 Player[A].Location.SpeedX = 0;
                                 Player[A].Location.SpeedY = 0;
                                 // Stop
-                                Player[A].Location.X = Warp[Player[A].Warp].Entrance.X + Warp[Player[A].Warp].Entrance.Width / 2.0 - Player[A].Location.Width / 2.0;
+                                Player[A].Location.X = Warp[Player[A].Warp].Entrance.X + (Warp[Player[A].Warp].Entrance.Width - Player[A].Location.Width) / 2;
                                 Player[A].Location.Y = Warp[Player[A].Warp].Entrance.Y + Warp[Player[A].Warp].Entrance.Height - Player[A].Location.Height;
                                 tempLocation = static_cast<Location_t>(Warp[numWarps + 1].Entrance);
                                 tempLocation.Y -= 32;
@@ -458,10 +342,6 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                             }
                         }
 
-
-                        if(HitSpot == 1 && (NPC[B].Type == NPCID_COIN_SWITCH || NPC[B].Type == NPCID_TIME_SWITCH || NPC[B].Type == NPCID_TNT) && NPC[B].Projectile != 0)
-                            HitSpot = 0;
-
                         if(NPC[B].Type == NPCID_LOCK_DOOR && Player[A].HasKey)
                         {
                             Player[A].HasKey = false;
@@ -470,12 +350,125 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                             NPCQueues::Killed.push_back(B);
                         }
 
-                        if(NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Projectile != 0 && HitSpot > 1)
-                            HitSpot = 5;
+                        if(NPC[B].Type == NPCID_MINIBOSS && NPC[B].Special == 4 && HitSpot > 1)
+                            HitSpot = 0;
+
+                        // END type-based "onCollidePlayer" logic
+
+                        if(Player[A].Stoned && HitSpot != 1) // if you are a statue then SLAM into the npc
+                        {
+                            if(Player[A].Location.SpeedX > 3 || Player[A].Location.SpeedX < -3)
+                                NPCHit(B, 3, B);
+                        }
+
+                        // kill things with the vehicle
+                        if(Player[A].Mount == 2 && !Player[A].SpinJump && !(Player[A].Stoned && !NPC[B]->CanWalkOn))
+                        {
+                            // already checked at top
+                            // if(NPC[B].vehiclePlr == A)
+                            //     HitSpot = 0;
+                            // else
+                            if(!(NPC[B].Type == NPCID_BULLET && NPC[B].CantHurt > 0))
+                            {
+                                if((NPC[B].Location.Y + NPC[B].Location.Height > Player[A].Location.Y + 18 && HitSpot != 3) || HitSpot == 1)
+                                {
+                                    NPCHit(B, 8, A);
+                                    if(NPC[B].Killed == 8)
+                                        HitSpot = 0;
+
+                                    if(NPC[B].Type == NPCID_WALK_BOMB_S2 || NPC[B].Type == NPCID_WALK_BOMB_S3 || NPC[B].Type == NPCID_LIT_BOMB_S3)
+                                    {
+                                        NPCHit(B, 3, B);
+                                        if(NPC[B].Killed == 3)
+                                            HitSpot = 0;
+                                    }
+                                }
+                            }
+                        }
+
+                        // prevented player from grabbing active slide blocks; logic moved to side grab code
+                        // if(NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Projectile != 0 && HitSpot > 1)
+                        //     HitSpot = 5;
 
                         if(HitSpot == 1) // Player landed on a NPC
                         {
-                            if(NPC[B]->CanWalkOn || (Player[A].ShellSurf && NPC[B]->IsAShell)) // NPCs that can be walked on
+                            // the following code is for spin jumping and landing on things as yoshi/shoe
+                            if(Player[A].Mount == 1 || Player[A].Mount == 3 || Player[A].SpinJump ||
+                               (Player[A].Stoned && !NPC[B]->CanWalkOn))
+                            {
+                                // these types were not hit during spin bounces in SMBX 1.3 (but may be vulnerable to stomps by mounts)
+                                bool dont_hit_spin_bounce = (NPC[B].Type == NPCID_FIRE_PLANT || NPC[B].Type == NPCID_QUAD_SPITTER || NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_LAVABUBBLE ||
+                                          NPC[B].Type == NPCID_SPIKY_S3 || NPC[B].Type == NPCID_SPIKY_S4 || NPC[B].Type == NPCID_SPIKY_BALL_S4 || NPC[B].Type == NPCID_BOTTOM_PLANT ||
+                                          NPC[B].Type == NPCID_SIDE_PLANT || NPC[B].Type == NPCID_CRAB || NPC[B].Type == NPCID_FLY || NPC[B].Type == NPCID_BIG_PLANT ||
+                                          NPC[B].Type == NPCID_PLANT_S1 || NPC[B].Type == NPCID_VILLAIN_S1 || NPC[B].Type == NPCID_WALL_BUG || NPC[B].Type == NPCID_WALL_TURTLE ||
+                                          NPC[B].Type == NPCID_SICK_BOSS || NPC[B].Type == NPCID_WALK_PLANT || NPC[B].Type == NPCID_JUMP_PLANT);
+
+                                // these types are immune to spin bounces and were hit (with no effect) in SMBX 1.3 but are no longer hit
+                                bool immune_to_spin_bounce = (NPC[B].Type == NPCID_SAW || NPC[B].Type == NPCID_STONE_S3 || NPC[B].Type == NPCID_STONE_S4 || NPC[B].Type == NPCID_GHOST_S3 ||
+                                   NPC[B].Type == NPCID_GHOST_FAST || NPC[B].Type == NPCID_GHOST_S4 || NPC[B].Type == NPCID_BIG_GHOST || NPC[B].Type == NPCID_LAVA_MONSTER || NPC[B].Type == NPCID_LONG_PLANT_UP);
+
+                                bool force_bounce = (dont_hit_spin_bounce | immune_to_spin_bounce);
+
+                                if(Player[A].Mount == 1 || Player[A].Mount == 2 || Player[A].Stoned)
+                                    NPCHit(B, 8, A);
+                                else if(!force_bounce && !NPC[B]->CanWalkOn)
+                                {
+                                    if(Player[A].Wet > 0 && (NPC[B]->IsFish || NPC[B].Type == NPCID_SQUID_S3 || NPC[B].Type == NPCID_SQUID_S1))
+                                    {
+                                    }
+                                    else
+                                        NPCHit(B, 8, A);
+                                }
+
+                                if(NPC[B].Killed == 8 || NPC[B]->IsFish || force_bounce) // tap
+                                {
+                                    if(NPC[B].Killed == 8 && Player[A].Mount == 1 && Player[A].MountType == 2)
+                                    {
+                                        for(int i = 0; i < 2; i++)
+                                        {
+                                            numNPCs++;
+                                            NPC[numNPCs] = NPC_t();
+                                            NPC[numNPCs].Active = true;
+                                            NPC[numNPCs].TimeLeft = 100;
+                                            NPC[numNPCs].Section = Player[A].Section;
+                                            NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
+                                            NPC[numNPCs].Special = Player[A].Character;
+                                            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+                                            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+                                            NPC[numNPCs].Location.Y = Player[A].Location.Height + Player[A].Location.Y - NPC[numNPCs].Location.Height;
+                                            NPC[numNPCs].Location.X = Player[A].Location.X + (Player[A].Location.Width - NPC[numNPCs].Location.Width) / 2;
+                                            NPC[numNPCs].Location.SpeedX = (i == 0) ? -4 : 4;
+                                            NPC[numNPCs].Location.SpeedY = 10;
+                                            syncLayers_NPC(numNPCs);
+                                        }
+                                    }
+
+                                    Player[A].ForceHitSpot3 = true;
+                                    if(/*HitSpot == 1 && */ !(Player[A].GroundPound && NPC[B].Killed == 8))
+                                    {
+                                        tempHit = true;
+                                        tempLocation.Y = NPC[B].Location.Y - Player[A].Location.Height;
+
+                                        if(NPC[B].Killed == 0)
+                                            PlaySoundSpatial(SFX_Stomp, Player[A].Location);
+                                        else if(Player[A].SpinJump)
+                                        {
+                                            if(Player[A].Controls.Down)
+                                                tempHit = false;
+                                            else
+                                                spinKill = true;
+                                        }
+                                    }
+
+                                    continue;
+                                }
+                            }
+
+                            // moved from above
+                            if(/* HitSpot == 1 && */ (NPC[B].Type == NPCID_COIN_SWITCH || NPC[B].Type == NPCID_TIME_SWITCH || NPC[B].Type == NPCID_TNT) && NPC[B].Projectile != 0)
+                                HitSpot = 0;
+                            // NPCs that can be walked on
+                            else if(NPC[B]->CanWalkOn || (Player[A].ShellSurf && NPC[B]->IsAShell))
                             {
                                 // the player landed on an NPC he can stand on
                                 if(floorNpc1 == 0)
@@ -485,16 +478,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 else if(Player[A].StandingOnNPC == B)
                                 {
                                     // if standing on 2 or more NPCs find out the best one to stand on
-                                    float C = NPC[floorNpc1].Location.X + NPC[floorNpc1].Location.Width * 0.5;
-                                    float D = NPC[floorNpc2].Location.X + NPC[floorNpc2].Location.Width * 0.5;
-                                    C += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
-                                    D += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
-
-                                    if(C < 0)
-                                        C = -C;
-
-                                    if(D < 0)
-                                        D = -D;
+                                    float C = std::abs(NPC[floorNpc1].Location.minus_center_x(Player[A].Location));
+                                    float D = std::abs(NPC[floorNpc2].Location.minus_center_x(Player[A].Location));
 
                                     if(C < D)
                                         floorNpc2 = B;
@@ -503,9 +488,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 }
                                 else
                                     floorNpc2 = B;
-
-                                // if landing on a yoshi or boot, mount up!
                             }
+                            // if landing on a yoshi or boot, mount up!
                             else if((NPCIsYoshi(NPC[B]) || NPCIsBoot(NPC[B])) && Player[A].Character != 5 && !Player[A].Fairy)
                             {
                                 if(Player[A].Mount == 0 && NPC[B].CantHurtPlayer != A && Player[A].Dismount == 0)
@@ -570,19 +554,21 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     }
                                 }
                             }
-                            else if(NPC[B].Type != NPCID_CANNONITEM && NPC[B].Type != NPCID_KEY &&
-                                    NPC[B].Type != NPCID_TOOTHYPIPE && NPC[B].Type != NPCID_TOOTHY &&
-                                    (!Player[A].SlideKill || NPC[B]->WontHurt)) // NPCs that cannot be walked on
+                            else if(NPC[B].Type == NPCID_CANNONITEM || NPC[B].Type == NPCID_KEY ||
+                                    NPC[B].Type == NPCID_TOOTHYPIPE || NPC[B].Type == NPCID_TOOTHY ||
+                                    (Player[A].SlideKill && !NPC[B]->WontHurt)) // NPCs that cannot be walked on
                             {
+                                // cancel jump
+                            }
 #if 0
-                                // dead code since SMBX 1.3, because NoShellKick was never set
-                                if(NPC[B].CantHurtPlayer == A && Player[A].NoShellKick > 0)
-                                {
-                                    // Do nothing!
-                                }
-                                else
-                                // (the remainder of this section was previously guarded by the above)
+                            // dead code since SMBX 1.3, because NoShellKick was never set
+                            else if(NPC[B].CantHurtPlayer == A && Player[A].NoShellKick > 0)
+                            {
+                                // Do nothing!
+                            }
 #endif
+                            else
+                            {
                                 if(NPC[B]->IsABonus) // Bonus
                                     TouchBonus(A, B);
                                 else if(NPC[B]->IsAShell && NPC[B].Location.SpeedX == 0 && Player[A].HoldingNPC == 0 && Player[A].Controls.Run)
@@ -668,17 +654,18 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 }
                             }
                         }
-                        else if(HitSpot == 0) // if hitspot = 0 then do nothing
+                        else if(HitSpot == 0)
                         {
-
-                            // player touched an npc anywhere except from the top
+                            // if hitspot = 0 then do nothing
                         }
-                        else if(!(NPC[B].Type == NPCID_MINIBOSS && NPC[B].Special == 4)) // Player touched an NPC
+                        // player touched an npc anywhere except from the top
+                        else // Player touched an NPC
                         {
 
 /* If (.CanGrabNPCs = True Or NPCIsGrabbable(NPC(B).Type) = True Or (NPC(B).Effect = 2 And NPCIsABonus(NPC(B).Type) = False)) And (NPC(B).Effect = 0 Or NPC(B).Effect = 2) Or (NPCIsAShell(NPC(B).Type) And FreezeNPCs = True) Then      'GRAB EVERYTHING
 */
-                            // grab code
+
+                            // grab from side
                             if(
                                 ((Player[A].CanGrabNPCs || NPC[B]->IsGrabbable || (NPC[B].Effect == NPCEFF_DROP_ITEM && !NPC[B]->IsABonus)) && (NPC[B].Effect == NPCEFF_NORMAL || NPC[B].Effect == NPCEFF_DROP_ITEM)) ||
                                  (NPC[B]->IsAShell && FreezeNPCs)
@@ -690,7 +677,11 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                        (HitSpot == 4 && Player[A].Direction == 1) ||
                                        (NPC[B].Type == NPCID_CANNONITEM || NPC[B].Type == NPCID_TOOTHYPIPE || NPC[B].Effect == NPCEFF_DROP_ITEM || (NPCIsVeggie(NPC[B]) && NPC[B].CantHurtPlayer != A)))
                                     {
-                                        if(Player[A].HoldingNPC == 0)
+                                        if(NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Projectile != 0)
+                                        {
+                                            // don't grab active slide blocks
+                                        }
+                                        else if(Player[A].HoldingNPC == 0)
                                         {
                                             if(!NPC[B]->IsAShell || Player[A].Character >= 3)
                                             {
@@ -772,7 +763,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     {
                                         NPC[B].TailCD = 12;
                                         if(NPC[B].Type != NPCID_HIT_CARRY_FODDER && NPC[B].Type != NPCID_LIT_BOMB_S3)
-                                            NewEffect(EFFID_WHACK, newLoc((Player[A].Location.X + NPC[B].Location.X + (Player[A].Location.Width + NPC[B].Location.Width) / 2.0) / 2, (Player[A].Location.Y + NPC[B].Location.Y + (Player[A].Location.Height + NPC[B].Location.Height) / 2.0) / 2));
+                                            NewEffect(EFFID_WHACK, newLoc((Player[A].Location.X + NPC[B].Location.X + (Player[A].Location.Width + NPC[B].Location.Width) / 2) / 2, (Player[A].Location.Y + NPC[B].Location.Y + (Player[A].Location.Height + NPC[B].Location.Height) / 2) / 2));
                                         NPCHit(B, 1, A);
                                     }
                                 }
@@ -850,48 +841,55 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                                 PlayerHurt(A);
                                         }
                                     }
+                                    // player gets pushed left/right by NPC
                                     else
                                     {
+                                        tempHit2 = true;
+                                        tempHitSpeed = NPC[B].Location.SpeedX + NPC[B].BeltSpeed;
+
+                                        // reset player speed if not on conveyor belt
                                         bool tempBool = false;
                                         if(Player[A].StandingOnNPC != 0)
                                         {
-                                            if(NPC[Player[A].StandingOnNPC].Type == 57)
+                                            if(NPC[Player[A].StandingOnNPC].Type == NPCID_CONVEYOR)
                                                 tempBool = true;
                                         }
 
+                                        if(!tempBool && NPC[B].Type != NPCID_BULLY)
+                                            Player[A].Location.SpeedX = 0.2 * Player[A].Direction;
+
+                                        // reset player run count
+                                        Player[A].RunCount = 0;
+
+                                        // mark moving pinched (if needed)
+                                        if(NPC[B].Type != NPCID_KEY && NPC[B].Type != NPCID_COIN_SWITCH && NPC[B].Type != NPCID_CONVEYOR && (NPC[B].Location.SpeedX != 0 || NPC[B].Location.SpeedY != 0 || NPC[B].BeltSpeed))
+                                        {
+                                            Player[A].Pinched.Moving = 2;
+
+                                            if(NPC[B].Location.SpeedX != 0 || NPC[B].BeltSpeed)
+                                                Player[A].Pinched.MovingLR = true;
+                                        }
+
+                                        // save current X location (for NPCs riding player's vehicle)
                                         float D = Player[A].Location.X;
-                                        if(Player[A].Location.X + Player[A].Location.Width / 2.0 < NPC[B].Location.X + NPC[B].Location.Width / 2.0)
+
+                                        // actually move the player
+                                        if(NPC[B].Location.to_right_of(Player[A].Location))
                                         {
                                             Player[A].Pinched.Right4 = 2;
 
-                                            if(NPC[B].Type != NPCID_KEY && NPC[B].Type != NPCID_COIN_SWITCH && NPC[B].Type != NPCID_CONVEYOR && (NPC[B].Location.SpeedX != 0 || NPC[B].Location.SpeedY != 0 || NPC[B].BeltSpeed))
+                                            if(floorBlock != 0 && std::abs(Block[floorBlock].Location.X - NPC[B].Location.X) < 1)
                                             {
-                                                Player[A].Pinched.Moving = 2;
-
-                                                if(NPC[B].Location.SpeedX != 0 || NPC[B].BeltSpeed)
-                                                    Player[A].Pinched.MovingLR = true;
+                                                Player[A].Location.X = NPC[B].Location.X - Player[A].Location.Width - 1;
+                                                Player[A].Location.SpeedY = oldSpeedY;
                                             }
+                                            else
+                                                Player[A].Location.X = NPC[B].Location.X - Player[A].Location.Width - 0.1;
 
-                                            Player[A].Location.X = NPC[B].Location.X - Player[A].Location.Width - 0.1;
-                                            tempHit2 = true;
-                                            Player[A].RunCount = 0;
-                                            tempHitSpeed = NPC[B].Location.SpeedX + NPC[B].BeltSpeed;
-
-                                            if(floorBlock != 0)
-                                            {
-                                                if(std::abs(Block[floorBlock].Location.X - NPC[B].Location.X) < 1)
-                                                {
-                                                    Player[A].Location.X = NPC[B].Location.X - Player[A].Location.Width - 1;
-                                                    Player[A].Location.SpeedY = oldSpeedY;
-                                                }
-                                            }
-
-                                            if(!tempBool && NPC[B].Type != NPCID_BULLY)
-                                                Player[A].Location.SpeedX = 0.2 * Player[A].Direction;
-
-                                            if(NPC[Player[A].StandingOnNPC].Type == 57)
+                                            if(NPC[Player[A].StandingOnNPC].Type == NPCID_CONVEYOR)
                                                 Player[A].Location.X -= 1;
 
+                                            // forget about floors no longer supporting player
                                             if(floorNpc1 > 0)
                                             {
                                                 if(NPC[B].Location.X >= NPC[floorNpc1].Location.X - 2 && NPC[B].Location.X <= NPC[floorNpc1].Location.X + 2)
@@ -908,31 +906,15 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         {
                                             Player[A].Pinched.Left2 = 2;
 
-                                            if(NPC[B].Type != NPCID_KEY && NPC[B].Type != NPCID_COIN_SWITCH && NPC[B].Type != NPCID_CONVEYOR && (NPC[B].Location.SpeedX != 0 || NPC[B].Location.SpeedY != 0 || NPC[B].BeltSpeed))
+                                            if(floorBlock != 0 && std::abs(Block[floorBlock].Location.X + Block[floorBlock].Location.Width - NPC[B].Location.X - NPC[B].Location.Width) < 1)
                                             {
-                                                Player[A].Pinched.Moving = 2;
-
-                                                if(NPC[B].Location.SpeedX != 0 || NPC[B].BeltSpeed)
-                                                    Player[A].Pinched.MovingLR = true;
+                                                Player[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 1;
+                                                Player[A].Location.SpeedY = oldSpeedY;
                                             }
+                                            else
+                                                Player[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 0.01;
 
-                                            Player[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 0.01;
-                                            tempHit2 = true;
-                                            Player[A].RunCount = 0;
-                                            tempHitSpeed = NPC[B].Location.SpeedX + NPC[B].BeltSpeed;
-
-                                            if(floorBlock != 0)
-                                            {
-                                                if(std::abs(Block[floorBlock].Location.X + Block[floorBlock].Location.Width - NPC[B].Location.X - NPC[B].Location.Width) < 1)
-                                                {
-                                                    Player[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 1;
-                                                    Player[A].Location.SpeedY = oldSpeedY;
-                                                }
-                                            }
-
-                                            if(!tempBool && NPC[B].Type != NPCID_BULLY)
-                                                Player[A].Location.SpeedX = 0.2 * Player[A].Direction;
-
+                                            // forget about floors no longer supporting player
                                             if(floorNpc1 > 0)
                                             {
                                                 if(NPC[B].Location.X + NPC[B].Location.Width >= NPC[floorNpc1].Location.X + NPC[floorNpc1].Location.Width - 2 && NPC[B].Location.X + NPC[B].Location.Width <= NPC[floorNpc1].Location.X + NPC[floorNpc1].Location.Width + 2)
@@ -946,6 +928,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                             }
                                         }
 
+                                        // apply speed to vehicle riders if needed
                                         if(Player[A].Mount == 2)
                                         {
                                             D = Player[A].Location.X - D;
@@ -1002,33 +985,22 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
         if(tempSpring)
         {
             Player[A].Jump = Physics.PlayerSpringJumpHeight;
-
-            if(Player[A].Character == 2)
-                Player[A].Jump += 3;
-
-            if(Player[A].SpinJump)
-                Player[A].Jump -= 6;
-
             Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - 4;
-
-            if(Player[A].Wet > 0)
-                Player[A].Location.SpeedY = Player[A].Location.SpeedY * 0.3;
         }
         else
         {
             Player[A].Jump = Physics.PlayerNPCJumpHeight;
-
-            if(Player[A].Character == 2)
-                Player[A].Jump += 3;
-
-            if(Player[A].SpinJump)
-                Player[A].Jump -= 6;
-
             Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
-
-            if(Player[A].Wet > 0)
-                Player[A].Location.SpeedY = Player[A].Location.SpeedY * 0.3;
         }
+
+        if(Player[A].Character == 2)
+            Player[A].Jump += 3;
+
+        if(Player[A].SpinJump)
+            Player[A].Jump -= 6;
+
+        if(Player[A].Wet > 0)
+            Player[A].Location.SpeedY *= 0.3;
 
         // this is very likely but not certain to be the y value stored when tempHit was set
         Player[A].Location.Y = tempLocation.Y;
@@ -1036,7 +1008,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
         if(tempShell)
             NewEffect(EFFID_STOMP_INIT, newLoc(Player[A].Location.X + Player[A].Location.Width / 2.0 - EffectWidth[EFFID_STOMP_INIT] / 2.0, Player[A].Location.Y + Player[A].Location.Height - EffectHeight[EFFID_STOMP_INIT] / 2.0));
         else if(!tempSpring)
-            NewEffect(EFFID_WHACK, newLoc(Player[A].Location.X + Player[A].Location.Width / 2.0 - 16, Player[A].Location.Y + Player[A].Location.Height - 16));
+            NewEffect(EFFID_WHACK, newLoc(Player[A].Location.X + Player[A].Location.Width / 2 - 16, Player[A].Location.Y + Player[A].Location.Height - 16));
         else
             tempSpring = false;
 
@@ -1066,36 +1038,25 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
     {
         if(NPC[floorNpc1].Location.Y == NPC[floorNpc2].Location.Y)
         {
-            float C = NPC[floorNpc1].Location.X + NPC[floorNpc1].Location.Width * 0.5;
-            float D = NPC[floorNpc2].Location.X + NPC[floorNpc2].Location.Width * 0.5;
-            C += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
-            D += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
-
-            if(C < 0)
-                C = -C;
-
-            if(D < 0)
-                D = -D;
+            float C = std::abs(NPC[floorNpc1].Location.minus_center_x(Player[A].Location));
+            float D = std::abs(NPC[floorNpc2].Location.minus_center_x(Player[A].Location));
 
             if(C < D)
                 B = floorNpc1;
             else
                 B = floorNpc2;
         }
+        else if(NPC[floorNpc1].Location.Y < NPC[floorNpc2].Location.Y)
+            B = floorNpc1;
         else
-        {
-            if(NPC[floorNpc1].Location.Y < NPC[floorNpc2].Location.Y)
-                B = floorNpc1;
-            else
-                B = floorNpc2;
-        }
+            B = floorNpc2;
     }
     else if(floorNpc1 != 0)
         B = floorNpc1;
 
-    if(NPC[floorNpc1].Type >= 60 && NPC[floorNpc1].Type <= 66)
+    if(NPC[floorNpc1].Type >= NPCID_YEL_PLATFORM && NPC[floorNpc1].Type <= NPCID_RED_PLATFORM)
         B = floorNpc1;
-    else if(NPC[floorNpc2].Type >= 60 && NPC[floorNpc2].Type <= 66)
+    else if(NPC[floorNpc2].Type >= NPCID_YEL_PLATFORM && NPC[floorNpc2].Type <= NPCID_RED_PLATFORM)
         B = floorNpc2;
 
     if(NPC[B].Effect == NPCEFF_DROP_ITEM)
@@ -1124,7 +1085,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
             if(Player[A].Controls.Down)
             {
                 Player[A].Jump = 0;
-                Player[A].Location.SpeedY = Physics.PlayerJumpVelocity * 0.5;
+                Player[A].Location.SpeedY = Physics.PlayerJumpVelocity / 2;
             }
 
             B = 0;
@@ -1157,31 +1118,19 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
 
     if(B != 0)
     {
-        if(Player[A].StandingOnNPC == 0)
+        if(Player[A].StandingOnNPC == 0 && (Player[A].GroundPound || Player[A].YoshiYellow))
         {
-            if(Player[A].GroundPound)
-            {
-                numBlock++;
-                Block[numBlock].Location.Y = NPC[B].Location.Y;
-                // seems weird but I'll sync it since we don't know what could happen inside YoshiPound
-                syncLayersTrees_Block(numBlock);
-                YoshiPound(A, Player[A].Mount, true);
-                Block[numBlock].Location.Y = 0;
-                numBlock--;
-                syncLayersTrees_Block(numBlock + 1);
-                Player[A].GroundPound = false;
-            }
-            else if(Player[A].YoshiYellow)
-            {
-                numBlock++;
-                Block[numBlock].Location.Y = NPC[B].Location.Y;
-                // seems weird but I'll sync it since we don't know what could happen inside YoshiPound
-                syncLayersTrees_Block(numBlock);
-                YoshiPound(A, Player[A].Mount);
-                Block[numBlock].Location.Y = 0;
-                numBlock--;
-                syncLayersTrees_Block(numBlock + 1);
-            }
+            numBlock++;
+            Block[numBlock].Location.Y = NPC[B].Location.Y;
+            // seems weird but I'll sync it since we don't know what could happen inside YoshiPound
+            syncLayersTrees_Block(numBlock);
+
+            YoshiPound(A, Player[A].Mount, Player[A].GroundPound);
+            Player[A].GroundPound = false;
+
+            Block[numBlock].Location.Y = 0;
+            numBlock--;
+            syncLayersTrees_Block(numBlock + 1);
         }
 
         if(NPC[B].playerTemp == 0)
@@ -1192,55 +1141,62 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
 
         Player[A].Location.Y = NPC[B].Location.Y - Player[A].Location.Height;
 
+        // NPC has been stood on (condition over NPC types)
         if(NPC[B].Type == NPCID_FALL_BLOCK_RED || NPC[B].Type == NPCID_FALL_BLOCK_BROWN)
             NPC[B].Special2 = 1;
-
-        if(NPC[B].Type == NPCID_CHECKER_PLATFORM)
+        else if(NPC[B].Type == NPCID_CHECKER_PLATFORM)
             NPC[B].Special = 1;
-
-        if(NPC[B].Type == NPCID_PLATFORM_S3 && Player[A].Location.SpeedY > 0)
-            NPC[B].Direction = 1;
-
-        if(NPC[B].Type == NPCID_RAFT && NPC[B].Special == 0)
+        else if(NPC[B].Type == NPCID_PLATFORM_S3)
         {
-            NPC[B].Special = 1;
-            SkullRide(B);
+            if(Player[A].Location.SpeedY > 0)
+                NPC[B].Direction = 1;
         }
-
-        if(NPC[B].Type == NPCID_CONVEYOR)
+        else if(NPC[B].Type == NPCID_RAFT)
+        {
+            if(NPC[B].Special == 0)
+            {
+                NPC[B].Special = 1;
+                SkullRide(B);
+            }
+        }
+        else if(NPC[B].Type == NPCID_CONVEYOR)
             Player[A].Location.SpeedY = 0;
-
-
-        if(NPC[B].Type == NPCID_VEHICLE && Player[A].Controls.Down && Player[A].Mount == 0 &&
-           !NPC[B].playerTemp && Player[A].DuckRelease &&
-           (Player[A].HoldingNPC == 0 || Player[A].Character == 5))
+        else if(NPC[B].Type == NPCID_VEHICLE)
         {
-            UnDuck(Player[A]);
-
-            if(g_config.fix_char5_vehicle_climb && Player[A].Fairy) // Avoid the mortal glitch
+            if(Player[A].Controls.Down && Player[A].Mount == 0 &&
+               !NPC[B].playerTemp && Player[A].DuckRelease &&
+               (Player[A].HoldingNPC == 0 || Player[A].Character == 5))
             {
-                Player[A].Fairy = false;
-                PlaySoundSpatial(SFX_HeroFairy, Player[A].Location);
-                NewEffect(EFFID_SMOKE_S5, Player[A].Location);
-            }
+                UnDuck(Player[A]);
 
-            if(g_config.fix_vehicle_altjump_bug)
-                Player[A].SpinJump = false;
+                if(g_config.fix_char5_vehicle_climb && Player[A].Fairy) // Avoid the mortal glitch
+                {
+                    Player[A].Fairy = false;
+                    PlaySoundSpatial(SFX_HeroFairy, Player[A].Location);
+                    NewEffect(EFFID_SMOKE_S5, Player[A].Location);
+                }
 
-            Player[A].Location = NPC[B].Location;
-            Player[A].Mount = 2;
-            NPC[B].Killed = 9;
-            NPCQueues::Killed.push_back(B);
-            Player[A].HoldingNPC = 0;
-            Player[A].StandingOnNPC = 0;
-            PlaySoundSpatial(SFX_Stomp, Player[A].Location);
-            for(int C = 1; C <= numPlayers; ++C)
-            {
-                if(Player[C].StandingOnNPC == B)
-                    Player[C].StandingOnVehiclePlr = A;
+                if(g_config.fix_vehicle_altjump_bug)
+                    Player[A].SpinJump = false;
+
+                Player[A].Location = NPC[B].Location;
+                Player[A].Mount = 2;
+                NPC[B].Killed = 9;
+                NPCQueues::Killed.push_back(B);
+                Player[A].HoldingNPC = 0;
+                Player[A].StandingOnNPC = 0;
+                PlaySoundSpatial(SFX_Stomp, Player[A].Location);
+                for(int C = 1; C <= numPlayers; ++C)
+                {
+                    if(Player[C].StandingOnNPC == B)
+                        Player[C].StandingOnVehiclePlr = A;
+                }
+
+                B = 0;
             }
         }
-        else if(Player[A].Mount == 2)
+
+        if(Player[A].Mount == 2 && B != 0)
         {
             Player[A].StandingOnNPC = 0;
             if(Player[A].Location.SpeedY > 4 + NPC[B].Location.SpeedY)
@@ -1260,7 +1216,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                 if(Player[A].Location.SpeedY > 4.1)
                 {
                     Player[A].Location.Y += -Player[A].Location.SpeedY;
-                    Player[A].Location.SpeedY = NPC[Player[A].StandingOnNPC].Location.SpeedY;
+                    Player[A].Location.SpeedY = NPC[0 /*Player[A].StandingOnNPC*/].Location.SpeedY; // SMBX 1.3 bug
 
                     if(Player[A].Location.SpeedY > Physics.PlayerTerminalVelocity)
                         Player[A].Location.SpeedY = Physics.PlayerTerminalVelocity;
@@ -1273,10 +1229,11 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
     else if(Player[A].Mount == 1 && Player[A].Jump > 0)
     {
         // confusing logic, but safe, because StandingOnNPC gets set in ClownCar()
-        if(B == 0 && Player[A].StandingOnVehiclePlr > 0)
+        // NOTE: we know that B == 0!
+        if(/*B == 0 &&*/ Player[A].StandingOnVehiclePlr > 0)
             Player[A].Location.SpeedX += (NPC[Player[A].StandingOnNPC].Location.SpeedX + NPC[Player[A].StandingOnNPC].BeltSpeed);
-        else if(B > 0 && Player[A].StandingOnNPC == 0 && NPC[B].playerTemp)
-            Player[A].Location.SpeedX += -(NPC[B].Location.SpeedX + NPC[B].BeltSpeed);
+        // else if(B > 0 && Player[A].StandingOnNPC == 0 && NPC[B].playerTemp)
+        //     Player[A].Location.SpeedX += -(NPC[B].Location.SpeedX + NPC[B].BeltSpeed);
 
         Player[A].StandingOnNPC = 0;
         Player[A].StandingOnVehiclePlr = 0;
@@ -1308,7 +1265,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
         if(NPC[Player[A].StandingOnNPC].Type == NPCID_COCKPIT)
         {
             Player[A].Driving = true;
-            Player[A].Location.X = NPC[Player[A].StandingOnNPC].Location.X + NPC[Player[A].StandingOnNPC].Location.Width / 2.0 - Player[A].Location.Width / 2.0;
+            Player[A].Location.X = NPC[Player[A].StandingOnNPC].Location.X + (NPC[Player[A].StandingOnNPC].Location.Width - Player[A].Location.Width) / 2;
             Player[A].Direction = NPC[Player[A].StandingOnNPC].DefaultDirection;
         }
     }

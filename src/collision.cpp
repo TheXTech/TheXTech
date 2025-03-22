@@ -46,15 +46,15 @@ bool n00bCollision(const Location_t &Loc1, const Location_t &Loc2)
     bool tempn00bCollision = false;
     float EZ = 2.f;
 
-    if(float(Loc2.Width) >= 32 - EZ * 2 && float(Loc2.Height) >= 32 - EZ * 2)
+    if(Loc2.Width >= 32 - EZ * 2 && Loc2.Height >= 32 - EZ * 2)
     {
-        if(float(Loc1.Y) + float(Loc1.Height) - EZ >= float(Loc2.Y))
+        if(Loc1.Y + Loc1.Height - EZ >= Loc2.Y)
         {
-            if(float(Loc1.Y) + EZ <= float(Loc2.Y) + float(Loc2.Height))
+            if(Loc1.Y + EZ <= Loc2.Y + Loc2.Height)
             {
-                if(float(Loc1.X) + EZ <= float(Loc2.X + Loc2.Width))
+                if(Loc1.X + EZ <= Loc2.X + Loc2.Width)
                 {
-                    if(float(Loc1.X) + float(Loc1.Width) - EZ >= float(Loc2.X))
+                    if(Loc1.X + Loc1.Width - EZ >= Loc2.X)
                     {
                         tempn00bCollision = true;
                     }
@@ -82,6 +82,7 @@ bool n00bCollision(const Location_t &Loc1, const Location_t &Loc2)
     return tempn00bCollision;
 }
 
+#if 0
 // Used when a NPC is activated to see if it should spawn
 bool NPCStartCollision(const Location_t &Loc1, const Location_t &Loc2)
 {
@@ -101,6 +102,7 @@ bool NPCStartCollision(const Location_t &Loc1, const Location_t &Loc2)
     }
     return tempNPCStartCollision;
 }
+#endif
 
 // Warp point collisions
 bool WarpCollision(const Location_t &Loc1, const SpeedlessLocation_t &entrance, int direction)
@@ -131,13 +133,13 @@ bool WarpCollision(const Location_t &Loc1, const SpeedlessLocation_t &entrance, 
         Y2 = 32;
     }
 
-    if(float(Loc1.X) <= float(entrance.X) + float(entrance.Width) + X2)
+    if(Loc1.X <= entrance.X + entrance.Width + X2)
     {
-        if(float(Loc1.X) + float(Loc1.Width) >= float(entrance.X) + X2)
+        if(Loc1.X + Loc1.Width >= entrance.X + X2)
         {
-            if(float(Loc1.Y) <= float(entrance.Y) + float(entrance.Height) + Y2)
+            if(Loc1.Y <= entrance.Y + entrance.Height + Y2)
             {
-                if(float(Loc1.Y) + float(Loc1.Height) >= float(entrance.Y) + Y2)
+                if(Loc1.Y + Loc1.Height >= entrance.Y + Y2)
                 {
                     hasCollision = true;
                 }
@@ -441,6 +443,7 @@ bool vScreenCollision(int A, const TinyLocation_t &Loc2)
            (-vScreen[A].Y + vScreen[A].Height >= Loc2.Y);
 }
 
+#if 0
 // vScreen collisions 2
 bool vScreenCollision2(int A, const Location_t &Loc2)
 {
@@ -465,6 +468,7 @@ bool vScreenCollision2(int A, const TinyLocation_t &Loc2)
            (-vScreen[A].Y + 96 <= Loc2.Y + Loc2.Height) &&
            (-vScreen[A].Y + vScreen[A].Height - 64 >= Loc2.Y);
 }
+#endif
 
 // Collision detection for blocks. Prevents walking on walls.
 bool WalkingCollision(const Location_t &Loc1, const Location_t &Loc2)
@@ -483,6 +487,7 @@ bool WalkingCollision(const Location_t &Loc1, const Location_t &Loc2)
 }
 
 // Collision detection for blocks. Lets NPCs fall through cracks.
+#if 0
 bool WalkingCollision2(const Location_t &Loc1, const Location_t &Loc2)
 {
     bool tempWalkingCollision2 = false;
@@ -497,6 +502,7 @@ bool WalkingCollision2(const Location_t &Loc1, const Location_t &Loc2)
 
     return tempWalkingCollision2;
 }
+#endif
 
 // Factors in beltspeed
 bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, float BeltSpeed)
@@ -544,6 +550,7 @@ int FindRunningCollision(const Location_t &Loc1, const Location_t &Loc2, double 
 }
 
 // Determines if an NPC should turnaround
+#if 0
 bool ShouldTurnAround(const Location_t &Loc1, const Location_t &Loc2, float Direction)
 {
     bool tempShouldTurnAround = false;
@@ -568,6 +575,7 @@ bool ShouldTurnAround(const Location_t &Loc1, const Location_t &Loc2, float Dire
 
     return tempShouldTurnAround;
 }
+#endif
 
 // Determines if an NPC can come out of a pipe
 bool CanComeOut(const Location_t &Loc1, const Location_t &Loc2)
@@ -641,9 +649,9 @@ double blockGetTopYTouching(const Block_t &block, const Location_t& loc)
 
     // Get how far along the slope we are in the x direction
     double slope = (refX - block.Location.X) / block.Location.Width;
-    if(slopeDirection < 0) slope = 1.0 - slope;
-    if(slope < 0.0) slope = 0.0;
-    if(slope > 1.0) slope = 1.0;
+    if(slopeDirection < 0) slope = 1 - slope;
+    if(slope < 0) slope = 0;
+    if(slope > 1) slope = 1;
 
     // Determine the y coordinate
     return block.Location.Y + block.Location.Height * slope;
@@ -688,7 +696,7 @@ bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &refere
         return false;
     }
 
-    double refX = referenceLoc.X + referenceLoc.Width * 0.5;
+    double refX = referenceLoc.X + referenceLoc.Width / 2;
 
     // Break tie based on which of blocks intersects the center point
     bool oldIntersects = referenceLoc.X >= oldBlock.Location.X && referenceLoc.X + referenceLoc.Width <= oldBlock.Location.X + oldBlock.Location.Width;
@@ -706,8 +714,8 @@ bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &refere
     }
 
     // Break tie based on x-proximity
-    double newBlockDist = abs((newBlock.Location.X + newBlock.Location.Width * 0.5) - refX);
-    double oldBlockDist = abs((oldBlock.Location.X + oldBlock.Location.Width * 0.5) - refX);
+    double newBlockDist = abs((newBlock.Location.X + newBlock.Location.Width / 2) - refX);
+    double oldBlockDist = abs((oldBlock.Location.X + oldBlock.Location.Width / 2) - refX);
 
     if(newBlockDist < oldBlockDist)
     {
@@ -791,7 +799,7 @@ void CompareNpcWalkBlock(int &tempHitBlock, int &tempHitOldBlock,
 bool SectionCollision(const int section, const Location_t &loc)
 {
     const auto &sec = level[section];
-    const double gap = 64.0;
+    const double gap = 64;
 
     if(loc.X + loc.Width < sec.X - gap)
         return false;

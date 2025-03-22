@@ -111,6 +111,9 @@ static void minport_initFrame();
 // removes a texture from the render chain
 static void minport_unlinkTexture(StdPicture* tx);
 
+// marks a texture as used
+static void minport_usedTexture(StdPicture& tx);
+
 // unload all textures not rendered since g_never_unload_before
 static void minport_freeTextureMemory();
 

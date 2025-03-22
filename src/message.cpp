@@ -24,6 +24,12 @@
 #include "message.h"
 #include "globals.h"
 
+#include "player.h"
+#include "main/screen_pause.h"
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+#   include "main/client_methods.h"
+#endif
 
 namespace XMessage
 {
@@ -45,11 +51,31 @@ void Handle(const Message& m)
 
         button = is_press;
     }
+    else if(m.type == Type::char_swap)
+    {
+        if(m.screen >= maxNetplayClients || m.player >= Screens[m.screen].player_count || m.message < 1 || m.message > numCharacters || !SwapCharAllowed())
+            return;
+
+        SwapCharacter(Screens[m.screen].players[m.player], m.message);
+
+        if(LevelSelect)
+            SetupPlayers();
+    }
+    else if(m.type == Type::menu_action)
+    {
+        // FIXME: check that screen is the one in control of the pause menu
+
+        PauseScreen::g_pending_action = m.message;
+    }
 }
 
 void Tick()
 {
-    // eventually sync state with other clients here
+#ifdef THEXTECH_ENABLE_SDL_NET
+    // sync state with other clients here
+    if(CurrentRoom())
+        ClientFrameSync();
+#endif
 
     // update player controls based on message queue
     Message m;
@@ -66,10 +92,15 @@ void Tick()
         Player[A].Controls = s_last_controls[A];
 }
 
+void PushMessage_Direct(Message message)
+{
+    s_message_vector.push_back(message);
+}
+
 void PushMessage(Message message)
 {
     message.screen = l_screen - &Screens[0];
-    s_message_vector.push_back(message);
+    PushMessage_Direct(message);
 }
 
 Message PopMessage()
@@ -88,6 +119,7 @@ void PushControls(int l_player_i, const Controls_t& controls)
     Controls_t& last_controls = Controls::g_RawControls[l_player_i];
 
     Message m;
+    m.screen = l_screen - &Screens[0];
     m.player = l_player_i;
 
     for(uint8_t i = 0; i < Controls::PlayerControls::n_buttons; i++)
@@ -99,13 +131,13 @@ void PushControls(int l_player_i, const Controls_t& controls)
         {
             m.type = Type::press;
             m.message = i;
-            PushMessage(m);
+            PushMessage_Direct(m);
         }
         else if(old_pressed && !new_pressed)
         {
             m.type = Type::release;
             m.message = i;
-            PushMessage(m);
+            PushMessage_Direct(m);
         }
     }
 

@@ -24,6 +24,7 @@
 #include <fmt_format_ne.h>
 
 #include "config.h"
+#include "message.h"
 #include "config/config_impl.hpp"
 #include "main/game_info.h"
 #include "globals.h"
@@ -375,6 +376,19 @@ void UpdateConfig()
         else
             g_config.compatibility_mode = g_config.speedrun_mode - 1;
         g_config.enable_playtime_tracking = true;
+    }
+
+    if(XMessage::GetStatus() != XMessage::Status::local)
+    {
+        ConfigChangeSentinel sent(ConfigSetLevel::speedrun);
+
+#ifndef NO_WINDOW_FOCUS_TRACKING
+        g_config.background_work = true;
+#endif
+
+        g_config.enable_frameskip = true;
+        g_config.unlimited_framerate = true;
+        g_config.render_vsync = false;
     }
 
     if(g_config.compatibility_mode)

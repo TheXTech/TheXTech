@@ -42,6 +42,10 @@
 #   include "capabilities.h"
 #endif
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+#   include "main/client_methods.h"
+#endif
+
 #ifndef THEXTECH_NO_ARGV_HANDLING
 #   include <tclap/CmdLine.h>
 #endif
@@ -130,6 +134,7 @@ static void macosReceiveOpenFile()
 
 #ifdef __3DS__
 #include <3ds.h>
+#include <malloc.h>
 int n3ds_clocked = 0; // eventually move elsewhere
 
 void InitClockSpeed()
@@ -306,6 +311,12 @@ int main(int argc, char**argv)
 #ifdef __3DS__
     InitClockSpeed();
     SwapClockSpeed();
+
+#   ifdef THEXTECH_ENABLE_SDL_NET
+    // spend 256kb on a buffer
+    uint32_t* socket_buffer = (uint32_t*)memalign(0x1000, 0x40000);
+    socInit(socket_buffer, 0x40000);
+#   endif
 #endif
 
     seedRandom(std::time(NULL));
@@ -478,6 +489,14 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchVerboseLog(std::string(), "verbose", "Enable log output into the terminal", false);
 
         TCLAP::UnlabeledMultiArg<std::string> inputFileNames("levelpath", "Path to level file or replay data to run the test", false, std::string(), "path to file");
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+        TCLAP::ValueArg<std::string> server(std::string(), "server", "Server address", false, "", "");
+        cmd.add(&server);
+
+        TCLAP::ValueArg<std::string> room_key(std::string(), "room-key", "Room key", false, "", "");
+        cmd.add(&room_key);
+#endif
 
         cmd.add(&switchFrameSkip);
         cmd.add(&switchDisableFrameSkip);
@@ -748,6 +767,19 @@ int main(int argc, char**argv)
 
         if(lang.isSet())
             g_config.language = lang;
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+        if(!setup.testLevel.empty() && server.isSet())
+        {
+            XMessage::Connect(server.getValue().c_str());
+
+            uint32_t room_key_int = XMessage::RoomFromString(room_key.getValue());
+            if(!room_key_int)
+                XMessage::JoinNewRoom(XMessage::RoomInfo{});
+            else
+                XMessage::JoinRoom(room_key_int);
+        }
+#endif
     }
     catch(TCLAP::ArgException &e)   // catch any exceptions
     {

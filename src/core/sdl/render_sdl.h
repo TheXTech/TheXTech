@@ -85,6 +85,13 @@ class RenderSDL final : public AbstractRender_t
 
     static void txColorMod(StdPictureData &tx, XTColor color);
 
+protected:
+    inline void getViewportSize(int* viewport_w, int* viewport_h) override
+    {
+        *viewport_w = m_viewport_w;
+        *viewport_h = m_viewport_h;
+    }
+
 public:
     RenderSDL();
     ~RenderSDL() override;

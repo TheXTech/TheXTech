@@ -50,6 +50,17 @@
 #include "main/game_loop_interrupt.h"
 
 
+void p_PlayerMakeFlySparkle(const Location_t& loc, int Frame)
+{
+    NewEffect(EFFID_SPARKLE,
+        newLoc(loc.X - 8 + dRand() * (loc.Width + 16) - 4,
+            loc.Y - 8 + dRand() * (loc.Height + 16)),
+        1, 0, ShadowMode);
+    Effect[numEffects].Location.SpeedX = (dRand() / 2) - 0.25;
+    Effect[numEffects].Location.SpeedY = (dRand() / 2) - 0.25;
+    Effect[numEffects].Frame = Frame;
+}
+
 bool UpdatePlayer()
 {
     switch(g_gameLoopInterrupt.site)
@@ -163,7 +174,7 @@ bool UpdatePlayer()
                         UnDuck(Player[A]);
                     Player[A].Slide = true;
                 }
-                else if(Player[A].Location.SpeedX == 0.0)
+                else if(Player[A].Location.SpeedX == 0)
                     Player[A].Slide = false;
 
                 if(Player[A].Mount > 0 || Player[A].HoldingNPC > 0)
@@ -182,7 +193,7 @@ bool UpdatePlayer()
 
                 if(Player[A].StandingOnNPC > 0)
                 {
-                    if(NPC[Player[A].StandingOnNPC].Type == NPCID_ICE_CUBE && NPC[Player[A].StandingOnNPC].Location.SpeedX == 0.0)
+                    if(NPC[Player[A].StandingOnNPC].Type == NPCID_ICE_CUBE && NPC[Player[A].StandingOnNPC].Location.SpeedX == 0)
                         Player[A].Slippy = true;
                 }
 
@@ -218,7 +229,7 @@ bool UpdatePlayer()
                 // stop link when stabbing
                 if(Player[A].Character == 5)
                 {
-                    if(Player[A].FireBallCD > 0 && (Player[A].Location.SpeedY == 0.0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0))
+                    if(Player[A].FireBallCD > 0 && (Player[A].Location.SpeedY == 0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0))
                     {
                         if(Player[A].Slippy)
                             Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.75;
@@ -275,7 +286,7 @@ bool UpdatePlayer()
                 {
                     Player[A].Slide = false;
                     if(Player[A].Location.SpeedY >= 0)
-                        Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.5;
+                        Player[A].Location.SpeedX = Player[A].Location.SpeedX / 2;
                 }
 
                 // Apply movement -- this is where the actual movement happens
@@ -283,7 +294,7 @@ bool UpdatePlayer()
 
 
                 // Players Y movement.
-                if(Block[Player[A].Slope].Location.SpeedY != 0.0 && Player[A].Slope != 0)
+                if(Block[Player[A].Slope].Location.SpeedY != 0 && Player[A].Slope != 0)
                     Player[A].Location.Y += Block[Player[A].Slope].Location.SpeedY;
 
                 if(Player[A].Fairy) // the player is a fairy
@@ -359,14 +370,7 @@ bool UpdatePlayer()
                         )
                 {
                     if(iRand(4) == 0)
-                    {
-                        NewEffect(EFFID_SPARKLE,
-                                  newLoc(Player[A].Location.X - 8 + dRand() * (Player[A].Location.Width + 16) - 4,
-                                                  Player[A].Location.Y - 8 + dRand() * (Player[A].Location.Height + 16)),
-                                                  1, 0, ShadowMode);
-                        Effect[numEffects].Location.SpeedX = (dRand() * 0.5) - 0.25;
-                        Effect[numEffects].Location.SpeedY = (dRand() * 0.5) - 0.25;
-                    }
+                        p_PlayerMakeFlySparkle(Player[A].Location, 0);
                 }
 
                 Tanooki(A); // tanooki suit code
@@ -516,7 +520,7 @@ resume_SuperWarp:
                 // shell surf
                 if(Player[A].ShellSurf && Player[A].StandingOnNPC != 0)
                 {
-                    Player[A].Location.X = NPC[Player[A].StandingOnNPC].Location.X + NPC[Player[A].StandingOnNPC].Location.Width / 2.0 - Player[A].Location.Width / 2.0;
+                    Player[A].Location.X = NPC[Player[A].StandingOnNPC].Location.X + (NPC[Player[A].StandingOnNPC].Location.Width - Player[A].Location.Width) / 2;
                     Player[A].Location.SpeedX = 0; // 1 * .Direction
 
                     if(NPC[Player[A].StandingOnNPC].Location.SpeedX == 0)

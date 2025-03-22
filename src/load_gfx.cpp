@@ -521,13 +521,13 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             }
 
             loadImageFromList(in, line_buf, source_dir,
-                GFXBackgroundBMP[A], &GFXBackgroundWidth[A], &GFXBackgroundHeight[A], nullptr,
+                GFXBackgroundBMP[A], nullptr, nullptr, nullptr,
                 false, custom);
 
             if(!custom)
             {
-                BackgroundWidth[A] = GFXBackgroundWidth[A];
-                BackgroundHeight[A] = GFXBackgroundHeight[A];
+                BackgroundWidth[A] = GFXBackground[A].w;
+                BackgroundHeight[A] = GFXBackground[A].h;
             }
         }
         else if(type_buf[0] == 'b')
@@ -1009,10 +1009,8 @@ void LoadGFX()
         if(!p.empty())
         {
             XRender::lazyLoadPicture(GFXBackgroundBMP[A], p);
-            GFXBackgroundWidth[A] = GFXBackgroundBMP[A].w;
-            GFXBackgroundHeight[A] = GFXBackgroundBMP[A].h;
-            BackgroundWidth[A] = GFXBackgroundWidth[A];
-            BackgroundHeight[A] = GFXBackgroundHeight[A];
+            BackgroundWidth[A] = GFXBackgroundBMP[A].w;
+            BackgroundHeight[A] = GFXBackgroundBMP[A].h;
         }
         else
         {
@@ -1477,7 +1475,7 @@ void LoadCustomGFX(bool include_world, const char* preview_players_from)
     {
         loadCGFX(GfxRoot + fmt::format_ne("background/background-{0}.png", A),
                  fmt::format_ne("background-{0}", A),
-                 &GFXBackgroundWidth[A], &GFXBackgroundHeight[A], nullptr, GFXBackgroundBMP[A],
+                 nullptr, nullptr, nullptr, GFXBackgroundBMP[A],
                  false, BackgroundHasNoMask[A]);
     }
 

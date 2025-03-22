@@ -486,6 +486,10 @@ void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
         color);
 }
 
+void renderSizableBlock(int, int, int, int, StdPicture&)
+{
+}
+
 void splitFrame()
 {
 }

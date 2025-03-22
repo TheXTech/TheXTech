@@ -194,6 +194,7 @@ void delayedMusicReset();
 bool delayMusicIsSet();
 // play music
 void StartMusic(int A, int fadeInMs = 0);
+void StartMusicIfOnscreen(int section);
 // Public Sub StopMusic() 'stop playing music
 void PauseMusic();
 void ResumeMusic();
@@ -216,12 +217,12 @@ void PlaySoundSpatial(int A, int l, int t, int r, int b, int loops = 0, int volu
 // public signatures for spatial sound feature
 inline void PlaySoundSpatial(int A, const Location_t& loc, int loops = 0, int volume = 128)
 {
-    PlaySoundSpatial(A, loc.X, loc.Y, loc.X + loc.Width, loc.Y + loc.Height, loops, volume);
+    PlaySoundSpatial(A, (int)loc.X, (int)loc.Y, (int)(loc.X + loc.Width), (int)(loc.Y + loc.Height), loops, volume);
 }
 
 inline void PlaySoundSpatial(int A, const SpeedlessLocation_t& loc, int loops = 0, int volume = 128)
 {
-    PlaySoundSpatial(A, loc.X, loc.Y, loc.X + loc.Width, loc.Y + loc.Height, loops, volume);
+    PlaySoundSpatial(A, (int)loc.X, (int)loc.Y, (int)(loc.X + loc.Width), (int)(loc.Y + loc.Height), loops, volume);
 }
 
 inline void PlaySoundSpatial(int A, int x, int y, int loops = 0, int volume = 128)

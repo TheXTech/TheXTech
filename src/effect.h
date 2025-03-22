@@ -35,5 +35,7 @@ void NewEffect(int A, const Location_t &Location_t, int Direction = 1, int NewNp
 // Remove the effect
 void KillEffect(int A);
 
+// new sub deduplicating old logic
+void NewEffect_IceSparkle(const NPC_t& n, Location_t& tempLocation);
 
 #endif // EFFECT_H

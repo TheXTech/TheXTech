@@ -32,6 +32,7 @@
 #include "../controls.h"
 #include "pge_delay.h"
 #include "npc_id.h"
+#include "message.h"
 
 #include "main/hints.h"
 
@@ -146,17 +147,17 @@ static void placePlayers(Player_t tempPlayer[maxLocalPlayers])
 {
     if(numPlayers == 1 || g_ClonedPlayerMode)
     {
-        tempPlayer[0].Location.X = XRender::TargetW / 2.0 - tempPlayer[0].Location.Width / 2.0;
-        tempPlayer[0].Location.Y = XRender::TargetH / 2.0 - tempPlayer[0].Location.Height + 24;
+        tempPlayer[0].Location.X = XRender::TargetW / 2 - tempPlayer[0].Location.Width / 2;
+        tempPlayer[0].Location.Y = XRender::TargetH / 2 - tempPlayer[0].Location.Height + 24;
     }
     else if(numPlayers == 2)
     {
-        tempPlayer[0].Location.X = XRender::TargetW / 2.0 - tempPlayer[0].Location.Width / 2.0 - 30;
-        tempPlayer[0].Location.Y = XRender::TargetH / 2.0 - tempPlayer[0].Location.Height + 24;
+        tempPlayer[0].Location.X = XRender::TargetW / 2 - tempPlayer[0].Location.Width / 2 - 30;
+        tempPlayer[0].Location.Y = XRender::TargetH / 2 - tempPlayer[0].Location.Height + 24;
         tempPlayer[0].Direction = -1;
 
-        tempPlayer[1].Location.X = XRender::TargetW / 2.0 - tempPlayer[1].Location.Width / 2.0 + 32;
-        tempPlayer[1].Location.Y = XRender::TargetH / 2.0 - tempPlayer[1].Location.Height + 24;
+        tempPlayer[1].Location.X = XRender::TargetW / 2 - tempPlayer[1].Location.Width / 2 + 32;
+        tempPlayer[1].Location.Y = XRender::TargetH / 2 - tempPlayer[1].Location.Height + 24;
     }
     else
     {
@@ -164,8 +165,8 @@ static void placePlayers(Player_t tempPlayer[maxLocalPlayers])
 
         for(int i = 0; i < numPlayers && i < maxLocalPlayers; i++)
         {
-            tempPlayer[i].Location.X = start_x + 64 * i - tempPlayer[i].Location.Width / 2.0;
-            tempPlayer[i].Location.Y = XRender::TargetH / 2.0 - tempPlayer[i].Location.Height + 24;
+            tempPlayer[i].Location.X = start_x + 64 * i - tempPlayer[i].Location.Width / 2;
+            tempPlayer[i].Location.Y = XRender::TargetH / 2 - tempPlayer[i].Location.Height + 24;
         }
     }
 }
@@ -188,7 +189,7 @@ static void drawEnterScreen(Player_t tempPlayer[maxLocalPlayers])
     else
         DrawLives(XRender::TargetW / 2 - 14, XRender::TargetH / 2 + 31, Lives, g_100s);
 
-    XHints::Draw(XRender::TargetH / 2.0 + 64, 0);
+    XHints::Draw(XRender::TargetH / 2 + 64, 0);
 }
 
 
@@ -199,7 +200,9 @@ void GameThing(int waitms, int fadeSpeed)
 
     XHints::Select();
 
-    if(waitms <= 0)
+    int wait_frames = (waitms * 10 + 155) / 156;
+
+    if(wait_frames <= 0)
     {
         XRender::setTargetTexture();
         XRender::clearBuffer();
@@ -210,12 +213,11 @@ void GameThing(int waitms, int fadeSpeed)
     else
     {
         ScreenFader fader;
-        uint32_t targetTime = SDL_GetTicks() + waitms;
 
         if(g_config.EnableInterLevelFade && fadeSpeed > 0)
             fader.setupFader(fadeSpeed, 65, 0, ScreenFader::S_FADE);
 
-        while(SDL_GetTicks() < targetTime && GameIsActive)
+        while(wait_frames > 0 && GameIsActive)
         {
             XEvents::doEvents();
 
@@ -224,6 +226,11 @@ void GameThing(int waitms, int fadeSpeed)
                 computeFrameTime1();
 
                 Controls::Update(false);
+
+                wait_frames--;
+
+                if(XMessage::GetStatus() == XMessage::Status::replay)
+                    continue;
 
                 XRender::setTargetTexture();
                 XRender::clearBuffer();

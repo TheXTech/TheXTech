@@ -176,10 +176,8 @@ bool UpdateNPCs()
     case GameLoopInterrupt::UpdateNPCs_Activation_Self:
     case GameLoopInterrupt::UpdateNPCs_Activation_Chain:
         goto resume_Activation;
-    case GameLoopInterrupt::UpdateNPCs_FreezeNPCs_KillNPC:
-        goto resume_FreezeNPCs_KillNPC;
-    case GameLoopInterrupt::UpdateNPCs_Normal_KillNPC:
-        goto resume_Normal_KillNPC;
+    case GameLoopInterrupt::UpdateNPCs_KillNPC:
+        goto resume_KillNPC;
     default:
         break;
     }
@@ -215,17 +213,18 @@ bool UpdateNPCs()
         if(PSwitchStop <= 0)
         {
             FreezeNPCs = false;
-            StopMusic();
-            StartMusic(Player[PSwitchPlayer].Section);
+            SwitchEndResumeMusic();
         }
     }
 
     if(FreezeNPCs) // When time is paused
     {
         StopHit = 0;
-        int A;
-        for(A = numNPCs; A >= 1; A--) // check to see if NPCs should be killed
+
+        // handle active NPCs
+        for(; activation_it != NPCQueues::Active.may_insert_erase.end(); ++activation_it)
         {
+            int A = *activation_it;
             if(NPCIsBoot(NPC[A]) || NPCIsYoshi(NPC[A]))
             {
                 if(NPC[A].CantHurt > 0)
@@ -248,7 +247,10 @@ bool UpdateNPCs()
             {
                 Deactivate(A);
                 if(g_config.fix_FreezeNPCs_no_reset)
+                {
+                    // eventually: do something to reset the NPC's state using a routine shared with the main UpdateNPCs logic
                     NPC[A].TimeLeft = -1;
+                }
             }
 
             if(NPC[A].JustActivated)
@@ -256,39 +258,20 @@ bool UpdateNPCs()
                 NPC[A].JustActivated = 0;
                 NPCQueues::update(A);
             }
+        }
 
-            if(NPC[A].Killed > 0)
+        // keep inactive NPCs from respawning during FreezeNPCs (SMBX 1.3 behavior)
+        for(int A : NPCQueues::Unchecked)
+        {
+            if(A <= numNPCs && NPC[A].TimeLeft == 0)
             {
-                if(NPC[A].Location.SpeedX == 0.0)
-                {
-                    NPC[A].Location.SpeedX = dRand() * 2 - 1;
-                    if(NPC[A].Location.SpeedX < 0)
-                        NPC[A].Location.SpeedX -= 0.5;
-                    else
-                        NPC[A].Location.SpeedX += 0.5;
-                }
-
-                int KillCode;
-                KillCode = NPC[A].Killed;
-
-                while(KillNPC(A, KillCode))
-                {
-                    g_gameLoopInterrupt.site = GameLoopInterrupt::UpdateNPCs_FreezeNPCs_KillNPC;
-                    g_gameLoopInterrupt.A = A;
-                    g_gameLoopInterrupt.B = KillCode;
-                    return true;
-
-resume_FreezeNPCs_KillNPC:
-                    A = g_gameLoopInterrupt.A;
-                    KillCode = g_gameLoopInterrupt.B;
-                }
+                NPC[A].Reset[1] = false;
+                NPC[A].Reset[2] = false;
+                NPCQueues::NoReset.push_back(A);
             }
         }
 
-        NPCQueues::Killed.clear();
-
-        CharStuff();
-        return false;
+        goto kill_NPCs_and_CharStuff;
     }
 
 
@@ -602,7 +585,7 @@ resume_Activation_Generator:
             continue;
         }
 
-        // Force-active NPCs
+        // Force-active NPCs, part 1
         if(NPC[A].Type == NPCID_CONVEYOR && !NPC[A].Hidden)
         {
             CheckSectionNPC(A);
@@ -620,16 +603,12 @@ resume_Activation_Generator:
                 NPC[A].JustActivated = 0;
             }
         }
-        else if(NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM)
-        {
-            NPC[A].Active = true;
-            NPC[A].TimeLeft = 100;
-        }
         else if(NPC[A].Type == NPCID_STATUE_POWER || NPC[A].Type == NPCID_HEAVY_POWER)
         {
             if(NPC[A].TimeLeft == 1 || NPC[A].JustActivated != 0)
                 NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction, A);
         }
+        // platforms returned to their SMBX 1.3 position below chain activation logic to prevent mistaken chain-activations
 
         // process chain activations
         if(NPC[A].JustActivated != 0)
@@ -810,6 +789,13 @@ resume_Activation_Chain:
                 }
             } // NPCID_BOSS_CASE
         } // .JustActivated != 0
+
+        // force-activate platforms (but don't mistakenly chain-activate -- doing this logic above caused a bug from v1.3.6.1 until v1.3.7.1)
+        if(NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM)
+        {
+            NPC[A].Active = true;
+            NPC[A].TimeLeft = 100;
+        }
 
 #if 0
         // this code became the function CheckNPCWidth above
@@ -1088,7 +1074,7 @@ interrupt_Activation:
                     else if(NPC[A]->IsFish && NPC[A].Special == 2)
                     {
                         NPC[A].Location.Y = level[Player[NPC[A].JustActivated].Section].Height - 0.1;
-                        NPC[A].Location.SpeedX = (1 + (NPC[A].Location.Y - NPC[A].DefaultLocationY) * 0.005) * NPC[A].Direction;
+                        NPC[A].Location.SpeedX = (1 + (NPC[A].Location.Y - NPC[A].DefaultLocationY) / 200) * NPC[A].Direction;
                         NPC[A].Special5 = 1;
                         treeNPCUpdate(A);
                         if(NPC[A].tempBlock > 0)
@@ -1191,6 +1177,9 @@ interrupt_Activation:
                 NPC[A].TimeLeft = 100;
 
             float speedVar = 1; // percent of the NPC it should actually moved. this helps when underwater
+
+            // dead code in VB6
+#if 0
             if(NPC[A].Slope > 0 && !(NPC[A]->IsAShell || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1)))
             {
                 if((NPC[A].Location.SpeedX > 0 && BlockSlope[Block[NPC[A].Slope].Type] == -1) ||
@@ -1201,6 +1190,7 @@ interrupt_Activation:
                 }
             }
             speedVar = 1;
+#endif
 
             if(!NPC[A].Projectile)
                 speedVar = speedVar * NPC[A]->Speedvar;
@@ -1237,7 +1227,7 @@ interrupt_Activation:
                                     Location_t tempLocation;
                                     tempLocation.Width = 32;
                                     tempLocation.Height = 32;
-                                    tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - tempLocation.Width / 2.0;
+                                    tempLocation.X = NPC[A].Location.X + (NPC[A].Location.Width - tempLocation.Width) / 2;
                                     tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - tempLocation.Height;
                                     NewEffect(EFFID_WATER_SPLASH, tempLocation);
                                 }
@@ -1276,7 +1266,7 @@ interrupt_Activation:
                 Location_t tempLocation;
                 tempLocation.Width = 32;
                 tempLocation.Height = 32;
-                tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - tempLocation.Width / 2.0;
+                tempLocation.X = NPC[A].Location.X + (NPC[A].Location.Width - tempLocation.Width) / 2;
                 tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - tempLocation.Height;
                 NewEffect(EFFID_WATER_SPLASH, tempLocation);
             }
@@ -1287,17 +1277,17 @@ interrupt_Activation:
                 if(NPC[A].Type == NPCID_ICE_CUBE)
                 {
                     NPC[A].Projectile = true;
-                    Physics.NPCGravity = -Physics.NPCGravityReal * 0.2;
+                    Physics.NPCGravity = -Physics.NPCGravityReal / 5;
                 }
                 else
-                    Physics.NPCGravity = Physics.NPCGravityReal * 0.2;
+                    Physics.NPCGravity = Physics.NPCGravityReal / 5;
 
                 if(NPC[A].Type == NPCID_FLIPPED_RAINBOW_SHELL && NPC[A].Special4 == 1)
                     NPC[A].Special5 = 0;
                 else if(!NPC[A]->IsFish && NPC[A].Type != NPCID_RAFT && NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_WALL_SPARK && NPC[A].Type != NPCID_WALL_TURTLE)
-                    speedVar = (float)(speedVar * 0.5);
+                    speedVar /= 2;
                 else if(NPC[A]->IsFish && NPC[A].Special == 2 && NPC[A].Location.SpeedY > 0)
-                    speedVar = (float)(speedVar * 0.5);
+                    speedVar /= 2;
 
                 if(NPC[A].Location.SpeedY >= 3) // Terminal Velocity in water
                     NPC[A].Location.SpeedY = 3;
@@ -1305,8 +1295,10 @@ interrupt_Activation:
                 if(NPC[A].Location.SpeedY < -3)
                     NPC[A].Location.SpeedY = -3;
             }
-            else if(!(NPC[A].Type != NPCID_RAFT && !NPC[A]->IsFish))
+            // as far as I'm aware it would make absolutely no difference if this did not happen for NPCID_RAFT
+            else if(NPC[A].Type == NPCID_RAFT || NPC[A]->IsFish)
             {
+                // detect if fish is out of water for an extended period so that it can clip through walls
                 NPC[A].WallDeath += 2;
 
                 if(NPC[A].WallDeath >= 10)
@@ -1334,12 +1326,8 @@ interrupt_Activation:
                 NPC[A].Type = NPCID(NPCID_VEGGIE_2 + B);
                 if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
                     NPC[A].Type = NPCID_VEGGIE_1;
-                NPC[A].Location.X += NPC[A].Location.Width / 2.0;
-                NPC[A].Location.Y += NPC[A].Location.Height / 2.0;
-                NPC[A].Location.Width = NPC[A]->TWidth;
-                NPC[A].Location.Height = NPC[A]->THeight;
-                NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
-                NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
+                NPC[A].Location.set_width_center(NPC[A]->TWidth);
+                NPC[A].Location.set_height_center(NPC[A]->THeight);
                 NPCQueues::Unchecked.push_back(A);
             }
 
@@ -1485,12 +1473,8 @@ interrupt_Activation:
                                 if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
                                     NPC[A].Type = NPCID_VEGGIE_1;
 
-                                NPC[A].Location.X += NPC[A].Location.Width / 2.0;
-                                NPC[A].Location.Y += NPC[A].Location.Height / 2.0;
-                                NPC[A].Location.Width = NPC[A]->TWidth;
-                                NPC[A].Location.Height = NPC[A]->THeight;
-                                NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
-                                NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
+                                NPC[A].Location.set_width_center(NPC[A]->TWidth);
+                                NPC[A].Location.set_height_center(NPC[A]->THeight);
                             }
 
                             NPCQueues::Unchecked.push_back(A);
@@ -1501,13 +1485,9 @@ interrupt_Activation:
 
                         if(NPC[A].Type == NPCID_SPIT_GUY_BALL)
                         {
-                            NPC[A].Location.X += NPC[A].Location.Width / 2.0;
-                            NPC[A].Location.Y += NPC[A].Location.Height / 2.0;
                             NPC[A].Type = NPCID_COIN_S2;
-                            NPC[A].Location.Height = NPC[A]->THeight;
-                            NPC[A].Location.Width = NPC[A]->TWidth;
-                            NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
-                            NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
+                            NPC[A].Location.set_height_center(NPC[A]->THeight);
+                            NPC[A].Location.set_width_center(NPC[A]->TWidth);
 
                             NPCQueues::Unchecked.push_back(A);
                         }
@@ -1530,11 +1510,7 @@ interrupt_Activation:
                             if(iRand(100) >= 93)
                             {
                                 Location_t tempLocation;
-                                tempLocation.Height = EffectHeight[EFFID_SPARKLE];
-                                tempLocation.Width = EffectWidth[EFFID_SPARKLE];
-                                tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width - 4;
-                                tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height - 4;
-                                NewEffect(EFFID_SPARKLE, tempLocation);
+                                NewEffect_IceSparkle(NPC[A], tempLocation);
                             }
                         }
                     }
@@ -1626,7 +1602,7 @@ interrupt_Activation:
                     {
                         if((NPC[A].Type == NPCID_MAGIC_BOSS || NPC[A].Type == NPCID_FIRE_BOSS) && NPC[A].Special == 0) // larry koopa
                         {
-                            if(Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0 < NPC[A].Location.X + NPC[A].Location.Width / 2.0)
+                            if(NPC[A].Location.to_right_of(Player[NPC[A].Special5].Location))
                             {
                                 if(NPC[A].Special2 < 0)
                                     NPC[A].Special3 += 30;
@@ -1650,7 +1626,7 @@ interrupt_Activation:
                             Location_t tempLocation;
                             tempLocation.Height = 0;
                             tempLocation.Width = 0;
-                            tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 16;
+                            tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2 - 16;
                             tempLocation.X = NPC[A].Location.X - 16;
                             if(NPC[A].Direction == 1)
                                 tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width - 16;
@@ -1674,10 +1650,6 @@ interrupt_Activation:
 
                         NPC[A].TurnAround = false;
                     }
-
-                    if(NPC[A].Type == NPCID_SAW) // play saw sound
-                        PlaySoundSpatial(SFX_Saw, NPC[A].Location);
-
 
                     // NPC Movement Code
 
@@ -1710,11 +1682,17 @@ interrupt_Activation:
                     if(!(NPC[A]->IsACoin && NPC[A].Special == 0) && !(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0) &&
                        NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_STATUE_FIRE && NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_STAR_EXIT &&
                        NPC[A].Type != NPCID_STAR_COLLECT && !(NPC[A].Type >= NPCID_PLATFORM_S3 && NPC[A].Type <= NPCID_PLATFORM_S1) &&
-                       !(NPCIsAnExit(NPC[A]) && ((NPC[A].DefaultLocationX == NPC[A].Location.X &&
-                       NPC[A].DefaultLocationY == NPC[A].Location.Y) || NPC[A].Inert)) &&
                        NPC[A].Type != NPCID_LIFT_SAND && NPC[A].Type != NPCID_CHECKPOINT && NPC[A].Type != NPCID_SICK_BOSS_BALL &&
-                       !(NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPCID_LOCK_DOOR || NPC[A].Type == NPCID_FIRE_DISK || NPC[A].Type == NPCID_FIRE_CHAIN))
+                       !(NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPCID_LOCK_DOOR || NPC[A].Type == NPCID_FIRE_DISK || NPC[A].Type == NPCID_FIRE_CHAIN) &&
+                       !(NPCIsAnExit(NPC[A]) && ((NPC[A].DefaultLocationX == NPC[A].Location.X && NPC[A].DefaultLocationY == NPC[A].Location.Y) || NPC[A].Inert)))
                     {
+                        // only the top half of the saw collides with blocks (gets restored after block collisions)
+                        if(NPC[A].Type == NPCID_SAW)
+                        {
+                            PlaySoundSpatial(SFX_Saw, NPC[A].Location);
+                            NPC[A].Location.Height = 24;
+                        }
+
                         double tempHit = 0; // height of block NPC is walking on
                         int tempHitBlock = 0; // index of block NPC is walking on
                         float tempSpeedA = 0; // speed of ground the NPC is possibly standing on
@@ -1759,6 +1737,7 @@ interrupt_Activation:
                         // NPC Collision
                         NPCCollide(A);
 
+                        // reset WallDeath variable for thrown items and decay it for fish re-entering water
                         if(NPC[A].WallDeath > 0)
                         {
                             if(NPC[A]->IsFish)
@@ -1923,6 +1902,7 @@ interrupt_Activation:
 
     treeTempBlockClear();
 
+kill_NPCs_and_CharStuff:
 
     // kill the NPCs, from last to first
     std::sort(NPCQueues::Killed.begin(), NPCQueues::Killed.end(),
@@ -1973,7 +1953,7 @@ interrupt_Activation:
 
             while(KillNPC(A, NPC[A].Killed))
             {
-                g_gameLoopInterrupt.site = GameLoopInterrupt::UpdateNPCs_Normal_KillNPC;
+                g_gameLoopInterrupt.site = GameLoopInterrupt::UpdateNPCs_KillNPC;
                 g_gameLoopInterrupt.A = i; // NOT A
                 g_gameLoopInterrupt.B = KillCode;
                 // C is reserved as the event index
@@ -1982,7 +1962,7 @@ interrupt_Activation:
                 g_gameLoopInterrupt.F = KilledQueue_known;
                 return true;
 
-resume_Normal_KillNPC:
+resume_KillNPC:
                 i = g_gameLoopInterrupt.A;
                 A = NPCQueues::Killed[i];
                 KillCode = g_gameLoopInterrupt.B;

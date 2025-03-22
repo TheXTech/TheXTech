@@ -30,12 +30,20 @@ struct Controls_t;
 namespace XMessage
 {
 
+enum class Status : uint8_t
+{
+    local,
+    replay,
+    connected,
+};
+
 enum class Type : uint8_t
 {
     empty,
     press,
     release,
     menu_action,
+    char_swap,
 };
 
 struct Message
@@ -54,10 +62,25 @@ struct Message
 
 void Tick();
 
+void PushMessage_Direct(Message message);
 void PushMessage(Message message);
 Message PopMessage();
 
 void PushControls(int l_player_i, const Controls_t& controls);
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+
+// defined in client_methods.cpp
+Status GetStatus();
+
+#else // #ifdef THEXTECH_ENABLE_SDL_NET
+
+static inline Status GetStatus()
+{
+    return Status::local;
+}
+
+#endif // #ifdef THEXTECH_ENABLE_SDL_NET
 
 } // namespace XMessage
 

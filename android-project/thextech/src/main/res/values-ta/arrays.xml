@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="touchscreenControllerType1">வன்பொருள் விசைப்பலகை செருகப்படும்போது முடக்கு</string>
+    <string name="speedRunMode0">அணை</string>
+    <string name="speedRunMode1">பயன்முறை 1 (textech native)</string>
+    <string name="speedRunMode2">பயன்முறை 2 (நேரத்தை வென்ற அம்சங்களை முடக்கு)</string>
+    <string name="speedRunMode3">பயன்முறை 3 (கடுமையான SMBX 1.3, அனைத்து பிழைகள் இயக்கப்பட்டன)</string>
+    <string name="touchPadStyle0">விளையாட்டு செயல்கள்</string>
+    <string name="touchPadStyle1">நிண்டெண்டோ/எக்ச்பாக்ச் பாணி (a/b/x/y)</string>
+    <string name="touchPadStyle2">பிளேச்டேசன் பாணி (x/o/d/a</string>
+    <string name="batteryStatusShow1">குறைந்த பேட்டரி போது காண்பி</string>
+    <string name="rendererDefault">இயல்புநிலை</string>
+    <string name="touchscreenControllerType0">எப்போதும் இயக்கவும்</string>
+    <string name="touchscreenControllerType2">எப்போதும் முடக்கு</string>
+    <string name="batteryStatusShow0">ஒருபோதும் காட்ட வேண்டாம்</string>
+    <string name="batteryStatusShow2">எப்போதும் காட்டு</string>
+</resources>

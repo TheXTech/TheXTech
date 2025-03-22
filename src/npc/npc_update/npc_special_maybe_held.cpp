@@ -38,6 +38,7 @@
 void NPCSpecialMaybeHeld(int A)
 {
     // Special Code for things that work while held
+    // perfectly factored by NPC Type
     if(NPC[A].Type == NPCID_BOMB) // SMB2 Bomb
     {
         // If .Location.SpeedX < -2 Or .Location.SpeedX > 2 Or .Location.SpeedY < -2 Or .Location.SpeedY > 5 Then .Projectile = True
@@ -113,9 +114,8 @@ void NPCSpecialMaybeHeld(int A)
                 NPC[A].TimeLeft = 100;
                 if(bgMusic[NPC[A].Section] != 21)
                 {
-                    StopMusic();
                     bgMusic[NPC[A].Section] = 21;
-                    StartMusic(NPC[A].Section);
+                    StartMusicIfOnscreen(NPC[A].Section);
                 }
             }
         }
@@ -157,7 +157,7 @@ void NPCSpecialMaybeHeld(int A)
         bool tempBool = false;
         if(NPC[A].Special5 > 0)
         {
-            if(Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0 < NPC[A].Location.X + NPC[A].Location.Width / 2.0)
+            if(NPC[A].Location.to_right_of(Player[NPC[A].Special5].Location))
             {
                 if(NPC[A].Direction < 0)
                     tempBool = true;
@@ -285,7 +285,7 @@ void NPCSpecialMaybeHeld(int A)
         }
         else if(NPC[A].Special4 == 2) // hops
         {
-            if(NPC[A].Location.SpeedY == 0.0 || NPC[A].Slope > 0)
+            if(NPC[A].Location.SpeedY == 0 || NPC[A].Slope > 0)
             {
                 if(NPC[A].Special3 < 5)
                 {
@@ -345,8 +345,8 @@ void NPCSpecialMaybeHeld(int A)
                 NPC[A].Location.Y -= 0.1;
                 // This formula got been compacted: If something will glitch, feel free to restore back this crap
                 //NPC[A].Location.SpeedX = (static_cast<int>(std::floor(static_cast<double>(((Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0 - 16) + 1) / 32))) * 32 + 1 - NPC[A].Location.X) / 50;
-                double pCenter = pl.X + pl.Width / 2.0;
-                sx = std::floor((pCenter - 16.0 + 1.0) / 32.0) * 32.0 + 1.0;
+                double pCenter = pl.X + pl.Width / 2;
+                sx = std::floor((pCenter - 15) / 32) * 32 + 1;
                 sx -= NPC[A].Location.X;
                 sx /= 50;
                 if(sx > 15)
@@ -393,7 +393,7 @@ void NPCSpecialMaybeHeld(int A)
             }
             else if(NPC[A].Special3 == 21)
             {
-                if(NPC[A].Location.SpeedY != 0.0)
+                if(NPC[A].Location.SpeedY != 0)
                     NPC[A].Location.SpeedY = 10;
                 else
                 {
@@ -422,7 +422,7 @@ void NPCSpecialMaybeHeld(int A)
                     }
 
                     if(!legacy && g_config.extra_screen_shake)
-                        doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 7, 0.15);
+                        doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 7, 150, NPC[A].Location);
 
                     if(legacy) // Classic SMBX 1.0's behavior when Bowser stomps a floor
                     {
@@ -512,10 +512,10 @@ void NPCSpecialMaybeHeld(int A)
             }
             else
             {
-                if(NPC[A].Location.SpeedY == 0.0 || NPC[A].Slope > 0)
+                if(NPC[A].Location.SpeedY == 0 || NPC[A].Slope > 0)
                 {
                     NPC[A].Special3 = 0;
-                    if(Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0 < NPC[A].Location.X + NPC[A].Location.Width / 2.0)
+                    if(NPC[A].Location.to_right_of(Player[NPC[A].Special5].Location))
                         NPC[A].Special4 = -10;
                     else
                         NPC[A].Special4 = 10;
@@ -557,14 +557,9 @@ void NPCSpecialMaybeHeld(int A)
                     else
                         NPC[numNPCs].Location.X = NPC[A].Location.X + 54;
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + 19;
-                    NPC[numNPCs].Location.SpeedX = 4 * double(NPC[numNPCs].Direction);
-                    double C = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2.0) - (Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0);
-                    double D = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0) - (Player[NPC[A].Special5].Location.Y + Player[NPC[A].Special5].Location.Height / 2.0);
-                    NPC[numNPCs].Location.SpeedY = D / C * NPC[numNPCs].Location.SpeedX;
-                    if(NPC[numNPCs].Location.SpeedY > 1)
-                        NPC[numNPCs].Location.SpeedY = 1;
-                    else if(NPC[numNPCs].Location.SpeedY < -1)
-                        NPC[numNPCs].Location.SpeedY = -1;
+
+                    NPCSetSpeedTarget_FixedX(NPC[numNPCs], Player[NPC[A].Special5].Location, 4, 1);
+
                     syncLayers_NPC(numNPCs);
                     PlaySoundSpatial(SFX_BigFireball, NPC[A].Location);
                 }
@@ -580,33 +575,36 @@ void NPCSpecialMaybeHeld(int A)
                 NPC[A].Special4 = 0;
         }
     }
-    else if(NPC[A].Type == NPCID_HEAVY_THROWER && NPC[A].HoldingPlayer > 0)
+    else if(NPC[A].Type == NPCID_HEAVY_THROWER)
     {
-        // the throw counter was previously Special3, but it uses a double in the non-held logic, so it has been moved to SpecialX
-        if(Player[NPC[A].HoldingPlayer].Effect == PLREFF_NORMAL)
-            NPC[A].SpecialX += 1;
-
-        if(NPC[A].SpecialX >= 20)
+        if(NPC[A].HoldingPlayer > 0)
         {
-            PlaySoundSpatial(SFX_HeavyToss, NPC[A].Location);
-            NPC[A].SpecialX = 0; // -15
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Location.Height = 32;
-            NPC[numNPCs].Location.Width = 32;
-            NPC[numNPCs].Location.X = NPC[A].Location.X;
-            NPC[numNPCs].Location.Y = NPC[A].Location.Y;
-            NPC[numNPCs].Direction = NPC[A].Direction;
-            NPC[numNPCs].Type = NPCID_HEAVY_THROWN;
-            NPC[numNPCs].Shadow = NPC[A].Shadow;
-            NPC[numNPCs].CantHurt = 200;
-            NPC[numNPCs].CantHurtPlayer = NPC[A].HoldingPlayer;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].Projectile = true;
-            NPC[numNPCs].TimeLeft = 50;
-            NPC[numNPCs].Location.SpeedY = -8;
-            NPC[numNPCs].Location.SpeedX = 3 * Player[NPC[A].HoldingPlayer].Direction + Player[NPC[A].HoldingPlayer].Location.SpeedX * 0.8;
-            syncLayers_NPC(numNPCs);
+            // the throw counter was previously Special3, but it uses a double in the non-held logic, so it has been moved to SpecialX
+            if(Player[NPC[A].HoldingPlayer].Effect == PLREFF_NORMAL)
+                NPC[A].SpecialX += 1;
+
+            if(NPC[A].SpecialX >= 20)
+            {
+                PlaySoundSpatial(SFX_HeavyToss, NPC[A].Location);
+                NPC[A].SpecialX = 0; // -15
+                numNPCs++;
+                NPC[numNPCs] = NPC_t();
+                NPC[numNPCs].Location.Height = 32;
+                NPC[numNPCs].Location.Width = 32;
+                NPC[numNPCs].Location.X = NPC[A].Location.X;
+                NPC[numNPCs].Location.Y = NPC[A].Location.Y;
+                NPC[numNPCs].Direction = NPC[A].Direction;
+                NPC[numNPCs].Type = NPCID_HEAVY_THROWN;
+                NPC[numNPCs].Shadow = NPC[A].Shadow;
+                NPC[numNPCs].CantHurt = 200;
+                NPC[numNPCs].CantHurtPlayer = NPC[A].HoldingPlayer;
+                NPC[numNPCs].Active = true;
+                NPC[numNPCs].Projectile = true;
+                NPC[numNPCs].TimeLeft = 50;
+                NPC[numNPCs].Location.SpeedY = -8;
+                NPC[numNPCs].Location.SpeedX = 3 * Player[NPC[A].HoldingPlayer].Direction + Player[NPC[A].HoldingPlayer].Location.SpeedX * 0.8;
+                syncLayers_NPC(numNPCs);
+            }
         }
     }
     else if(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM) // Bullet Bill Shooter
@@ -690,7 +688,7 @@ void NPCSpecialMaybeHeld(int A)
                         if(C == 0.0 || dist < C)
                         {
                             C = dist;
-                            if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
+                            if(NPC[A].Location.to_right_of(Player[B].Location))
                                 NPC[A].Direction = -1;
                             else
                                 NPC[A].Direction = 1;
@@ -746,20 +744,20 @@ void NPCSpecialMaybeHeld(int A)
                         NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
 
                         if(NPC[numNPCs].Direction > 0)
-                            NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0;
+                            NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2;
                         else
-                            NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width;
+                            NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - NPC[numNPCs].Location.Width;
 
                         if(NPC[numNPCs].Direction > 0)
                             NPC[numNPCs].Frame = 1;
                         else
                             NPC[numNPCs].Frame = 0;
-                        NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - NPC[numNPCs].Location.Height / 2.0;
+                        NPC[numNPCs].Location.Y = NPC[A].Location.Y + (NPC[A].Location.Height - NPC[numNPCs].Location.Height) / 2;
                         syncLayers_NPC(numNPCs);
 
-                        Location_t tempLocation = NPC[numNPCs].Location;
-                        tempLocation.X = NPC[numNPCs].Location.X + (NPC[numNPCs].Location.Width / 2.0) * NPC[numNPCs].Direction;
-                        tempLocation.Y = NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0 - EffectHeight[10] / 2.0;
+                        Location_t tempLocation;
+                        tempLocation.X = NPC[numNPCs].Location.X + (NPC[numNPCs].Location.Width / 2) * NPC[numNPCs].Direction;
+                        tempLocation.Y = NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2 - EffectHeight[EFFID_SMOKE_S3] / 2;
                         NewEffect(EFFID_SMOKE_S3, tempLocation);
 
                         PlaySoundSpatial(SFX_Bullet, NPC[A].Location);
@@ -825,7 +823,7 @@ void NPCSpecialMaybeHeld(int A)
         // In original game, this is a dead code because of "And 0" condition at end.
         // In this sample, the "& false" was been commented
         // This code makes Toothy shown off the pipe when the pipe is a projectile, shooted by generator
-        if(NPC[A].Projectile && NPC[A].Special2 == 0.0 && NPC[A].Special == 0.0 /*&& false*/)
+        if(NPC[A].Projectile && NPC[A].Special2 == 0 && NPC[A].Special == 0 /*&& false*/)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -892,13 +890,13 @@ void NPCSpecialMaybeHeld(int A)
                 if(target_plr == 0)
                     target_plr = 1;
 
-                if(Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0 > NPC[A].Location.X + 16)
+                if(Player[target_plr].Location.X + Player[target_plr].Location.Width / 2 > NPC[A].Location.X + 16)
                     NPC[A].Direction = 1;
                 else
                     NPC[A].Direction = -1;
             }
 
-            if(NPC[A].Location.SpeedY == 0.0 || NPC[A].Slope > 0)
+            if(NPC[A].Location.SpeedY == 0 || NPC[A].Slope > 0)
             {
                 NPC[A].Location.SpeedX = 0;
 

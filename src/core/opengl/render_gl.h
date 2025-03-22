@@ -562,6 +562,12 @@ protected:
     // Compiles user fragment shader and assembles program in target.
     void compileShaders(StdPicture &target) override;
 
+    inline void getViewportSize(int* viewport_w, int* viewport_h) override
+    {
+        *viewport_w = m_viewport.w;
+        *viewport_h = m_viewport.h;
+    }
+
 
     /**************************************************************\
     || Public render functions, defined at render_gl_frontend.cpp ||

@@ -56,6 +56,8 @@ protected:
     static bool m_blockRender;
 #endif
 
+    virtual void getViewportSize(int* viewport_w, int* viewport_h) = 0;
+
     virtual void compileShaders(StdPicture &target);
 
     static void dumpFullFile(std::vector<char> &dst, const std::string &path);
@@ -316,6 +318,8 @@ public:
 
     virtual void renderTexture(float xDst, float yDst, StdPicture &tx,
                                XTColor color = XTColor()) = 0;
+
+    void renderSizableBlock(int xDst, int yDst, int wDst, int hDst, StdPicture &tx);
 
     virtual void renderParticleSystem(StdPicture &tx,
                                       double camX,

@@ -72,7 +72,9 @@ int ScreenFader::loadTransitEffect(const std::string& name)
 void ScreenFader::clearFader()
 {
     m_active = false;
-    m_scale = 0.0f;
+    m_current_fade = 0;
+    m_target_fade = 0;
+    m_step = 0;
     m_full = false;
     m_focusX = -1;
     m_focusY = -1;
@@ -80,16 +82,16 @@ void ScreenFader::clearFader()
     m_focusSet = false;
     m_focusTrackX = nullptr;
     m_focusTrackY = nullptr;
-    m_focusOffsetX = 0.0;
-    m_focusOffsetY = 0.0;
+    m_focusOffsetX = 0;
+    m_focusOffsetY = 0;
 }
 
 void ScreenFader::setupFader(int step, int start, int goal, int shape, bool useFocus, int focusX, int focusY, int screen)
 {
     m_shape = shape;
-    m_fader.setRatio(start / 65.0);
-    m_fader.setFade(15, goal / 65.0, step / 65.0);
-    m_scale = (float)m_fader.fadeRatio();
+    m_current_fade = start;
+    m_target_fade = goal;
+    m_step = step;
     m_dirUp = start < goal;
     m_active = true;
     m_full = false;
@@ -100,8 +102,8 @@ void ScreenFader::setupFader(int step, int start, int goal, int shape, bool useF
     m_focusScreen = screen;
     m_focusTrackX = nullptr;
     m_focusTrackY = nullptr;
-    m_focusOffsetX = 0.0;
-    m_focusOffsetY = 0.0;
+    m_focusOffsetX = 0;
+    m_focusOffsetY = 0;
 
 #ifdef THEXTECH_BUILD_GL_MODERN
     if(m_shape >= S_CUSTOM && m_shape - S_CUSTOM < (int)s_loaded_effects.size() && s_loaded_effects[m_shape - S_CUSTOM]->get())
@@ -144,30 +146,46 @@ void ScreenFader::update()
     if(!m_active)
         return;
 
-    if(!m_fader.isFading())
-    {
-        if(m_scale <= 0.0f)
-        {
-            m_active = false;
-            m_complete = true;
-        }
-        else if(m_scale >= 1.0f)
-        {
-            m_full = true;
-            m_complete = true;
-        }
-    }
-
     if(m_focusSet)
     {
         if(m_focusTrackX)
-            m_focusX = *m_focusTrackX + m_focusOffsetX;
+            m_focusX = (int)(*m_focusTrackX + m_focusOffsetX);
         if(m_focusTrackY)
-            m_focusY = *m_focusTrackY + m_focusOffsetY;
+            m_focusY = (int)(*m_focusTrackY + m_focusOffsetY);
     }
 
-    m_fader.tickFader(1000.0 / 65.0);
-    m_scale = (float)m_fader.fadeRatio();
+    if(m_current_fade < m_target_fade)
+    {
+        m_current_fade += m_step;
+
+        if(m_current_fade >= m_target_fade)
+        {
+            m_current_fade = m_target_fade;
+            m_step = 0;
+
+            if(m_current_fade >= 65)
+            {
+                m_full = true;
+                m_complete = true;
+            }
+        }
+    }
+    else if(m_current_fade > m_target_fade)
+    {
+        m_current_fade -= m_step;
+
+        if(m_current_fade <= m_target_fade)
+        {
+            m_current_fade = m_target_fade;
+            m_step = 0;
+
+            if(m_current_fade <= 0)
+            {
+                m_active = false;
+                m_complete = true;
+            }
+        }
+    }
 }
 
 void ScreenFader::draw(bool fullscreen)
@@ -189,8 +207,8 @@ void ScreenFader::draw(bool fullscreen)
 
     if(m_focusSet && m_focusScreen > 0 && m_focusScreen <= c_vScreenCount)
     {
-        focusX += vScreen[m_focusScreen].X;
-        focusY += vScreen[m_focusScreen].Y;
+        focusX += (int)vScreen[m_focusScreen].X;
+        focusY += (int)vScreen[m_focusScreen].Y;
 
         if(fullscreen)
         {
@@ -198,6 +216,8 @@ void ScreenFader::draw(bool fullscreen)
             focusY += vScreen[m_focusScreen].TargetY();
         }
     }
+
+    uint8_t alpha = m_current_fade * 255 / 65;
 
     switch(m_shape)
     {
@@ -210,7 +230,7 @@ void ScreenFader::draw(bool fullscreen)
             if(m_focusUniform >= 0)
                 XRender::assignUniform(effect, m_focusUniform, UniformValue_t((GLfloat)focusX, (GLfloat)focusY));
 
-            XRender::renderTextureScale(0, 0, drawW, drawH, effect, XTAlphaF(m_scale));
+            XRender::renderTextureScale(0, 0, drawW, drawH, effect, XTAlpha(alpha));
 
             // if catastrophic failure, fallback to normal fader
             if(effect.inited)
@@ -220,35 +240,35 @@ void ScreenFader::draw(bool fullscreen)
 
     // fallthrough
     case S_FADE:
-        XRender::renderRect(0, 0, drawW, drawH, color.with_alphaF(m_scale), true);
+        XRender::renderRect(0, 0, drawW, drawH, color.with_alpha(alpha), true);
         break;
 
     case S_RECT:
-        if(m_scale >= 1.0f)
-            XRender::renderRect(0, 0, drawW, drawH, color.with_alphaF(m_scale), true);
+        if(m_current_fade >= 65)
+            XRender::renderRect(0, 0, drawW, drawH, color.with_alpha(alpha), true);
         else
         {
             float rightW = (drawW - focusX),
                     bottomH = (drawH - focusY),
-                    leftW = focusX * m_scale, // left side
-                    topY = focusY * m_scale, // top side
-                    rightX = drawW - SDL_ceil(rightW * m_scale) + 1, // right side
-                    bottomY = drawH - SDL_ceil(bottomH * m_scale) + 1; // bottom side
+                    leftW = focusX * m_current_fade / 65, // left side
+                    topY = focusY * m_current_fade / 65, // top side
+                    rightX = drawW - SDL_ceil(rightW * m_current_fade / 65) + 1, // right side
+                    bottomY = drawH - SDL_ceil(bottomH * m_current_fade / 65) + 1; // bottom side
 
             // Left side
             XRender::renderRect(0, 0, leftW, drawH, color, true);
             // right side
-            XRender::renderRect(rightX, 0, rightW * m_scale, drawH, color, true);
+            XRender::renderRect(rightX, 0, rightW * m_current_fade / 65, drawH, color, true);
             // Top side
             XRender::renderRect(0, 0, drawW, topY, color, true);
             // Bottom side
-            XRender::renderRect(0, bottomY, drawW, bottomH * m_scale, color, true);
+            XRender::renderRect(0, bottomY, drawW, bottomH * m_current_fade / 65, color, true);
         }
         break;
 
     case S_CIRCLE:
-        if(m_scale >= 1.0f)
-            XRender::renderRect(0, 0, drawW, drawH, color.with_alphaF(m_scale), true);
+        if(m_current_fade >= 65)
+            XRender::renderRect(0, 0, drawW, drawH, color.with_alpha(alpha), true);
         else
         {
             // int radius = drawH - (drawH * m_scale);
@@ -274,7 +294,7 @@ void ScreenFader::draw(bool fullscreen)
             if(maxRadius < maxRadiusPre)
                 maxRadius = maxRadiusPre;
 
-            int radius = maxRadius - (maxRadius * m_scale);
+            int radius = maxRadius - (maxRadius * m_current_fade / 65);
 
             XRender::renderCircleHole(focusX, focusY, radius, color);
             // left side
@@ -289,24 +309,24 @@ void ScreenFader::draw(bool fullscreen)
         break;
 
     case S_FLIP_H:
-        if(m_scale >= 1.0f)
-            XRender::renderRect(0, 0, drawW, drawH, color.with_alphaF(m_scale), true);
+        if(m_current_fade >= 65)
+            XRender::renderRect(0, 0, drawW, drawH, color.with_alpha(alpha), true);
         else
         {
-            float center = (drawH / 2);
-            float sideHeight = SDL_ceil(center * m_scale);
+            int center = (drawH / 2);
+            int sideHeight = (center * m_current_fade + 64) / 65;
             XRender::renderRect(0, 0, drawW, sideHeight, color, true);
             XRender::renderRect(0, drawH - sideHeight, drawW, sideHeight, color, true);
         }
         break;
 
     case S_FLIP_V:
-        if(m_scale >= 1.0f)
-            XRender::renderRect(0, 0, drawW, drawH, color.with_alphaF(m_scale), true);
+        if(m_current_fade >= 65)
+            XRender::renderRect(0, 0, drawW, drawH, color.with_alpha(alpha), true);
         else
         {
-            float center = (drawW / 2);
-            float sideWidth = SDL_ceil(center * m_scale);
+            int center = (drawW / 2);
+            int sideWidth = (center * m_current_fade + 64) / 65;
             XRender::renderRect(0, 0, sideWidth, drawH, color, true);
             XRender::renderRect(drawW - sideWidth, 0, sideWidth, drawH, color, true);
         }

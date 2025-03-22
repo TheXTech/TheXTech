@@ -1222,7 +1222,12 @@ void InputMethodType_Wii::UpdateControlsPost()
         if(data->err || !data->data_present)
             m_chnConnected[i] = 0;
         else if(m_chnConnected[i] < 8)
+        {
             m_chnConnected[i]++;
+
+            // fixes bug where Wiimote could be stuck in Rumble state if it had previously died while Rumble was active
+            WPAD_Rumble(i, 0);
+        }
 
         if(data->ir.valid)
         {

@@ -39,6 +39,7 @@
 #include "../game_main.h"
 #include "main/screen_textentry.h"
 #include "main/screen_quickreconnect.h"
+#include "main/screen_pause.h"
 #include "main/cheat_code.h"
 #include "main/menu_main.h"
 #include "main/translate.h"
@@ -862,6 +863,10 @@ bool Update(bool check_lost_devices)
     for(InputMethodType* type : g_InputMethodTypes)
         type->UpdateControlsPost();
 
+    // call pause screen logic if needed (this is needed for pause screen to use local controls state to trigger events)
+    if(GamePaused == PauseCode::PauseScreen)
+        PauseScreen::ControlsLogic();
+
     // sync any messages, and reset player controls to raw controls
     XMessage::Tick();
 
@@ -880,10 +885,10 @@ bool Update(bool check_lost_devices)
 
     if(SharedCursor.Move)
     {
-        if(SharedCursor.X >= 0. && SharedCursor.Y >= 0.)
+        if(SharedCursor.X >= 0 && SharedCursor.Y >= 0)
         {
             int window_x, window_y;
-            XRender::mapFromScreen(SharedCursor.X, SharedCursor.Y, &window_x, &window_y);
+            XRender::mapFromScreen((int)SharedCursor.X, (int)SharedCursor.Y, &window_x, &window_y);
             XWindow::placeCursor(window_x, window_y);
         }
     }

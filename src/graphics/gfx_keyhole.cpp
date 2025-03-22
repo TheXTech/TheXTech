@@ -38,8 +38,8 @@ void RenderKeyhole(int Z)
 
     double keyholeGrowthCoord = (double)ratio / 100;
 
-    if(keyholeGrowthCoord > 1.0)
-        keyholeGrowthCoord = 1.0;
+    if(keyholeGrowthCoord > 1)
+        keyholeGrowthCoord = 1;
 
     double keyholeScale = keyholeGrowthCoord * 12;
 

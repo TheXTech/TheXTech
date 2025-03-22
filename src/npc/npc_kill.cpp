@@ -39,7 +39,7 @@
 
 #include "main/game_loop_interrupt.h"
 
-static void s_makeSparkles(const NPC_t& npc, double speed_random, double speed_mult)
+static void s_makeSparkles(const NPC_t& npc, int speed_random, double speed_mult)
 {
     NewEffect(EFFID_SMOKE_S3, npc.Location);
 
@@ -85,8 +85,7 @@ bool KillNPC(int A, int B)
 
     switch(g_gameLoopInterrupt.site)
     {
-    case GameLoopInterrupt::UpdateNPCs_FreezeNPCs_KillNPC:
-    case GameLoopInterrupt::UpdateNPCs_Normal_KillNPC:
+    case GameLoopInterrupt::UpdateNPCs_KillNPC:
         if(g_gameLoopInterrupt.bool1)
             goto resume_TriggerLast;
         else
@@ -112,7 +111,7 @@ bool KillNPC(int A, int B)
 
         NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.4;
         if(NPC[A].Location.SpeedX < 2 && NPC[A].Location.SpeedX > -2)
-            NPC[A].Location.SpeedX = double(2 * NPC[A].Direction);
+            NPC[A].Location.SpeedX = 2 * NPC[A].Direction;
     }
 
     if(NPC[A].Killed == 8 && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_KNIGHT && !NPCIsABot(NPC[A]) && NPC[A].Type != NPCID_FLIER && NPC[A].Type != NPCID_ROCKET_FLIER && NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_HOMING_BALL)
@@ -293,10 +292,10 @@ resume_TriggerLast:
                 if(iRand(40) < 3)
                     NPC[numNPCs].Type = NPCID_GEM_20;
                 NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-                NPC[numNPCs].Location.X = NPC_CenterX - NPC[numNPCs].Location.Width / 2.0;
+                NPC[numNPCs].Location.X = NPC_CenterX - NPC[numNPCs].Location.Width / 2;
                 NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
                 if(NPC[A].Location.Height >= 32)
-                    NPC[numNPCs].Location.Y = NPC_CenterY - NPC[numNPCs].Location.Height / 2.0;
+                    NPC[numNPCs].Location.Y = NPC_CenterY - NPC[numNPCs].Location.Height / 2;
                 else if(NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_LONG_PLANT_DOWN) // Stops the rupees from spawning in blocks
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + 1;
                 else // Stops the rupees from spawning in blocks
@@ -307,7 +306,7 @@ resume_TriggerLast:
                 NPC[numNPCs].TailCD = 10;
                 NPC[numNPCs].Special = 1;
                 NPC[numNPCs].Location.SpeedY = -5;
-                NPC[numNPCs].Location.SpeedX = (1 + dRand() * 0.5) * NPC[A].Direction;
+                NPC[numNPCs].Location.SpeedX = (1 + dRand() / 2) * NPC[A].Direction;
                 syncLayers_NPC(numNPCs);
                 CheckSectionNPC(numNPCs);
             }
@@ -353,10 +352,7 @@ resume_TriggerLast:
             }
             else if(B == 8)
             {
-                NPC[A].Location.X = NPC_CenterX - 16;
-                NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-                NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
-                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
                 PlaySoundSpatial(SFX_Smash, NPC[A].Location);
             }
             else
@@ -483,9 +479,7 @@ resume_TriggerLast:
             }
             else if(B == 8)
             {
-                NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-                NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
-                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
                 PlaySoundSpatial(SFX_Smash, NPC[A].Location);
             }
             else
@@ -542,7 +536,7 @@ resume_TriggerLast:
             if(B == 1)
             {
                 NPC[A].Location.Y += 2;
-                NewEffect(124 , NPC[A].Location);
+                NewEffect(EFFID_TNT_PRESS, NPC[A].Location);
             }
             else if(B == 2)
             {
@@ -613,9 +607,7 @@ resume_TriggerLast:
             }
             else if(B == 8)
             {
-                NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-                NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
-                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
                 PlaySoundSpatial(SFX_Smash, NPC[A].Location);
             }
             else
@@ -638,9 +630,7 @@ resume_TriggerLast:
             }
             else if(B == 8)
             {
-                NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-                NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
-                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
                 PlaySoundSpatial(SFX_Smash, NPC[A].Location);
             }
             else
@@ -675,9 +665,7 @@ resume_TriggerLast:
             }
             else if(B == 8)
             {
-                NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-                NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
-                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
                 PlaySoundSpatial(SFX_Smash, NPC[A].Location);
             }
             else
@@ -809,9 +797,7 @@ resume_TriggerLast:
             }
             else if(B == 8)
             {
-                NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-                NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
-                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
                 PlaySoundSpatial(SFX_Smash, NPC[A].Location);
             }
             else
@@ -845,7 +831,7 @@ resume_TriggerLast:
             CharStuff(A, true);
             if(NPC[A].Special == NPCID_RANDOM_POWER)
                 NPC[A].Special = RandomBonus();
-            NewEffect(EFFID_ITEM_POD_OPEN, NPC[A].Location, 1, (int)SDL_floor(NPC[A].Special), false, NPC[A].Variant);
+            NewEffect(EFFID_ITEM_POD_OPEN, NPC[A].Location, 1, NPC[A].Special, false, NPC[A].Variant);
             if(C == 98)
                 Effect[numEffects].Frame += 3;
             else if(C == 99)
@@ -878,9 +864,7 @@ resume_TriggerLast:
             }
             else if(B == 8)
             {
-                NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-                NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
-                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
                 PlaySoundSpatial(SFX_Smash, NPC[A].Location);
             }
             else
@@ -902,9 +886,7 @@ resume_TriggerLast:
             }
             else if(B == 8)
             {
-                NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-                NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
-                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
                 PlaySoundSpatial(SFX_Smash, NPC[A].Location);
             }
             else
@@ -928,9 +910,7 @@ resume_TriggerLast:
             }
             else if(B == 8)
             {
-                NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-                NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
-                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
                 PlaySoundSpatial(SFX_Smash, NPC[A].Location);
             }
             else
@@ -978,9 +958,7 @@ resume_TriggerLast:
             }
             else if(B == 8)
             {
-                NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-                NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
-                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
                 PlaySoundSpatial(SFX_Smash, NPC[A].Location);
             }
             else
@@ -1031,9 +1009,7 @@ resume_TriggerLast:
             }
             else if(B == 8)
             {
-                NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-                NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
-                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
                 PlaySoundSpatial(SFX_Smash, NPC[A].Location);
             }
             else
@@ -1119,9 +1095,7 @@ resume_TriggerLast:
             }
             else if(B == 8)
             {
-                NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-                NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
-                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
                 PlaySoundSpatial(SFX_Smash, NPC[A].Location);
             }
             else
@@ -1181,14 +1155,13 @@ resume_TriggerLast:
                     if(!DontResetMusic)
                     {
                         bgMusic[NPC[A].Section] = bgMusicREAL[NPC[A].Section];
-                        StopMusic();
-                        StartMusic(NPC[A].Section);
+                        StartMusicIfOnscreen(NPC[A].Section);
                     }
                 }
             }
 
-            NPC[A].Location.Y += -NPC[A].Location.Height / 2.0 + 32;
-            NPC[A].Location.X += -NPC[A].Location.Width / 2.0 + 20;
+            NPC[A].Location.Y += -NPC[A].Location.Height / 2 + 32;
+            NPC[A].Location.X += -NPC[A].Location.Width / 2 + 20;
             NewEffect(EFFID_SPIT_BOSS_DIE, NPC[A].Location, NPC[A].Direction);
         }
         else if(NPC[A].Type == NPCID_SPIT_BOSS_BALL) // Egg
@@ -1295,7 +1268,7 @@ resume_TriggerLast:
             tempLocation = NPC[A].Location;
             if(NPC[A].Type == NPCID_LONG_PLANT_DOWN)
             {
-                int npcH = NPC[A].Location.Height;
+                int npcH = (int)NPC[A].Location.Height;
                 for(C = 0; C <= npcH; C += 32)
                 {
                     if(NPC[A].Location.Height - C > 16)
@@ -1307,7 +1280,7 @@ resume_TriggerLast:
             }
             else
             {
-                int npcH = NPC[A].Location.Height;
+                int npcH = (int)NPC[A].Location.Height;
                 for(C = 0; C <= npcH; C += 32)
                 {
                     if(NPC[A].Location.Height - C > 16)
@@ -1321,9 +1294,7 @@ resume_TriggerLast:
         }
         else if(NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_QUAD_SPITTER || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_LAVABUBBLE || NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_GHOST_S3 || NPC[A].Type == NPCID_GHOST_FAST || NPC[A].Type == NPCID_GHOST_S4 || NPC[A].Type == NPCID_BIG_GHOST || NPC[A].Type == NPCID_FIRE_PLANT || NPC[A].Type == NPCID_JUMP_PLANT) // Piranha Plant / Fireball
         {
-            NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-            NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
-            NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+            NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
             if(B == 8)
                 PlaySoundSpatial(SFX_Smash, NPC[A].Location);
             else
@@ -1351,13 +1322,11 @@ resume_TriggerLast:
                     else
                         NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[A].Location, NPC[A].Special, 0, NPC[A].Shadow);
 
-                    Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[A].Location.SpeedX * 0.1;
-                    Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[A].Location.SpeedY * 0.1;
+                    Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[A].Location.SpeedX / 10;
+                    Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[A].Location.SpeedY / 10;
                 }
-                NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-                NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
                 if((NPC[A].Type == NPCID_PLR_FIREBALL && NPC[A].Special == 5) || NPC[A].Type == NPCID_PET_FIRE)
-                    NewEffect(EFFID_SMOKE_S3, NPC[A].Location, 1, 0, NPC[A].Shadow);
+                    NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location, 1, 0, NPC[A].Shadow);
                 else
                     NewEffect(EFFID_SMOKE_S4, NPC[A].Location, 1, 0, NPC[A].Shadow);
             }
@@ -1402,8 +1371,7 @@ resume_TriggerLast:
                     if(!DontResetMusic)
                     {
                         bgMusic[NPC[A].Section] = bgMusicREAL[NPC[A].Section];
-                        StopMusic();
-                        StartMusic(Player[1].Section);
+                        StartMusicIfOnscreen(NPC[A].Section);
                     }
                 }
             }
@@ -1425,9 +1393,7 @@ resume_TriggerLast:
 
             if(B == 8)
             {
-                NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-                NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
-                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
                 PlaySoundSpatial(SFX_Smash, NPC[A].Location);
             }
             else
@@ -1452,9 +1418,7 @@ resume_TriggerLast:
             }
             else if(B == 8)
             {
-                NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-                NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
-                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
                 PlaySoundSpatial(SFX_Smash, NPC[A].Location);
             }
             else
@@ -1584,16 +1548,12 @@ resume_TriggerLast:
             {
                 if(!NPC[A]->IsACoin || LevelEditor || TestLevel) // Shell hit sound
                     PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
-                NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-                NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
-                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
             }
             else if(B == 6)
             {
                 PlaySoundSpatial(SFX_Lava, NPC[A].Location);
-                NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-                NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
-                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
                     NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
@@ -1602,9 +1562,7 @@ resume_TriggerLast:
         {
             if(!(NPC[A].Type == NPCID_COIN_SWITCH && B == 1))
             {
-                NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
-                NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_SMOKE_S3] / 2;
-                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
                 PlaySoundSpatial(SFX_Smash, NPC[A].Location);
             }
         }

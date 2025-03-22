@@ -239,16 +239,13 @@ void RasterFont::loadFontMap(const std::string& fontmap_ini)
         char32_t ch = ucharX[0];
         //qDebug()<<"=char=" << ch << "=id="<<charPosX.toInt()<<charPosY.toInt()<<"=";
         RasChar rch;
-        float l, t;
         try
         {
             rch.tx              =  &fontTexture;
-            l                   =  std::stof(charPosY.c_str()) / m_matrixWidth;
+            rch.x               =  static_cast<int16_t>(std::stoi(charPosY.c_str()) * fontTexture.w / m_matrixWidth);
             rch.padding_left    = (ucharX.size() > 1) ? char2int(ucharX[1]) : 0;
             rch.padding_right   = (ucharX.size() > 2) ? char2int(ucharX[2]) : 0;
-            t                   =  std::stof(charPosX.c_str()) / m_matrixHeight;
-            rch.x               =  static_cast<int16_t>(fontTexture.w * l);
-            rch.y               =  static_cast<int16_t>(fontTexture.h * t);
+            rch.y               =  static_cast<int16_t>(std::stoi(charPosX.c_str()) * fontTexture.h / m_matrixHeight);
             rch.valid = true;
         }
         catch(std::exception &e)
@@ -279,18 +276,18 @@ PGE_Size RasterFont::glyphSize(const char* utf8char, uint32_t charNum, uint32_t 
 
     case '\t':
     {
-        size_t spaceSize = m_spaceWidth + m_interLetterSpace / 2;
+        size_t spaceSize = m_spaceWidth;
         if(spaceSize == 0)
             spaceSize = 1; // Don't divide by zero
         size_t tabMult = 4 - ((charNum / spaceSize) % 4);
-        ret.setWidth(static_cast<size_t>(m_spaceWidth + m_interLetterSpace / 2) * tabMult);
+        ret.setWidth(static_cast<size_t>(spaceSize) * tabMult);
         ret.setHeight(m_newlineOffset);
         break;
     }
 
     case ' ':
     {
-        ret.setWidth(m_spaceWidth + m_interLetterSpace / 2);
+        ret.setWidth(m_spaceWidth);
         ret.setHeight(m_newlineOffset);
         break;
     }
@@ -362,7 +359,7 @@ PGE_Size RasterFont::glyphSize(const char* utf8char, uint32_t charNum, uint32_t 
 PGE_Size RasterFont::printText(const char* text, size_t text_size,
                                int32_t x, int32_t y,
                                XTColor color,
-                               uint32_t,
+                               uint32_t fontSize,
                                CropInfo* crop_info)
 {
     if(m_charMap.empty() || !text || text_size == 0)
@@ -403,7 +400,7 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
             continue;
 
         case ' ':
-            offsetX += m_spaceWidth + m_interLetterSpace / 2;
+            offsetX += m_spaceWidth;
             continue;
         }
 
@@ -438,7 +435,7 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
             TtfFont *font = FontManager::getTtfFontByName(m_ttfFallback);
             if(font)
             {
-                uint32_t font_size_use = m_ttfSize > 0 ? m_ttfSize : m_letterWidth;
+                uint32_t font_size_use = (m_ttfSize > 0) ? m_ttfSize : m_letterWidth;
 
                 int y_offset = 0;
                 bool doublePixel = font->doublePixel();
@@ -448,10 +445,12 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
                     if(font->doublePixel() || font_size_use > font->bitmapSize() * 1.5)
                         doublePixel = true;
 
-                    if(doublePixel)
-                        y_offset = ((int)m_letterWidth - (font->bitmapSize() * 2)) / 2;
+                    if(fontSize == 0)
+                        y_offset = 0;
+                    else if(doublePixel)
+                        y_offset = ((int)fontSize - (font->bitmapSize() * 2)) / 2;
                     else
-                        y_offset = ((int)m_letterWidth - font->bitmapSize()) / 2;
+                        y_offset = ((int)fontSize - font->bitmapSize()) / 2;
 
                     font_size_use = font->bitmapSize();
                 }

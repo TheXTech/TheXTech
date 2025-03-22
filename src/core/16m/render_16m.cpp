@@ -234,7 +234,7 @@ static int s_loadTextureToRAM(tex_load_data& tex, const std::string& path, int l
     return complete_texture_count + 1;
 }
 
-static int s_loadTexture(const std::string& path, int* tex_out, int* data_size, int logical_w, int logical_h, int flags)
+static int s_loadTexture(const std::string& path, int* tex_out, int* data_size, int logical_w, int logical_h, int flags, bool& file_missing)
 {
     if(!tex_out || !data_size)
     {
@@ -247,7 +247,10 @@ static int s_loadTexture(const std::string& path, int* tex_out, int* data_size, 
     int tex_count = s_loadTextureToRAM(tex, path, logical_w, logical_h, flags);
 
     if(tex_count == 0)
+    {
+        file_missing = true;
         return false;
+    }
 
     int loaded = 0;
     uint32_t loaded_data_size = 0;
@@ -397,9 +400,17 @@ static inline bool GL_DrawImage_Custom(int name, int flags,
     uint16_t v2 = (src_y + src_h) >> (flags & 15);
 
     if(flip & X_FLIP_HORIZONTAL)
+    {
         std::swap(u1, u2);
+        u1 -= 1;
+        u2 -= 1;
+    }
     if(flip & X_FLIP_VERTICAL)
+    {
         std::swap(v1, v2);
+        v1 -= 1;
+        v2 -= 1;
+    }
 
     uint8_t r = color.r;
     uint8_t g = color.g;
@@ -806,21 +817,32 @@ void lazyLoadPictureFromList(StdPicture_Sub& target, PGE_FileFormats_misc::TextI
 
 void lazyLoad(StdPicture &target)
 {
-    if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
+    if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture() || (target.d.last_draw_frame && g_current_frame - target.d.last_draw_frame < g_load_failure_retry_frames))
         return;
 
-    target.d.attempted_load = true;
-    s_texture_bank.insert(&target);
-
-    std::string suppPath;
-
-    if(!s_loadTexture(target.l.path, target.d.texture, &target.d.data_size, target.w, target.h, target.l.flags))
+    bool file_missing = false;
+    if(!s_loadTexture(target.l.path, target.d.texture, &target.d.data_size, target.w, target.h, target.l.flags, file_missing))
     {
-        pLogWarning("Permanently failed to load %s", target.l.path.c_str());
-        return;
+        if(file_missing)
+        {
+            pLogWarning("Permanently failed to load %s", target.l.path.c_str());
+            target.inited = false;
+            return;
+        }
+        else
+        {
+            pLogInfo("Failed to load %s", target.l.path.c_str());
+
+            // use normal timeout if it's already failed to load once
+            if(target.d.last_draw_frame)
+                target.d.last_draw_frame = g_current_frame;
+            // use fast timeout if this is the first time
+            else
+                target.d.last_draw_frame = g_current_frame - (g_load_failure_retry_frames - 65);
+        }
     }
 
-    return;
+    s_texture_bank.insert(&target);
 }
 
 void lazyPreLoad(StdPicture &target)
@@ -859,7 +881,7 @@ void unloadTexture(StdPicture &tx)
 
     minport_unlinkTexture(&tx);
 
-    if(tx.d.reallyHasTexture())
+    if(tx.d.hasTexture())
     {
         D_pLogDebug("Freeing %d bytes from %s", tx.d.data_size);
         s_loadedVRAM -= tx.d.data_size;
@@ -880,7 +902,7 @@ static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDs
     if(!tx.inited)
         return;
 
-    if(tx.l.lazyLoaded && !tx.d.hasTexture() && !tx.d.reallyHasTexture())
+    if(tx.l.lazyLoaded && !tx.d.hasTexture())
         lazyLoad(tx);
 
     // handle rotation NOW
@@ -907,24 +929,22 @@ static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDs
         yDst = -cy;
     }
 
-    if(!tx.d.reallyHasTexture())
+    int to_draw = 0;
+    int to_draw_2 = 0;
+
+    int tex_part_height = 1024 << (tx.l.flags & 15);
+
+    if(!tx.d.hasTexture())
     {
+        // can't do anything
         s_glBoxFilledGradient( xDst, yDst, xDst + wDst - 1, yDst + hDst - 1,
                              RGB15( 15, 2, 1 ),
                              RGB15( 1, 15, 1 ),
                              RGB15( 1, 2, 15 ),
                              RGB15( 1, 15, 15 )
                            );
-
-        return;
     }
-
-    int to_draw = 0;
-    int to_draw_2 = 0;
-
-    int tex_part_height = 1024 << (tx.l.flags & 15);
-
-    if(ySrc + hSrc > tex_part_height)
+    else if(ySrc + hSrc > tex_part_height)
     {
         if(ySrc + hSrc > tex_part_height * 2)
         {
@@ -961,12 +981,14 @@ static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDs
         to_draw = tx.d.texture[0];
     }
 
-    if(!to_draw) return;
+    if(!to_draw)
+        goto cleanup;
 
     GL_DrawImage_Custom(to_draw, tx.l.flags, xDst, yDst, wDst, hDst,
                         xSrc, ySrc, wSrc, hSrc, flip, color);
 
     // finalize rotation HERE
+cleanup:
     if(rotateAngle)
         glPopMatrix(1);
 }
@@ -979,10 +1001,10 @@ static void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16
     if(!tx.inited)
         return;
 
-    if(tx.l.lazyLoaded && !tx.d.hasTexture() && !tx.d.reallyHasTexture())
+    if(tx.l.lazyLoaded && !tx.d.hasTexture())
         lazyLoad(tx);
 
-    if(!tx.d.reallyHasTexture())
+    if(!tx.d.hasTexture())
         return;
 
     if(tx.d.texture[1])
@@ -999,6 +1021,132 @@ static void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16
     if(!to_draw) return;
 
     GL_DrawImage_Custom_Basic(to_draw, tx.l.flags, xDst, yDst, wDst, hDst, xSrc, ySrc, color);
+}
+
+void renderSizableBlock(int bLeftOnscreen, int bTopOnscreen, int wDst, int hDst, StdPicture &tx)
+{
+    // initial bounds check
+    int bRightOnscreen = bLeftOnscreen + wDst;
+    if(bRightOnscreen < 0)
+        return;
+
+    int bBottomOnscreen = bTopOnscreen + hDst;
+    if(bBottomOnscreen < 0)
+        return;
+
+    bTopOnscreen = FLOORDIV2(bTopOnscreen);
+    bBottomOnscreen = bBottomOnscreen / 2;
+    bLeftOnscreen = FLOORDIV2(bLeftOnscreen);
+    bRightOnscreen = bRightOnscreen / 2;
+
+    // load texture
+    if(!tx.inited)
+        return;
+
+    if(tx.l.lazyLoaded && !tx.d.hasTexture())
+        lazyLoad(tx);
+
+    if(!tx.d.hasTexture())
+        return;
+
+    glBindTexture(0, tx.d.texture[0]);
+
+    if(tx.l.flags & 32)
+        glPolyFmt(POLY_ID(s_render_planes.m_current_plane / 8) | POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FOG_Q);
+
+    glBegin(GL_QUADS);
+
+    glColor3b(255, 255, 255);
+
+    // pre-scale u and v for efficiency
+    uint32_t left_u1 = ( 0 << 4);
+
+    if(bLeftOnscreen <= -16)
+    {
+        left_u1 = (16 << 4);
+        bLeftOnscreen = bLeftOnscreen % 16;
+
+        // go straight to right if less than 17 pixels in total
+        if(bRightOnscreen - bLeftOnscreen < 17)
+        {
+            left_u1 = (32 << 4);
+        }
+    }
+
+    uint32_t top_v1 = ( 0 << 20);
+
+    if(bTopOnscreen <= -16)
+    {
+        top_v1 = (16 << 20);
+        bTopOnscreen = bTopOnscreen % 16;
+
+        // go straight to bottom if less than 33 pixels in total
+        if(bBottomOnscreen - bTopOnscreen < 17)
+        {
+            top_v1 = (32 << 20);
+        }
+    }
+
+    // location of second-to-last row/column in screen coordinates
+    int colSemiLast = bRightOnscreen - 32;
+    int rowSemiLast = bBottomOnscreen - 32;
+
+    if(bRightOnscreen > g_viewport_w)
+        bRightOnscreen = g_viewport_w;
+
+    if(bBottomOnscreen > g_viewport_h)
+        bBottomOnscreen = g_viewport_h;
+
+    // first row source
+    uint32_t src_v1 = top_v1;
+
+    for(int dst_y = bTopOnscreen; dst_y < bBottomOnscreen; dst_y += 16)
+    {
+        // first col source
+        int src_u1 = left_u1;
+
+        for(int dst_x = bLeftOnscreen; dst_x < bRightOnscreen; dst_x += 16)
+        {
+            // add vertices
+            {
+                // u1, v1
+                GFX_TEX_COORD = (src_u1 | src_v1);
+                s_gxVertex3i(dst_x, dst_y, s_render_planes.m_plane_depth[s_render_planes.m_current_plane]);
+
+                // u1, v2
+                GFX_TEX_COORD = (src_u1 | src_v1) + (16 << 20);
+                s_gxVertex2i(dst_x, dst_y + 16);
+
+                // u2, v2
+                GFX_TEX_COORD = (src_u1 | src_v1) + (16 << 4) + (16 << 20);
+                s_gxVertex2i(dst_x + 16, dst_y + 16);
+
+                // u2, v1
+                GFX_TEX_COORD = (src_u1 | src_v1) + (16 << 4);
+                s_gxVertex2i(dst_x + 16, dst_y);
+            }
+
+            // next col source
+            if(dst_x >= colSemiLast)
+                src_u1 = (32 << 4);
+            else
+                src_u1 = (16 << 4);
+        }
+
+        // next row source
+        if(dst_y >= rowSemiLast)
+            src_v1 = (32 << 20);
+        else
+            src_v1 = (16 << 20);
+    }
+
+    // finalize
+    s_render_planes.m_plane_depth[s_render_planes.m_current_plane] += 8;
+
+    if(tx.l.flags & 32)
+        glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FOG_Q);
+
+    minport_usedTexture(tx);
 }
 
 }; // namespace XRender

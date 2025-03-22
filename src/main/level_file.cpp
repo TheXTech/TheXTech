@@ -408,11 +408,11 @@ bool OpenLevel_Section(void*, LevelSection& s)
 
         int B = s.id;
 
-        level[B].X = double(s.size_left);
-        level[B].Y = double(s.size_top);
-        level[B].Height = double(s.size_bottom);
-        level[B].Width = double(s.size_right);
-        LevelREAL[B] = level[B];
+        LevelREAL[B].X = s.size_left;
+        LevelREAL[B].Y = s.size_top;
+        LevelREAL[B].Height = s.size_bottom;
+        LevelREAL[B].Width = s.size_right;
+        level[B] = static_cast<SpeedlessLocation_t>(LevelREAL[B]);
         bgMusic[B] = int(s.music_id);
         bgMusicREAL[B] = bgMusic[B];
         // bgColor[B] = s.bgcolor;    // unused since SMBX64, removed
@@ -763,10 +763,10 @@ bool OpenLevel_Block(void* userdata, LevelBlock& b)
 
         block = Block_t();
 
-        block.Location.X = double(b.x);
-        block.Location.Y = double(b.y);
-        block.Location.Height = double(b.h);
-        block.Location.Width = double(b.w);
+        block.Location.X = b.x;
+        block.Location.Y = b.y;
+        block.Location.Height = b.h;
+        block.Location.Width = b.w;
 
         // don't allow improper rects
         if(block.Location.Width < 0)
@@ -849,8 +849,8 @@ bool OpenLevel_Background(void* userdata, LevelBGO& b)
 
         bgo = Background_t();
 
-        bgo.Location.X = double(b.x);
-        bgo.Location.Y = double(b.y);
+        bgo.Location.X = b.x;
+        bgo.Location.Y = b.y;
         bgo.Type = int(b.id);
 
         if(IF_OUTRANGE(bgo.Type, 1, maxBackgroundType)) // Drop ID to 1 for BGOs of out of range IDs
@@ -860,7 +860,7 @@ bool OpenLevel_Background(void* userdata, LevelBGO& b)
         }
 
         bgo.Layer = load.FindLayer(b.layer);
-        bgo.Location.Width = GFXBackgroundWidth[bgo.Type];
+        bgo.Location.Width = GFXBackground[bgo.Type].w;
         bgo.Location.Height = BackgroundHeight[bgo.Type];
 
         bgo.SetSortPriority(b.z_mode, std::round(b.z_offset));
@@ -1131,7 +1131,7 @@ bool OpenLevel_Water(void* userdata, LevelPhysEnv& w)
             water.Location.Height = 0;
         }
 
-        water.Buoy = w.buoy;
+        // water.Buoy = w.buoy;
         water.Quicksand = w.env_type;
         water.Layer = load.FindLayer(w.layer);
     }
@@ -1558,7 +1558,7 @@ void OpenLevelDataPost()
                 bgo.Location.Width = 24;
                 bgo.Location.Height = 24;
                 bgo.Location.Y = w.Entrance.Y - bgo.Location.Height;
-                bgo.Location.X = w.Entrance.X + w.Entrance.Width / 2.0 - bgo.Location.Width / 2.0;
+                bgo.Location.X = w.Entrance.X + (w.Entrance.Width - bgo.Location.Width) / 2;
                 bgo.Type = 160;
                 syncLayers_BGO(B);
 
@@ -1570,7 +1570,7 @@ void OpenLevelDataPost()
                     bgo2 = bgo;
                     bgo2.Location = bgo.Location;
                     bgo2.Location.Y = w.Exit.Y - bgo2.Location.Height;
-                    bgo2.Location.X = w.Exit.X + w.Exit.Width / 2.0 - bgo2.Location.Width / 2.0;
+                    bgo2.Location.X = w.Exit.X + (w.Exit.Width - bgo2.Location.Width) / 2;
                     syncLayers_BGO(B);
                 }
             }
@@ -1772,7 +1772,7 @@ void ClearLevel()
         level[A] = BlankSpeedless;
         LevelWrap[A] = false;
         LevelVWrap[A] = false;
-        LevelChop[A] = 0;
+        // LevelChop[A] = 0; // unused since SMBX64, removed
         NoTurnBack[A] = false;
         UnderWater[A] = false;
         OffScreenExit[A] = false;

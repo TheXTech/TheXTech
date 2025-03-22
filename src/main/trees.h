@@ -171,40 +171,40 @@ extern void treeLevelCleanAll();
 extern void treeWorldTileAdd(TileRef_t obj);
 extern void treeWorldTileUpdate(TileRef_t obj);
 extern void treeWorldTileRemove(TileRef_t obj);
-extern TreeResult_Sentinel<TileRef_t> treeWorldTileQuery(double Left, double Top, double Right, double Bottom,
-                               int sort_mode, double margin = 0.0);
-extern TreeResult_Sentinel<TileRef_t> treeWorldTileQuery(const Location_t &loc, int sort_mode, double margin = 0.0);
+extern TreeResult_Sentinel<TileRef_t> treeWorldTileQuery(int Left, int Top, int Right, int Bottom,
+                               int sort_mode, int margin = 0);
+extern TreeResult_Sentinel<TileRef_t> treeWorldTileQuery(const TinyLocation_t &loc, int sort_mode, int margin = 0);
 
 
 extern void treeWorldSceneAdd(SceneRef_t obj);
 extern void treeWorldSceneUpdate(SceneRef_t obj);
 extern void treeWorldSceneRemove(SceneRef_t obj);
-extern TreeResult_Sentinel<SceneRef_t> treeWorldSceneQuery(double Left, double Top, double Right, double Bottom,
-                               int sort_mode, double margin = 16.0);
-extern TreeResult_Sentinel<SceneRef_t> treeWorldSceneQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
+extern TreeResult_Sentinel<SceneRef_t> treeWorldSceneQuery(int Left, int Top, int Right, int Bottom,
+                               int sort_mode, int margin = 16);
+extern TreeResult_Sentinel<SceneRef_t> treeWorldSceneQuery(const TinyLocation_t &loc, int sort_mode, int margin = 16);
 
 
 extern void treeWorldPathAdd(WorldPathRef_t obj);
 extern void treeWorldPathUpdate(WorldPathRef_t obj);
 extern void treeWorldPathRemove(WorldPathRef_t obj);
-extern TreeResult_Sentinel<WorldPathRef_t> treeWorldPathQuery(double Left, double Top, double Right, double Bottom,
-                               int sort_mode, double margin = 16.0);
-extern TreeResult_Sentinel<WorldPathRef_t> treeWorldPathQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
+extern TreeResult_Sentinel<WorldPathRef_t> treeWorldPathQuery(int Left, int Top, int Right, int Bottom,
+                               int sort_mode, int margin = 16);
+extern TreeResult_Sentinel<WorldPathRef_t> treeWorldPathQuery(const TinyLocation_t &loc, int sort_mode, int margin = 16);
 
 
 extern void treeWorldLevelAdd(WorldLevelRef_t obj);
 extern void treeWorldLevelUpdate(WorldLevelRef_t obj);
 extern void treeWorldLevelRemove(WorldLevelRef_t obj);
-extern TreeResult_Sentinel<WorldLevelRef_t> treeWorldLevelQuery(double Left, double Top, double Right, double Bottom,
-                               int sort_mode, double margin = 16.0);
-extern TreeResult_Sentinel<WorldLevelRef_t> treeWorldLevelQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
+extern TreeResult_Sentinel<WorldLevelRef_t> treeWorldLevelQuery(int Left, int Top, int Right, int Bottom,
+                               int sort_mode, int margin = 16);
+extern TreeResult_Sentinel<WorldLevelRef_t> treeWorldLevelQuery(const TinyLocation_t &loc, int sort_mode, int margin = 16);
 
 extern void treeWorldMusicAdd(WorldMusicRef_t obj);
 extern void treeWorldMusicUpdate(WorldMusicRef_t obj);
 extern void treeWorldMusicRemove(WorldMusicRef_t obj);
-extern TreeResult_Sentinel<WorldMusicRef_t> treeWorldMusicQuery(double Left, double Top, double Right, double Bottom,
-                               int sort_mode, double margin = 16.0);
-extern TreeResult_Sentinel<WorldMusicRef_t> treeWorldMusicQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
+extern TreeResult_Sentinel<WorldMusicRef_t> treeWorldMusicQuery(int Left, int Top, int Right, int Bottom,
+                               int sort_mode, int margin = 16);
+extern TreeResult_Sentinel<WorldMusicRef_t> treeWorldMusicQuery(const TinyLocation_t &loc, int sort_mode, int margin = 16);
 
 
 // declared in block_table.cpp

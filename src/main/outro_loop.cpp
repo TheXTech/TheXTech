@@ -64,6 +64,8 @@ void initOutroContent()
 
 void DoCredits(bool quit)
 {
+    // CreditChop and CreditOffsetY were previously floats, now they are ints measured in tenths
+
     if(GameMenu)
         return;
 
@@ -71,12 +73,12 @@ void DoCredits(bool quit)
 
     int shrink = vScreen[1].Top;
 
-    CreditOffsetY -= 0.8;
+    CreditOffsetY -= 8;
 //    if(CreditOffsetY > ScreenH || CreditOffsetY + CreditTotalHeight < 0)
 //    {}
 
     // Closing screen
-    if((CreditOffsetY + CreditTotalHeight) < -shrink)
+    if((CreditOffsetY + CreditTotalHeight * 10) < -shrink * 10)
     {
         if(musicPlaying)
         {
@@ -84,10 +86,11 @@ void DoCredits(bool quit)
             musicPlaying = false;
         }
 
-        CreditChop += 0.4f;
-        if(CreditChop >= static_cast<float>(TargetH_half))
+        // CreditChop += 0.4f;
+        CreditChop += 4;
+        if(CreditChop >= TargetH_half * 10)
         {
-            CreditChop = static_cast<float>(TargetH_half);
+            CreditChop = TargetH_half * 10;
             EndCredits++;
             if(EndCredits == TargetH_half)
             {
@@ -101,13 +104,14 @@ void DoCredits(bool quit)
     }
 
         // Opening screen
-    else if(CreditChop > shrink && CreditOffsetY + CreditTotalHeight > 0)
+    else if(CreditChop > shrink * 10 && CreditOffsetY + CreditTotalHeight * 10 > 0)
     {
-        CreditChop -= 2.0f;
-        if(CreditChop < shrink)
-            CreditChop = shrink;
+        // CreditChop -= 2.0f;
+        CreditChop -= 20;
+        if(CreditChop < shrink * 10)
+            CreditChop = shrink * 10;
 
-        if(CreditChop < TargetH_half - 50 && !musicPlaying)
+        if(CreditChop < TargetH_half * 10 - 500 && !musicPlaying)
         {
             if(bgMusic[0] <= 0) // Play default music if no music set in outro level
             {
@@ -120,13 +124,13 @@ void DoCredits(bool quit)
         }
     }
 
-    if(CreditChop <= shrink || EndCredits > 0)
+    if(CreditChop <= shrink * 10 || EndCredits > 0)
     {
 //        for(A = 1; A <= 2; A++) // Useless loop
 //        {
         if(quit)
         {
-            CreditChop = static_cast<float>(TargetH_half);
+            CreditChop = TargetH_half * 10;
             EndCredits = 0;
             XRender::clearBuffer();
             SetupCredits();
@@ -447,7 +451,10 @@ void SetupCredits()
     AddCredit("");
     AddCredit(g_gameInfo.creditsHomePage);
 
-    CreditOffsetY = (XRender::TargetH + 40);
+    // CreditChop and CreditOffsetY were previously floats, now they are ints measured in tenths
+    CreditChop = (XRender::TargetH / 2) * 10; // 100
+    EndCredits = 0;
+    CreditOffsetY = (XRender::TargetH + 40) * 10;
     CreditTotalHeight = 32;
 
     for(A = 1; A <= numCredits; A++)

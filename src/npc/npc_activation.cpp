@@ -46,7 +46,7 @@ inline static bool s_Event_SoundOnly(const Events_t& evt, int test_section)
 
     bool autoscroll_okay = !AutoUseModern || evt.AutoSection != test_section
         || (g_config.fix_autoscroll_speed
-            ? (!(evt.AutoX != 0.0 || evt.AutoY != 0.0)
+            ? (!(evt.AutoX != 0 || evt.AutoY != 0)
                 || (AutoX[evt.AutoSection] == evt.AutoX && AutoY[evt.AutoSection] == evt.AutoY))
             : (!IF_INRANGE(evt.AutoSection, 0, SDL_min(maxSections, maxEvents))
                 || (AutoX[evt.AutoSection] == Events[evt.AutoSection].AutoX
@@ -58,7 +58,7 @@ inline static bool s_Event_SoundOnly(const Events_t& evt, int test_section)
     const EventSection_t& s = const_cast<Events_t&>(evt).section[test_section];
     bool section_okay = s.music_id == EventSection_t::LESet_Nothing
         && s.background_id == EventSection_t::LESet_Nothing
-        && (int)s.position.X == EventSection_t::LESet_Nothing
+        && s.position.X == EventSection_t::LESet_Nothing
         && s.autoscroll == false;
 
     return section_okay;

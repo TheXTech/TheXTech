@@ -97,7 +97,7 @@ extern void KillWarp(int A);
 
 extern void zTestLevel(bool magicHand = false, bool interProcess = false);
 
-extern void MouseMove(float X, float Y, bool nCur = false);
+extern void MouseMove(int X, int Y, bool nCur = false);
 
 extern void ResetNPC(NPCID A);
 

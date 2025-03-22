@@ -187,14 +187,14 @@ void PlayerEffectWings(int A)
 
             double target_speed = SDL_sqrt(target_SpeedX * target_SpeedX + target_SpeedY * target_SpeedY);
 
-            if(target_speed != 0.0)
+            if(target_speed != 0)
             {
-                target_SpeedX *= 8.0 / target_speed;
-                target_SpeedY *= 8.0 / target_speed;
+                target_SpeedX *= 8 / target_speed;
+                target_SpeedY *= 8 / target_speed;
             }
 
-            p.Location.SpeedX = p.Location.SpeedX * 0.5 + target_SpeedX * 0.5;
-            p.Location.SpeedY = p.Location.SpeedY * 0.5 + target_SpeedY * 0.5;
+            p.Location.SpeedX = (p.Location.SpeedX + target_SpeedX) / 2;
+            p.Location.SpeedY = (p.Location.SpeedY + target_SpeedY) / 2;
 
             if(SoundPause[SFX_Swim] == 0)
             {
@@ -208,7 +208,7 @@ void PlayerEffectWings(int A)
             double sq_speed = p.Location.SpeedX * p.Location.SpeedX + p.Location.SpeedY * p.Location.SpeedY;
             double decelerate_rate = (sq_speed > 4.0) ? 0.95 : (sq_speed > 1.0) ? 0.99 : 0.999;
 
-            if(sq_speed <= 4.0)
+            if(sq_speed <= 4)
             {
                 WingsFrame = 1;
 
@@ -379,7 +379,7 @@ void PlayerLevelWrapLogic(int A)
                 continue;
 
             // center on player that wrapped
-            o_p.Location.X = pLoc.X + pLoc.Width / 2 - o_p.Location.Width / 2;
+            o_p.Location.X = pLoc.X + (pLoc.Width - o_p.Location.Width) / 2;
             o_p.Location.Y = target_Y - ((o_p.Mount != 2) ? o_p.Location.Height : 0);
 
             // make sure fully in section
@@ -426,15 +426,25 @@ void PlayerLevelWrapLogic(int A)
 void PlayerOffscreenExitCheck(int A)
 {
     bool offScreenExit = false;
-    if(Player[A].Location.X + Player[A].Location.Width < level[Player[A].Section].X)
+    double nearby_left = (Player[A].Location.X + Player[A].Location.Width) - level[Player[A].Section].X;
+    double nearby_right = level[Player[A].Section].Width - Player[A].Location.X;
+    if(nearby_left < 0)
     {
         offScreenExit = true;
         for(int B = 1; B <= numPlayers; B++)
             Player[B].TailCount = 0;
     }
-    else if(Player[A].Location.X > level[Player[A].Section].Width)
+    else if(nearby_right < 0)
     {
         offScreenExit = true;
+    }
+    else if(g_config.EnableInterLevelFade)
+    {
+        int nearby = SDL_min((int)nearby_left, (int)nearby_right);
+        int fade = (32 - nearby) * 2;
+
+        if(fade > 0 && g_levelScreenFader.m_current_fade < fade && g_levelScreenFader.m_target_fade == 0 && g_levelScreenFader.m_current_fade == g_levelScreenFader.m_step)
+            g_levelScreenFader.setupFader(fade, fade, 0, ScreenFader::S_FADE);
     }
 
     if(offScreenExit)
@@ -451,13 +461,7 @@ void PlayerOffscreenExitCheck(int A)
         EndLevel = true;
         LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;
-
-        if(g_config.EnableInterLevelFade)
-            g_levelScreenFader.setupFader(4, 0, 65, ScreenFader::S_FADE);
-        else
-            g_levelScreenFader.setupFader(65, 0, 65, ScreenFader::S_FADE);
-
-        levelWaitForFade();
+        g_levelScreenFader.setupFader(65, 65, 0, ScreenFader::S_FADE);
     }
 }
 
@@ -475,7 +479,7 @@ void PlayerLevelEdgeCheck(int A, bool check_X)
 
             Player[A].Pinched.Left2 = 2;
 
-            if(AutoX[Player[A].Section] != 0.0f)
+            if(AutoX[Player[A].Section] != 0)
             {
                 Player[A].Pinched.Moving = 2;
                 Player[A].Pinched.MovingLR = true;
@@ -490,7 +494,7 @@ void PlayerLevelEdgeCheck(int A, bool check_X)
 
             Player[A].Pinched.Right4 = 2;
 
-            if(AutoX[Player[A].Section] != 0.f)
+            if(AutoX[Player[A].Section] != 0)
             {
                 Player[A].Pinched.Moving = 2;
                 Player[A].Pinched.MovingLR = true;
@@ -502,7 +506,7 @@ void PlayerLevelEdgeCheck(int A, bool check_X)
     {
         Player[A].Location.Y = level[Player[A].Section].Y - Player[A].Location.Height - 32;
 
-        if(AutoY[Player[A].Section] != 0.f)
+        if(AutoY[Player[A].Section] != 0)
         {
             Player[A].Pinched.Moving = 3;
             Player[A].Pinched.MovingUD = true;

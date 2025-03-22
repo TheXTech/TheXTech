@@ -59,11 +59,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
     double tempSlope2X = 0; // The old X before player was moved
 
     if(Player[A].Character == 5 && Player[A].Duck && (Player[A].Location.SpeedY == Physics.PlayerGravity || Player[A].StandingOnNPC != 0 || Player[A].Slope != 0))
-    {
-        Player[A].Location.Y += Player[A].Location.Height;
-        Player[A].Location.Height = 30;
-        Player[A].Location.Y += -Player[A].Location.Height;
-    }
+        Player[A].Location.set_height_floor(30);
 
 
     // block collision optimization
@@ -95,7 +91,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                             // 2 is from the right
                             // 3 is from the bottom
                             // 4 is from the left
-                            double block_belt_speed = 0.0;
+                            double block_belt_speed = 0;
                             if(Block[B].Type >= BLKID_CONVEYOR_L_START && Block[B].Type <= BLKID_CONVEYOR_L_END)
                                 block_belt_speed = -0.8;
                             else if(Block[B].Type >= BLKID_CONVEYOR_R_START && Block[B].Type <= BLKID_CONVEYOR_R_END)
@@ -361,11 +357,11 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
                                             Player[A].Location.Y = Block[B].Location.Y + (Block[B].Location.Height * Slope) - Player[A].Location.Height - 0.1;
 
-                                            if(Player[A].Location.SpeedY > Player[A].Location.SpeedX * (Block[B].Location.Height / static_cast<double>(Block[B].Location.Width)) * BlockSlope[Block[B].Type] || !Player[A].Slide)
+                                            if(Player[A].Location.SpeedY > Player[A].Location.SpeedX * (Block[B].Location.Height / Block[B].Location.Width) * BlockSlope[Block[B].Type] || !Player[A].Slide)
                                             {
                                                 if(!Player[A].WetFrame)
                                                 {
-                                                    cursed_value_C = Player[A].Location.SpeedX * (Block[B].Location.Height / static_cast<double>(Block[B].Location.Width)) * BlockSlope[Block[B].Type];
+                                                    cursed_value_C = Player[A].Location.SpeedX * (Block[B].Location.Height / Block[B].Location.Width) * BlockSlope[Block[B].Type];
                                                     Player[A].Location.SpeedY = cursed_value_C;
                                                     if(Player[A].Location.SpeedY > 0 && !Player[A].Slide && Player[A].Mount != 1 && Player[A].Mount != 2)
                                                         Player[A].Location.SpeedY = Player[A].Location.SpeedY * 4;
@@ -387,7 +383,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
                                             if(Player[A].Location.SpeedY < 0 && !Player[A].Slide && !SuperSpeed && !Player[A].Stoned)
                                                 Player[A].Location.SpeedY = 0;
-                                            if(Block[B].Location.SpeedX != 0.0 || Block[B].Location.SpeedY != 0.0)
+                                            if(Block[B].Location.SpeedX != 0 || Block[B].Location.SpeedY != 0)
                                             {
                                                 NPC[-A] = NPC_t();
                                                 NPC[-A].Location = Block[B].Location;
@@ -552,15 +548,9 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                         }
                                         else
                                         {
-                                            cursed_value_C = Block[B].Location.X + Block[B].Location.Width * 0.5;
-                                            float D = Block[floorBlock].Location.X + Block[floorBlock].Location.Width * 0.5;
+                                            cursed_value_C = std::abs(Block[B].Location.minus_center_x(Player[A].Location));
+                                            float D = std::abs(Block[floorBlock].Location.minus_center_x(Player[A].Location));
 
-                                            cursed_value_C += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
-                                            D += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
-                                            if(cursed_value_C < 0)
-                                                cursed_value_C = -cursed_value_C;
-                                            if(D < 0)
-                                                D = -D;
                                             if(cursed_value_C < D)
                                                 floorBlock = B;
                                         }
@@ -575,48 +565,44 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                 }
 
                             }
-                            else if(HitSpot == 2) // hit the block from the right <----
+                            else if(HitSpot == 2 || HitSpot == 4) // hit the block from the right <---- (or left now! -------.)
                             {
-
-                                if(BlockSlope[Block[oldSlope].Type] == 1 && Block[oldSlope].Location.Y <= Block[B].Location.Y)
+                                if(HitSpot == 2 && BlockSlope[Block[oldSlope].Type] == 1 && Block[oldSlope].Location.Y <= Block[B].Location.Y)
                                 {
                                     // Just a blank block :-P
                                 }
                                 else
                                 {
-                                    if(Player[A].Mount == 2)
-                                        Player[A].mountBump = Player[A].Location.X;
                                     tempSlope2X = Player[A].Location.X;
-                                    Player[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.01;
-                                    tempSlope2 = B;
-                                    tempHit2 = true;
-                                    blockPushX = Block[B].Location.SpeedX;
-                                    if(Player[A].Mount == 2)
-                                        Player[A].mountBump = -Player[A].mountBump + Player[A].Location.X;
-                                    Player[A].Pinched.Left2 = 2;
+
+                                    if(HitSpot == 4)
+                                    {
+                                        Player[A].Location.X = Block[B].Location.X - Player[A].Location.Width - 0.01;
+                                        Player[A].Pinched.Right4 = 2;
+                                    }
+                                    else
+                                    {
+                                        Player[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.01;
+                                        Player[A].Pinched.Left2 = 2;
+                                    }
+
                                     if(Block[B].Location.SpeedX != 0)
                                     {
                                         Player[A].Pinched.Moving = 2;
                                         Player[A].Pinched.MovingLR = true;
                                     }
-                                }
-                            }
-                            else if(HitSpot == 4) // hit the block from the left -------.
-                            {
-                                if(Player[A].Mount == 2)
-                                    Player[A].mountBump = Player[A].Location.X;
-                                tempSlope2X = Player[A].Location.X;
-                                Player[A].Location.X = Block[B].Location.X - Player[A].Location.Width - 0.01;
-                                tempSlope2 = B;
-                                tempHit2 = true;
-                                blockPushX = Block[B].Location.SpeedX;
-                                if(Player[A].Mount == 2)
-                                    Player[A].mountBump = -Player[A].mountBump + Player[A].Location.X;
-                                Player[A].Pinched.Right4 = 2;
-                                if(Block[B].Location.SpeedX != 0)
-                                {
-                                    Player[A].Pinched.Moving = 2;
-                                    Player[A].Pinched.MovingLR = true;
+
+                                    if(Player[A].Mount == 2)
+                                    {
+                                        // cast to float because in VB6 the old X location was temporarily stored in mountBump, which is a float
+                                        Player[A].mountBump = Player[A].Location.X - (float)tempSlope2X;
+                                    }
+
+                                    tempSlope2 = B;
+                                    tempHit2 = true;
+
+                                    // IMPORTANT: this case was truncation until v1.3.7.1-dev. Confirm that changing to VB6 rounding does not cause any issues.
+                                    blockPushX = vb6Round(Block[B].Location.SpeedX);
                                 }
                             }
                             else if(HitSpot == 3) // hit the block from below
@@ -661,10 +647,12 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                 else
                                 {
                                     tempSlope3 = B;
-                                    if(Player[A].Location.X + Player[A].Location.Width / 2.0 < Block[B].Location.X + Block[B].Location.Width / 2.0)
+
+                                    if(Block[B].Location.to_right_of(Player[A].Location))
                                         Player[A].Pinched.Right4 = 2;
                                     else
                                         Player[A].Pinched.Left2 = 2;
+
                                     if(Block[B].Location.SpeedX != 0 || Block[B].Location.SpeedY != 0)
                                     {
                                         Player[A].Pinched.Moving = 2;
@@ -675,6 +663,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                         if(Block[B].Location.SpeedY != 0)
                                             Player[A].Pinched.MovingUD = true;
                                     }
+
                                     Location_t tempLocation;
                                     tempLocation.X = Player[A].Location.X;
                                     tempLocation.Width = Player[A].Location.Width;
@@ -745,11 +734,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
     }
 
     if(Player[A].Character == 5 && Player[A].Duck)
-    {
-        Player[A].Location.Y += Player[A].Location.Height;
-        Player[A].Location.Height = Physics.PlayerDuckHeight[Player[A].Character][Player[A].State];
-        Player[A].Location.Y += -Player[A].Location.Height;
-    }
+        Player[A].Location.set_height_floor(Physics.PlayerDuckHeight[Player[A].Character][Player[A].State]);
 
 
     // helps the player run down slopes at different angles
@@ -757,7 +742,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
     {
         if(Player[A].Location.SpeedY > 0)
         {
-            float C = Player[A].Location.SpeedX * (Block[oldSlope].Location.Height / static_cast<double>(Block[oldSlope].Location.Width)) * BlockSlope[Block[oldSlope].Type];
+            float C = Player[A].Location.SpeedX * (Block[oldSlope].Location.Height / Block[oldSlope].Location.Width) * BlockSlope[Block[oldSlope].Type];
             if(C > 0)
                 Player[A].Location.SpeedY = C;
         }
@@ -824,7 +809,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                     YoshiPound(A, Player[A].Mount);
 
                 Player[A].Location.SpeedY = 0;
-                if(floorLocation.SpeedX != 0.0 || floorLocation.SpeedY != 0.0)
+                if(floorLocation.SpeedX != 0 || floorLocation.SpeedY != 0)
                 {
                     NPC[-A] = NPC_t();
                     NPC[-A].Location = floorLocation;
@@ -872,7 +857,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                     if(Player[A].Controls.Down)
                     {
                         Player[A].Jump = 0;
-                        Player[A].Location.SpeedY = Physics.PlayerJumpVelocity * 0.5;
+                        Player[A].Location.SpeedY = Physics.PlayerJumpVelocity / 2;
                     }
                 }
             }
@@ -897,7 +882,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
             if(Player[A].Slope == 0 || Player[A].Slide)
                 Player[A].Location.SpeedY = 0;
 
-            if(floorLocation.SpeedX != 0.0 || floorLocation.SpeedY != 0.0)
+            if(floorLocation.SpeedX != 0 || floorLocation.SpeedY != 0)
             {
                 NPC[-A] = NPC_t();
                 NPC[-A].Location = floorLocation;
@@ -970,7 +955,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                 if(Player[A].Controls.Down)
                 {
                     Player[A].Jump = 0;
-                    Player[A].Location.SpeedY = Physics.PlayerJumpVelocity * 0.5;
+                    Player[A].Location.SpeedY = Physics.PlayerJumpVelocity / 2;
                 }
             }
         }
@@ -1012,16 +997,8 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
     if(ceilingBlock2 != 0) // Hitting a block from below
     {
-        float C = Block[ceilingBlock1].Location.X + Block[ceilingBlock1].Location.Width * 0.5;
-        float D = Block[ceilingBlock2].Location.X + Block[ceilingBlock2].Location.Width * 0.5;
-        C += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
-        D += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
-
-        if(C < 0)
-            C = -C;
-
-        if(D < 0)
-            D = -D;
+        float C = std::abs(Block[ceilingBlock1].Location.minus_center_x(Player[A].Location));
+        float D = std::abs(Block[ceilingBlock2].Location.minus_center_x(Player[A].Location));
 
         if(C < D)
             ceilingBlock = ceilingBlock1;
@@ -1089,7 +1066,11 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
     if(Player[A].Slide && oldSlope > 0 && Player[A].Slope == 0 && Player[A].Location.SpeedY < 0)
     {
         if(Player[A].NoGravity == 0)
-            Player[A].NoGravity = static_cast<int>(floor(static_cast<double>(Player[A].Location.SpeedY / Physics.PlayerJumpVelocity * 8)));
+        {
+            // Player[A].NoGravity = static_cast<int>(floor(static_cast<double>(Player[A].Location.SpeedY / Physics.PlayerJumpVelocity * 8)));
+            // PlayerJumpVelocity is -5.7, SpeedY is negative
+            Player[A].NoGravity = (int)(Player[A].Location.SpeedY * -80) / 57;
+        }
     }
     else if(Player[A].Slope > 0 || oldSlope > 0 || !Player[A].Slide)
         Player[A].NoGravity = 0;

@@ -36,14 +36,7 @@ void PlayerFairyTimerUpdate(int A)
     if(Player[A].FairyTime != 0 && Player[A].Fairy)
     {
         if(iRand(10) == 0)
-        {
-            NewEffect(EFFID_SPARKLE,
-                      newLoc(Player[A].Location.X - 8 + dRand() * (Player[A].Location.Width + 16) - 4,
-                             Player[A].Location.Y - 8 + dRand() * (Player[A].Location.Height + 16)), 1, 0, ShadowMode);
-            Effect[numEffects].Location.SpeedX = dRand() * 0.5 - 0.25;
-            Effect[numEffects].Location.SpeedY = dRand() * 0.5 - 0.25;
-            Effect[numEffects].Frame = 1;
-        }
+            p_PlayerMakeFlySparkle(Player[A].Location);
 
         if(Player[A].FairyTime > 0)
             Player[A].FairyTime -= 1;
@@ -69,7 +62,7 @@ void PlayerFairyTimerUpdate(int A)
     else
         Player[A].FairyTime = 0;
 
-    if(Player[A].FairyCD != 0 && (Player[A].Location.SpeedY == 0.0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0 || Player[A].WetFrame))
+    if(Player[A].FairyCD != 0 && (Player[A].Location.SpeedY == 0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0 || Player[A].WetFrame))
         Player[A].FairyCD -= 1;
 }
 
@@ -101,48 +94,28 @@ void PlayerFairyMovementY(int A)
 {
     Player[A].WetFrame = false;
     Player[A].Wet = 0;
-    if(Player[A].FairyCD == 0)
+
+    // this was previously two separate clauses in VB6 (split by whether FairyCD was 0)
+    if(Player[A].Controls.Jump || Player[A].Controls.AltJump || Player[A].Controls.Up)
     {
-        if(Player[A].Controls.Jump || Player[A].Controls.AltJump || Player[A].Controls.Up)
-        {
-            Player[A].Location.SpeedY -= 0.15;
-            if(Player[A].Location.SpeedY > 0)
-                Player[A].Location.SpeedY -= 0.1;
-        }
-        else if(Player[A].Location.SpeedY < -0.1 || Player[A].Controls.Down)
-        {
-            if(Player[A].Location.SpeedY < 3)
-                Player[A].Location.SpeedY += double(Physics.PlayerGravity * 0.05f);
-            if(Player[A].Location.SpeedY < 0)
-                Player[A].Location.SpeedY += double(Physics.PlayerGravity * 0.05f);
-            Player[A].Location.SpeedY += double(Physics.PlayerGravity * 0.1f);
-            if(Player[A].Controls.Down)
-                Player[A].Location.SpeedY += 0.05;
-        }
-        else if(Player[A].Location.SpeedY > 0.1)
-            Player[A].Location.SpeedY -= 0.15;
-        else
-            Player[A].Location.SpeedY = 0;
+        Player[A].Location.SpeedY -= 0.15;
+        if(Player[A].Location.SpeedY > 0)
+            Player[A].Location.SpeedY -= 0.1;
     }
+    else if(Player[A].FairyCD != 0 || Player[A].Location.SpeedY < -0.1 || Player[A].Controls.Down)
+    {
+        if(Player[A].Location.SpeedY < 3)
+            Player[A].Location.SpeedY += Physics.PlayerGravity / 20;
+        if(Player[A].Location.SpeedY < 0)
+            Player[A].Location.SpeedY += Physics.PlayerGravity / 20;
+        Player[A].Location.SpeedY += Physics.PlayerGravity / 10;
+        if(Player[A].Controls.Down)
+            Player[A].Location.SpeedY += 0.05;
+    }
+    else if(Player[A].Location.SpeedY > 0.1)
+        Player[A].Location.SpeedY -= 0.15;
     else
-    {
-        if(Player[A].Controls.Jump || Player[A].Controls.AltJump || Player[A].Controls.Up)
-        {
-            Player[A].Location.SpeedY -= 0.15;
-            if(Player[A].Location.SpeedY > 0)
-                Player[A].Location.SpeedY -= 0.1;
-        }
-        else
-        {
-            if(Player[A].Location.SpeedY < 3)
-                Player[A].Location.SpeedY += Physics.PlayerGravity * 0.05;
-            if(Player[A].Location.SpeedY < 0)
-                Player[A].Location.SpeedY += Physics.PlayerGravity * 0.05;
-            Player[A].Location.SpeedY += Physics.PlayerGravity * 0.1;
-            if(Player[A].Controls.Down)
-                Player[A].Location.SpeedY += 0.05;
-        }
-    }
+        Player[A].Location.SpeedY = 0;
 
     if(Player[A].Location.SpeedY > 4)
         Player[A].Location.SpeedY = 4;

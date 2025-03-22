@@ -121,12 +121,12 @@ void ResetSectionScrolls()
     for(int i = 0; i <= maxSections; i++)
     {
         // initialize the section
-        if(level[i].Height == level[i].Y)
+        if(LevelREAL[i].Height == LevelREAL[i].Y)
         {
-            level[i].Height = (-200000 + 20000 * i);
-            level[i].Y = level[i].Height - 600;
-            level[i].X = (-200000 + 20000 * i);
-            level[i].Width = level[i].X + 800;
+            LevelREAL[i].Height = (-200000 + 20000 * i);
+            LevelREAL[i].Y = LevelREAL[i].Height - 600;
+            LevelREAL[i].X = (-200000 + 20000 * i);
+            LevelREAL[i].Width = LevelREAL[i].X + 800;
 
             // initialize player positions
             if(i == 0)
@@ -135,36 +135,38 @@ void ResetSectionScrolls()
                 {
                     PlayerStart[p].Width = Physics.PlayerWidth[p][2];
                     PlayerStart[p].Height = Physics.PlayerHeight[p][2];
-                    PlayerStart[p].X = level[i].X + 128 - 64 * (p - 1);
-                    PlayerStart[p].Y = level[i].Height - 32 - PlayerStart[p].Height;
+                    PlayerStart[p].X = LevelREAL[i].X + 128 - 64 * (p - 1);
+                    PlayerStart[p].Y = LevelREAL[i].Height - 32 - PlayerStart[p].Height;
                 }
             }
+
+            level[i] = static_cast<SpeedlessLocation_t>(LevelREAL[i]);
         }
 
         // normally start at bottom-left
-        last_vScreenY[i] = -(level[i].Height - screen.H);
-        last_vScreenX[i] = -(level[i].X);
+        last_vScreenY[i] = -(LevelREAL[i].Height - screen.H);
+        last_vScreenX[i] = -(LevelREAL[i].X);
 
         // if player start is in section, start there instead
         for(int p = 1; p <= 2; p++)
         {
-            if(PlayerStart[p].X >= level[i].X && PlayerStart[p].X + PlayerStart[p].Width <= level[i].Width
-                && PlayerStart[p].Y >= level[i].Y && PlayerStart[p].Y + PlayerStart[p].Height <= level[i].Height)
+            if(PlayerStart[p].X >= LevelREAL[i].X && PlayerStart[p].X + PlayerStart[p].Width <= LevelREAL[i].Width
+                && PlayerStart[p].Y >= LevelREAL[i].Y && PlayerStart[p].Y + PlayerStart[p].Height <= LevelREAL[i].Height)
             {
                 // center on player
                 last_vScreenX[i] = -(PlayerStart[p].X + PlayerStart[p].Width / 2 - screen.W / 2);
                 last_vScreenY[i] = -(PlayerStart[p].Y + PlayerStart[p].Height / 2 - screen.H / 2);
 
                 // check section bounds
-                if(-last_vScreenX[i] < level[i].X)
-                    last_vScreenX[i] = -level[i].X;
-                else if(-last_vScreenX[i] + screen.W > level[i].Width)
-                    last_vScreenX[i] = -(level[i].Width - screen.W);
+                if(-last_vScreenX[i] < LevelREAL[i].X)
+                    last_vScreenX[i] = -LevelREAL[i].X;
+                else if(-last_vScreenX[i] + screen.W > LevelREAL[i].Width)
+                    last_vScreenX[i] = -(LevelREAL[i].Width - screen.W);
 
-                if(-last_vScreenY[i] < level[i].Y)
-                    last_vScreenY[i] = -level[i].Y;
-                else if(-last_vScreenY[i] + screen.H > level[i].Height)
-                    last_vScreenY[i] = -(level[i].Height - screen.H);
+                if(-last_vScreenY[i] < LevelREAL[i].Y)
+                    last_vScreenY[i] = -LevelREAL[i].Y;
+                else if(-last_vScreenY[i] + screen.H > LevelREAL[i].Height)
+                    last_vScreenY[i] = -(LevelREAL[i].Height - screen.H);
 
                 // save P1 section
                 if(p == 1)
@@ -176,16 +178,14 @@ void ResetSectionScrolls()
         }
 
         // center on section if screen bigger
-        if(level[i].Width - level[i].X < screen.W)
-            last_vScreenX[i] += screen.W / 2 - (level[i].Width - level[i].X) / 2;
-        if(level[i].Height - level[i].Y < screen.H)
-            last_vScreenY[i] = -level[i].Y + screen.H / 2 - (level[i].Height - level[i].Y) / 2;
+        if(LevelREAL[i].Width - LevelREAL[i].X < screen.W)
+            last_vScreenX[i] += screen.W / 2 - (LevelREAL[i].Width - LevelREAL[i].X) / 2;
+        if(LevelREAL[i].Height - LevelREAL[i].Y < screen.H)
+            last_vScreenY[i] = -LevelREAL[i].Y + screen.H / 2 - (LevelREAL[i].Height - LevelREAL[i].Y) / 2;
 
         // align to grid
-        if(std::fmod((last_vScreenY[i] + 8), 32) != 0.0)
-            last_vScreenY[i] = static_cast<int>(round((last_vScreenY[i] + 8) / 32)) * 32 - 8;
-        if(std::fmod(last_vScreenX[i], 32) != 0.0)
-            last_vScreenX[i] = static_cast<int>(round(last_vScreenX[i] / 32)) * 32;
+        last_vScreenY[i] = ((last_vScreenY[i] + 8 + 16) / 32) * 32 - 8;
+        last_vScreenX[i] = ((last_vScreenX[i] + 16) / 32) * 32;
     }
 
     curSection = p1_section;
@@ -210,8 +210,8 @@ void SetSection(int i)
         editor_section_toast = 66;
     }
 
-    last_vScreenY[curSection] = vScreen[1].Y;
-    last_vScreenX[curSection] = vScreen[1].X;
+    last_vScreenY[curSection] = (int)vScreen[1].Y;
+    last_vScreenX[curSection] = (int)vScreen[1].X;
     curSection = i;
     vScreen[1].Y = last_vScreenY[curSection];
     vScreen[1].X = last_vScreenX[curSection];
@@ -219,8 +219,8 @@ void SetSection(int i)
 
 void EditorBackup()
 {
-    last_vScreenY[curSection] = vScreen[1].Y;
-    last_vScreenX[curSection] = vScreen[1].X;
+    last_vScreenY[curSection] = (int)vScreen[1].Y;
+    last_vScreenX[curSection] = (int)vScreen[1].X;
     for(int i = 0; i <= maxSections; i++)
     {
         last_vScreenX_b[i] = last_vScreenX[i];
@@ -265,7 +265,7 @@ void UpdateInteract();
 template<class LocType>
 void InteractResize(LocType& loc, int min, int snap);
 
-void InteractResizeSection(SpeedlessLocation_t& section);
+void InteractResizeSection(IntegerLocation_t& section);
 
 // this sub handles the level editor
 // it is still called when the player is testing a level in the editor in windowed mode
@@ -343,10 +343,8 @@ void UpdateEditor()
         else
             ScrollRelease = true;
 
-        if(std::fmod((vScreen[1].Y + 8), 32) != 0.0)
-            vScreen[1].Y = static_cast<int>(floor(static_cast<double>(vScreen[1].Y / 32))) * 32 - 8;
-        if(std::fmod(vScreen[1].X, 32) != 0.0)
-            vScreen[1].X = static_cast<int>(floor(static_cast<double>(vScreen[1].X / 32))) * 32;
+        vScreen[1].Y = SDL_floor((((vScreen[1].Y + 8) / 32))) * 32 - 8;
+        vScreen[1].X = SDL_floor(((vScreen[1].X / 32))) * 32;
     }
     else
     {
@@ -369,8 +367,8 @@ void UpdateEditor()
 
         // if(ScrollDelay <= 0)
         {
-            int to_scroll_x = scroll_buffer_x / scroll_required;
-            int to_scroll_y = scroll_buffer_y / scroll_required;
+            int to_scroll_x = (int)(scroll_buffer_x / scroll_required);
+            int to_scroll_y = (int)(scroll_buffer_y / scroll_required);
 
             if(to_scroll_x)
             {
@@ -421,7 +419,8 @@ void UpdateEditor()
                 else if(EditorCursor.InteractMode == OptCursor_t::LVL_SECTION)
                 {
                     MouseRelease = false;
-                    InteractResizeSection(level[curSection]);
+                    InteractResizeSection(LevelREAL[curSection]);
+                    level[curSection] = static_cast<SpeedlessLocation_t>(LevelREAL[curSection]);
                     UpdateSectionOverlaps(curSection);
                 }
 
@@ -536,8 +535,8 @@ void UpdateEditor()
                     {
                         LevelBlock block;
                         block.id = EditorCursor.Block.Type;
-                        block.w = EditorCursor.Location.Width;
-                        block.h = EditorCursor.Location.Height;
+                        block.w = (int)EditorCursor.Location.Width;
+                        block.h = (int)EditorCursor.Location.Height;
                         block.invisible = EditorCursor.Block.Invis;
                         block.slippery = EditorCursor.Block.Slippy;
                         block.layer = GetL(EditorCursor.Block.Layer);
@@ -667,7 +666,7 @@ void UpdateEditor()
                 {
                     MouseRelease = false;
 
-                    IntegerLocation_t& iLoc = WorldArea[EditorCursor.InteractIndex].Location;
+                    TinyLocation_t& iLoc = WorldArea[EditorCursor.InteractIndex].Location;
                     InteractResize(iLoc, 32, 32);
                 }
                 else if(EditorCursor.InteractMode == OptCursor_t::WLD_AREA) // World map areas
@@ -799,9 +798,9 @@ void UpdateEditor()
                     int A = EditorCursor.InteractIndex;
 
                     if(iRand(2) == 0)
-                        NPC[A].Location.SpeedX = double(Physics.NPCShellSpeed / 2);
+                        NPC[A].Location.SpeedX = Physics.NPCShellSpeed / 2;
                     else
-                        NPC[A].Location.SpeedX = -double(Physics.NPCShellSpeed / 2);
+                        NPC[A].Location.SpeedX = -Physics.NPCShellSpeed / 2;
 
                     NPC[A].DefaultType = NPCID_NULL;
                     if(NPC[A]->IsABonus || NPC[A]->IsACoin)
@@ -846,10 +845,7 @@ void UpdateEditor()
                     Location_t loc = static_cast<Location_t>(Background[A].Location);
                     int type = Background[A].Type;
 
-                    auto &b = Background[A];
-                    b.Location.X += b.Location.Width / 2.0 - EffectWidth[10] / 2;
-                    b.Location.Y += b.Location.Height / 2.0 - EffectHeight[10] / 2;
-                    NewEffect(EFFID_SMOKE_S3, static_cast<Location_t>(b.Location));
+                    NewEffect(EFFID_SMOKE_S3_CENTER, loc);
                     PlaySound(SFX_Smash);
 
                     Background[A] = Background[numBackground];
@@ -891,13 +887,13 @@ void UpdateEditor()
                 if(EditorCursor.InteractMode == OptCursor_t::WLD_AREA)
                 {
                     int A = EditorCursor.InteractIndex;
+                    tempLocation = static_cast<Location_t>(WorldArea[A].Location);
                     for(int X = 16; X < WorldArea[A].Location.Width; X += 32)
                     {
                         for(int Y = 16; Y < WorldArea[A].Location.Height; Y += 32)
                         {
-                            tempLocation = static_cast<Location_t>(WorldArea[A].Location);
-                            tempLocation.X += X - EffectWidth[10] / 2;
-                            tempLocation.Y += Y - EffectHeight[10] / 2;
+                            tempLocation.X += X - EffectWidth[EFFID_SMOKE_S3] / 2;
+                            tempLocation.Y += Y - EffectHeight[EFFID_SMOKE_S3] / 2;
                             NewEffect(EFFID_SMOKE_S3, tempLocation);
                         }
                     }
@@ -915,9 +911,7 @@ void UpdateEditor()
                 {
                     int A = EditorCursor.InteractIndex;
                     tempLocation = static_cast<Location_t>(WorldMusic[A].Location);
-                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
-                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                    NewEffect(EFFID_SMOKE_S3, tempLocation);
+                    NewEffect(EFFID_SMOKE_S3_CENTER, tempLocation);
                     PlaySound(SFX_ShellHit);
                     if(A != numWorldMusic)
                     {
@@ -935,9 +929,7 @@ void UpdateEditor()
                 {
                     int A = EditorCursor.InteractIndex;
                     tempLocation = static_cast<Location_t>(WorldPath[A].Location);
-                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
-                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                    NewEffect(EFFID_SMOKE_S3, tempLocation);
+                    NewEffect(EFFID_SMOKE_S3_CENTER, tempLocation);
                     PlaySound(SFX_ShellHit);
                     if(A != numWorldPaths)
                     {
@@ -955,9 +947,7 @@ void UpdateEditor()
                 {
                     int A = EditorCursor.InteractIndex;
                     tempLocation = static_cast<Location_t>(Scene[A].Location);
-                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
-                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                    NewEffect(EFFID_SMOKE_S3, tempLocation);
+                    NewEffect(EFFID_SMOKE_S3_CENTER, tempLocation);
                     PlaySound(SFX_ShellHit);
                     for(int B = A; B < numScenes; B++)
                     {
@@ -975,9 +965,7 @@ void UpdateEditor()
                 {
                     int A = EditorCursor.InteractIndex;
                     tempLocation = static_cast<Location_t>(WorldLevel[A].Location);
-                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
-                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                    NewEffect(EFFID_SMOKE_S3, tempLocation);
+                    NewEffect(EFFID_SMOKE_S3_CENTER, tempLocation);
                     PlaySound(SFX_ShellHit);
                     if(A != numWorldLevels)
                     {
@@ -994,13 +982,10 @@ void UpdateEditor()
                 if(EditorCursor.InteractMode == OptCursor_t::WLD_TILES)
                 {
                     int A = EditorCursor.InteractIndex;
-                    tempLocation = static_cast<Location_t>(Tile[A].Location);
-                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
-                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                    NewEffect(EFFID_SMOKE_S3, tempLocation);
+                    Location_t loc = static_cast<Location_t>(Tile[A].Location);
+                    NewEffect(EFFID_SMOKE_S3_CENTER, loc);
                     PlaySound(SFX_ShellHit);
 
-                    Location_t loc = static_cast<Location_t>(Tile[A].Location);
                     int type = Tile[A].Type;
 
                     if(A != numTiles)
@@ -1585,8 +1570,8 @@ void UpdateEditor()
 
                 if(CanPlace)
                 {
-                    EditorCursor.WorldArea.Location.X = EditorCursor.Location.X;
-                    EditorCursor.WorldArea.Location.Y = EditorCursor.Location.Y;
+                    EditorCursor.WorldArea.Location.X = (int)EditorCursor.Location.X;
+                    EditorCursor.WorldArea.Location.Y = (int)EditorCursor.Location.Y;
                     numWorldAreas++;
                     WorldArea[numWorldAreas] = EditorCursor.WorldArea;
                     MouseRelease = false;
@@ -1885,13 +1870,14 @@ int EditorNPCFrame(const NPCID A, vbint_t& C, int N)
                 if(!Player[D].Dead && Player[D].Section == NPC[N].Section && Player[D].Character != 3 &&
                     Player[D].Character != 4 && Player[D].TimeToLive == 0)
                 {
-                    if(E == 0 || std::abs(NPC[N].Location.X + NPC[N].Location.Width / 2.0 -
-                                          (Player[D].Location.X + Player[D].Location.Width / 2.0)) +
-                                 std::abs(NPC[N].Location.Y + NPC[N].Location.Height / 2.0 -
-                                          (Player[D].Location.Y + Player[D].Location.Height / 2.0)) < D)
+                    // this logic is expensive and broken but must be kept because this NPC's frame affects the RNG state (via effect spawning)
+                    int dist = (int)(std::abs(NPC[N].Location.minus_center_x(Player[D].Location))
+                        + std::abs(NPC[N].Location.minus_center_y(Player[D].Location)));
+
+                    // dist should get compared to E, but instead it's compared to D
+                    if(E == 0 || dist < D)
                     {
-                        E = CInt(std::abs(NPC[N].Location.X + NPC[N].Location.Width / 2.0 - (Player[D].Location.X + Player[D].Location.Width / 2.0)) +
-                                 std::abs(NPC[N].Location.Y + NPC[N].Location.Height / 2.0 - (Player[D].Location.Y + Player[D].Location.Height / 2.0)));
+                        E = dist;
                         if(Player[D].Character == 5)
                             ret = 1;
                         else
@@ -2031,9 +2017,7 @@ void GetEditorControls()
     }
 
     if(SharedCursor.Move)
-    {
-        MouseMove(SharedCursor.X, SharedCursor.Y);
-    }
+        MouseMove((int)SharedCursor.X, (int)SharedCursor.Y);
 
     if(SharedCursor.Secondary || (EditorControls.ModeSelect && !MagicHand))
     {
@@ -2133,7 +2117,7 @@ void SetCursor()
         EditorCursor.Location.Width = EditorCursor.Water.Location.Width;
         EditorCursor.Water.Location.X = EditorCursor.Location.X;
         EditorCursor.Water.Location.Y = EditorCursor.Location.Y;
-        EditorCursor.Water.Buoy = 0; // frmWater.scrBuoy / 100
+        // EditorCursor.Water.Buoy = 0; // frmWater.scrBuoy / 100
         EditorCursor.Water.Layer = EditorCursor.Layer;
 //        if(frmWater::Quicksand.Caption == "Yes")
             // EditorCursor.Water.Quicksand = false;
@@ -2226,8 +2210,8 @@ void SetCursor()
         EditorCursor.NPC.Special4 = 0;
         EditorCursor.NPC.Special5 = 0;
         // EditorCursor.NPC.Special6 = 0;
-        EditorCursor.NPC.SpecialX = 0.0;
-        EditorCursor.NPC.SpecialY = 0.0;
+        EditorCursor.NPC.SpecialX = 0;
+        EditorCursor.NPC.SpecialY = 0;
         EditorCursor.NPC.Layer = EditorCursor.Layer;
         EditorCursor.NPC.Location = EditorCursor.Location;
 
@@ -2242,8 +2226,8 @@ void SetCursor()
         EditorCursor.Location.Width = EditorCursor.NPC.Location.Width;
         EditorCursor.Location.Height = EditorCursor.NPC.Location.Height;
 
-        EditorCursor.Location.SpeedX = 0.0;
-        EditorCursor.Location.SpeedY = 0.0;
+        EditorCursor.Location.SpeedX = 0;
+        EditorCursor.Location.SpeedY = 0;
 
         EditorCursor.NPC.Frame = EditorNPCFrame(EditorCursor.NPC.Type, EditorCursor.NPC.Direction);
         EditorCursor.NPC.Active = true;
@@ -2304,8 +2288,8 @@ void SetCursor()
     {
         EditorCursor.Location.Height = 32;
         EditorCursor.Location.Width = 32;
-        EditorCursor.WorldArea.Location.X = EditorCursor.Location.X;
-        EditorCursor.WorldArea.Location.Y = EditorCursor.Location.Y;
+        EditorCursor.WorldArea.Location.X = (int)EditorCursor.Location.X;
+        EditorCursor.WorldArea.Location.Y = (int)EditorCursor.Location.Y;
 
         if(EditorCursor.WorldArea.Location.Width < 32)
             EditorCursor.WorldArea.Location.Width = 32;
@@ -2408,9 +2392,9 @@ void HideCursor()
 {
     // printf("Hiding cursor...\n");
     EditorCursor.Location.X = vScreen[1].X - 800;
-    EditorCursor.X = float(vScreen[1].X - 800);
+    EditorCursor.X = (int)EditorCursor.Location.X;
     EditorCursor.Location.Y = vScreen[1].Y - 600;
-    EditorCursor.Y = float(vScreen[1].Y - 600);
+    EditorCursor.Y = (int)EditorCursor.Location.Y;
     HasCursor = false;
     EditorControls.ScrollDown = false;
     EditorControls.ScrollRight = false;
@@ -2557,12 +2541,12 @@ void zTestLevel(bool magicHand, bool interProcess)
 #endif
 
     // in speedrun mode, confirm that controls are set up before game starts
-    if(g_config.speedrun_mode != 0 && !Controls::Update())
+    if((int)g_config.speedrun_mode != 0 && !Controls::Update())
     {
         ClearLevel();
         // force players offscreen
         for(int i = 1; i <= maxLocalPlayers; i++)
-            Player[i].Location.X = -20000.0;
+            Player[i].Location.X = -20000;
 
         LevelBeatCode = -3;
         QuickReconnectScreen::g_active = true;
@@ -2644,7 +2628,7 @@ void zTestLevel(bool magicHand, bool interProcess)
     // reset Drop/Add allowed characters
     ConnectScreen::SaveChars();
 
-    int waitms = (g_config.speedrun_mode != 0) ? 750 : 0;
+    int waitms = ((int)g_config.speedrun_mode != 0) ? 750 : 0;
     GameThing(waitms, 0);
 
     SetupScreens();
@@ -2685,7 +2669,7 @@ static inline int s_find_flags(const LocType& loc)
     return found_flags;
 }
 
-static inline int s_find_flags_section(const SpeedlessLocation_t& loc)
+static inline int s_find_flags_section(const IntegerLocation_t& loc)
 {
     // require cursor to be at least nearby
     if(    EditorCursor.Location.X < loc.X - s_resize_border
@@ -2724,8 +2708,8 @@ void UpdateInteract()
     EditorCursor.InteractMode = 0;
     EditorCursor.InteractFlags = 0;
     EditorCursor.InteractIndex = 0;
-    EditorCursor.InteractX = EditorCursor.Location.X;
-    EditorCursor.InteractY = EditorCursor.Location.Y;
+    EditorCursor.InteractX = (int)EditorCursor.Location.X;
+    EditorCursor.InteractY = (int)EditorCursor.Location.Y;
 
      if(!select_mode && !erase_mode)
         return;
@@ -2910,7 +2894,7 @@ void UpdateInteract()
         // section borders
         if(!MagicHand && select_mode && EditorCursor.InteractFlags < 2)
         {
-            int found_flags = s_find_flags_section(level[curSection]);
+            int found_flags = s_find_flags_section(LevelREAL[curSection]);
 
             if(found_flags)
             {
@@ -2945,7 +2929,7 @@ void UpdateInteract()
         // world map music
         if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_MUSIC))
         {
-            for(int A : treeWorldMusicQuery(EditorCursor.Location, SORTMODE_NONE))
+            for(int A : treeWorldMusicQuery(static_cast<TinyLocation_t>(EditorCursor.Location), SORTMODE_NONE))
             {
                 if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location))
                 {
@@ -2960,7 +2944,7 @@ void UpdateInteract()
         // world paths
         if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_PATHS))
         {
-            for(int A : treeWorldPathQuery(EditorCursor.Location, SORTMODE_NONE))
+            for(int A : treeWorldPathQuery(static_cast<TinyLocation_t>(EditorCursor.Location), SORTMODE_NONE))
             {
                 if(CursorCollision(EditorCursor.Location, WorldPath[A].Location))
                 {
@@ -2979,7 +2963,7 @@ void UpdateInteract()
             // it's a good thing that the sentinel's scope ends quickly,
             // otherwise it would take a long time for the result vector
             // to rejoin the pool. -- ds-sloth
-            auto sentinel = treeWorldSceneQuery(EditorCursor.Location, SORTMODE_ID);
+            auto sentinel = treeWorldSceneQuery(static_cast<TinyLocation_t>(EditorCursor.Location), SORTMODE_ID);
             for(auto i = sentinel.end(); i > sentinel.begin();)
             {
                 int A = *(--i);
@@ -2997,7 +2981,7 @@ void UpdateInteract()
         // world levels
         if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_LEVELS))
         {
-            for(int A : treeWorldLevelQuery(EditorCursor.Location, SORTMODE_NONE))
+            for(int A : treeWorldLevelQuery(static_cast<TinyLocation_t>(EditorCursor.Location), SORTMODE_NONE))
             {
                 if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location))
                 {
@@ -3012,7 +2996,7 @@ void UpdateInteract()
         // world tiles
         if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_TILES))
         {
-            for(int A : treeWorldTileQuery(EditorCursor.Location, SORTMODE_NONE))
+            for(int A : treeWorldTileQuery(static_cast<TinyLocation_t>(EditorCursor.Location), SORTMODE_NONE))
             {
                 if(CursorCollision(EditorCursor.Location, Tile[A].Location))
                 {
@@ -3094,7 +3078,7 @@ void InteractResize(LocType& loc, int min, int snap)
     }
 }
 
-void InteractResizeSection(SpeedlessLocation_t& section)
+void InteractResizeSection(IntegerLocation_t& section)
 {
     bool resized = false;
 
@@ -3154,7 +3138,7 @@ void InteractResizeSection(SpeedlessLocation_t& section)
         PlaySound(SFX_Saw);
 }
 
-void MouseMove(float X, float Y, bool /*nCur*/)
+void MouseMove(int X, int Y, bool /*nCur*/)
 {
     EditorCursor.X = X;
     EditorCursor.Y = Y;
@@ -3167,13 +3151,13 @@ void MouseMove(float X, float Y, bool /*nCur*/)
         A = SingleCoop;
     else if(l_screen->Type == 5 && vScreen[2].Visible)
     {
-        if(X < float(vScreen[2].TargetX() + vScreen[2].Width))
+        if(X < vScreen[2].TargetX() + vScreen[2].Width)
         {
-            if(X > float(vScreen[2].TargetX()))
+            if(X > vScreen[2].TargetX())
             {
-                if(Y < float(vScreen[2].TargetY() + vScreen[2].Height))
+                if(Y < vScreen[2].TargetY() + vScreen[2].Height)
                 {
-                    if(Y > float(vScreen[2].TargetY()))
+                    if(Y > vScreen[2].TargetY())
                         A = 2;
                 }
             }
@@ -3188,28 +3172,30 @@ void MouseMove(float X, float Y, bool /*nCur*/)
     if(XRender::TargetOverscanX && WorldEditor)
         X -= XRender::TargetOverscanX;
 
+    double lX = 0, lY = 0;
+
     // translate into layer coordinates to snap to layer's grid
     if(MagicHand && EditorCursor.Layer != LAYER_NONE)
     {
-        X -= Layer[EditorCursor.Layer].OffsetX;
-        Y -= Layer[EditorCursor.Layer].OffsetY;
+        lX = 32 - (Layer[EditorCursor.Layer].OffsetX - SDL_floor(Layer[EditorCursor.Layer].OffsetX / 32) * 32);
+        lY = 32 - (Layer[EditorCursor.Layer].OffsetY - SDL_floor(Layer[EditorCursor.Layer].OffsetY / 32) * 32);
+        X += (int)lX;
+        Y += (int)lY;
     }
 
     if(EditorCursor.Mode == OptCursor_t::LVL_ERASER || EditorCursor.Mode == OptCursor_t::LVL_SELECT /*|| frmLevelEditor::chkAlign.Value == 0*/)
     {
-        EditorCursor.Location.X = double(X) - vScreen[A].X;
-        EditorCursor.Location.Y = double(Y) - vScreen[A].Y;
+        EditorCursor.Location.X = X - vScreen[A].X;
+        EditorCursor.Location.Y = Y - vScreen[A].Y;
         PositionCursor();
     }
     else
     {
-        if(MagicHand)
-        {
-            if(std::fmod((vScreen[A].Y + 8), 32) != 0.0)
-                vScreen[A].Y = static_cast<int>(floor(static_cast<double>(vScreen[A].Y / 32))) * 32 - 8;
-            if(std::fmod(vScreen[A].X, 32) != 0.0)
-                vScreen[A].X = static_cast<int>(floor(static_cast<double>(vScreen[A].X / 32))) * 32;
-        }
+        int vScreenX = SDL_floor(((vScreen[A].X / 32))) * 32;
+        int vScreenY = SDL_floor((((vScreen[A].Y + 8) / 32))) * 32 - 8;
+
+        X += (int)(vScreenX - vScreen[A].X);
+        Y += (int)(vScreenY - vScreen[A].Y);
 
         // 16x16 alignment
         if(
@@ -3237,44 +3223,39 @@ void MouseMove(float X, float Y, bool /*nCur*/)
                 EditorCursor.NPC.Type == 257 || EditorCursor.NPC.Type == 260))
         )
         {
-            if(!(ffEqual(EditorCursor.Location.X, double(std::floor(X / 16)) * 16 - vScreen[A].X) &&
-                 ffEqual(EditorCursor.Location.Y + 8, double(std::floor(Y / 16)) * 16 - vScreen[A].Y)) )
+            if(!(ffEqual(EditorCursor.Location.X, (X / 16) * 16 - vScreenX) &&
+                 ffEqual(EditorCursor.Location.Y, ((Y + 8) / 16) * 16 - vScreenY - 8)) )
             {
-                EditorCursor.Location.X = double(std::floor(X / 16)) * 16 - vScreen[A].X;
-                EditorCursor.Location.Y = double(std::floor(Y / 16)) * 16 - vScreen[A].Y;
-                EditorCursor.Location.Y -= 8;
+                EditorCursor.Location.X = (X / 16) * 16 - vScreenX;
+                EditorCursor.Location.Y = ((Y + 8) / 16) * 16 - vScreenY - 8;
                 PositionCursor();
             }
         }
         else if(EditorCursor.Mode == OptCursor_t::LVL_PLAYERSTART)
         {
-            if(!(EditorCursor.Location.X == static_cast<float>(floor(X / 8)) * 8 - vScreen[A].X && EditorCursor.Location.Y + 8 == static_cast<float>(floor(Y / 8)) * 8 - vScreen[A].Y))
+            if(!(EditorCursor.Location.X == (X / 8) * 8 - vScreenX && EditorCursor.Location.Y == (Y / 8) * 8 - vScreenY))
             {
-                EditorCursor.Location.X = static_cast<float>(floor(X / 8)) * 8 - vScreen[A].X;
-                EditorCursor.Location.Y = static_cast<float>(floor(Y / 8)) * 8 - vScreen[A].Y;
-                EditorCursor.Location.Y -= 8;
+                EditorCursor.Location.X = (X / 8) * 8 - vScreenX;
+                EditorCursor.Location.Y = (Y / 8) * 8 - vScreenY;
                 PositionCursor();
             }
         }
         else if(EditorCursor.Mode == OptCursor_t::WLD_SCENES)
         {
-            EditorCursor.Location.X = double(std::floor(X / 16)) * 16 - vScreen[A].X;
-            EditorCursor.Location.Y = double(std::floor(Y / 16)) * 16 - vScreen[A].Y;
-            EditorCursor.Location.Y -= 8;
+            EditorCursor.Location.X = (X / 16) * 16 - vScreenX;
+            EditorCursor.Location.Y = ((Y + 8) / 16) * 16 - vScreenY - 8;
             PositionCursor();
         }
         else if(EditorCursor.Mode == OptCursor_t::LVL_WATER)
         {
-            EditorCursor.Location.X = double(std::floor(X / 16)) * 16 - vScreen[A].X;
-            EditorCursor.Location.Y = double(std::floor(Y / 16)) * 16 - vScreen[A].Y;
-            EditorCursor.Location.Y -= 8;
+            EditorCursor.Location.X = (X / 16) * 16 - vScreenX;
+            EditorCursor.Location.Y = ((Y + 8) / 16) * 16 - vScreenY - 8;
             PositionCursor();
         }
         else // Everything also align as 32x32
         {
-            EditorCursor.Location.X = double(std::floor(X / 32)) * 32 - vScreen[A].X;
-            EditorCursor.Location.Y = double(std::floor(Y / 32)) * 32 - vScreen[A].Y;
-            EditorCursor.Location.Y -= 8;
+            EditorCursor.Location.X = (X / 32) * 32 - vScreenX;
+            EditorCursor.Location.Y = ((Y + 8) / 32) * 32 - vScreenY - 8;
             PositionCursor();
         }
     }
@@ -3292,8 +3273,8 @@ void MouseMove(float X, float Y, bool /*nCur*/)
     // translate from layer coordinates to screen coordinates
     if(MagicHand && EditorCursor.Layer != LAYER_NONE)
     {
-        EditorCursor.Location.X += Layer[EditorCursor.Layer].OffsetX;
-        EditorCursor.Location.Y += Layer[EditorCursor.Layer].OffsetY;
+        EditorCursor.Location.X -= lX;
+        EditorCursor.Location.Y -= lY;
     }
 }
 

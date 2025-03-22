@@ -48,7 +48,7 @@ void PlayerVehicleDismountCheck(int A)
         tempLocation.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
         tempLocation.Y += -Physics.PlayerHeight[Player[A].Character][Player[A].State];
         tempLocation.Width = Physics.PlayerWidth[Player[A].Character][Player[A].State];
-        tempLocation.X += 64 - tempLocation.Width / 2.0;
+        tempLocation.X += 64 - tempLocation.Width / 2;
 
         // fBlock = FirstBlock[(tempLocation.X / 32) - 1];
         // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];

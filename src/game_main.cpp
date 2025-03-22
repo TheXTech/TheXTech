@@ -56,6 +56,7 @@
 #include "gfx.h"
 
 #include "config.h"
+#include "message.h"
 #include "frame_timer.h"
 #include "blocks.h"
 #include "change_res.h"
@@ -912,8 +913,6 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             SetupPlayers();
-            CreditChop = XRender::TargetH / 2; // 100
-            EndCredits = 0;
             GameOutroDoQuit = false;
             SetupCredits();
 
@@ -1228,9 +1227,12 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 LevelSelect = false;
 
-                XRender::setTargetTexture();
-                XRender::clearBuffer();
-                XRender::repaint();
+                if(XMessage::GetStatus() != XMessage::Status::replay)
+                {
+                    XRender::setTargetTexture();
+                    XRender::clearBuffer();
+                    XRender::repaint();
+                }
 
                 lunaReset();
                 ResetSoundFX();
@@ -1262,7 +1264,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 {
                     GameThing(1000, 3);
                 }
-                else
+                else if(XMessage::GetStatus() != XMessage::Status::replay)
                 {
                     XRender::setTargetTexture();
                     XRender::clearBuffer();
@@ -1371,7 +1373,7 @@ int GameMain(const CmdLineSetup_t &setup)
                         if(warp.Direction2 == 1) // DOWN
                         {
 //                                .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width / 2 - .Location.Width / 2
-                            p.Location.X = warp.Exit.X + (warp.Exit.Width / 2) - (p.Location.Width / 2);
+                            p.Location.X = warp.Exit.X + (warp.Exit.Width - p.Location.Width) / 2;
 //                                .Location.Y = Warp(.Warp).Exit.Y - .Location.Height - 8
                             p.Location.Y = warp.Exit.Y - p.Location.Height - 8;
                         }
@@ -1379,7 +1381,7 @@ int GameMain(const CmdLineSetup_t &setup)
                         if(warp.Direction2 == 3) // UP
                         {
 //                                .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width / 2 - .Location.Width / 2
-                            p.Location.X = warp.Exit.X + (warp.Exit.Width / 2) - (p.Location.Width / 2);
+                            p.Location.X = warp.Exit.X + (warp.Exit.Width - p.Location.Width) / 2;
 //                                .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height + 8
                             p.Location.Y = warp.Exit.Y + warp.Exit.Height + 8;
                         }
@@ -1414,7 +1416,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     else if(warp.Effect == 2)
                     {
 //                            .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width / 2 - .Location.Width / 2
-                        p.Location.X = warp.Exit.X + warp.Exit.Width / 2 - p.Location.Width / 2;
+                        p.Location.X = warp.Exit.X + (warp.Exit.Width - p.Location.Width) / 2;
 //                            .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height - .Location.Height
                         p.Location.Y = warp.Exit.Y + warp.Exit.Height - p.Location.Height;
 
@@ -1424,7 +1426,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     }
                     else if(warp.Effect == 3) // Portal warp
                     {
-                        p.Location.X = warp.Exit.X + warp.Exit.Width / 2 - p.Location.Width / 2;
+                        p.Location.X = warp.Exit.X + (warp.Exit.Width - p.Location.Width) / 2;
                         p.Location.Y = warp.Exit.Y + warp.Exit.Height - p.Location.Height;
                         CheckSection(A);
                         p.WarpCD = 50;
@@ -1774,13 +1776,25 @@ void NextLevel()
     lunaReset();
     ResetSoundFX();
     ClearLevel();
-    XRender::setTargetTexture();
-    XRender::clearBuffer();
-    XRender::repaint();
-    XEvents::doEvents();
 
-    if(!TestLevel && GoToLevel.empty() && !NoMap && !g_config.unlimited_framerate)
-        PGE_Delay(500);
+    if(XMessage::GetStatus() != XMessage::Status::replay)
+    {
+        XRender::setTargetTexture();
+        XRender::clearBuffer();
+        XRender::repaint();
+        XEvents::doEvents();
+    }
+
+    if(!TestLevel && GoToLevel.empty() && !NoMap)
+    {
+        if(XMessage::GetStatus() != XMessage::Status::local)
+        {
+            for(int i = 0; i < 32; i++)
+                Controls::Update(false);
+        }
+        else if(!g_config.unlimited_framerate)
+            PGE_Delay(500);
+    }
 
     if(BattleMode && !LevelEditor && !TestLevel)
     {
@@ -1916,7 +1930,9 @@ void UpdateMacro()
             EndLevel = true;
             LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
-            XRender::clearBuffer();
+
+            if(XMessage::GetStatus() != XMessage::Status::replay)
+                XRender::clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
@@ -1949,7 +1965,9 @@ void UpdateMacro()
             LevelMacro = LEVELMACRO_OFF;
             LevelMacroWhich = 0;
             LevelMacroCounter = 0;
-            XRender::clearBuffer();
+
+            if(XMessage::GetStatus() != XMessage::Status::replay)
+                XRender::clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_CRYSTAL_BALL_EXIT)
@@ -1980,7 +1998,9 @@ void UpdateMacro()
             EndLevel = true;
             LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
-            XRender::clearBuffer();
+
+            if(XMessage::GetStatus() != XMessage::Status::replay)
+                XRender::clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_GAME_COMPLETE_EXIT)
@@ -2022,7 +2042,9 @@ void UpdateMacro()
                 MenuMode = MENU_INTRO;
                 MenuCursor = 0;
             }
-            XRender::clearBuffer();
+
+            if(XMessage::GetStatus() != XMessage::Status::replay)
+                XRender::clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_STAR_EXIT) // Star Exit
@@ -2101,7 +2123,7 @@ void UpdateMacro()
                             level[Player[1].Section].Width;
             double focusY = Player[1].Location.Y + Player[1].Location.Height / 2;
 
-            g_levelScreenFader.setupFader(2, 0, 65, ScreenFader::S_CIRCLE, true, focusX, focusY, 1);
+            g_levelScreenFader.setupFader(2, 0, 65, ScreenFader::S_CIRCLE, true, (int)focusX, (int)focusY, 1);
 
             if(canTrack)
                 g_levelScreenFader.setTrackedFocus(&Player[1].Location.X,
@@ -2122,27 +2144,6 @@ void UpdateMacro()
 
 // main_config.cpp
 
-
-void NPCyFix()
-{
-    int A = 0;
-    float XnH = 0;
-    float XnHfix = 0;
-
-    for(A = 1; A <= numNPCs; A++)
-    {
-        XnH = NPC[A].Location.Y + NPC[A].Location.Height;
-        if((int(XnH * 100) % 800) / 100 != 0)
-        {
-            if((int(XnH + std::abs((int(XnH * 100) % 800) / 100)) * 100) % 800 == 0)
-                XnHfix = std::abs((int(XnH * 100) % 800) / 100);
-            else
-                XnHfix = std::abs(8 - ((int(XnH * 100) % 800) / 100));
-            NPC[A].Location.Y += XnHfix;
-            treeNPCUpdate(A);
-        }
-    }
-}
 
 void CheckActive()
 {

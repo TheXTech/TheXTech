@@ -217,6 +217,9 @@ void renderRect(int x, int y, int w, int h, XTColor color, bool filled)
     int y_div = FLOORDIV2(y);
     int h_div = FLOORDIV2(y + h) - y_div;
 
+    if(w_div <= 0 || h_div <= 0)
+        return;
+
     if(filled)
         minport_RenderBoxFilled(x_div, y_div, x_div + w_div, y_div + h_div, color);
     else
@@ -423,26 +426,7 @@ static inline void minport_RenderTexturePrivate_2(int16_t xDst, int16_t yDst, in
                              rotateAngle, center, flip,
                              color);
 
-    if(tx.d.hasTexture() && tx.l.lazyLoaded && &tx != g_render_chain_head)
-    {
-        tx.d.last_draw_frame = g_current_frame;
-
-        // unlink
-        minport_unlinkTexture(&tx);
-
-        // insert at head
-        if(g_render_chain_head)
-        {
-            g_render_chain_head->d.next_texture = &tx;
-            tx.d.last_texture = g_render_chain_head;
-        }
-        else
-        {
-            g_render_chain_tail = &tx;
-        }
-
-        g_render_chain_head = &tx;
-    }
+    minport_usedTexture(tx);
 }
 
 static inline void minport_RenderTexturePrivate_Basic_2(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
@@ -475,6 +459,11 @@ static inline void minport_RenderTexturePrivate_Basic_2(int16_t xDst, int16_t yD
                              xSrc, ySrc,
                              color);
 
+    minport_usedTexture(tx);
+}
+
+static void minport_usedTexture(StdPicture &tx)
+{
     if(tx.d.hasTexture() && tx.l.lazyLoaded && &tx != g_render_chain_head)
     {
         tx.d.last_draw_frame = g_current_frame;
@@ -554,11 +543,10 @@ void renderTexture(double xDst, double yDst, double wDst, double hDst,
     auto div_w = FLOORDIV2(xDst + wDst) - div_x;
     auto div_h = FLOORDIV2(yDst + hDst) - div_y;
 
-    minport_RenderTexturePrivate_2(
+    minport_RenderTexturePrivate_Basic_2(
         div_x, div_y, div_w, div_h,
         tx,
-        FLOORDIV2(xSrc), FLOORDIV2(ySrc), div_w, div_h,
-        0.0f, nullptr, X_FLIP_NONE,
+        FLOORDIV2(xSrc), FLOORDIV2(ySrc),
         color);
 }
 
@@ -568,11 +556,10 @@ void renderTexture(float xDst, float yDst, StdPicture &tx,
     int w = tx.w / 2;
     int h = tx.h / 2;
 
-    minport_RenderTexturePrivate_2(
+    minport_RenderTexturePrivate_Basic_2(
         FLOORDIV2(xDst), FLOORDIV2(yDst), w, h,
         tx,
-        0, 0, w, h,
-        0.0f, nullptr, X_FLIP_NONE,
+        0, 0,
         color);
 }
 
@@ -586,19 +573,6 @@ void renderTextureBasic(int xDst, int yDst, StdPicture &tx,
         FLOORDIV2(xDst), FLOORDIV2(yDst), w, h,
         tx,
         0, 0,
-        color);
-}
-
-void renderTexture(int xDst, int yDst, StdPicture &tx, XTColor color)
-{
-    int w = tx.w / 2;
-    int h = tx.h / 2;
-
-    minport_RenderTexturePrivate_2(
-        FLOORDIV2(xDst), FLOORDIV2(yDst), w, h,
-        tx,
-        0.0f, 0.0f, w, h,
-        0.0f, nullptr, X_FLIP_NONE,
         color);
 }
 
@@ -656,6 +630,77 @@ void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
         rotateAngle, center, flip,
         color);
 }
+
+#ifndef __16M__
+void renderSizableBlock(int bLeftOnscreen, int bTopOnscreen, int wDst, int hDst, StdPicture &tx)
+{
+    int bRightOnscreen = bLeftOnscreen + wDst;
+    if(bRightOnscreen < 0)
+        return;
+
+    int bBottomOnscreen = bTopOnscreen + hDst;
+    if(bBottomOnscreen < 0)
+        return;
+
+    int left_sx = 0;
+    if(bLeftOnscreen <= -32)
+    {
+        left_sx = 32;
+        bLeftOnscreen = bLeftOnscreen % 32;
+
+        // go straight to right if less than 33 pixels in total
+        if(bRightOnscreen - bLeftOnscreen < 33)
+            left_sx = 64;
+    }
+
+    int top_sy = 0;
+    if(bTopOnscreen <= -32)
+    {
+        top_sy = 32;
+        bTopOnscreen = bTopOnscreen % 32;
+
+        // go straight to bottom if less than 33 pixels in total
+        if(bBottomOnscreen - bTopOnscreen < 33)
+            top_sy = 64;
+    }
+
+    // location of second-to-last row/column in screen coordinates
+    int colSemiLast = bRightOnscreen - 64;
+    int rowSemiLast = bBottomOnscreen - 64;
+
+    if(bRightOnscreen > g_viewport_w * 2)
+        bRightOnscreen = g_viewport_w * 2;
+
+    if(bBottomOnscreen > g_viewport_h * 2)
+        bBottomOnscreen = g_viewport_h * 2;
+
+    // first row source
+    int src_y = top_sy;
+
+    for(int dst_y = bTopOnscreen; dst_y < bBottomOnscreen; dst_y += 32)
+    {
+        // first col source
+        int src_x = left_sx;
+
+        for(int dst_x = bLeftOnscreen; dst_x < bRightOnscreen; dst_x += 32)
+        {
+            renderTextureBasic(dst_x, dst_y, 32, 32, tx, src_x, src_y);
+
+            // next col source
+            if(dst_x >= colSemiLast)
+                src_x = 64;
+            else
+                src_x = 32;
+        }
+
+        // next row source
+        if(dst_y >= rowSemiLast)
+            src_y = 64;
+        else
+            src_y = 32;
+    }
+}
+#endif
 
 
 size_t lazyLoadedBytes()

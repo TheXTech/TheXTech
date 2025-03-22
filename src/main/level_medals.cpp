@@ -281,18 +281,16 @@ void OrderMedals()
         {
             const NPC_t& n = NPC[auto_medals[auto_i].second];
 
-            double coord = graph.distance_from_start({n.Location.X, n.Location.Y});
+            unsigned int coord = graph.distance_from_start({(int)n.Location.X, (int)n.Location.Y});
 
-            if(graph.furthest_dist)
-                coord /= graph.furthest_dist;
+            D_pLogDebug("Medal with NPC ID %d at %d from level start, %d to level end", auto_medals[auto_i].second, coord, graph.furthest_dist);
 
-            D_pLogDebug("Medal with NPC ID %d at %f from level start to level end", auto_medals[auto_i].second, coord);
+            // furthest_dist is the furthest item (including medals), and it's never negative
+            uint64_t scaled_coord = (uint64_t)coord * 0x10000 / (2 * graph.furthest_dist);
+            if(scaled_coord >= 0x10000)
+                scaled_coord = 0xFFFF;
 
-            // 1.0 is the furthest exit, and it's never negative
-            if(coord > 2.0)
-                coord = 2.0;
-
-            auto_medals[auto_i].first = static_cast<uint16_t>(coord / 2.0 * 0xFFFF);
+            auto_medals[auto_i].first = static_cast<uint16_t>(scaled_coord);
         }
 
         // sort by distance

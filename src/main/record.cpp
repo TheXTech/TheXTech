@@ -498,7 +498,7 @@ static void write_status()
     for(int i = 1; i <= numPlayers; i++)
     {
         fprintf(record_file, "p%dx %lf\r\np%dy %lf\r\n",
-            i, Player[i].Location.X, i, Player[i].Location.Y);
+            i, (double)Player[i].Location.X, i, (double)Player[i].Location.Y);
     }
 
     fflush(record_file);
@@ -621,8 +621,8 @@ static void read_status()
         {
             pLogWarning("player %d position diverged (old x=%f new x=%f, old y=%f new y=%f) at frame %" PRId64 ".",
                         i,
-                        px, Player[i].Location.X,
-                        py, Player[i].Location.Y, frame_no);
+                        px, (double)Player[i].Location.X,
+                        py, (double)Player[i].Location.Y, frame_no);
             diverged_minor = true;
             if(SDL_fabs(px - Player[i].Location.X) > 1 ||
                SDL_fabs(py - Player[i].Location.Y) > 1)
@@ -644,7 +644,7 @@ static void write_NPCs()
         fprintf(record_file, "Type %d\r\n", n.Type);
         fprintf(record_file, "Active %d\r\n", n.Active);
         fprintf(record_file, "Dir %lf\r\n", (double)n.Direction);
-        fprintf(record_file, "XYWH %lf %lf %lf %lf\r\n", n.Location.X, n.Location.Y, n.Location.Width, n.Location.Height);
+        fprintf(record_file, "XYWH %lf %lf %lf %lf\r\n", (double)n.Location.X, (double)n.Location.Y, (double)n.Location.Width, (double)n.Location.Height);
         fprintf(record_file, "S %lf %lf %lf %lf %lf %lf %lf\r\n", (double)n.Special, (double)n.Special2, (double)n.Special3, (double)n.Special4, (double)n.Special5, (double)n.SpecialX, (double)n.SpecialY);
     }
 }
@@ -727,9 +727,9 @@ static void read_NPCs()
                 diverged_minor = true;
             }
 
-            if(!fEqual((float)D, n.Direction))
+            if(D != n.Direction)
             {
-                pLogWarning("NPC[%d].Direction diverged (old %f, new %f; type %d) at frame %" PRId64 ".", i, D, n.Direction, n.Type, frame_no);
+                pLogWarning("NPC[%d].Direction diverged (old %f, new %d; type %d) at frame %" PRId64 ".", i, D, n.Direction, n.Type, frame_no);
                 diverged_minor = true;
             }
 
@@ -739,7 +739,7 @@ static void read_NPCs()
                SDL_fabs(H - n.Location.Height) > 0.01)
             {
                 pLogWarning("NPC[%d].Location diverged (old %lf %lf %lf %lf, new %lf %lf %lf %lf; type %d) at frame %" PRId64 ".", i,
-                    X, Y, W, H, n.Location.X, n.Location.Y, n.Location.Width, n.Location.Height, n.Type, frame_no);
+                    X, Y, W, H, (double)n.Location.X, (double)n.Location.Y, (double)n.Location.Width, (double)n.Location.Height, n.Type, frame_no);
                 diverged_minor = true;
             }
 

@@ -26,6 +26,7 @@
 #include "globals.h"
 #include "graphics.h"
 #include "game_main.h"
+#include "message.h"
 
 #include "main/menu_main.h"
 #include "main/game_strings.h"
@@ -53,6 +54,9 @@ void Logic()
         Deactivate();
         return;
     }
+
+    if(XMessage::GetStatus() == XMessage::Status::replay)
+        return;
 
     bool has_missing = false;
     bool has_toast = false;

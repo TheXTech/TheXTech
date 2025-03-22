@@ -832,7 +832,7 @@ struct Water_t
 //    Location As Location
     SpeedlessLocation_t Location;
 //    Buoy As Single 'not used
-    float Buoy = 0.0f;
+    // float Buoy = 0.0f;
 //    Layer As String
     layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean
@@ -1021,9 +1021,9 @@ struct WorldLevel_t
     bool Visible = false;
 
 //    WarpX As Double 'for warping to another location on the world map
-    double WarpX = 0.0;
+    int32_t WarpX = 0;
 //    WarpY As Double
-    double WarpY = 0.0;
+    int32_t WarpY = 0;
 
 //End Type
 
@@ -1096,7 +1096,7 @@ struct Warp_t
     bool noPrintStars = false;
     bool noEntranceScene = false;
     bool cannonExit = false;
-    float cannonExitSpeed = 10.0;
+    vbint_t cannonExitSpeed = 10;
     bool stoodRequired = false; // Require player stood on the ground to enter this warp
     eventindex_t eventEnter = EVENT_NONE;
     eventindex_t eventExit = EVENT_NONE;
@@ -1169,16 +1169,16 @@ struct WorldMusic_t
 //! NEW: a camera zone for the world map
 struct WorldArea_t
 {
-    IntegerLocation_t Location;
+    TinyLocation_t Location;
 };
 
 //Public Type EditorCursor 'The editor's cursor
 struct EditorCursor_t
 {
 //    X As Single
-    float X = -50.0f;
+    int X = -50;
 //    Y As Single
-    float Y = -50.0f;
+    int Y = -50;
 //    SelectedMode As Integer 'cursor mode. eraser/npc/block/background
 
     // class of object (uses same enum as Mode)
@@ -1233,7 +1233,7 @@ struct EditorCursor_t
 struct WorldPlayer_t
 {
 //    Location As Location
-    Location_t Location;
+    TinyLocation_t Location;
 //    Type As Integer
     int Type = 0;
 //    Frame As Integer
@@ -1403,6 +1403,11 @@ struct SelectWorld_t
     bool highlight = false;
     bool disabled = false;
     bool probably_incompatible = false;
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+    // content hash of packed episode
+    uint32_t lz4_content_hash = 0;
+#endif
 //End Type
 };
 
@@ -1450,7 +1455,7 @@ extern bool RestartLevel;
 //! Per-level stars showing policy
 extern int WorldStarsShowPolicy;
 //Public LevelChop(0 To maxSections) As Single 'for drawing backgrounds when the level has been shrunk
-extern float LevelChop[maxSections + 1];
+// extern float LevelChop[maxSections + 1];
 
 //'collision detection optimization. creates a table of contents for blocks
 // removed in favor of new block quadtree
@@ -1493,7 +1498,7 @@ extern RangeArrI<vbint_t, 0, maxSections, 0> bgMusicREAL;
 //Public Background2REAL(0 To maxSections) As Integer 'background
 extern RangeArrI<vbint_t, 0, maxSections, 0> Background2REAL;
 //Public LevelREAL(0 To maxSections) As Location 'default background
-extern RangeArr<SpeedlessLocation_t, 0, maxSections> LevelREAL;
+extern RangeArr<IntegerLocation_t, 0, maxSections> LevelREAL;
 //Public curMusic As Integer 'current music playing
 extern int curMusic;
 //Public bgColor(0 To maxSections) As Long 'obsolete
@@ -1519,7 +1524,7 @@ DECLREF_T(Scene);
 //Public Credit(1 To 200) As CreditLine 'for end game credits
 extern RangeArr<CreditLine_t, 1, maxCreditsLines> Credit;
 extern int numWorldCredits;
-extern double CreditOffsetY;
+extern int CreditOffsetY;
 extern int CreditTotalHeight;
 //Public numCredits As Integer 'number of credits
 extern int numCredits;
@@ -1899,7 +1904,7 @@ extern bool IsHubLevel;
 //Public Coins As Integer 'number of coins
 extern int Coins;
 //Public Lives As Single 'number of lives
-extern float Lives;
+extern int Lives;
 //NEW: tracker of number of hundreds of coins that have been obtained
 extern int g_100s;
 //Public EndIntro As Boolean
@@ -2151,7 +2156,7 @@ extern bool g_ClonedPlayerMode;
 extern bool GameOutro;
 extern bool GameOutroDoQuit;
 //Public CreditChop As Single
-extern float CreditChop;
+extern int CreditChop;
 //Public EndCredits As Integer
 extern int EndCredits;
 //Public curStars As Integer 'number of stars
@@ -2217,7 +2222,7 @@ extern bool LoadingInProcess;
 //Public LoadCoins As Integer
 extern int LoadCoins;
 //Public LoadCoinsT As Single
-extern float LoadCoinsT;
+extern unsigned int LoadCoinsT;
 
 //'Game Graphics
 //Public GFXBlockCustom(1 To maxBlockType) As Boolean
@@ -2287,9 +2292,9 @@ extern RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundBMP;
 //Public GFXBackgroundMaskBMP(1 To maxBackgroundType) As StdPicture
 //extern RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundMaskBMP;
 //Public GFXBackgroundHeight(1 To maxBackgroundType) As Integer
-extern RangeArrI<vbint_t, 1, maxBackgroundType, 0> GFXBackgroundHeight;
+// extern RangeArrI<vbint_t, 1, maxBackgroundType, 0> GFXBackgroundHeight;
 //Public GFXBackgroundWidth(1 To maxBackgroundType) As Integer
-extern RangeArrI<vbint_t, 1, maxBackgroundType, 0> GFXBackgroundWidth;
+// extern RangeArrI<vbint_t, 1, maxBackgroundType, 0> GFXBackgroundWidth;
 
 extern const char *GFXPlayerNames[numCharacters];
 extern RangeArr<StdPicture, 1, 10> *GFXCharacterBMP[numCharacters];

@@ -43,15 +43,150 @@
 #   include <InterProcess/intproc.h>
 #endif
 
+static inline int s_round2int(double d)
+{
+    return std::floor(d + 0.5);
+}
+
+void s_drawBlockExtra(int Z, int camX, int camY, const Block_t& b)
+{
+    if(b.Special > 0 && !b.Hidden)
+    {
+        if(vScreenCollision(Z, b.Location))
+        {
+            NPCID C = NPCID_NULL;
+            if(b.Special > 1000)
+                C = NPCID(b.Special - 1000);
+            else
+                C = NPCID_COIN_S3;
+
+            int dW, dH;
+
+            if(NPCWidthGFX(C) == 0)
+            {
+                dH = NPCHeight(C);
+                dW = NPCWidth(C);
+            }
+            else
+            {
+                dH = NPCHeightGFX(C);
+                dW = NPCWidthGFX(C);
+            }
+
+            int sX = s_round2int(b.Location.X + b.Location.Width / 2) - dW / 2;
+            int sY = s_round2int(b.Location.Y + b.Location.Height / 2) - dH / 2;
+
+            vbint_t tempDirection = -1;
+
+            XRender::renderTextureBasic(camX + sX + NPCFrameOffsetX(C),
+                camY + sY + NPCFrameOffsetY(C),
+                dW, dH,
+                GFXNPC[C], 0, EditorNPCFrame(C, tempDirection) * dH);
+        }
+    }
+
+    // new: indicate that blocks have events
+    if(b.TriggerHit != EVENT_NONE || b.TriggerDeath != EVENT_NONE || b.TriggerLast != EVENT_NONE)
+    {
+        if(vScreenCollision(Z, b.Location))
+        {
+            int sX = s_round2int(b.Location.X + b.Location.Width / 2) - GFX.Chat.w / 2;
+            int sY = s_round2int(b.Location.Y) - GFX.Chat.h - 8;
+
+            XRender::renderTextureBasic(camX + sX, camY + sY, GFX.Chat, XTColorF(1., 0., 0., 0.7f));
+        }
+    }
+}
+
+void s_drawNpcExtra(int Z, int camX, int camY, const NPC_t& n)
+{
+    if(!n.Hidden && (n.Type == NPCID_ITEM_BURIED || n.Type == NPCID_ITEM_POD)
+        && (n.Special > 0))
+    {
+        if(vScreenCollision(Z, n.Location))
+        {
+            NPCID C = NPCID(n.Special);
+
+            int dW, dH;
+            if(NPCWidthGFX(C) == 0)
+            {
+                dH = NPCHeight(C);
+                dW = NPCWidth(C);
+            }
+            else
+            {
+                dH = NPCHeightGFX(C);
+                dW = NPCWidthGFX(C);
+            }
+
+            int sY;
+            if(n.Type == NPCID_ITEM_POD)
+                sY = s_round2int(n.Location.Y + n.Location.Height) - dH;
+            else
+                sY = s_round2int(n.Location.Y);
+
+            int sX = s_round2int(n.Location.X + n.Location.Width / 2) - dW / 2;
+
+            vbint_t tempDirection = -1;
+
+            XRender::renderTextureBasic(camX + sX + NPCFrameOffsetX(C),
+                camY + sY + NPCFrameOffsetY(C),
+                dW, dH,
+                GFXNPC[C], 0, EditorNPCFrame(C, tempDirection) * dH);
+        }
+    }
+
+    // new: indicate that NPCs have events
+    if(n.TriggerActivate != EVENT_NONE || n.TriggerTalk != EVENT_NONE || n.TriggerDeath != EVENT_NONE || n.TriggerLast != EVENT_NONE)
+    {
+        if(vScreenCollision(Z, n.Location))
+        {
+            int sX = s_round2int(n.Location.X + n.Location.Width / 2);
+            if(n.Text == STRINGINDEX_NONE)
+                sX -= GFX.Chat.w / 2;
+            else
+                sX -= 4 + GFX.Chat.w;
+
+            int sY = s_round2int(n.Location.Y) - GFX.Chat.h - 8;
+
+            XRender::renderTextureBasic(camX + sX, camY + sY, GFX.Chat, XTColorF(1., 0., 0., 0.7f));
+        }
+    }
+
+    // and that they can talk
+    if(n.Text != STRINGINDEX_NONE)
+    {
+        if(vScreenCollision(Z, n.Location))
+        {
+            int sX = s_round2int(n.Location.X + n.Location.Width / 2);
+            if(!(n.TriggerActivate != EVENT_NONE || n.TriggerTalk != EVENT_NONE || n.TriggerDeath != EVENT_NONE || n.TriggerLast != EVENT_NONE))
+                sX -= GFX.Chat.w / 2;
+            else
+                sX += 4;
+
+            int sY = s_round2int(n.Location.Y) - GFX.Chat.h - 8;
+
+            XRender::renderTextureBasic(camX + sX, camY + sY, GFX.Chat, XTColorF(1., 1., 1., 0.7f));
+        }
+    }
+}
+
+void s_drawWaterBox(int camX, int camY, const Water_t& w)
+{
+    XRender::renderRect(camX + s_round2int(w.Location.X), camY + s_round2int(w.Location.Y), (int)(w.Location.Width), (int)(w.Location.Height),
+        (w.Quicksand) ? XTColor{255, 255, 0} : XTColor{0, 255, 255}, false);
+}
+
 void DrawEditorLevel(int Z)
 {
     int A = 0;
     int B = 0;
     int C = 0;
-    int D;
-    int E;
-    Location_t tempLocation;
     int S = curSection; // Level section to display
+
+    // camera offsets to add to all object positions before drawing
+    int camX = vScreen[Z].CameraAddX();
+    int camY = vScreen[Z].CameraAddY();
 
 #ifdef __3DS__
     XRender::setTargetLayer(2);
@@ -60,121 +195,13 @@ void DrawEditorLevel(int Z)
     {
         if((CommonFrame % 46) <= 30)
         {
-            // render NPCs in blocks
+            // render NPCs in and events for blocks
             for(A = 1; A <= numBlock; A++)
-            {
-                if(Block[A].Special > 0 && !Block[A].Hidden)
-                {
-                    if(vScreenCollision(Z, Block[A].Location))
-                    {
-                        NPCID C = NPCID_NULL;
-                        if(Block[A].Special > 1000)
-                            C = NPCID(Block[A].Special - 1000);
-                        else
-                            C = NPCID_COIN_S3;
-
-                        if(NPCWidthGFX(C) == 0)
-                        {
-                            tempLocation.X = Block[A].Location.X + Block[A].Location.Width / 2 - NPCWidth(C) / 2;
-                            tempLocation.Y = Block[A].Location.Y + Block[A].Location.Height / 2 - NPCHeight(C) / 2;
-                            tempLocation.Height = NPCHeight(C);
-                            tempLocation.Width = NPCWidth(C);
-                        }
-                        else
-                        {
-                            tempLocation.X = Block[A].Location.X + Block[A].Location.Width / 2 - NPCWidthGFX(C) / 2;
-                            tempLocation.Y = Block[A].Location.Y + Block[A].Location.Height / 2 - NPCHeightGFX(C) / 2;
-                            tempLocation.Height = NPCHeightGFX(C);
-                            tempLocation.Width = NPCWidthGFX(C);
-                        }
-
-                        vbint_t tempDirection = -1;
-
-                        XRender::renderTexture(vScreen[Z].X + tempLocation.X + NPCFrameOffsetX(C),
-                            vScreen[Z].Y + tempLocation.Y + NPCFrameOffsetY(C),
-                            tempLocation.Width, tempLocation.Height,
-                            GFXNPC[C], 0, EditorNPCFrame(C, tempDirection) * tempLocation.Height);
-                    }
-                }
-
-                // new: indicate that blocks have events
-                if(Block[A].TriggerHit != EVENT_NONE || Block[A].TriggerDeath != EVENT_NONE || Block[A].TriggerLast != EVENT_NONE)
-                {
-                    if(vScreenCollision(Z, Block[A].Location))
-                    {
-                        tempLocation.X = Block[A].Location.X + Block[A].Location.Width / 2 - GFX.Chat.w / 2;
-                        tempLocation.Y = Block[A].Location.Y - GFX.Chat.h - 8;
-
-                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, XTColorF(1., 0., 0., 0.7f));
-                    }
-                }
-            }
+                s_drawBlockExtra(Z, camX, camY, Block[A]);
 
             // render NPCs in containers
             for(A = 1; A <= numNPCs; A++)
-            {
-                if(!NPC[A].Hidden && (NPC[A].Type == NPCID_ITEM_BURIED || NPC[A].Type == NPCID_ITEM_POD)
-                    && (NPC[A].Special > 0))
-                {
-                    if(vScreenCollision(Z, NPC[A].Location))
-                    {
-                        NPCID C = NPCID(NPC[A].Special);
-                        if(NPCWidthGFX(C) == 0)
-                        {
-                            tempLocation.Height = NPCHeight(C);
-                            tempLocation.Width = NPCWidth(C);
-                        }
-                        else
-                        {
-                            tempLocation.Height = NPCHeightGFX(C);
-                            tempLocation.Width = NPCWidthGFX(C);
-                        }
-                        if(NPC[A].Type == NPCID_ITEM_POD)
-                            tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - tempLocation.Height;
-                        else
-                            tempLocation.Y = NPC[A].Location.Y;
-
-                        tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - tempLocation.Width / 2;
-
-                        vbint_t tempDirection = -1;
-
-                        XRender::renderTexture(vScreen[Z].X + tempLocation.X + NPCFrameOffsetX(C),
-                            vScreen[Z].Y + tempLocation.Y + NPCFrameOffsetY(C),
-                            tempLocation.Width, tempLocation.Height,
-                            GFXNPC[C], 0, EditorNPCFrame(C, tempDirection) * tempLocation.Height);
-                    }
-                }
-
-                // new: indicate that NPCs have events
-                if(NPC[A].TriggerActivate != EVENT_NONE || NPC[A].TriggerTalk != EVENT_NONE || NPC[A].TriggerDeath != EVENT_NONE || NPC[A].TriggerLast != EVENT_NONE)
-                {
-                    if(vScreenCollision(Z, NPC[A].Location))
-                    {
-                        if(NPC[A].Text == STRINGINDEX_NONE)
-                            tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - GFX.Chat.w / 2;
-                        else
-                            tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - 4 - GFX.Chat.w;
-                        tempLocation.Y = NPC[A].Location.Y - GFX.Chat.h - 8;
-
-                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, XTColorF(1., 0., 0., 0.7f));
-                    }
-                }
-
-                // and that they can talk
-                if(NPC[A].Text != STRINGINDEX_NONE)
-                {
-                    if(vScreenCollision(Z, NPC[A].Location))
-                    {
-                        if(!(NPC[A].TriggerActivate != EVENT_NONE || NPC[A].TriggerTalk != EVENT_NONE || NPC[A].TriggerDeath != EVENT_NONE || NPC[A].TriggerLast != EVENT_NONE))
-                            tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - GFX.Chat.w / 2;
-                        else
-                            tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 + 4;
-                        tempLocation.Y = NPC[A].Location.Y - GFX.Chat.h - 8;
-
-                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, XTColorF(1., 1., 1., 0.7f));
-                    }
-                }
-            }
+                s_drawNpcExtra(Z, camX, camY, NPC[A]);
         }
 
         // render player start points
@@ -236,6 +263,15 @@ void DrawEditorLevel(int Z)
             }
         }
 
+        // render water
+        for(int B : treeWaterQuery(-camX, -camY,
+            -camX + vScreen[Z].Width, -camY + vScreen[Z].Height,
+            SORTMODE_ID))
+        {
+            if(!Water[B].Hidden && vScreenCollision(Z, Water[B].Location))
+                s_drawWaterBox(camX, camY, Water[B]);
+        }
+
         // render warps
         for(A = 1; A <= numWarps; A++)
         {
@@ -246,17 +282,17 @@ void DrawEditorLevel(int Z)
 
                 if(Warp[A].PlacedEnt)
                 {
-                    XRender::renderRect(vScreen[Z].X + Warp[A].Entrance.X, vScreen[Z].Y + Warp[A].Entrance.Y, 32, 32,
+                    XRender::renderRect(camX + s_round2int(Warp[A].Entrance.X), camY + s_round2int(Warp[A].Entrance.Y), 32, 32,
                         color, false);
-                    SuperPrint(std::to_string(A), 1, vScreen[Z].X + Warp[A].Entrance.X + 2, vScreen[Z].Y + Warp[A].Entrance.Y + 2);
+                    SuperPrint(std::to_string(A), 1, camX + s_round2int(Warp[A].Entrance.X) + 2, camY + s_round2int(Warp[A].Entrance.Y) + 2);
                 }
 
                 if(Warp[A].PlacedExit)
                 {
-                    XRender::renderRect(vScreen[Z].X + Warp[A].Exit.X, vScreen[Z].Y + Warp[A].Exit.Y, 32, 32,
+                    XRender::renderRect(camX + s_round2int(Warp[A].Exit.X), camY + s_round2int(Warp[A].Exit.Y), 32, 32,
                         color, false);
-                    SuperPrint(std::to_string(A), 1, vScreen[Z].X + Warp[A].Exit.X + Warp[A].Exit.Width - 16 - 2,
-                        vScreen[Z].Y + Warp[A].Exit.Y + Warp[A].Exit.Height - 14 - 2);
+                    SuperPrint(std::to_string(A), 1, camX + s_round2int(Warp[A].Exit.X + Warp[A].Exit.Width) - 16 - 2,
+                        camY + s_round2int(Warp[A].Exit.Y + Warp[A].Exit.Height) - 14 - 2);
                 }
             }
         }
@@ -265,15 +301,15 @@ void DrawEditorLevel(int Z)
         for(int A = 0; A < numEvents; A++)
         {
             const auto& e = Events[A];
-            const auto& sectPos = e.section[curSection].position;
+            const IntegerLocation_t& sectPos = e.section[curSection].position;
             if(sectPos.X == EventSection_t::LESet_Nothing || sectPos.X == EventSection_t::LESet_ResetDefault)
                 continue;
 
             XTColor ev_color = {uint8_t(64 + 128 * (A & 1)), uint8_t(64 + 64 * (A & 2)), uint8_t(64 + 32 * (A & 4))};
-            DrawSimpleFrame(vScreen[Z].X + sectPos.X, vScreen[Z].Y + sectPos.Y, sectPos.Width - sectPos.X, sectPos.Height - sectPos.Y, {0, 0, 0}, ev_color, {0, 0, 0, 0});
-            SuperPrint(g_editorStrings.wordEvent, 3, vScreen[Z].X + sectPos.X + 8, vScreen[Z].Y + sectPos.Y + 8);
-            SuperPrint(e.Name, 3, vScreen[Z].X + sectPos.X + 8, vScreen[Z].Y + sectPos.Y + 28, ev_color);
-            SuperPrint(g_editorStrings.eventsCaseBounds, 3, vScreen[Z].X + sectPos.X + 8, vScreen[Z].Y + sectPos.Y + 48);
+            DrawSimpleFrame(camX + sectPos.X, camY + sectPos.Y, sectPos.Width - sectPos.X, sectPos.Height - sectPos.Y, {0, 0, 0}, ev_color, {0, 0, 0, 0});
+            SuperPrint(g_editorStrings.wordEvent, 3, camX + sectPos.X + 8, camY + sectPos.Y + 8);
+            SuperPrint(e.Name, 3, camX + sectPos.X + 8, camY + sectPos.Y + 28, ev_color);
+            SuperPrint(g_editorStrings.eventsCaseBounds, 3, camX + sectPos.X + 8, camY + sectPos.Y + 48);
         }
     }
 
@@ -284,28 +320,28 @@ void DrawEditorLevel(int Z)
     // render section boundary
     if(LevelEditor)
     {
-        if(vScreen[Z].X + level[S].X > 0)
+        if(camX + LevelREAL[S].X > 0)
         {
             XRender::renderRect(0, 0,
-                               vScreen[Z].X + level[S].X, XRender::TargetH, {63, 63, 63, 192}, true);
+                               camX + LevelREAL[S].X, XRender::TargetH, {63, 63, 63, 192}, true);
         }
 
-        if(XRender::TargetW > level[S].Width + vScreen[Z].X)
+        if(XRender::TargetW > LevelREAL[S].Width + camX)
         {
-            XRender::renderRect(level[S].Width + vScreen[Z].X, 0,
-                               XRender::TargetW - (level[S].Width + vScreen[Z].X), XRender::TargetH, {63, 63, 63, 192}, true);
+            XRender::renderRect(LevelREAL[S].Width + camX, 0,
+                               XRender::TargetW - (LevelREAL[S].Width + camX), XRender::TargetH, {63, 63, 63, 192}, true);
         }
 
-        if(vScreen[Z].Y + level[S].Y > 0)
+        if(camY + LevelREAL[S].Y > 0)
         {
-            XRender::renderRect(vScreen[Z].X + level[S].X, 0,
-                               level[S].Width - level[S].X, vScreen[Z].Y + level[S].Y, {63, 63, 63, 192}, true);
+            XRender::renderRect(camX + LevelREAL[S].X, 0,
+                               LevelREAL[S].Width - LevelREAL[S].X, camY + LevelREAL[S].Y, {63, 63, 63, 192}, true);
         }
 
-        if(XRender::TargetH > level[S].Height + vScreen[Z].Y)
+        if(XRender::TargetH > LevelREAL[S].Height + camY)
         {
-            XRender::renderRect(vScreen[Z].X + level[S].X, level[S].Height + vScreen[Z].Y,
-                               level[S].Width - level[S].X, XRender::TargetH - (level[S].Height + vScreen[Z].Y), {63, 63, 63, 192}, true);
+            XRender::renderRect(camX + LevelREAL[S].X, LevelREAL[S].Height + camY,
+                               LevelREAL[S].Width - LevelREAL[S].X, XRender::TargetH - (LevelREAL[S].Height + camY), {63, 63, 63, 192}, true);
         }
     }
 
@@ -326,8 +362,8 @@ void DrawEditorLevel(int Z)
     // Display the cursor
     {
         auto &e = EditorCursor;
-        int curX = int(double(e.X) - vScreen[Z].TargetX());
-        int curY = int(double(e.Y) - vScreen[Z].TargetY());
+        int curX = s_round2int(e.X) - vScreen[Z].TargetX();
+        int curY = s_round2int(e.Y) - vScreen[Z].TargetY();
 
         if((CommonFrame % 46) < 10)
         {
@@ -339,94 +375,23 @@ void DrawEditorLevel(int Z)
             if(BlockIsSizable[b.Type])
             {
                 if(vScreenCollision(Z, b.Location))
-                {
-                    for(B = 0; B <= (b.Location.Height / 32) - 1; B++)
-                    {
-                        for(C = 0; C <= (b.Location.Width / 32) - 1; C++)
-                        {
-                            D = C;
-                            E = B;
-
-                            if(D != 0)
-                            {
-                                if(fEqual(D, (b.Location.Width / 32) - 1))
-                                    D = 2;
-                                else
-                                {
-                                    D = 1;
-                                }
-                            }
-
-                            if(E != 0)
-                            {
-                                if(fEqual(E, (b.Location.Height / 32) - 1))
-                                    E = 2;
-                                else
-                                    E = 1;
-                            }
-
-                            XRender::renderTexture(vScreen[Z].X + b.Location.X + C * 32,
-                                                  vScreen[Z].Y + b.Location.Y + B * 32,
-                                                  32, 32, GFXBlock[b.Type], D * 32, E * 32);
-                        }
-                    }
-                }
+                    XRender::renderSizableBlock(camX + s_round2int(b.Location.X), camY + s_round2int(b.Location.Y), (int)(b.Location.Width), (int)(b.Location.Height), GFXBlockBMP[b.Type]);
             }
             else
             {
                 if(vScreenCollision(Z, b.Location))
                 {
-                    XRender::renderTexture(vScreen[Z].X + b.Location.X,
-                                          vScreen[Z].Y + b.Location.Y + b.ShakeOffset,
-                                          b.Location.Width,
-                                          b.Location.Height,
+                    XRender::renderTextureBasic(camX + s_round2int(b.Location.X),
+                                          camY + s_round2int(b.Location.Y) + b.ShakeOffset,
+                                          (int)(b.Location.Width),
+                                          (int)(b.Location.Height),
                                           GFXBlock[b.Type], 0, BlockFrame[b.Type] * 32);
                 }
             }
 
             // render NPC inside block
-            if((CommonFrame % 46) <= 30 && b.Special > 0)
-            {
-                if(vScreenCollision(Z, b.Location))
-                {
-                    NPCID C = NPCID_NULL;
-                    if(b.Special > 1000)
-                        C = NPCID(b.Special - 1000);
-                    else
-                        C = NPCID_COIN_S3;
-
-                    if(NPCWidthGFX(C) == 0)
-                    {
-                        tempLocation.X = b.Location.X + b.Location.Width / 2 - NPCWidth(C) / 2;
-                        tempLocation.Y = b.Location.Y + b.Location.Height / 2 - NPCHeight(C) / 2;
-                        tempLocation.Height = NPCHeight(C);
-                        tempLocation.Width = NPCWidth(C);
-                    }
-                    else
-                    {
-                        tempLocation.X = b.Location.X + b.Location.Width / 2 - NPCWidthGFX(C) / 2;
-                        tempLocation.Y = b.Location.Y + b.Location.Height / 2 - NPCHeightGFX(C) / 2;
-                        tempLocation.Height = NPCHeightGFX(C);
-                        tempLocation.Width = NPCWidthGFX(C);
-                    }
-
-                    vbint_t tempDirection = -1;
-
-                    XRender::renderTexture(vScreen[Z].X + tempLocation.X + NPCFrameOffsetX(C),
-                        vScreen[Z].Y + tempLocation.Y + NPCFrameOffsetY(C),
-                        tempLocation.Width, tempLocation.Height,
-                        GFXNPC[C], 0, EditorNPCFrame(C, tempDirection) * tempLocation.Height);
-                }
-            }
-
-            // new: indicate that blocks have events
-            if(b.TriggerHit != EVENT_NONE || b.TriggerDeath != EVENT_NONE || b.TriggerLast != EVENT_NONE)
-            {
-                tempLocation.X = b.Location.X + b.Location.Width / 2 - GFX.Chat.w / 2;
-                tempLocation.Y = b.Location.Y - GFX.Chat.h - 8;
-
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, XTColorF(1., 0., 0., 0.7f));
-            }
+            if((CommonFrame % 46) <= 30)
+                s_drawBlockExtra(Z, camX, camY, b);
         }
 
         else if(e.Mode == OptCursor_t::LVL_PLAYERSTART) // Player start points
@@ -493,8 +458,8 @@ void DrawEditorLevel(int Z)
             auto &b = e.Background;
             if(vScreenCollision(Z, b.Location))
             {
-                XRender::renderTexture(vScreen[Z].X + b.Location.X,
-                                      vScreen[Z].Y + b.Location.Y,
+                XRender::renderTextureBasic(camX + s_round2int(b.Location.X),
+                                      camY + s_round2int(b.Location.Y),
                                       BackgroundWidth[b.Type],
                                       BackgroundHeight[b.Type],
                                       GFXBackground[b.Type], 0,
@@ -513,113 +478,51 @@ void DrawEditorLevel(int Z)
             auto &n = e.NPC;
             if(n->WidthGFX == 0)
             {
-                XRender::renderTexture(vScreen[Z].X + n.Location.X + n->FrameOffsetX,
-                                      vScreen[Z].Y + n.Location.Y + n->FrameOffsetY,
-                                      n.Location.Width,
-                                      n.Location.Height,
-                                      GFXNPC[n.Type], 0, n.Frame * n.Location.Height);
+                XRender::renderTextureBasic(camX + s_round2int(n.Location.X) + n->FrameOffsetX,
+                                      camY + s_round2int(n.Location.Y) + n->FrameOffsetY,
+                                      (int)n.Location.Width,
+                                      (int)n.Location.Height,
+                                      GFXNPC[n.Type], 0, n.Frame * (int)n.Location.Height);
             }
             else
             {
                 if(n.Type == NPCID_ITEM_BUBBLE && n.Special > 0)
                 {
+                    int dW, dH;
                     if(NPCWidthGFX(n.Special) == 0)
                     {
-                        tempLocation.Width = NPCWidth(n.Special);
-                        tempLocation.Height = NPCHeight(n.Special);
+                        dW = NPCWidth(n.Special);
+                        dH = NPCHeight(n.Special);
                     }
                     else
                     {
-                        tempLocation.Width = NPCWidthGFX(n.Special);
-                        tempLocation.Height = NPCHeightGFX(n.Special);
+                        dW = NPCWidthGFX(n.Special);
+                        dH = NPCHeightGFX(n.Special);
                     }
 
-                    tempLocation.X = n.Location.X + n.Location.Width / 2 - tempLocation.Width / 2;
-                    tempLocation.Y = n.Location.Y + n.Location.Height / 2 - tempLocation.Height / 2;
+                    int sX = s_round2int(n.Location.X + n.Location.Width / 2) - dW / 2;
+                    int sY = s_round2int(n.Location.Y + n.Location.Height / 2) - dH / 2;
                     B = EditorNPCFrame(NPCID(n.Special), n.Direction);
 
-                    XRender::renderTexture(vScreen[Z].X + tempLocation.X + n->FrameOffsetX,
-                                          vScreen[Z].Y + tempLocation.Y,
-                                          tempLocation.Width, tempLocation.Height,
-                                          GFXNPC[n.Special], 0, B * tempLocation.Height);
+                    XRender::renderTextureBasic(camX + sX + n->FrameOffsetX,
+                                          camY + sY,
+                                          dW, dH,
+                                          GFXNPC[n.Special], 0, B * dH);
                 }
 
-                XRender::renderTexture(vScreen[Z].X + n.Location.X + n->FrameOffsetX - n->WidthGFX / 2 + n.Location.Width / 2,
-                                      vScreen[Z].Y + n.Location.Y + n->FrameOffsetY - n->HeightGFX + n.Location.Height,
+                XRender::renderTextureBasic(camX + s_round2int(n.Location.X + n.Location.Width / 2) + n->FrameOffsetX - n->WidthGFX / 2,
+                                      camY + s_round2int(n.Location.Y + n.Location.Height) + n->FrameOffsetY - n->HeightGFX,
                                       n->WidthGFX, n->HeightGFX, GFXNPC[n.Type],
                                       0, n.Frame * n->HeightGFX);
             }
 
-            // render NPC inside container
-            if((CommonFrame % 46) <= 30 && (n.Type == NPCID_ITEM_BURIED || n.Type == NPCID_ITEM_POD)
-                && (n.Special > 0))
-            {
-                if(vScreenCollision(Z, n.Location))
-                {
-                    NPCID C = NPCID(n.Special);
-                    if(NPCWidthGFX(C) == 0)
-                    {
-                        tempLocation.Height = NPCHeight(C);
-                        tempLocation.Width = NPCWidth(C);
-                    }
-                    else
-                    {
-                        tempLocation.Height = NPCHeightGFX(C);
-                        tempLocation.Width = NPCWidthGFX(C);
-                    }
-
-                    if(n.Type == NPCID_ITEM_POD)
-                        tempLocation.Y = n.Location.Y + n.Location.Height - tempLocation.Height;
-                    else
-                        tempLocation.Y = n.Location.Y;
-
-                    tempLocation.X = n.Location.X + n.Location.Width / 2 - tempLocation.Width / 2;
-
-                    vbint_t tempDirection = -1;
-
-                    XRender::renderTexture(vScreen[Z].X + tempLocation.X + NPCFrameOffsetX(C),
-                        vScreen[Z].Y + tempLocation.Y + NPCFrameOffsetY(C),
-                        tempLocation.Width, tempLocation.Height,
-                        GFXNPC[C], 0, EditorNPCFrame(C, tempDirection) * tempLocation.Height);
-                }
-            }
-
-            // new: indicate that NPCs have events
-            if(n.TriggerActivate != EVENT_NONE || n.TriggerTalk != EVENT_NONE || n.TriggerDeath != EVENT_NONE || n.TriggerLast != EVENT_NONE)
-            {
-                if(n.Text == STRINGINDEX_NONE)
-                    tempLocation.X = n.Location.X + n.Location.Width / 2 - GFX.Chat.w / 2;
-                else
-                    tempLocation.X = n.Location.X + n.Location.Width / 2 - 4 - GFX.Chat.w;
-                tempLocation.Y = n.Location.Y - GFX.Chat.h - 8;
-
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, XTColorF(1., 0., 0., 0.7f));
-            }
-
-            // and that they can talk
-            if(n.Text != STRINGINDEX_NONE)
-            {
-                if(!(n.TriggerActivate != EVENT_NONE || n.TriggerTalk != EVENT_NONE || n.TriggerDeath != EVENT_NONE || n.TriggerLast != EVENT_NONE))
-                    tempLocation.X = n.Location.X + n.Location.Width / 2 - GFX.Chat.w / 2;
-                else
-                    tempLocation.X = n.Location.X + n.Location.Width / 2 + 4;
-                tempLocation.Y = n.Location.Y - GFX.Chat.h - 8;
-
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, XTColorF(1., 1., 1., 0.7f));
-            }
+            s_drawNpcExtra(Z, camX, camY, n);
         }
         else if(EditorCursor.Mode == OptCursor_t::LVL_WATER) // Water
-        {
-            if(EditorCursor.Water.Quicksand)
-                XRender::renderRect(vScreen[Z].X + EditorCursor.Location.X, vScreen[Z].Y + EditorCursor.Location.Y, EditorCursor.Location.Width, EditorCursor.Location.Height,
-                    XTColorF(1.f, 1.f, 0.f, 1.f), false);
-            else
-                XRender::renderRect(vScreen[Z].X + EditorCursor.Location.X, vScreen[Z].Y + EditorCursor.Location.Y, EditorCursor.Location.Width, EditorCursor.Location.Height,
-                    XTColorF(0.f, 1.f, 1.f, 1.f), false);
-        }
+            s_drawWaterBox(camX, camY, EditorCursor.Water);
         else if(EditorCursor.Mode == OptCursor_t::LVL_WARPS)
         {
-            XRender::renderRect(vScreen[Z].X + EditorCursor.Location.X, vScreen[Z].Y + EditorCursor.Location.Y, EditorCursor.Location.Width, EditorCursor.Location.Height,
+            XRender::renderRect(camX + s_round2int(EditorCursor.Location.X), camY + s_round2int(EditorCursor.Location.Y), (int)EditorCursor.Location.Width, (int)EditorCursor.Location.Height,
                 XTColorF(1.f, 0.f, 0.f, 1.f), false);
         }
 
@@ -865,7 +768,7 @@ void DrawEditorWorld()
         XRender::renderTextureBasic(X, Y, GFX.ECursor[2]);
 
         // show coordinates of nearby level for help making warps
-        for(WorldLevel_t* t : treeWorldLevelQuery(newLoc(EditorCursor.Location.X, EditorCursor.Location.Y, 1, 1), SORTMODE_NONE))
+        for(WorldLevel_t* t : treeWorldLevelQuery(TinyLocation_t{(int)EditorCursor.Location.X, (int)EditorCursor.Location.Y, 1, 1}, SORTMODE_NONE))
         {
             WorldLevel_t &lvl = *t;
             if(CursorCollision(EditorCursor.Location, lvl.Location))

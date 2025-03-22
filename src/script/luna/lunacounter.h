@@ -48,8 +48,6 @@ struct DeathCounter
     void Recount();
     void ClearRecords();
 
-    void PrintDebug() const;
-
     struct CachedPrint
     {
         // Cache meta-data for counter

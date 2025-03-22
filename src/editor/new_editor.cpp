@@ -140,13 +140,18 @@ int e_CursorX, e_CursorY;
 void DisableCursorNew()
 {
     EditorCursor.Location.X = vScreen[1].X - 800;
-    EditorCursor.X = float(vScreen[1].X - 800);
+    EditorCursor.X = (int)EditorCursor.Location.X;
     EditorCursor.Location.Y = vScreen[1].Y - 600;
-    EditorCursor.Y = float(vScreen[1].Y - 600);
+    EditorCursor.Y = (int)EditorCursor.Location.Y;
     HasCursor = false;
 
     e_CursorX = -50;
     e_CursorY = -50;
+}
+
+static void s_fix_mouse_pos()
+{
+    MouseMove((int)SharedCursor.X, (int)SharedCursor.Y);
 }
 
 // static const std::vector<std::string> list_backgrounds_names = {"None", "Set 1", "Underground", "Night", "Night 2", "Overworld", "Castle", "Mushrooms", "Desert", "", "Set 2", "Trees", "Underground", "Castle", "Clouds", "Night - Hills", "Night - Desert", "Cliff", "Warehouse", "Dungeon", "Set 3", "Blocks", "Hills", "Dungeon", "Pipes", "Bonus", "Clouds", "Desert", "Dungeon 2", "Ship", "Forest", "Battle", "Waterfall", "Tanks", "Final Boss", "Shroom Dealer", "Castle", "Snow Trees", "Clouds 2", "Snow Hills", "Cave", "Cave 2", "Underwater", "World", "Trees", "Mansion", "Forest", "Bonus", "Night", "Cave", "Clouds", "Hills", "Hills 2", "Hills 4", "Hills 3", "Castle", "Castle 2", "Underwater", "Desert Night", "", "Misc.", "Space Base", "Space Ship", "Space Swamp", "Space Crater", "Secret Mine"};
@@ -341,15 +346,15 @@ void SetEditorBlockType(int type)
 {
     if(BlockIsSizable[type])
     {
-        if(EditorCursor.Block.Location.Width < 64.)
-            EditorCursor.Block.Location.Width = 64.;
-        if(EditorCursor.Block.Location.Height < 64.)
-            EditorCursor.Block.Location.Height = 64.;
+        if(EditorCursor.Block.Location.Width < 64)
+            EditorCursor.Block.Location.Width = 64;
+        if(EditorCursor.Block.Location.Height < 64)
+            EditorCursor.Block.Location.Height = 64;
     }
     else
     {
-        EditorCursor.Block.Location.Width = 0.;
-        EditorCursor.Block.Location.Height = 0.;
+        EditorCursor.Block.Location.Width = 0;
+        EditorCursor.Block.Location.Height = 0;
     }
 
     if(type == 5 || type == 88 || type == 193 || type == 224)
@@ -781,7 +786,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 std::string&& prompt = fmt::format_ne(g_editorStrings.phraseTextOf, g_editorStrings.wordNPCGenitive);
                 SetS(EditorCursor.NPC.Text, TextEntryScreen::Run(prompt, GetS(EditorCursor.NPC.Text)));
 
-                MouseMove(SharedCursor.X, SharedCursor.Y);
+                s_fix_mouse_pos();
             }
         }
 
@@ -799,7 +804,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 std::string ai_invalid;
                 const std::string* ai_name = &ai_invalid;
 
-                int index = (int)EditorCursor.NPC.Special;
+                int index = EditorCursor.NPC.Special;
 
                 if(index >= 0 && index < 4)
                 {
@@ -838,7 +843,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 std::string ai_invalid;
                 const std::string* ai_name = &ai_invalid;
 
-                int index = (int)EditorCursor.NPC.Special;
+                int index = EditorCursor.NPC.Special;
 
                 if(index >= 0 && index < 5)
                 {
@@ -886,7 +891,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
         if(EditorCursor.NPC.Type == NPCID_FIRE_CHAIN)
         {
-            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseRadiusIndex, (int)EditorCursor.NPC.Special), 3, e_ScreenW - 200, 220);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseRadiusIndex, EditorCursor.NPC.Special), 3, e_ScreenW - 200, 220);
 
             if(EditorCursor.NPC.Special > 0 && UpdateButton(mode, e_ScreenW - 160 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
                 EditorCursor.NPC.Special --;
@@ -1276,7 +1281,7 @@ void EditorScreen::UpdateEventsScreen(CallMode mode)
                 std::string new_name = TextEntryScreen::Run(g_editorStrings.eventsPromptEventName, Events[e].Name);
                 if(!new_name.empty())
                     RenameEvent((eventindex_t)e, new_name);
-                MouseMove(SharedCursor.X, SharedCursor.Y);
+                s_fix_mouse_pos();
             }
 
             // shift up
@@ -1304,7 +1309,7 @@ void EditorScreen::UpdateEventsScreen(CallMode mode)
             {
                 DisableCursorNew();
                 std::string new_name = TextEntryScreen::Run(g_editorStrings.eventsPromptEventName, "");
-                MouseMove(SharedCursor.X, SharedCursor.Y);
+                s_fix_mouse_pos();
                 if(!new_name.empty() && FindEvent(new_name) == EVENT_NONE)
                 {
                     InitializeEvent(Events[e]);
@@ -1661,12 +1666,12 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         all_set = true;
         for(int s = 0; s <= maxSections; s++)
         {
-            if((int)Events[m_current_event].section[s].position.X == LESet_Nothing)
+            if(Events[m_current_event].section[s].position.X == LESet_Nothing)
             {
                 all_reset = false;
                 all_set = false;
             }
-            else if((int)Events[m_current_event].section[s].position.X == LESet_ResetDefault)
+            else if(Events[m_current_event].section[s].position.X == LESet_ResetDefault)
             {
                 all_set = false;
                 all_keep = false;
@@ -1717,14 +1722,14 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             m_special_page = SPECIAL_PAGE_EVENT_BACKGROUND;
 
         // bounds
-        if(UpdateButton(mode, 150 + 4, e_ScreenH - 40 + 4, GFX.EIcons, (int)es.position.X == LESet_Nothing, 0, 0, 1, 1))
+        if(UpdateButton(mode, 150 + 4, e_ScreenH - 40 + 4, GFX.EIcons, es.position.X == LESet_Nothing, 0, 0, 1, 1))
             es.position.X = LESet_Nothing;
 
-        if(UpdateButton(mode, 250 + 4, e_ScreenH - 40 + 4, GFX.EIcons, (int)es.position.X == LESet_ResetDefault, 0, 32*Icon::x, 32, 32))
+        if(UpdateButton(mode, 250 + 4, e_ScreenH - 40 + 4, GFX.EIcons, es.position.X == LESet_ResetDefault, 0, 32*Icon::x, 32, 32))
             es.position.X = LESet_ResetDefault;
 
-        if(UpdateButton(mode, 350 + 4, e_ScreenH - 40 + 4, GFX.EIcons, (int)es.position.X != LESet_Nothing && (int)es.position.X != LESet_ResetDefault, 0, 32*Icon::subscreen, 32, 32))
-            es.position = static_cast<SpeedlessLocation_t>(level[m_special_subpage-1]);
+        if(UpdateButton(mode, 350 + 4, e_ScreenH - 40 + 4, GFX.EIcons, es.position.X != LESet_Nothing && es.position.X != LESet_ResetDefault, 0, 32*Icon::subscreen, 32, 32))
+            es.position = LevelREAL[m_special_subpage-1];
     }
 
     // autostart (top left)
@@ -1769,7 +1774,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
     {
         DisableCursorNew();
         SetS(Events[m_current_event].Text, TextEntryScreen::Run(g_editorStrings.eventsPromptEventText, GetS(Events[m_current_event].Text)));
-        MouseMove(SharedCursor.X, SharedCursor.Y);
+        s_fix_mouse_pos();
     }
 
     // trigger event (full width, below all)
@@ -1782,7 +1787,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         SuperPrintR(mode, GetE(Events[m_current_event].TriggerEvent).substr(0,19), 3, 54, 240);
 
         if(Events[m_current_event].TriggerDelay > 0)
-            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseDelayIsMs, 100 * (int)Events[m_current_event].TriggerDelay), 3, 54, 272);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseDelayIsMs, 100 * Events[m_current_event].TriggerDelay), 3, 54, 272);
         else
             SuperPrintR(mode, g_editorStrings.wordInstant, 3, 54, 272);
 
@@ -1800,7 +1805,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
 void UpdateStartLevelEventBounds()
 {
     Events[0].AutoSection = 0;
-    Events[0].section[0].position = static_cast<SpeedlessLocation_t>(level[0]);
+    Events[0].section[0].position = LevelREAL[0];
 
     // not sure why 800 is also used for height in the default code, but I will stick with it.
     if(Events[0].AutoX < 0)
@@ -1821,7 +1826,7 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
     {
         DisableCursorNew();
         LevelName = TextEntryScreen::Run(g_editorStrings.levelName, LevelName);
-        MouseMove(SharedCursor.X, SharedCursor.Y);
+        s_fix_mouse_pos();
     }
 
     SuperPrintR(mode, g_editorStrings.levelName, 3, 54, 42);
@@ -2217,7 +2222,7 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
     {
         DisableCursorNew();
         WorldName = TextEntryScreen::Run(g_editorStrings.worldName, WorldName);
-        MouseMove((float)SharedCursor.X, (float)SharedCursor.Y);
+        s_fix_mouse_pos();
     }
 
     SuperPrintR(mode, g_editorStrings.worldName, 3, 54, 42);
@@ -2289,7 +2294,7 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
     {
         DisableCursorNew();
         WorldCredits[m_special_subpage + 1] = TextEntryScreen::Run(fmt::format_ne(g_editorStrings.worldCreditIndex, m_special_subpage + 1), WorldCredits[m_special_subpage + 1]);
-        MouseMove((float)SharedCursor.X, (float)SharedCursor.Y);
+        s_fix_mouse_pos();
         for(int i = SDL_max(numWorldCredits, m_special_subpage + 1); i > 0; --i) // Find the last non-empty line
         {
             if(!WorldCredits[m_special_subpage + 1].empty())
@@ -2713,7 +2718,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
     {
         // delay selector, instead of page selector
         if(Events[m_current_event].TriggerDelay > 0)
-            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseDelayIsMs, 100 * (int)Events[m_current_event].TriggerDelay), 3, e_ScreenW - 240 + 4, 272);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseDelayIsMs, 100 * Events[m_current_event].TriggerDelay), 3, e_ScreenW - 240 + 4, 272);
         else
             SuperPrintR(mode, g_editorStrings.wordInstant, 3, e_ScreenW - 240 + 4, 272);
 
@@ -2818,7 +2823,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
     {
         // trigger after current event is a special case
         std::string descFormatted = (m_special_page == SPECIAL_PAGE_EVENT_TRIGGER)
-            ? fmt::format(g_editorStrings.eventsDescPhraseTriggersAfterTemplate, event_name, (int)Events[m_current_event].TriggerDelay * 100, Events[m_current_event].Name)
+            ? fmt::format(g_editorStrings.eventsDescPhraseTriggersAfterTemplate, event_name, Events[m_current_event].TriggerDelay * 100, Events[m_current_event].Name)
             : fmt::format(g_editorStrings.eventsDescPhraseTriggersWhenTemplate, event_name, event_desc);
 
         FontManager::printTextOptiPx(descFormatted,
@@ -3082,7 +3087,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
                     std::string new_name = TextEntryScreen::Run(g_editorStrings.layersPromptLayerName, Layer[l].Name);
                     if(!new_name.empty())
                         RenameLayer(l, new_name);
-                    MouseMove((float)SharedCursor.X, (float)SharedCursor.Y);
+                    s_fix_mouse_pos();
                 }
 
                 // shift up
@@ -3164,7 +3169,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
                     numLayers ++;
                 }
 
-                MouseMove((float)SharedCursor.X, (float)SharedCursor.Y);
+                s_fix_mouse_pos();
             }
         }
     }
@@ -3371,7 +3376,7 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
 
 bool EditorScreen::UpdateBGOButton(CallMode mode, int x, int y, int type, bool sel)
 {
-    return UpdateButton(mode, x, y, GFXBackgroundBMP[type], sel, 0, BackgroundFrame[type] * BackgroundHeight[type], GFXBackgroundWidth[type], BackgroundHeight[type]);
+    return UpdateButton(mode, x, y, GFXBackgroundBMP[type], sel, 0, BackgroundFrame[type] * BackgroundHeight[type], GFXBackground[type].w, BackgroundHeight[type]);
 }
 
 void EditorScreen::UpdateBGO(CallMode mode, int x, int y, int type)
@@ -3825,12 +3830,12 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             {
                 EditorCursor.Warp.cannonExit = !EditorCursor.Warp.cannonExit;
                 if(!EditorCursor.Warp.cannonExit)
-                    EditorCursor.Warp.cannonExitSpeed = Warp_t().cannonExitSpeed;
+                    EditorCursor.Warp.cannonExitSpeed = 0;
             }
 
             if(EditorCursor.Warp.cannonExit)
             {
-                SuperPrintR(mode, g_editorStrings.warpSpeed + std::to_string(vb6Round(EditorCursor.Warp.cannonExitSpeed)), 3, 26, 394);
+                SuperPrintR(mode, g_editorStrings.warpSpeed + std::to_string(EditorCursor.Warp.cannonExitSpeed), 3, 26, 394);
                 if(EditorCursor.Warp.cannonExitSpeed > 1 && UpdateButton(mode, 180 + 4, 380 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
                     EditorCursor.Warp.cannonExitSpeed --;
                 if(EditorCursor.Warp.cannonExitSpeed <= 31 && UpdateButton(mode, 220 + 4, 380 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
@@ -3864,7 +3869,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             {
                 DisableCursorNew();
                 SetS(EditorCursor.Warp.StarsMsg, TextEntryScreen::Run(g_editorStrings.warpStarLockMessage, GetS(EditorCursor.Warp.StarsMsg)));
-                MouseMove(SharedCursor.X, SharedCursor.Y);
+                s_fix_mouse_pos();
             }
         }
 
@@ -3968,10 +3973,10 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             // map warp!
             SuperPrintR(mode, g_editorStrings.mapPos, 3, 44, 302);
 
-            if((int)EditorCursor.Warp.MapX != -1 || (int)EditorCursor.Warp.MapY != -1)
+            if(EditorCursor.Warp.MapX != -1 || EditorCursor.Warp.MapY != -1)
             {
-                SuperPrintR(mode, g_editorStrings.letterCoordX + ": " + std::to_string((int)EditorCursor.Warp.MapX), 3, 4, 320);
-                SuperPrintR(mode, g_editorStrings.letterCoordY + ": " + std::to_string((int)EditorCursor.Warp.MapY), 3, 4, 340);
+                SuperPrintR(mode, g_editorStrings.letterCoordX + ": " + std::to_string(EditorCursor.Warp.MapX), 3, 4, 320);
+                SuperPrintR(mode, g_editorStrings.letterCoordY + ": " + std::to_string(EditorCursor.Warp.MapY), 3, 4, 340);
             }
             else
             {
@@ -3980,29 +3985,29 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
 
             if(UpdateButton(mode, 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
             {
-                EditorCursor.Warp.MapY = 32*((int)EditorCursor.Warp.MapY/32 - 1);
-                if((int)EditorCursor.Warp.MapX == -1)
+                EditorCursor.Warp.MapY = 32*(EditorCursor.Warp.MapY/32 - 1);
+                if(EditorCursor.Warp.MapX == -1)
                     EditorCursor.Warp.MapX = 0.;
             }
 
             if(UpdateButton(mode, 40 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
             {
-                EditorCursor.Warp.MapY = 32*((int)EditorCursor.Warp.MapY/32 + 1);
-                if((int)EditorCursor.Warp.MapX == -1)
+                EditorCursor.Warp.MapY = 32*(EditorCursor.Warp.MapY/32 + 1);
+                if(EditorCursor.Warp.MapX == -1)
                     EditorCursor.Warp.MapX = 0.;
             }
 
             if(UpdateButton(mode, 80 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             {
-                EditorCursor.Warp.MapX = 32*((int)EditorCursor.Warp.MapX/32 - 1);
-                if((int)EditorCursor.Warp.MapY == -1)
+                EditorCursor.Warp.MapX = 32*(EditorCursor.Warp.MapX/32 - 1);
+                if(EditorCursor.Warp.MapY == -1)
                     EditorCursor.Warp.MapY = 0.;
             }
 
             if(UpdateButton(mode, 120 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
             {
-                EditorCursor.Warp.MapX = 32*((int)EditorCursor.Warp.MapX/32 + 1);
-                if((int)EditorCursor.Warp.MapY == -1)
+                EditorCursor.Warp.MapX = 32*(EditorCursor.Warp.MapX/32 + 1);
+                if(EditorCursor.Warp.MapY == -1)
                     EditorCursor.Warp.MapY = 0.;
             }
         }
@@ -4207,10 +4212,10 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
     // map warp!
     SuperPrintR(mode, g_editorStrings.mapPos, 3, e_ScreenW - 240 + 44, 302);
 
-    if((int)EditorCursor.WorldLevel.WarpX != -1 || (int)EditorCursor.WorldLevel.WarpY != -1)
+    if(EditorCursor.WorldLevel.WarpX != -1 || EditorCursor.WorldLevel.WarpY != -1)
     {
-        SuperPrintR(mode, g_editorStrings.letterCoordX + ": " + std::to_string((int)EditorCursor.WorldLevel.WarpX), 3, e_ScreenW - 240 + 4, 320);
-        SuperPrintR(mode, g_editorStrings.letterCoordY + ": " + std::to_string((int)EditorCursor.WorldLevel.WarpY), 3, e_ScreenW - 240 + 4, 340);
+        SuperPrintR(mode, g_editorStrings.letterCoordX + ": " + std::to_string(EditorCursor.WorldLevel.WarpX), 3, e_ScreenW - 240 + 4, 320);
+        SuperPrintR(mode, g_editorStrings.letterCoordY + ": " + std::to_string(EditorCursor.WorldLevel.WarpY), 3, e_ScreenW - 240 + 4, 340);
         if(UpdateButton(mode, e_ScreenW - 240 + 160 + 4, 320 + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
         {
             EditorCursor.WorldLevel.WarpX = -1;
@@ -4224,29 +4229,29 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
 
     if(UpdateButton(mode, e_ScreenW - 240 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
     {
-        EditorCursor.WorldLevel.WarpY = 32*((int)EditorCursor.WorldLevel.WarpY/32 - 1);
-        if((int)EditorCursor.WorldLevel.WarpX == -1)
+        EditorCursor.WorldLevel.WarpY = 32*(EditorCursor.WorldLevel.WarpY/32 - 1);
+        if(EditorCursor.WorldLevel.WarpX == -1)
             EditorCursor.WorldLevel.WarpX = 0.;
     }
 
     if(UpdateButton(mode, e_ScreenW - 240 + 40 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
     {
-        EditorCursor.WorldLevel.WarpY = 32*((int)EditorCursor.WorldLevel.WarpY/32 + 1);
-        if((int)EditorCursor.WorldLevel.WarpX == -1)
+        EditorCursor.WorldLevel.WarpY = 32*(EditorCursor.WorldLevel.WarpY/32 + 1);
+        if(EditorCursor.WorldLevel.WarpX == -1)
             EditorCursor.WorldLevel.WarpX = 0.;
     }
 
     if(UpdateButton(mode, e_ScreenW - 240 + 80 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
     {
-        EditorCursor.WorldLevel.WarpX = 32*((int)EditorCursor.WorldLevel.WarpX/32 - 1);
-        if((int)EditorCursor.WorldLevel.WarpY == -1)
+        EditorCursor.WorldLevel.WarpX = 32*(EditorCursor.WorldLevel.WarpX/32 - 1);
+        if(EditorCursor.WorldLevel.WarpY == -1)
             EditorCursor.WorldLevel.WarpY = 0.;
     }
 
     if(UpdateButton(mode, e_ScreenW - 240 + 120 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
     {
-        EditorCursor.WorldLevel.WarpX = 32*((int)EditorCursor.WorldLevel.WarpX/32 + 1);
-        if((int)EditorCursor.WorldLevel.WarpY == -1)
+        EditorCursor.WorldLevel.WarpX = 32*(EditorCursor.WorldLevel.WarpX/32 + 1);
+        if(EditorCursor.WorldLevel.WarpY == -1)
             EditorCursor.WorldLevel.WarpY = 0.;
     }
 
@@ -4264,7 +4269,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
     {
         DisableCursorNew();
         EditorCursor.WorldLevel.LevelName = TextEntryScreen::Run(g_editorStrings.levelName, EditorCursor.WorldLevel.LevelName);
-        MouseMove(SharedCursor.X, SharedCursor.Y);
+        s_fix_mouse_pos();
     }
 
     // level filename - FileName
@@ -4953,7 +4958,7 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
             {
                 DisableCursorNew();
                 std::string folder_name = TextEntryScreen::Run(g_editorStrings.browserItemNewFolder, "");
-                MouseMove(SharedCursor.X, SharedCursor.Y);
+                s_fix_mouse_pos();
 
                 if(!folder_name.empty() && !m_dirman.exists(folder_name))
                 {
@@ -4987,7 +4992,7 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
             {
                 DisableCursorNew();
                 std::string file_name = TextEntryScreen::Run(g_editorStrings.fileCommandSaveAs, "");
-                MouseMove(SharedCursor.X, SharedCursor.Y);
+                s_fix_mouse_pos();
 
                 if(!file_name.empty())
                 {

@@ -361,8 +361,8 @@ void Do()
             PlaySoundMenu(SFX_Do);
             GameMenu = false;
             GameOutro = true;
-            CreditChop = XRender::TargetH / 2;
-            EndCredits = 0;
+
+            // these is here only to prevent the screen from looking strange
             SetupCredits();
             return;
         }
@@ -637,7 +637,7 @@ bool Mouse_Render(bool mouse, bool render)
         if(SharedCursor.X < sX || SharedCursor.X >= sX + width / 2)
             return false;
 
-        int cur_mouse_line = (SharedCursor.Y - sY) / line;
+        int cur_mouse_line = ((int)SharedCursor.Y - sY) / line;
         int cur_mouse_item = cur_scroll + cur_mouse_line - first_display_row;
 
         if(SharedCursor.Primary && cur_mouse_item == (int)cur_item && MenuMouseRelease)

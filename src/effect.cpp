@@ -106,7 +106,7 @@ void UpdateEffects()
         }
         else if(e.Type == EFFID_FIRE_DISK_DIE) // RotoDisk
         {
-            if(e.Location.SpeedX != 0.0 || e.Location.SpeedY != 0.0)
+            if(e.Location.SpeedX != 0 || e.Location.SpeedY != 0)
                 e.Location.SpeedY += 0.5;
             e.Frame += 1;
             if(e.Frame >= 5)
@@ -216,7 +216,7 @@ void UpdateEffects()
                 e.Frame = 0;
             }
             e.Location.Y -= 2;
-            e.Location.X += dRand() * 2.0 - 1.0;
+            e.Location.X += dRand() * 2 - 1;
         }
         else if(e.Type == EFFID_ITEM_POD_BREAK) // egg shells
         {
@@ -386,11 +386,7 @@ void UpdateEffects()
         else if(e.Type == EFFID_COIN_SWITCH_PRESS || e.Type == EFFID_TIME_SWITCH_PRESS || e.Type == EFFID_TNT_PRESS) // P Switch
         {
             if(e.Life == 1)
-            {
-                e.Location.X += e.Location.Width / 2.0 - EffectWidth[10] / 2.0;
-                e.Location.Y += e.Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(EFFID_SMOKE_S3, e.Location);
-            }
+                NewEffect(EFFID_SMOKE_S3_CENTER, e.Location);
         }
         else if(e.Type == EFFID_SKID_DUST) // Slide Smoke
         {
@@ -430,19 +426,19 @@ void UpdateEffects()
             {
                 e.Frame = 6;
                 // NOTE: The same behavior at VB6 code: just checks the boolean expression and writes 0 or -1
-                e.Location.SpeedY = (e.Location.SpeedY == 0.0) ? 0.0 : -1.0;
+                e.Location.SpeedY = (e.Location.SpeedY == 0) ? 0 : -1;
             }
             else if(e.Life <= 4)
             {
                 e.Frame = 5;
                 // NOTE: The same behavior at VB6 code: just checks the boolean expression and writes 0 or -1
-                e.Location.SpeedY = (e.Location.SpeedY == 0.0) ? 0.0 : -1.0;
+                e.Location.SpeedY = (e.Location.SpeedY == 0) ? 0 : -1;
             }
             else if(e.Life <= 6)
             {
                 e.Frame = 4;
                 // NOTE: The same behavior at VB6 code: just checks the boolean expression and writes 0 or -1
-                e.Location.SpeedY = (e.Location.SpeedY == 0.0) ? 0.0 : -1.0;
+                e.Location.SpeedY = (e.Location.SpeedY == 0) ? 0 : -1;
             }
             else
             {
@@ -560,7 +556,7 @@ void UpdateEffects()
 
                     nn.Location.Height = nn->THeight;
                     nn.Location.Width = nn->TWidth;
-                    nn.Location.X = e.Location.X + e.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+                    nn.Location.X = e.Location.X + (e.Location.Width - NPC[numNPCs].Location.Width) / 2;
                     nn.Location.Y = e.Location.Y - 1;
                     nn.Location.SpeedY = -6;
 
@@ -730,7 +726,7 @@ void UpdateEffects()
             else if(e.FrameCount == 30)
             {
                 e.Life = 0;
-                if(!LevelEditor && e.NewNpc != 96)
+                if(!LevelEditor && e.NewNpc != NPCID_ITEM_POD)
                 {
                     if(NPCIsYoshi(e.NewNpc))
                         NewEffect(EFFID_PET_BIRTH, e.Location, 1, e.NewNpc);
@@ -747,7 +743,7 @@ void UpdateEffects()
                         nn.Location.Height = nn->THeight;
                         nn.Location.Width = nn->TWidth;
                         nn.Location.Y += 32 - nn.Location.Height;
-                        nn.Location.X += -nn.Location.Width / 2.0 + 16;
+                        nn.Location.X += -nn.Location.Width / 2 + 16;
 
                         if(nn.Type == NPCID_LEAF_POWER)
                             nn.Location.SpeedY = -6;
@@ -812,19 +808,19 @@ void UpdateEffects()
                 CheckSectionNPC(numNPCs);
             }
 
-            if(e.NewNpc == 98)
+            if(e.NewNpc == NPCID_PET_BLUE)
                 e.Frame += 2;
-            else if(e.NewNpc == 99)
+            else if(e.NewNpc == NPCID_PET_YELLOW)
                 e.Frame += 4;
-            else if(e.NewNpc == 100)
+            else if(e.NewNpc == NPCID_PET_RED)
                 e.Frame += 6;
-            else if(e.NewNpc == 148)
+            else if(e.NewNpc == NPCID_PET_BLACK)
                 e.Frame += 8;
-            else if(e.NewNpc == 149)
+            else if(e.NewNpc == NPCID_PET_PURPLE)
                 e.Frame += 10;
-            else if(e.NewNpc == 150)
+            else if(e.NewNpc == NPCID_PET_PINK)
                 e.Frame += 12;
-            else if(e.NewNpc == 228)
+            else if(e.NewNpc == NPCID_PET_CYAN)
                 e.Frame += 14;
         }
         else if(e.Type == EFFID_SCORE)
@@ -895,18 +891,18 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             }
             else if(B == 2)
             {
-                ne.Location.X = Location.X + Location.Width / 2.0;
+                ne.Location.X = Location.X + Location.Width / 2;
                 ne.Location.Y = Location.Y;
             }
             else if(B == 3)
             {
                 ne.Location.X = Location.X;
-                ne.Location.Y = Location.Y + Location.Height / 2.0;
+                ne.Location.Y = Location.Y + Location.Height / 2;
             }
             else
             {
-                ne.Location.X = Location.X + Location.Width / 2.0;
-                ne.Location.Y = Location.Y + Location.Height / 2.0;
+                ne.Location.X = Location.X + Location.Width / 2;
+                ne.Location.Y = Location.Y + Location.Height / 2;
             }
         }
     }
@@ -924,7 +920,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.FrameCount = 0;
         ne.Life = 160;
         ne.Type = A;
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
         PlaySoundSpatial(SFX_MagicBossKilled, Location);
     }
@@ -937,9 +933,9 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         if(ne.NewNpc == 96)
             ne.NewNpc = 0;
         if(Direction == -1)
-            ne.Location.X = Location.X + Location.Width / 2.0 + 16 + 48 * Direction;
+            ne.Location.X = Location.X + Location.Width / 2 + 16 + 48 * Direction;
         else
-            ne.Location.X = Location.X + Location.Width / 2.0 + 16; // + 48 * Direction
+            ne.Location.X = Location.X + Location.Width / 2 + 16; // + 48 * Direction
 
         ne.Location.Y = Location.Y;
         ne.Location.Width = 32;
@@ -1006,7 +1002,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.NewNpc = NewNpc;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
         ne.Location.SpeedX = 0;
         ne.Location.SpeedY = 0;
@@ -1054,8 +1050,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
 
             if(B == 1 || B == 3)
                 ne.Location.SpeedX = -ne.Location.SpeedX;
-            ne.Location.SpeedX += ((dRand() * 0.5) - 0.25);
-            ne.Location.SpeedY += ((dRand() * 1) - 0.5);
+            ne.Location.SpeedX += (dRand() / 2 - 0.25);
+            ne.Location.SpeedY += (dRand() - 0.5);
             if(B == 1)
                 ne.Frame = 0;
             else if(B == 2)
@@ -1074,18 +1070,18 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             }
             else if(B == 2)
             {
-                ne.Location.X = Location.X + Location.Width / 2.0;
+                ne.Location.X = Location.X + Location.Width / 2;
                 ne.Location.Y = Location.Y;
             }
             else if(B == 3)
             {
                 ne.Location.X = Location.X;
-                ne.Location.Y = Location.Y + Location.Height / 2.0;
+                ne.Location.Y = Location.Y + Location.Height / 2;
             }
             else
             {
-                ne.Location.X = Location.X + Location.Width / 2.0;
-                ne.Location.Y = Location.Y + Location.Height / 2.0;
+                ne.Location.X = Location.X + Location.Width / 2;
+                ne.Location.Y = Location.Y + Location.Height / 2;
             }
         }
     }
@@ -1124,7 +1120,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
         ne.Location.SpeedY = 0;
         ne.Location.SpeedX = 0;
@@ -1204,8 +1200,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = 64;
         ne.Location.Height = 64;
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
-        ne.Location.Y = Location.Y + Location.Height / 2.0 - ne.Location.Height / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+        ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
         ne.Location.SpeedY = 0;
         ne.Location.SpeedX = 0;
         ne.Frame = 0;
@@ -1235,8 +1231,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X - ne.Location.Width * 0.5 + Location.Width * 0.5;
-        ne.Location.Y = Location.Y - ne.Location.Height * 0.5 + Location.Height * 0.5;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+        ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
         ne.Location.SpeedY = -11;
         ne.Location.SpeedX = 0;
         ne.Frame = 0;
@@ -1256,8 +1252,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[ne.Type];
         ne.Location.Height = EffectHeight[ne.Type];
-        ne.Location.X = Location.X - ne.Location.Width * 0.5 + Location.Width * 0.5;
-        ne.Location.Y = Location.Y - ne.Location.Height * 0.5 + Location.Height * 0.5;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+        ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
         ne.Location.X += dRand() * 32 - 16;
         ne.Location.Y += dRand() * 32 - 16;
         ne.Location.SpeedY = -2;
@@ -1277,14 +1273,14 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
                 ne.Type = A;
                 ne.Location.Width = EffectWidth[A];
                 ne.Location.Height = EffectHeight[A];
-                ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
-                ne.Location.Y = Location.Y + Location.Height / 2.0 - ne.Location.Height / 2.0;
+                ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+                ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
                 // ne.Location.SpeedY = -0; // Assigned below
                 // ne.Location.SpeedX = 0; // Assigned below
                 ne.Life = 15;
 
-                ne.Location.SpeedX = 3 * 0.8;
-                ne.Location.SpeedY = 1.5 * 0.8;
+                ne.Location.SpeedX = 2.4; // 3 * 0.8;
+                ne.Location.SpeedY = 1.2; // 1.5 * 0.8;
 
                 if(B == 1 || B == 2)
                     ne.Location.SpeedY = -ne.Location.SpeedY;
@@ -1307,8 +1303,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
                 ne.Type = A;
                 ne.Location.Width = EffectWidth[A];
                 ne.Location.Height = EffectHeight[A];
-                ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
-                ne.Location.Y = Location.Y + Location.Height / 2.0 - ne.Location.Height / 2.0;
+                ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+                ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
                 ne.Life = 8;
                 ne.Location.SpeedX = 2;
                 ne.Location.SpeedY = 2;
@@ -1329,8 +1325,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = 16;
         ne.Location.Height = 16;
-        ne.Location.X = Location.X - ne.Location.Width * 0.5 + Location.Width * 0.5;
-        ne.Location.Y = Location.Y - ne.Location.Height * 0.5 + Location.Height * 0.5;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+        ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
         ne.Location.SpeedY = -0;
         ne.Location.SpeedX = 0;
         ne.Frame = 0;
@@ -1349,21 +1345,21 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
                 ne.Shadow = Shadow;
                 ne.Location.Width = EffectWidth[A];
                 ne.Location.Height = EffectHeight[A];
-                ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
-                ne.Location.Y = Location.Y + Location.Height / 2.0 - ne.Location.Height / 2.0;
+                ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+                ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
                 ne.Location.SpeedY = -0;
                 ne.Location.SpeedX = 0;
                 ne.Life = 10;
                 if(B == 1 || B == 3 || B == 4 || B == 6)
                 {
-                    ne.Location.SpeedY = 3.5;
-                    ne.Location.SpeedX = 2;
+                    ne.Location.SpeedY = 1.75; // 3.5 * 0.5
+                    ne.Location.SpeedX = 1; // 2 * 0.5
                 }
                 else
                 {
                     ne.Life = 11;
                     ne.Location.SpeedY = 0;
-                    ne.Location.SpeedX = 4;
+                    ne.Location.SpeedX = 2; // 4 * 0.5
                 }
 
                 if(B <= 3)
@@ -1376,8 +1372,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
                     ne.Location.SpeedX = ne.Location.SpeedY;
                     ne.Location.SpeedY = tempDoub;
                 }
-                ne.Location.SpeedX = ne.Location.SpeedX * 0.5;
-                ne.Location.SpeedY = ne.Location.SpeedY * 0.5;
+                // ne.Location.SpeedX = ne.Location.SpeedX * 0.5;
+                // ne.Location.SpeedY = ne.Location.SpeedY * 0.5;
 
                 ne.Location.X += ne.Location.SpeedX * 3;
                 ne.Location.Y += ne.Location.SpeedY * 3;
@@ -1407,14 +1403,14 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
                 ne.Life = 13;
                 if(B == 1 || B == 3 || B == 4 || B == 6)
                 {
-                    ne.Location.SpeedY = 3;
-                    ne.Location.SpeedX = 2;
+                    ne.Location.SpeedY = 4.5; // 3 * 1.5
+                    ne.Location.SpeedX = 3; // 2 * 1.5
                     ne.Life = 14;
                 }
                 else
                 {
                     ne.Location.SpeedY = 0;
-                    ne.Location.SpeedX = 4;
+                    ne.Location.SpeedX = 6; // 4 * 1.5
                 }
 
                 if(B <= 3)
@@ -1427,8 +1423,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
                     ne.Location.SpeedX = ne.Location.SpeedY;
                     ne.Location.SpeedY = tempDoub;
                 }
-                ne.Location.SpeedX = ne.Location.SpeedX * 1.5;
-                ne.Location.SpeedY = ne.Location.SpeedY * 1.5;
+                // ne.Location.SpeedX = ne.Location.SpeedX * 1.5;
+                // ne.Location.SpeedY = ne.Location.SpeedY * 1.5;
                 ne.Frame = Direction;
                 ne.Type = A;
             }
@@ -1463,7 +1459,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
 
         if(fEqual(Location.SpeedY, 0.123))
@@ -1502,8 +1498,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             ne.Shadow = Shadow;
             ne.Location.Width = EffectWidth[A];
             ne.Location.Height = EffectHeight[A];
-            ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
-            ne.Location.Y = Location.Y + Location.Height / 2.0 - ne.Location.Height / 2.0;
+            ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+            ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
             ne.Location.SpeedY = 0;
             ne.Location.SpeedX = 0;
             if(B == 1)
@@ -1519,22 +1515,28 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             ne.Type = A;
         }
     }
-    else if(A == 10 || A == 73 || A == 74 || A == 75 || A == 131 || A == 132 || A == 147) // Puff of smoke
+    else if(A == EFFID_SMOKE_S3_CENTER || A == EFFID_SMOKE_S3 || A == EFFID_WHIP || A == EFFID_SKID_DUST || A == EFFID_WHACK || A == EFFID_SMOKE_S4 || A == EFFID_STOMP_INIT || A == EFFID_SMOKE_S2) // Puff of smoke
     {
         numEffects++;
         auto &ne = Effect[numEffects];
         ne.Shadow = Shadow;
-        ne.Location.Width = EffectWidth[A];
-        ne.Location.Height = EffectHeight[A];
         ne.Location.X = Location.X;
         ne.Location.Y = Location.Y;
+
+        if(A == EFFID_SMOKE_S3_CENTER || A == EFFID_SMOKE_S4)
+        {
+            if(A == EFFID_SMOKE_S3_CENTER)
+                A = EFFID_SMOKE_S3;
+
+            ne.Location.X += (Location.Width - EffectWidth[A]) / 2;
+            ne.Location.Y += (Location.Height - EffectHeight[A]) / 2;
+        }
+
+        ne.Location.Width = EffectWidth[A];
+        ne.Location.Height = EffectHeight[A];
         ne.Location.SpeedY = 0;
         ne.Location.SpeedX = 0;
-        if(A == 132)
-        {
-            ne.Location.Y += dRand() * 16 - 8;
-            ne.Location.X += dRand() * 16 - 8;
-        }
+
         ne.Frame = 0;
         ne.Life = 12;
         ne.Type = A;
@@ -1542,12 +1544,12 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         if(ne.Type == EFFID_SMOKE_S2)
             ne.Life = 24;
 
-        if(A == 73 || A == 75)
+        if(A == EFFID_STOMP_INIT || A == EFFID_WHIP || A == EFFID_WHACK)
         {
             ne.Location.X += dRand() * 16 - 8;
             ne.Location.Y += dRand() * 16 - 8;
         }
-        else if(A == 74)
+        else if(A == EFFID_SKID_DUST)
         {
             ne.Location.X += dRand() * 4 - 2;
             ne.Location.Y += dRand() * 4 - 2;
@@ -1560,8 +1562,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
-        ne.Location.Y = Location.Y + Location.Height / 2.0 - ne.Location.Height / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+        ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
         ne.Location.SpeedY = 0;
         ne.Location.SpeedX = 0;
         ne.Frame = 0;
@@ -1575,8 +1577,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = 48;
         ne.Location.Height = 48;
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
-        ne.Location.Y = Location.Y + Location.Height / 2.0 - ne.Location.Height / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+        ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
         ne.Location.SpeedY = 0;
         ne.Location.SpeedX = 0;
         ne.Frame = 0;
@@ -1590,7 +1592,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = 32;
         ne.Location.Height = 32;
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y - 32;
         ne.Location.SpeedY = -8;
         ne.Location.SpeedX = 0;
@@ -1605,7 +1607,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = 8;
         ne.Location.Height = 8;
-        ne.Location.X = Location.X + 4 + (dRand() * 12.0);
+        ne.Location.X = Location.X + 4 + (dRand() * 12);
         ne.Location.Y = Location.Y + 40;
         // .Location.SpeedY = -8
         ne.Location.SpeedX = 0;
@@ -1655,8 +1657,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + Location.Width / 2.0 - EffectWidth[A] / 2.0 + dRand() * 4 - 2;
-        ne.Location.Y = Location.Y + Location.Height / 2.0 - EffectHeight[A] / 2.0 + dRand() * 4 - 2;
+        ne.Location.X = Location.X + (Location.Width - EffectWidth[A]) / 2 + dRand() * 4 - 2;
+        ne.Location.Y = Location.Y + (Location.Height - EffectHeight[A]) / 2 + dRand() * 4 - 2;
         ne.Location.SpeedY = 0;
         ne.Location.SpeedX = 0;
         ne.Frame = 0;
@@ -1680,8 +1682,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = 16;
         ne.Location.Height = 16;
-        ne.Location.X = Location.X + Location.Width / 2.0 - 4 + dRand() * 4 - 2;
-        ne.Location.Y = Location.Y + Location.Height / 2.0 - 4 + dRand() * 4 - 2;
+        ne.Location.X = Location.X + Location.Width / 2 - 4 + dRand() * 4 - 2;
+        ne.Location.Y = Location.Y + Location.Height / 2 - 4 + dRand() * 4 - 2;
         ne.Location.SpeedY = 0;
         ne.Location.SpeedX = 0;
         ne.Frame = 0;
@@ -1693,9 +1695,9 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         numEffects++;
         auto &ne = Effect[numEffects];
         ne.Shadow = Shadow;
-        ne.Location.Width = EffectWidth[13];
-        ne.Location.Height = EffectHeight[13];
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.Width = EffectWidth[EFFID_LAVA_SPLASH];
+        ne.Location.Height = EffectHeight[EFFID_LAVA_SPLASH];
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + 24;
         ne.Location.SpeedY = -8;
         ne.Location.SpeedX = 0;
@@ -1710,7 +1712,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + 22;
         ne.Location.SpeedY = 0;
         ne.Location.SpeedX = 0;
@@ -1764,8 +1766,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Location.Y = Location.Y;
         ne.Location.SpeedY = Location.SpeedY;
         ne.Location.SpeedX = Location.SpeedX;
-        ne.Location.X += ne.Location.Width / 2.0 - 16;
-        ne.Location.Y += ne.Location.Height / 2.0 - 16;
+        ne.Location.X += ne.Location.Width / 2 - 16;
+        ne.Location.Y += ne.Location.Height / 2 - 16;
         ne.Location.Width = 32;
         ne.Location.Height = 32;
         ne.Frame = 0;
@@ -1805,8 +1807,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = 64;
         ne.Location.Height = 64;
-        ne.Location.X = Location.X + Location.Width / 2.0 - 32;
-        ne.Location.Y = Location.Y + Location.Height / 2.0 - 32;
+        ne.Location.X = Location.X + Location.Width / 2 - 32;
+        ne.Location.Y = Location.Y + Location.Height / 2 - 32;
         ne.Location.SpeedX = 0;
         ne.Location.SpeedY = 0;
         ne.Life = 60;
@@ -1837,7 +1839,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
         ne.Frame = 0;
 
@@ -1887,12 +1889,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
 
         if(A == 91)
         {
-            ne.Location.X += ne.Location.Width / 2.0;
-            ne.Location.Y += ne.Location.Height / 2.0;
-            ne.Location.Width = EffectWidth[A];
-            ne.Location.Height = EffectHeight[A];
-            ne.Location.X += -ne.Location.Width / 2.0;
-            ne.Location.Y += -ne.Location.Height / 2.0;
+            ne.Location.set_width_center(EffectWidth[A]);
+            ne.Location.set_height_center(EffectHeight[A]);
         }
 
         if(ne.Location.SpeedX != 0 && ne.Location.SpeedX > -2 && ne.Location.SpeedX < 2)
@@ -1914,7 +1912,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
 
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
 
         ne.Location.X = Location.X;
@@ -1941,7 +1939,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
         ne.Location.X = Location.X;
         ne.Location.Y = Location.Y;
@@ -1951,6 +1949,17 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Type = A;
         PlaySoundSpatial(SFX_FireBossKilled, Location);
     }
+}
+
+void NewEffect_IceSparkle(const NPC_t& n, Location_t& tempLocation)
+{
+    tempLocation.Height = EffectHeight[EFFID_SPARKLE];
+    tempLocation.Width = EffectWidth[EFFID_SPARKLE];
+    tempLocation.SpeedX = 0;
+    tempLocation.SpeedY = 0;
+    tempLocation.X = n.Location.X - tempLocation.Width / 2 + dRand() * n.Location.Width - 4;
+    tempLocation.Y = n.Location.Y - tempLocation.Height / 2 + dRand() * n.Location.Height - 4;
+    NewEffect(EFFID_SPARKLE, tempLocation, 1, 0, n.Shadow);
 }
 
 // Remove the effect

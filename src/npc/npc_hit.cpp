@@ -68,76 +68,59 @@ void NPCHit(int A, int B, int C)
         if(NPC[C].Type == NPCID_PLR_ICEBALL && NPC[A].Location.Width > 8 && NPC[A].Location.Height > 8)
         {
             if(NPC[A].Type == NPCID_ITEM_BUBBLE)
-                NPCHit(A, 3, B);
+            {
+                if(NPC[3].Type == NPCID_PLR_ICEBALL)
+                {
+                    // FIXME: warn user that game would have crashed
+
+                    if(NPC[0].Type == NPCID_PLR_ICEBALL)
+                        NPC[0].Type = NPCID_PLR_FIREBALL;
+
+                    NPCHit(A, 3, 0);
+                }
+                else
+                {
+                    // B is always 3, this caused a crash if NPC[3].Type was NPCID_PLR_ICEBALL
+                    NPCHit(A, 3, B);
+                }
+            }
 
             if(NPC[A]->NoIceBall || NPC[A].Location.Width > 128 || NPC[A].Location.Height > 128)
                 return;
 
+            bool reset_frame = true;
+
             if(NPC[A].Type == NPCID_RED_FLY_FODDER)
-            {
                 NPC[A].Type = NPCID_RED_FODDER;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_GRN_TURTLE_S3)
-            {
                 NPC[A].Type = NPCID_GRN_SHELL_S3;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_RED_TURTLE_S3 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S3)
-            {
                 NPC[A].Type = NPCID_RED_SHELL_S3;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_BIG_TURTLE)
-            {
                 NPC[A].Type = NPCID_BIG_SHELL;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_GRN_FLY_TURTLE_S3)
-            {
                 NPC[A].Type = NPCID_GRN_SHELL_S3;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_GRN_TURTLE_S4 || NPC[A].Type == NPCID_GRN_FLY_TURTLE_S4)
-            {
                 NPC[A].Type = NPCID_GRN_SHELL_S4;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_RED_TURTLE_S4 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S4)
-            {
                 NPC[A].Type = NPCID_RED_SHELL_S4;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_BLU_TURTLE_S4 || NPC[A].Type == NPCID_BLU_FLY_TURTLE_S4)
-            {
                 NPC[A].Type = NPCID_BLU_SHELL_S4;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_YEL_TURTLE_S4 || NPC[A].Type == NPCID_YEL_FLY_TURTLE_S4)
-            {
                 NPC[A].Type = NPCID_YEL_SHELL_S4;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_RED_TURTLE_S1 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S1)
-            {
                 NPC[A].Type = NPCID_RED_SHELL_S1;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_GRN_TURTLE_S1 || NPC[A].Type == NPCID_GRN_FLY_TURTLE_S1)
-            {
                 NPC[A].Type = NPCID_GRN_SHELL_S1;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_FLY_FODDER_S5)
-            {
                 NPC[A].Type = NPCID_FODDER_S5;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_FLY_FODDER_S3)
-            {
                 NPC[A].Type = NPCID_FODDER_S3;
+            else
+                reset_frame = false;
+
+            if(reset_frame)
                 NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
 
             NPC[A].Special = NPC[A].Type;
             NPC[A].Special2 = NPC[A].Frame;
@@ -167,13 +150,7 @@ void NPCHit(int A, int B, int C)
             NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
             for(C = 1; C <= 20; C++)
             {
-                tempLocation.Height = EffectHeight[EFFID_SPARKLE];
-                tempLocation.Width = EffectWidth[EFFID_SPARKLE];
-                tempLocation.SpeedX = 0;
-                tempLocation.SpeedY = 0;
-                tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width - 4;
-                tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height - 4;
-                NewEffect(EFFID_SPARKLE, tempLocation);
+                NewEffect_IceSparkle(NPC[A], tempLocation);
                 Effect[numEffects].Location.SpeedX = dRand() * 2 - 1;
                 Effect[numEffects].Location.SpeedY = dRand() * 2 - 1;
                 Effect[numEffects].Frame = iRand(3);
@@ -222,9 +199,7 @@ void NPCHit(int A, int B, int C)
         if(Player[C].Wet > 0)
             return;
     }
-    if(NPC[A].Inert || StopHit > 2 || NPC[A].Immune > 0 || NPC[A].Killed > 0 || NPC[A].Effect == NPCEFF_ENCASED || NPC[A].Generator)
-        return;
-    if(B == 6 && NPC[A].Killed == 6)
+    if(NPC[A].Inert || StopHit > 2 || NPC[A].Immune > 0 || NPC[A].Effect == NPCEFF_ENCASED || NPC[A].Generator)
         return;
     if(B == 3 || B == 4 || B == 5) // Things immune to fire
     {
@@ -239,14 +214,12 @@ void NPCHit(int A, int B, int C)
     if(B == 1 && NPC[A]->JumpHurt && NPC[A].Type != NPCID_ITEM_BUBBLE) // Things that don't die from jumping
         return;
 
-    // Add it to the queue, no matter whether it will happen. Reduces code size and increases maintainability.
-    NPCQueues::Killed.push_back(A);
-
     if(B == 10 && NPC[A].Type == NPCID_KEY)
     {
         if(Player[C].Character == 5 && !Player[C].HasKey)
         {
             NPC[A].Killed = 9;
+            NPCQueues::Killed.push_back(A);
             Player[C].HasKey = true;
             PlaySoundSpatial(SFX_HeroKey, NPC[A].Location);
             return;
@@ -280,8 +253,8 @@ void NPCHit(int A, int B, int C)
             NPC[A].Special4 = 0;
             NPC[A].Special5 = 0;
             // NPC[A].Special6 = 0;
-            NPC[A].SpecialX = 0.0;
-            NPC[A].SpecialY = 0.0;
+            NPC[A].SpecialX = 0;
+            NPC[A].SpecialY = 0;
         }
         else if(B == 3 || B == 5)
         {
@@ -370,7 +343,7 @@ void NPCHit(int A, int B, int C)
         NPC[A].Location.Height = NPC[A]->THeight;
         NPC[A].Location.Width = NPC[A]->TWidth;
         NPC[A].Location.Y += -NPC[A].Location.Height;
-        NPC[A].Location.SpeedX = (3 + dRand() * 1) * Player[C].Direction;
+        NPC[A].Location.SpeedX = (3 + dRand()) * Player[C].Direction;
         if(NPC[A].Type == NPCID_BULLET)
             NPC[A].Location.SpeedX = 5 * Player[C].Direction;
         NPC[A].Location.SpeedY = -4;
@@ -380,18 +353,14 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[A].Type != NPCID_GEM_5)
                 NPC[A].Type = NPCID_GEM_1;
-            NPC[A].Location.SpeedX = (1 + dRand() * 0.5) * Player[C].Direction;
+            NPC[A].Location.SpeedX = (1 + dRand() / 2) * Player[C].Direction;
             NPC[A].Location.SpeedY = -5;
             if(iRand(20) < 3)
                 NPC[A].Type = NPCID_GEM_5;
             if(iRand(40) < 3)
                 NPC[A].Type = NPCID_GEM_20;
-            NPC[A].Location.X += NPC[A].Location.Width / 2.0;
-            NPC[A].Location.Y += NPC[A].Location.Height;
-            NPC[A].Location.Width = NPC[A]->TWidth;
-            NPC[A].Location.Height = NPC[A]->THeight;
-            NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
-            NPC[A].Location.Y += -NPC[A].Location.Height;
+            NPC[A].Location.set_width_center(NPC[A]->TWidth);
+            NPC[A].Location.set_height_floor(NPC[A]->THeight);
         }
         if(NPC[A]->IsAShell)
             NPC[A].Location.SpeedX = Physics.NPCShellSpeed * Player[C].Direction;
@@ -469,18 +438,14 @@ void NPCHit(int A, int B, int C)
             NPC[A].Special4 = 0;
             NPC[A].Special5 = 0;
             // NPC[A].Special6 = 0;
-            NPC[A].SpecialX = 0.0;
-            NPC[A].SpecialY = 0.0;
-            NPC[A].Location.X += NPC[A].Location.Width / 2.0;
-            NPC[A].Location.Y += NPC[A].Location.Height;
+            NPC[A].SpecialX = 0;
+            NPC[A].SpecialY = 0;
             if(NPC[A].Type == NPCID_MAGIC_BOSS)
                 NPC[A].Type = NPCID_MAGIC_BOSS_SHELL;
             else
                 NPC[A].Type = NPCID_FIRE_BOSS_SHELL;
-            NPC[A].Location.Width = NPC[A]->TWidth;
-            NPC[A].Location.Height = NPC[A]->THeight;
-            NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
-            NPC[A].Location.Y += -NPC[A].Location.Height;
+            NPC[A].Location.set_width_center(NPC[A]->TWidth);
+            NPC[A].Location.set_height_floor(NPC[A]->THeight);
             NPC[A].Location.SpeedX = 0;
             NPC[A].Location.SpeedY = 0;
 
@@ -504,7 +469,7 @@ void NPCHit(int A, int B, int C)
             if(B == 1 || B == 8)
             {
 
-                if(Player[C].Location.X + Player[C].Location.Width / 2.0 < NPC[A].Location.X + NPC[A].Location.Width / 2.0)
+                if(NPC[A].Location.to_right_of(Player[C].Location))
                     Player[C].Location.SpeedX -= 3;
                 else
                     Player[C].Location.SpeedX += 3;
@@ -561,10 +526,8 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[A].Type == NPCID_BRUTE)
             {
-                NPC[A].Location.Y += NPC[A].Location.Height;
-                NPC[A].Location.Height = 32;
+                NPC[A].Location.set_height_floor(32);
                 NPC[A].Type = NPCID_BRUTE_SQUISHED;
-                NPC[A].Location.Y += -NPC[A].Location.Height;
                 PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
             }
             else if(NPC[A].Type != NPCID_BONE_FISH)
@@ -957,7 +920,7 @@ void NPCHit(int A, int B, int C)
                     NPC[A].CantHurt = 10;
                     PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
                     NPC[A].Projectile = true;
-                    if(Player[C].Location.X + Player[C].Location.Width / 2.0 > NPC[A].Location.X + NPC[A].Location.Width / 2.0)
+                    if(Player[C].Location.to_right_of(NPC[A].Location))
                         NPC[A].Direction = -1;
                     else
                         NPC[A].Direction = 1;
@@ -1077,7 +1040,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].CantHurtPlayer = NPC[A].HoldingPlayer;
             NPC[A].HoldingPlayer = 0;
             NPC[A].CantHurt = 1000;
-            NPC[A].Location.SpeedX = double(3 * -NPC[A].Direction);
+            NPC[A].Location.SpeedX = 3 * -NPC[A].Direction;
             NPC[A].Location.SpeedY = -3;
             NPC[A].Projectile = true;
         }
@@ -1089,7 +1052,7 @@ void NPCHit(int A, int B, int C)
             {
                 if(NPC[A].Location.SpeedY > -4)
                     NPC[A].Location.SpeedY = -4;
-                if(NPC[A].Location.SpeedX == 0.0)
+                if(NPC[A].Location.SpeedX == 0)
                 {
                     if(iRand(2) == 0)
                         NPC[A].Location.SpeedX = 2;
@@ -1112,7 +1075,7 @@ void NPCHit(int A, int B, int C)
                 NPC[A].CantHurtPlayer = C;
                 PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
                 NPC[A].Projectile = true;
-                if(Player[C].Location.X + Player[C].Location.Width / 2.0 > NPC[A].Location.X + NPC[A].Location.Width / 2.0)
+                if(Player[C].Location.to_right_of(NPC[A].Location))
                     NPC[A].Direction = -1;
                 else
                     NPC[A].Direction = 1;
@@ -1305,7 +1268,7 @@ void NPCHit(int A, int B, int C)
         {
             PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
             NPC[A].Location.Y += NPC[A].Location.Height;
-            NPC[A].Location.X += NPC[A].Location.Width / 2.0;
+            NPC[A].Location.X += NPC[A].Location.Width / 2;
             if(NPC[A].Type == NPCID_GRN_TURTLE_S3)
                 NPC[A].Type = NPCID_GRN_SHELL_S3;
             else if(NPC[A].Type == NPCID_RED_TURTLE_S3)
@@ -1342,13 +1305,13 @@ void NPCHit(int A, int B, int C)
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Location = NPC[A].Location;
-                NPC[numNPCs].Location.Y -= 32.0;
+                NPC[numNPCs].Location.Y -= 32;
                 NPC[numNPCs].Type = NPCID(NPC[A].Type + 8);
                 NPC[numNPCs].Projectile = true;
                 NPC[numNPCs].Direction = Player[C].Direction;
                 NPC[numNPCs].Location.SpeedY = 0;
-                NPC[numNPCs].Location.SpeedX = double(Physics.NPCShellSpeed * NPC[numNPCs].Direction);
-                NPC[numNPCs].Location.X += -16.0 + NPC[numNPCs].Location.SpeedX;
+                NPC[numNPCs].Location.SpeedX = Physics.NPCShellSpeed * NPC[numNPCs].Direction;
+                NPC[numNPCs].Location.X += -16 + NPC[numNPCs].Location.SpeedX;
                 CheckSectionNPC(numNPCs);
                 NPC[numNPCs].CantHurtPlayer = C;
                 NPC[numNPCs].CantHurt = 6;
@@ -1363,7 +1326,7 @@ void NPCHit(int A, int B, int C)
             NPCQueues::Unchecked.push_back(A);
 
             NPC[A].Location.Y -= NPC[A].Location.Height;
-            NPC[A].Location.X += -(NPC[A].Location.Width / 2.0) - double(NPC[A].Direction * 2.f);
+            NPC[A].Location.X += -(NPC[A].Location.Width / 2) - NPC[A].Direction * 2;
             NPC[A].Location.SpeedX = 0;
             NPC[A].Location.SpeedY = 0;
             NPC[A].RealSpeedX = 0;
@@ -1378,7 +1341,7 @@ void NPCHit(int A, int B, int C)
             PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
             NPC[A].Projectile = true;
             NPC[A].Location.Y += NPC[A].Location.Height;
-            NPC[A].Location.X += NPC[A].Location.Width / 2.0;
+            NPC[A].Location.X += NPC[A].Location.Width / 2;
             if(NPC[A].Type == NPCID_GRN_TURTLE_S3 || NPC[A].Type == NPCID_GRN_FLY_TURTLE_S3)
                 NPC[A].Type = NPCID_GRN_SHELL_S3;
             else if(NPC[A].Type == NPCID_RED_TURTLE_S3 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S3)
@@ -1422,13 +1385,13 @@ void NPCHit(int A, int B, int C)
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Location = NPC[A].Location;
-                NPC[numNPCs].Location.Y -= 32.0;
+                NPC[numNPCs].Location.Y -= 32;
                 NPC[numNPCs].Type = NPCID(NPC[A].Type + 4);
                 NPC[numNPCs].Projectile = true;
                 NPC[numNPCs].Direction = Player[C].Direction;
                 NPC[numNPCs].Location.SpeedY = 0;
-                NPC[numNPCs].Location.SpeedX = double(Physics.NPCShellSpeed * NPC[numNPCs].Direction);
-                NPC[numNPCs].Location.X += -(16.0 + double(32.0f * NPC[numNPCs].Direction));
+                NPC[numNPCs].Location.SpeedX = Physics.NPCShellSpeed * NPC[numNPCs].Direction;
+                NPC[numNPCs].Location.X += -(16 + 32 * NPC[numNPCs].Direction);
                 CheckSectionNPC(numNPCs);
                 NPC[numNPCs].CantHurtPlayer = C;
                 NPC[numNPCs].CantHurt = 6;
@@ -1440,7 +1403,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.Height = NPC[A]->THeight;
             NPC[A].Location.Width = NPC[A]->TWidth;
             NPC[A].Location.Y -= NPC[A].Location.Height;
-            NPC[A].Location.X += -(NPC[A].Location.Width / 2.0) - double(NPC[A].Direction * 2.f);
+            NPC[A].Location.X += -(NPC[A].Location.Width / 2) - NPC[A].Direction * 2;
             NPC[A].Location.SpeedX = 0;
 
             NPCQueues::Unchecked.push_back(A);
@@ -1515,7 +1478,7 @@ void NPCHit(int A, int B, int C)
         if(NPC[A].Damage >= 200)
         {
             NPC[A].Location.SpeedY = -13;
-            NPC[A].Location.SpeedX = double(4 * NPC[C].Direction);
+            NPC[A].Location.SpeedX = 4 * NPC[C].Direction;
             NPC[A].Killed = B;
             if(NPC[A].Legacy)
             {
@@ -1562,10 +1525,10 @@ void NPCHit(int A, int B, int C)
 
             if(Player[C].Dismount <= 0 && Player[C].Mount != 2)
             {
-                if(NPC[A].Location.SpeedX == 0.0 && NPC[A].CantHurtPlayer != C)
+                if(NPC[A].Location.SpeedX == 0 && NPC[A].CantHurtPlayer != C)
                 {
                     PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
-                    NPC[A].Location.SpeedX = double(Physics.NPCShellSpeed * Player[C].Direction);
+                    NPC[A].Location.SpeedX = Physics.NPCShellSpeed * Player[C].Direction;
                     NPC[A].CantHurt = Physics.NPCCanHurtWait;
                     NPC[A].CantHurtPlayer = C;
                     NPC[A].Projectile = true;
@@ -2006,7 +1969,7 @@ void NPCHit(int A, int B, int C)
                     NPC[A].Location.SpeedY = -5;
                     NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01;
                     NPC[A].Projectile = true;
-                    NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.5;
+                    NPC[A].Location.SpeedX /= 2;
                 }
             }
             else if(NPC[A].Type == NPCID_SATURN && B == 5)
@@ -2025,7 +1988,7 @@ void NPCHit(int A, int B, int C)
                     NPC[A].Immune = 30;
                     NPC[A].Projectile = true;
                     NPC[A].Location.SpeedY = -5;
-                    NPC[A].Location.SpeedX = (NPC[C].Location.SpeedX + NPC[A].Location.SpeedX) * 0.5;
+                    NPC[A].Location.SpeedX = (NPC[C].Location.SpeedX + NPC[A].Location.SpeedX) / 2;
                     if(NPC[A].Location.SpeedX < 1.2 && NPC[A].Location.SpeedX > -1.2)
                     {
                         if(NPC[C].Direction == -1)
@@ -2065,7 +2028,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.SpeedY = 0;
             NPC[A].Location.SpeedX = 0;
         }
-        else if(B == 1 && !NPC[A]->CanWalkOn && !NPC[A]->JumpHurt)
+        else if(B == 1 && !NPC[A]->CanWalkOn /*&& !NPC[A]->JumpHurt*/) // JumpHurt checked at the top
         {
             NPC[A].Killed = B;
             NPC[A].Location.SpeedY = 0.123;
@@ -2089,6 +2052,7 @@ void NPCHit(int A, int B, int C)
             NPCQueues::Unchecked.push_back(A);
         }
     }
+    // non type-based logic
     // Coins
     else if(NPC[A]->IsACoin)
     {
@@ -2116,10 +2080,9 @@ void NPCHit(int A, int B, int C)
             }
             else
             {
-                NPC[A].Location.Y += NPC[A].Location.Height;
                 // useless self-assignment code [PVS-Studio]
                 //NPC[A].Location.X = NPC[A].Location.X; // - (32 - .Location.Width) / 2
-                NPC[A].Location.Height = 0;
+                NPC[A].Location.set_height_floor(0);
                 PlaySoundSpatial(SFX_Coin, NPC[A].Location);
                 NewEffect(EFFID_COIN_BLOCK_S3, NPC[A].Location);
             }
@@ -2176,7 +2139,7 @@ void NPCHit(int A, int B, int C)
                (NPC[A].Type >= NPCID_FIRE_POWER_S1 && NPC[A].Type <= NPCID_3_LIFE) || NPC[A].Type == NPCID_HEAVY_POWER)
             {
                 NPC[A].Direction = Player[C].Direction;
-                NPC[A].Location.SpeedX = std::abs(NPC[A].Location.SpeedX) * double(NPC[A].Direction);
+                NPC[A].Location.SpeedX = std::abs(NPC[A].Location.SpeedX) * NPC[A].Direction;
                 NPC[A].TurnAround = false;
                 NPC[A].Location.SpeedY = -6;
                 PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
@@ -2309,14 +2272,14 @@ void NPCHit(int A, int B, int C)
             if(NPC[A].Location.Width >= 64 || NPC[A].Location.Height >= 64)
             {
                 tempLocation = NPC[C].Location;
-                tempLocation.X = NPC[C].Location.X + NPC[C].Location.Width / 2.0 - 16 + NPC[C].Location.SpeedX;
-                tempLocation.Y = NPC[C].Location.Y + NPC[C].Location.Height / 2.0 - 16 + NPC[C].Location.SpeedY;
+                tempLocation.X = NPC[C].Location.X + NPC[C].Location.Width / 2 - 16 + NPC[C].Location.SpeedX;
+                tempLocation.Y = NPC[C].Location.Y + NPC[C].Location.Height / 2 - 16 + NPC[C].Location.SpeedY;
             }
             else
             {
                 tempLocation = NPC[A].Location;
-                tempLocation.Y = (NPC[C].Location.Y + tempLocation.Y + NPC[C].Location.Height / 2.0 + tempLocation.Height / 2.0) / 2 - 16;
-                tempLocation.X = (NPC[C].Location.X + tempLocation.X + NPC[C].Location.Width / 2.0 + tempLocation.Width / 2.0) / 2 - 16;
+                tempLocation.Y = (NPC[C].Location.Y + tempLocation.Y + (NPC[C].Location.Height + tempLocation.Height) / 2) / 2 - 16;
+                tempLocation.X = (NPC[C].Location.X + tempLocation.X + (NPC[C].Location.Width + tempLocation.Width) / 2) / 2 - 16;
             }
             NewEffect(EFFID_WHACK, tempLocation);
         }
@@ -2328,17 +2291,16 @@ void NPCHit(int A, int B, int C)
             NPC[A].NoLavaSplash = true;
     }
 
-    if(NPC[A].Killed == 0 && NPC[A].Location.SpeedX == 0.0 && oldNPC.Location.SpeedX != 0.0)
+    if(NPC[A].Killed == 0 && NPC[A].Location.SpeedX == 0 && oldNPC.Location.SpeedX != 0)
         NPC[A].RealSpeedX = 0;
+
+    if(NPC[A].Killed != 0 && oldNPC.Killed == 0)
+        NPCQueues::Killed.push_back(A);
 
     if(NPC[A].Type != oldNPC.Type)
     {
-        NPC[A].Location.Y += NPC[A].Location.Height;
-        NPC[A].Location.Height = NPC[A]->THeight;
-        NPC[A].Location.Y -= NPC[A].Location.Height;
-        NPC[A].Location.X += (NPC[A].Location.Width / 2.0);
-        NPC[A].Location.Width = NPC[A]->TWidth;
-        NPC[A].Location.X -= (NPC[A].Location.Width / 2.0);
+        NPC[A].Location.set_height_floor(NPC[A]->THeight);
+        NPC[A].Location.set_width_center(NPC[A]->TWidth);
     }
 
     if(NPC[A].Location.Width != oldNPC.Location.Width)

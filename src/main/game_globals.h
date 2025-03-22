@@ -31,7 +31,7 @@ extern RangeArr<ScreenFader, 0, c_vScreenCount> g_levelVScreenFader;
 
 extern void clearScreenFaders();
 extern void updateScreenFaders();
-extern void levelWaitForFade();
+// extern void levelWaitForFade();
 extern void editorWaitForFade();
 
 #endif // GAME_GLOBALS_H

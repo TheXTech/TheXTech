@@ -28,6 +28,7 @@
 #include "config.h"
 #include "global_dirs.h"
 #include "frame_timer.h"
+#include "message.h"
 
 #include "load_gfx.h"
 #include "core/msgbox.h"
@@ -758,7 +759,7 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
 
 void PlaySfx_Blocking(int Alias, int loops, int volume, uint8_t left, uint8_t right)
 {
-    if(!g_mixerLoaded || (int)g_config.audio_sfx_volume == 0)
+    if(!g_mixerLoaded || (int)g_config.audio_sfx_volume == 0 || XMessage::GetStatus() == XMessage::Status::replay)
         return;
 
     auto sfx = sound.find(Alias);
@@ -846,7 +847,7 @@ void StartMusic(int A, int fadeInMs)
 
     D_pLogDebug("Start music A=%d", A);
 
-    if(!g_mixerLoaded || (int)g_config.audio_mus_volume == 0)
+    if(!g_mixerLoaded || (int)g_config.audio_mus_volume == 0 || XMessage::GetStatus() == XMessage::Status::replay)
     {
         if(g_mixerLoaded && g_curMusic)
             StopMusic();
@@ -958,6 +959,18 @@ void StartMusic(int A, int fadeInMs)
 
     s_recentMusicA = A;
     musicPlaying = true;
+}
+
+void StartMusicIfOnscreen(int section)
+{
+    for(int i = 0; i < l_screen->player_count; i++)
+    {
+        if(Player[l_screen->players[i]].Section == section)
+        {
+            StartMusic(section);
+            break;
+        }
+    }
 }
 
 void PauseMusic()
@@ -1680,7 +1693,7 @@ void PlayExtSound(const std::string &path, int loops, int volume)
 {
     int play_ch = -1;
 
-    if(!g_mixerLoaded || (int)g_config.audio_sfx_volume == 0)
+    if(!g_mixerLoaded || (int)g_config.audio_sfx_volume == 0 || XMessage::GetStatus() == XMessage::Status::replay)
         return;
 
     auto f = extSfx.find(path);

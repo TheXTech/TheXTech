@@ -79,8 +79,8 @@ static void s_getMargins(const Screen_t& screen, int& margin, int& marginTop, in
 void GetvScreenWorld(vScreen_t& vscreen)
 {
     const Screen_t& screen = Screens[vscreen.screen_ref];
-    const WorldPlayer_t& wp = WorldPlayer[vscreen.player];
-    const Location_t& wpLoc = wp.Location;
+    const WorldPlayer_t& wp = WorldPlayer[1];
+    const TinyLocation_t& wpLoc = wp.Location;
 
     int margin, marginTop, marginBottom;
     s_getMargins(screen, margin, marginTop, marginBottom);
@@ -107,14 +107,15 @@ void GetvScreenWorld(vScreen_t& vscreen)
         }
     }
 
-    double fX = wpLoc.X + wpLoc.Width / 2;
-    double fY = wpLoc.Y + wpLoc.Height / 2;
+    int fX = wpLoc.X + wpLoc.Width / 2;
+    int fY = wpLoc.Y + wpLoc.Height / 2;
 
     // apply a temporary vScreen focus
     if(vscreen.TempDelay)
     {
-        fX = vscreen.tempX;
-        fY = vscreen.TempY;
+        // this is safe; tempX/Y are set to integral values
+        fX = (int)(vscreen.tempX);
+        fY = (int)(vscreen.TempY);
     }
 
     vscreen.X = -fX + vscreen.Width / 2;
@@ -127,13 +128,13 @@ void GetvScreenWorld(vScreen_t& vscreen)
     int c_margin, c_marginTop, c_marginBottom;
     s_getMargins(c_screen, c_margin, c_marginTop, c_marginBottom);
 
-    double c_width = c_screen.W - c_margin * 2;
-    double c_height = c_screen.H - c_marginTop - c_marginBottom;
+    int c_width = c_screen.W - c_margin * 2;
+    int c_height = c_screen.H - c_marginTop - c_marginBottom;
 
-    const IntegerLocation_t defaultBounds = IntegerLocation_t{Maths::iRound(fX - c_width / 2), Maths::iRound(fY - c_height / 2), (int)c_width, (int)c_height};
+    const TinyLocation_t defaultBounds = TinyLocation_t{fX - c_width / 2, fY - c_height / 2, (int16_t)c_width, (int16_t)c_height};
 
     // get the bounds from the player's section if possible, otherwise the defaults
-    const IntegerLocation_t& bounds = (wp.Section != 0)
+    const TinyLocation_t& bounds = (wp.Section != 0)
         ? WorldArea[wp.Section].Location
         : defaultBounds;
 

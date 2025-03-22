@@ -25,26 +25,45 @@
 
 #include "global_constants.h"
 
+enum PlayerState : vbint_t
+{
+    PLR_STATE_SMALL = 1,
+    PLR_STATE_BIG = 2,
+    PLR_STATE_FIRE = 3,
+    PLR_STATE_LEAF = 4,
+    PLR_STATE_STATUE = 5,
+    PLR_STATE_HEAVY = 6,
+    PLR_STATE_ICE = 7,
+};
+
 enum PlayerEffect : vbint_t
 {
     PLREFF_NORMAL = 0,
     PLREFF_TURN_BIG = 1,
     PLREFF_TURN_SMALL = 2,
     PLREFF_WARP_PIPE = 3,
-    PLREFF_TURN_FIRE = 4,
-    PLREFF_TURN_LEAF = 5,
     PLREFF_RESPAWN = 6,
     PLREFF_WARP_DOOR = 7,
     PLREFF_WAITING = 8,
     PLREFF_NO_COLLIDE = 9,
     PLREFF_PET_INSIDE = 10,
-    PLREFF_TURN_STATUE = 11,
-    PLREFF_TURN_HEAVY = 12,
     PLREFF_COOP_WINGS = 13,
-    PLREFF_TURN_ICE = 41,
-    PLREFF_FIRE_TO_BIG = 227,
-    PLREFF_ICE_TO_BIG = 228,
+    PLREFF_GROW_TO_STATE = 16,
+    PLREFF_GROW_TO_STATE_END = 32,
+    PLREFF_TURN_TO_STATE = 32,
+    PLREFF_TURN_TO_STATE_END = 48,
+    PLREFF_STATE_TO_BIG = 48,
+    PLREFF_STATE_TO_BIG_END = 64,
     PLREFF_STONE = 500,
+
+    // old SMBX 1.3 Effect IDs
+    // PLREFF_TURN_FIRE = 4,
+    // PLREFF_TURN_LEAF = 5,
+    // PLREFF_TURN_STATUE = 11,
+    // PLREFF_TURN_HEAVY = 12,
+    // PLREFF_TURN_ICE = 41,
+    // PLREFF_FIRE_TO_BIG = 227,
+    // PLREFF_ICE_TO_BIG = 228,
 };
 
 

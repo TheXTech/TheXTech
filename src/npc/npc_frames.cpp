@@ -29,6 +29,13 @@
 
 #include "main/trees.h"
 
+static void s_makeHeavySparkle(const NPC_t& n, int offY)
+{
+    NewEffect(EFFID_SPARKLE, newLoc(n.Location.X + n.Location.Width / 2 - 4, n.Location.Y + n.Location.Height / 2 - offY), 1, 0, n.Shadow);
+    Effect[numEffects].Location.SpeedX = dRand() - 0.5;
+    Effect[numEffects].Location.SpeedY = dRand() - 0.5;
+}
+
 
 void NPCFrames(int A)
 {
@@ -109,17 +116,23 @@ void NPCFrames(int A)
             }
         }
     }
-    else if(NPC[A].Type == NPCID_SQUID_S3 || NPC[A].Type == NPCID_SQUID_S1 || NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_SPIT_BOSS_BALL ||
-            NPC[A].Type == NPCID_FALL_BLOCK_RED || NPC[A].Type == NPCID_FALL_BLOCK_BROWN || NPC[A].Type == NPCID_SPIKY_THROWER || NPC[A].Type == NPCID_ITEM_THROWER ||
+    // massive conditional over NPC's Type
+    else if(NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_ITEM_THROWER || NPC[A].Type == NPCID_SPIKY_THROWER)
+    {
+        // do nothing
+    }
+    else if(NPC[A].Type == NPCID_SQUID_S3 || NPC[A].Type == NPCID_SQUID_S1 || NPC[A].Type == NPCID_SPIT_BOSS_BALL ||
+            NPC[A].Type == NPCID_FALL_BLOCK_RED || NPC[A].Type == NPCID_FALL_BLOCK_BROWN ||
             NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT ||
             NPC[A].Type == NPCID_VPIPE_LONG || NPC[A].Type == NPCID_BIG_SHELL || NPCIsVeggie(NPC[A]) || NPC[A].Type == NPCID_SHORT_WOOD ||
             NPC[A].Type == NPCID_LONG_WOOD || NPC[A].Type == NPCID_SLANT_WOOD_R || NPC[A].Type == NPCID_SLANT_WOOD_M || NPC[A].Type == NPCID_PLATFORM_S3 ||
             NPC[A].Type == NPCID_CHECKER_PLATFORM || NPC[A].Type == NPCID_PLATFORM_S1 || NPC[A].Type == NPCID_SPIT_GUY_BALL || NPC[A].Type == NPCID_SIGN ||
             (NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_CHECKPOINT ||
-            NPC[A].Type == NPCID_GOALTAPE || NPC[A]->IsAVine || NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_TNT ||
-            NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_POWER_S5 || NPC[A].Type == NPCID_MAGIC_DOOR || NPC[A].Type == NPCID_COCKPIT) // no frames
+            NPC[A].Type == NPCID_GOALTAPE || NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_TNT ||
+            NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_POWER_S5 || NPC[A].Type == NPCID_MAGIC_DOOR || NPC[A].Type == NPCID_COCKPIT ||
+            NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_COIN_SWITCH) // no frames
     {
-        if(!(NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_ITEM_THROWER || NPC[A].Type == NPCID_SPIKY_THROWER) && A == 0) // Reset Frame to 0 unless a specific NPC type
+        if(A == 0) // Reset Frame to 0
             NPC[A].Frame = 0;
     }
     else if(NPC[A].Type == NPCID_STATUE_POWER || NPC[A].Type == NPCID_HEAVY_POWER)
@@ -589,9 +602,9 @@ void NPCFrames(int A)
     else if(NPC[A].Type == NPCID_FIRE_PLANT)
     {
         NPC[A].Frame = 0;
-        if(Player[NPC[A].Special4].Location.X + Player[NPC[A].Special4].Location.Width / 2.0 > NPC[A].Location.X + NPC[A].Location.Width / 2.0)
+        if(Player[NPC[A].Special4].Location.to_right_of(NPC[A].Location))
             NPC[A].Frame = 2;
-        if(Player[NPC[A].Special4].Location.Y + Player[NPC[A].Special4].Location.Height / 2.0 < NPC[A].Location.Y + 16)
+        if(Player[NPC[A].Special4].Location.Y + Player[NPC[A].Special4].Location.Height / 2 < NPC[A].Location.Y + 16)
             NPC[A].Frame += 1;
     }
     else if(NPC[A].Type == NPCID_FLY_FODDER_S5)
@@ -864,7 +877,7 @@ void NPCFrames(int A)
         {
             tempLocation = NPC[A].Location;
             tempLocation.Width = NPC[A].Location.Width * 2;
-            tempLocation.X = NPC[A].Location.X - NPC[A].Location.Width / 2.0;
+            tempLocation.X = NPC[A].Location.X - NPC[A].Location.Width / 2;
 
             for(int B = 1; B <= numPlayers; ++B)
             {
@@ -919,14 +932,7 @@ void NPCFrames(int A)
         }
 
         if(iRand(4) == 0)
-        {
-            NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - 4, NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 4), 1, 0, NPC[A].Shadow);
-            Effect[numEffects].Location.SpeedX = dRand() * 1 - 0.5;
-            Effect[numEffects].Location.SpeedY = dRand() * 1 - 0.5;
-        }
-
-
-
+            s_makeHeavySparkle(NPC[A], 4);
     }
     else if(NPC[A].Type == NPCID_PLR_HEAVY) // Mario Hammer
     {
@@ -934,6 +940,7 @@ void NPCFrames(int A)
         if(NPC[A].FrameCount >= 4)
         {
             NPC[A].FrameCount = 0;
+
             if(NPC[A].Location.SpeedX > 0)
             {
                 NPC[A].Frame += 1;
@@ -958,18 +965,18 @@ void NPCFrames(int A)
                 else
                     NPC[A].Location.Y += 12;
             }
+
             if(NPC[A].Frame > 3)
                 NPC[A].Frame = 0;
             else if(NPC[A].Frame < 0)
                 NPC[A].Frame = 3;
-            NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - 8, NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 8), 1, 0, NPC[A].Shadow);
-            Effect[numEffects].Location.SpeedX = dRand() * 1 - 0.5;
-            Effect[numEffects].Location.SpeedY = dRand() * 1 - 0.5;
-        }
 
-        treeNPCUpdate(A);
-        if(NPC[A].tempBlock > 0)
-            treeNPCSplitTempBlock(A);
+            treeNPCUpdate(A);
+            if(NPC[A].tempBlock > 0)
+                treeNPCSplitTempBlock(A);
+
+            s_makeHeavySparkle(NPC[A], 8);
+        }
     }
     else if(NPC[A].Type == NPCID_FLY_CARRY_FODDER) // smw paragoomba
     {
@@ -1073,6 +1080,7 @@ void NPCFrames(int A)
             NPC[A].FrameCount = 0;
             NPC[A].Frame = 0;
         }
+
         NPC[A].Special3 += 1;
         if(NPC[A].Special3 < 4)
         {}
@@ -1082,12 +1090,9 @@ void NPCFrames(int A)
             NPC[A].Frame += 6;
         else // If .Special3 >= 16 Then
             NPC[A].Special3 = 0;
+
         if(iRand(100) >= 92)
-        {
-            NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - 4, NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 6), 1, 0, NPC[A].Shadow);
-            Effect[numEffects].Location.SpeedX = dRand() * 1 - 0.5;
-            Effect[numEffects].Location.SpeedY = dRand() * 1 - 0.5;
-        }
+            s_makeHeavySparkle(NPC[A], 6);
     }
     else if(NPC[A].Type == NPCID_ITEM_BURIED)
         NPC[A].Frame = SpecialFrame[5];
@@ -1156,22 +1161,6 @@ void NPCFrames(int A)
             NPC[A].Frame += 8;
         else if(NPC[A].Special5 < 16)
             NPC[A].Frame += 12;
-    }
-    else if(NPC[A]->IsAShell) // Turtle shell
-    {
-        if(NPC[A].Location.SpeedX == 0)
-            NPC[A].Frame = 0;
-        else
-        {
-            NPC[A].FrameCount += 1;
-            if(NPC[A].FrameCount >= 4)
-            {
-                NPC[A].FrameCount = 0;
-                NPC[A].Frame += 1;
-                if(NPC[A].Frame >= 4)
-                    NPC[A].Frame = 0;
-            }
-        }
     }
     else if(NPC[A].Type == NPCID_JUMPER_S4) // black ninja
     {
@@ -1563,14 +1552,6 @@ void NPCFrames(int A)
             NPC[A].Frame = 0;
         }
     }
-    else if(NPC[A]->IsACoin) // Coin
-    {
-        NPC[A].Frame = CoinFrame[3];
-        if(NPC[A].Type == NPCID_COIN_S2)
-            NPC[A].Frame = CoinFrame[2];
-        if(NPC[A].Type == NPCID_RING)
-            NPC[A].Frame = CoinFrame[3];
-    }
     else if(NPC[A].Type == NPCID_ITEMGOAL) // Frame finder for Star/Flower/Mushroom Exit
     {
         NPC[A].FrameCount += 1;
@@ -1684,29 +1665,23 @@ void NPCFrames(int A)
                         NewEffect(EFFID_PLR_ICEBALL_TRAIL, NPC[A].Location, 1, 0, NPC[A].Shadow);
                         if(iRand(5) == 0)
                         {
-                            tempLocation.Height = EffectHeight[80];
-                            tempLocation.Width = EffectWidth[80];
+                            tempLocation.Height = EffectHeight[EFFID_SPARKLE];
+                            tempLocation.Width = EffectWidth[EFFID_SPARKLE];
                             tempLocation.SpeedX = 0;
                             tempLocation.SpeedY = 0;
-                            tempLocation.X = NPC[A].Location.X + dRand() * 16 - EffectWidth[80] / 2.0 - 4 - NPC[A].Location.SpeedX * 3;
-                            tempLocation.Y = NPC[A].Location.Y + dRand() * 16 - EffectHeight[80] / 2.0 - 4;
+                            tempLocation.X = NPC[A].Location.X + dRand() * 16 - EffectWidth[EFFID_SPARKLE] / 2.0 - 4 - NPC[A].Location.SpeedX * 3;
+                            tempLocation.Y = NPC[A].Location.Y + dRand() * 16 - EffectHeight[EFFID_SPARKLE] / 2.0 - 4;
                             NewEffect(EFFID_SPARKLE, tempLocation);
-                            Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.5;
-                            Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY * 0.5;
+                            Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX / 2;
+                            Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY / 2;
                             Effect[numEffects].Frame = iRand(3);
                         }
                     }
                     else if(iRand(5) >= 3)
                     {
-                        tempLocation.Height = EffectHeight[80];
-                        tempLocation.Width = EffectWidth[80];
-                        tempLocation.SpeedX = 0;
-                        tempLocation.SpeedY = 0;
-                        tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width - 4;
-                        tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height - 4;
-                        NewEffect(EFFID_SPARKLE, tempLocation, 1, 0, NPC[A].Shadow);
-                        Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.25;
-                        Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY * 0.25;
+                        NewEffect_IceSparkle(NPC[A], tempLocation);
+                        Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX / 4;
+                        Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY / 4;
                         Effect[numEffects].Frame = iRand(3);
                     }
                 }
@@ -1834,28 +1809,28 @@ void NPCFrames(int A)
         else
             NPC[A].Frame = 0;
     }
-    else if(NPC[A].Type == NPCID_WALK_BOMB_S2 && NPC[A].Special2 == 1)
-    {
-        NPC[A].FrameCount += 1;
-        if(NPC[A].FrameCount < 4)
-            NPC[A].Frame = 8;
-        else if(NPC[A].FrameCount < 8)
-            NPC[A].Frame = 9;
-        else if(NPC[A].FrameCount < 11)
-            NPC[A].Frame = 10;
-        else
-        {
-            NPC[A].Frame = 10;
-            NPC[A].FrameCount = 0;
-        }
-        if(NPC[A].HoldingPlayer > 0 || NPC[A].Projectile)
-            NPC[A].Frame += 6;
-        if(NPC[A].Direction == 1)
-            NPC[A].Frame += 3;
-    }
     else if(NPC[A].Type == NPCID_BLU_GUY || NPC[A].Type == NPCID_RED_GUY || NPC[A].Type == NPCID_RED_FISH_S1 || (NPC[A].Type >= NPCID_BIRD && NPC[A].Type <= NPCID_GRY_SPIT_GUY) || NPC[A].Type == NPCID_WALK_BOMB_S2 || NPC[A].Type == NPCID_SATURN) // Shy guys / Jumping Fish
     {
-        if(NPC[A].HoldingPlayer == 0 && !NPC[A].Projectile)
+        if(NPC[A].Type == NPCID_WALK_BOMB_S2 && NPC[A].Special2 == 1)
+        {
+            NPC[A].FrameCount += 1;
+            if(NPC[A].FrameCount < 4)
+                NPC[A].Frame = 8;
+            else if(NPC[A].FrameCount < 8)
+                NPC[A].Frame = 9;
+            else if(NPC[A].FrameCount < 11)
+                NPC[A].Frame = 10;
+            else
+            {
+                NPC[A].Frame = 10;
+                NPC[A].FrameCount = 0;
+            }
+            if(NPC[A].HoldingPlayer > 0 || NPC[A].Projectile)
+                NPC[A].Frame += 6;
+            if(NPC[A].Direction == 1)
+                NPC[A].Frame += 3;
+        }
+        else if(NPC[A].HoldingPlayer == 0 && !NPC[A].Projectile)
         {
             NPC[A].FrameCount += 1;
             if(NPC[A].Direction == -1 && NPC[A].Frame >= 2)
@@ -2185,19 +2160,6 @@ void NPCFrames(int A)
                 NPC[A].FrameCount = 0;
         }
     }
-    else if(!(NPC[A]->IsABonus || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_COIN_SWITCH)) // Frame finder for everything else
-    {
-        NPC[A].FrameCount += 1;
-        if(NPC[A].Type == NPCID_SPIKY_BALL_S3 || NPC[A].Type == NPCID_WALL_SPARK)
-            NPC[A].FrameCount += 1;
-        if(NPC[A].FrameCount >= 8)
-        {
-            NPC[A].FrameCount = 1;
-            NPC[A].Frame += 1;
-            if(NPC[A].Frame == 2)
-                NPC[A].Frame = 0;
-        }
-    }
     else if(NPC[A].Type == NPCID_FIRE_POWER_S4 || NPC[A].Type == NPCID_ICE_POWER_S4)
     {
         NPC[A].FrameCount += 1;
@@ -2220,9 +2182,60 @@ void NPCFrames(int A)
                 NPC[A].Frame = 0;
         }
     }
-    else
+    else if(NPC[A].Type == NPCID_SPIKY_BALL_S3 || NPC[A].Type == NPCID_WALL_SPARK)
+    {
+        NPC[A].FrameCount += 2;
+        if(NPC[A].FrameCount >= 8)
+        {
+            NPC[A].FrameCount = 1;
+            NPC[A].Frame += 1;
+            if(NPC[A].Frame == 2)
+                NPC[A].Frame = 0;
+        }
+    }
+    else if(NPC[A].Type == NPCID_COIN_S2)
+    {
+        NPC[A].Frame = CoinFrame[2];
+    }
+    else if(NPC[A].Type == NPCID_RING)
+    {
+        NPC[A].Frame = CoinFrame[3];
+    }
+    // non-type based logic
+    else if(NPC[A]->IsACoin) // Coin
+    {
+        NPC[A].Frame = CoinFrame[3];
+    }
+    else if(NPC[A]->IsAVine || NPC[A]->IsABonus) // no frames for these
     {
         if(A == 0)
             NPC[A].Frame = 0;
+    }
+    else if(NPC[A]->IsAShell) // Turtle shell
+    {
+        if(NPC[A].Location.SpeedX == 0)
+            NPC[A].Frame = 0;
+        else
+        {
+            NPC[A].FrameCount += 1;
+            if(NPC[A].FrameCount >= 4)
+            {
+                NPC[A].FrameCount = 0;
+                NPC[A].Frame += 1;
+                if(NPC[A].Frame >= 4)
+                    NPC[A].Frame = 0;
+            }
+        }
+    }
+    else // Frame finder for everything else
+    {
+        NPC[A].FrameCount += 1;
+        if(NPC[A].FrameCount >= 8)
+        {
+            NPC[A].FrameCount = 1;
+            NPC[A].Frame += 1;
+            if(NPC[A].Frame == 2)
+                NPC[A].Frame = 0;
+        }
     }
 }

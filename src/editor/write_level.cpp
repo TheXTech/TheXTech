@@ -110,7 +110,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
     // sections
     for(int i = 0; i < numSections; ++i)
     {
-        const auto &s = level[i];
+        const auto &s = LevelREAL[i];
 
         section.id = i;
         section.size_left = s.X;
@@ -164,10 +164,10 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         const auto &b = Block[i];
 
         block.id = b.Type;
-        block.x = b.Location.X;
-        block.y = b.Location.Y;
-        block.w = b.Location.Width;
-        block.h = b.Location.Height;
+        block.x = (int32_t)b.Location.X;
+        block.y = (int32_t)b.Location.Y;
+        block.w = (int32_t)b.Location.Width;
+        block.h = (int32_t)b.Location.Height;
 
         if(b.Special >= 1000)
             block.npc_id = b.Special - 1000;
@@ -202,8 +202,8 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         const auto &b = Background[i];
 
         bgo.id = b.Type;
-        bgo.x = b.Location.X;
-        bgo.y = b.Location.Y;
+        bgo.x = (int32_t)b.Location.X;
+        bgo.y = (int32_t)b.Location.Y;
         bgo.layer = GetL(b.Layer);
 
         bgo.z_mode = b.GetCustomLayer();
@@ -223,8 +223,8 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         const auto &n = NPC[i];
 
         npc.id = n.Type;
-        npc.x = n.Location.X;
-        npc.y = n.Location.Y;
+        npc.x = (int32_t)n.Location.X;
+        npc.y = (int32_t)n.Location.Y;
         npc.direct = n.Direction;
 
         if(n.Type == NPCID_ITEM_BURIED || n.Type == NPCID_ITEM_POD ||
@@ -290,10 +290,10 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         if(!w.PlacedEnt || !w.PlacedExit)
             continue;
 
-        warp.ix = w.Entrance.X;
-        warp.iy = w.Entrance.Y;
-        warp.ox = w.Exit.X;
-        warp.oy = w.Exit.Y;
+        warp.ix = (int32_t)w.Entrance.X;
+        warp.iy = (int32_t)w.Entrance.Y;
+        warp.ox = (int32_t)w.Exit.X;
+        warp.oy = (int32_t)w.Exit.Y;
         warp.isSetIn = w.PlacedEnt;
         warp.isSetOut = w.PlacedExit;
         warp.idirect = w.Direction;
@@ -343,11 +343,11 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
     {
         const auto &p = Water[i];
 
-        pez.x = p.Location.X;
-        pez.y = p.Location.Y;
-        pez.w = p.Location.Width;
-        pez.h = p.Location.Height;
-        pez.buoy = p.Buoy;
+        pez.x = (int32_t)p.Location.X;
+        pez.y = (int32_t)p.Location.Y;
+        pez.w = (int32_t)p.Location.Width;
+        pez.h = (int32_t)p.Location.Height;
+        // pez.buoy = p.Buoy;
         pez.env_type = p.Quicksand ? LevelPhysEnv::ENV_QUICKSAND : LevelPhysEnv::ENV_WATER;
         pez.layer = GetL(p.Layer);
 
@@ -420,8 +420,8 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
             s.position_bottom = ss.position.Height;
 
             s.autoscrol = ss.autoscroll;
-            s.autoscrol_x = ss.autoscroll_x;
-            s.autoscrol_y = ss.autoscroll_y;
+            s.autoscrol_x = (double)ss.autoscroll_x;
+            s.autoscrol_y = (double)ss.autoscroll_y;
             s.autoscroll_style = LevelEvent_Sets::AUTOSCROLL_SIMPLE;
 
             if(j >= (int)evt.sets.size())
@@ -448,11 +448,11 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
 
         evt.autostart = e.AutoStart;
         evt.movelayer = GetL(e.MoveLayer);
-        evt.layer_speed_x = e.SpeedX;
-        evt.layer_speed_y = e.SpeedY;
+        evt.layer_speed_x = (double)e.SpeedX;
+        evt.layer_speed_y = (double)e.SpeedY;
 
-        evt.move_camera_x = e.AutoX;
-        evt.move_camera_y = e.AutoY;
+        evt.move_camera_x = (double)e.AutoX;
+        evt.move_camera_y = (double)e.AutoY;
         evt.scroll_section = e.AutoSection;
 
         evt.meta.array_id = out.events_array_id++;

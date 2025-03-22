@@ -185,7 +185,7 @@ TreeResult_Sentinel<BlockRef_t> treeQuery<BlockRef_t>(const Location_t& loc, int
 template<>
 TreeResult_Sentinel<TileRef_t> treeQuery<TileRef_t>(const Location_t& loc, int sort_mode)
 {
-    return treeWorldTileQuery(loc, sort_mode);
+    return treeWorldTileQuery(static_cast<TinyLocation_t>(loc), sort_mode);
 }
 
 template<>
