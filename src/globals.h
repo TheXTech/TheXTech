@@ -35,6 +35,7 @@
 #include "rand.h"
 #include "floats.h"
 #include "npc_id.h"
+#include "phys_id.h"
 #include "npc_effect.h"
 #include "player/player_effect.h"
 
@@ -833,12 +834,12 @@ struct Water_t
     SpeedlessLocation_t Location;
 //    Buoy As Single 'not used
     // float Buoy = 0.0f;
+//    Quicksand As Boolean
+    PHYSID Type = PHYSID_WATER;
 //    Layer As String
     layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean
     bool Hidden = false;
-//    Quicksand As Boolean
-    bool Quicksand = false;
 //End Type
 };
 

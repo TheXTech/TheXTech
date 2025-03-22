@@ -1252,7 +1252,7 @@ interrupt_Activation:
                                     NPC[A].SpecialY = NPC[A].Location.SpeedY;
                             }
 
-                            if(Water[B].Quicksand)
+                            if(Water[B].Type == PHYSID_QUICKSAND)
                                 NPC[A].Quicksand = 2;
 
                             NPC[A].Wet = 2;

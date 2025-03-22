@@ -1132,7 +1132,7 @@ bool OpenLevel_Water(void* userdata, LevelPhysEnv& w)
         }
 
         // water.Buoy = w.buoy;
-        water.Quicksand = w.env_type;
+        water.Type = (PHYSID)w.env_type;
         water.Layer = load.FindLayer(w.layer);
     }
 

@@ -4465,7 +4465,7 @@ void WaterCheck(const int A)
                 p.Wet = 2;
                 p.SpinJump = false;
 
-                if(Water[B].Quicksand)
+                if(Water[B].Type == PHYSID_QUICKSAND)
                     p.Quicksand = 3;
             }
         }
