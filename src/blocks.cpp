@@ -293,7 +293,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
             for(int B : treeBlockQuery(query_loc, SORTMODE_NONE))
             {
-                if(B != A && !Block[B].Hidden && !(BlockOnlyHitspot1[Block[B].Type] && !BlockIsSizable[Block[B].Type]))
+                if(B != A && !Block[B].Hidden && !BlockOnlyHitspot1[Block[B].Type] && !BlockIsSizable[Block[B].Type])
                 {
                     // if(CheckCollision(Block[B].Location, newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30)))
                     if(CheckCollision(Block[B].Location, query_loc))
