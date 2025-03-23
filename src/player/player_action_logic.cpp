@@ -74,7 +74,6 @@ void PlayerThrownNpcMazeCheck(const Player_t& p, NPC_t& npc)
     if(npc->NoClipping)
         return;
 
-    npc.Projectile = false;
     npc.Effect = NPCEFF_MAZE;
     npc.Effect2 = p.CurMazeZone;
     PlayerThrowItemMaze(p, npc.Location, npc.Effect3);
@@ -212,7 +211,8 @@ void PlayerShootChar5Beam(int A)
     if(Player[A].StandingOnNPC != 0)
         NPC[numNPCs].Location.Y += -Player[A].Location.SpeedY;
 
-    PlayerThrownNpcMazeCheck(Player[A], NPC[numNPCs]);
+    if(Player[A].State != 6)
+        PlayerThrownNpcMazeCheck(Player[A], NPC[numNPCs]);
 
     syncLayers_NPC(numNPCs);
     CheckSectionNPC(numNPCs);
@@ -384,6 +384,8 @@ void PlayerThrowHeavy(const int A)
 
     if(p.Character == 4)
         NPC[numNPCs].Location.X = p.Location.X + (p.Location.Width - NPC[numNPCs].Location.Width) / 2;
+
+    PlayerThrownNpcMazeCheck(p, NPC[numNPCs]);
 
     syncLayers_NPC(numNPCs);
     CheckSectionNPC(numNPCs);
