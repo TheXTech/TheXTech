@@ -67,4 +67,8 @@ void PlayerEffectWarpPipe(int A);
 void PlayerEffectWarpDoor(int A);
 void PlayerEffectWarpWait(int A);
 
+void PlayerMazeZoneMovement(int A);
+void PlayerThrowItemMaze(const Player_t& p, Location_t& loc, uint8_t& maze_status);
+void PlayerThrownNpcMazeCheck(const Player_t& p, NPC_t& npc);
+
 #endif // PLAYER_UPDATE_PRIV_H

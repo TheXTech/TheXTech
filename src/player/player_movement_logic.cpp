@@ -24,6 +24,7 @@
 #include "config.h"
 #include "effect.h"
 #include "eff_id.h"
+#include "phys_env.h"
 
 #include "player/player_update_priv.h"
 #include "npc/npc_cockpit_bits.h"
@@ -1058,4 +1059,31 @@ void PlayerSwimMovementY(int A)
         if(Player[A].Location.SpeedY < -3)
             Player[A].Location.SpeedY = -3;
     }
+}
+
+void PlayerMazeZoneMovement(int A)
+{
+    if(Player[A].Mount == 3)
+    {
+        Player[A].Duck = true;
+        SizeCheck(Player[A]);
+    }
+    else
+    {
+        UnDuck(Player[A]);
+        Player[A].WetFrame = true;
+    }
+
+    Player[A].Bumped = 0;
+    Player[A].Bumped2 = 0;
+
+    if(Player[A].MazeZoneStatus & MAZE_PLAYER_FLIP)
+        Player[A].MazeZoneStatus = (Player[A].MazeZoneStatus & 3) ^ MAZE_DIR_FLIP_BIT;
+
+    Player[A].SpinJump = false;
+
+    PhysEnv_Maze(Player[A].Location, Player[A].CurMazeZone, Player[A].MazeZoneStatus, 0, A, Player[A].Quicksand ? 1 : (Player[A].Wet ? 2 : 4), {Player[A].Controls.Left, Player[A].Controls.Up, Player[A].Controls.Right, Player[A].Controls.Down});
+
+    if(!Player[A].CurMazeZone)
+        PlaySoundSpatial(SFX_HeroDash, Player[A].Location);
 }

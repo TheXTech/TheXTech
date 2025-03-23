@@ -790,6 +790,11 @@ struct Player_t
     // float SpeedFixY = 0.0f;
 //End Type
 
+    // NEW: currently in a maze zone PhysEnv? (stores physenv index)
+    vbint_t CurMazeZone = 0;
+    // NEW: status field for maze zone (stores current direction and clearance to leave)
+    uint8_t MazeZoneStatus = 0;
+
     Player_t() : GroundPound(false), GroundPound2(false), CanPound(false), AltRunRelease(false), DuckRelease(false) {}
 };
 
