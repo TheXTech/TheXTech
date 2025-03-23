@@ -1930,11 +1930,13 @@ void PlayerFrame(Player_t &p)
     }
     else
     {
+        bool grounded = (p.Location.SpeedY == 0 || p.StandingOnNPC != 0 || p.Slope > 0);
+
         if(p.State == 1 && (p.Character == 1 || p.Character == 2)) // Small Mario & Luigi
         {
             if(p.HoldingNPC == 0) // not holding anything
             {
-                if(p.WetFrame && p.Location.SpeedY != 0 && p.Slope == 0 && p.StandingOnNPC == 0 && !p.Duck && p.Quicksand == 0) // swimming
+                if(p.WetFrame && !grounded && !p.Duck && p.Quicksand == 0) // swimming
                 {
                     if(p.Location.SpeedY < 0 || p.Frame == 42 || p.Frame == 43)
                     {
@@ -1972,7 +1974,7 @@ void PlayerFrame(Player_t &p)
                 }
                 else // not swimming
                 {
-                    if(p.Location.SpeedY == 0 || p.StandingOnNPC != 0 || p.Slope > 0 || (p.Location.SpeedY > 0 && p.Quicksand > 0))
+                    if(grounded || (p.Location.SpeedY > 0 && p.Quicksand > 0))
                     {
                         if(p.Location.SpeedX > 0 && (p.Controls.Left || (p.Direction == -1 && p.Bumped)) && p.Effect == PLREFF_NORMAL && p.Quicksand == 0)
                         {
@@ -2052,7 +2054,7 @@ void PlayerFrame(Player_t &p)
             }
             else
             {
-                if(p.Location.SpeedY == 0 || p.StandingOnNPC != 0 || p.Slope > 0)
+                if(grounded)
                 {
                     if(p.Mount != 2 &&
                        ((p.Controls.Left && p.Location.SpeedX > 0) || (p.Controls.Right && p.Location.SpeedX < 0)) &&
@@ -2147,8 +2149,7 @@ void PlayerFrame(Player_t &p)
         {
             if(p.HoldingNPC == 0 || (p.Effect == PLREFF_WARP_PIPE && p.Character >= 3))
             {
-                if(p.WetFrame && p.Location.SpeedY != 0 && p.Slope == 0 &&
-                   p.StandingOnNPC == 0 && !p.Duck && p.Quicksand == 0)
+                if(p.WetFrame && !grounded && !p.Duck && p.Quicksand == 0)
                 {
                     if(p.Location.SpeedY < 0 || p.Frame == 43 || p.Frame == 44)
                     {
@@ -2197,12 +2198,11 @@ void PlayerFrame(Player_t &p)
                             p.Frame = 2;
                         else
                             p.Frame = 5;
-
                     }
                 }
                 else
                 {
-                    if(p.Location.SpeedY == 0 || p.StandingOnNPC != 0 || p.Slope > 0 || (p.Quicksand > 0 && p.Location.SpeedY > 0))
+                    if(grounded || (p.Quicksand > 0 && p.Location.SpeedY > 0))
                     {
                         if(p.Location.SpeedX > 0 && (p.Controls.Left || (p.Direction == -1 && p.Bumped)) &&
                            p.Effect == PLREFF_NORMAL && !p.Duck && p.Quicksand == 0)
@@ -2352,7 +2352,7 @@ void PlayerFrame(Player_t &p)
             }
             else
             {
-                if(p.Location.SpeedY == 0 || p.StandingOnNPC != 0 || p.Slope > 0)
+                if(grounded)
                 {
                     if(p.Mount != 2 &&
                        ((p.Controls.Left && p.Location.SpeedX > 0) || (p.Controls.Right && p.Location.SpeedX < 0)) &&
