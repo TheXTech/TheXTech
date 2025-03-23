@@ -1085,5 +1085,24 @@ void PlayerMazeZoneMovement(int A)
     PhysEnv_Maze(Player[A].Location, Player[A].CurMazeZone, Player[A].MazeZoneStatus, 0, A, Player[A].Quicksand ? 1 : (Player[A].Wet ? 2 : 4), {Player[A].Controls.Left, Player[A].Controls.Up, Player[A].Controls.Right, Player[A].Controls.Down});
 
     if(!Player[A].CurMazeZone)
+    {
+        // prevent unexpected block clipping
+        if(Player[A].MazeZoneStatus % 4 == MAZE_DIR_DOWN)
+        {
+            PlayerPush(A, 1);
+        }
+        else if(Player[A].MazeZoneStatus % 4 == MAZE_DIR_UP)
+        {
+            Player[A].StandUp = true;
+            Player[A].StandUp2 = true;
+            Player[A].ForceHitSpot3 = true;
+        }
+        // don't allow jumping
+        else
+        {
+            Player[A].Location.SpeedY = 0.01;
+        }
+
         PlaySoundSpatial(SFX_HeroDash, Player[A].Location);
+    }
 }
