@@ -1261,7 +1261,7 @@ interrupt_Activation:
                                 if(NPC[A].Effect3 == MAZE_DIR_DOWN)
                                 {
                                     double rel_speed = NPC[A].Location.SpeedY - Layer[Water[B].Layer].SpeedY;
-                                    if(rel_speed < 0 || (NPC[A]->IsABlock && rel_speed <= Physics.NPCGravity))
+                                    if(rel_speed < 0 || (NPC[A]->IsABlock && rel_speed <= 4))
                                         NPC[A].Effect = NPCEFF_NORMAL;
                                 }
 
