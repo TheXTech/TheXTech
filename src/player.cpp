@@ -4615,41 +4615,33 @@ void PlayerCollide(const int A)
                     p1.Bumped = true;
                     p2.Bumped = true;
                 }
-                else if(HitSpot == 1)
+                else if(HitSpot == 1 || HitSpot == 3)
                 {
+                    Player_t& top_player = (HitSpot == 1) ? p1 : p2;
+                    Player_t& bottom_player = (HitSpot == 1) ? p2 : p1;
+                    int top_player_idx = (HitSpot == 1) ? A : B;
+
                     if(!g_ClonedPlayerMode)
-                        PlaySoundSpatial(SFX_Stomp, p1.Location);
-                    p1.Location.Y = p2.Location.Y - p1.Location.Height - 0.1;
-                    PlayerPush(A, 3);
-                    p1.Location.SpeedY = Physics.PlayerJumpVelocity;
-                    p1.Jump = Physics.PlayerHeadJumpHeight;
-                    if(p1.Character == 2)
+                        PlaySoundSpatial(SFX_Stomp, top_player.Location);
+
+                    top_player.Location.Y = bottom_player.Location.Y - top_player.Location.Height - 0.1;
+                    PlayerPush(top_player_idx, 3);
+
+                    top_player.Location.SpeedY = Physics.PlayerJumpVelocity;
+
+                    top_player.Jump = Physics.PlayerHeadJumpHeight;
+
+                    // yes, it's an SMBX 1.3 bug... :'(
+                    if(top_player.Character == 2)
                         p1.Jump += 3;
-                    if(p1.SpinJump)
+                    if(top_player.SpinJump)
                         p1.Jump -= 6;
-                    p2.Jump = 0;
-                    if(p2.Location.SpeedY <= 0)
-                        p2.Location.SpeedY = 0.1;
-                    p2.CanJump = false;
-                    NewEffect(EFFID_WHACK, newLoc(p1.Location.X + p1.Location.Width / 2 - 16, p1.Location.Y + p1.Location.Height - 16));
-                }
-                else if(HitSpot == 3)
-                {
-                    if(!g_ClonedPlayerMode)
-                        PlaySoundSpatial(SFX_Stomp, p1.Location);
-                    p2.Location.Y = p1.Location.Y - p2.Location.Height - 0.1;
-                    PlayerPush(B, 3);
-                    p2.Location.SpeedY = Physics.PlayerJumpVelocity;
-                    p2.Jump = Physics.PlayerHeadJumpHeight;
-                    if(p2.Character == 2)
-                        p1.Jump += 3;
-                    if(p1.SpinJump)
-                        p1.Jump -= 6;
-                    p1.Jump = 0;
-                    if(p1.Location.SpeedY <= 0)
-                        p1.Location.SpeedY = 0.1;
-                    p1.CanJump = false;
-                    NewEffect(EFFID_WHACK, newLoc(p2.Location.X + p2.Location.Width / 2 - 16, p2.Location.Y + p2.Location.Height - 16));
+
+                    bottom_player.Jump = 0;
+                    if(bottom_player.Location.SpeedY <= 0)
+                        bottom_player.Location.SpeedY = 0.1;
+                    bottom_player.CanJump = false;
+                    NewEffect(EFFID_WHACK, newLoc(top_player.Location.X + top_player.Location.Width / 2 - 16, top_player.Location.Y + top_player.Location.Height - 16));
                 }
                 else if(HitSpot == 5)
                 {
