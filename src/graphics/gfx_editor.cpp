@@ -175,6 +175,7 @@ void s_drawWaterBox(int camX, int camY, const Water_t& w)
 {
     XRender::renderRect(camX + s_round2int(w.Location.X), camY + s_round2int(w.Location.Y), (int)(w.Location.Width), (int)(w.Location.Height),
         (w.Type == PHYSID_QUICKSAND) ? XTColor{255, 255, 0} :
+        (w.Type == PHYSID_MAZE) ? XTColor{192, 192, 255} :
         XTColor{0, 255, 255},
         false);
 }

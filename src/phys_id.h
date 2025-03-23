@@ -29,6 +29,7 @@ enum PHYSID : vbint_t
 {
     PHYSID_WATER = 0,
     PHYSID_QUICKSAND = 1,
+    PHYSID_MAZE = 17,
 };
 
 #endif // #ifndef ENUM_PHYSID_HHH
