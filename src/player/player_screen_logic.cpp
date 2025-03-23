@@ -133,166 +133,166 @@ void PlayerEffectWings(int A)
     Screen_t& screen = ScreenByPlayer(A);
     Player_t& p = Player[A];
 
-    int vscreen_i = vScreenIdxByPlayer(A);
+    // check if the player should be moving towards another player or towards the screen
+    int target_plr = CheckNearestLiving(A);
+    if(target_plr)
+        p.Section = Player[target_plr].Section;
+
+    int vscreen_i;
+    if(target_plr && screen.Type != ScreenTypes::SharedScreen)
+        vscreen_i = vScreenIdxByPlayer(target_plr);
+    else
+        vscreen_i = vScreenIdxByPlayer(A);
+
     const vScreen_t& vscreen = vScreen[vscreen_i];
 
     p.Fairy = false;
 
-    if(screen.Type == ScreenTypes::SharedScreen)
+    bool button_pressed = p.Controls.Jump && p.CanJump;
+    if(p.Controls.Jump)
+        p.CanJump = false;
+
+    int WingsFrame = 0;
+
+    if(!button_pressed)
+        target_plr = 0;
+
+    bool offscreen = !vScreenCollision(vscreen_i, p.Location);
+
+    // force to be close to the screen
+    if(offscreen)
     {
-        bool button_pressed = p.Controls.Jump && p.CanJump;
-        if(p.Controls.Jump)
-            p.CanJump = false;
+        if(p.Location.X + p.Location.Width < -vscreen.X - 100)
+            p.Location.X = -vscreen.X - 100 - p.Location.Width;
+        if(p.Location.X > -vscreen.X + vscreen.Width + 100)
+            p.Location.X = -vscreen.X + vscreen.Width + 100;
+        if(p.Location.Y + p.Location.Height < -vscreen.Y - 100)
+            p.Location.Y = -vscreen.Y - 100 - p.Location.Height;
+        if(p.Location.Y > -vscreen.Y + vscreen.Height + 100)
+            p.Location.Y = -vscreen.Y + vscreen.Height + 100;
+    }
 
-        int WingsFrame = 0;
+    // move towards screen center or living player
+    if(target_plr || offscreen)
+    {
+        double target_X = (target_plr) ? (Player[target_plr].Location.X + Player[target_plr].Location.Width / 2) : -vscreen.X + vscreen.Width / 2;
+        double target_Y = (target_plr) ? Player[target_plr].Location.Y - 8 : -vscreen.Y + vscreen.Height / 2;
 
-        // check if the player should be moving towards another player or towards the screen
-        int target_plr = CheckNearestLiving(A);
-        if(target_plr)
-            p.Section = Player[target_plr].Section;
+        int randomness = (target_plr) ? 8 : vscreen.Width / 10;
+        target_X += iRand(randomness * 2) - randomness;
+        target_Y += iRand(randomness * 2) - randomness;
 
-        if(!button_pressed)
-            target_plr = 0;
+        double center_X = p.Location.X + p.Location.Width / 2;
+        double center_Y = p.Location.Y + p.Location.Height / 2;
 
-        bool offscreen = !vScreenCollision(vscreen_i, p.Location);
+        double target_SpeedX = (target_X - center_X);
+        double target_SpeedY = (target_Y - center_Y);
 
-        // force to be close to the screen
-        if(offscreen)
+        double target_speed = SDL_sqrt(target_SpeedX * target_SpeedX + target_SpeedY * target_SpeedY);
+
+        if(target_speed != 0)
         {
-            if(p.Location.X + p.Location.Width < -vscreen.X - 100)
-                p.Location.X = -vscreen.X - 100 - p.Location.Width;
-            if(p.Location.X > -vscreen.X + vscreen.Width + 100)
-                p.Location.X = -vscreen.X + vscreen.Width + 100;
-            if(p.Location.Y + p.Location.Height < -vscreen.Y - 100)
-                p.Location.Y = -vscreen.Y - 100 - p.Location.Height;
-            if(p.Location.Y > -vscreen.Y + vscreen.Height + 100)
-                p.Location.Y = -vscreen.Y + vscreen.Height + 100;
+            target_SpeedX *= 8 / target_speed;
+            target_SpeedY *= 8 / target_speed;
         }
 
-        // move towards screen center or living player
-        if(target_plr || offscreen)
+        p.Location.SpeedX = (p.Location.SpeedX + target_SpeedX) / 2;
+        p.Location.SpeedY = (p.Location.SpeedY + target_SpeedY) / 2;
+
+        if(SoundPause[SFX_Swim] == 0)
         {
-            double target_X = (target_plr) ? (Player[target_plr].Location.X + Player[target_plr].Location.Width / 2) : -vscreen.X + vscreen.Width / 2;
-            double target_Y = (target_plr) ? Player[target_plr].Location.Y - 8 : -vscreen.Y + vscreen.Height / 2;
-
-            int randomness = (target_plr) ? 8 : vscreen.Width / 10;
-            target_X += iRand(randomness * 2) - randomness;
-            target_Y += iRand(randomness * 2) - randomness;
-
-            double center_X = p.Location.X + p.Location.Width / 2;
-            double center_Y = p.Location.Y + p.Location.Height / 2;
-
-            double target_SpeedX = (target_X - center_X);
-            double target_SpeedY = (target_Y - center_Y);
-
-            double target_speed = SDL_sqrt(target_SpeedX * target_SpeedX + target_SpeedY * target_SpeedY);
-
-            if(target_speed != 0)
-            {
-                target_SpeedX *= 8 / target_speed;
-                target_SpeedY *= 8 / target_speed;
-            }
-
-            p.Location.SpeedX = (p.Location.SpeedX + target_SpeedX) / 2;
-            p.Location.SpeedY = (p.Location.SpeedY + target_SpeedY) / 2;
-
-            if(SoundPause[SFX_Swim] == 0)
-            {
-                PlaySoundSpatial(SFX_Swim, p.Location);
-                SoundPause[SFX_Swim] = 15;
-            }
+            PlaySoundSpatial(SFX_Swim, p.Location);
+            SoundPause[SFX_Swim] = 15;
         }
-        // deceleration
-        else
+    }
+    // deceleration
+    else
+    {
+        double sq_speed = p.Location.SpeedX * p.Location.SpeedX + p.Location.SpeedY * p.Location.SpeedY;
+        double decelerate_rate = (sq_speed > 4.0) ? 0.95 : (sq_speed > 1.0) ? 0.99 : 0.999;
+
+        if(sq_speed <= 4)
         {
-            double sq_speed = p.Location.SpeedX * p.Location.SpeedX + p.Location.SpeedY * p.Location.SpeedY;
-            double decelerate_rate = (sq_speed > 4.0) ? 0.95 : (sq_speed > 1.0) ? 0.99 : 0.999;
+            WingsFrame = 1;
 
-            if(sq_speed <= 4)
-            {
-                WingsFrame = 1;
-
-                if(!p.Controls.Jump)
-                    p.CanJump = true;
-            }
-
-            p.Location.SpeedX *= decelerate_rate;
-            p.Location.SpeedY *= decelerate_rate;
+            if(!p.Controls.Jump)
+                p.CanJump = true;
         }
 
-        // update frame
-        p.SpinJump = false;
-        p.WetFrame = false;
-        if(p.Location.SpeedY == 0)
-            p.Location.SpeedY = 0.00001;
-        PlayerFrame(p);
-        if(p.Location.SpeedX >= 0)
-        {
-            p.Direction = 1;
-            p.YoshiWingsFrame = WingsFrame + 2;
-        }
-        else
-        {
-            p.Direction = -1;
-            p.YoshiWingsFrame = WingsFrame;
-        }
+        p.Location.SpeedX *= decelerate_rate;
+        p.Location.SpeedY *= decelerate_rate;
+    }
 
-        // apply movement
-        p.Location.X += p.Location.SpeedX;
-        p.Location.Y += p.Location.SpeedY;
+    // update frame
+    p.SpinJump = false;
+    p.WetFrame = false;
+    if(p.Location.SpeedY == 0)
+        p.Location.SpeedY = 0.00001;
+    PlayerFrame(p);
+    if(p.Location.SpeedX >= 0)
+    {
+        p.Direction = 1;
+        p.YoshiWingsFrame = WingsFrame + 2;
+    }
+    else
+    {
+        p.Direction = -1;
+        p.YoshiWingsFrame = WingsFrame;
+    }
 
-        // tag other players
-        bool found_player = false;
-        for(int B = 1; B <= numPlayers; B++)
+    // apply movement
+    p.Location.X += p.Location.SpeedX;
+    p.Location.Y += p.Location.SpeedY;
+
+    // tag other players
+    bool found_player = false;
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].Dead || Player[B].TimeToLive != 0 || Player[B].Effect != PLREFF_NORMAL)
+            continue;
+
+        if(!CheckCollision(Player[A].Location, Player[B].Location))
+            continue;
+
+        found_player = true;
+        break;
+    }
+
+    // just collided with player
+    if(found_player && !p.Effect2)
+    {
+        // if we're inside a block, then we can't respawn yet
+        bool hit_block = false;
+        for(BlockRef_t b_ref : treeBlockQuery(Player[A].Location, SORTMODE_NONE))
         {
-            if(Player[B].Dead || Player[B].TimeToLive != 0 || Player[B].Effect != PLREFF_NORMAL)
+            const Block_t& b = b_ref;
+            int B = (int)b_ref;
+
+            if(b.Hidden || b.Invis || BlockIsSizable[b.Type] || BlockOnlyHitspot1[b.Type] || BlockNoClipping[b.Type])
                 continue;
 
-            if(!CheckCollision(Player[A].Location, Player[B].Location))
+            if(BlockCheckPlayerFilter(B, A))
                 continue;
 
-            found_player = true;
+            if(!CheckCollision(Player[A].Location, b.Location))
+                continue;
+
+            if(BlockSlope[b.Type] || BlockSlope2[b.Type])
+                continue;
+
+            hit_block = true;
             break;
         }
 
-        // just collided with player
-        if(found_player && !p.Effect2)
+        if(!hit_block)
         {
-            // if we're inside a block, then we can't respawn yet
-            bool hit_block = false;
-            for(BlockRef_t b_ref : treeBlockQuery(Player[A].Location, SORTMODE_NONE))
-            {
-                const Block_t& b = b_ref;
-                int B = (int)b_ref;
-
-                if(b.Hidden || b.Invis || BlockIsSizable[b.Type] || BlockOnlyHitspot1[b.Type] || BlockNoClipping[b.Type])
-                    continue;
-
-                if(BlockCheckPlayerFilter(B, A))
-                    continue;
-
-                if(!CheckCollision(Player[A].Location, b.Location))
-                    continue;
-
-                if(BlockSlope[b.Type] || BlockSlope2[b.Type])
-                    continue;
-
-                hit_block = true;
-                break;
-            }
-
-            if(!hit_block)
-            {
-                p.Effect = PLREFF_NORMAL;
-                PlayerCollide(A);
-                PlaySoundSpatial(SFX_Transform, p.Location);
-            }
+            p.Effect = PLREFF_NORMAL;
+            PlayerCollide(A);
+            PlaySoundSpatial(SFX_Transform, p.Location);
         }
-
-        p.Effect2 = found_player;
     }
-    else
-        p.Effect = PLREFF_NORMAL;
+
+    p.Effect2 = found_player;
 
     if(p.Effect != PLREFF_COOP_WINGS)
     {
