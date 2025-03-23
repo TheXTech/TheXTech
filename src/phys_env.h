@@ -19,25 +19,29 @@
  */
 
 #pragma once
+#ifndef PHYS_ENV_H
+#define PHYS_ENV_H
 
-#ifndef ENUMNPCEFFECT_HHH
-#define ENUMNPCEFFECT_HHH
+#include <array>
 
-#include "global_constants.h"
+#include "globals.h"
 
-enum NPCEffect : vbint_t
+enum PhysEnv_Maze_Status
 {
-    NPCEFF_NORMAL = 0,
-    NPCEFF_EMERGE_UP = 1,
-    NPCEFF_DROP_ITEM = 2,
-    NPCEFF_EMERGE_DOWN = 3,
-    NPCEFF_WARP = 4,
-    NPCEFF_PET_TONGUE = 5,
-    NPCEFF_PET_INSIDE = 6,
-    NPCEFF_WAITING = 8,
-    NPCEFF_ENCASED = 208,
-    NPCEFF_MAZE = 9,
+    MAZE_DIR_LEFT = 0,
+    MAZE_DIR_UP = 1,
+    MAZE_DIR_RIGHT = 2,
+    MAZE_DIR_DOWN = 3,
+    MAZE_CAN_EXIT = 4,
+    MAZE_PLAYER_FLIP = 128,
+    MAZE_DIR_FLIP_BIT = 2,
 };
 
+// applies maze physics to a location. modifies maze_index and effect_data as needed.
+// indicates leaving the env by setting maze_index to 0.
+void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int npc_A, int plr_A, int speedvar, std::array<bool, 4> controls);
 
-#endif // ENUMNPCEFFECT_HHH
+// picks direction for a possible maze entry
+void PhysEnv_Maze_PickDirection(const Location_t& loc, vbint_t maze_index, uint8_t& maze_state);
+
+#endif // #ifndef PHYS_ENV_H

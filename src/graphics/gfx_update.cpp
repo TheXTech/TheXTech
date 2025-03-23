@@ -357,6 +357,7 @@ public:
             g_stats.renderedNPCs += 1;
         }
         else if(NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_JUMP_PLANT ||
+            NPC[A].Effect == NPCEFF_MAZE ||
             ((NPC[A].Effect == NPCEFF_ENCASED || NPC[A]->IsAVine ||
                     NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_FIRE_PLANT ||
                     NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_BIG_PLANT ||
@@ -902,7 +903,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
              NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_BIG_PLANT ||
              NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == NPCID_BOTTOM_PLANT ||
              NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Effect == NPCEFF_EMERGE_UP || NPC[A].Effect == NPCEFF_EMERGE_DOWN ||
-             NPC[A].Effect == NPCEFF_WARP || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0)) &&
+             NPC[A].Effect == NPCEFF_WARP || NPC[A].Effect == NPCEFF_MAZE || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0)) &&
              (NPC[A].vehiclePlr == 0 && (!NPC[A].Generator || LevelEditor))) ||
              NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_JUMP_PLANT)
         {
@@ -2197,6 +2198,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
                         cn);
                 }
             }
+            else if(NPC[A].Type == NPCID_ICE_CUBE)
+                DrawFrozenNPC(Z, A);
             // fix a graphical SMBX64 bug where the draw width and frame stride were incorrect
             else if(NPC[A]->WidthGFX != 0 && NPC[A].Effect == NPCEFF_EMERGE_UP && g_config.fix_visual_bugs)
             {

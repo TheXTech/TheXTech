@@ -29,6 +29,8 @@
 #include "layers.h"
 #include "editor.h"
 #include "player.h"
+#include "npc_update_priv.h"
+#include "phys_env.h"
 
 #include "main/trees.h"
 
@@ -331,6 +333,50 @@ static inline void NPCEffectLogic_Waiting(int A)
     }
 }
 
+static inline void NPCEffectLogic_Maze(int A)
+{
+    NPCFrames(A);
+    NPCCollide(A);
+
+    NPC_t& npc = NPC[A];
+
+    if(npc.TurnAround)
+    {
+        npc.Effect3 = npc.Effect3 ^ MAZE_DIR_FLIP_BIT;
+        npc.TurnAround = false;
+    }
+
+    // make balls go very slightly faster, and give them speed when they leave so they don't bounce forever
+    bool is_ball = (npc.Type == NPCID_PLR_FIREBALL || npc.Type == NPCID_PLR_ICEBALL);
+
+    PhysEnv_Maze(npc.Location, npc.Effect2, npc.Effect3, A, 0, npc.Quicksand ? 1 : (npc.Wet ? 2 : 4) + is_ball, {false, false, false, false});
+
+    if(npc.Effect3 == MAZE_DIR_LEFT)
+        npc.Direction = -1;
+    else if(npc.Effect3 == MAZE_DIR_RIGHT)
+        npc.Direction = 1;
+
+    if(!npc.Effect2)
+    {
+        npc.Effect = NPCEFF_NORMAL;
+
+        bool is_vert = (npc.Effect3 % 4 == MAZE_DIR_UP || npc.Effect3 % 4 == MAZE_DIR_DOWN);
+        npc.Effect3 = 0;
+
+        if(is_vert)
+        {
+            if(!npc.Projectile && !npc.Wet)
+            {
+                npc.Projectile = true;
+                npc.Effect3 = 128;
+            }
+
+            if(is_ball && npc.Special != 5)
+                npc.Location.SpeedX = 1 - 4 * iRand(2) + 2 * dRand();
+        }
+    }
+}
+
 
 void NPCEffects(int A)
 {
@@ -350,4 +396,6 @@ void NPCEffects(int A)
         NPCEffectLogic_PetInside(A);
     else if(NPC[A].Effect == NPCEFF_WAITING) // Holding Pattern
         NPCEffectLogic_Waiting(A);
+    else if(NPC[A].Effect == NPCEFF_MAZE) // In a maze zone
+        NPCEffectLogic_Maze(A);
 }
