@@ -3623,6 +3623,8 @@ void PlayerPush(const int A, int HitSpot)
                         p.Location.Y = b.Location.Y + b.Location.Height + 0.01;
                     else if(HitSpot == 4)
                         p.Location.X = b.Location.X + b.Location.Width + 0.01;
+                    else if(HitSpot == 1) // new-added
+                        p.Location.Y = b.Location.Y - p.Location.Height - 0.01;
 
                     q.update(p.Location, it);
                 }
