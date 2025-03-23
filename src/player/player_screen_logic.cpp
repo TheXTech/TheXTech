@@ -27,6 +27,7 @@
 #include "blocks.h"
 #include "collision.h"
 #include "config.h"
+#include "phys_env.h"
 
 #include "main/trees.h"
 #include "main/game_globals.h"
@@ -63,6 +64,9 @@ void PlayerSharedScreenLogic(int A)
         {
             const Player_t& o_p = Player[screen.players[o_p_i]];
 
+            if(o_p.Dead || o_p.TimeToLive || o_p.Effect == PLREFF_COOP_WINGS)
+                continue;
+
             if(o_p.Location.X <= -vscreen.X + 8 && !vscreen_at_section_bound_left)
                 check_right = true;
             else if(o_p.Location.X + o_p.Location.Width >= -vscreen.X + vscreen.Width - 8 && !vscreen_at_section_bound_right)
@@ -83,6 +87,14 @@ void PlayerSharedScreenLogic(int A)
 
                 if(p.Location.SpeedX < 0)
                     p.Location.SpeedX = 0;
+
+                if(p.CurMazeZone && (p.MazeZoneStatus % 4) == MAZE_DIR_LEFT)
+                    p.MazeZoneStatus |= MAZE_PLAYER_FLIP;
+                else if(p.CurMazeZone && (p.MazeZoneStatus % 4) != MAZE_DIR_RIGHT)
+                {
+                    p.CurMazeZone = 0;
+                    p.Effect = PLREFF_COOP_WINGS;
+                }
             }
 
             if(p.Location.SpeedX >= 0 && p.Location.SpeedX < 1)
@@ -106,6 +118,14 @@ void PlayerSharedScreenLogic(int A)
 
                 if(p.Location.SpeedX > 0)
                     p.Location.SpeedX = 0;
+
+                if(p.CurMazeZone && (p.MazeZoneStatus % 4) == MAZE_DIR_RIGHT)
+                    p.MazeZoneStatus |= MAZE_PLAYER_FLIP;
+                else if(p.CurMazeZone && (p.MazeZoneStatus % 4) != MAZE_DIR_LEFT)
+                {
+                    p.CurMazeZone = 0;
+                    p.Effect = PLREFF_COOP_WINGS;
+                }
             }
 
             if(p.Location.SpeedX > -1 && p.Location.SpeedX <= 0)
