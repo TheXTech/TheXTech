@@ -1199,7 +1199,7 @@ interrupt_Activation:
             // water check
 
             // Things immune to water's effects
-            if(NPC[A].Type == NPCID_LAVABUBBLE || NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || NPC[A].Type == NPCID_HEAVY_THROWN
+            if(NPC[A].Type == NPCID_LAVABUBBLE || NPC[A].Type == NPCID_BIG_BULLET || NPC[A].Type == NPCID_HEAVY_THROWN
                 || NPC[A].Type == NPCID_GHOST_S3 || NPC[A].Type == NPCID_GHOST_FAST || NPC[A].Type == NPCID_GHOST_S4 || NPC[A].Type == NPCID_BIG_GHOST
                 || NPC[A].Type == NPCID_STATUE_FIRE || NPC[A].Type == NPCID_VILLAIN_FIRE || NPC[A].Type == NPCID_PET_FIRE || NPC[A].Type == NPCID_PLR_HEAVY
                 || NPC[A].Type == NPCID_CHAR4_HEAVY || NPC[A].Type == NPCID_GOALTAPE || NPC[A].Type == NPCID_SICK_BOSS_BALL || NPC[A].Type == NPCID_HOMING_BALL
@@ -1218,7 +1218,7 @@ interrupt_Activation:
                 if(NPC[A].Quicksand > 0)
                     NPC[A].Quicksand -= 1;
 
-                if(UnderWater[NPC[A].Section])
+                if(UnderWater[NPC[A].Section] && NPC[A].Type != NPCID_BULLET)
                     NPC[A].Wet = 2;
 
                 bool already_in_maze = (NPC[A].Effect == NPCEFF_MAZE);
@@ -1241,9 +1241,11 @@ interrupt_Activation:
                             if(NPCIsYoshi(NPC[A]) || NPCIsBoot(NPC[A]))
                                 continue;
 
-                            if((NPCIsVeggie(NPC[A]) && NPC[A].Projectile) || NPC[A]->NoClipping || NPC[A].WallDeath || NPC[A].HoldingPlayer)
+                            if((NPCIsVeggie(NPC[A]) && NPC[A].Projectile) || (NPC[A]->NoClipping && NPC[A].Type != NPCID_BULLET) || NPC[A].WallDeath || NPC[A].HoldingPlayer)
                                 continue;
                         }
+                        else if(NPC[A].Type == NPCID_BULLET)
+                            continue;
 
                         if(CheckCollision(NPC[A].Location, Water[B].Location))
                         {
