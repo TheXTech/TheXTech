@@ -32,6 +32,7 @@
 #include "layers.h"
 #include "blocks.h"
 #include "graphics.h"
+#include "player/player_update_priv.h"
 
 #include "main/trees.h"
 
@@ -753,6 +754,10 @@ void NPCSpecialMaybeHeld(int A)
                         else
                             NPC[numNPCs].Frame = 0;
                         NPC[numNPCs].Location.Y = NPC[A].Location.Y + (NPC[A].Location.Height - NPC[numNPCs].Location.Height) / 2;
+
+                        if(NPC[A].HoldingPlayer)
+                            PlayerThrownNpcMazeCheck(Player[NPC[A].HoldingPlayer], NPC[numNPCs]);
+
                         syncLayers_NPC(numNPCs);
 
                         Location_t tempLocation;

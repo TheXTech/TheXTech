@@ -348,9 +348,10 @@ static inline void NPCEffectLogic_Maze(int A)
 
     // make balls go very slightly faster, and give them speed when they leave so they don't bounce forever
     bool is_ball = (npc.Type == NPCID_PLR_FIREBALL || npc.Type == NPCID_PLR_ICEBALL);
+    bool is_bullet = (npc.Type == NPCID_BULLET && npc.CantHurt);
     bool is_player_thrown = is_ball || (npc.Type == NPCID_CHAR3_HEAVY || npc.Type == NPCID_BOMB);
 
-    PhysEnv_Maze(npc.Location, npc.Effect2, npc.Effect3, A, 0, npc.Quicksand ? 1 : (npc.Wet ? 2 : 4) + is_player_thrown, {false, false, false, false});
+    PhysEnv_Maze(npc.Location, npc.Effect2, npc.Effect3, A, 0, npc.Quicksand ? 1 : (npc.Wet ? 2 : 4) + is_player_thrown + 4 * is_bullet, {false, false, false, false});
 
     if(npc.Effect3 == MAZE_DIR_LEFT)
         npc.Direction = -1;
@@ -364,7 +365,9 @@ static inline void NPCEffectLogic_Maze(int A)
         bool is_vert = (npc.Effect3 % 4 == MAZE_DIR_UP || npc.Effect3 % 4 == MAZE_DIR_DOWN);
         npc.Effect3 = 0;
 
-        if(is_vert)
+        if(is_bullet)
+            npc.Location.SpeedX = (npc.CantHurt ? 8 : 4) * npc.Direction;
+        else if(is_vert)
         {
             if(!npc.Projectile && !npc.Wet)
             {

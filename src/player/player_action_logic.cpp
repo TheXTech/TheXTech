@@ -71,7 +71,7 @@ void PlayerThrownNpcMazeCheck(const Player_t& p, NPC_t& npc)
     if(!p.CurMazeZone)
         return;
 
-    if(npc->NoClipping)
+    if(npc->NoClipping && npc.Type != NPCID_BULLET)
         return;
 
     npc.Effect = NPCEFF_MAZE;
