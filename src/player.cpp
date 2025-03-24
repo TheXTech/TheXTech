@@ -43,6 +43,7 @@
 #include "editor.h"
 #include "layers.h"
 #include "config.h"
+#include "phys_env.h"
 #include "main/level_file.h"
 #include "main/game_globals.h"
 #include "main/trees.h"
@@ -276,6 +277,9 @@ static void s_makePetMount(int A)
     NPC[numNPCs].Location.SpeedX = 0;
     NPC[numNPCs].CantHurt = 10;
     NPC[numNPCs].CantHurtPlayer = A;
+
+    PlayerThrownNpcMazeCheck(p, NPC[numNPCs]);
+
     syncLayers_NPC(numNPCs);
 }
 
@@ -824,6 +828,7 @@ void SetupPlayers()
         Player[A].RunRelease = false;
         Player[A].FloatTime = 0;
         Player[A].CanFloat = false;
+        Player[A].CurMazeZone = 0;
 
         if(Player[A].Character == 3)
             Player[A].CanFloat = true;
@@ -1228,6 +1233,7 @@ void PlayerDead(int A)
         SizeCheck(Player[A]);
     }
 
+    p.CurMazeZone = 0;
     p.Mount = 0;
     p.State = 1;
     p.HoldingNPC = 0;
@@ -1930,13 +1936,20 @@ void PlayerFrame(Player_t &p)
     }
     else
     {
+        bool grounded = (p.Location.SpeedY == 0 || p.StandingOnNPC != 0 || p.Slope > 0);
+
+        if(p.CurMazeZone)
+            grounded = false;
+
         if(p.State == 1 && (p.Character == 1 || p.Character == 2)) // Small Mario & Luigi
         {
             if(p.HoldingNPC == 0) // not holding anything
             {
-                if(p.WetFrame && p.Location.SpeedY != 0 && p.Slope == 0 && p.StandingOnNPC == 0 && !p.Duck && p.Quicksand == 0) // swimming
+                if(p.WetFrame && !grounded && !p.Duck && p.Quicksand == 0) // swimming
                 {
-                    if(p.Location.SpeedY < 0 || p.Frame == 42 || p.Frame == 43)
+                    if(p.CurMazeZone)
+                        p.Frame = 40;
+                    else if(p.Location.SpeedY < 0 || p.Frame == 42 || p.Frame == 43)
                     {
                         if(p.Frame != 40 && p.Frame != 42 && p.Frame != 43)
                             p.FrameCount = 6;
@@ -1972,7 +1985,7 @@ void PlayerFrame(Player_t &p)
                 }
                 else // not swimming
                 {
-                    if(p.Location.SpeedY == 0 || p.StandingOnNPC != 0 || p.Slope > 0 || (p.Location.SpeedY > 0 && p.Quicksand > 0))
+                    if(grounded || (p.Location.SpeedY > 0 && p.Quicksand > 0))
                     {
                         if(p.Location.SpeedX > 0 && (p.Controls.Left || (p.Direction == -1 && p.Bumped)) && p.Effect == PLREFF_NORMAL && p.Quicksand == 0)
                         {
@@ -2052,7 +2065,7 @@ void PlayerFrame(Player_t &p)
             }
             else
             {
-                if(p.Location.SpeedY == 0 || p.StandingOnNPC != 0 || p.Slope > 0)
+                if(grounded)
                 {
                     if(p.Mount != 2 &&
                        ((p.Controls.Left && p.Location.SpeedX > 0) || (p.Controls.Right && p.Location.SpeedX < 0)) &&
@@ -2147,10 +2160,11 @@ void PlayerFrame(Player_t &p)
         {
             if(p.HoldingNPC == 0 || (p.Effect == PLREFF_WARP_PIPE && p.Character >= 3))
             {
-                if(p.WetFrame && p.Location.SpeedY != 0 && p.Slope == 0 &&
-                   p.StandingOnNPC == 0 && !p.Duck && p.Quicksand == 0)
+                if(p.WetFrame && !grounded && !p.Duck && p.Quicksand == 0)
                 {
-                    if(p.Location.SpeedY < 0 || p.Frame == 43 || p.Frame == 44)
+                    if(p.CurMazeZone)
+                        p.Frame = 40;
+                    else if(p.Location.SpeedY < 0 || p.Frame == 43 || p.Frame == 44)
                     {
                         if(p.Character <= 2)
                         {
@@ -2197,12 +2211,11 @@ void PlayerFrame(Player_t &p)
                             p.Frame = 2;
                         else
                             p.Frame = 5;
-
                     }
                 }
                 else
                 {
-                    if(p.Location.SpeedY == 0 || p.StandingOnNPC != 0 || p.Slope > 0 || (p.Quicksand > 0 && p.Location.SpeedY > 0))
+                    if(grounded || (p.Quicksand > 0 && p.Location.SpeedY > 0))
                     {
                         if(p.Location.SpeedX > 0 && (p.Controls.Left || (p.Direction == -1 && p.Bumped)) &&
                            p.Effect == PLREFF_NORMAL && !p.Duck && p.Quicksand == 0)
@@ -2352,7 +2365,7 @@ void PlayerFrame(Player_t &p)
             }
             else
             {
-                if(p.Location.SpeedY == 0 || p.StandingOnNPC != 0 || p.Slope > 0)
+                if(grounded)
                 {
                     if(p.Mount != 2 &&
                        ((p.Controls.Left && p.Location.SpeedX > 0) || (p.Controls.Right && p.Location.SpeedX < 0)) &&
@@ -3177,7 +3190,13 @@ void YoshiSpit(const int A)
         Player[p.YoshiPlayer].Bumped = true;
 
         // Simplified code
-        PlayerPush(p.YoshiPlayer, (p.Direction == 1) ? 2 : 4);
+        if(p.CurMazeZone)
+        {
+            Player[p.YoshiPlayer].CurMazeZone = p.CurMazeZone;
+            PlayerThrowItemMaze(p, Player[p.YoshiPlayer].Location, Player[p.YoshiPlayer].MazeZoneStatus);
+        }
+        else
+            PlayerPush(p.YoshiPlayer, (p.Direction == 1) ? 2 : 4);
         //if(p.Direction == 1)
         //    PlayerPush(p.YoshiPlayer, 2);
         //else
@@ -3254,15 +3273,6 @@ void YoshiSpit(const int A)
             NPC[p.YoshiNPC].Location.SpeedX = 0;
             NPC[p.YoshiNPC].Location.SpeedY = 0;
 
-            if(p.YoshiNPC > 0 && p.YoshiNPC <= numNPCs)
-            {
-                NPCQueues::Active.insert(p.YoshiNPC);
-                NPCQueues::Unchecked.push_back(p.YoshiNPC);
-                treeNPCUpdate(p.YoshiNPC);
-            }
-
-
-
             if(NPC[p.YoshiNPC].Type == NPCID_SLIDE_BLOCK)
                 NPC[p.YoshiNPC].Special = 1;
 
@@ -3292,6 +3302,15 @@ void YoshiSpit(const int A)
                 NPC[p.YoshiNPC].Projectile = true;
                 NPC[p.YoshiNPC].Location.SpeedX = Physics.NPCShellSpeed * p.Direction * 0.6 + p.Location.SpeedX * 0.4;
                 NPC[p.YoshiNPC].TurnAround = false;
+            }
+
+            PlayerThrownNpcMazeCheck(p, NPC[p.YoshiNPC]);
+
+            if(p.YoshiNPC > 0 && p.YoshiNPC <= numNPCs)
+            {
+                NPCQueues::Active.insert(p.YoshiNPC);
+                NPCQueues::Unchecked.push_back(p.YoshiNPC);
+                treeNPCUpdate(p.YoshiNPC);
             }
         }
     }
@@ -3604,6 +3623,8 @@ void PlayerPush(const int A, int HitSpot)
                         p.Location.Y = b.Location.Y + b.Location.Height + 0.01;
                     else if(HitSpot == 4)
                         p.Location.X = b.Location.X + b.Location.Width + 0.01;
+                    else if(HitSpot == 1) // new-added
+                        p.Location.Y = b.Location.Y - p.Location.Height - 0.01;
 
                     q.update(p.Location, it);
                 }
@@ -4035,6 +4056,7 @@ void YoshiEatCode(const int A)
         }
         else if(p.MountSpecial == 0 && p.YoshiPlayer > 0)
         {
+            Player[p.YoshiPlayer].CurMazeZone = 0;
             Player[p.YoshiPlayer].Effect = PLREFF_PET_INSIDE;
             Player[p.YoshiPlayer].Effect2 = A;
             Player[p.YoshiPlayer].Location.X = p.Location.X + (p.Location.Width - Player[p.YoshiPlayer].Location.Width) / 2;
@@ -4084,10 +4106,10 @@ void RespawnPlayerTo(int A, int TargetPlayer)
     RespawnPlayer(A, Player[TargetPlayer].Direction, CenterX, StopY, target_vscreen);
 
     // if TargetPlayer is scrolling in warp, we can't spawn them directly.
-    if(PlayerScrollingInWarp(Player[TargetPlayer]))
+    if(PlayerScrollingInWarp(Player[TargetPlayer]) || Player[TargetPlayer].CurMazeZone)
     {
         // Give player A wings in shared screen
-        if(screen.Type == ScreenTypes::SharedScreen)
+        if(screen.Type == ScreenTypes::SharedScreen || Player[TargetPlayer].CurMazeZone)
         {
             Player[A].Location.Y -= 100;
             Player[A].Dead = true;
@@ -4422,12 +4444,36 @@ void WaterCheck(const int A)
         }
     }
 
+    bool already_in_maze = p.CurMazeZone;
+
     for(int B : treeWaterQuery(p.Location, SORTMODE_NONE))
     {
         if(!Water[B].Hidden)
         {
             if(CheckCollision(p.Location, Water[B].Location))
             {
+                if(Water[B].Type == PHYSID_MAZE)
+                {
+                    if(p.CurMazeZone && (already_in_maze || p.CurMazeZone < B))
+                        continue;
+
+                    if(p.Mount == 2 || p.Fairy)
+                        continue;
+
+                    p.CurMazeZone = B;
+
+                    PhysEnv_Maze_PickDirection(p.Location, B, p.MazeZoneStatus);
+
+                    std::array<bool, 4> maze_controls = {Player[A].Controls.Left, Player[A].Controls.Up, Player[A].Controls.Right, Player[A].Controls.Down};
+
+                    if(maze_controls[p.MazeZoneStatus])
+                        PlaySoundSpatial(SFX_HeroDash, p.Location);
+                    else
+                        p.CurMazeZone = 0;
+
+                    continue;
+                }
+
                 if(p.Wet == 0 && p.Mount != 2)
                 {
                     p.FlyCount = 0;
@@ -4465,7 +4511,7 @@ void WaterCheck(const int A)
                 p.Wet = 2;
                 p.SpinJump = false;
 
-                if(Water[B].Quicksand)
+                if(Water[B].Type == PHYSID_QUICKSAND)
                     p.Quicksand = 3;
             }
         }
@@ -4605,6 +4651,7 @@ void PlayerCollide(const int A)
 
                 if(p1.Stoned || p2.Stoned)
                     HitSpot = 0;
+
                 if(HitSpot == 2 || HitSpot == 4)
                 {
                     if(!g_ClonedPlayerMode)
@@ -4615,41 +4662,36 @@ void PlayerCollide(const int A)
                     p1.Bumped = true;
                     p2.Bumped = true;
                 }
-                else if(HitSpot == 1)
+                else if(HitSpot == 1 || HitSpot == 3)
                 {
+                    Player_t& top_player = (HitSpot == 1) ? p1 : p2;
+                    Player_t& bottom_player = (HitSpot == 1) ? p2 : p1;
+                    int top_player_idx = (HitSpot == 1) ? A : B;
+
                     if(!g_ClonedPlayerMode)
-                        PlaySoundSpatial(SFX_Stomp, p1.Location);
-                    p1.Location.Y = p2.Location.Y - p1.Location.Height - 0.1;
-                    PlayerPush(A, 3);
-                    p1.Location.SpeedY = Physics.PlayerJumpVelocity;
-                    p1.Jump = Physics.PlayerHeadJumpHeight;
-                    if(p1.Character == 2)
+                        PlaySoundSpatial(SFX_Stomp, top_player.Location);
+
+                    if(!top_player.CurMazeZone)
+                    {
+                        top_player.Location.Y = bottom_player.Location.Y - top_player.Location.Height - 0.1;
+                        PlayerPush(top_player_idx, 3);
+                    }
+
+                    top_player.Location.SpeedY = Physics.PlayerJumpVelocity;
+
+                    top_player.Jump = Physics.PlayerHeadJumpHeight;
+
+                    // yes, it's an SMBX 1.3 bug... :'(
+                    if(top_player.Character == 2)
                         p1.Jump += 3;
-                    if(p1.SpinJump)
+                    if(top_player.SpinJump)
                         p1.Jump -= 6;
-                    p2.Jump = 0;
-                    if(p2.Location.SpeedY <= 0)
-                        p2.Location.SpeedY = 0.1;
-                    p2.CanJump = false;
-                    NewEffect(EFFID_WHACK, newLoc(p1.Location.X + p1.Location.Width / 2 - 16, p1.Location.Y + p1.Location.Height - 16));
-                }
-                else if(HitSpot == 3)
-                {
-                    if(!g_ClonedPlayerMode)
-                        PlaySoundSpatial(SFX_Stomp, p1.Location);
-                    p2.Location.Y = p1.Location.Y - p2.Location.Height - 0.1;
-                    PlayerPush(B, 3);
-                    p2.Location.SpeedY = Physics.PlayerJumpVelocity;
-                    p2.Jump = Physics.PlayerHeadJumpHeight;
-                    if(p2.Character == 2)
-                        p1.Jump += 3;
-                    if(p1.SpinJump)
-                        p1.Jump -= 6;
-                    p1.Jump = 0;
-                    if(p1.Location.SpeedY <= 0)
-                        p1.Location.SpeedY = 0.1;
-                    p1.CanJump = false;
-                    NewEffect(EFFID_WHACK, newLoc(p2.Location.X + p2.Location.Width / 2 - 16, p2.Location.Y + p2.Location.Height - 16));
+
+                    bottom_player.Jump = 0;
+                    if(bottom_player.Location.SpeedY <= 0)
+                        bottom_player.Location.SpeedY = 0.1;
+                    bottom_player.CanJump = false;
+                    NewEffect(EFFID_WHACK, newLoc(top_player.Location.X + top_player.Location.Width / 2 - 16, top_player.Location.Y + top_player.Location.Height - 16));
                 }
                 else if(HitSpot == 5)
                 {
@@ -4678,6 +4720,36 @@ void PlayerCollide(const int A)
                     // If Player(B).Bumped2 < -1 Then Player(B).Bumped2 = -1 - Rnd
                     // If Player(B).Bumped2 > 1 Then Player(B).Bumped2 = 1 + Rnd
                 }
+
+                if(HitSpot == 1)
+                {
+                    if((p1.MazeZoneStatus & 3) == MAZE_DIR_DOWN)
+                        p1.MazeZoneStatus |= MAZE_PLAYER_FLIP;
+                    if((p2.MazeZoneStatus & 3) == MAZE_DIR_UP)
+                        p2.MazeZoneStatus |= MAZE_PLAYER_FLIP;
+                }
+                else if(HitSpot == 2)
+                {
+                    if((p1.MazeZoneStatus & 3) == MAZE_DIR_LEFT)
+                        p1.MazeZoneStatus |= MAZE_PLAYER_FLIP;
+                    if((p2.MazeZoneStatus & 3) == MAZE_DIR_RIGHT)
+                        p2.MazeZoneStatus |= MAZE_PLAYER_FLIP;
+                }
+                else if(HitSpot == 3)
+                {
+                    if((p1.MazeZoneStatus & 3) == MAZE_DIR_UP)
+                        p1.MazeZoneStatus |= MAZE_PLAYER_FLIP;
+                    if((p2.MazeZoneStatus & 3) == MAZE_DIR_DOWN)
+                        p2.MazeZoneStatus |= MAZE_PLAYER_FLIP;
+                }
+                else if(HitSpot == 4)
+                {
+                    if((p1.MazeZoneStatus & 3) == MAZE_DIR_RIGHT)
+                        p1.MazeZoneStatus |= MAZE_PLAYER_FLIP;
+                    if((p2.MazeZoneStatus & 3) == MAZE_DIR_LEFT)
+                        p2.MazeZoneStatus |= MAZE_PLAYER_FLIP;
+                }
+
                 if(BattleMode)
                 {
                     if(HitSpot == 1 && p1.Mount == 1)
@@ -5216,6 +5288,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 NPC[p.HoldingNPC].Projectile = true;
             }
 
+            PlayerThrownNpcMazeCheck(p, NPC[p.HoldingNPC]);
 
             NPC[p.HoldingNPC].HoldingPlayer = 0;
             p.HoldingNPC = 0;

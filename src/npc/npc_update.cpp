@@ -46,6 +46,7 @@
 
 #include "game_main.h"
 #include "npc_traits.h"
+#include "phys_env.h"
 
 #include "npc/npc_queues.h"
 #include "npc/section_overlap.h"
@@ -1198,7 +1199,13 @@ interrupt_Activation:
             // water check
 
             // Things immune to water's effects
-            if(NPC[A].Type == NPCID_LAVABUBBLE || NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || NPC[A].Type == NPCID_HEAVY_THROWN || NPC[A].Type == NPCID_GHOST_S3 || NPC[A].Type == NPCID_GHOST_FAST || NPC[A].Type == NPCID_GHOST_S4 || NPC[A].Type == NPCID_BIG_GHOST || NPC[A].Type == NPCID_STATUE_FIRE || NPC[A].Type == NPCID_VILLAIN_FIRE || NPC[A].Type == NPCID_PET_FIRE || NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_CHAR4_HEAVY || NPC[A].Type == NPCID_GOALTAPE || NPC[A].Type == NPCID_SICK_BOSS_BALL || NPC[A].Type == NPCID_HOMING_BALL || NPC[A].Type == NPCID_RED_VINE_TOP_S3 || NPC[A].Type == NPCID_GRN_VINE_TOP_S3 || NPC[A].Type == NPCID_GRN_VINE_TOP_S4 || NPC[A].Type == NPCID_SPIKY_THROWER || NPC[A].Type == NPCID_ITEM_THROWER || NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_JUMP_PLANT || NPC[A].Type == NPCID_MAGIC_BOSS_BALL || (NPC[A]->IsACoin && NPC[A].Special == 0) || NPC[A].Type == NPCID_SWORDBEAM || NPC[A].Type == NPCID_FIRE_DISK || NPC[A].Type == NPCID_FIRE_CHAIN)
+            if(NPC[A].Type == NPCID_LAVABUBBLE || NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || NPC[A].Type == NPCID_HEAVY_THROWN
+                || NPC[A].Type == NPCID_GHOST_S3 || NPC[A].Type == NPCID_GHOST_FAST || NPC[A].Type == NPCID_GHOST_S4 || NPC[A].Type == NPCID_BIG_GHOST
+                || NPC[A].Type == NPCID_STATUE_FIRE || NPC[A].Type == NPCID_VILLAIN_FIRE || NPC[A].Type == NPCID_PET_FIRE || NPC[A].Type == NPCID_PLR_HEAVY
+                || NPC[A].Type == NPCID_CHAR4_HEAVY || NPC[A].Type == NPCID_GOALTAPE || NPC[A].Type == NPCID_SICK_BOSS_BALL || NPC[A].Type == NPCID_HOMING_BALL
+                || NPC[A].Type == NPCID_RED_VINE_TOP_S3 || NPC[A].Type == NPCID_GRN_VINE_TOP_S3 || NPC[A].Type == NPCID_GRN_VINE_TOP_S4 || NPC[A].Type == NPCID_SPIKY_THROWER
+                || NPC[A].Type == NPCID_ITEM_THROWER || NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_JUMP_PLANT || NPC[A].Type == NPCID_MAGIC_BOSS_BALL
+                || (NPC[A]->IsACoin && NPC[A].Special == 0) || NPC[A].Type == NPCID_SWORDBEAM || NPC[A].Type == NPCID_FIRE_DISK || NPC[A].Type == NPCID_FIRE_CHAIN)
             {
                 NPC[A].Wet = 0;
                 NPC[A].Quicksand = 0;
@@ -1214,12 +1221,53 @@ interrupt_Activation:
                 if(UnderWater[NPC[A].Section])
                     NPC[A].Wet = 2;
 
+                bool already_in_maze = (NPC[A].Effect == NPCEFF_MAZE);
+
                 for(int B : treeWaterQuery(NPC[A].Location, SORTMODE_NONE))
                 {
                     if(!Water[B].Hidden)
                     {
+                        if(Water[B].Type == PHYSID_MAZE)
+                        {
+                            if(NPC[A]->TWidth > 64 || NPC[A]->THeight > 64)
+                                continue;
+
+                            if(NPC[A].Effect != NPCEFF_NORMAL && NPC[A].Effect != NPCEFF_MAZE)
+                                continue;
+
+                            if(NPC[A].Effect == NPCEFF_MAZE && (already_in_maze || NPC[A].Effect2 < B))
+                                continue;
+
+                            if(NPCIsYoshi(NPC[A]) || NPCIsBoot(NPC[A]))
+                                continue;
+
+                            if((NPCIsVeggie(NPC[A]) && NPC[A].Projectile) || NPC[A]->NoClipping || NPC[A].WallDeath)
+                                continue;
+                        }
+
                         if(CheckCollision(NPC[A].Location, Water[B].Location))
                         {
+                            if(Water[B].Type == PHYSID_MAZE)
+                            {
+                                NPC[A].Effect = NPCEFF_MAZE;
+                                NPC[A].Effect2 = B;
+
+                                if(NPC[A].Effect3 == 128)
+                                    NPC[A].Projectile = false;
+
+                                PhysEnv_Maze_PickDirection(NPC[A].Location, B, NPC[A].Effect3);
+
+                                // cancel if not currently moving down
+                                if(NPC[A].Effect3 == MAZE_DIR_DOWN)
+                                {
+                                    double rel_speed = NPC[A].Location.SpeedY - Layer[Water[B].Layer].SpeedY;
+                                    if(rel_speed < 0 || (NPC[A]->IsABlock && rel_speed <= 4))
+                                        NPC[A].Effect = NPCEFF_NORMAL;
+                                }
+
+                                continue;
+                            }
+
                             if(NPC[A].Wet == 0 && !NPC[A]->IsACoin)
                             {
                                 if(NPC[A].Location.SpeedY >= 1 && (!g_config.fix_submerged_splash_effect || !CheckCollisionIntersect(NPC[A].Location, static_cast<Location_t>(Water[B].Location))))
@@ -1252,7 +1300,7 @@ interrupt_Activation:
                                     NPC[A].SpecialY = NPC[A].Location.SpeedY;
                             }
 
-                            if(Water[B].Quicksand)
+                            if(Water[B].Type == PHYSID_QUICKSAND)
                                 NPC[A].Quicksand = 2;
 
                             NPC[A].Wet = 2;

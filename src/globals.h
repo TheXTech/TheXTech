@@ -35,6 +35,7 @@
 #include "rand.h"
 #include "floats.h"
 #include "npc_id.h"
+#include "phys_id.h"
 #include "npc_effect.h"
 #include "player/player_effect.h"
 
@@ -789,6 +790,11 @@ struct Player_t
     // float SpeedFixY = 0.0f;
 //End Type
 
+    // NEW: currently in a maze zone PhysEnv? (stores physenv index)
+    vbint_t CurMazeZone = 0;
+    // NEW: status field for maze zone (stores current direction and clearance to leave)
+    uint8_t MazeZoneStatus = 0;
+
     Player_t() : GroundPound(false), GroundPound2(false), CanPound(false), AltRunRelease(false), DuckRelease(false) {}
 };
 
@@ -833,12 +839,12 @@ struct Water_t
     SpeedlessLocation_t Location;
 //    Buoy As Single 'not used
     // float Buoy = 0.0f;
+//    Quicksand As Boolean
+    PHYSID Type = PHYSID_WATER;
 //    Layer As String
     layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean
     bool Hidden = false;
-//    Quicksand As Boolean
-    bool Quicksand = false;
 //End Type
 };
 

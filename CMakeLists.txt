@@ -880,6 +880,7 @@ set(THEXTECH_SRC
     src/screen_fader.cpp
     src/message.cpp
     src/std_picture.cpp
+    src/phys_env.cpp
     src/npc/npc_hit.cpp
     src/npc/npc_kill.cpp
     src/npc/npc_update.cpp

@@ -1,36 +1,48 @@
 #!/bin/bash
 
-reponame=$(basename `git rev-parse --show-toplevel`)
+projroot=$(dirname "$1")
+projroot_len=$((${#projroot}+1))
+cur_dir=$(pwd)
+repo_path=${cur_dir:$projroot_len}
+
 echo "-----------------------------------"
-echo "Updating repo $reponame"
-if [[ "$reponame" == "LuaJIT" ]]; then
-    echo "Branch v2.1"
-    git checkout v2.1
-    git pull origin v2.1
-elif [[ "$reponame" == "angle-shader-translator" ]]; then
-    echo "Branch dist-no-spirv"
-    git checkout dist-no-spirv
-    git pull origin dist-no-spirv
-elif [[ "$reponame" == "harfbuzz" || "$reponame" == "thextech-discord-rpc" ]]; then
-    echo "Branch main"
-    git checkout main
-    git pull origin main
-# ========================================================
-# TEMPORARY, REMOVE THIS ONCE THIS GETS MERGED INTO MASTER
-elif [[ "$reponame" == "PGE_File_Formats" ]]; then
-    echo "Branch wip-mdx"
-    git checkout wip-mdx
-    git pull origin wip-mdx
-# ========================================================
-elif [[ "$reponame" == "mbediso" ]]; then
-    echo "Branch main"
-    git checkout main
-    git pull origin main
-    # Sync submodules
+# echo "Debug: projroot=$projroot"
+# echo "Debug: projroot_len=$projroot_len"
+# echo "Debug: cur_dir=$cur_dir"
+# echo "Debug: repo_path=$repo_path"
+
+dstbranch=""
+found=false
+
+while IFS= read -r line; do
+    line_clear=$(echo "$line" | sed 's/^[ \t]*//g')
+
+    if $found ; then
+        if [[ "$line_clear" == "branch = "* ]]; then
+            dstbranch=$(echo "$line_clear" | sed 's/^branch = *//g')
+            echo "Found branch name: $dstbranch"
+            break
+        fi
+    elif [[ "$line_clear" == "path = $repo_path" ]]; then
+        found=true
+    fi
+done < "$1"
+
+reponame=$(basename `git rev-parse --show-toplevel`)
+echo "Updating repo $reponame (path=$repo_path), branch $dstbranch"
+
+git checkout $dstbranch
+git pull origin $dstbranch
+
+if [[ -f .gitmodules ]]; then
+    echo "========================================="
+    echo "Running recursive submodule sync..."
+    echo "========================================="
     git submodule init
     git submodule update
-else
-    echo "Branch master"
-    git checkout master
-    git pull origin master
+    echo ""
+    git submodule foreach submodule-update.sh "$PWD/.gitmodules"
+    echo "========================================="
+    echo "Exiting recursive scan of the $reponame's submodules!"
+    echo "========================================="
 fi

@@ -20,24 +20,16 @@
 
 #pragma once
 
-#ifndef ENUMNPCEFFECT_HHH
-#define ENUMNPCEFFECT_HHH
+#ifndef ENUM_PHYSID_HHH
+#define ENUM_PHYSID_HHH
 
 #include "global_constants.h"
 
-enum NPCEffect : vbint_t
+enum PHYSID : vbint_t
 {
-    NPCEFF_NORMAL = 0,
-    NPCEFF_EMERGE_UP = 1,
-    NPCEFF_DROP_ITEM = 2,
-    NPCEFF_EMERGE_DOWN = 3,
-    NPCEFF_WARP = 4,
-    NPCEFF_PET_TONGUE = 5,
-    NPCEFF_PET_INSIDE = 6,
-    NPCEFF_WAITING = 8,
-    NPCEFF_ENCASED = 208,
-    NPCEFF_MAZE = 9,
+    PHYSID_WATER = 0,
+    PHYSID_QUICKSAND = 1,
+    PHYSID_MAZE = 17,
 };
 
-
-#endif // ENUMNPCEFFECT_HHH
+#endif // #ifndef ENUM_PHYSID_HHH

@@ -525,6 +525,16 @@ void NPCCollide(int A)
                         }
                     }
                 }
+                else if(NPC[A].Effect == NPCEFF_MAZE && NPC[B].Effect == NPCEFF_MAZE && HitSpot != 5)
+                {
+                    NPC[A].onWall = true;
+
+                    if(!NPC[B].TurnAround)
+                        NPC[A].TurnAround = true;
+
+                    if(NPC[A].Effect3 != NPC[B].Effect3)
+                        NPC[B].TurnAround = true;
+                }
                 else if((HitSpot == 2 || HitSpot == 4) && NPC[A].Type != NPCID_SAW && NPC[B].Type != NPCID_SAW)
                 {
                     NPC[A].onWall = true;

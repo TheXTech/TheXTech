@@ -3614,11 +3614,14 @@ void EditorScreen::UpdateWaterScreen(CallMode mode)
     // mode
     SuperPrintRightR(mode, g_editorStrings.wordMode, 3, 330, 170);
 
-    if(UpdateButton(mode, 340 + 4, 160 + 4, GFXBackgroundBMP[26], !EditorCursor.Water.Quicksand, 0, 0, 32, 32))
-        EditorCursor.Water.Quicksand = false;
+    if(UpdateButton(mode, 340 + 4, 160 + 4, GFXBackgroundBMP[26], EditorCursor.Water.Type == PHYSID_WATER, 0, 0, 32, 32))
+        EditorCursor.Water.Type = PHYSID_WATER;
 
-    if(UpdateButton(mode, 380 + 4, 160 + 4, GFXBackgroundBMP[188], EditorCursor.Water.Quicksand, 0, 0, 32, 32))
-        EditorCursor.Water.Quicksand = true;
+    if(UpdateButton(mode, 380 + 4, 160 + 4, GFXBackgroundBMP[188], EditorCursor.Water.Type == PHYSID_QUICKSAND, 0, 0, 32, 32))
+        EditorCursor.Water.Type = PHYSID_QUICKSAND;
+
+    if(FileFormat == FileFormats::LVL_PGEX && UpdateButton(mode, 420 + 4, 160 + 4, GFXBlock[294], EditorCursor.Water.Type == PHYSID_MAZE, 0, 0, 32, 32))
+        EditorCursor.Water.Type = PHYSID_MAZE;
 
     // layers
     SuperPrintRightR(mode, g_editorStrings.labelLayer, 3, 330, 234);

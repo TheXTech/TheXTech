@@ -197,119 +197,125 @@ bool UpdatePlayer()
                         Player[A].Slippy = true;
                 }
 
-                // this variable does not persist over the interrupt/resume routine
-                double SlippySpeedX;
-                SlippySpeedX = Player[A].Location.SpeedX;
-
-
-                // Player's X movement. ---------------------------
-
-                // Code used to move the player while sliding down a slope
-                if(Player[A].Slide)
-                    PlayerSlideMovementX(A);
-                // TODO: mount-dependent logic
-                // if not sliding and in the clown car
-                else if(Player[A].Mount == 2)
-                    PlayerVehicleDismountCheck(A);
-                // driving (standing on NPCID_COCKPIT)
-                else if(Player[A].Driving)
-                    PlayerCockpitMovementX(A);
-                // if a fairy
-                else if(Player[A].Fairy)
-                    PlayerFairyMovementX(A);
-                // TODO: state-dependent logic
-                // if the player is climbing a vine
-                else if(Player[A].Vine > 0)
-                    PlayerVineMovement(A);
-                // if none of the above apply then the player controls like normal. remeber this is for the players X movement
+                if(Player[A].CurMazeZone)
+                    PlayerMazeZoneMovement(A);
+                // normal player movement
                 else
-                    PlayerMovementX(A, cursed_value_C);
-
-
-                // stop link when stabbing
-                if(Player[A].Character == 5)
                 {
-                    if(Player[A].FireBallCD > 0 && (Player[A].Location.SpeedY == 0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0))
-                    {
-                        if(Player[A].Slippy)
-                            Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.75;
-                        else
-                            Player[A].Location.SpeedX = 0;
-                    }
-                }
-
-                // fairy stuff
-                PlayerFairyTimerUpdate(A);
+                    // this variable does not persist over the interrupt/resume routine
+                    double SlippySpeedX;
+                    SlippySpeedX = Player[A].Location.SpeedX;
 
 
-                // the single pinched variable has been always false since SMBX64
-                if(Player[A].StandingOnNPC != 0 && /*!NPC[Player[A].StandingOnNPC].Pinched && */ !FreezeNPCs)
-                {
-                    if(Player[A].StandingOnNPC < 0)
-                        NPC[Player[A].StandingOnNPC].Location = Block[NPC[Player[A].StandingOnNPC].Special].Location;
+                    // Player's X movement. ---------------------------
 
-                    Player[A].Location.SpeedX += NPC[Player[A].StandingOnNPC].Location.SpeedX + NPC[Player[A].StandingOnNPC].BeltSpeed;
-                }
-
-                if(GameOutro) // force the player to walk a specific speed during the credits
-                {
-                    if(Player[A].Location.SpeedX < -2)
-                        Player[A].Location.SpeedX = -2;
-                    if(Player[A].Location.SpeedX > 2)
-                        Player[A].Location.SpeedX = 2;
-                }
-
-
-
-                // slippy code
-                if(Player[A].Slippy && (!Player[A].Slide || Player[A].Slope == 0))
-                {
-                    if(Player[A].Slope > 0)
-                    {
-                        Player[A].Location.SpeedX = (Player[A].Location.SpeedX + SlippySpeedX * 4) / 5;
-                        if(Player[A].Location.SpeedX > -0.01 && Player[A].Location.SpeedX < 0.01)
-                            Player[A].Location.SpeedX = 0;
-                    }
+                    // Code used to move the player while sliding down a slope
+                    if(Player[A].Slide)
+                        PlayerSlideMovementX(A);
+                    // TODO: mount-dependent logic
+                    // if not sliding and in the clown car
+                    else if(Player[A].Mount == 2)
+                        PlayerVehicleDismountCheck(A);
+                    // driving (standing on NPCID_COCKPIT)
+                    else if(Player[A].Driving)
+                        PlayerCockpitMovementX(A);
+                    // if a fairy
+                    else if(Player[A].Fairy)
+                        PlayerFairyMovementX(A);
+                    // TODO: state-dependent logic
+                    // if the player is climbing a vine
+                    else if(Player[A].Vine > 0)
+                        PlayerVineMovement(A);
+                    // if none of the above apply then the player controls like normal. remeber this is for the players X movement
                     else
+                        PlayerMovementX(A, cursed_value_C);
+
+
+                    // stop link when stabbing
+                    if(Player[A].Character == 5)
                     {
-                        Player[A].Location.SpeedX = (Player[A].Location.SpeedX + SlippySpeedX * 3) / 4;
-                        if(Player[A].Location.SpeedX > -0.01 && Player[A].Location.SpeedX < 0.01)
-                            Player[A].Location.SpeedX = 0;
+                        if(Player[A].FireBallCD > 0 && (Player[A].Location.SpeedY == 0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0))
+                        {
+                            if(Player[A].Slippy)
+                                Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.75;
+                            else
+                                Player[A].Location.SpeedX = 0;
+                        }
                     }
+
+                    // fairy stuff
+                    PlayerFairyTimerUpdate(A);
+
+
+                    // the single pinched variable has been always false since SMBX64
+                    if(Player[A].StandingOnNPC != 0 && /*!NPC[Player[A].StandingOnNPC].Pinched && */ !FreezeNPCs)
+                    {
+                        if(Player[A].StandingOnNPC < 0)
+                            NPC[Player[A].StandingOnNPC].Location = Block[NPC[Player[A].StandingOnNPC].Special].Location;
+
+                        Player[A].Location.SpeedX += NPC[Player[A].StandingOnNPC].Location.SpeedX + NPC[Player[A].StandingOnNPC].BeltSpeed;
+                    }
+
+                    if(GameOutro) // force the player to walk a specific speed during the credits
+                    {
+                        if(Player[A].Location.SpeedX < -2)
+                            Player[A].Location.SpeedX = -2;
+                        if(Player[A].Location.SpeedX > 2)
+                            Player[A].Location.SpeedX = 2;
+                    }
+
+
+
+                    // slippy code
+                    if(Player[A].Slippy && (!Player[A].Slide || Player[A].Slope == 0))
+                    {
+                        if(Player[A].Slope > 0)
+                        {
+                            Player[A].Location.SpeedX = (Player[A].Location.SpeedX + SlippySpeedX * 4) / 5;
+                            if(Player[A].Location.SpeedX > -0.01 && Player[A].Location.SpeedX < 0.01)
+                                Player[A].Location.SpeedX = 0;
+                        }
+                        else
+                        {
+                            Player[A].Location.SpeedX = (Player[A].Location.SpeedX + SlippySpeedX * 3) / 4;
+                            if(Player[A].Location.SpeedX > -0.01 && Player[A].Location.SpeedX < 0.01)
+                                Player[A].Location.SpeedX = 0;
+                        }
+                    }
+
+                    // moved Slippy reset to immediately before the player Block logic
+                    // bool wasSlippy = Player[A].Slippy;
+                    // Player[A].Slippy = false;
+
+                    if(Player[A].Quicksand > 1)
+                    {
+                        Player[A].Slide = false;
+                        if(Player[A].Location.SpeedY >= 0)
+                            Player[A].Location.SpeedX = Player[A].Location.SpeedX / 2;
+                    }
+
+                    // Apply movement -- this is where the actual movement happens
+                    Player[A].Location.X += Player[A].Location.SpeedX;
+
+
+                    // Players Y movement.
+                    if(Block[Player[A].Slope].Location.SpeedY != 0 && Player[A].Slope != 0)
+                        Player[A].Location.Y += Block[Player[A].Slope].Location.SpeedY;
+
+                    if(Player[A].Fairy) // the player is a fairy
+                        PlayerFairyMovementY(A);
+                    // TODO: state-dependent logic
+                    else if(Player[A].Wet > 0 && Player[A].Quicksand == 0) // the player is swimming
+                        PlayerSwimMovementY(A);
+                    else if(Player[A].Mount == 2)
+                    {
+                        // vehicle has own Y movement code in ClownCar()
+                    }
+                    else // the player is not swimming
+                        PlayerMovementY(A);
+
+                    Player[A].Location.Y += Player[A].Location.SpeedY;
                 }
-
-                // moved Slippy reset to immediately before the player Block logic
-                // bool wasSlippy = Player[A].Slippy;
-                // Player[A].Slippy = false;
-
-                if(Player[A].Quicksand > 1)
-                {
-                    Player[A].Slide = false;
-                    if(Player[A].Location.SpeedY >= 0)
-                        Player[A].Location.SpeedX = Player[A].Location.SpeedX / 2;
-                }
-
-                // Apply movement -- this is where the actual movement happens
-                Player[A].Location.X += Player[A].Location.SpeedX;
-
-
-                // Players Y movement.
-                if(Block[Player[A].Slope].Location.SpeedY != 0 && Player[A].Slope != 0)
-                    Player[A].Location.Y += Block[Player[A].Slope].Location.SpeedY;
-
-                if(Player[A].Fairy) // the player is a fairy
-                    PlayerFairyMovementY(A);
-                // TODO: state-dependent logic
-                else if(Player[A].Wet > 0 && Player[A].Quicksand == 0) // the player is swimming
-                    PlayerSwimMovementY(A);
-                else if(Player[A].Mount == 2)
-                {
-                    // vehicle has own Y movement code in ClownCar()
-                }
-                else // the player is not swimming
-                    PlayerMovementY(A);
-
-                Player[A].Location.Y += Player[A].Location.SpeedY;
 
                 // princess peach and toad stuff
                 if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
@@ -418,11 +424,14 @@ bool UpdatePlayer()
 
                     Player[A].Slippy = false;
 
-                    // Block collisions.
-                    PlayerBlockLogic(A, floorBlock, movingBlock, DontResetGrabTime, cursed_value_C);
+                    if(!Player[A].CurMazeZone)
+                    {
+                        // Block collisions.
+                        PlayerBlockLogic(A, floorBlock, movingBlock, DontResetGrabTime, cursed_value_C);
 
-                    // Vine collisions.
-                    PlayerVineLogic(A);
+                        // Vine collisions.
+                        PlayerVineLogic(A);
+                    }
 
                     // Check NPC collisions
                     PlayerNPCLogic(A, tempSpring, tempShell, MessageNPC, movingBlock, floorBlock, oldSpeedY);

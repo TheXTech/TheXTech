@@ -33,6 +33,7 @@
 #include "collision.h"
 #include "layers.h"
 #include "config.h"
+#include "phys_env.h"
 
 #include "main/trees.h"
 
@@ -45,7 +46,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
 
     // cleanup variables for NPC collisions
 
-    bool tempHit = false; // Used for JUMP detection
+    int tempHit = 0; // Used for JUMP detection -- new: it's the ID of the last NPC that was jumped on
     bool tempHit2 = false;
     Location_t tempLocation;
 
@@ -446,7 +447,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     Player[A].ForceHitSpot3 = true;
                                     if(/*HitSpot == 1 && */ !(Player[A].GroundPound && NPC[B].Killed == 8))
                                     {
-                                        tempHit = true;
+                                        tempHit = B;
                                         tempLocation.Y = NPC[B].Location.Y - Player[A].Location.Height;
 
                                         if(NPC[B].Killed == 0)
@@ -454,7 +455,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         else if(Player[A].SpinJump)
                                         {
                                             if(Player[A].Controls.Down)
-                                                tempHit = false;
+                                                tempHit = 0;
                                             else
                                                 spinKill = true;
                                         }
@@ -604,7 +605,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     {
                                         if(NPC[B].Special != 0)
                                             PlaySoundSpatial(SFX_Stomp, Player[A].Location);
-                                        tempHit = true;
+                                        tempHit = B;
                                         tempLocation.Y = NPC[B].Location.Y - Player[A].Location.Height;
                                     }
                                     else if(NPC[B].Special != 4)
@@ -623,12 +624,12 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     if(NPC[B]->IsAShell && NPC[B].Location.SpeedX == 0 && NPC[B].Location.SpeedY == 0)
                                         tempShell = true;
 
-                                    tempHit = true;
+                                    tempHit = B;
                                     tempLocation.Y = NPC[B].Location.Y - Player[A].Location.Height;
 
                                     if(NPC[B].Type == NPCID_COIN_SWITCH || NPC[B].Type == NPCID_TIME_SWITCH || NPC[B].Type == NPCID_TNT)
                                     {
-                                        tempHit = false;
+                                        tempHit = 0;
                                         Player[A].Jump = false;
                                         Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
                                         Player[A].Location.SpeedY = -Physics.PlayerGravity;
@@ -667,7 +668,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
 
                             // grab from side
                             if(
-                                ((Player[A].CanGrabNPCs || NPC[B]->IsGrabbable || (NPC[B].Effect == NPCEFF_DROP_ITEM && !NPC[B]->IsABonus)) && (NPC[B].Effect == NPCEFF_NORMAL || NPC[B].Effect == NPCEFF_DROP_ITEM)) ||
+                                ((Player[A].CanGrabNPCs || NPC[B]->IsGrabbable || (NPC[B].Effect == NPCEFF_DROP_ITEM && !NPC[B]->IsABonus)) && (NPC[B].Effect == NPCEFF_NORMAL || NPC[B].Effect == NPCEFF_DROP_ITEM || NPC[B].Effect == NPCEFF_MAZE)) ||
                                  (NPC[B]->IsAShell && FreezeNPCs)
                             ) // GRAB EVERYTHING
                             {
@@ -727,7 +728,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                             if(NPC[B].Type != NPCID_FLIPPED_RAINBOW_SHELL)
                                             {
                                                 tempLocation.Y = Player[A].Location.Y;
-                                                tempHit = true;
+                                                tempHit = B;
                                                 NPCHit(B, 8, A);
                                             }
                                         }
@@ -807,7 +808,11 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                             HitSpot = 3;
                                     }
 
-                                    if(HitSpot == 3)
+                                    if(Player[A].CurMazeZone != 0)
+                                    {
+                                        // don't actually collide
+                                    }
+                                    else if(HitSpot == 3)
                                     {
                                         if(NPC[B].Type == NPCID_ICE_CUBE && Player[A].Character != 5 && Player[A].State > 1)
                                             NPCHit(B, 3, B);
@@ -974,7 +979,18 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
         }
     }
 
-    if(tempHit) // For multiple NPC hits
+    if(tempHit && Player[A].CurMazeZone)
+    {
+        if(NPC[tempHit].Effect == NPCEFF_MAZE && NPC[tempHit].Effect3 != MAZE_DIR_DOWN)
+            NPC[tempHit].TurnAround = true;
+
+        Player[A].Location.Y = tempLocation.Y;
+        Player[A].Location.SpeedY += Physics.PlayerJumpVelocity / 2;
+
+        if(Player[A].MazeZoneStatus == MAZE_DIR_DOWN)
+            Player[A].MazeZoneStatus |= MAZE_PLAYER_FLIP;
+    }
+    else if(tempHit) // For multiple NPC hits
     {
         // enable another double-jump when Char4 bounces on an NPC
         if(Player[A].Character == 4 && (Player[A].State == 4 || Player[A].State == 5) && !Player[A].SpinJump)
@@ -1093,6 +1109,10 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
     }
 
     if(Player[A].HoldingNPC == B) // cant hold an npc that you are standing on
+        B = 0;
+
+    // don't stand on NPCs during maze zone
+    if(Player[A].CurMazeZone)
         B = 0;
 
     // confusing logic, but safe, because StandingOnNPC gets set in ClownCar()

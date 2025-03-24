@@ -125,11 +125,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Special = NPC[A].Type;
             NPC[A].Special2 = NPC[A].Frame;
             // If .Type = 52 Or .Type = 51 Then
-            NPC[A].Special3 = 1;
-            NPC[A].Location.SpeedY = 0;
             // End If
-
-            NPC[A].Location.SpeedX = 0;
 
             if(NPC[A].Type == NPCID_SIDE_PLANT)
             {
@@ -144,8 +140,23 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.Height = static_cast<int>(floor(static_cast<double>(NPC[A].Location.Height)));
             NPC[A].Type = NPCID_ICE_CUBE;
             NPC[A].BeltSpeed = 0;
-            NPC[A].Projectile = false;
             NPC[A].RealSpeedX = 0;
+            NPC[A].Projectile = false;
+
+            if(NPC[A].Effect == NPCEFF_MAZE)
+            {
+                NPC[A].Special3 = 0;
+                NPC[A].Projectile = true;
+
+                if(NPC[A].Effect3 != NPC[C].Effect3)
+                    NPC[A].TurnAround = true;
+            }
+            else
+            {
+                NPC[A].Special3 = 1;
+                NPC[A].Location.SpeedY = 0;
+                NPC[A].Location.SpeedX = 0;
+            }
 
             NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
             for(C = 1; C <= 20; C++)
@@ -255,6 +266,9 @@ void NPCHit(int A, int B, int C)
             // NPC[A].Special6 = 0;
             NPC[A].SpecialX = 0;
             NPC[A].SpecialY = 0;
+
+            if(NPC[A].Effect == NPCEFF_MAZE)
+                NPC[A].Projectile = false;
         }
         else if(B == 3 || B == 5)
         {

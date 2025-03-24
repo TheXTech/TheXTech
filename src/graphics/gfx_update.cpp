@@ -316,7 +316,7 @@ public:
         else if(
                 (
                   (
-                    (NPC[A].HoldingPlayer > 0 && Player[NPC[A].HoldingPlayer].Effect != PLREFF_WARP_PIPE) ||
+                    (NPC[A].HoldingPlayer > 0 && Player[NPC[A].HoldingPlayer].Effect != PLREFF_WARP_PIPE && Player[NPC[A].HoldingPlayer].CurMazeZone == 0) ||
                     (NPC[A].Type == NPCID_TOOTHY && NPC[A].vehiclePlr == 0) ||
                     (NPC[A].Type == NPCID_BULLET && NPC[A].CantHurt > 0)
                   ) || NPC[A].Effect == NPCEFF_PET_TONGUE
@@ -357,6 +357,7 @@ public:
             g_stats.renderedNPCs += 1;
         }
         else if(NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_JUMP_PLANT ||
+            NPC[A].Effect == NPCEFF_MAZE || (NPC[A].HoldingPlayer && Player[NPC[A].HoldingPlayer].CurMazeZone != 0) ||
             ((NPC[A].Effect == NPCEFF_ENCASED || NPC[A]->IsAVine ||
                     NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_FIRE_PLANT ||
                     NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_BIG_PLANT ||
@@ -902,7 +903,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
              NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_BIG_PLANT ||
              NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == NPCID_BOTTOM_PLANT ||
              NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Effect == NPCEFF_EMERGE_UP || NPC[A].Effect == NPCEFF_EMERGE_DOWN ||
-             NPC[A].Effect == NPCEFF_WARP || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0)) &&
+             NPC[A].Effect == NPCEFF_WARP || NPC[A].Effect == NPCEFF_MAZE || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0)) &&
              (NPC[A].vehiclePlr == 0 && (!NPC[A].Generator || LevelEditor))) ||
              NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_JUMP_PLANT)
         {
@@ -2197,6 +2198,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
                         cn);
                 }
             }
+            else if(NPC[A].Type == NPCID_ICE_CUBE)
+                DrawFrozenNPC(Z, A);
             // fix a graphical SMBX64 bug where the draw width and frame stride were incorrect
             else if(NPC[A]->WidthGFX != 0 && NPC[A].Effect == NPCEFF_EMERGE_UP && g_config.fix_visual_bugs)
             {
@@ -2230,7 +2233,12 @@ void UpdateGraphicsScreen(Screen_t& screen)
         // Player warp effects 'Players behind blocks
         for(int A = 1; A <= numPlayers; A++)
         {
-            if(!Player[A].Dead && !Player[A].Immune2 && Player[A].TimeToLive == 0 && Player[A].Effect == PLREFF_WARP_PIPE)
+            if(Player[A].Dead || Player[A].Immune2 || Player[A].TimeToLive != 0)
+                continue;
+
+            if(Player[A].CurMazeZone != 0)
+                DrawPlayer(Player[A], Z);
+            else if(!Player[A].Dead && !Player[A].Immune2 && Player[A].TimeToLive == 0 && Player[A].Effect == PLREFF_WARP_PIPE)
             {
                 const Player_t& p = Player[A];
 
@@ -2885,7 +2893,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
             Player_t& p = Player[A];
             bool player_door_scroll = (p.Effect == PLREFF_WARP_DOOR && p.Effect2 >= 128);
 
-            if(!p.Dead && p.TimeToLive == 0 && !(p.Effect == PLREFF_WARP_PIPE || p.Effect == (PLREFF_TURN_TO_STATE + PLR_STATE_LEAF) || p.Effect == PLREFF_WAITING || p.Effect == PLREFF_PET_INSIDE || player_door_scroll))
+            if(!p.Dead && p.TimeToLive == 0 && p.CurMazeZone == 0 && !(p.Effect == PLREFF_WARP_PIPE || p.Effect == (PLREFF_TURN_TO_STATE + PLR_STATE_LEAF) || p.Effect == PLREFF_WAITING || p.Effect == PLREFF_PET_INSIDE || player_door_scroll))
                 DrawPlayer(p, Z);
         }
         //'normal player end

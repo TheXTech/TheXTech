@@ -25,7 +25,59 @@
 #include "layers.h"
 #include "npc.h"
 #include "npc_traits.h"
+#include "phys_env.h"
 #include "npc/npc_queues.h"
+
+void PlayerThrowItemMaze(const Player_t& p, Location_t& loc, uint8_t& maze_status)
+{
+    loc.SpeedX = 0;
+    loc.SpeedY = 0;
+
+    int direction = p.MazeZoneStatus % 4;
+
+    if(direction == MAZE_DIR_UP || direction == MAZE_DIR_DOWN)
+        loc.X = p.Location.X + (p.Location.Width - loc.Width) / 2;
+    else
+        loc.Y = p.Location.Y + (p.Location.Height - loc.Height) / 2;
+
+    if((direction == MAZE_DIR_UP && !p.Controls.Down) || (direction == MAZE_DIR_DOWN && p.Controls.Up))
+    {
+        maze_status = MAZE_DIR_UP;
+        loc.SpeedY = -6;
+        loc.Y = p.Location.Y - loc.Height - 24;
+    }
+    else if(direction == MAZE_DIR_UP || direction == MAZE_DIR_DOWN)
+    {
+        maze_status = MAZE_DIR_DOWN;
+        loc.SpeedY = 6;
+        loc.Y = p.Location.Y + p.Location.Height + 24;
+    }
+    else if(p.Direction <= 0)
+    {
+        maze_status = MAZE_DIR_LEFT;
+        loc.SpeedX = -6;
+        loc.X = p.Location.X - loc.Width - 24;
+    }
+    else
+    {
+        maze_status = MAZE_DIR_RIGHT;
+        loc.SpeedX = 6;
+        loc.X = p.Location.X + p.Location.Width + 24;
+    }
+}
+
+void PlayerThrownNpcMazeCheck(const Player_t& p, NPC_t& npc)
+{
+    if(!p.CurMazeZone)
+        return;
+
+    if(npc->NoClipping)
+        return;
+
+    npc.Effect = NPCEFF_MAZE;
+    npc.Effect2 = p.CurMazeZone;
+    PlayerThrowItemMaze(p, npc.Location, npc.Effect3);
+}
 
 void PlayerPoundLogic(int A)
 {
@@ -159,6 +211,9 @@ void PlayerShootChar5Beam(int A)
     if(Player[A].StandingOnNPC != 0)
         NPC[numNPCs].Location.Y += -Player[A].Location.SpeedY;
 
+    if(Player[A].State != 6)
+        PlayerThrownNpcMazeCheck(Player[A], NPC[numNPCs]);
+
     syncLayers_NPC(numNPCs);
     CheckSectionNPC(numNPCs);
 }
@@ -201,6 +256,8 @@ void PlayerThrowBomb(int A)
 
         PlaySoundSpatial(SFX_Throw, p.Location);
     }
+
+    PlayerThrownNpcMazeCheck(Player[A], NPC[numNPCs]);
 
     syncLayers_NPC(numNPCs);
 }
@@ -328,6 +385,8 @@ void PlayerThrowHeavy(const int A)
     if(p.Character == 4)
         NPC[numNPCs].Location.X = p.Location.X + (p.Location.Width - NPC[numNPCs].Location.Width) / 2;
 
+    PlayerThrownNpcMazeCheck(p, NPC[numNPCs]);
+
     syncLayers_NPC(numNPCs);
     CheckSectionNPC(numNPCs);
 }
@@ -383,9 +442,6 @@ void PlayerThrowBall(const int A)
     if(NPC[numNPCs].Special == 4)
         NPC[numNPCs].Frame = 12;
 
-    syncLayers_NPC(numNPCs);
-    CheckSectionNPC(numNPCs);
-
     p.FireBallCD = 30;
     if(p.Character == 2)
         p.FireBallCD = 35;
@@ -432,6 +488,10 @@ void PlayerThrowBall(const int A)
     if(p.StandingOnNPC != 0)
         NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX + NPC[p.StandingOnNPC].Location.SpeedX) / 3.5;
 
+    PlayerThrownNpcMazeCheck(p, NPC[numNPCs]);
+
+    syncLayers_NPC(numNPCs);
+    CheckSectionNPC(numNPCs);
 }
 
 void PowerUps(const int A)
