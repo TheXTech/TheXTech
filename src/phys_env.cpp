@@ -257,11 +257,9 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
 
 void PhysEnv_Maze_PickDirection(const Location_t& loc, vbint_t maze_index, uint8_t& maze_state)
 {
-    double dx = Water[maze_index].Location.X - loc.X + (Water[maze_index].Location.Width - loc.Width) / 2;
-    double dy = Water[maze_index].Location.Y - loc.Y + (Water[maze_index].Location.Height - loc.Height) / 2;
-
-    if(std::abs(dx) > std::abs(dy))
+    if(Water[maze_index].Location.Width > Water[maze_index].Location.Height)
     {
+        double dx = Water[maze_index].Location.X - loc.X + (Water[maze_index].Location.Width - loc.Width) / 2;
         if(dx > 0)
             maze_state = MAZE_DIR_RIGHT;
         else
@@ -269,6 +267,7 @@ void PhysEnv_Maze_PickDirection(const Location_t& loc, vbint_t maze_index, uint8
     }
     else
     {
+        double dy = Water[maze_index].Location.Y - loc.Y + (Water[maze_index].Location.Height - loc.Height) / 2;
         if(dy > 0)
             maze_state = MAZE_DIR_DOWN;
         else
