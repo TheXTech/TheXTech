@@ -1091,14 +1091,8 @@ void PlayerMazeZoneMovement(int A)
         {
             PlayerPush(A, 1);
         }
-        else if(Player[A].MazeZoneStatus % 4 == MAZE_DIR_UP)
-        {
-            Player[A].StandUp = true;
-            Player[A].StandUp2 = true;
-            Player[A].ForceHitSpot3 = true;
-        }
         // don't allow jumping
-        else
+        else if(Player[A].MazeZoneStatus % 4 != MAZE_DIR_UP)
         {
             Player[A].Location.SpeedY = 0.01;
         }
