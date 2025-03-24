@@ -22,6 +22,7 @@
 #include "collision.h"
 #include "blocks.h"
 #include "layers.h"
+#include "npc_traits.h"
 
 #include "main/trees.h"
 
@@ -157,6 +158,23 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
                 {
                     cleared_to_exit = false;
                     break;
+                }
+            }
+        }
+
+        if(!npc_A && cleared_to_exit)
+        {
+            for(int N : treeNPCQuery(edgeLoc, SORTMODE_NONE))
+            {
+                const NPC_t& n = NPC[N];
+
+                if(n.Active && !n.Generator && n->IsABlock)
+                {
+                    if(CheckCollision(edgeLoc, n.Location))
+                    {
+                        cleared_to_exit = false;
+                        break;
+                    }
                 }
             }
         }
