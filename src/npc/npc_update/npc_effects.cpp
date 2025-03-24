@@ -342,7 +342,7 @@ static inline void NPCEffectLogic_Maze(int A)
 
     if(npc.TurnAround)
     {
-        npc.Effect3 = npc.Effect3 ^ MAZE_DIR_FLIP_BIT;
+        npc.Effect3 = (npc.Effect3 & 3) ^ MAZE_DIR_FLIP_BIT;
         npc.TurnAround = false;
     }
 
