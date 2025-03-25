@@ -1238,7 +1238,7 @@ interrupt_Activation:
                             if(NPC[A].Effect == NPCEFF_MAZE && (already_in_maze || NPC[A].Effect2 < B))
                                 continue;
 
-                            if(NPCIsYoshi(NPC[A]) || NPCIsBoot(NPC[A]))
+                            if(NPCIsYoshi(NPC[A]) || NPCIsBoot(NPC[A]) || (NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPCID_WALL_TURTLE))
                                 continue;
 
                             if((NPCIsVeggie(NPC[A]) && NPC[A].Projectile) || (NPC[A]->NoClipping && !NPC[A].Projectile) || NPC[A].WallDeath || NPC[A].HoldingPlayer)
