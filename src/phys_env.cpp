@@ -67,14 +67,14 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
     {
         if(direction == MAZE_DIR_UP)
         {
-            exit_check_y = cur_maze.Location.Y - 16;
-            space_left = center_y - cur_maze.Location.Y;
+            exit_check_y = cur_maze.Location.Y;
+            space_left = center_y - exit_check_y;
             target_speed_y = -4;
         }
         else
         {
-            exit_check_y = cur_maze.Location.Y + cur_maze.Location.Height + 16;
-            space_left = cur_maze.Location.Y + cur_maze.Location.Height - center_y;
+            exit_check_y = cur_maze.Location.Y + cur_maze.Location.Height;
+            space_left = exit_check_y - center_y;
             target_speed_y = 4;
         }
 
@@ -96,14 +96,14 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
     {
         if(direction == MAZE_DIR_LEFT)
         {
-            exit_check_x = cur_maze.Location.X - 16;
-            space_left = center_x - cur_maze.Location.X;
+            exit_check_x = cur_maze.Location.X;
+            space_left = center_x - exit_check_x;
             target_speed_x = -4;
         }
         else
         {
-            exit_check_x = cur_maze.Location.X + cur_maze.Location.Width + 16;
-            space_left = cur_maze.Location.X + cur_maze.Location.Width - center_x;
+            exit_check_x = cur_maze.Location.X + cur_maze.Location.Width;
+            space_left = exit_check_x - center_x;
             target_speed_x = 4;
         }
 
@@ -126,7 +126,15 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
         }
     }
 
-    if(cleared_to_exit)
+    bool do_cancel = false;
+    if(space_left > space_to_cancel + 128 || space_left < -128)
+    {
+        do_cancel = true;
+        exit_check_x = center_x;
+        exit_check_y = center_y;
+    }
+
+    if(cleared_to_exit && !do_cancel)
     {
         if(space_left < -space_to_leave)
         {
@@ -137,12 +145,12 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
         if(direction == MAZE_DIR_UP)
             target_speed_y *= 2;
     }
-    else if(space_left < 32 || space_left > space_to_cancel + 128)
+    else if(space_left < 32 || do_cancel)
     {
         // need to find a new direction
         Location_t edgeLoc;
-        edgeLoc.X = exit_check_x - 16;
-        edgeLoc.Y = exit_check_y - 16;
+        edgeLoc.X = exit_check_x - 16 + target_speed_x * 4;
+        edgeLoc.Y = exit_check_y - 16 + target_speed_y * 4;
         edgeLoc.Width = 32;
         edgeLoc.Height = 32;
 
@@ -179,11 +187,14 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
             }
         }
 
-        if(cleared_to_exit)
+        if(cleared_to_exit && !do_cancel)
             maze_state |= MAZE_CAN_EXIT;
         else
         {
             int new_maze[4] = {0, 0, 0, 0};
+
+            edgeLoc.X = exit_check_x - 16;
+            edgeLoc.Y = exit_check_y - 16;
 
             for(int W : treeWaterQuery(edgeLoc, SORTMODE_NONE))
             {
@@ -212,7 +223,7 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
             }
 
             // if things are normal, return to the same maze segment if the other directions are blocked
-            if(space_left < 32)
+            if(!do_cancel)
                 new_maze[direction ^ MAZE_DIR_FLIP_BIT] = maze_index;
 
             bool random_choice = iRand(2);
