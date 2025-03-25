@@ -1241,7 +1241,7 @@ interrupt_Activation:
                             if(NPCIsYoshi(NPC[A]) || NPCIsBoot(NPC[A]))
                                 continue;
 
-                            if((NPCIsVeggie(NPC[A]) && NPC[A].Projectile) || (NPC[A]->NoClipping && NPC[A].Type != NPCID_BULLET) || NPC[A].WallDeath || NPC[A].HoldingPlayer)
+                            if((NPCIsVeggie(NPC[A]) && NPC[A].Projectile) || (NPC[A]->NoClipping && !NPC[A].Projectile) || NPC[A].WallDeath || NPC[A].HoldingPlayer)
                                 continue;
                         }
                         else if(NPC[A].Type == NPCID_BULLET)
