@@ -1722,6 +1722,17 @@ void CheckSection(const int A)
     }
 }
 
+static void s_makeDust(Player_t& p, int dir_offset)
+{
+    if(p.SlideCounter <= 0)
+    {
+        p.SlideCounter = 2 + iRand_round(2);
+        tempLocation.Y = p.Location.Y + p.Location.Height - 5;
+        tempLocation.X = p.Location.X + p.Location.Width / 2 - 4 + dir_offset * p.Direction;
+        NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
+    }
+}
+
 void PlayerFrame(const int A)
 {
     PlayerFrame(Player[A]);
@@ -1994,13 +2005,7 @@ void PlayerFrame(Player_t &p)
                                 if(p.Mount != 2 && !p.WetFrame && !p.Duck)
                                 {
                                     PlaySoundSpatial(SFX_Skid, p.Location);
-                                    if(p.SlideCounter <= 0)
-                                    {
-                                        p.SlideCounter = 2 + iRand_round(2);
-                                        tempLocation.Y = p.Location.Y + p.Location.Height - 5;
-                                        tempLocation.X = p.Location.X + p.Location.Width / 2 - 4 + 8 * -p.Direction;
-                                        NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
-                                    }
+                                    s_makeDust(p, -8);
                                 }
 
                                 p.Frame = 4;
@@ -2013,13 +2018,7 @@ void PlayerFrame(Player_t &p)
                                 if(p.Mount != 2 && !p.WetFrame && !p.Duck)
                                 {
                                     PlaySoundSpatial(SFX_Skid, p.Location);
-                                    if(p.SlideCounter <= 0)
-                                    {
-                                        p.SlideCounter = 2 + iRand_round(2);
-                                        tempLocation.Y = p.Location.Y + p.Location.Height - 5;
-                                        tempLocation.X = p.Location.X + p.Location.Width / 2 - 4 + 8 * -p.Direction;
-                                        NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
-                                    }
+                                    s_makeDust(p, -8);
                                 }
 
                                 p.Frame = 4;
@@ -2072,13 +2071,7 @@ void PlayerFrame(Player_t &p)
                         p.Effect == PLREFF_NORMAL && !p.Duck)
                     {
                         PlaySoundSpatial(SFX_Skid, p.Location);
-                        if(p.SlideCounter <= 0)
-                        {
-                            p.SlideCounter = 2 + iRand_round(2);
-                            tempLocation.Y = p.Location.Y + p.Location.Height - 5;
-                            tempLocation.X = p.Location.X + p.Location.Width / 2 - 4 + 10 * -p.Direction;
-                            NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
-                        }
+                        s_makeDust(p, -10);
                     }
 
                     if(p.Location.SpeedX != 0)
@@ -2225,13 +2218,7 @@ void PlayerFrame(Player_t &p)
                                 if(p.Mount != 2 && p.Wet == 0)
                                 {
                                     PlaySoundSpatial(SFX_Skid, p.Location);
-                                    if(p.SlideCounter <= 0)
-                                    {
-                                        p.SlideCounter = 2 + iRand_round(2);
-                                        tempLocation.Y = p.Location.Y + p.Location.Height - 5;
-                                        tempLocation.X = p.Location.X + p.Location.Width / 2 - 4 + 6 * -p.Direction;
-                                        NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
-                                    }
+                                    s_makeDust(p, -6);
                                 }
                                 p.Frame = 6;
                             }
@@ -2244,13 +2231,7 @@ void PlayerFrame(Player_t &p)
                                 if(p.Mount != 2 && p.Wet == 0)
                                 {
                                     PlaySoundSpatial(SFX_Skid, p.Location);
-                                    if(p.SlideCounter <= 0)
-                                    {
-                                        p.SlideCounter = 2 + iRand_round(2);
-                                        tempLocation.Y = p.Location.Y + p.Location.Height - 5;
-                                        tempLocation.X = p.Location.X + p.Location.Width / 2 - 4 + 10 * -p.Direction;
-                                        NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
-                                    }
+                                    s_makeDust(p, -10);
                                 }
                                 p.Frame = 6;
                             }
@@ -2372,13 +2353,7 @@ void PlayerFrame(Player_t &p)
                        p.Effect == PLREFF_NORMAL && !p.Duck)
                     {
                         PlaySoundSpatial(SFX_Skid, p.Location);
-                        if(p.SlideCounter <= 0)
-                        {
-                            p.SlideCounter = 2 + iRand_round(2);
-                            tempLocation.Y = p.Location.Y + p.Location.Height - 5;
-                            tempLocation.X = p.Location.X + p.Location.Width / 2 - 4 + 10 * -p.Direction;
-                            NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
-                        }
+                        s_makeDust(p, -10);
                     }
                     if(p.Location.SpeedX != 0)
                     {
