@@ -2058,6 +2058,11 @@ void PlayerFrame(Player_t &p)
                             }
                         }
                     }
+                    else if(CanWallJump && (p.Pinched.Left2 == 2 || p.Pinched.Right4 == 2) && p.Mount == 0 && !p.SpinJump && !p.Duck && !p.SlippyWall)
+                    {
+                        s_makeDust(p, 8, tempLocation);
+                        p.Frame = -4;
+                    }
                     else
                         p.Frame = 3;
                 }
@@ -2284,6 +2289,11 @@ void PlayerFrame(Player_t &p)
                                 p.FrameCount = 0;
                             }
                         }
+                    }
+                    else if(CanWallJump && (p.Pinched.Left2 == 2 || p.Pinched.Right4 == 2) && p.Mount == 0 && !p.SpinJump && !p.Duck && !p.SlippyWall)
+                    {
+                        s_makeDust(p, 8, tempLocation);
+                        p.Frame = -6;
                     }
                     else
                     {
@@ -5394,7 +5404,12 @@ void LinkFrame(Player_t &p)
     }
     else if(p.Location.SpeedY != 0 && p.StandingOnNPC == 0 && p.Slope == 0 && !(p.Quicksand > 0 && p.Location.SpeedY > 0)) // Jumping/falling
     {
-        if(p.Location.SpeedY < 0)
+        if(CanWallJump && (p.Pinched.Left2 == 2 || p.Pinched.Right4 == 2) && !p.SlippyWall)
+        {
+            s_makeDust(p, 8, tempLocation);
+            p.Frame = 11;
+        }
+        else if(p.Location.SpeedY < 0)
         {
             if(p.Controls.Up)
                 p.Frame = 10;

@@ -796,6 +796,9 @@ struct Player_t
     // NEW: status field for maze zone (stores current direction and clearance to leave)
     uint8_t MazeZoneStatus = 0;
 
+    // Can the player NOT currently wall jump because the wall is slippery?
+    bool SlippyWall = false;
+
     Player_t() : GroundPound(false), GroundPound2(false), CanPound(false), AltRunRelease(false), DuckRelease(false) {}
 };
 
@@ -1879,8 +1882,11 @@ extern int LevelMacroCounter;
 // Card roulette exit: negative value indicates triggered by cheat
 extern int LevelMacroWhich;
 
+//EXTRA: can the player wall-jump?
+extern bool CanWallJump;
+
 //Public numJoysticks As Integer
-extern int numJoysticks;
+// extern int numJoysticks;
 
 //Public FileName As String
 extern std::string FileName;

@@ -1035,6 +1035,7 @@ int GameMain(const CmdLineSetup_t &setup)
             g_ClonedPlayerMode = false;
             g_CheatLogicScreen = false;
             g_CheatEditYourFriends = false;
+            CanWallJump = false;
             g_VanillaCam = false;
             XRender::unloadGifTextures();
 

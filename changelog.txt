@@ -14,6 +14,7 @@ Changelog for 1.3.8-dev
 -Offscreen exit fade effect now occurs when the player approaches the edge of the level (instead of after leaving) (@ds-sloth)
 -Performance improvements for the stopwatch freeze logic (@ds-sloth)
 -Add experimental support for maze physics zones to the game and editor (@ds-sloth)
+-Add experimental cheat "borntoclimb" (@ds-sloth)
 
 Changelog for 1.3.7.1-dev
 -Add GameCube controller support for Wii (@ds-sloth)

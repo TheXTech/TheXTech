@@ -294,7 +294,7 @@ bool EndLevel = false;
 int LevelMacro = LEVELMACRO_OFF;
 int LevelMacroWhich = 0;
 int LevelMacroCounter = 0;
-int numJoysticks = 0;
+bool CanWallJump = false;
 
 // information about the currently loaded file
 std::string FileName;

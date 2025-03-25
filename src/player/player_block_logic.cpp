@@ -603,6 +603,9 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
                                     // IMPORTANT: this case was truncation until v1.3.7.1-dev. Confirm that changing to VB6 rounding does not cause any issues.
                                     blockPushX = vb6Round(Block[B].Location.SpeedX);
+
+                                    if(Block[B].Slippy)
+                                        Player[A].SlippyWall = true;
                                 }
                             }
                             else if(HitSpot == 3) // hit the block from below

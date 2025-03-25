@@ -467,6 +467,8 @@ void PlayerMovementY(int A)
     if(Player[A].Wet > 0 || Player[A].WetFrame)
         Player[A].CanFloat = false;
 
+    bool has_wall_traction = CanWallJump && (Player[A].Pinched.Left2 == 2 || Player[A].Pinched.Right4 == 2) && !Player[A].SpinJump && !Player[A].SlippyWall && Player[A].HoldingNPC == 0 && Player[A].Mount == 0 && !Player[A].Duck;
+
     // handles the regular jump
     if(Player[A].Controls.Jump || (Player[A].Controls.AltJump &&
        ((Player[A].Character > 2 && Player[A].Character != 4) || Player[A].Quicksand > 0 || g_config.disable_spin_jump) &&
@@ -550,6 +552,17 @@ void PlayerMovementY(int A)
                     else
                         Player[A].FlyCount = 320; // Length of flight time
                 }
+            }
+            else if(has_wall_traction && Player[A].CanJump)
+            {
+                PlaySoundSpatial(SFX_Jump, Player[A].Location); // Jump sound
+                Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - tempSpeed;
+                Player[A].Location.SpeedX -= 4 * Player[A].Direction;
+                Player[A].Location.X += Player[A].Location.SpeedX;
+                Player[A].Jump = 6;
+
+                if(Player[A].Character == 2)
+                    Player[A].Jump += 3;
             }
             else if(Player[A].Jump > 0) // controls the height of the jump
             {
@@ -698,8 +711,10 @@ void PlayerMovementY(int A)
                 Player[A].SpinJump = true;
 //                                    if(nPlay.Online == true && nPlay.MySlot + 1 == A)
 //                                        Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1l" + std::to_string(A) + LB;
-                if(Player[A].Duck)
-                    UnDuck(Player[A]);
+
+                // just checked that Player[A].Duck wasn't true!
+                // if(Player[A].Duck)
+                //     UnDuck(Player[A]);
 
                 if(Player[A].ShellSurf)
                 {
@@ -727,6 +742,15 @@ void PlayerMovementY(int A)
                     Player[A].FlyCount = 150; // Length of flight time
                 }
             }
+        }
+        else if(has_wall_traction && Player[A].CanAltJump)
+        {
+            PlaySoundSpatial(SFX_Whip, Player[A].Location); // Jump sound
+            Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - tempSpeed;
+            Player[A].Location.SpeedX -= 6 * Player[A].Direction;
+            Player[A].Location.X += Player[A].Location.SpeedX;
+            Player[A].Jump = 3;
+            Player[A].SpinJump = true;
         }
         else if(Player[A].Jump > 0)
         {
@@ -799,7 +823,9 @@ void PlayerMovementY(int A)
     {
         if(Player[A].NoGravity == 0)
         {
-            if(Player[A].Character == 2)
+            if(has_wall_traction && Player[A].Location.SpeedY > 0)
+                Player[A].Location.SpeedY += Physics.PlayerGravity / 2;
+            else if(Player[A].Character == 2)
                 Player[A].Location.SpeedY += Physics.PlayerGravity * 0.9_r;
             else
                 Player[A].Location.SpeedY += Physics.PlayerGravity;

@@ -1816,6 +1816,12 @@ static void editYourFriends()
     PauseGame(PauseCode::Options);
 }
 
+static void bornToClimb()
+{
+    CanWallJump = !CanWallJump;
+    PlaySound(CanWallJump ? SFX_PlayerGrow : SFX_PlayerShrink);
+}
+
 static void newLeaf()
 {
     if(g_config.show_fps.m_set == ConfigSetLevel::cheat || g_config.unlimited_framerate.m_set == ConfigSetLevel::cheat)
@@ -1834,6 +1840,7 @@ static void newLeaf()
     CaptainN = false;
     GrabAll = false;
     ShadowMode = false;
+    CanWallJump = false;
     PlaySound(SFX_VillainKilled);
 }
 
@@ -2206,6 +2213,7 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
 
     {"getmeouttahere", getMeOuttaHere, true},
     {"newleaf", newLeaf, true},
+    {"borntoclimb", bornToClimb, true},
 
     {"holytrinity", holyTrinity, true}, {"passerby", holyTrinity, true},
     {"essentials", essentials, true}, {"holyfour", essentials, true},

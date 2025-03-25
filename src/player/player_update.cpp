@@ -423,6 +423,7 @@ bool UpdatePlayer()
                     int floorBlock = 0; // was previously called tempHit3
 
                     Player[A].Slippy = false;
+                    Player[A].SlippyWall = false;
 
                     if(!Player[A].CurMazeZone)
                     {
