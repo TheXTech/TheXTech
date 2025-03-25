@@ -196,8 +196,8 @@ struct TableInterface
             std::sort(out.begin(), out.end(), Comparisons::Z<ItemRef_t>);
     }
 
-    void query(std::vector<BaseRef_t>& out, double Left, double Top, double Right, double Bottom,
-               int sort_mode, double margin)
+    void query(std::vector<BaseRef_t>& out, num_t Left, num_t Top, num_t Right, num_t Bottom,
+               int sort_mode, num_t margin)
     {
         auto loc = newLoc(Left - margin,
                           Top - margin,
@@ -217,8 +217,8 @@ struct TableInterface
         return result;
     }
 
-    TreeResult_Sentinel<ItemRef_t> query(double Left, double Top, double Right, double Bottom,
-                             int sort_mode, double margin)
+    TreeResult_Sentinel<ItemRef_t> query(num_t Left, num_t Top, num_t Right, num_t Bottom,
+                             int sort_mode, num_t margin)
     {
         auto loc = newLoc(Left - margin,
                           Top - margin,
@@ -283,9 +283,9 @@ void treeBlockRemoveLayer(int layer, BlockRef_t block)
     s_block_tables.erase(layer, block);
 }
 
-TreeResult_Sentinel<BlockRef_t> treeFLBlockQuery(double Left, double Top, double Right, double Bottom,
+TreeResult_Sentinel<BlockRef_t> treeFLBlockQuery(num_t Left, num_t Top, num_t Right, num_t Bottom,
                          int sort_mode,
-                         double margin)
+                         num_t margin)
 {
     return s_block_tables.query(Left, Top, Right, Bottom, sort_mode, margin);
 }
@@ -435,9 +435,9 @@ TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &_loc,
     return result;
 }
 
-TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(double Left, double Top, double Right, double Bottom,
+TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(num_t Left, num_t Top, num_t Right, num_t Bottom,
                          int sort_mode,
-                         double margin)
+                         num_t margin)
 {
     auto loc = newLoc(Left - margin,
                       Top - margin,
@@ -480,8 +480,8 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &_loc,
 
     s_block_tables.common_table.query(*result.i_vec, loc);
 
-    double oX = loc.X;
-    double oY = loc.Y;
+    num_t oX = loc.X;
+    num_t oY = loc.Y;
 
     for(int i = 0; i < s_block_tables.num_active_tables; i++)
     {
@@ -576,9 +576,9 @@ void treeBackgroundRemoveLayer(int layer, BackgroundRef_t obj)
     s_background_tables.erase(layer, obj);
 }
 
-TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(double Left, double Top, double Right, double Bottom,
+TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(num_t Left, num_t Top, num_t Right, num_t Bottom,
                          int sort_mode,
-                         double margin)
+                         num_t margin)
 {
     return s_background_tables.query(Left, Top, Right, Bottom, sort_mode, margin);
 }
@@ -688,9 +688,9 @@ TreeResult_Sentinel<NPCRef_t> treeNPCQuery(const Location_t &_loc,
     return result;
 }
 
-TreeResult_Sentinel<NPCRef_t> treeNPCQuery(double Left, double Top, double Right, double Bottom,
+TreeResult_Sentinel<NPCRef_t> treeNPCQuery(num_t Left, num_t Top, num_t Right, num_t Bottom,
                          int sort_mode,
-                         double margin)
+                         num_t margin)
 {
     auto loc = newLoc(Left - margin,
                       Top - margin,
@@ -749,9 +749,9 @@ void treeWaterRemoveLayer(int layer, WaterRef_t obj)
     s_water_tables.erase(layer, obj);
 }
 
-TreeResult_Sentinel<WaterRef_t> treeWaterQuery(double Left, double Top, double Right, double Bottom,
+TreeResult_Sentinel<WaterRef_t> treeWaterQuery(num_t Left, num_t Top, num_t Right, num_t Bottom,
                          int sort_mode,
-                         double margin)
+                         num_t margin)
 {
     if(numWater == 0)
     {

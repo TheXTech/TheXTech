@@ -19,28 +19,9 @@
  */
 
 #pragma once
-#ifndef WORLD_GLOBALS_H
-#define WORLD_GLOBALS_H
+#ifndef XT_NUMERIC_TYPES_H
+#define XT_NUMERIC_TYPES_H
 
-#include "../screen_fader.h"
+#include "floating_point.h"
 
-//! Holds the screen overlay for the world map
-extern ScreenFader g_worldScreenFader;
-
-//! Multiplier for world map qScreen
-extern num_t g_worldCamSpeed;
-
-//! Play sound if world map qScreen stays active next frame
-extern bool g_worldPlayCamSound;
-
-//! NEW: set the world player's section variable based on its position
-extern void worldCheckSection(WorldPlayer_t& wp);
-
-//! NEW: reset the world players' section variables without invoking qScreen
-extern void worldResetSection();
-
-extern void worldWaitForFade(int waitTicks = -1);
-
-extern bool worldHasFrameAssets();
-
-#endif // WORLD_GLOBALS_H
+#endif // #ifndef XT_NUMERIC_TYPES_H

@@ -104,7 +104,7 @@ int iRand2(int max)
 }
 
 
-double dRand()
+num_t dRand()
 {
     g_random_n_calls ++;
 

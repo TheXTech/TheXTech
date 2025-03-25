@@ -23,7 +23,7 @@
 
 void SetupPhysics()
 {
-    Physics.PlayerJumpVelocity = -5.7f;     // Jump velocity
+    Physics.PlayerJumpVelocity = -5.7_nf;   // Jump velocity
     Physics.PlayerJumpHeight = 20;          // Jump height
     Physics.PlayerBlockJumpHeight = 25;     // Jump height off bouncy blocks
     Physics.PlayerHeadJumpHeight = 22;      // Jump height off another players head
@@ -31,7 +31,7 @@ void SetupPhysics()
     Physics.PlayerSpringJumpHeight = 55;    // Jump height off a Spring
     Physics.PlayerRunSpeed = 6;             // Max run speed
     Physics.PlayerWalkSpeed = 3;            // Max walk speed
-    Physics.PlayerGravity = 0.4f;            // Player// s gravity
+    Physics.PlayerGravity = 0.4_nf;         // Player's gravity
     Physics.PlayerTerminalVelocity = 12;    // Max falling speed
     Physics.PlayerHeight[1][1] = 30;        // Little Mario
     Physics.PlayerWidth[1][1] = 24;         // ------------
@@ -227,13 +227,13 @@ void SetupPhysics()
     Physics.PlayerGrabSpotY[5][7] = 16;     // ---------
 
     Physics.NPCTimeOffScreen = 180;         // How long NPCs are active offscreen before being reset
-    Physics.NPCShellSpeed = 7.1f;            // Speed of kicked shells
+    Physics.NPCShellSpeed = 7.1_nf;         // Speed of kicked shells
     Physics.NPCShellSpeedY = 11;            // Vertical Speed of kicked shells
     Physics.NPCCanHurtWait = 30;            // How long to wait before NPCs can hurt players
-    Physics.NPCGravity = 0.26f;              // NPC Gravity
-    Physics.NPCGravityReal = 0.26f;              // NPC Gravity
-    Physics.NPCWalkingSpeed = 1.2f;          // NPC Walking Speed
+    Physics.NPCGravity = 0.26_nf;           // NPC Gravity
+    Physics.NPCGravityReal = 0.26_nf;       // NPC Gravity
+    Physics.NPCWalkingSpeed = 1.2_nf;       // NPC Walking Speed
     Physics.NPCWalkingOnSpeed = 1;          // NPC that can be walked on walking speed
-    Physics.NPCMushroomSpeed = 1.8f;         // Mushroom X Speed
+    Physics.NPCMushroomSpeed = 1.8_nf;      // Mushroom X Speed
     Physics.NPCPSwitch = 777;               // P Switch time
 }

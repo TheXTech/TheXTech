@@ -29,8 +29,8 @@ extern std::array<bool, maxLocalPlayers> g_drawBlocks_valid;
 extern std::array<bool, maxLocalPlayers> g_drawBGOs_valid;
 
 // should equal the largest X or Y move rate of any layer containing blocks / BGOs
-extern double g_drawBlocks_invalidate_rate;
-extern double g_drawBGOs_invalidate_rate;
+extern num_t g_drawBlocks_invalidate_rate;
+extern num_t g_drawBGOs_invalidate_rate;
 
 // call when a block is added, moved, or its Hidden attribute is changed
 inline void invalidateDrawBlocks()

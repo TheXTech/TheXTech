@@ -44,7 +44,7 @@ bool CheckCollisionIntersect(const Location_t &Loc1, const Location_t &Loc2)
 bool n00bCollision(const Location_t &Loc1, const Location_t &Loc2)
 {
     bool tempn00bCollision = false;
-    float EZ = 2.f;
+    num_t EZ = 2;
 
     if(Loc2.Width >= 32 - EZ * 2 && Loc2.Height >= 32 - EZ * 2)
     {
@@ -109,8 +109,8 @@ bool WarpCollision(const Location_t &Loc1, const SpeedlessLocation_t &entrance, 
 {
     bool hasCollision = false;
 
-    float X2 = 0;
-    float Y2 = 0;
+    num_t X2 = 0;
+    num_t Y2 = 0;
 
     if(direction == 3)
     {
@@ -167,7 +167,7 @@ int FindCollision(const Location_t &Loc1, const Location_t &Loc2)
     {
         tempFindCollision = COLLISION_LEFT;
     }
-    else if(Loc1.Y - Loc1.SpeedY > Loc2.Y + Loc2.Height - Loc2.SpeedY - 0.1)
+    else if(Loc1.Y - Loc1.SpeedY > Loc2.Y + Loc2.Height - Loc2.SpeedY - 0.1_n)
     {
         tempFindCollision = COLLISION_BOTTOM;
     }
@@ -180,7 +180,7 @@ int FindCollision(const Location_t &Loc1, const Location_t &Loc2)
 }
 
 // Whats side the collision happened for belts
-int FindCollisionBelt(const Location_t &Loc1, const Location_t &Loc2, float BeltSpeed)
+int FindCollisionBelt(const Location_t &Loc1, const Location_t &Loc2, numf_t BeltSpeed)
 {
     int tempFindCollisionBelt = COLLISION_NONE;
 
@@ -196,7 +196,7 @@ int FindCollisionBelt(const Location_t &Loc1, const Location_t &Loc2, float Belt
     {
         tempFindCollisionBelt = COLLISION_LEFT;
     }
-    else if(Loc1.Y - Loc1.SpeedY - BeltSpeed > Loc2.Y + Loc2.Height - Loc2.SpeedY - 0.1)
+    else if(Loc1.Y - Loc1.SpeedY - BeltSpeed > Loc2.Y + Loc2.Height - Loc2.SpeedY - 0.1_n)
     {
         tempFindCollisionBelt = COLLISION_BOTTOM;
     }
@@ -225,7 +225,7 @@ int NPCFindCollision(const Location_t &Loc1, const Location_t &Loc2)
     {
         tempNPCFindCollision = COLLISION_LEFT;
     }
-    else if(Loc1.Y - Loc1.SpeedY > Loc2.Y + Loc2.Height - Loc2.SpeedY - 0.1)
+    else if(Loc1.Y - Loc1.SpeedY > Loc2.Y + Loc2.Height - Loc2.SpeedY - 0.1_n)
     {
         tempNPCFindCollision = COLLISION_BOTTOM;
     }
@@ -505,7 +505,7 @@ bool WalkingCollision2(const Location_t &Loc1, const Location_t &Loc2)
 #endif
 
 // Factors in beltspeed
-bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, float BeltSpeed)
+bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, numf_t BeltSpeed)
 {
     bool tempWalkingCollision3 = false;
 
@@ -521,11 +521,11 @@ bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, float Bel
 }
 
 // Helps the player to walk over 1 unit cracks
-int FindRunningCollision(const Location_t &Loc1, const Location_t &Loc2, double BeltSpeedX)
+int FindRunningCollision(const Location_t &Loc1, const Location_t &Loc2, num_t BeltSpeedX)
 {
     int tempFindRunningCollision = COLLISION_NONE;
 
-    if(Loc1.Y + Loc1.Height - Loc1.SpeedY - 2.5 <= Loc2.Y - Loc2.SpeedY)
+    if(Loc1.Y + Loc1.Height - Loc1.SpeedY - 2.5_n <= Loc2.Y - Loc2.SpeedY)
     {
         tempFindRunningCollision = COLLISION_TOP;
     }
@@ -613,7 +613,7 @@ bool CheckHitSpot1(const Location_t &Loc1, const Location_t &Loc2)
     return tempCheckHitSpot1;
 }
 
-double blockGetTopYTouching(const Block_t &block, const Location_t& loc)
+num_t blockGetTopYTouching(const Block_t &block, const Location_t& loc)
 {
     // Get slope type
     int blockType = block.Type;
@@ -643,18 +643,18 @@ double blockGetTopYTouching(const Block_t &block, const Location_t& loc)
     // The following uses a slope calculation like 1.3 does
 
     // Get right or left x coordinate as relevant for the slope direction
-    double refX = loc.X;
+    num_t refX = loc.X;
     if(slopeDirection < 0)
         refX += loc.Width;
 
     // Get how far along the slope we are in the x direction
-    double slope = (refX - block.Location.X) / block.Location.Width;
+    num_t slope = (refX - block.Location.X) / (int_ok)block.Location.Width;
     if(slopeDirection < 0) slope = 1 - slope;
     if(slope < 0) slope = 0;
     if(slope > 1) slope = 1;
 
     // Determine the y coordinate
-    return block.Location.Y + block.Location.Height * slope;
+    return block.Location.Y + (int_ok)block.Location.Height * slope;
 }
 
 bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &referenceLoc)
@@ -667,8 +667,8 @@ bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &refere
     const Block_t& oldBlock = Block[oldBlockIdx];
     const Block_t& newBlock = Block[newBlockIdx];
 
-    double newBlockY = blockGetTopYTouching(newBlock, referenceLoc);
-    double oldBlockY = blockGetTopYTouching(oldBlock, referenceLoc);
+    num_t newBlockY = blockGetTopYTouching(newBlock, referenceLoc);
+    num_t oldBlockY = blockGetTopYTouching(oldBlock, referenceLoc);
 
     if(newBlockY < oldBlockY)
     {
@@ -682,8 +682,8 @@ bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &refere
     }
 
     // Break tie based on if one is moving upward faster
-    double newBlockSpeedY = newBlock.Location.SpeedY;
-    double oldBlockSpeedY = oldBlock.Location.SpeedY;
+    num_t newBlockSpeedY = newBlock.Location.SpeedY;
+    num_t oldBlockSpeedY = oldBlock.Location.SpeedY;
 
     if(newBlockSpeedY < oldBlockSpeedY)
     {
@@ -696,7 +696,7 @@ bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &refere
         return false;
     }
 
-    double refX = referenceLoc.X + referenceLoc.Width / 2;
+    num_t refX = referenceLoc.X + referenceLoc.Width / 2;
 
     // Break tie based on which of blocks intersects the center point
     bool oldIntersects = referenceLoc.X >= oldBlock.Location.X && referenceLoc.X + referenceLoc.Width <= oldBlock.Location.X + oldBlock.Location.Width;
@@ -714,8 +714,8 @@ bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &refere
     }
 
     // Break tie based on x-proximity
-    double newBlockDist = abs((newBlock.Location.X + newBlock.Location.Width / 2) - refX);
-    double oldBlockDist = abs((oldBlock.Location.X + oldBlock.Location.Width / 2) - refX);
+    num_t newBlockDist = std::abs((newBlock.Location.X + newBlock.Location.Width / 2) - refX);
+    num_t oldBlockDist = std::abs((oldBlock.Location.X + oldBlock.Location.Width / 2) - refX);
 
     if(newBlockDist < oldBlockDist)
     {
@@ -730,8 +730,8 @@ bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &refere
     }
 
     // Break tie based on narrower width (more specific match)
-    double newBlockWidth = newBlock.Location.Width;
-    double oldBlockWidth = oldBlock.Location.Width;
+    num_t newBlockWidth = newBlock.Location.Width;
+    num_t oldBlockWidth = oldBlock.Location.Width;
 
     if(newBlockWidth < oldBlockWidth)
     {
@@ -750,7 +750,7 @@ bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &refere
 }
 
 void CompareNpcWalkBlock(int &tempHitBlock, int &tempHitOldBlock,
-                         double &tempHit,   double &tempHitOld,
+                         num_t &tempHit,   num_t &tempHitOld,
                          int &tempHitIsSlope, NPC_t *npc)
 {
     int oldBlockIdx  = tempHitOldBlock;
@@ -799,7 +799,7 @@ void CompareNpcWalkBlock(int &tempHitBlock, int &tempHitOldBlock,
 bool SectionCollision(const int section, const Location_t &loc)
 {
     const auto &sec = level[section];
-    const double gap = 64;
+    const num_t gap = 64;
 
     if(loc.X + loc.Width < sec.X - gap)
         return false;

@@ -2488,6 +2488,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
 
         if(save_configs != 0)
         {
+            // FIXME: unnecessary float
             float rot = 0;
             float op = 1.0f;
             if(A == MenuCursor + 1)
@@ -2966,6 +2967,7 @@ void mainMenuDraw()
             int mode_icon_X = MenuX + 340;
             int mode_icon_Y = MenuY - 34 + (B * 30);
 
+            // FIXME: unnecessary float
             float rot = 0;
             rot = std::abs((int)(CommonFrame % 90) - 45);
             rot = rot - 22.5;

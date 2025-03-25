@@ -117,7 +117,7 @@ void PlayerPoundLogic(int A)
         Player[A].Controls.Up = false;
         Player[A].Controls.Right = false;
         Player[A].Controls.Jump = true;
-        Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.95;
+        Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.95_r;
         Player[A].RunRelease = false;
         Player[A].CanFly = false;
         Player[A].FlyCount = 0;
@@ -342,12 +342,12 @@ void PlayerThrowHeavy(const int A)
 
     if(p.Controls.Up)
     {
-        NPC[numNPCs].Location.SpeedX = 2 * p.Direction + p.Location.SpeedX * 0.9;
+        NPC[numNPCs].Location.SpeedX = 2 * p.Direction + p.Location.SpeedX * 0.9_r;
 
         if(p.StandingOnNPC == 0)
-            NPC[numNPCs].Location.SpeedY = -8 + p.Location.SpeedY * 0.3;
+            NPC[numNPCs].Location.SpeedY = -8 + p.Location.SpeedY * 0.3_r;
         else
-            NPC[numNPCs].Location.SpeedY = -8 + NPC[p.StandingOnNPC].Location.SpeedY * 0.3;
+            NPC[numNPCs].Location.SpeedY = -8 + NPC[p.StandingOnNPC].Location.SpeedY * 0.3_r;
 
         NPC[numNPCs].Location.Y -= 24;
         NPC[numNPCs].Location.X += -6 * p.Direction;
@@ -355,7 +355,7 @@ void PlayerThrowHeavy(const int A)
         if(p.Character == 3)
         {
             NPC[numNPCs].Location.SpeedY += 1;
-            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.5;
+            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.5_rb;
         }
         else if(p.Character == 4)
         {
@@ -365,12 +365,12 @@ void PlayerThrowHeavy(const int A)
     }
     else
     {
-        NPC[numNPCs].Location.SpeedX = 4 * p.Direction + p.Location.SpeedX * 0.9;
+        NPC[numNPCs].Location.SpeedX = 4 * p.Direction + p.Location.SpeedX * 0.9_r;
 
         if(p.StandingOnNPC == 0)
-            NPC[numNPCs].Location.SpeedY = -5 + p.Location.SpeedY * 0.3;
+            NPC[numNPCs].Location.SpeedY = -5 + p.Location.SpeedY * 0.3_r;
         else
-            NPC[numNPCs].Location.SpeedY = -5 + NPC[p.StandingOnNPC].Location.SpeedY * 0.3;
+            NPC[numNPCs].Location.SpeedY = -5 + NPC[p.StandingOnNPC].Location.SpeedY * 0.3_r;
 
         if(p.Character == 3)
             NPC[numNPCs].Location.SpeedY += 1;
@@ -450,14 +450,14 @@ void PlayerThrowBall(const int A)
     if(p.Character == 4)
         p.FireBallCD = 25;
 
-    NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX / 3.5);
+    NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX) / 3.5_ri;
 
     if(p.State == 7)
     {
         PlaySoundSpatial(SFX_Iceball, p.Location);
 
         NPC[numNPCs].Location.SpeedY = (p.Controls.Up) ? -8 : 5;
-        NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.8;
+        NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.8_r;
     }
     else
     {
@@ -466,7 +466,7 @@ void PlayerThrowBall(const int A)
         NPC[numNPCs].Location.SpeedY = (p.Controls.Up) ? -6 : 20;
 
         if(NPC[numNPCs].Special == 2)
-            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.85;
+            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.85_r;
     }
 
     if(p.Controls.Up)
@@ -476,17 +476,17 @@ void PlayerThrowBall(const int A)
         else
             NPC[numNPCs].Location.SpeedY += p.Location.SpeedY / 10;
 
-        NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.9;
+        NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.9_r;
     }
 
     if(FlameThrower)
     {
-        NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.5;
-        NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY * 1.5;
+        NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.5_rb;
+        NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY * 1.5_rb;
     }
 
     if(p.StandingOnNPC != 0)
-        NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX + NPC[p.StandingOnNPC].Location.SpeedX) / 3.5;
+        NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX + NPC[p.StandingOnNPC].Location.SpeedX) / 3.5_ri;
 
     PlayerThrownNpcMazeCheck(p, NPC[numNPCs]);
 
@@ -605,11 +605,11 @@ void Tanooki(const int A)
     // tanooki
     if(p.Stoned && p.Controls.Down && p.StandingOnNPC == 0)
     {
-        p.Location.SpeedX = p.Location.SpeedX * 0.8;
-        if(p.Location.SpeedX >= -0.5 && p.Location.SpeedX <= 0.5)
+        p.Location.SpeedX = p.Location.SpeedX * 0.8_r;
+        if(p.Location.SpeedX >= -0.5_n && p.Location.SpeedX <= 0.5_n)
             p.Location.SpeedX = 0;
         if(p.Location.SpeedY < 8)
-            p.Location.SpeedY += 0.25;
+            p.Location.SpeedY += 0.25_n;
     }
 
     if(p.StonedCD == 0)

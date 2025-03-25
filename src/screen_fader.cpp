@@ -113,7 +113,7 @@ void ScreenFader::setupFader(int step, int start, int goal, int shape, bool useF
 #endif
 }
 
-void ScreenFader::setTrackedFocus(double *x, double *y, double offX, double offY)
+void ScreenFader::setTrackedFocus(num_t *x, num_t *y, num_t offX, num_t offY)
 {
     m_focusTrackX = x;
     m_focusTrackY = y;

@@ -180,7 +180,7 @@ bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m
         }
     }
 
-    double* const scroll[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
+    num_t* const scroll[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
 
     for(int i = 0; i < 4; i++)
     {

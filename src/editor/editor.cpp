@@ -99,16 +99,16 @@ int last_vScreenY_b[maxSections+1];
 int editor_section_toast = 0;
 
 // buffer for scrolling since we can only scroll in 32-pixel increments
-int scroll_buffer_x = 0;
-int scroll_buffer_y = 0;
+num_t scroll_buffer_x = 0;
+num_t scroll_buffer_y = 0;
 
 // to prevent constant replacement of tiled items during "replace_existing" mode
 Location_t last_EC_loc;
 
 // the first f stands for "fixed"
-constexpr bool ffEqual(double i, double j)
+constexpr bool ffEqual(num_t i, num_t j)
 {
-    return (i - j > -0.1) && (i - j < 0.1);
+    return (i - j > -0.1_n) && (i - j < 0.1_n);
 }
 
 void ResetSectionScrolls()
@@ -3015,7 +3015,7 @@ void InteractResize(LocType& loc, int min, int snap)
 {
     if(EditorCursor.InteractFlags & IF_ResizeL)
     {
-        double dl = EditorCursor.Location.X - loc.X;
+        num_t dl = EditorCursor.Location.X - loc.X;
         if(dl > snap && loc.Width > min)
         {
             loc.X += snap;
@@ -3032,7 +3032,7 @@ void InteractResize(LocType& loc, int min, int snap)
 
     if(EditorCursor.InteractFlags & IF_ResizeR)
     {
-        double dr = EditorCursor.Location.X - (loc.X + loc.Width);
+        num_t dr = EditorCursor.Location.X - (loc.X + loc.Width);
         if(dr < -snap && loc.Width > min)
         {
             loc.Width -= snap;
@@ -3047,7 +3047,7 @@ void InteractResize(LocType& loc, int min, int snap)
 
     if(EditorCursor.InteractFlags & IF_ResizeT)
     {
-        double dt = EditorCursor.Location.Y - loc.Y;
+        num_t dt = EditorCursor.Location.Y - loc.Y;
         if(dt > snap && loc.Height > min)
         {
             loc.Y += snap;
@@ -3064,7 +3064,7 @@ void InteractResize(LocType& loc, int min, int snap)
 
     if(EditorCursor.InteractFlags & IF_ResizeB)
     {
-        double db = EditorCursor.Location.Y - (loc.Y + loc.Height);
+        num_t db = EditorCursor.Location.Y - (loc.Y + loc.Height);
         if(db < -snap && loc.Height > min)
         {
             loc.Height -= snap;
@@ -3172,7 +3172,7 @@ void MouseMove(int X, int Y, bool /*nCur*/)
     if(XRender::TargetOverscanX && WorldEditor)
         X -= XRender::TargetOverscanX;
 
-    double lX = 0, lY = 0;
+    num_t lX = 0, lY = 0;
 
     // translate into layer coordinates to snap to layer's grid
     if(MagicHand && EditorCursor.Layer != LAYER_NONE)

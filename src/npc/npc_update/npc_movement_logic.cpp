@@ -32,7 +32,7 @@ static inline bool s_use_default_movement(int A)
     return (NPCDefaultMovement(NPC[A]) || (NPC[A]->IsFish && NPC[A].Special != 2)) && !((NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[A].Special > 0);
 }
 
-void NPCMovementLogic(int A, float& speedVar)
+void NPCMovementLogic(int A, numf_t& speedVar)
 {
     // POSSIBLE SUBROUTINE: setSpeed
 
@@ -57,15 +57,15 @@ void NPCMovementLogic(int A, float& speedVar)
 
             if(NPC[A].Location.SpeedX > Physics.NPCWalkingOnSpeed)
             {
-                NPC[A].Location.SpeedX -= 0.05;
+                NPC[A].Location.SpeedX -= 0.05_n;
                 if(!NPC[A].Projectile)
-                    NPC[A].Location.SpeedX -= 0.1;
+                    NPC[A].Location.SpeedX -= 0.1_n;
             }
             else if(NPC[A].Location.SpeedX < -Physics.NPCWalkingOnSpeed)
             {
-                NPC[A].Location.SpeedX += 0.05;
+                NPC[A].Location.SpeedX += 0.05_n;
                 if(!NPC[A].Projectile)
-                    NPC[A].Location.SpeedX += 0.1;
+                    NPC[A].Location.SpeedX += 0.1_n;
             }
         }
         else if(NPC[A].Type == NPCID_KNIGHT)
@@ -77,9 +77,9 @@ void NPCMovementLogic(int A, float& speedVar)
             }
 
             if(NPC[A].Location.SpeedX > 2)
-                NPC[A].Location.SpeedX -= 0.05;
+                NPC[A].Location.SpeedX -= 0.05_n;
             else if(NPC[A].Location.SpeedX < -2)
-                NPC[A].Location.SpeedX += 0.05;
+                NPC[A].Location.SpeedX += 0.05_n;
         }
         else if(!(NPC[A].Type >= NPCID_GRN_HIT_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_HIT_TURTLE_S4 && NPC[A].Projectile))
         {
@@ -90,9 +90,9 @@ void NPCMovementLogic(int A, float& speedVar)
             }
 
             if(NPC[A].Location.SpeedX > Physics.NPCWalkingSpeed)
-                NPC[A].Location.SpeedX -= 0.05;
+                NPC[A].Location.SpeedX -= 0.05_n;
             else if(NPC[A].Location.SpeedX < -Physics.NPCWalkingSpeed)
-                NPC[A].Location.SpeedX += 0.05;
+                NPC[A].Location.SpeedX += 0.05_n;
         }
     }
     else if(NPC[A].Type == NPCID_FLIER)
@@ -102,8 +102,8 @@ void NPCMovementLogic(int A, float& speedVar)
     }
     else if(NPC[A].Type == NPCID_ROCKET_FLIER)
     {
-        if(NPC[A].Location.SpeedX > -2.5 && NPC[A].Location.SpeedX < 2.5)
-            NPC[A].Location.SpeedX = 2.5 * NPC[A].Direction;
+        if(NPC[A].Location.SpeedX > -2.5_n && NPC[A].Location.SpeedX < 2.5_n)
+            NPC[A].Location.SpeedX = 2.5_n * NPC[A].Direction;
     }
     // Slow things down that shouldnt move
     else if(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_JUMPER_S3 || NPC[A].Type == NPCID_SPRING ||
@@ -125,21 +125,21 @@ void NPCMovementLogic(int A, float& speedVar)
             NPC[A].Type == NPCID_ICE_POWER_S3 || NPC[A].Type == NPCID_DOOR_MAKER || NPC[A].Type == NPCID_QUAD_SPITTER)
     {
         if(NPC[A].Location.SpeedX > 0)
-            NPC[A].Location.SpeedX -= 0.05;
+            NPC[A].Location.SpeedX -= 0.05_n;
         else if(NPC[A].Location.SpeedX < 0)
-            NPC[A].Location.SpeedX += 0.05;
+            NPC[A].Location.SpeedX += 0.05_n;
 
-        if(NPC[A].Location.SpeedX >= -0.05 && NPC[A].Location.SpeedX <= 0.05)
+        if(NPC[A].Location.SpeedX >= -0.05_n && NPC[A].Location.SpeedX <= 0.05_n)
             NPC[A].Location.SpeedX = 0;
 
         if(NPC[A].Location.SpeedY >= -Physics.NPCGravity && NPC[A].Location.SpeedY <= Physics.NPCGravity)
         {
             if(NPC[A].Location.SpeedX > 0)
-                NPC[A].Location.SpeedX -= 0.3;
+                NPC[A].Location.SpeedX -= 0.3_n;
             else if(NPC[A].Location.SpeedX < 0)
-                NPC[A].Location.SpeedX += 0.3;
+                NPC[A].Location.SpeedX += 0.3_n;
 
-            if(NPC[A].Location.SpeedX >= -0.3 && NPC[A].Location.SpeedX <= 0.3)
+            if(NPC[A].Location.SpeedX >= -0.3_n && NPC[A].Location.SpeedX <= 0.3_n)
                 NPC[A].Location.SpeedX = 0;
         }
     }
@@ -183,9 +183,9 @@ void NPCMovementLogic(int A, float& speedVar)
         }
 
         if(NPC[A].Location.SpeedX > Physics.NPCMushroomSpeed)
-            NPC[A].Location.SpeedX -= 0.05;
+            NPC[A].Location.SpeedX -= 0.05_n;
         else if(NPC[A].Location.SpeedX < -Physics.NPCMushroomSpeed)
-            NPC[A].Location.SpeedX += 0.05;
+            NPC[A].Location.SpeedX += 0.05_n;
     }
     else if(NPC[A].Type == NPCID_RAINBOW_SHELL)
     {
@@ -193,7 +193,7 @@ void NPCMovementLogic(int A, float& speedVar)
 
         NPCFaceNearestPlayer(NPC[A]);
 
-        NPC[A].Location.SpeedX += 0.1 * NPC[A].Direction;
+        NPC[A].Location.SpeedX += 0.1_n * NPC[A].Direction;
 
         if(NPC[A].Location.SpeedX < -4)
             NPC[A].Location.SpeedX = -4;
@@ -215,7 +215,7 @@ void NPCMovementLogic(int A, float& speedVar)
         {
             NPCFaceNearestPlayer(NPC[A]);
 
-            NPC[A].Location.SpeedX += 0.05 * NPC[A].Direction;
+            NPC[A].Location.SpeedX += 0.05_n * NPC[A].Direction;
 
             if(NPC[A].Location.SpeedX >= 3)
                 NPC[A].Location.SpeedX = 3;
@@ -225,12 +225,12 @@ void NPCMovementLogic(int A, float& speedVar)
         }
         else
         {
-            if(NPC[A].Location.SpeedX > 0.1)
-                NPC[A].Location.SpeedX -= 0.075;
-            else if(NPC[A].Location.SpeedX < -0.1)
-                NPC[A].Location.SpeedX += 0.075;
+            if(NPC[A].Location.SpeedX > 0.1_n)
+                NPC[A].Location.SpeedX -= 0.075_n;
+            else if(NPC[A].Location.SpeedX < -0.1_n)
+                NPC[A].Location.SpeedX += 0.075_n;
 
-            if(NPC[A].Location.SpeedX >= -0.1 && NPC[A].Location.SpeedX <= 0.1)
+            if(NPC[A].Location.SpeedX >= -0.1_n && NPC[A].Location.SpeedX <= 0.1_n)
                 NPC[A].Special2 = 0;
         }
     }
@@ -249,30 +249,30 @@ void NPCMovementLogic(int A, float& speedVar)
 
         if(NPC[A].Special == 0 || NPC[A].Special == 3)
         {
-            if(NPC[A].Location.SpeedX < 3.5 && NPC[A].Location.SpeedX > -3.5)
-                NPC[A].Location.SpeedX += (0.1 * NPC[A].Direction);
+            if(NPC[A].Location.SpeedX < 3.5_n && NPC[A].Location.SpeedX > -3.5_n)
+                NPC[A].Location.SpeedX += (0.1_n * NPC[A].Direction);
 
-            if(NPC[A].Location.SpeedX > 3.5)
-                NPC[A].Location.SpeedX -= 0.05;
-            else if(NPC[A].Location.SpeedX < -3.5)
-                NPC[A].Location.SpeedX += 0.05;
+            if(NPC[A].Location.SpeedX > 3.5_n)
+                NPC[A].Location.SpeedX -= 0.05_n;
+            else if(NPC[A].Location.SpeedX < -3.5_n)
+                NPC[A].Location.SpeedX += 0.05_n;
 
             if(NPC[A].Special == 3)
                 NPC[A].Location.SpeedY = -6;
         }
         else if(NPC[A].Special == 2)
-            NPC[A].Location.SpeedX += (0.2 * NPC[A].Direction);
+            NPC[A].Location.SpeedX += (0.2_n * NPC[A].Direction);
         else if(NPC[A].Special == 3)
             NPC[A].Location.SpeedY = -6;
         else
         {
             if(NPC[A].Location.SpeedX > 0)
-                NPC[A].Location.SpeedX -= 0.05;
+                NPC[A].Location.SpeedX -= 0.05_n;
             else if(NPC[A].Location.SpeedX < 0)
-                NPC[A].Location.SpeedX += 0.05;
+                NPC[A].Location.SpeedX += 0.05_n;
 
-            if(NPC[A].Location.SpeedX > -0.5 && NPC[A].Location.SpeedX < 0.5)
-                NPC[A].Location.SpeedX = 0.0001 * NPC[A].Direction;
+            if(NPC[A].Location.SpeedX > -0.5_n && NPC[A].Location.SpeedX < 0.5_n)
+                NPC[A].Location.SpeedX = 0.0001_n * NPC[A].Direction;
         }
     }
     // spiney eggs
@@ -288,9 +288,9 @@ void NPCMovementLogic(int A, float& speedVar)
             NPCFaceNearestPlayer(NPC[A]);
 
             if(NPC[A].Direction == 1 && NPC[A].Location.SpeedX < 4)
-                NPC[A].Location.SpeedX += 0.04;
+                NPC[A].Location.SpeedX += 0.04_n;
             if(NPC[A].Direction == -1 && NPC[A].Location.SpeedX > -4)
-                NPC[A].Location.SpeedX -= 0.04;
+                NPC[A].Location.SpeedX -= 0.04_n;
         }
     }
     else if(NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET)
@@ -306,12 +306,12 @@ void NPCMovementLogic(int A, float& speedVar)
     {
         if(NPC[A].Special == 0)
         {
-            if(NPC[A].Location.SpeedY == 0.0 || NPC[A].Slope > 0)
+            if(NPC[A].Location.SpeedY == 0 || NPC[A].Slope > 0)
             {
                 if(NPC[A].Wet == 0)
-                    NPC[A].Location.SpeedY = -2.1;
+                    NPC[A].Location.SpeedY = -2.1_n;
                 else
-                    NPC[A].Location.SpeedY = -1.1;
+                    NPC[A].Location.SpeedY = -1.1_n;
             }
         }
         else
@@ -366,8 +366,8 @@ void NPCMovementLogic(int A, float& speedVar)
 
                 if(NPC[A].Special2 <= 0)
                 {
-                    NPC[A].SpecialX = NPC[A].SpecialX * 0.99;
-                    if(NPC[A].SpecialX > -0.1 && NPC[A].SpecialX < 0.1)
+                    NPC[A].SpecialX = NPC[A].SpecialX * 0.99_r;
+                    if(NPC[A].SpecialX > -0.1_n && NPC[A].SpecialX < 0.1_n)
                         NPC[A].SpecialX = 0;
                     NPC[A].Location.SpeedX = NPC[A].SpecialX;
                 }
@@ -392,31 +392,31 @@ void NPCMovementLogic(int A, float& speedVar)
         {
             NPC[A].CantHurt = 100;
             if(NPC[A].Special < 2)
-                NPC[A].Location.SpeedY += Physics.NPCGravity * 1.5;
+                NPC[A].Location.SpeedY += Physics.NPCGravity * 1.5_rb;
             else if(NPC[A].Special == 3)
             {
                 // peach fireball changes
-                NPC[A].Location.SpeedY += Physics.NPCGravity * 0.9;
+                NPC[A].Location.SpeedY += Physics.NPCGravity * 0.9_r;
                 if(NPC[A].Location.SpeedX > 3)
-                    NPC[A].Location.SpeedX -= 0.04;
+                    NPC[A].Location.SpeedX -= 0.04_n;
                 else if(NPC[A].Location.SpeedX < -3)
-                    NPC[A].Location.SpeedX += 0.04;
+                    NPC[A].Location.SpeedX += 0.04_n;
             }
             else if(NPC[A].Special == 4)
             {
 
                 // toad fireball changes
-                NPC[A].Location.SpeedY += Physics.NPCGravity * 1.3;
+                NPC[A].Location.SpeedY += Physics.NPCGravity * 1.3_r;
                 if(NPC[A].Location.SpeedX < 8 && NPC[A].Location.SpeedX > 0)
-                    NPC[A].Location.SpeedX += 0.03;
+                    NPC[A].Location.SpeedX += 0.03_n;
                 else if(NPC[A].Location.SpeedX > -8 && NPC[A].Location.SpeedX < 0)
-                    NPC[A].Location.SpeedX -= 0.03;
+                    NPC[A].Location.SpeedX -= 0.03_n;
             }
             else if(NPC[A].Special == 5) // link fireballs float
             {
             }
             else
-                NPC[A].Location.SpeedY += Physics.NPCGravity * 1.3;
+                NPC[A].Location.SpeedY += Physics.NPCGravity * 1.3_r;
 
         }
         else if(NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET)
@@ -434,7 +434,7 @@ void NPCMovementLogic(int A, float& speedVar)
             else
             {
                 // If .Location.SpeedY < 2 + (.Location.Y - .DefaultLocationY) * 0.02 Then
-                NPC[A].Location.SpeedY += Physics.NPCGravity * 0.4;
+                NPC[A].Location.SpeedY += Physics.NPCGravity * 0.4_r;
                 // End If
             }
         }
@@ -476,7 +476,7 @@ void NPCMovementLogic(int A, float& speedVar)
 
                         if(NPC[A].Location.SpeedY == 0)
                             NPC[A].Special4 = 1;
-                        if(NPC[A].Location.SpeedY == 0.01)
+                        if(NPC[A].Location.SpeedY == 0.01_n)
                             NPC[A].Special4 = 0;
 
                         NPC[A].Location.SpeedX = 0;
@@ -489,35 +489,35 @@ void NPCMovementLogic(int A, float& speedVar)
                         else if(NPC[A].Location.Y < NPC[A].DefaultLocationY - 25)
                             NPC[A].Special4 = 0;
                         if(NPC[A].Special4 == 0)
-                            NPC[A].Location.SpeedY += 0.05;
+                            NPC[A].Location.SpeedY += 0.05_n;
                         else
-                            NPC[A].Location.SpeedY -= 0.05;
+                            NPC[A].Location.SpeedY -= 0.05_n;
                     }
                     else
                     {
                         if(NPC[A].Special4 == 0)
                         {
-                            NPC[A].Location.SpeedY -= 0.025;
+                            NPC[A].Location.SpeedY -= 0.025_n;
                             if(NPC[A].Location.SpeedY <= -1)
                                 NPC[A].Special4 = 1;
-                            if(NPC[A].Special == 3 && NPC[A].Location.SpeedY <= -0.5)
+                            if(NPC[A].Special == 3 && NPC[A].Location.SpeedY <= -0.5_n)
                                 NPC[A].Special4 = 1;
                         }
                         else
                         {
-                            NPC[A].Location.SpeedY += 0.025;
+                            NPC[A].Location.SpeedY += 0.025_n;
                             if(NPC[A].Location.SpeedY >= 1)
                                 NPC[A].Special4 = 0;
-                            if(NPC[A].Special == 3 && NPC[A].Location.SpeedY >= 0.5)
+                            if(NPC[A].Special == 3 && NPC[A].Location.SpeedY >= 0.5_n)
                                 NPC[A].Special4 = 0;
                         }
                     }
                 }
                 else if(NPC[A]->IsFish && NPC[A].Special == 1 && NPC[A].Special5 == 1)
-                    NPC[A].Location.SpeedY += Physics.NPCGravity * 0.6;
+                    NPC[A].Location.SpeedY += Physics.NPCGravity * 0.6_r;
                 else if(NPC[A].Type == NPCID_FLY_BLOCK || (g_config.fix_flamethrower_gravity && NPC[A].Type == NPCID_FLY_CANNON))
                 {
-                    NPC[A].Location.SpeedY += Physics.NPCGravity * 0.75;
+                    NPC[A].Location.SpeedY += Physics.NPCGravity * 0.75_rb;
                     if(NPC[A].Location.SpeedY > Physics.NPCGravity * 15)
                         NPC[A].Location.SpeedY = Physics.NPCGravity * 15;
                 }
@@ -529,20 +529,20 @@ void NPCMovementLogic(int A, float& speedVar)
 
         if(NPC[A].Type == NPCID_CHAR3_HEAVY)
         {
-            NPC[A].Location.SpeedY += Physics.NPCGravity * 0.8;
+            NPC[A].Location.SpeedY += Physics.NPCGravity * 0.8_r;
             // If .Location.SpeedY >= 5 Then .Location.SpeedY = 5
-            if(NPC[A].Location.SpeedX < -0.005)
-                NPC[A].Location.SpeedX += 0.02;
-            else if(NPC[A].Location.SpeedX > 0.005)
-                NPC[A].Location.SpeedX -= 0.02;
+            if(NPC[A].Location.SpeedX < -0.005_n)
+                NPC[A].Location.SpeedX += 0.02_n;
+            else if(NPC[A].Location.SpeedX > 0.005_n)
+                NPC[A].Location.SpeedX -= 0.02_n;
             else
                 NPC[A].Location.SpeedX = 0;
         }
     }
     else if(NPC[A].Projectile)
     {
-        NPC[A].Location.SpeedY = NPC[A].Location.SpeedY * 0.95;
-        if(NPC[A].Location.SpeedY > -0.1 && NPC[A].Location.SpeedY < 0.1)
+        NPC[A].Location.SpeedY = NPC[A].Location.SpeedY * 0.95_r;
+        if(NPC[A].Location.SpeedY > -0.1_n && NPC[A].Location.SpeedY < 0.1_n)
         {
             NPC[A].Projectile = false;
             NPC[A].Location.SpeedY = 0;
@@ -560,10 +560,10 @@ void NPCMovementLogic(int A, float& speedVar)
 
     if(NPC[A].Type == NPCID_STACKER && !NPC[A].Projectile)
     {
-        speedVar = (float)(speedVar * 0.7);
+        speedVar = speedVar * 0.7_r;
         if(NPC[A].Special2 < 2)
         {
-            speedVar = (float)(speedVar * 0.7);
+            speedVar = speedVar * 0.7_r;
             NPC[A].Special2 += 1;
         }
     }
@@ -593,7 +593,7 @@ void NPCMovementLogic(int A, float& speedVar)
     {
         if(!(NPC[A].Location.X == NPC[A].DefaultLocationX && NPC[A].Location.Y == NPC[A].DefaultLocationY) || NPC[A].Type == NPCID_FIRE_POWER_S3)
         {
-            NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.99;
+            NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.99_r;
             NPC[A].Location.X += NPC[A].Location.SpeedX;
             NPC[A].Location.Y += NPC[A].Location.SpeedY;
             if(!NPC[A].Projectile)

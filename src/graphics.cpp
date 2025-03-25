@@ -51,10 +51,10 @@ void GetvScreen(vScreen_t& vscreen)
         pLoc.Height = 0;
 
     // this check is new because players can now respawn in 1P mode through DropAdd
-    double pLocY = (p.Effect == PLREFF_RESPAWN) ? p.RespawnY : pLoc.Y;
+    num_t pLocY = (p.Effect == PLREFF_RESPAWN) ? p.RespawnY : pLoc.Y;
 
     vscreen.X = -pLoc.X + (vscreen.Width - pLoc.Width) / 2;
-    vscreen.Y = -pLocY + (vscreen.Height * 0.5) - vScreenYOffset - pLoc.Height;
+    vscreen.Y = -pLocY + (vscreen.Height * 0.5_n) - vScreenYOffset - pLoc.Height;
 
     ProcessSmallScreenCam(vscreen);
 
@@ -97,8 +97,8 @@ void GetvScreenAverage(vScreen_t& vscreen)
 {
     int A = 0;
     int B = 0;
-    double OldX = 0;
-    double OldY = 0;
+    num_t OldX = 0;
+    num_t OldY = 0;
 
     OldX = vscreen.X;
     OldY = vscreen.Y;
@@ -112,7 +112,7 @@ void GetvScreenAverage(vScreen_t& vscreen)
         {
             vscreen.X += -Player[A].Location.X - Player[A].Location.Width / 2;
 
-            double pLocY = (Player[A].Effect == PLREFF_RESPAWN) ? Player[A].RespawnY : Player[A].Location.Y;
+            num_t pLocY = (Player[A].Effect == PLREFF_RESPAWN) ? Player[A].RespawnY : Player[A].Location.Y;
 
             if(Player[A].Mount == 2)
                 vscreen.Y += -pLocY;
@@ -145,8 +145,8 @@ void GetvScreenAverage(vScreen_t& vscreen)
     const SpeedlessLocation_t& section = level[Player[1].Section];
 
     // remember that the screen will be limited to the section's size in all cases
-    double use_width  = SDL_min(static_cast<double>(screen.W), section.Width  - section.X);
-    double use_height = SDL_min(static_cast<double>(screen.H), section.Height - section.Y);
+    num_t use_width  = SDL_min(static_cast<num_t>(screen.W), section.Width  - section.X);
+    num_t use_height = SDL_min(static_cast<num_t>(screen.H), section.Height - section.Y);
 
     vscreen.X = (vscreen.X / B) + (use_width / 2);
     vscreen.Y = (vscreen.Y / B) + (use_height / 2) - vScreenYOffset;
@@ -211,8 +211,8 @@ void GetvScreenAverage2(vScreen_t& vscreen)
 
     const SpeedlessLocation_t& section = level[Player[1].Section];
 
-    double use_width  = SDL_min(static_cast<double>(screen.W), section.Width  - section.X);
-    double use_height = SDL_min(static_cast<double>(screen.H), section.Height - section.Y);
+    num_t use_width  = SDL_min(static_cast<num_t>(screen.W), section.Width  - section.X);
+    num_t use_height = SDL_min(static_cast<num_t>(screen.H), section.Height - section.Y);
 
     vscreen.X = (vscreen.X / B) + (use_width / 2);
     vscreen.Y = (vscreen.Y / B) + (use_height / 2) - vScreenYOffset;
@@ -224,19 +224,19 @@ void GetvScreenAverage2(vScreen_t& vscreen)
 void GetvScreenAverage3(vScreen_t& vscreen)
 {
     int plr_count = 0;
-    double OldX = 0;
-    double OldY = 0;
+    num_t OldX = 0;
+    num_t OldY = 0;
 
     OldX = vscreen.X;
     OldY = vscreen.Y;
 
     // calculate average Y position
     vscreen.Y = 0;
-    double Y_not_warping = 0;
+    num_t Y_not_warping = 0;
     int not_warping_count = 0;
 
     // find furthest left, right, top, and bottom players
-    double l, r, t, b;
+    num_t l, r, t, b;
 
     const Screen_t& screen = Screens[vscreen.screen_ref];
 
@@ -252,13 +252,13 @@ void GetvScreenAverage3(vScreen_t& vscreen)
         if(plr_count == 0)
             section_idx = plr.Section;
 
-        double pl = plr.Location.X;
-        double pr = pl + plr.Location.Width;
+        num_t pl = plr.Location.X;
+        num_t pr = pl + plr.Location.Width;
 
         // DANGER: consider case where players are free-fall and a player respawns
-        double pLocY = (plr.Effect == PLREFF_RESPAWN) ? plr.RespawnY : plr.Location.Y;
+        num_t pLocY = (plr.Effect == PLREFF_RESPAWN) ? plr.RespawnY : plr.Location.Y;
 
-        double by = pLocY + plr.Location.Height;
+        num_t by = pLocY + plr.Location.Height;
 
         if(plr_count == 0 || by < t)
             t = by;
@@ -291,29 +291,29 @@ void GetvScreenAverage3(vScreen_t& vscreen)
     plr_count += 1;
 
     // take the average, but if the players waiting to exit a warp are keeping the screen too high, don't let them control the screen
-    double mean_Y = vscreen.Y / plr_count;
+    num_t mean_Y = vscreen.Y / plr_count;
     if(not_warping_count != 0)
     {
-        double mean_Y_not_warping = Y_not_warping / not_warping_count;
+        num_t mean_Y_not_warping = Y_not_warping / not_warping_count;
         // if the warping players are pulling the screen up by more than 100px, ignore them
-        double allowed_height = 100;
+        num_t allowed_height = 100;
         if(mean_Y > mean_Y_not_warping + allowed_height)
             mean_Y = mean_Y_not_warping + allowed_height;
     }
 
     const SpeedlessLocation_t& section = level[section_idx];
 
-    double use_width  = screen.W;
-    double use_height = screen.H;
+    num_t use_width  = screen.W;
+    num_t use_height = screen.H;
 
     // allow canonical screen to expand to reach size of main screen, if there are players near the side of the screen
     if(g_config.allow_multires && !screen.Visible)
     {
         // vScreen boundaries that would have been present in SMBX 1.3 splitscreen
-        double want_l = l - screen.W / 4;
-        double want_r = r + screen.W / 4;
-        double want_t = t - screen.H / 4;
-        double want_b = b + screen.H / 4;
+        num_t want_l = l - screen.W / 4;
+        num_t want_r = r + screen.W / 4;
+        num_t want_t = t - screen.H / 4;
+        num_t want_b = b + screen.H / 4;
 
         if(want_t > -mean_Y - screen.H / 2)
             want_t = -mean_Y - screen.H / 2;
@@ -336,9 +336,9 @@ void GetvScreenAverage3(vScreen_t& vscreen)
         if(want_b - want_t > use_height)
             use_height = want_b - want_t;
 
-        use_width  = SDL_min(use_width,  static_cast<double>(screen.visible_screen().W));
+        use_width  = SDL_min(use_width,  static_cast<num_t>(screen.visible_screen().W));
         // don't limit by visible screen: needed to handle unusual shared screen cases found by Sapphire Bullet Bill
-        // use_height = SDL_min(use_height, static_cast<double>(screen.visible_screen().H));
+        // use_height = SDL_min(use_height, static_cast<num_t>(screen.visible_screen().H));
 
         vscreen.Width = (int)use_width;
         vscreen.Height = (int)use_height;
@@ -349,7 +349,7 @@ void GetvScreenAverage3(vScreen_t& vscreen)
 
     // if a NoTurnBack section, make sure that the limited width is tracked
     if(g_config.allow_multires && NoTurnBack[section_idx])
-        use_width = SDL_min(use_width, static_cast<double>(screen.canonical_screen().W));
+        use_width = SDL_min(use_width, static_cast<num_t>(screen.canonical_screen().W));
 
     use_width  = SDL_min(use_width,  section.Width  - section.X);
     use_height = SDL_min(use_height, section.Height - section.Y);
@@ -438,8 +438,8 @@ void SharedScreenAvoidJump_Post(Screen_t& screen, int Delay)
 
     auto& vscreen = screen.vScreen(1);
 
-    double curX = vscreen.X;
-    double curY = vscreen.Y;
+    num_t curX = vscreen.X;
+    num_t curY = vscreen.Y;
 
     vscreen.tempX = 0;
     vscreen.TempY = 0;
@@ -474,11 +474,11 @@ void SharedScreenResetTemp(Screen_t& screen)
 }
 
 // NEW: get the fixed-resolution vScreen position for a player, and write the top-left coordinate to (left, top)
-void GetPlayerScreen(double W, double H, const Player_t& p, double& left, double& top)
+void GetPlayerScreen(num_t W, num_t H, const Player_t& p, num_t& left, num_t& top)
 {
     auto &pLoc = p.Location;
 
-    double pHeight = (p.Mount != 2) ? pLoc.Height : 0;
+    num_t pHeight = (p.Mount != 2) ? pLoc.Height : 0;
 
     left = -pLoc.X + (W - pLoc.Width) / 2;
     top = -pLoc.Y + (H / 2) - vScreenYOffset - pHeight;
@@ -787,8 +787,8 @@ void GetvScreenCredits(vScreen_t& vscreen)
     const SpeedlessLocation_t& section = level[Player[1].Section];
 
     // remember that the screen will be limited to the section's size in all cases
-    double use_width  = SDL_min((double)vscreen.Width,  section.Width  - section.X);
-    double use_height = SDL_min((double)vscreen.Height, section.Height - section.Y);
+    num_t use_width  = SDL_min((num_t)vscreen.Width,  section.Width  - section.X);
+    num_t use_height = SDL_min((num_t)vscreen.Height, section.Height - section.Y);
 
     vscreen.X = (vscreen.X / B) + (use_width / 2);
     vscreen.Y = (vscreen.Y / B) + (use_height / 2) - vScreenYOffset;

@@ -190,12 +190,12 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             if(Block[B].Type >= BLKID_CONVEYOR_L_START && Block[B].Type <= BLKID_CONVEYOR_L_END)
             {
                 Block[B].Type += BLKID_CONVEYOR_R_START - BLKID_CONVEYOR_L_START;
-                Block[B].Location.SpeedX = Layer[Block[B].Layer].ApplySpeedX + 0.8;
+                Block[B].Location.SpeedX = Layer[Block[B].Layer].ApplySpeedX + 0.8_n;
             }
             else if(Block[B].Type >= BLKID_CONVEYOR_R_START && Block[B].Type <= BLKID_CONVEYOR_R_END)
             {
                 Block[B].Type -= BLKID_CONVEYOR_R_START - BLKID_CONVEYOR_L_START;
-                Block[B].Location.SpeedX = Layer[Block[B].Layer].ApplySpeedX - 0.8;
+                Block[B].Location.SpeedX = Layer[Block[B].Layer].ApplySpeedX - 0.8_n;
             }
         }
     }
@@ -314,8 +314,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     nLoc.Width = nn->TWidth;
                     nLoc.Height = nn->THeight;
                     nLoc.X = b.Location.X + (b.Location.Width - nLoc.Width) / 2;
-                    nLoc.Y = b.Location.Y - nLoc.Height - 0.01;
-                    nLoc.SpeedX = dRand() * 3 - 1.5;
+                    nLoc.Y = b.Location.Y - nLoc.Height - 0.01_n;
+                    nLoc.SpeedX = dRand() * 3 - 1.5_n;
                     nLoc.SpeedY = -(dRand() * 4) - 3;
                     if(HitDown)
                     {
@@ -390,8 +390,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 nn.Location.Width = nn->TWidth;
                 nn.Location.Height = nn->THeight;
                 nn.Location.X = b.Location.X + (b.Location.Width - nn.Location.Width) / 2;
-                nn.Location.Y = b.Location.Y - nn.Location.Height - 0.01;
-                nn.Location.SpeedX = dRand() * 3 - 1.5;
+                nn.Location.Y = b.Location.Y - nn.Location.Height - 0.01_n;
+                nn.Location.SpeedX = dRand() * 3 - 1.5_n;
                 nn.Location.SpeedY = -(dRand() * 4) - 3;
                 nn.Special = 1;
                 nn.Immune = 20;
@@ -575,9 +575,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             {
                 // set value directly to make sure Location.Width == 31.9 heuristic works on low-mem builds
                 // b.Location.Width -= 0.1;
-                b.Location.Width = 31.9;
+                b.Location.Width = 31.9_n;
 
-                b.Location.X += 0.05;
+                b.Location.X += 0.05_n;
                 b.setShrinkResized();
             }
 
@@ -613,7 +613,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
                 // old behavior was never changed for ancient 101 / 104 / 201 cases
                 if(is_ancient)
-                    nn.Location.Y = b.Location.Y - 0.1;
+                    nn.Location.Y = b.Location.Y - 0.1_n;
 
                 if(NPCIsYoshi(C))
                 {
@@ -721,7 +721,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         nn.Location.Width = nn->TWidth;
         nn.Location.Height = nn->THeight;
         nn.Location.X += (b.Location.Width - nn.Location.Width) / 2;
-        nn.Location.Y -= 0.01;
+        nn.Location.Y -= 0.01_n;
         nn.DefaultLocationX = nn.Location.X;
         nn.DefaultLocationY = nn.Location.Y;
         nn.DefaultType = nn.Type;
@@ -2019,7 +2019,7 @@ void PowBlock()
             if(NPC[A]->IsACoin)
             {
                 NPC[A].Special = 1;
-                NPC[A].Location.SpeedX = dRand() - 0.5;
+                NPC[A].Location.SpeedX = dRand() - 0.5_n;
             }
         }
     }

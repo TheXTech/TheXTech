@@ -74,13 +74,13 @@ void UpdateEffects()
         {
             if(e.Life % 5 == 0)
             {
-                NewEffect(EFFID_BOSS_FRAGILE_EXPLODE, newLoc(e.Location.X + (dRand() * e.Location.Width),
-                                      e.Location.Y + (dRand() * e.Location.Height)));
+                NewEffect(EFFID_BOSS_FRAGILE_EXPLODE, newLoc(e.Location.X + (dRand() * (int_ok)e.Location.Width),
+                                      e.Location.Y + (dRand() * (int_ok)e.Location.Height)));
             }
         }
         else if(e.Type == EFFID_BOSS_CASE_BREAK)
         {
-            e.Location.SpeedY += 0.5;
+            e.Location.SpeedY += 0.5_n;
             e.FrameCount += 1;
             if(e.FrameCount >= 4)
             {
@@ -107,7 +107,7 @@ void UpdateEffects()
         else if(e.Type == EFFID_FIRE_DISK_DIE) // RotoDisk
         {
             if(e.Location.SpeedX != 0 || e.Location.SpeedY != 0)
-                e.Location.SpeedY += 0.5;
+                e.Location.SpeedY += 0.5_n;
             e.Frame += 1;
             if(e.Frame >= 5)
                 e.Frame = 0;
@@ -126,8 +126,8 @@ void UpdateEffects()
         }
         else if(e.Type == EFFID_BLOCK_SMASH || e.Type == EFFID_BLU_BLOCK_SMASH || e.Type == EFFID_SLIDE_BLOCK_SMASH || e.Type == EFFID_BLOCK_S1_SMASH || e.Type == EFFID_GRY_BLOCK_SMASH || e.Type == EFFID_DIRT_BLOCK_SMASH) // Block break
         {
-            e.Location.SpeedY += 0.6;
-            e.Location.SpeedX = e.Location.SpeedX * 0.99;
+            e.Location.SpeedY += 0.6_n;
+            e.Location.SpeedX = e.Location.SpeedX * 0.99_r;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
             e.FrameCount += 1;
@@ -220,16 +220,16 @@ void UpdateEffects()
         }
         else if(e.Type == EFFID_ITEM_POD_BREAK) // egg shells
         {
-            e.Location.SpeedY += 0.6;
-            e.Location.SpeedX = e.Location.SpeedX * 0.99;
+            e.Location.SpeedY += 0.6_n;
+            e.Location.SpeedX = e.Location.SpeedX * 0.99_r;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
         }
         else if(e.Type == EFFID_CHAR1_DIE || e.Type == EFFID_CHAR2_DIE || e.Type == EFFID_CHAR3_DIE || e.Type == EFFID_CHAR4_DIE || e.Type == EFFID_CHAR5_DIE) // Mario & Luigi death
-            e.Location.SpeedY += 0.25;
+            e.Location.SpeedY += 0.25_n;
         else if(e.Type == EFFID_ITEM_THROWER_DIE || e.Type == EFFID_WALL_SPARK_DIE || e.Type == EFFID_FODDER_S5_DIE || e.Type == EFFID_FODDER_S3_DIE || e.Type == EFFID_FIRE_BOSS_DIE || e.Type == EFFID_VINE_BUG_DIE || e.Type == EFFID_RED_FODDER_DIE || e.Type == EFFID_UNDER_FODDER_DIE || e.Type == EFFID_SPIKY_BALL_S3_DIE || e.Type == EFFID_CRAB_DIE || e.Type == EFFID_FLY_DIE || e.Type == EFFID_YELSWITCH_FODDER_DIE || e.Type == EFFID_BLUSWITCH_FODDER_DIE || e.Type == EFFID_GRNSWITCH_FODDER_DIE || e.Type == EFFID_REDSWITCH_FODDER_DIE || e.Type == EFFID_BIG_FODDER_DIE || e.Type == EFFID_FODDER_S1_DIE || e.Type == EFFID_SQUID_S3_DIE) // Goomba air ride of dooom
         {
-            e.Location.SpeedY += 0.5;
+            e.Location.SpeedY += 0.5_n;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
             e.FrameCount += 1;
@@ -247,9 +247,9 @@ void UpdateEffects()
         {
             e.Life += 2;
             if(e.Life <= 30)
-                e.Location.SpeedY = -2.8;
+                e.Location.SpeedY = -2.8_n;
             else if(e.Life <= 40)
-                e.Location.SpeedY = 0.5;
+                e.Location.SpeedY = 0.5_n;
             else if(e.Life <= 80)
                 e.Location.SpeedY = 0;
             else if(e.Life <= 100)
@@ -267,7 +267,7 @@ void UpdateEffects()
         }
         else if(e.Type == EFFID_HIT_TURTLE_S4_DIE) // Beack Koopa
         {
-            e.Location.SpeedY += 0.5;
+            e.Location.SpeedY += 0.5_n;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
             e.FrameCount += 1;
@@ -281,13 +281,13 @@ void UpdateEffects()
         }
         else if(e.Type == EFFID_GRN_SHELL_S3_DIE || e.Type == EFFID_RED_SHELL_S3_DIE || e.Type == EFFID_BULLET_DIE || e.Type == EFFID_BIG_BULLET_DIE || e.Type == EFFID_GLASS_SHELL_DIE || e.Type == EFFID_SPIKY_S3_DIE || e.Type == EFFID_SPIKY_S4_DIE || e.Type == EFFID_SPIT_BOSS_BALL_DIE || e.Type == EFFID_SPIT_BOSS_DIE || e.Type == EFFID_SPIKY_THROWER_DIE || e.Type == EFFID_EXT_TURTLE_DIE || e.Type == EFFID_BIG_SHELL_DIE || e.Type == EFFID_SHELL_S4_DIE || e.Type == EFFID_GRN_SHELL_S1_DIE || e.Type == EFFID_RED_SHELL_S1_DIE || e.Type == EFFID_WALL_TURTLE_DIE) // Flying turtle shell / Bullet bill /hard thing
         {
-            e.Location.SpeedY += 0.5;
+            e.Location.SpeedY += 0.5_n;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
         }
         else if(e.Type == EFFID_GRN_BOOT_DIE || e.Type == EFFID_RED_BOOT_DIE || e.Type == EFFID_BLU_BOOT_DIE) // Goombas shoes
         {
-            e.Location.SpeedY += 0.5;
+            e.Location.SpeedY += 0.5_n;
 
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
@@ -391,7 +391,7 @@ void UpdateEffects()
         else if(e.Type == EFFID_SKID_DUST) // Slide Smoke
         {
             e.FrameCount += 1;
-            e.Location.Y -= 0.1;
+            e.Location.Y -= 0.1_n;
             if(e.FrameCount >= 4)
             {
                 e.Frame += 1;
@@ -442,7 +442,7 @@ void UpdateEffects()
             }
             else
             {
-                e.Location.SpeedY += 0.4;
+                e.Location.SpeedY += 0.4_n;
                 e.FrameCount += 1;
                 if(e.FrameCount >= 3)
                 {
@@ -612,8 +612,8 @@ void UpdateEffects()
             if(e.Type == EFFID_CHAR3_HEAVY_EXPLODE && iRand(10) >= 8)
             {
                 NewEffect(EFFID_PLR_FIREBALL_TRAIL, e.Location, 3);
-                Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5;
-                Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5;
+                Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5_n;
+                Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5_n;
             }
         }
         else if(e.Type == EFFID_EARTHQUAKE_BLOCK_HIT) // POW Block
@@ -654,13 +654,13 @@ void UpdateEffects()
         }
         else if(e.Type == EFFID_BULLET_DIE || e.Type == EFFID_BIG_BULLET_DIE || e.Type == EFFID_HEAVY_THROWER_DIE || e.Type == EFFID_POWER_S3_DIE || e.Type == EFFID_JUMPER_S4_DIE || e.Type == EFFID_VILLAIN_S3_DIE || e.Type == EFFID_SPIT_GUY_BALL_DIE || e.Type == EFFID_WALK_BOMB_S3_DIE || e.Type == EFFID_BULLY_DIE || e.Type == EFFID_STONE_S3_DIE || e.Type == EFFID_BIG_GHOST_DIE || e.Type == EFFID_GHOST_S4_DIE || e.Type == EFFID_GHOST_FAST_DIE || e.Type == EFFID_GHOST_S3_DIE || e.Type == EFFID_STONE_S4_DIE || e.Type == EFFID_SAW_DIE || e.Type == EFFID_VILLAIN_S1_DIE || e.Type == EFFID_BOMBER_BOSS_DIE || e.Type == EFFID_SICK_BOSS_DIE || e.Type == EFFID_BAT_DIE) // Bullet Bill / Hammer Bro
         {
-            e.Location.SpeedY += 0.5;
+            e.Location.SpeedY += 0.5_n;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
         }
         else if(e.Type == EFFID_STACKER_DIE)
         {
-            e.Location.SpeedY += 0.5;
+            e.Location.SpeedY += 0.5_n;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
             e.FrameCount += 1;
@@ -675,7 +675,7 @@ void UpdateEffects()
         }
         else if(e.Type == EFFID_RED_GUY_DIE || e.Type == EFFID_BLU_GUY_DIE || e.Type == EFFID_JUMPER_S3_DIE || e.Type == EFFID_RED_FISH_S1_DIE || (e.Type >= EFFID_BIRD_DIE && e.Type <= EFFID_GRY_SPIT_GUY_DIE) || e.Type == EFFID_SATURN_DIE) // Shy guy free falling
         {
-            e.Location.SpeedY += 0.5;
+            e.Location.SpeedY += 0.5_n;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
             e.FrameCount += 1;
@@ -694,7 +694,7 @@ void UpdateEffects()
         }
         else if(e.Type == EFFID_BRUTE_SQUISHED_DIE || e.Type == EFFID_BRUTE_DIE || e.Type == EFFID_BIG_MOLE_DIE || e.Type == EFFID_CARRY_FODDER_DIE || e.Type == EFFID_SKELETON_DIE || e.Type == EFFID_GRN_FISH_S3_DIE || e.Type == EFFID_FISH_S4_DIE || e.Type == EFFID_RED_FISH_S3_DIE || e.Type == EFFID_GOGGLE_FISH_DIE || e.Type == EFFID_GRN_FISH_S1_DIE || e.Type == EFFID_BONE_FISH_DIE || e.Type == EFFID_SQUID_S1_DIE || e.Type == EFFID_WALK_PLANT_DIE) // Rex / mega mole / smw goomba free falling
         {
-            e.Location.SpeedY += 0.5;
+            e.Location.SpeedY += 0.5_n;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
             e.FrameCount += 1;
@@ -824,7 +824,7 @@ void UpdateEffects()
                 e.Frame += 14;
         }
         else if(e.Type == EFFID_SCORE)
-            e.Location.SpeedY = e.Location.SpeedY * 0.97;
+            e.Location.SpeedY = e.Location.SpeedY * 0.97_r;
 
         // check for killed (lets us only do a single loop over effects)
         if(e.Life <= 0)
@@ -859,7 +859,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
 
     int B = 0;
     bool tempBool = false;
-    double tempDoub = 0;
+    num_t tempDoub = 0;
 
     if(numEffects >= maxEffects - 4)
         return;
@@ -1045,13 +1045,13 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             else
             {
                 ne.Location.SpeedY = -7;
-                ne.Location.SpeedX = 1.5;
+                ne.Location.SpeedX = 1.5_n;
             }
 
             if(B == 1 || B == 3)
                 ne.Location.SpeedX = -ne.Location.SpeedX;
-            ne.Location.SpeedX += (dRand() / 2 - 0.25);
-            ne.Location.SpeedY += (dRand() - 0.5);
+            ne.Location.SpeedX += (dRand() / 2 - 0.25_n);
+            ne.Location.SpeedY += (dRand() - 0.5_n);
             if(B == 1)
                 ne.Frame = 0;
             else if(B == 2)
@@ -1279,8 +1279,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
                 // ne.Location.SpeedX = 0; // Assigned below
                 ne.Life = 15;
 
-                ne.Location.SpeedX = 2.4; // 3 * 0.8;
-                ne.Location.SpeedY = 1.2; // 1.5 * 0.8;
+                ne.Location.SpeedX = 2.4_n; // 3 * 0.8;
+                ne.Location.SpeedY = 1.2_n; // 1.5 * 0.8;
 
                 if(B == 1 || B == 2)
                     ne.Location.SpeedY = -ne.Location.SpeedY;
@@ -1352,7 +1352,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
                 ne.Life = 10;
                 if(B == 1 || B == 3 || B == 4 || B == 6)
                 {
-                    ne.Location.SpeedY = 1.75; // 3.5 * 0.5
+                    ne.Location.SpeedY = 1.75_n; // 3.5 * 0.5
                     ne.Location.SpeedX = 1; // 2 * 0.5
                 }
                 else
@@ -1403,7 +1403,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
                 ne.Life = 13;
                 if(B == 1 || B == 3 || B == 4 || B == 6)
                 {
-                    ne.Location.SpeedY = 4.5; // 3 * 1.5
+                    ne.Location.SpeedY = 4.5_n; // 3 * 1.5
                     ne.Location.SpeedX = 3; // 2 * 1.5
                     ne.Life = 14;
                 }
@@ -1467,15 +1467,15 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             ne.Location.SpeedY = 1;
             ne.Location.SpeedX = 0;
         }
-        else if(Location.SpeedY != -5.1)
+        else if(Location.SpeedY != -5.1_n)
         {
             ne.Location.SpeedY = -11;
             ne.Location.SpeedX = Location.SpeedX;
         }
         else
         {
-            ne.Location.SpeedY = -5.1;
-            ne.Location.SpeedX = Location.SpeedX * 0.6;
+            ne.Location.SpeedY = -5.1_n;
+            ne.Location.SpeedX = Location.SpeedX * 0.6_r;
         }
 
         ne.Frame = 0;
@@ -1849,7 +1849,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             ne.Location.SpeedY = Location.SpeedY;
 
         ne.Location.SpeedX = Location.SpeedX;
-        if(Location.SpeedY == 0.123)
+        if(Location.SpeedY == 0.123_n)
         {
             ne.Location.SpeedY = 1;
             ne.Location.SpeedX = 0;

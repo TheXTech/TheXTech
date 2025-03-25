@@ -71,21 +71,21 @@ void PlayerFairyMovementX(int A)
     if(Player[A].Controls.Right)
     {
         if(Player[A].Location.SpeedX < 3)
-            Player[A].Location.SpeedX += 0.15;
+            Player[A].Location.SpeedX += 0.15_n;
         if(Player[A].Location.SpeedX < 0)
-            Player[A].Location.SpeedX += 0.1;
+            Player[A].Location.SpeedX += 0.1_n;
     }
     else if(Player[A].Controls.Left)
     {
         if(Player[A].Location.SpeedX > -3)
-            Player[A].Location.SpeedX -= 0.15;
+            Player[A].Location.SpeedX -= 0.15_n;
         if(Player[A].Location.SpeedX > 0)
-            Player[A].Location.SpeedX -= 0.1;
+            Player[A].Location.SpeedX -= 0.1_n;
     }
-    else if(Player[A].Location.SpeedX > 0.1)
-        Player[A].Location.SpeedX -= 0.1;
-    else if(Player[A].Location.SpeedX < -0.1)
-        Player[A].Location.SpeedX += 0.1;
+    else if(Player[A].Location.SpeedX > 0.1_n)
+        Player[A].Location.SpeedX -= 0.1_n;
+    else if(Player[A].Location.SpeedX < -0.1_n)
+        Player[A].Location.SpeedX += 0.1_n;
     else
         Player[A].Location.SpeedX = 0;
 }
@@ -98,11 +98,11 @@ void PlayerFairyMovementY(int A)
     // this was previously two separate clauses in VB6 (split by whether FairyCD was 0)
     if(Player[A].Controls.Jump || Player[A].Controls.AltJump || Player[A].Controls.Up)
     {
-        Player[A].Location.SpeedY -= 0.15;
+        Player[A].Location.SpeedY -= 0.15_n;
         if(Player[A].Location.SpeedY > 0)
-            Player[A].Location.SpeedY -= 0.1;
+            Player[A].Location.SpeedY -= 0.1_n;
     }
-    else if(Player[A].FairyCD != 0 || Player[A].Location.SpeedY < -0.1 || Player[A].Controls.Down)
+    else if(Player[A].FairyCD != 0 || Player[A].Location.SpeedY < -0.1_n || Player[A].Controls.Down)
     {
         if(Player[A].Location.SpeedY < 3)
             Player[A].Location.SpeedY += Physics.PlayerGravity / 20;
@@ -110,10 +110,10 @@ void PlayerFairyMovementY(int A)
             Player[A].Location.SpeedY += Physics.PlayerGravity / 20;
         Player[A].Location.SpeedY += Physics.PlayerGravity / 10;
         if(Player[A].Controls.Down)
-            Player[A].Location.SpeedY += 0.05;
+            Player[A].Location.SpeedY += 0.05_n;
     }
-    else if(Player[A].Location.SpeedY > 0.1)
-        Player[A].Location.SpeedY -= 0.15;
+    else if(Player[A].Location.SpeedY > 0.1_n)
+        Player[A].Location.SpeedY -= 0.15_n;
     else
         Player[A].Location.SpeedY = 0;
 

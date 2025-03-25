@@ -28,6 +28,7 @@
 
 #include "std_picture.h"
 
+#include "numeric_types.h"
 #include "location.h"
 #include "pinched_info.h"
 #include "range_arr.hpp"
@@ -298,8 +299,8 @@ struct NPC_t
     Location_t Location;
 
 // NEW: position variables (or double counters) used by AI
-    double SpecialX = 0.0;
-    double SpecialY = 0.0;
+    num_t SpecialX = 0_n;
+    num_t SpecialY = 0_n;
 
 //'Secial - misc variables used for NPC AI
 //    Special As Double
@@ -413,11 +414,11 @@ struct NPC_t
 
     // Misc floating-point variables
 //    RealSpeedX As Single 'the real speed of the NPC
-    float RealSpeedX = 0.0f;
+    numf_t RealSpeedX = 0;
 //    BeltSpeed As Single 'The speed of the object this NPC is standing on
-    float BeltSpeed = 0.0f;
+    numf_t BeltSpeed = 0;
 //    oldAddBelt As Single
-    float oldAddBelt = 0.0f;
+    numf_t oldAddBelt = 0;
 //    FrameCount As Single 'The counter for incrementing the frames
     // was previously a float but this didn't accomplish anything
     vbint_t FrameCount = 0;
@@ -491,8 +492,8 @@ struct NPC_t
 //    DefaultSpecial2 As Integer
     vbint_t DefaultSpecial2 = 0;
 //    DefaultLocation As Location
-    double DefaultLocationX = 0;
-    double DefaultLocationY = 0;
+    num_t DefaultLocationX = 0_n;
+    num_t DefaultLocationY = 0_n;
 
     // obsolete and removed fields
 //    PinchCount As Integer 'obsolete
@@ -554,13 +555,13 @@ struct Player_t
 //    FloatTime As Integer
     vbint_t FloatTime = 0;
 //    FloatSpeed As Single
-    float FloatSpeed = 0.0f;
+    numf_t FloatSpeed = 0;
 //    FloatDir As Integer
     vbint_t FloatDir = 0;
 //    GrabTime As Integer 'how long the player has been trying to grab an npc from above
     vbint_t GrabTime = 0;
 //    GrabSpeed As Single
-    float GrabSpeed = 0.0f;
+    numf_t GrabSpeed = 0;
 //    VineNPC As Double 'the NPC that the player is climbing
     vbint_t VineNPC = 0;
 //  EXTRA:  Fence BGO
@@ -700,7 +701,7 @@ struct Player_t
 //    Effect2 As Double 'counter for the effects (was double)
     vbint_t Effect2 = 0;
 //    NEW: this previously used the same storage as Effect2
-    double RespawnY = 0.0;
+    num_t RespawnY = 0_n;
 //    Duck As Boolean 'true if ducking
     bool Duck = false;
 //    DropRelease As Boolean
@@ -784,7 +785,7 @@ struct Player_t
 //    UnStart As Boolean 'Player let go of the start button
     bool UnStart = false;
 //    mountBump As Single 'Player hit something while in a mount
-    float mountBump = 0.0f;
+    numf_t mountBump = 0.0_nf;
 //    SpeedFixY As Single
     // unused since SMBX 1.3
     // float SpeedFixY = 0.0f;
@@ -919,7 +920,7 @@ public:
         // The block location width isn't set to a non-integer anywhere else in the game, so this is safe.
         // This is a heuristic and has a small CPU tradeoff, but it saves memory.
         // If it fails in some case, we can switch to the below implementation, or we could use this implementation only when LOW_MEM is set.
-        return Location.Width == 31.9;
+        return Location.Width == 31.9_n;
     }
 
 #else
@@ -1424,9 +1425,9 @@ extern RangeArrI<vbint_t, 0, maxPlayers, 0> OwedMountType;
 //EXTRA: set this flag once modern autoscroll used, otherwise, legacy will be used
 extern bool AutoUseModern;
 //Public AutoX(0 To maxSections) As Single 'for autoscroll
-extern RangeArr<float, 0, maxSections> AutoX;
+extern RangeArr<numf_t, 0, maxSections> AutoX;
 //Public AutoY(0 To maxSections) As Single 'for autoscroll
-extern RangeArr<float, 0, maxSections> AutoY;
+extern RangeArr<numf_t, 0, maxSections> AutoY;
 //Public numStars As Integer 'the number of stars the player has
 extern int numStars;
 
@@ -2073,15 +2074,15 @@ struct Physics_t
 //    PlayerSpringJumpHeight As Integer
     int PlayerSpringJumpHeight = 0;
 //    PlayerJumpVelocity As Single
-    float PlayerJumpVelocity = 0.0f;
+    numf_t PlayerJumpVelocity = 0_nf;
 //    PlayerRunSpeed As Single
-    float PlayerRunSpeed = 0.0f;
+    numf_t PlayerRunSpeed = 0_nf;
 //    PlayerWalkSpeed As Single
-    float PlayerWalkSpeed = 0.0f;
+    numf_t PlayerWalkSpeed = 0_nf;
 //    PlayerTerminalVelocity As Integer
     int PlayerTerminalVelocity = 0;
 //    PlayerGravity As Single
-    float PlayerGravity = 0.0f;
+    numf_t PlayerGravity = 0_nf;
 //    PlayerHeight(1 To numCharacters, 1 To numStates) As Integer
     RangeArr<RangeArrI<int, 1, numStates, 0>, 1, numCharacters> PlayerHeight;
 //    PlayerDuckHeight(1 To numCharacters, 1 To numStates) As Integer
@@ -2097,19 +2098,19 @@ struct Physics_t
 //    NPCCanHurtWait As Integer
     int NPCCanHurtWait = 0;
 //    NPCShellSpeed As Single
-    float NPCShellSpeed = 0.0f;
+    numf_t NPCShellSpeed = 0_nf;
 //    NPCShellSpeedY As Single
-    float NPCShellSpeedY = 0.0f;
+    numf_t NPCShellSpeedY = 0_nf;
 //    NPCWalkingSpeed As Single
-    float NPCWalkingSpeed = 0.0f;
+    numf_t NPCWalkingSpeed = 0_nf;
 //    NPCWalkingOnSpeed As Single
-    float NPCWalkingOnSpeed = 0.0f;
+    numf_t NPCWalkingOnSpeed = 0_nf;
 //    NPCMushroomSpeed As Single
-    float NPCMushroomSpeed = 0.0f;
+    numf_t NPCMushroomSpeed = 0_nf;
 //    NPCGravity As Single
-    float NPCGravity = 0.0f;
+    numf_t NPCGravity = 0_nf;
 //    NPCGravityReal As Single
-    float NPCGravityReal = 0.0f;
+    numf_t NPCGravityReal = 0_nf;
 //    NPCPSwitch As Integer
     int NPCPSwitch = 0;
 //End Type

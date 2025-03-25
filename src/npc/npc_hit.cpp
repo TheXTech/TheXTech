@@ -939,7 +939,7 @@ void NPCHit(int A, int B, int C)
                     else
                         NPC[A].Direction = 1;
                     NPC[A].Location.SpeedX = 5 * NPC[A].Direction;
-                    NPC[A].Location.SpeedY = -2.5;
+                    NPC[A].Location.SpeedY = -2.5_n;
                 }
             }
             NPC[A].Special = 0;
@@ -957,7 +957,7 @@ void NPCHit(int A, int B, int C)
                 else
                     NPC[A].Projectile = true;
                 NPC[A].Location.SpeedY = -5;
-                NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01;
+                NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01_n;
             }
         }
         else if(B == 7)
@@ -1104,7 +1104,7 @@ void NPCHit(int A, int B, int C)
                 PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
                 NPC[A].Projectile = true;
                 NPC[A].Location.SpeedY = -5;
-                NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01;
+                NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01_n;
             }
         }
         else if(B == 7 || B == 10)
@@ -1145,7 +1145,7 @@ void NPCHit(int A, int B, int C)
                 PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
                 NPC[A].Location.SpeedY = -5;
                 NPC[A].Projectile = true;
-                NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01;
+                NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01_n;
             }
             NPC[A].Type = NPCID_LIT_BOMB_S3;
             NPC[A].Special = 0;
@@ -1179,7 +1179,7 @@ void NPCHit(int A, int B, int C)
         {
             PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
             NPC[A].Location.SpeedY = -5;
-            NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01;
+            NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01_n;
         }
         else if(B == 3 || B == 4 || B == 5 || B == 6 || B == 9)
         {
@@ -1426,7 +1426,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Frame = 0;
             NPC[A].Location.SpeedY = -5;
             if(B == 2)
-                NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01;
+                NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01_n;
         }
         else
         {
@@ -1867,7 +1867,7 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Special = 1;
             else
             {
-                NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.6;
+                NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.6_r;
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
             }
 
@@ -1920,7 +1920,7 @@ void NPCHit(int A, int B, int C)
                 PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
                 NPC[A].Location.SpeedY = -5;
                 // If .Type = 96 Then .Location.SpeedY = -4
-                NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01;
+                NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01_n;
             }
             else if(B == 6)
             {
@@ -1981,7 +1981,7 @@ void NPCHit(int A, int B, int C)
                     NPC[A].CantHurt = 10;
                     PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
                     NPC[A].Location.SpeedY = -5;
-                    NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01;
+                    NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01_n;
                     NPC[A].Projectile = true;
                     NPC[A].Location.SpeedX /= 2;
                 }
@@ -2003,7 +2003,7 @@ void NPCHit(int A, int B, int C)
                     NPC[A].Projectile = true;
                     NPC[A].Location.SpeedY = -5;
                     NPC[A].Location.SpeedX = (NPC[C].Location.SpeedX + NPC[A].Location.SpeedX) / 2;
-                    if(NPC[A].Location.SpeedX < 1.2 && NPC[A].Location.SpeedX > -1.2)
+                    if(NPC[A].Location.SpeedX < 1.2_n && NPC[A].Location.SpeedX > -1.2_n)
                     {
                         if(NPC[C].Direction == -1)
                             NPC[A].Location.SpeedX = 3;
@@ -2045,7 +2045,7 @@ void NPCHit(int A, int B, int C)
         else if(B == 1 && !NPC[A]->CanWalkOn /*&& !NPC[A]->JumpHurt*/) // JumpHurt checked at the top
         {
             NPC[A].Killed = B;
-            NPC[A].Location.SpeedY = 0.123;
+            NPC[A].Location.SpeedY = 0.123_n;
             NPC[A].Location.SpeedX = 0;
         }
 
@@ -2128,7 +2128,7 @@ void NPCHit(int A, int B, int C)
         {
             PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
             NPC[A].Location.SpeedY = -5;
-            NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01;
+            NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01_n;
         }
         // B == 6 - touched a lava block, C is a block, not NPC!!!
         else if(B == 6 && g_config.fix_powerup_lava_bug)

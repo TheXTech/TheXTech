@@ -129,12 +129,12 @@ void DropBonus(int A)
         GetvScreenAuto(vScreenByPlayer_canonical(A));
 
     // find the HUD
-    double ScreenTop = -vscreen.Y;
+    num_t ScreenTop = -vscreen.Y;
 
     if(vscreen.Height > 600)
         ScreenTop += vscreen.Height / 2 - 300;
 
-    double CenterX = -vscreen.X + vscreen.Width / 2;
+    num_t CenterX = -vscreen.X + vscreen.Width / 2;
 
     // place NPC at HUD
     NPC[numNPCs].Location.X = CenterX + hud_offset - NPC[numNPCs].Location.Width / 2;
@@ -296,8 +296,8 @@ void TouchBonus(int A, int B)
             // tempLocation = p_touched.Location;
 
             // swap location
-            double touched_X = p_touched.Location.X;
-            double touched_Y = p_touched.Location.Y;
+            num_t touched_X = p_touched.Location.X;
+            num_t touched_Y = p_touched.Location.Y;
             p_touched.Location.X = p_target.Location.X + (p_target.Location.Width  - p_touched.Location.Width) / 2;
             p_touched.Location.Y = p_target.Location.Y + p_target.Location.Height  - p_touched.Location.Height;
             p_target.Location.X  = touched_X           + (p_touched.Location.Width - p_target.Location.Width) / 2;

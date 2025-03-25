@@ -195,18 +195,18 @@ void PlayerEffectWings(int A)
     // move towards screen center or living player
     if(target_plr || offscreen)
     {
-        double target_X = (target_plr) ? (Player[target_plr].Location.X + Player[target_plr].Location.Width / 2) : -vscreen.X + vscreen.Width / 2;
-        double target_Y = (target_plr) ? Player[target_plr].Location.Y - 8 : -vscreen.Y + vscreen.Height / 2;
+        num_t target_X = (target_plr) ? (Player[target_plr].Location.X + Player[target_plr].Location.Width / 2) : -vscreen.X + vscreen.Width / 2;
+        num_t target_Y = (target_plr) ? Player[target_plr].Location.Y - 8 : -vscreen.Y + vscreen.Height / 2;
 
         int randomness = (target_plr) ? 8 : vscreen.Width / 10;
         target_X += iRand(randomness * 2) - randomness;
         target_Y += iRand(randomness * 2) - randomness;
 
-        double center_X = p.Location.X + p.Location.Width / 2;
-        double center_Y = p.Location.Y + p.Location.Height / 2;
+        num_t center_X = p.Location.X + p.Location.Width / 2;
+        num_t center_Y = p.Location.Y + p.Location.Height / 2;
 
-        double target_SpeedX = (target_X - center_X);
-        double target_SpeedY = (target_Y - center_Y);
+        num_t target_SpeedX = (target_X - center_X);
+        num_t target_SpeedY = (target_Y - center_Y);
 
         double target_speed = SDL_sqrt(target_SpeedX * target_SpeedX + target_SpeedY * target_SpeedY);
 
@@ -229,7 +229,7 @@ void PlayerEffectWings(int A)
     else
     {
         double sq_speed = p.Location.SpeedX * p.Location.SpeedX + p.Location.SpeedY * p.Location.SpeedY;
-        double decelerate_rate = (sq_speed > 4.0) ? 0.95 : (sq_speed > 1.0) ? 0.99 : 0.999;
+        qdec_t decelerate_rate = (sq_speed > 4) ? 0.95_r : (sq_speed > 1) ? 0.99_r : 0.999_r;
 
         if(sq_speed <= 4)
         {
@@ -247,7 +247,7 @@ void PlayerEffectWings(int A)
     p.SpinJump = false;
     p.WetFrame = false;
     if(p.Location.SpeedY == 0)
-        p.Location.SpeedY = 0.00001;
+        p.Location.SpeedY = 0.00001_n;
     PlayerFrame(p);
     if(p.Location.SpeedX >= 0)
     {
@@ -384,7 +384,7 @@ void PlayerLevelWrapLogic(int A)
     // shared screen: teleport other players to other side of section
     if(screen.Type == ScreenTypes::SharedScreen && (did_wrap_lr || did_wrap_rl || did_wrap_tb || did_wrap_bt))
     {
-        double target_Y = pLoc.Y + ((Player[A].Mount != 2) ? pLoc.Height : 0);
+        num_t target_Y = pLoc.Y + ((Player[A].Mount != 2) ? pLoc.Height : 0);
 
         for(int i = 0; i < screen.player_count; i++)
         {
@@ -446,8 +446,8 @@ void PlayerLevelWrapLogic(int A)
 void PlayerOffscreenExitCheck(int A)
 {
     bool offScreenExit = false;
-    double nearby_left = (Player[A].Location.X + Player[A].Location.Width) - level[Player[A].Section].X;
-    double nearby_right = level[Player[A].Section].Width - Player[A].Location.X;
+    num_t nearby_left = (Player[A].Location.X + Player[A].Location.Width) - level[Player[A].Section].X;
+    num_t nearby_right = level[Player[A].Section].Width - Player[A].Location.X;
     if(nearby_left < 0)
     {
         offScreenExit = true;

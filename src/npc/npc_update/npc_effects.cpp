@@ -120,7 +120,7 @@ static inline void NPCEffectLogic_EmergeDown(int A)
                 {
                     if(CheckCollision(NPC[A].Location, Block[B].Location))
                     {
-                        NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.1;
+                        NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.1_n;
                         break;
                     }
                 }
@@ -164,8 +164,8 @@ static inline void NPCEffectLogic_DropItem(int A)
         vScreen_t& vscreen = vScreenByPlayer(NPC[A].Effect3);
 
         // put above player
-        double target_X = pLoc.X + (pLoc.Width - nLoc.Width) / 2;
-        double target_Y = pLoc.Y + pLoc.Height - 192;
+        num_t target_X = pLoc.X + (pLoc.Width - nLoc.Width) / 2;
+        num_t target_Y = pLoc.Y + pLoc.Height - 192;
 
         // anticipate player movement
         if(PlayerNormal(p))
@@ -179,11 +179,11 @@ static inline void NPCEffectLogic_DropItem(int A)
             target_Y = -vscreen.Y - 8;
 
         // perform movement
-        double delta_X = target_X - nLoc.X;
-        double delta_Y = target_Y - nLoc.Y;
+        num_t delta_X = target_X - nLoc.X;
+        num_t delta_Y = target_Y - nLoc.Y;
 
-        double move_X = delta_X / 8.0;
-        double move_Y = delta_Y / 8.0;
+        num_t move_X = delta_X / 8;
+        num_t move_Y = delta_Y / 8;
 
         double dist_sq = (move_X * move_X + move_Y * move_Y);
 
@@ -219,7 +219,7 @@ static inline void NPCEffectLogic_DropItem(int A)
     }
     else
     {
-        NPC[A].Location.Y += 2.2;
+        NPC[A].Location.Y += 2.2_n;
 
         NPC[A].Effect2 += 1;
         if(NPC[A].Effect2 == 5)

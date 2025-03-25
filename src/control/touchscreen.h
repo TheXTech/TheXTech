@@ -236,10 +236,10 @@ public:
     bool m_scrollActive = false;
     bool m_wasScrolling = false;
     int m_lastMeanX = 0, m_lastMeanY = 0;
-    double m_scrollX = 0., m_scrollY = 0.;
+    num_t m_scrollX = 0, m_scrollY = 0;
     // needed because of an SDL bug where the frame a finger it is lifted its finger still exists at its old location
-    double m_lastScrollX = 0., m_lastScrollY = 0.;
-    double m_scrollMomentumX = 0., m_scrollMomentumY = 0.;
+    num_t m_lastScrollX = 0, m_lastScrollY = 0;
+    num_t m_scrollMomentumX = 0, m_scrollMomentumY = 0;
 
     struct ExtraKeys_t
     {

@@ -90,10 +90,10 @@ void RenderTexturePlayerScale(int Z, int dst_x, int dst_y, int dst_w, int dst_h,
 
     Background_t& keyhole = Background[LevelMacroWhich];
 
-    double scale = ratio < 155 ? 1.0 : (double)(255 - ratio) / 100;
+    num_t scale = ratio < 155 ? 1 : (num_t)(255 - ratio) / 100;
 
-    double cx = vScreen[Z].X + keyhole.Location.X + keyhole.Location.Width / 2;
-    double cy = vScreen[Z].Y + keyhole.Location.Y + 12;
+    num_t cx = vScreen[Z].X + keyhole.Location.X + keyhole.Location.Width / 2;
+    num_t cy = vScreen[Z].Y + keyhole.Location.Y + 12;
 
     return XRender::renderTextureScaleEx(
                 dst_x * scale + cx * (1 - scale),

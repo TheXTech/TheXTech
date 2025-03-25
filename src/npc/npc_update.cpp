@@ -69,14 +69,14 @@ void CheckNPCWidth(NPC_t& n)
                  n.Type == NPCID_SIDE_PLANT || n.Type == NPCID_BIG_PLANT || n.Type == NPCID_LONG_PLANT_UP ||
                  n.Type == NPCID_LONG_PLANT_DOWN || n.Type == NPCID_PLANT_S1 || n.Type == NPCID_FIRE_PLANT))
             {
-                n.Location.X += 0.015;
+                n.Location.X += 0.015_n;
             }
 
-            n.Location.Width -= 0.03;
+            n.Location.Width -= 0.03_n;
         }
     }
     else if(fEqual(n.Location.Width, 256.0))
-        n.Location.Width = 255.9;
+        n.Location.Width = 255.9_n;
     else if(fEqual(n.Location.Width, 128.0))
         n.Location.Width = 127.9;
 
@@ -166,8 +166,8 @@ bool UpdateNPCs()
     // bool SlopeTurn = false;
 //    std::string timeStr;
 
-    double lyrX = 0; // for attaching to layers
-    double lyrY = 0; // for attaching to layers
+    num_t lyrX = 0; // for attaching to layers
+    num_t lyrY = 0; // for attaching to layers
 
     auto activation_it = NPCQueues::Active.may_insert_erase.begin();
 
@@ -423,8 +423,8 @@ resume_Activation:
                                 if(!Block[B].Hidden && !BlockIsSizable[Block[B].Type])
                                 {
                                     if(CheckCollision(NPC[A].Location,
-                                                      newLoc(Block[B].Location.X + 0.1, Block[B].Location.Y + 0.1,
-                                                             Block[B].Location.Width - 0.2, Block[B].Location.Height - 0.2)))
+                                                      newLoc(Block[B].Location.X + 0.1_n, Block[B].Location.Y + 0.1_n,
+                                                             Block[B].Location.Width - 0.2_n, Block[B].Location.Height - 0.2_n)))
                                     {
                                         tempBool = true;
                                         break;
@@ -1074,7 +1074,7 @@ interrupt_Activation:
                     }
                     else if(NPC[A]->IsFish && NPC[A].Special == 2)
                     {
-                        NPC[A].Location.Y = level[Player[NPC[A].JustActivated].Section].Height - 0.1;
+                        NPC[A].Location.Y = level[Player[NPC[A].JustActivated].Section].Height - 0.1_n;
                         NPC[A].Location.SpeedX = (1 + (NPC[A].Location.Y - NPC[A].DefaultLocationY) / 200) * NPC[A].Direction;
                         NPC[A].Special5 = 1;
                         treeNPCUpdate(A);
@@ -1154,10 +1154,10 @@ interrupt_Activation:
         else if(NPC[A].Active && NPC[A].Killed == 0 && !NPC[A].Generator)
         {
             // don't worry about updating A's tree within this block -- it is done at the end if needed.
-            double prevX = NPC[A].Location.X;
-            double prevY = NPC[A].Location.Y;
-            double prevW = NPC[A].Location.Width;
-            double prevH = NPC[A].Location.Height;
+            num_t prevX = NPC[A].Location.X;
+            num_t prevY = NPC[A].Location.Y;
+            num_t prevW = NPC[A].Location.Width;
+            num_t prevH = NPC[A].Location.Height;
 
             // all this cleanup code was moved here from the top of the loop
             Physics.NPCGravity = Physics.NPCGravityReal;
@@ -1177,7 +1177,7 @@ interrupt_Activation:
             if(NPC[A].Type == NPCID_VEHICLE && NPC[A].TimeLeft > 1)
                 NPC[A].TimeLeft = 100;
 
-            float speedVar = 1; // percent of the NPC it should actually moved. this helps when underwater
+            numf_t speedVar = 1; // percent of the NPC it should actually moved. this helps when underwater
 
             // dead code in VB6
 #if 0
@@ -1262,7 +1262,7 @@ interrupt_Activation:
                                 // cancel if not currently moving down
                                 if(NPC[A].Effect3 == MAZE_DIR_DOWN)
                                 {
-                                    double rel_speed = NPC[A].Location.SpeedY - Layer[Water[B].Layer].SpeedY;
+                                    num_t rel_speed = NPC[A].Location.SpeedY - Layer[Water[B].Layer].SpeedY;
                                     if(rel_speed < 0 || (NPC[A]->IsABlock && rel_speed <= 4))
                                         NPC[A].Effect = NPCEFF_NORMAL;
                                 }
@@ -1284,10 +1284,10 @@ interrupt_Activation:
 
                                 if(!(NPC[A]->IsFish && NPC[A].Special == 1) && NPC[A].Type != NPCID_LEAF_POWER && NPC[A].Type != NPCID_PLR_FIREBALL)
                                 {
-                                    if(NPC[A].Location.SpeedY > 0.5)
-                                        NPC[A].Location.SpeedY = 0.5;
-                                    if(NPC[A].Location.SpeedY < -0.5)
-                                        NPC[A].Location.SpeedY = -0.5;
+                                    if(NPC[A].Location.SpeedY > 0.5_n)
+                                        NPC[A].Location.SpeedY = 0.5_n;
+                                    if(NPC[A].Location.SpeedY < -0.5_n)
+                                        NPC[A].Location.SpeedY = -0.5_n;
                                 }
                                 else
                                 {
@@ -1361,10 +1361,10 @@ interrupt_Activation:
 
                 if(NPC[A].Location.SpeedY < -1)
                     NPC[A].Location.SpeedY = -1;
-                else if(NPC[A].Location.SpeedY > 0.5)
-                    NPC[A].Location.SpeedY = 0.5;
+                else if(NPC[A].Location.SpeedY > 0.5_n)
+                    NPC[A].Location.SpeedY = 0.5_n;
 
-                speedVar = (float)(speedVar * 0.3);
+                speedVar *= 0.3_r;
             }
 
 
@@ -1743,9 +1743,9 @@ interrupt_Activation:
                             NPC[A].Location.Height = 24;
                         }
 
-                        double tempHit = 0; // height of block NPC is walking on
+                        num_t tempHit = 0; // height of block NPC is walking on
                         int tempHitBlock = 0; // index of block NPC is walking on
-                        float tempSpeedA = 0; // speed of ground the NPC is possibly standing on
+                        numf_t tempSpeedA = 0; // speed of ground the NPC is possibly standing on
 
                         NPCBlockLogic(A, tempHit, tempHitBlock, tempSpeedA, numTempBlock, speedVar);
 
@@ -1757,10 +1757,10 @@ interrupt_Activation:
                         {
                             if(NPC[A].Special > 0)
                             {
-                                NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.9;
+                                NPC[A].Location.SpeedX *= 0.9_r;
                                 NPC[A].Frame = 0;
                                 NPC[A].FrameCount = 0;
-                                if(NPC[A].Location.SpeedX > -0.3 && NPC[A].Location.SpeedX < 0.3)
+                                if(NPC[A].Location.SpeedX > -0.3_n && NPC[A].Location.SpeedX < 0.3_n)
                                 {
                                     NPC[A].Location.SpeedX = 0;
                                     NPC[A].Special = 0;
@@ -1988,13 +1988,13 @@ kill_NPCs_and_CharStuff:
 
         if(NPC[A].Killed > 0)
         {
-            if(NPC[A].Location.SpeedX == 0.0)
+            if(NPC[A].Location.SpeedX == 0)
             {
                 NPC[A].Location.SpeedX = dRand() * 2 - 1;
                 if(NPC[A].Location.SpeedX < 0)
-                    NPC[A].Location.SpeedX -= 0.5;
+                    NPC[A].Location.SpeedX -= 0.5_n;
                 else
-                    NPC[A].Location.SpeedX += 0.5;
+                    NPC[A].Location.SpeedX += 0.5_n;
             }
 
             // preserved by the interrupt / resume routine

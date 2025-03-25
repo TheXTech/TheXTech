@@ -322,7 +322,7 @@ void PlayerEffectWarpPipe(int A)
             p.Location.Y += 1;
             p.Location.X = warp_enter.X + (warp_enter.Width - p.Location.Width) / 2;
 
-            leftToGoal = (int)(warp_enter.Y + warp_enter.Height - p.Location.Y + 0.5);
+            leftToGoal = (int)(warp_enter.Y + warp_enter.Height - p.Location.Y + 0.5_n);
 
             if(p.Location.Y > warp_enter.Y + warp_enter.Height + 8)
             {
@@ -346,7 +346,7 @@ void PlayerEffectWarpPipe(int A)
             p.Location.Y -= 1;
             p.Location.X = warp_enter.X + (warp_enter.Width - p.Location.Width) / 2;
 
-            leftToGoal = (int)(p.Location.Y + p.Location.Height - warp_enter.Y + 0.5);
+            leftToGoal = (int)(p.Location.Y + p.Location.Height - warp_enter.Y + 0.5_n);
 
             if(p.Location.Y + p.Location.Height + 8 < warp_enter.Y)
             {
@@ -374,9 +374,9 @@ void PlayerEffectWarpPipe(int A)
 
             p.Direction = -1; // makes (p.Direction > 0) always false
             p.Location.Y = warp_enter.Y + warp_enter.Height - p.Location.Height - 2;
-            p.Location.X -= 0.5;
+            p.Location.X -= 0.5_n;
 
-            leftToGoal = (int)((p.Location.X + p.Location.Width - warp_enter.X) * 2 + 0.5);
+            leftToGoal = (int)((p.Location.X + p.Location.Width - warp_enter.X) * 2 + 0.5_n);
 
             if(p.Location.X + p.Location.Width + 8 < warp_enter.X)
             {
@@ -394,7 +394,7 @@ void PlayerEffectWarpPipe(int A)
 //                    else
                 NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
             }
-            p.Location.SpeedX = -0.5;
+            p.Location.SpeedX = -0.5_n;
             PlayerFrame(p);
             p.Location.SpeedX = 0;
         }
@@ -407,9 +407,9 @@ void PlayerEffectWarpPipe(int A)
             }
             p.Direction = 1; // Makes (p.Direction > 0) always true
             p.Location.Y = warp_enter.Y + warp_enter.Height - p.Location.Height - 2;
-            p.Location.X += 0.5;
+            p.Location.X += 0.5_n;
 
-            leftToGoal = (int)((warp_enter.X + warp_enter.Width - p.Location.X) * 2 + 0.5);
+            leftToGoal = (int)((warp_enter.X + warp_enter.Width - p.Location.X) * 2 + 0.5_n);
 
             if(p.Location.X > warp_enter.X + warp_enter.Width + 8)
             {
@@ -427,7 +427,7 @@ void PlayerEffectWarpPipe(int A)
 //                    else
 //                        NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
             }
-            p.Location.SpeedX = 0.5;
+            p.Location.SpeedX = 0.5_n;
             PlayerFrame(p);
             p.Location.SpeedX = 0;
         }
@@ -682,8 +682,8 @@ void PlayerEffectWarpPipe(int A)
     }
     else if(p.Effect2 > 128) // Scrolling between pipes
     {
-        double targetX = p.Location.X;
-        double targetY = p.Location.Y;
+        num_t targetX = p.Location.X;
+        num_t targetY = p.Location.Y;
 
         if(warp_dir_exit == 1)
         {
@@ -800,7 +800,7 @@ void PlayerEffectWarpPipe(int A)
         }
         else if(warp_dir_exit == LevelDoor::EXIT_LEFT)
         {
-            p.Location.X -= 0.5;
+            p.Location.X -= 0.5_n;
             p.Direction = -1; // makes (p.Direction < 0) always true
 
             if(p.Location.X + p.Location.Width <= warp_exit.X + warp_exit.Width)
@@ -838,14 +838,14 @@ void PlayerEffectWarpPipe(int A)
             }
             else
             {
-                p.Location.SpeedX = -0.5;
+                p.Location.SpeedX = -0.5_n;
                 PlayerFrame(p);
                 p.Location.SpeedX = 0;
             }
         }
         else if(warp_dir_exit == LevelDoor::EXIT_RIGHT)
         {
-            p.Location.X += 0.5;
+            p.Location.X += 0.5_n;
             p.Direction = 1; // makes (p.Direction < 0) always false
 
             if(p.Location.X >= warp_exit.X)
@@ -883,7 +883,7 @@ void PlayerEffectWarpPipe(int A)
             }
             else
             {
-                p.Location.SpeedX = -0.5;
+                p.Location.SpeedX = -0.5_n;
                 PlayerFrame(p);
                 p.Location.SpeedX = 0;
             }
@@ -1079,8 +1079,8 @@ void PlayerEffectWarpDoor(int A)
     // process the scroll effect
     else if(p.Effect2 >= 128)
     {
-        double targetX = warp_exit.X + (warp_exit.Width - p.Location.Width) / 2;
-        double targetY = warp_exit.Y + warp_exit.Height - p.Location.Height;
+        num_t targetX = warp_exit.X + (warp_exit.Width - p.Location.Width) / 2;
+        num_t targetY = warp_exit.Y + warp_exit.Height - p.Location.Height;
 
         // += 1 above
         p.Effect2 -= 1;
@@ -1520,7 +1520,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         }
 
         plr.Location.X = exit.X + (exit.Width - plr.Location.Width) / 2;
-        plr.Location.Y = exit.Y + exit.Height - plr.Location.Height - 0.1;
+        plr.Location.Y = exit.Y + exit.Height - plr.Location.Height - 0.1_n;
         CheckSection(A);
         plr.WarpCD = (warp.Effect == 3) ? 10 : 50;
 
@@ -1552,7 +1552,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                     RemoveFromPet(o_A);
 
                     o_p.Location.X = exit.X + (exit.Width - o_p.Location.Width) / 2;
-                    o_p.Location.Y = exit.Y + exit.Height - o_p.Location.Height - 0.1;
+                    o_p.Location.Y = exit.Y + exit.Height - o_p.Location.Height - 0.1_n;
                     CheckSection(o_A);
 
                     if(warp.Effect != 3) // Don't zero speed when passing a portal warp

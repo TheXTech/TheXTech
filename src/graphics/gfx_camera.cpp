@@ -34,15 +34,15 @@ void ResetCameraPanning()
         vScreen[i].small_screen_features = vScreen_t::SmallScreenFeatures_t();
 }
 
-static inline double s_small_screen_rate(const Screen_t& screen, const Screen_t& c_screen)
+static inline num_t s_small_screen_rate(const Screen_t& screen, const Screen_t& c_screen)
 {
     // slowly disable small screen camera features as player cameras approach each other
-    double rate = 1;
+    num_t rate = 1;
     if(screen.Type == ScreenTypes::Dynamic && (screen.W < c_screen.W || screen.H < c_screen.H))
     {
-        double dx = std::abs(screen.vScreen(1).X - screen.vScreen(2).X);
-        double dy = std::abs(screen.vScreen(1).Y - screen.vScreen(2).Y);
-        double d = dx + dy;
+        num_t dx = std::abs(screen.vScreen(1).X - screen.vScreen(2).X);
+        num_t dy = std::abs(screen.vScreen(1).Y - screen.vScreen(2).Y);
+        num_t d = dx + dy;
         const int screen_join = (screen.W + screen.H) / 2;
 
         rate = (d - screen_join) / screen_join;
@@ -62,7 +62,7 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
     const Player_t& p = Player[vscreen.player];
 
     // slowly disable small screen camera features as player cameras approach each other
-    double rate = s_small_screen_rate(screen, c_screen);
+    num_t rate = s_small_screen_rate(screen, c_screen);
 
     if(g_config.small_screen_cam && screen.W < c_screen.W && !NoTurnBack[p.Section])
     {
@@ -213,7 +213,7 @@ void DrawSmallScreenCam(vScreen_t& vscreen)
         CamX -= XRender::TargetOverscanX;
 
     // scale the opacity by the current effectiveness of the camera features
-    double rate = s_small_screen_rate(screen, c_screen);
+    num_t rate = s_small_screen_rate(screen, c_screen);
 
     int16_t max_offsetY = 200;
     if(max_offsetY > (c_screen.H - screen.H) + 50)

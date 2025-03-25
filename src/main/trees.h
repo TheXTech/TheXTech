@@ -219,8 +219,8 @@ extern void treeBlockUpdateLayer(int layer, BlockRef_t obj);
  *
  * use this to replace VB6 iterations over block columns (that previously used FLBlock), or code that specifically wants to exclude tempBlocks
  **/
-extern TreeResult_Sentinel<BlockRef_t> treeFLBlockQuery(double Left, double Top, double Right, double Bottom,
-                               int sort_mode, double margin = 2.0);
+extern TreeResult_Sentinel<BlockRef_t> treeFLBlockQuery(num_t Left, num_t Top, num_t Right, num_t Bottom,
+                               int sort_mode, num_t margin = 2);
 extern void treeFLBlockQuery(std::vector<BaseRef_t>& out, const Location_t &loc, int sort_mode);
 extern TreeResult_Sentinel<BlockRef_t> treeFLBlockQuery(const Location_t &loc, int sort_mode);
 
@@ -237,8 +237,8 @@ extern void treeTempBlockClear();
 extern void treeTempBlockAdd(BlockRef_t obj);
 extern void treeTempBlockUpdate(BlockRef_t obj);
 extern void treeTempBlockRemove(BlockRef_t obj);
-extern TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(double Left, double Top, double Right, double Bottom,
-                               int sort_mode, double margin = 2.0);
+extern TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(num_t Left, num_t Top, num_t Right, num_t Bottom,
+                               int sort_mode, num_t margin = 2);
 extern void treeTempBlockQuery(std::vector<BaseRef_t>& out, const Location_t &loc, int sort_mode);
 extern TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &loc, int sort_mode);
 
@@ -246,8 +246,8 @@ extern void treeLevelCleanBackgroundLayers();
 extern void treeBackgroundAddLayer(int layer, BackgroundRef_t obj);
 extern void treeBackgroundRemoveLayer(int layer, BackgroundRef_t obj);
 extern void treeBackgroundUpdateLayer(int layer, BackgroundRef_t obj);
-extern TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(double Left, double Top, double Right, double Bottom,
-                               int sort_mode, double margin = 2.0);
+extern TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(num_t Left, num_t Top, num_t Right, num_t Bottom,
+                               int sort_mode, num_t margin = 2);
 extern void treeBackgroundQuery(std::vector<BaseRef_t>& out, const Location_t &loc, int sort_mode);
 extern TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(const Location_t &loc, int sort_mode);
 
@@ -257,8 +257,8 @@ extern void treeNPCRemove(NPCRef_t obj);
 extern void treeNPCUpdate(NPCRef_t obj);
 extern void treeNPCSplitTempBlock(NPCRef_t obj);
 extern void treeNPCUpdateTempBlock(NPCRef_t obj);
-extern TreeResult_Sentinel<NPCRef_t> treeNPCQuery(double Left, double Top, double Right, double Bottom,
-                               int sort_mode, double margin = 2.0);
+extern TreeResult_Sentinel<NPCRef_t> treeNPCQuery(num_t Left, num_t Top, num_t Right, num_t Bottom,
+                               int sort_mode, num_t margin = 2);
 extern void treeNPCQuery(std::vector<BaseRef_t>& out, const Location_t &loc, int sort_mode);
 extern TreeResult_Sentinel<NPCRef_t> treeNPCQuery(const Location_t &loc, int sort_mode);
 
@@ -266,8 +266,8 @@ extern void treeLevelCleanWaterLayers();
 extern void treeWaterAddLayer(int layer, WaterRef_t obj);
 extern void treeWaterRemoveLayer(int layer, WaterRef_t obj);
 extern void treeWaterUpdateLayer(int layer, WaterRef_t obj);
-extern TreeResult_Sentinel<WaterRef_t> treeWaterQuery(double Left, double Top, double Right, double Bottom,
-                               int sort_mode, double margin = 2.0);
+extern TreeResult_Sentinel<WaterRef_t> treeWaterQuery(num_t Left, num_t Top, num_t Right, num_t Bottom,
+                               int sort_mode, num_t margin = 2);
 extern TreeResult_Sentinel<WaterRef_t> treeWaterQuery(const Location_t &loc, int sort_mode);
 
 // removed in favor of block quadtree

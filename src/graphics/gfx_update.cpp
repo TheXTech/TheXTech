@@ -618,23 +618,23 @@ static Location_t s_drawBlocks_bounds[maxLocalPlayers];
 static Location_t s_drawBGOs_bounds[maxLocalPlayers];
 
 // maximum amount of layer movement since last tree query
-static double s_drawBlocks_invalidate_timer[maxLocalPlayers] = {0, 0};
-static double s_drawBGOs_invalidate_timer[maxLocalPlayers] = {0, 0};
+static num_t s_drawBlocks_invalidate_timer[maxLocalPlayers] = {0, 0};
+static num_t s_drawBGOs_invalidate_timer[maxLocalPlayers] = {0, 0};
 
 // global: force-invalidate the cache when the blocks themselves change
 std::array<bool, maxLocalPlayers> g_drawBlocks_valid{};
 std::array<bool, maxLocalPlayers> g_drawBGOs_valid{};
 
 // global: based on layer movement speed, set in layers.cpp
-double g_drawBlocks_invalidate_rate = 0;
-double g_drawBGOs_invalidate_rate = 0;
+num_t g_drawBlocks_invalidate_rate = 0;
+num_t g_drawBGOs_invalidate_rate = 0;
 
 
 // Performance-tweakable code. This is the margin away from the vScreen that is filled when onscreen blocks and BGOs are calculated.
 //   Larger values result in more offscreen blocks / BGOs being checked.
 //   Smaller values result in more frequent block / BGO table queries.
-constexpr double i_drawBlocks_margin = 64;
-constexpr double i_drawBGOs_margin = 128;
+constexpr num_t i_drawBlocks_margin = 64;
+constexpr num_t i_drawBGOs_margin = 128;
 
 // updates the lists of blocks and BGOs to draw on i'th vScreen of screen
 void s_UpdateDrawItems(Screen_t& screen, int i)
@@ -1108,10 +1108,10 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
     std::bitset<maxNPCs>& NPC_present = s_NPC_present;
 
     // find the onscreen NPCs; first, get query bounds that cover all 3 possible screens
-    double bounds_left = -vScreen[Z].X;
-    double bounds_top = -vScreen[Z].Y;
-    double bounds_right = -vScreen[Z].X + vScreen[Z].Width;
-    double bounds_bottom = -vScreen[Z].Y + vScreen[Z].Height;
+    num_t bounds_left = -vScreen[Z].X;
+    num_t bounds_top = -vScreen[Z].Y;
+    num_t bounds_right = -vScreen[Z].X + vScreen[Z].Width;
+    num_t bounds_bottom = -vScreen[Z].Y + vScreen[Z].Height;
 
     if(c_Z1)
     {
@@ -1656,7 +1656,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
             {
                 if(g_ClonedPlayerMode)
                 {
-                    int C = 0;
+                    num_t C = 0;
                     int D = 0;
 
                     For(A, 1, numPlayers)
@@ -2465,7 +2465,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
             if(/*!BlockIsSizable[block.Type] &&*/ (!block.Invis || (LevelEditor && (CommonFrame % 46) <= 30)) /*&& block.Type != 0 && !BlockKills[block.Type]*/)
             {
                 // Don't show a visual difference of hit-resized block in a comparison to original state
-                int sX = (block.getShrinkResized()) ? (camX + s_round2int(block.Location.X - 0.05)) : (camX + s_round2int(block.Location.X));
+                int sX = (block.getShrinkResized()) ? (camX + s_round2int(block.Location.X - 0.05_n)) : (camX + s_round2int(block.Location.X));
                 if(sX > vScreen[Z].Width)
                     continue;
 
@@ -2991,7 +2991,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
             // if(vScreenCollision(Z, block.Location) /*&& !block.Hidden*/)
 
             // Don't show a visual difference of hit-resized block in a comparison to original state
-            int sX = (block.getShrinkResized()) ? (camX + s_round2int(block.Location.X - 0.05)) : (camX + s_round2int(block.Location.X));
+            int sX = (block.getShrinkResized()) ? (camX + s_round2int(block.Location.X - 0.05_n)) : (camX + s_round2int(block.Location.X));
             if(sX > vScreen[Z].Width)
                 continue;
 
@@ -3175,6 +3175,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 int A = NPC_Draw_Queue_p.Dropped[i];
 
                 // pulse alpha during modern item drop
+                // FIXME: unnecessary float
                 XTColor cn = (NPC[A].Effect3 != 0) ? (NPC[A].Special5 <= 66 ? XTAlpha(128 + (66 - NPC[A].Special5) + (int)(32 * cosf((float)NPC[A].Special5 / 4))) : XTAlpha(128)) : XTColor();
 
                 if(NPC[A]->WidthGFX == 0)

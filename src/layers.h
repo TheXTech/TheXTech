@@ -45,13 +45,13 @@ struct Layer_t
 //    Hidden As Boolean
     bool Hidden = false;
 //    SpeedX As Single
-    float SpeedX = 0.0f;
+    numf_t SpeedX = 0;
 //    SpeedY As Single
-    float SpeedY = 0.0f;
+    numf_t SpeedY = 0;
 
 // NEW: track the actual applied SpeedX and SpeedY during the last frame. Used for vines.
-    float ApplySpeedX = 0.0f;
-    float ApplySpeedY = 0.0f;
+    numf_t ApplySpeedX = 0;
+    numf_t ApplySpeedY = 0;
 
 //End Type
 // NEW: track the objects belonging to the layer
@@ -61,8 +61,8 @@ struct Layer_t
     std::vector<vbint_t> warps;
     std::vector<vbint_t> waters;
 // NEW: track the layer offset so we don't need to update the block/BGO trees
-    double OffsetX = 0.0;
-    double OffsetY = 0.0;
+    num_t OffsetX = 0;
+    num_t OffsetY = 0;
 };
 
 struct EventSection_t
@@ -87,9 +87,9 @@ struct EventSection_t
     //! Do override current autoscroll
     bool  autoscroll = false;
     //! X speed of autoscrool
-    float autoscroll_x = 0.0;
+    numf_t autoscroll_x = 0;
     //! Y speed of autoscrool
-    float autoscroll_y = 0.0;
+    numf_t autoscroll_y = 0;
 };
 
 
@@ -134,13 +134,13 @@ struct Events_t
 //    MoveLayer As String
     layerindex_t MoveLayer = LAYER_NONE;
 //    SpeedX As Single
-    float SpeedX = 0.0f;
+    numf_t SpeedX = 0;
 //    SpeedY As Single
-    float SpeedY = 0.0f;
+    numf_t SpeedY = 0;
 //    AutoX As Single
-    float AutoX = 0.0f;
+    numf_t AutoX = 0;
 //    AutoY As Single
-    float AutoY = 0.0f;
+    numf_t AutoY = 0;
 //    AutoSection As Integer
     int AutoSection = 0;
 //    AutoStart As Boolean
@@ -223,7 +223,7 @@ bool DeleteLayer(layerindex_t index, bool killall);
 // sets the speed of a layer
 // EffectStop controls whether the layer will stop when a player has abnormal status
 // Defective means that SMBX 1.3 was initially missing all code other than setting the speed
-void SetLayerSpeed(layerindex_t index, double SpeedX, double SpeedY, bool EffectStop = true, bool Defective = false);
+void SetLayerSpeed(layerindex_t index, num_t SpeedX, num_t SpeedY, bool EffectStop = true, bool Defective = false);
 
 // Old functions:
 

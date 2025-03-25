@@ -96,7 +96,7 @@ void UpdatePlayerTimeToLive(int A)
 
     if(B > 0 && player_can_move) // Move camera to the other living players
     {
-        float A1, B1;
+        numf_t A1, B1;
         if(shared_screen)
         {
             const vScreen_t& vscreen = screen.vScreen(screen.active_begin() + 1);
@@ -175,8 +175,8 @@ void UpdatePlayerTimeToLive(int A)
     }
     else if((!BattleMode || B == 0) && player_timer_done) // ScreenType = 1
     {
-        double old_LocX = Player[A].Location.X;
-        double old_LocY = Player[A].Location.Y;
+        num_t old_LocX = Player[A].Location.X;
+        num_t old_LocY = Player[A].Location.Y;
         KillPlayer(A); // Time to die
 
         // new logic: fix player's location

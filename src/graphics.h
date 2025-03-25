@@ -73,7 +73,7 @@ void SharedScreenAvoidJump_Post(Screen_t& screen, int TempDelay);
 void SharedScreenResetTemp(Screen_t& screen);
 
 // NEW: get the fixed-res vScreen position for a player, and write the top-left coordinate to (left, top)
-void GetPlayerScreen(double W, double H, const Player_t& p, double& left, double& top);
+void GetPlayerScreen(num_t W, num_t H, const Player_t& p, num_t& left, num_t& top);
 
 
 // Public Sub SetupGraphics()
@@ -104,7 +104,7 @@ void CenterScreens(Screen_t& screen);
 void CenterScreens();
 
 // NEW: moves qScreen towards vScreen, now including the screen size
-bool Update_qScreen(int Z, double camRate = 2, double resizeRate = 2);
+bool Update_qScreen(int Z, num_t camRate = 2, num_t resizeRate = 2);
 
 // Public Sub SuperPrint(SuperWords As String, Font As Integer, X As Single, Y As Single) 'prints text to the screen
 // prints text to the screen

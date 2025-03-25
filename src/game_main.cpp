@@ -1124,7 +1124,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     {
                         if(CheckCollision(p.Location, Block[B].Location))
                         {
-                            p.Location.Y = Block[B].Location.Y - p.Location.Height - 0.1;
+                            p.Location.Y = Block[B].Location.Y - p.Location.Height - 0.1_n;
                             tempBool = false;
                         }
                     }
@@ -2118,10 +2118,10 @@ void UpdateMacro()
         if(g_config.EnableInterLevelFade && LevelMacroCounter == 598)
         {
             bool canTrack = (Player[1].Location.X < level[Player[1].Section].Width);
-            double focusX = canTrack ?
+            num_t focusX = (canTrack) ?
                             Player[1].Location.X + Player[1].Location.Width / 2 :
                             level[Player[1].Section].Width;
-            double focusY = Player[1].Location.Y + Player[1].Location.Height / 2;
+            num_t focusY = Player[1].Location.Y + Player[1].Location.Height / 2;
 
             g_levelScreenFader.setupFader(2, 0, 65, ScreenFader::S_CIRCLE, true, (int)focusX, (int)focusY, 1);
 
@@ -2233,7 +2233,7 @@ void CheckActive()
 }
 
 
-Location_t newLoc(double X, double Y, double Width, double Height)
+Location_t newLoc(num_t X, num_t Y, num_t Width, num_t Height)
 {
     Location_t ret;
     ret.X = X;

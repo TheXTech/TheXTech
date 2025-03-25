@@ -890,7 +890,7 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
         npc.Location.X = n.x;
         npc.Location.Y = n.y;
         if(!LevelEditor)
-            npc.Location.Y -= 0.01;
+            npc.Location.Y -= 0.01_n;
         npc.Direction = n.direct;
 
         if(n.id > maxNPCType) // Drop ID to 1 for NPCs of out of range IDs
@@ -1460,7 +1460,7 @@ void OpenLevelDataPost()
                     block.Location = n_in.Location;
 
                     block.Type = (n_in.Direction > 0) ? BLKID_CONVEYOR_R_CONV : BLKID_CONVEYOR_L_CONV;
-                    block.Location.SpeedX = (n_in.Direction > 0) ? 0.8 : -0.8;
+                    block.Location.SpeedX = (n_in.Direction > 0) ? 0.8_n : -0.8_n;
 
                     block.DefaultType = block.Type;
                     block.Layer = n_in.Layer;

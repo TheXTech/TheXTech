@@ -1448,17 +1448,17 @@ void TouchScreenController::update()
 
     if(!m_scrollActive && m_scrollMomentumX != 0)
     {
-        m_scrollMomentumX *= 0.97;
+        m_scrollMomentumX *= 0.97_r;
         m_scrollX += m_scrollMomentumX;
-        if(m_scrollMomentumX > -0.1 && m_scrollMomentumX < 0.1)
+        if(m_scrollMomentumX > -0.1_n && m_scrollMomentumX < 0.1_n)
             m_scrollMomentumX = 0;
     }
 
     if(!m_scrollActive && m_scrollMomentumY != 0)
     {
-        m_scrollMomentumY *= 0.97;
+        m_scrollMomentumY *= 0.97_r;
         m_scrollY += m_scrollMomentumY;
-        if(m_scrollMomentumY > -0.1 && m_scrollMomentumY < 0.1)
+        if(m_scrollMomentumY > -0.1_n && m_scrollMomentumY < 0.1_n)
             m_scrollMomentumY = 0;
     }
 

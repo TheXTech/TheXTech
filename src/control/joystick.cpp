@@ -150,11 +150,11 @@ static void s_updateCtrlKey(SDL_GameController* c, bool& key, const KM_Key& mkey
     key |= key_new;
 }
 
-static void s_updateJoystickAnalogue(SDL_Joystick* j, double& amount, const KM_Key& mkey, double digital_amount = 1.0)
+static void s_updateJoystickAnalogue(SDL_Joystick* j, num_t& amount, const KM_Key& mkey, num_t digital_amount = 1)
 {
     Sint32 val = 0, dx = 0, dy = 0;
     Sint16 val_initial = 0;
-    double amount_new = 0.;
+    num_t amount_new = 0;
 
     switch(mkey.type)
     {
@@ -163,7 +163,7 @@ static void s_updateJoystickAnalogue(SDL_Joystick* j, double& amount, const KM_K
         //      and doesn't available in already released assemblies
         if(SDL_JoystickGetAxisInitialState(j, mkey.id, &val_initial) == SDL_FALSE)
         {
-            amount_new = 0.;
+            amount_new = 0;
             break;
         }
 
@@ -171,27 +171,27 @@ static void s_updateJoystickAnalogue(SDL_Joystick* j, double& amount, const KM_K
 
         if(SDL_abs(val) <= 15000)
         {
-            amount_new = 0.0;
+            amount_new = 0;
         }
         else if(mkey.val > val_initial)
         {
-            amount_new = (val - val_initial) / (32768. - val_initial);
-            double other_amount_new = (val - 15000) / (32768. - 15000);
+            amount_new = num_t(val - val_initial) / (32768 - val_initial);
+            num_t other_amount_new = num_t(val - 15000) / (32768 - 15000);
 
             if(other_amount_new > 0 && other_amount_new < amount_new)
                 amount_new = other_amount_new;
         }
         else if(mkey.val < val_initial)
         {
-            amount_new = (val_initial - val) / (val_initial + 32768.);
-            double other_amount_new = (-val - 15000) / (32768. - 15000);
+            amount_new = num_t(val_initial - val) / (val_initial + 32768);
+            num_t other_amount_new = num_t(-val - 15000) / (32768 - 15000);
 
             if(other_amount_new > 0 && other_amount_new < amount_new)
                 amount_new = other_amount_new;
         }
         else
         {
-            amount_new = 0.0;
+            amount_new = 0;
         }
 
         break;
@@ -200,11 +200,11 @@ static void s_updateJoystickAnalogue(SDL_Joystick* j, double& amount, const KM_K
         SDL_JoystickGetBall(j, mkey.id, &dx, &dy);
 
         if(mkey.id > 0)
-            amount_new = (dx / 32.);
+            amount_new = num_t(dx) / 32;
         else if(mkey.id < 0)
-            amount_new = (-dx / 32.);
+            amount_new = num_t(-dx) / 32;
         else
-            amount_new = 0.0;
+            amount_new = 0;
 
         break;
 
@@ -212,11 +212,11 @@ static void s_updateJoystickAnalogue(SDL_Joystick* j, double& amount, const KM_K
         SDL_JoystickGetBall(j, mkey.id, &dx, &dy);
 
         if(mkey.id > 0)
-            amount_new = (dy / 32.);
+            amount_new = num_t(dy) / 32;
         else if(mkey.id < 0)
-            amount_new = (dy / 32.);
+            amount_new = num_t(dy) / 32;
         else
-            amount_new = 0.0;
+            amount_new = 0;
 
         break;
 
@@ -235,7 +235,7 @@ static void s_updateJoystickAnalogue(SDL_Joystick* j, double& amount, const KM_K
         break;
 
     default:
-        amount_new = 0.0;
+        amount_new = 0;
         break;
     }
 
@@ -243,9 +243,9 @@ static void s_updateJoystickAnalogue(SDL_Joystick* j, double& amount, const KM_K
         amount = amount_new;
 }
 
-static void s_updateCtrlAnalogue(SDL_GameController* c, double& amount, const KM_Key& mkey, double digital_amount = 1.0)
+static void s_updateCtrlAnalogue(SDL_GameController* c, num_t& amount, const KM_Key& mkey, num_t digital_amount = 1)
 {
-    double amount_new = 0.;
+    num_t amount_new = 0;
 
     switch(mkey.type)
     {
@@ -255,13 +255,13 @@ static void s_updateCtrlAnalogue(SDL_GameController* c, double& amount, const KM
         Sint32 val = SDL_GameControllerGetAxis(c, (SDL_GameControllerAxis)mkey.id);
 
         if(SDL_abs(val) <= 15000)
-            amount_new = 0.0;
+            amount_new = 0;
         else if(mkey.val > 0)
-            amount_new = (val - 15000) / (32768. - 15000);
+            amount_new = num_t(val - 15000) / (32768 - 15000);
         else if(mkey.val < 0)
-            amount_new = (-val - 15000) / (32768. - 15000);
+            amount_new = num_t(-val - 15000) / (32768 - 15000);
         else
-            amount_new = 0.0;
+            amount_new = 0;
 
         break;
     }
@@ -273,11 +273,11 @@ static void s_updateCtrlAnalogue(SDL_GameController* c, double& amount, const KM
         break;
 
     default:
-        amount_new = 0.0;
+        amount_new = 0;
         break;
     }
 
-    if(amount_new > 0.0)
+    if(amount_new > 0)
         amount = amount_new;
 }
 
@@ -523,8 +523,8 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
     }
 
     // analogue controls
-    double cursor[4] = {0, 0, 0, 0};
-    double scroll[4] = {0, 0, 0, 0};
+    num_t cursor[4] = {0, 0, 0, 0};
+    num_t scroll[4] = {0, 0, 0, 0};
 
     if(p->m_controllerProfile && this->m_devices->ctrl)
     {
@@ -532,8 +532,8 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
         {
             if(p->m_simple_editor && LevelEditor && GamePaused == PauseCode::None)
             {
-                s_updateCtrlAnalogue(this->m_devices->ctrl, cursor[i], p->m_keys[i], 0.5);
-                s_updateCtrlAnalogue(this->m_devices->ctrl, cursor[i], p->m_keys2[i], 0.5);
+                s_updateCtrlAnalogue(this->m_devices->ctrl, cursor[i], p->m_keys[i], 0.5_n);
+                s_updateCtrlAnalogue(this->m_devices->ctrl, cursor[i], p->m_keys2[i], 0.5_n);
             }
             else
             {
@@ -550,8 +550,8 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
         {
             if(p->m_simple_editor && LevelEditor && GamePaused == PauseCode::None)
             {
-                s_updateJoystickAnalogue(this->m_devices->joy, cursor[i], p->m_keys[i], 0.5);
-                s_updateJoystickAnalogue(this->m_devices->joy, cursor[i], p->m_keys2[i], 0.5);
+                s_updateJoystickAnalogue(this->m_devices->joy, cursor[i], p->m_keys[i], 0.5_n);
+                s_updateJoystickAnalogue(this->m_devices->joy, cursor[i], p->m_keys2[i], 0.5_n);
             }
             else
             {
@@ -564,9 +564,9 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
     }
 
     // Scroll control (UDLR)
-    double* const scroll_dest[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
+    num_t* const scroll_dest[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
     for(int i = 0; i < 4; i++)
-        *scroll_dest[i] += scroll[i] * 10.;
+        *scroll_dest[i] += scroll[i] * 10;
 
     // Cursor control (UDLR)
     if(cursor[0] || cursor[1] || cursor[2] || cursor[3])

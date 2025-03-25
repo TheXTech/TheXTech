@@ -56,8 +56,8 @@ void p_PlayerMakeFlySparkle(const Location_t& loc, int Frame)
         newLoc(loc.X - 8 + dRand() * (loc.Width + 16) - 4,
             loc.Y - 8 + dRand() * (loc.Height + 16)),
         1, 0, ShadowMode);
-    Effect[numEffects].Location.SpeedX = (dRand() / 2) - 0.25;
-    Effect[numEffects].Location.SpeedY = (dRand() / 2) - 0.25;
+    Effect[numEffects].Location.SpeedX = (dRand() / 2) - 0.25_n;
+    Effect[numEffects].Location.SpeedY = (dRand() / 2) - 0.25_n;
     Effect[numEffects].Frame = Frame;
 }
 
@@ -237,7 +237,7 @@ bool UpdatePlayer()
                         if(Player[A].FireBallCD > 0 && (Player[A].Location.SpeedY == 0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0))
                         {
                             if(Player[A].Slippy)
-                                Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.75;
+                                Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.75_rb;
                             else
                                 Player[A].Location.SpeedX = 0;
                         }
@@ -272,13 +272,13 @@ bool UpdatePlayer()
                         if(Player[A].Slope > 0)
                         {
                             Player[A].Location.SpeedX = (Player[A].Location.SpeedX + SlippySpeedX * 4) / 5;
-                            if(Player[A].Location.SpeedX > -0.01 && Player[A].Location.SpeedX < 0.01)
+                            if(Player[A].Location.SpeedX > -0.01_n && Player[A].Location.SpeedX < 0.01_n)
                                 Player[A].Location.SpeedX = 0;
                         }
                         else
                         {
                             Player[A].Location.SpeedX = (Player[A].Location.SpeedX + SlippySpeedX * 3) / 4;
-                            if(Player[A].Location.SpeedX > -0.01 && Player[A].Location.SpeedX < 0.01)
+                            if(Player[A].Location.SpeedX > -0.01_n && Player[A].Location.SpeedX < 0.01_n)
                                 Player[A].Location.SpeedX = 0;
                         }
                     }
@@ -418,7 +418,7 @@ bool UpdatePlayer()
 
                 // scoping variables shared between block logic and NPC logic
                 {
-                    float oldSpeedY = Player[A].Location.SpeedY; // holds the players previous Y speed
+                    numf_t oldSpeedY = Player[A].Location.SpeedY; // holds the players previous Y speed
                     bool movingBlock = false; // helps with collisions for moving blocks
                     int floorBlock = 0; // was previously called tempHit3
 

@@ -24,6 +24,8 @@
 
 #include <cmath>
 
+#include "numeric_types.h"
+
 // supported only on gcc
 // #define DEBUG_RANDOM_CALLS
 #ifdef DEBUG_RANDOM_CALLS
@@ -58,7 +60,7 @@ extern void random_set_ncalls(long ncalls);
  * @brief Random number generator in double format, between 0.0 to 1.0 (exclusive)
  * @return random double value
  */
-extern double dRand();
+extern num_t dRand();
 
 /**
  * @brief Random number generator in integer format, between 0 to argument max (exclusive)

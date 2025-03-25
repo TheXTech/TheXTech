@@ -63,7 +63,7 @@ bool WarpCollision(const Location_t &Loc1, const SpeedlessLocation_t &entrance, 
 int FindCollision(const Location_t &Loc1, const Location_t &Loc2);
 // Public Function FindCollisionBelt(Loc1 As Location, Loc2 As Location, BeltSpeed As Single) As Integer  'Whats side the collision happened for belts
 // Whats side the collision happened for belts
-int FindCollisionBelt(const Location_t &Loc1, const Location_t &Loc2, float BeltSpeed);
+int FindCollisionBelt(const Location_t &Loc1, const Location_t &Loc2, numf_t BeltSpeed);
 // Public Function NPCFindCollision(Loc1 As Location, Loc2 As Location) As Integer 'Whats side the collision happened for NPCs
 // Whats side the collision happened for NPCs
 int NPCFindCollision(const Location_t &Loc1, const Location_t &Loc2);
@@ -99,11 +99,11 @@ bool WalkingCollision(const Location_t &Loc1, const Location_t &Loc2);
 // bool WalkingCollision2(const Location_t &Loc1, const Location_t &Loc2);
 // Public Function WalkingCollision3(Loc1 As Location, Loc2 As Location, BeltSpeed As Single) As Boolean 'Factors in beltspeed
 // Factors in beltspeed
-bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, float BeltSpeed);
+bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, numf_t BeltSpeed);
 // Public Function FindRunningCollision(Loc1 As Location, Loc2 As Location) As Integer 'Helps the player to walk over 1 unit cracks
 // Helps the player to walk over 1 unit cracks
 // NEW: BeltSpeedX accounts for the speed of a conveyor belt when testing side collisions
-int FindRunningCollision(const Location_t &Loc1, const Location_t &Loc2, double BeltSpeedX);
+int FindRunningCollision(const Location_t &Loc1, const Location_t &Loc2, num_t BeltSpeedX);
 // Public Function ShouldTurnAround(Loc1 As Location, Loc2 As Location, Direction As Single) As Boolean  'Determines if an NPC should turnaround
 // Determines if an NPC should turnaround
 // bool ShouldTurnAround(const Location_t &Loc1, const Location_t &Loc2, float Direction);
@@ -114,12 +114,12 @@ bool CanComeOut(const Location_t &Loc1, const Location_t &Loc2);
 // Fixes NPCs sinking through the ground
 bool CheckHitSpot1(const Location_t &Loc1, const Location_t &Loc2);
 
-double blockGetTopYTouching(const Block_t &block, const Location_t& loc);
+num_t blockGetTopYTouching(const Block_t &block, const Location_t& loc);
 
 bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &referenceLoc);
 
 void CompareNpcWalkBlock(int &tempHitBlock, int &tempHitOldBlock,
-                         double &tempHit,   double &tempHitOld,
+                         num_t &tempHit,   num_t &tempHitOld,
                          int &tempHitIsSlope, NPC_t *npc);
 
 bool SectionCollision(const int section, const Location_t &loc);

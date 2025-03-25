@@ -166,9 +166,9 @@ void PlayerVineMovement(int A)
     Player[A].SpinJump = false;
 
     if(Player[A].Controls.Left)
-        Player[A].Location.SpeedX = -1.5;
+        Player[A].Location.SpeedX = -1.5_n;
     else if(Player[A].Controls.Right)
-        Player[A].Location.SpeedX = 1.5;
+        Player[A].Location.SpeedX = 1.5_n;
     else
         Player[A].Location.SpeedX = 0;
 

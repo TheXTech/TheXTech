@@ -56,10 +56,10 @@ struct ScreenFader
     int m_focusScreen = -1;
     bool m_focusSet = false;
 
-    double *m_focusTrackX = nullptr;
-    double *m_focusTrackY = nullptr;
-    double m_focusOffsetX = 0.0;
-    double m_focusOffsetY = 0.0;
+    num_t *m_focusTrackX = nullptr;
+    num_t *m_focusTrackY = nullptr;
+    num_t m_focusOffsetX = 0.0_n;
+    num_t m_focusOffsetY = 0.0_n;
 
     int m_shape = S_FADE;
 
@@ -69,7 +69,7 @@ struct ScreenFader
     void clearFader();
 
     void setupFader(int step, int start, int goal, int shape, bool useFocus = false, int focusX = -1, int focusY = -1, int screen = -1);
-    void setTrackedFocus(double *x, double *y, double offX, double offY);
+    void setTrackedFocus(num_t *x, num_t *y, num_t offX, num_t offY);
 
     bool isComplete();
     bool isVisible();

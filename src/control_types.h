@@ -2,6 +2,8 @@
 
 #define CONTROL_TYPES_H
 
+#include "numeric_types.h"
+
 // Controls for the player
 struct Controls_t
 {
@@ -40,8 +42,8 @@ struct CursorControls_t
     // moved this frame
     bool Move = false;
     // position of cursor in screen coordinates
-    double X = -4000.0;
-    double Y = -4000.0;
+    num_t X = -4000.0_n;
+    num_t Y = -4000.0_n;
     // "left button" down
     bool Primary = false;
     // "right button" down
@@ -55,8 +57,8 @@ struct CursorControls_t
     // call to easily send cursor offscreen (on disconnect, etc)
     inline void GoOffscreen()
     {
-        X = -4000.0;
-        Y = -4000.0;
+        X = -4000.0_n;
+        Y = -4000.0_n;
         Move = true;
     }
 };
@@ -64,10 +66,10 @@ struct CursorControls_t
 // Controls for the editor
 struct EditorControls_t
 {
-    double ScrollUp = 0.0;
-    double ScrollDown = 0.0;
-    double ScrollLeft = 0.0;
-    double ScrollRight = 0.0;
+    num_t ScrollUp = 0.0_n;
+    num_t ScrollDown = 0.0_n;
+    num_t ScrollLeft = 0.0_n;
+    num_t ScrollRight = 0.0_n;
 
     bool FastScroll = false;
 

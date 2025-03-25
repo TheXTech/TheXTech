@@ -100,7 +100,7 @@ static void updateIntroLevelActivity()
         if(p.Jump == 0 || p.Location.Y < level[0].Y + 200)
             p.Controls.Jump = false;
 
-        if(p.Location.SpeedX < 0.5)
+        if(p.Location.SpeedX < 0.5_n)
         {
             p.Controls.Jump = true;
             if(p.Slope > 0 || p.StandingOnNPC > 0 || p.Location.SpeedY == 0)
@@ -224,7 +224,7 @@ static void updateIntroLevelActivity()
         if(p.Location.X > -vScreen[1].X + vScreen[1].Width + 200)
             p.Dead = true;
 
-        if(p.Location.X > -vScreen[1].X + vScreen[1].Width * 0.75 && -vScreen[1].X + vScreen[1].Width + 50 < level[0].Width)
+        if(p.Location.X > -vScreen[1].X + vScreen[1].Width * 0.75_n && -vScreen[1].X + vScreen[1].Width + 50 < level[0].Width)
             p.Controls.Run = false;
 
         if(-vScreen[1].X <= level[0].X && (p.Dead || p.TimeToLive > 0) && g_gameInfo.introMaxPlayersCount > 0)
@@ -291,7 +291,7 @@ static void updateIntroLevelActivity()
                 {
                     if(CheckCollision(p.Location, Block[B].Location))
                     {
-                        p.Location.Y = Block[B].Location.Y - p.Location.Height - 0.1;
+                        p.Location.Y = Block[B].Location.Y - p.Location.Height - 0.1_n;
                         tempBool = false;
                         break;
                     }
@@ -319,7 +319,7 @@ static void updateIntroLevelActivity()
                     p.Mount = 3;
                     p.MountType = iRand(7) + 1;
                     p.Location.set_height_floor(Physics.PlayerHeight[2][2]);
-                    p.Location.Y -= 0.01;
+                    p.Location.Y -= 0.01_n;
                 }
             }
 
