@@ -25,8 +25,12 @@
 
 #include "numeric_types.h"
 
+struct NPC_t;
+
 // most of these routines were originally part of UpdateNPCs
 void NPCMovementLogic(int A, numf_t& speedVar);
+
+void NPCSectionWrap(NPC_t& npc);
 
 void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA, const int numTempBlock, const numf_t speedVar);
 

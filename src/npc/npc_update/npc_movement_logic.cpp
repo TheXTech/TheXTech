@@ -610,3 +610,25 @@ void NPCMovementLogic(int A, numf_t& speedVar)
     // Special NPCs code
     SpecialNPC(A);
 }
+
+void NPCSectionWrap(NPC_t& npc)
+{
+    if((LevelWrap[npc.Section] || LevelVWrap[npc.Section]) && npc.Type != NPCID_HEAVY_THROWN && npc.Type != NPCID_PET_FIRE) // Level wraparound
+    {
+        if(LevelWrap[npc.Section])
+        {
+            if(npc.Location.X + npc.Location.Width < level[npc.Section].X)
+                npc.Location.X = level[npc.Section].Width - 1;
+            else if(npc.Location.X > level[npc.Section].Width)
+                npc.Location.X = level[npc.Section].X - npc.Location.Width + 1;
+        }
+
+        if(LevelVWrap[npc.Section])
+        {
+            if(npc.Location.Y + npc.Location.Height < level[npc.Section].Y)
+                npc.Location.Y = level[npc.Section].Height - 1;
+            else if(npc.Location.Y > level[npc.Section].Height)
+                npc.Location.Y = level[npc.Section].Y - npc.Location.Height + 1;
+        }
+    }
+}

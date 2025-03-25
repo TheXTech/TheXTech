@@ -1603,24 +1603,7 @@ interrupt_Activation:
                     // tempBlockHit[2] = 0;
                     // winningBlock = 0;
 
-                    if((LevelWrap[NPC[A].Section] || LevelVWrap[NPC[A].Section]) && NPC[A].Type != NPCID_HEAVY_THROWN && NPC[A].Type != NPCID_PET_FIRE) // Level wraparound
-                    {
-                        if(LevelWrap[NPC[A].Section])
-                        {
-                            if(NPC[A].Location.X + NPC[A].Location.Width < level[NPC[A].Section].X)
-                                NPC[A].Location.X = level[NPC[A].Section].Width - 1;
-                            else if(NPC[A].Location.X > level[NPC[A].Section].Width)
-                                NPC[A].Location.X = level[NPC[A].Section].X - NPC[A].Location.Width + 1;
-                        }
-
-                        if(LevelVWrap[NPC[A].Section])
-                        {
-                            if(NPC[A].Location.Y + NPC[A].Location.Height < level[NPC[A].Section].Y)
-                                NPC[A].Location.Y = level[NPC[A].Section].Height - 1;
-                            else if(NPC[A].Location.Y > level[NPC[A].Section].Height)
-                                NPC[A].Location.Y = level[NPC[A].Section].Y - NPC[A].Location.Height + 1;
-                        }
-                    }
+                    NPCSectionWrap(NPC[A]);
 
                     if(NoTurnBack[NPC[A].Section] && NPC[A].Location.X < level[NPC[A].Section].X - NPC[A].Location.Width - 32)
                         NPCHit(A, 9);
