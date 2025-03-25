@@ -193,14 +193,20 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
                 {
                     if(CheckCollision(edgeLoc, w.Location))
                     {
-                        if(w.Location.Y <= exit_check_y - 32 && new_maze[MAZE_DIR_UP] < W)
-                            new_maze[MAZE_DIR_UP] = W;
-                        if(w.Location.Y + w.Location.Height >= exit_check_y + 32 && new_maze[MAZE_DIR_DOWN] < W)
-                            new_maze[MAZE_DIR_DOWN] = W;
-                        if(w.Location.X <= exit_check_x - 32 && new_maze[MAZE_DIR_LEFT] < W)
-                            new_maze[MAZE_DIR_LEFT] = W;
-                        if(w.Location.X + w.Location.Width >= exit_check_x + 32 && new_maze[MAZE_DIR_RIGHT] < W)
-                            new_maze[MAZE_DIR_RIGHT] = W;
+                        if(w.Location.Height > w.Location.Width)
+                        {
+                            if(w.Location.Y <= exit_check_y - 32 && new_maze[MAZE_DIR_UP] < W)
+                                new_maze[MAZE_DIR_UP] = W;
+                            if(w.Location.Y + w.Location.Height >= exit_check_y + 32 && new_maze[MAZE_DIR_DOWN] < W)
+                                new_maze[MAZE_DIR_DOWN] = W;
+                        }
+                        else
+                        {
+                            if(w.Location.X <= exit_check_x - 32 && new_maze[MAZE_DIR_LEFT] < W)
+                                new_maze[MAZE_DIR_LEFT] = W;
+                            if(w.Location.X + w.Location.Width >= exit_check_x + 32 && new_maze[MAZE_DIR_RIGHT] < W)
+                                new_maze[MAZE_DIR_RIGHT] = W;
+                        }
                     }
                 }
             }
