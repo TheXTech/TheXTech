@@ -66,7 +66,16 @@ int pfrX(const StdPicture& tx, const Player_t& p)
         int n_rows = 4;
         int n_cols = (p.Character == 5) ? 4 : 10;
 
-        int fr = (p.Frame <= 32) ? p.Frame : p.Frame - 7;
+        int fr = p.Frame;
+        int dir = p.Direction;
+
+        if(fr < 0)
+        {
+            fr = -fr;
+            dir = -dir;
+        }
+
+        fr = (fr <= 32) ? fr : fr - 7;
 
         bool is_center_frame = (fr == 0);
 
@@ -76,7 +85,7 @@ int pfrX(const StdPicture& tx, const Player_t& p)
         int col = fr / n_rows;
 
         // load left-facing frame (bottom) - right to left (in order to mirror top half)
-        if(!is_center_frame && p.Direction < 0)
+        if(!is_center_frame && dir < 0)
             return col_w * (n_cols - col - 1);
         // load right-facing frame (top) - left to right
         else
@@ -101,7 +110,16 @@ int pfrY(const StdPicture& tx, const Player_t& p)
         int row_h = 64;
         int n_rows = 4;
 
-        int fr = (p.Frame <= 32) ? p.Frame : p.Frame - 7;
+        int fr = p.Frame;
+        int dir = p.Direction;
+
+        if(fr < 0)
+        {
+            fr = -fr;
+            dir = -dir;
+        }
+
+        fr = (fr <= 32) ? fr : fr - 7;
 
         bool is_center_frame = (fr == 0);
 
@@ -111,7 +129,7 @@ int pfrY(const StdPicture& tx, const Player_t& p)
         int row = fr % n_rows;
 
         // load left-facing frame (bottom)
-        if(!is_center_frame && p.Direction < 0)
+        if(!is_center_frame && dir < 0)
             return row_h * (n_rows + row);
         // load right-facing frame (top)
         else
