@@ -335,10 +335,11 @@ static inline void NPCEffectLogic_Waiting(int A)
 
 static inline void NPCEffectLogic_Maze(int A)
 {
-    NPCFrames(A);
-    NPCCollide(A);
-
     NPC_t& npc = NPC[A];
+
+    NPCFrames(A);
+    NPCSectionWrap(npc);
+    NPCCollide(A);
 
     if(npc.TurnAround)
     {
