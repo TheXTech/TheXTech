@@ -622,6 +622,11 @@ struct Player_t
 //    DuckRelease As Boolean
     bool DuckRelease : 1;
 
+    // Can the player NOT currently wall-jump because the wall is slippery?
+    bool SlippyWall : 1;
+    // Is the player's current jump a wall-jump?
+    bool JumpOffWall : 1;
+
 //'yoshi powers
 //    YoshiYellow As Boolean
     bool YoshiYellow = false;
@@ -796,10 +801,7 @@ struct Player_t
     // NEW: status field for maze zone (stores current direction and clearance to leave)
     uint8_t MazeZoneStatus = 0;
 
-    // Can the player NOT currently wall jump because the wall is slippery?
-    bool SlippyWall = false;
-
-    Player_t() : GroundPound(false), GroundPound2(false), CanPound(false), AltRunRelease(false), DuckRelease(false) {}
+    Player_t() : GroundPound(false), GroundPound2(false), CanPound(false), AltRunRelease(false), DuckRelease(false), SlippyWall(false), JumpOffWall(false) {}
 };
 
 //Public Type Background  'Background objects

@@ -138,6 +138,7 @@ void PlayerMovementX(int A, numf_t& cursed_value_C)
 
     // deduplicated (was previously separate sections for holding Left and Right)
     if((Player[A].Controls.Left || Player[A].Controls.Right) &&
+       !Player[A].JumpOffWall &&
        ((!Player[A].Duck && Player[A].GrabTime == 0) ||
         (Player[A].Location.SpeedY != 0 && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0) ||
         Player[A].Mount == 1)
@@ -461,7 +462,7 @@ void PlayerMovementY(int A)
             PlayerDismount(A);
     }
 
-    if((Player[A].Location.SpeedY == 0 || Player[A].Jump > 0 || Player[A].Vine > 0) && Player[A].FloatTime == 0) // princess float
+    if((Player[A].Location.SpeedY == 0 || (Player[A].Jump > 0 && !Player[A].JumpOffWall) || Player[A].Vine > 0) && Player[A].FloatTime == 0) // princess float
         Player[A].CanFloat = true;
 
     if(Player[A].Wet > 0 || Player[A].WetFrame)
@@ -555,11 +556,13 @@ void PlayerMovementY(int A)
             }
             else if(has_wall_traction && Player[A].CanJump)
             {
+                NewEffect(EFFID_WHACK, newLoc(Player[A].Location.X + Player[A].Location.Width / 2 - 16, Player[A].Location.Y + Player[A].Location.Height - 16));
                 PlaySoundSpatial(SFX_Jump, Player[A].Location); // Jump sound
-                Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - tempSpeed;
-                Player[A].Location.SpeedX -= 4 * Player[A].Direction;
+                Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
+                Player[A].Location.SpeedX -= 5 * Player[A].Direction;
                 Player[A].Location.X += Player[A].Location.SpeedX;
-                Player[A].Jump = 6;
+                Player[A].Jump = 8;
+                Player[A].JumpOffWall = true;
 
                 if(Player[A].Character == 2)
                     Player[A].Jump += 3;
@@ -745,11 +748,13 @@ void PlayerMovementY(int A)
         }
         else if(has_wall_traction && Player[A].CanAltJump)
         {
+            NewEffect(EFFID_WHACK, newLoc(Player[A].Location.X + Player[A].Location.Width / 2 - 16, Player[A].Location.Y + Player[A].Location.Height - 16));
             PlaySoundSpatial(SFX_Whip, Player[A].Location); // Jump sound
-            Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - tempSpeed;
-            Player[A].Location.SpeedX -= 6 * Player[A].Direction;
+            Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
+            Player[A].Location.SpeedX -= 7 * Player[A].Direction;
             Player[A].Location.X += Player[A].Location.SpeedX;
-            Player[A].Jump = 3;
+            Player[A].Jump = 5;
+            Player[A].JumpOffWall = true;
             Player[A].SpinJump = true;
         }
         else if(Player[A].Jump > 0)
@@ -796,6 +801,8 @@ void PlayerMovementY(int A)
 
     if(Player[A].Jump > 0)
         Player[A].Vine = 0;
+    else
+        Player[A].JumpOffWall = false;
 
 
     if(Player[A].Quicksand > 1)
