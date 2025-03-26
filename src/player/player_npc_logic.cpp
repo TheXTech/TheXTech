@@ -585,7 +585,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
 #endif
                                 if(NPC[B]->IsABonus) // Bonus
                                     TouchBonus(A, B);
-                                else if(NPC[B]->IsAShell && NPC[B].Location.SpeedX == 0 && Player[A].HoldingNPC == 0 && Player[A].Controls.Run)
+                                else if(NPC[B]->IsAShell && NPC[B].Location.SpeedX == 0 && Player[A].HoldingNPC == 0 && Player[A].Controls.Run && !g_config.no_shell_grab_top)
                                 {
                                     // grab turtle shells
                                     //if(nPlay.Online == false || nPlay.MySlot + 1 == A)
