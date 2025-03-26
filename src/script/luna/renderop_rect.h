@@ -36,8 +36,8 @@ public:
     int y1;
     int x2;
     int y2;
-    RenderOpColor fillColor;
-    RenderOpColor borderColor;
+    XTColor fillColor;
+    XTColor borderColor;
     bool   sceneCoords;        // If true, x and y are scene coordinates
 };
 

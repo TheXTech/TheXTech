@@ -25,8 +25,8 @@
 
 RenderRectOp::RenderRectOp() : RenderOp(),
     x1(0), y1(0), x2(0), y2(0),
-    fillColor(0.0, 0.0, 0.0, 0.0),
-    borderColor(1.0f, 1.0f, 1.0f, 1.0f),
+    fillColor(0, 0, 0, 0),
+    borderColor(255, 255, 255, 255),
     sceneCoords(false)
 {
     static_assert(sizeof(RenderRectOp) <= c_rAllocChunkSize,
@@ -35,7 +35,7 @@ RenderRectOp::RenderRectOp() : RenderOp(),
 
 void RenderRectOp::Draw(Renderer *renderer)
 {
-    if(borderColor.a <= 0.0 && fillColor.a <= 0.0) return;
+    if(borderColor.a <= 0 && fillColor.a <= 0) return;
 
     // Convert coordinates
     int sx1 = this->x1, sy1 = this->y1, sx2 = this->x2, sy2 = this->y2;
@@ -59,18 +59,18 @@ void RenderRectOp::Draw(Renderer *renderer)
         }
     }
 
-    if(fillColor.a > 0.0f)
+    if(fillColor.a > 0)
         XRender::renderRect(sx1,
                             sy1,
                             sx2 - sx1,
                             sy2 - sy1,
-                            XTColor(fillColor), true);
+                            fillColor, true);
 
-    if(borderColor.a > 0.0f)
+    if(borderColor.a > 0)
         XRender::renderRect(sx1,
                             sy1,
                             sx2 - sx1,
                             sy2 - sy1,
-                            XTColor(borderColor), false);
+                            borderColor, false);
 }
 

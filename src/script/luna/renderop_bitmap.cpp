@@ -36,10 +36,6 @@ void RenderBitmapOp::Draw(Renderer *renderer)
     if(!direct_img || (direct_img->getH() == 0) || (direct_img->getW() == 0))
         return;
 
-    float opacity = this->opacity;
-    if(opacity > 1.0f) opacity = 1.0f;
-    if(opacity < 0.0f) opacity = 0.0f;
-
     int screenX = this->x;
     int screenY = this->y;
 
@@ -72,5 +68,5 @@ void RenderBitmapOp::Draw(Renderer *renderer)
     if((width <= 0) || (height <= 0))
         return;
 
-    XRender::renderTextureBasic(x, y, width, height, direct_img->m_image, sx, sy, XTAlphaF(opacity));
+    XRender::renderTextureBasic(x, y, width, height, direct_img->m_image, sx, sy, color);
 }

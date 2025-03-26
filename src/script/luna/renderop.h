@@ -38,21 +38,6 @@ static const PLANE RENDEROP_DEFAULT_PRIORITY_RENDEROP_SCENE = (PLANE)(PLANE_LVL_
 static const PLANE RENDEROP_DEFAULT_PRIORITY_CGFX_SCENE = (PLANE)(PLANE_LVL_SECTION_FG - 1); // Default priority for Custom GFX (scene)
 static const PLANE RENDEROP_DEFAULT_PRIORITY_TEXT_SCENE = (PLANE)(PLANE_LVL_SECTION_FG); // Default priority for Text (scene)
 
-struct RenderOpColor
-{
-    float r;
-    float g;
-    float b;
-    float a;
-
-    inline RenderOpColor(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {}
-
-    inline explicit operator XTColor()
-    {
-        return XTColorF(r, g, b, a);
-    }
-};
-
 // Base class respresenting a rendering operation
 // Rendering operations include a draw function and a count of how many frames of activity remain
 class RenderOp

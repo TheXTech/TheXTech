@@ -40,8 +40,8 @@ public:
     int sw = 0;				// Source x1 (right edge)
     int sh = 0;				// Source x1 (bottom edge)
 
-    float  opacity = 1.0f;         // Opacity value
-    bool   sceneCoords = false;     // If true, x and y are scene coordinates
+    XTColor color = XTAlpha(255);         // Opacity value
+    bool    sceneCoords = false;     // If true, x and y are scene coordinates
 
     LunaImage *direct_img = nullptr;
 };
