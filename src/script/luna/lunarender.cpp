@@ -324,10 +324,10 @@ void Renderer::DrawOp(RenderOp &op)
 }
 
 
-bool Render::IsOnScreen(double x, double y, double w, double h)
+bool Render::IsOnScreen(int x, int y, int w, int h)
 {
-    int cam_x = vScreen[1].X;
-    int cam_y = vScreen[1].Y;
+    int cam_x = vScreen[1].CameraAddX();
+    int cam_y = vScreen[1].CameraAddY();
     int cam_w = vScreen[1].Width;
     int cam_h = vScreen[1].Height;
 
@@ -355,7 +355,7 @@ void Render::CalcCameraPos(double *ret_x, double *ret_y)
 }
 #endif
 
-void Render::TranslateScreenCoords(double &x, double &y, double w, double h)
+void Render::TranslateScreenCoords(int &x, int &y, int w, int h)
 {
     // FIXME: What we shall to do with w and h?
     UNUSED(w);
@@ -371,7 +371,7 @@ void Render::TranslateScreenCoords(double &x, double &y, double w, double h)
         x += left;
         y += top;
 
-        if(vScreen[1].Height < 600.0)
-            y *= vScreen[1].Height / 600.0;
+        if(vScreen[1].Height < 600)
+            y = (y * vScreen[1].Height) / 600;
     }
 }

@@ -31,7 +31,7 @@ public:
     // Quick ctor
     RenderStringOp();
 
-    RenderStringOp(const std::string &str, int font_type, float X, float Y);
+    RenderStringOp(const std::string &str, int font_type, int X, int Y);
 
     ~RenderStringOp() override;
 
@@ -44,8 +44,8 @@ public:
     bool   m_StringDup = false;
 
     int m_FontType;
-    float m_X;
-    float m_Y;
+    int m_X;
+    int m_Y;
     bool   sceneCoords;     // If true, x and y are scene coordinates
 };
 

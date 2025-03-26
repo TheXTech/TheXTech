@@ -58,6 +58,11 @@
 
 #include "main/trees.h"
 
+static inline int s_round2int(double d)
+{
+    return std::floor(d + 0.5);
+}
+
 static FIELDTYPE StrToFieldtype(std::string string)
 {
     string.erase(string.find_last_not_of(" \n\r\t") + 1);
@@ -294,7 +299,7 @@ void Autocode::Do(bool init)
 
         // SHOW TEXT
         case AT_ShowText:
-            Renderer::Get().AddOp(new RenderStringOp(GetS(MyString), (int)Param3, (float)Param1, (float)Param2));
+            Renderer::Get().AddOp(new RenderStringOp(GetS(MyString), (int)Param3, s_round2int(Param1), s_round2int(Param2)));
             break;
 
         // SHOW NPC LIFE LEFT
@@ -306,21 +311,21 @@ void Autocode::Do(bool init)
             {
                 //float hits = *(((float *)((&(*(uint8_t *)npc)) + 0x148)));
                 int hits = npc->Damage;
-                Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("{0}", (base_health - hits)), 3, (float)Param1, (float)Param2));
+                Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("{0}", (base_health - hits)), 3, s_round2int(Param1), s_round2int(Param2)));
             }
             else
-                Renderer::Get().AddOp(new RenderStringOp("?", 3, (float)Param1, (float)Param2));
+                Renderer::Get().AddOp(new RenderStringOp("?", 3, s_round2int(Param1), s_round2int(Param2)));
             break;
         }
 
         // Show level's internal name (or show the filename if empty)
         case AT_ShowLevelName:
-            Renderer::Get().AddOp(new RenderStringOp(LevelName.empty() ? FileName : LevelName, (int)Param3, (float)Param1, (float)Param2));
+            Renderer::Get().AddOp(new RenderStringOp(LevelName.empty() ? FileName : LevelName, (int)Param3, s_round2int(Param1), s_round2int(Param2)));
             break;
 
         // Show level's file name (without extension)
         case AT_ShowLevelFile:
-            Renderer::Get().AddOp(new RenderStringOp(FileName, (int)Param3, (float)Param1, (float)Param2));
+            Renderer::Get().AddOp(new RenderStringOp(FileName, (int)Param3, s_round2int(Param1), s_round2int(Param2)));
             break;
 
         // AUDIO
@@ -780,7 +785,7 @@ void Autocode::Do(bool init)
                 std::string str = fmt::format_ne("{0}", gAutoMan.GetVar(GetS(MyRef)));
                 if(GetS(MyString).length() > 0)
                     str = GetS(MyString) + str;
-                Renderer::Get().AddOp(new RenderStringOp(str, (int)Param3, (float)Param1, (float)Param2));
+                Renderer::Get().AddOp(new RenderStringOp(str, (int)Param3, s_round2int(Param1), s_round2int(Param2)));
             }
             break;
         }
@@ -1485,7 +1490,7 @@ void Autocode::HeartSystem() const
         Renderer::Get().AddOp(new RenderStringOp(std::string(
                                   std::string("HP: ") + std::string(gAutoMan_m_Hearts.str())
                               )
-                              , 3, (float)Target, (float)Param1));
+                              , 3, s_round2int(Target), s_round2int(Param1)));
     }//if heartuser
 }
 

@@ -35,6 +35,11 @@
 #include "renderop_bitmap.h"
 #include "mememu.h"
 
+static inline int s_round2int(double d)
+{
+    return std::floor(d + 0.5);
+}
+
 
 // Activate -- Formally trigger a component link in the given sprite (copy all matches into behavior list)
 void Activate(int code, CSprite *spr)
@@ -755,8 +760,8 @@ void SpriteFunc::StaticDraw(CSprite *me)
         {
             auto *op = new RenderBitmapOp();
             op->m_FramesLeft = 1;
-            op->x = me->m_Xpos + me->m_GfxXOffset;
-            op->y = me->m_Ypos + me->m_GfxYOffset;
+            op->x = s_round2int(me->m_Xpos) + me->m_GfxXOffset;
+            op->y = s_round2int(me->m_Ypos) + me->m_GfxYOffset;
             auto &r = me->m_GfxRects[me->m_AnimationFrame];
             op->sx = r.left;
             op->sy = r.top;
@@ -789,8 +794,8 @@ void SpriteFunc::RelativeDraw(CSprite *me)
         {
             // double cx = 0;              // camera x (top left of screen)
             // double cy = 0;              // camera y (top left of screen)
-            double sx = me->m_Xpos;     // sprite x position (top left of sprite)
-            double sy = me->m_Ypos;     // sprite y position (top left of sprite)
+            int sx = s_round2int(me->m_Xpos);     // sprite x position (top left of sprite)
+            int sy = s_round2int(me->m_Ypos);     // sprite y position (top left of sprite)
             sx +=  me->m_GfxXOffset;
             sy +=  me->m_GfxYOffset;
 

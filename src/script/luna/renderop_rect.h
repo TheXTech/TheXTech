@@ -32,10 +32,10 @@ public:
 
     void Draw(Renderer *renderer) override;
 
-    double x1;
-    double y1;
-    double x2;
-    double y2;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
     RenderOpColor fillColor;
     RenderOpColor borderColor;
     bool   sceneCoords;        // If true, x and y are scene coordinates
