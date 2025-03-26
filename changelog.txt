@@ -38,6 +38,7 @@ Changelog for 1.3.7.1-dev
 -Fix SMBX 1.3 crash caused by freezing a bubble when the NPC with index 3 is an ice ball (@ds-sloth)
 -Fix TheXTech 1.3.1 inaccuracy where certain internal values were not rounded correctly (@ds-sloth)
 -Fix TheXTech 1.3.1 bug where characters 2 and 5 couldn't release all coins in a block if the block was in front of another sizable block (@ds-sloth)
+-Added compat flag "no-shell-grab-top" to disable grabbing shells while falling from above, for compatibility with pre-SMBX 1.3 content (@Wohlstand)
 
 Changelog for 1.3.7
 -Fix vanilla peculiarity where medals were sometimes not collected when killed, guarded by "fix-medal-kill" [Modern Mode] (@ds-sloth, thanks to @Superbloxen for the report)
