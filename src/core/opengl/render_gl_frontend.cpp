@@ -845,6 +845,9 @@ void RenderGL::setTargetScreen()
 
 void RenderGL::setDrawPlane(uint8_t plane)
 {
+    if(m_render_planes.m_current_plane == plane)
+        return;
+
     m_render_planes.set_plane(plane);
 
     m_recent_draw_context = DrawContext_t(nullptr);
