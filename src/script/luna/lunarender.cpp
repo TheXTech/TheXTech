@@ -151,7 +151,7 @@ static bool CompareRenderPriority(const RenderOp *lhs, const RenderOp *rhs)
     return lhs->m_renderPriority < rhs->m_renderPriority;
 }
 
-void Renderer::RenderBelowPriority(double maxPriority)
+void Renderer::RenderBelowPriority(PLANE maxPriority)
 {
     if(!m_queueState.m_InFrameRender) return;
 
@@ -179,10 +179,10 @@ void Renderer::RenderBelowPriority(double maxPriority)
         std::stable_sort(ops.begin() + m_queueState.m_renderOpsSortedCount, ops.end(), CompareRenderPriority);
 
         // Render things as many of the new items as we should before merging the sorted lists
-        double maxPassPriority = maxPriority;
+        PLANE maxPassPriority = maxPriority;
         if(m_queueState.m_renderOpsSortedCount > m_queueState.m_renderOpsProcessedCount)
         {
-            double nextPriorityInOldList = ops[m_queueState.m_renderOpsProcessedCount]->m_renderPriority;
+            PLANE nextPriorityInOldList = ops[m_queueState.m_renderOpsProcessedCount]->m_renderPriority;
             if(nextPriorityInOldList < maxPassPriority)
                 maxPassPriority = nextPriorityInOldList;
         }
@@ -211,7 +211,7 @@ void Renderer::RenderBelowPriority(double maxPriority)
         m_queueState.m_renderOpsProcessedCount++;
     }
 
-    if(maxPriority >= DBL_MAX)
+    if(maxPriority >= RENDEROP_PRIORITY_MAX)
     {
         // Format debug messages and enter them into renderstring list
         int dbg_x = 325;
@@ -219,7 +219,7 @@ void Renderer::RenderBelowPriority(double maxPriority)
 
         for(auto &dbg : m_queueState.m_debugMessages)
         {
-            RenderStringOp(dbg, 4, (float)dbg_x, (float)dbg_y).Draw(this);
+            RenderStringOp(dbg, 4, dbg_x, dbg_y).Draw(this);
             dbg_y += 20;
             if(dbg_y > 560)
             {

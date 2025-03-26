@@ -29,6 +29,7 @@
 #include <list>
 #include <Allocator/PoolAllocator.h>
 
+#include "draw_planes.h"
 #include "lunaimgbox.h"
 
 class RenderOp;
@@ -60,7 +61,7 @@ struct Renderer
     void DebugPrint(const std::string &message);                // Print a debug message on the screen
     void DebugPrint(const std::string &message, double val);    // Print a debug message on the screen and display a related value
 
-    void RenderBelowPriority(double maxPriority);
+    void RenderBelowPriority(PLANE maxPriority);
 
     void ClearAllDebugMessages();
 

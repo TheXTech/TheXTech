@@ -26,16 +26,17 @@
 #include "sdl_proxy/sdl_assert.h"
 
 #include "xt_color.h"
+#include "draw_planes.h"
 
-static const double RENDEROP_PRIORITY_MIN = -100.0;
-static const double RENDEROP_PRIORITY_MAX = 10.0;
-static const double RENDEROP_DEFAULT_PRIORITY_RENDEROP = 1.0; // Default priority for RenderOp and RenderImage
-static const double RENDEROP_DEFAULT_PRIORITY_CGFX = 2.0; // Default priority for Custom GFX
-static const double RENDEROP_DEFAULT_PRIORITY_TEXT = 3.0; // Default priority for Text
+static const PLANE RENDEROP_PRIORITY_MIN = PLANE_INTERNAL_BG;
+static const PLANE RENDEROP_PRIORITY_MAX = PLANE_INTERNAL_FG;
+static const PLANE RENDEROP_DEFAULT_PRIORITY_RENDEROP = (PLANE)(PLANE_LVL_HUD - 2); // Default priority for RenderOp and RenderImage
+static const PLANE RENDEROP_DEFAULT_PRIORITY_CGFX = (PLANE)(PLANE_LVL_HUD - 1); // Default priority for Custom GFX
+static const PLANE RENDEROP_DEFAULT_PRIORITY_TEXT = (PLANE)(PLANE_LVL_HUD); // Default priority for Text
 
-static const double RENDEROP_DEFAULT_PRIORITY_RENDEROP_SCENE = RENDEROP_DEFAULT_PRIORITY_RENDEROP - 5.0; // Default priority for RenderOp and RenderImage (scene)
-static const double RENDEROP_DEFAULT_PRIORITY_CGFX_SCENE = RENDEROP_DEFAULT_PRIORITY_CGFX - 5.0; // Default priority for Custom GFX (scene)
-static const double RENDEROP_DEFAULT_PRIORITY_TEXT_SCENE = RENDEROP_DEFAULT_PRIORITY_TEXT - 5.0; // Default priority for Text (scene)
+static const PLANE RENDEROP_DEFAULT_PRIORITY_RENDEROP_SCENE = (PLANE)(PLANE_LVL_SECTION_FG - 2); // Default priority for RenderOp and RenderImage (scene)
+static const PLANE RENDEROP_DEFAULT_PRIORITY_CGFX_SCENE = (PLANE)(PLANE_LVL_SECTION_FG - 1); // Default priority for Custom GFX (scene)
+static const PLANE RENDEROP_DEFAULT_PRIORITY_TEXT_SCENE = (PLANE)(PLANE_LVL_SECTION_FG); // Default priority for Text (scene)
 
 struct RenderOpColor
 {
@@ -58,7 +59,7 @@ class RenderOp
 {
 public:
     RenderOp() : m_FramesLeft(1), m_selectedCamera(0), m_renderPriority(RENDEROP_DEFAULT_PRIORITY_RENDEROP) {}
-    explicit RenderOp(double priority) : m_FramesLeft(1), m_selectedCamera(0), m_renderPriority(priority) {}
+    explicit RenderOp(PLANE priority) : m_FramesLeft(1), m_selectedCamera(0), m_renderPriority(priority) {}
     virtual ~RenderOp() = default;
     virtual void Draw(Renderer* /*renderer*/) {}
 
@@ -77,7 +78,7 @@ public:
 
     int m_FramesLeft;		// How many frames until this op should be destroyed
     int m_selectedCamera;
-    double m_renderPriority;
+    PLANE m_renderPriority;
 };
 
 #endif // RENDEROP_H

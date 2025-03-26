@@ -143,7 +143,7 @@ void lunaRenderHud(int screenZ)
     if(dcAllow && g_config.show_fails_counter && ShowOnScreenHUD)
         gDeathCounter.Draw(screenZ);
 
-    Renderer::Get().RenderBelowPriority(5);
+    Renderer::Get().RenderBelowPriority(PLANE_INTERNAL_FG);
 }
 
 void lunaRender(int screenZ)
@@ -152,7 +152,7 @@ void lunaRender(int screenZ)
     {
         Renderer::Get().StartCameraRender(screenZ);
         gSpriteMan.RunSprites();
-        Renderer::Get().RenderBelowPriority(0);
+        Renderer::Get().RenderBelowPriority((PLANE)(PLANE_LVL_SECTION_FG + 4));
     }
 }
 
