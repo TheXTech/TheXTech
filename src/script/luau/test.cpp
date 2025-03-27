@@ -48,7 +48,10 @@ void load_test_script()
 {
     working = false;
     if(L)
+    {
         lua_close(L);
+        L = nullptr;
+    }
 
     Files::Data d = Files::load_file(g_dirEpisode.resolveFileCaseExistsAbs("test.luau"));
 
