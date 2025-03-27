@@ -79,6 +79,10 @@
 #    include "core/opengl/gl_program_bank.h"
 #endif
 
+#ifdef THEXTECH_ENABLE_LUAU
+#    include "script/luau/test.h"
+#endif
+
 
 // warning for improper rects
 static const char* s_improper_rect_warning = "Attempted to set %s %d %s to %f, setting to 0";
@@ -1407,6 +1411,9 @@ void OpenLevelDataPost()
     if(!GameMenu && !LevelEditor)
         tr.loadLevelTranslation(FileNameFull);
 
+#ifdef THEXTECH_ENABLE_LUAU
+    load_test_script();
+#endif
 
     IsEpisodeIntro = (StartLevel == FileNameFull);
 
