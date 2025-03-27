@@ -81,7 +81,6 @@ namespace Controls
 std::vector<InputMethod*> g_InputMethods;
 std::vector<InputMethodType*> g_InputMethodTypes;
 bool g_renderTouchscreen = false;
-static PauseCode s_requestedPause = PauseCode::None;
 HotkeysPressed_t g_hotkeysPressed;
 static HotkeysPressed_t s_hotkeysPressedOld;
 bool g_disallowHotkeys = false;
@@ -148,8 +147,8 @@ void Hotkeys::Activate(size_t i, int player)
         return;
 
     case Buttons::EnterCheats:
-        if(!GameMenu && !GameOutro && !LevelEditor && !BattleMode)
-            s_requestedPause = PauseCode::TextEntry;
+        SharedControls.Pause = true;
+        PauseScreen::UnlockCheats();
         return;
 
     case Buttons::ToggleHUD:
@@ -157,8 +156,10 @@ void Hotkeys::Activate(size_t i, int player)
         return;
 
     case Buttons::LegacyPause:
-        // handled elsewhere
-        (void)player;
+        if(player == 0)
+            SharedControls.Pause = true;
+
+        SharedControls.LegacyPause = true;
         return;
 
     default:
@@ -848,13 +849,16 @@ bool Update(bool check_lost_devices)
         {
             InputMethod* method = g_InputMethods[i];
 
-            if(!method->Update(l_screen->players[i], newControls, cursor, editor, g_hotkeysPressed) && check_lost_devices)
+            if(!method->Update(i + 1, newControls, cursor, editor, g_hotkeysPressed) && check_lost_devices)
             {
                 okay = false;
                 DeleteInputMethod(method);
                 // the method pointer is no longer valid
             }
         }
+
+        if(g_hotkeysPressed[Hotkeys::Buttons::LegacyPause] == i + 1)
+            newControls.Start = true;
 
         // push messages corresponding to controls press / release
         XMessage::PushControls(i, newControls);
@@ -867,21 +871,18 @@ bool Update(bool check_lost_devices)
     if(GamePaused == PauseCode::PauseScreen)
         PauseScreen::ControlsLogic();
 
+    // trigger hotkeys
+    for(size_t i = 0; i < Hotkeys::n_buttons; i++)
+    {
+        if(s_hotkeysPressedOld[i] != g_hotkeysPressed[i] && g_hotkeysPressed[i] != -1)
+            Hotkeys::Activate(i, g_hotkeysPressed[i]);
+
+        s_hotkeysPressedOld[i] = g_hotkeysPressed[i];
+        g_hotkeysPressed[i] = -1;
+    }
+
     // sync any messages, and reset player controls to raw controls
     XMessage::Tick();
-
-    // check for legacy pause key
-    if(g_hotkeysPressed[Hotkeys::Buttons::LegacyPause] != -1)
-    {
-        int A = g_hotkeysPressed[Hotkeys::Buttons::LegacyPause];
-
-        if(A >= 1 && A <= numPlayers)
-            Player[A].Controls.Start = true;
-        else
-            SharedControls.Pause = true;
-
-        SharedControls.LegacyPause = true;
-    }
 
     if(SharedCursor.Move)
     {
@@ -976,38 +977,6 @@ bool Update(bool check_lost_devices)
             g_InputMethods.push_back(nullptr);
 
         okay = false;
-    }
-
-    // trigger hotkeys
-    for(size_t i = 0; i < Hotkeys::n_buttons; i++)
-    {
-        if(s_hotkeysPressedOld[i] != g_hotkeysPressed[i] && g_hotkeysPressed[i] != -1)
-            Hotkeys::Activate(i, g_hotkeysPressed[i]);
-
-        s_hotkeysPressedOld[i] = g_hotkeysPressed[i];
-        g_hotkeysPressed[i] = -1;
-    }
-
-    if(s_requestedPause != PauseCode::None && GamePaused != s_requestedPause)
-    {
-        PauseCode p = s_requestedPause;
-        s_requestedPause = PauseCode::None;
-
-        if(p == PauseCode::TextEntry)
-            cheats_setBuffer(TextEntryScreen::Run(g_gameStrings.pauseItemEnterCode));
-        else
-            PauseGame(p);
-
-        MenuCursorCanMove = false;
-        MenuMouseRelease = false;
-        MouseRelease = false;
-    }
-    else if(s_requestedPause != PauseCode::None)
-    {
-        if(s_requestedPause == PauseCode::TextEntry)
-            TextEntryScreen::Commit();
-
-        s_requestedPause = PauseCode::None;
     }
 
     g_disallowHotkeys = false;

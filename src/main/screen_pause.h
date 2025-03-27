@@ -27,6 +27,8 @@ namespace PauseScreen
 
 extern uint8_t g_pending_action;
 
+void UnlockCheats();
+
 void Init(int plr, bool LegacyPause);
 
 void ControlsLogic();
