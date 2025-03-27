@@ -131,11 +131,11 @@ extern double vb6Round(double x, int decimals);
 //Public Const HWND_NOTOPMOST As Long = -2
 //const long HWND_NOTOPMOST  = -2;
 //Public myBackBuffer As Long 'Backbuffer
-extern long myBackBuffer;
+// extern long myBackBuffer;
 //Public myBufferBMP As Long 'Backbuffer
-extern long myBufferBMP;
+// extern long myBufferBMP;
 //Public AllCharBlock As Integer
-extern int AllCharBlock;
+// extern int AllCharBlock;
 //Public Const KEY_TOGGLED As Integer = &H1   'For control information
 //const int KEY_TOGGLED = 0x01;
 //Public LocalNick As String  'Online Nickname
@@ -144,7 +144,7 @@ extern int AllCharBlock;
 //Public ServerPassword As String  'Password game server wants the client to use
 //Public ServerClear As Boolean
 //Public StartMenu As Boolean
-extern bool StartMenu;
+// extern bool StartMenu;
 
 //Public BlockFlash As Integer
 // Note: was previously BlockFlash, manually looped by local code to 0-90. Now incremented every frame, should be used with modulus operator.
@@ -158,8 +158,6 @@ extern bool ScrollRelease;
 extern bool TakeScreen;
 // EXTRA: Show any on-screen meta (HUD, debug prints, etc.)
 extern bool ShowOnScreenHUD;
-// EXTRA: Enable the new font engine
-extern bool NewFontRender;
 //Public LB As String  ' Line Break
 //extern std::string LB;
 //Public EoT As String  ' End of Transmission for WINSOCK
@@ -215,20 +213,15 @@ extern bool NewFontRender;
 //End Type
 
 //Public Type EditorControls      'Controls for the editor
-struct OldEditorControls_t
-{
+// struct OldEditorControls_t
+// {
 //    Up As Boolean
-    bool Up = false;
 //    Down As Boolean
-    bool Down = false;
 //    Left As Boolean
-    bool Left = false;
 //    Right As Boolean
-    bool Right = false;
 //    Mouse1 As Boolean
-    bool Mouse1 = false;
 //End Type
-};
+// };
 
 
 // Structures moved into con_control.h
@@ -1823,7 +1816,7 @@ extern RangeArrI<vbint_t, 1, 100, 0> LevelFrame2;
 //Public BlockHasNoMask(1 To maxBlockType) As Boolean
 extern RangeArrI<bool, 1, maxBlockType, false> BlockHasNoMask;
 //Public LevelHasNoMask(1 To 100) As Boolean
-extern RangeArrI<bool, 1, 100, false> LevelHasNoMask;
+// extern RangeArrI<bool, 1, 100, false> LevelHasNoMask;
 //Public BlockOnlyHitspot1(0 To maxBlockType) As Boolean
 extern RangeArrI<bool, 0, maxBlockType, false> BlockOnlyHitspot1;
 //Public BlockKills(0 To maxBlockType) As Boolean 'block is lava
@@ -1843,7 +1836,6 @@ extern RangeArrI<vbint_t, 1, 10, 0> CoinFrame2;
 //Public EditorCursor As EditorCursor
 extern EditorCursor_t EditorCursor;
 //Public EditorControls As EditorControls
-extern OldEditorControls_t OldEditorControls;
 
 extern SharedControls_t SharedControls;
 
@@ -1923,9 +1915,9 @@ extern int Lives;
 //NEW: tracker of number of hundreds of coins that have been obtained
 extern int g_100s;
 //Public EndIntro As Boolean
-extern bool EndIntro;
+// extern bool EndIntro;
 //Public ExitMenu As Boolean
-extern bool ExitMenu;
+// extern bool ExitMenu;
 //Public LevelSelect As Boolean 'true if game should load the world map
 extern bool LevelSelect;
 
@@ -2145,7 +2137,7 @@ extern bool MenuCursorCanMove;
 // Now used to check if it's okay to go back (separately from the other actions)
 extern bool MenuCursorCanMove_Back;
 //Public NextFrame As Boolean
-extern bool NextFrame;
+// extern bool NextFrame;
 //Public StopHit As Integer
 extern int StopHit;
 //Public MouseRelease As Boolean
@@ -2177,7 +2169,7 @@ extern int EndCredits;
 //Public curStars As Integer 'number of stars
 extern int curStars;
 //Public maxStars As Integer 'max number of stars in the game
-extern int maxStars;
+// extern int maxStars;
 //'cheat codes --------------
 //Public ShadowMode As Boolean 'cheat code
 extern bool ShadowMode;
@@ -2198,7 +2190,7 @@ extern bool FlameThrower;
 //Public CoinMode As Boolean 'cheat code
 extern bool CoinMode;
 //Public WorldUnlock As Boolean
-extern bool WorldUnlock;
+// extern bool WorldUnlock;
 // replaced with g_config.unlimited_framerate
 //Public MaxFPS As Boolean
 // extern bool MaxFPS;
@@ -2229,7 +2221,7 @@ extern RangeArrI<int, 1, 13, 0> Points;
 //Public MaxWorldStars As Integer 'maximum number of world stars
 extern int MaxWorldStars;
 //Public Debugger As Boolean 'if the debugger window is open
-extern bool Debugger;
+// extern bool Debugger;
 //Public SavedChar(0 To 10) As Player 'Saves the Player's Status
 extern RangeArr<SavedChar_t, 0, 10> SavedChar;
 
@@ -2492,9 +2484,9 @@ extern RangeArr<StdPicture, 1, numCharacters> GFXPlayerBMP;
 // extern RangeArrI<vbint_t, 1, numCharacters, 0> GFXPlayerWidth;
 
 //Public PlayerCharacter As Integer
-extern int PlayerCharacter;
+// extern int PlayerCharacter;
 //Public PlayerCharacter2 As Integer
-extern int PlayerCharacter2;
+// extern int PlayerCharacter2;
 
 // replaced with SharedCursor.*
 
@@ -2529,9 +2521,9 @@ extern bool ForcedControls;
 //Public ForcedControl As Controls
 extern Controls_t ForcedControl;
 //Public SyncCount As Integer
-extern int SyncCount;
+// extern int SyncCount;
 //Public noUpdate As Boolean
-extern bool noUpdate;
+// extern bool noUpdate;
 //Public gameTime As Double
 //extern double gameTime;
 

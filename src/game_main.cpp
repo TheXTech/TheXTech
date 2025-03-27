@@ -466,7 +466,7 @@ int GameMain(const CmdLineSetup_t &setup)
     // Set global SMBX64 behaviour at PGE-FL
     FileFormats::SetSMBX64LvlFlags(FileFormats::F_SMBX64_KEEP_LEGACY_NPC_IN_BLOCK_CODES);
 
-    StartMenu = true;
+    // StartMenu = true;
     MenuMode = MENU_INTRO;
 
     // strings and translation initialization moved into MainLoadAll
@@ -981,7 +981,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
             BattleIntro = 0;
             BattleOutro = 0;
-            AllCharBlock = 0;
+            // AllCharBlock = 0;
             Cheater = false;
 
             // in a main menu, reset this into initial state
@@ -998,11 +998,11 @@ int GameMain(const CmdLineSetup_t &setup)
             MenuCursorCanMove = false;
             BattleMode = false;
 
-            if(MenuMode != MENU_BATTLE_MODE)
-            {
-                PlayerCharacter = 0;
-                PlayerCharacter2 = 0;
-            }
+            // if(MenuMode != MENU_BATTLE_MODE)
+            // {
+            //     PlayerCharacter = 0;
+            //     PlayerCharacter2 = 0;
+            // }
 
             pLogDebug("Clear check-points at Game Menu start");
             Checkpoint.clear();
@@ -1803,8 +1803,8 @@ void NextLevel()
         GameMenu = true;
         MenuMode = MENU_BATTLE_MODE;
         MenuCursor = selWorld - 1;
-        PlayerCharacter = Player[1].Character;
-        PlayerCharacter2 = Player[2].Character;
+        // PlayerCharacter = Player[1].Character;
+        // PlayerCharacter2 = Player[2].Character;
     }
     else
     {
@@ -2479,6 +2479,7 @@ void StartEpisode()
 
     Integrator::setEpisodeName(WorldName);
 
+#if 0 // unused cheat code from SMBX64
     if(WorldUnlock)
     {
         For(A, 1, numWorldPaths)
@@ -2504,6 +2505,7 @@ void StartEpisode()
         For(A, 1, numWorldLevels)
             WorldLevel[A].Active = true;
     }
+#endif
 
     SetupPlayers();
 

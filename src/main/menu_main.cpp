@@ -1170,8 +1170,8 @@ bool mainMenuUpdate()
             else if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
             {
                 MenuCursorCanMove = false;
-                PlayerCharacter = 0;
-                PlayerCharacter2 = 0;
+                // PlayerCharacter = 0;
+                // PlayerCharacter2 = 0;
 
                 int i = 0;
                 if(MenuCursor == i++)

@@ -379,7 +379,7 @@ bool OpenLevel_Head(void* userdata, LevelData& head)
     LevelLoad& load = *static_cast<LevelLoad*>(userdata);
 
     // Level-wide settings
-    maxStars = head.stars;
+    // maxStars = head.stars;
     LevelName = head.LevelName;
 
 #ifdef PGEFL_CALLBACK_API
@@ -1643,7 +1643,7 @@ void ClearLevel()
     SetupPhysics();
     LoadNPCDefaults();
     LoadPlayerDefaults();
-    noUpdate = true;
+    // noUpdate = true;
     BlocksSorted = true;
     qScreen = false;
     qScreen_canonical = false;
@@ -1703,7 +1703,7 @@ void ClearLevel()
     Events[2].Name = "P Switch - End";
     curMusic = 0;
     curStars = 0;
-    maxStars = 0;
+    // maxStars = 0;
     g_curLevelMedals.reset_lvl();
 
     PSwitchTime = 0;
@@ -1745,7 +1745,7 @@ void ClearLevel()
 //        frmBlocks.chkFill.Value = 0
 //        frmEvents.txtEvent.Text = ""
 //        noUpdate = True
-        noUpdate = true;
+        // noUpdate = true;
 //        frmEvents.RefreshEvents
 //        frmLayers.lstLayer.Clear
 //        frmLayers.lstLayer.AddItem "Default"
@@ -1800,7 +1800,7 @@ void ClearLevel()
     PlayerStart[1] = BlankLocation;
     PlayerStart[2] = BlankLocation;
 
-    noUpdate = false;
+    // noUpdate = false;
 }
 
 void FindStars()

@@ -530,7 +530,7 @@ void ClearGame(bool punnish)
     for(int A = 1; A <= maxScenes; ++A)
         Scene[A].Active = true;
 
-    maxStars = 0;
+    // maxStars = 0;
     Star.clear();
     numStars = 0;
 

@@ -694,7 +694,7 @@ public:
         insert(0x00B2C8A4, &EndCredits);
 
         insert(0x00B2C8A6, &curStars);
-        insert(0x00B2C8A8, &maxStars);
+        // insert(0x00B2C8A8, &maxStars);
 
         insert(0x00B2C8AA, &ShadowMode);
         insert(0x00B2C8AC, &MultiHop);
@@ -716,10 +716,10 @@ public:
         insert(0x00B2C8E4, &Score); // HUD points count
         insert(0x00B2C906, &MaxWorldStars); // Max stars at episode
 
-        insert(0x00B2C908, &Debugger);
+        // insert(0x00B2C908, &Debugger);
 
-        insert(0x00B2D6B8, &PlayerCharacter);
-        insert(0x00B2D6BA, &PlayerCharacter2);
+        // insert(0x00B2D6B8, &PlayerCharacter);
+        // insert(0x00B2D6BA, &PlayerCharacter2);
 
         insert(0x00B2D6BC, &SharedCursor.X); // Mouse cursor X
         insert(0x00B2D6C4, &SharedCursor.Y); // Mouse cursor Y
