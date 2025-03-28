@@ -281,7 +281,7 @@ RangeArrI<vbint_t, 1, 10, 0> CoinFrame;
 RangeArrI<vbint_t, 1, 10, 0> CoinFrame2;
 EditorCursor_t EditorCursor;
 EditorControls_t EditorControls;
-SharedControls_t SharedControls;
+SharedControls_t l_SharedControls;
 
 CursorControls_t SharedCursor;
 // RangeArr<CursorControls_t, 1, maxLocalPlayers> PlayerCursor;

@@ -145,7 +145,7 @@ void OutroLoop()
 {
     Controls::Update(false);
     Integrator::sync();
-    bool quit = SharedControls.QuitCredits;
+    bool quit = l_SharedControls.QuitCredits;
 
     for(int i = 0; i < l_screen->player_count; i++)
         quit |= Controls::g_RawControls[i].Start;

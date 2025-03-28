@@ -1182,7 +1182,7 @@ int menuControls_Logic()
             return 0;
         }
 
-        bool cancel = SharedControls.MenuBack;
+        bool cancel = l_SharedControls.MenuBack;
 
         for(int i = 0; i < l_screen->player_count; i++)
             cancel |= Controls::g_RawControls[i].Run;
@@ -1199,13 +1199,13 @@ int menuControls_Logic()
         return 0;
     }
 
-    bool upPressed = SharedControls.MenuUp;
-    bool downPressed = SharedControls.MenuDown;
-    bool leftPressed = SharedControls.MenuLeft;
-    bool rightPressed = SharedControls.MenuRight;
+    bool upPressed = l_SharedControls.MenuUp;
+    bool downPressed = l_SharedControls.MenuDown;
+    bool leftPressed = l_SharedControls.MenuLeft;
+    bool rightPressed = l_SharedControls.MenuRight;
 
-    bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
-    bool menuBackPress = SharedControls.MenuBack || (SharedCursor.Secondary && MenuMouseRelease);
+    bool menuDoPress = l_SharedControls.MenuDo || l_SharedControls.Pause;
+    bool menuBackPress = l_SharedControls.MenuBack || (SharedCursor.Secondary && MenuMouseRelease);
 
     bool delPressed = false;
 

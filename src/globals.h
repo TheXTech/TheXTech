@@ -1837,7 +1837,7 @@ extern RangeArrI<vbint_t, 1, 10, 0> CoinFrame2;
 extern EditorCursor_t EditorCursor;
 //Public EditorControls As EditorControls
 
-extern SharedControls_t SharedControls;
+extern SharedControls_t l_SharedControls;
 
 extern CursorControls_t SharedCursor;
 

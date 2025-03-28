@@ -171,10 +171,10 @@ void Render()
 
 bool Logic()
 {
-    bool upPressed = SharedControls.MenuUp;
-    bool downPressed = SharedControls.MenuDown;
+    bool upPressed = l_SharedControls.MenuUp;
+    bool downPressed = l_SharedControls.MenuDown;
 
-    bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
+    bool menuDoPress = l_SharedControls.MenuDo || l_SharedControls.Pause;
 
     for(int i = 0; i < l_screen->player_count; i++)
     {

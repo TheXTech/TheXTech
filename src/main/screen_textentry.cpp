@@ -704,14 +704,14 @@ bool Logic()
         return true;
     }
 
-    bool upPressed = SharedControls.MenuUp;
-    bool downPressed = SharedControls.MenuDown;
-    bool leftPressed = SharedControls.MenuLeft;
-    bool rightPressed = SharedControls.MenuRight;
+    bool upPressed = l_SharedControls.MenuUp;
+    bool downPressed = l_SharedControls.MenuDown;
+    bool leftPressed = l_SharedControls.MenuLeft;
+    bool rightPressed = l_SharedControls.MenuRight;
 
     bool startPressed = false;
-    bool doPressed = SharedControls.MenuDo;
-    bool backPressed = SharedControls.MenuBack;
+    bool doPressed = l_SharedControls.MenuDo;
+    bool backPressed = l_SharedControls.MenuBack;
 
     for(int i = 0; i < l_screen->player_count; i++)
     {

@@ -147,7 +147,7 @@ void Hotkeys::Activate(size_t i, int player)
         return;
 
     case Buttons::EnterCheats:
-        SharedControls.Pause = true;
+        l_SharedControls.Pause = true;
         PauseScreen::UnlockCheats();
         return;
 
@@ -157,9 +157,9 @@ void Hotkeys::Activate(size_t i, int player)
 
     case Buttons::LegacyPause:
         if(player == 0)
-            SharedControls.Pause = true;
+            l_SharedControls.Pause = true;
 
-        SharedControls.LegacyPause = true;
+        l_SharedControls.LegacyPause = true;
         return;
 
     default:
@@ -813,7 +813,7 @@ bool ProcessEvent(const SDL_Event* ev)
 //    a. May call or set changeScreen, frmMain.toggleGifRecorder, TakeScreen, g_stats.enabled, etc
 // 3. Calls the UpdateControlsPost hooks of loaded InputMethodTypes
 //    a. May call or set changeScreen, frmMain.toggleGifRecorder, TakeScreen, g_stats.enabled, etc
-//    b. May update SharedControls or SharedCursor using hardcoded keys
+//    b. May update l_SharedControls or SharedCursor using hardcoded keys
 // 4. Updates speedrun and recording modules
 // 5. Resolves inconsistent control states (Left+Right, etc)
 bool Update(bool check_lost_devices)
@@ -827,8 +827,8 @@ bool Update(bool check_lost_devices)
     SharedCursor.Tertiary = false;
     SharedCursor.ScrollUp = false;
     SharedCursor.ScrollDown = false;
-    // reset SharedControls
-    SharedControls = SharedControls_t();
+    // reset l_SharedControls
+    l_SharedControls = SharedControls_t();
 
     // reset EditorControls
     ::EditorControls = EditorControls_t();

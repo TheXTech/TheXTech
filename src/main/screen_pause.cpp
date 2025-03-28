@@ -493,13 +493,13 @@ void Render()
 
 void ControlsLogic()
 {
-    bool upPressed = SharedControls.MenuUp;
-    bool downPressed = SharedControls.MenuDown;
-    bool leftPressed = SharedControls.MenuLeft;
-    bool rightPressed = SharedControls.MenuRight;
+    bool upPressed = l_SharedControls.MenuUp;
+    bool downPressed = l_SharedControls.MenuDown;
+    bool leftPressed = l_SharedControls.MenuLeft;
+    bool rightPressed = l_SharedControls.MenuRight;
 
-    bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
-    bool menuBackPress = SharedControls.MenuBack;
+    bool menuDoPress = l_SharedControls.MenuDo || l_SharedControls.Pause;
+    bool menuBackPress = l_SharedControls.MenuBack;
 
     // there was previously code to copy all players' controls from the main player, but this is no longer necessary (and actively harmful in the SingleCoop case)
 

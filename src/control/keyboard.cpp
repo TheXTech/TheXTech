@@ -980,20 +980,20 @@ void InputMethodType_Keyboard::UpdateControlsPost()
     bool backPressed = false;
 #endif
 
-    SharedControls.QuitCredits |= (spacePressed || backPressed);
-    SharedControls.QuitCredits |= (returnPressed && !altPressed);
-    SharedControls.QuitCredits |= (escBackPressed && !altPressed);
+    l_SharedControls.QuitCredits |= (spacePressed || backPressed);
+    l_SharedControls.QuitCredits |= (returnPressed && !altPressed);
+    l_SharedControls.QuitCredits |= (escBackPressed && !altPressed);
 
-    SharedControls.Pause |= backPressed;
-    SharedControls.Pause |= (escPausePressed && !altPressed);
+    l_SharedControls.Pause |= backPressed;
+    l_SharedControls.Pause |= (escPausePressed && !altPressed);
 
-    SharedControls.MenuUp |= upPressed;
-    SharedControls.MenuDown |= downPressed;
-    SharedControls.MenuLeft |= leftPressed;
-    SharedControls.MenuRight |= rightPressed;
-    SharedControls.MenuDo |= (returnPressed && !altPressed) || spacePressed;
-    SharedControls.MenuBack |= backPressed;
-    SharedControls.MenuBack |= (escBackPressed && !altPressed);
+    l_SharedControls.MenuUp |= upPressed;
+    l_SharedControls.MenuDown |= downPressed;
+    l_SharedControls.MenuLeft |= leftPressed;
+    l_SharedControls.MenuRight |= rightPressed;
+    l_SharedControls.MenuDo |= (returnPressed && !altPressed) || spacePressed;
+    l_SharedControls.MenuBack |= backPressed;
+    l_SharedControls.MenuBack |= (escBackPressed && !altPressed);
 }
 
 // this is challenging for the keyboard because we don't want to allocate 20 copies of it
