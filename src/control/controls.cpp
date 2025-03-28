@@ -820,6 +820,10 @@ bool Update(bool check_lost_devices)
 {
     bool okay = true;
 
+    // track whether shared controls buttons were pressed last frame, to modify the global versions
+    bool old_shared_pause = l_SharedControls.Pause;
+    bool old_shared_legacy = l_SharedControls.LegacyPause;
+
     // reset per-frame state for SharedCursor
     SharedCursor.Move = false;
     SharedCursor.Primary = false;
@@ -880,6 +884,17 @@ bool Update(bool check_lost_devices)
         s_hotkeysPressedOld[i] = g_hotkeysPressed[i];
         g_hotkeysPressed[i] = -1;
     }
+
+    // push shared controls
+    if(l_SharedControls.Pause && !old_shared_pause)
+        XMessage::PushMessage({XMessage::Type::shared_controls, 0, 0});
+    else if(old_shared_pause && !l_SharedControls.Pause)
+        XMessage::PushMessage({XMessage::Type::shared_controls, 0, 1});
+
+    if(l_SharedControls.LegacyPause && !old_shared_legacy)
+        XMessage::PushMessage({XMessage::Type::shared_controls, 0, 2});
+    else if(old_shared_legacy && !l_SharedControls.LegacyPause)
+        XMessage::PushMessage({XMessage::Type::shared_controls, 0, 3});
 
     // sync any messages, and reset player controls to raw controls
     XMessage::Tick();

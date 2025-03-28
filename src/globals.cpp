@@ -286,6 +286,9 @@ SharedControls_t l_SharedControls;
 CursorControls_t SharedCursor;
 // RangeArr<CursorControls_t, 1, maxLocalPlayers> PlayerCursor;
 
+bool SharedPause;
+bool SharedPauseLegacy;
+
 // RangeArrI<int, 1, numSounds, 0> Sound;
 RangeArrI<vbint_t, 1, numSounds, 0> SoundPause;
 bool ErrorQuit = false;

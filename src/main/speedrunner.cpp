@@ -196,7 +196,7 @@ void RenderControls_priv(int player, const Controls_t* controls, int x, int y, i
     XRender::renderRect(x + 56, y + 6, 6, 6, bool2(s_yellow, c.AltRun, alphaBtn), true);
 
     XRender::renderRect(x + 26, y + 22, 10, 4, bool2(s_gray, c.Drop, alphaBtn), true);
-    if(l_SharedControls.LegacyPause)
+    if(SharedPauseLegacy)
         XRender::renderRect(x + 40, y + 22, 10, 4, bool2(s_legacy, c.Start, alphaBtn), true);
     else
         XRender::renderRect(x + 40, y + 22, 10, 4, bool2(s_gray, c.Start, alphaBtn), true);

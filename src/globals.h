@@ -1843,6 +1843,9 @@ extern CursorControls_t SharedCursor;
 
 extern EditorControls_t EditorControls;
 
+extern bool SharedPause;
+extern bool SharedPauseLegacy;
+
 // extern RangeArr<CursorControls_t, 1, maxLocalPlayers> PlayerCursor;
 
 //Public Sound(1 To numSounds) As Integer

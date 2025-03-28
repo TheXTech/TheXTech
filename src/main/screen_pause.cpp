@@ -395,10 +395,11 @@ void Init(int plr, bool LegacyPause)
         pLogWarning("Menu doesn't fit within bounds (actual size %dx%d, bounds 480x320)", total_menu_width, total_menu_height);
 
     // force cheat entry if needed
-    if(s_cheat_menu_bits == 15 && CommonFrame - s_cheat_menu_frame < 8)
+    if(s_cheat_menu_bits == 15)
     {
         s_cheat_menu_bits = 14;
-        TextEntryScreen::Init(g_gameStrings.pauseItemEnterCode, s_CheatScreen_callback);
+        if(CommonFrame - s_cheat_menu_frame < 60)
+            TextEntryScreen::Init(g_gameStrings.pauseItemEnterCode, s_CheatScreen_callback);
     }
 }
 

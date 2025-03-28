@@ -44,6 +44,7 @@ enum class Type : uint8_t
     release,
     menu_action,
     char_swap,
+    shared_controls,
 };
 
 struct Message
@@ -54,6 +55,7 @@ struct Message
     uint8_t message;
 
     inline Message() : screen(0), player(0) {}
+    inline Message(Type type, uint8_t player, uint8_t message) : type(type), screen(0), player(player), message(message) {}
     operator bool() const
     {
         return type != Type::empty;

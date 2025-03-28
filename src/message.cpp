@@ -63,9 +63,18 @@ void Handle(const Message& m)
     }
     else if(m.type == Type::menu_action)
     {
-        // FIXME: check that screen is the one in control of the pause menu
-
         PauseScreen::g_pending_action = m.message;
+    }
+    else if(m.type == Type::shared_controls)
+    {
+        if(m.message == 0)
+            SharedPause = true;
+        else if(m.message == 1)
+            SharedPause = false;
+        else if(m.message == 2)
+            SharedPauseLegacy = true;
+        else if(m.message == 3)
+            SharedPauseLegacy = false;
     }
 }
 

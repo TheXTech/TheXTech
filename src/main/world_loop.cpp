@@ -389,7 +389,7 @@ void WorldLoop()
 
     if(WorldPlayer[1].Move == 0)
     {
-        if(l_SharedControls.Pause)
+        if(SharedPause)
         {
             PauseInit(PauseCode::PauseScreen, 0);
             return;

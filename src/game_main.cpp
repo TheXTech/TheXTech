@@ -1037,6 +1037,8 @@ int GameMain(const CmdLineSetup_t &setup)
             g_CheatEditYourFriends = false;
             CanWallJump = false;
             g_VanillaCam = false;
+            SharedPause = false;
+            SharedPauseLegacy = false;
             XRender::unloadGifTextures();
 
             Controls::RemoveNullInputMethods();
