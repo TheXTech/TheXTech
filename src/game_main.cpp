@@ -49,6 +49,10 @@
 #include "xtech_lua_main.h"
 #endif
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+#include "main/client_methods.h"
+#endif
+
 #include "sdl_proxy/sdl_timer.h"
 
 #include "globals.h"
@@ -303,6 +307,10 @@ static void s_ExpandSectionForMenu()
 
 void ReportLoadFailure(const std::string& filename)
 {
+#ifdef THEXTECH_ENABLE_SDL_NET
+    XMessage::Disconnect();
+#endif
+
     g_MessageType = MESSAGE_TYPE_SYS_WARNING;
 
     // temporarily store error code from load process in MessageTitle string
