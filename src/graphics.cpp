@@ -240,7 +240,7 @@ void GetvScreenAverage3(vScreen_t& vscreen)
 
     const Screen_t& screen = Screens[vscreen.screen_ref];
 
-    int section_idx = Player[1].Section;
+    int section_idx = Player[screen.players[0]].Section;
 
     for(int i = 0; i < screen.player_count; i++)
     {
@@ -248,9 +248,6 @@ void GetvScreenAverage3(vScreen_t& vscreen)
 
         if(plr.Dead)
             continue;
-
-        if(plr_count == 0)
-            section_idx = plr.Section;
 
         num_t pl = plr.Location.X;
         num_t pr = pl + plr.Location.Width;
