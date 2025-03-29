@@ -62,6 +62,39 @@ void Handle(const Message& m)
         if(LevelSelect)
             SetupPlayers();
     }
+    else if(m.type == Type::add_player || m.type == Type::add_player_dead)
+    {
+        if(m.screen >= maxNetplayClients || Screens[m.screen].player_count >= maxLocalPlayers || m.message < 1 || m.message > numCharacters)
+            return;
+
+        // after AddPlayer, numPlayers is always the new player
+        AddPlayer(m.message, Screens[m.screen]);
+
+        // set the player to be dead if needed
+        if(m.type == Type::add_player_dead)
+        {
+            Player[numPlayers].Dead = true;
+
+            // initialize ghost logic for player
+            int living = CheckNearestLiving(numPlayers);
+            if(living)
+            {
+                Player[numPlayers].Effect2 = -living;
+                Player[numPlayers].Location.X = Player[living].Location.X;
+                Player[numPlayers].Location.Y = Player[living].Location.Y;
+                Player[numPlayers].Section    = Player[living].Section;
+            }
+            else
+                Player[numPlayers].Effect2 = 0;
+        }
+    }
+    else if(m.type == Type::drop_player)
+    {
+        if(m.screen >= maxNetplayClients || m.player >= Screens[m.screen].player_count)
+            return;
+
+        DropPlayer(Screens[m.screen].players[m.player]);
+    }
     else if(m.type == Type::menu_action)
     {
         PauseScreen::g_pending_action = m.message;

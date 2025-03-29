@@ -44,6 +44,9 @@ enum class Type : uint8_t
     release,
     menu_action,
     char_swap,
+    add_player,
+    add_player_dead,
+    drop_player,
     shared_controls,
     enter_code,
 };

@@ -706,13 +706,7 @@ void ControlsLogic()
                     if(target != Player[A].Character)
                     {
                         snd = SFX_Slide;
-
-                        XMessage::Message swap_char;
-                        swap_char.type = XMessage::Type::char_swap;
-                        swap_char.player = plr_i;
-                        swap_char.message = target;
-
-                        XMessage::PushMessage(swap_char);
+                        XMessage::PushMessage({XMessage::Type::char_swap, plr_i, target});
                     }
                 }
 

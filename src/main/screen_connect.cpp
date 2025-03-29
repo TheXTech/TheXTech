@@ -3,6 +3,7 @@
 #include "core/render.h"
 
 #include "global_constants.h"
+#include "message.h"
 #include "controls.h"
 #include "sound.h"
 #include "globals.h"
@@ -633,7 +634,7 @@ static void Player_Remove(int p)
         if((Player[l_screen->players[p]].Dead || Player[l_screen->players[p]].TimeToLive > 0) && Player[l_screen->players[p]].Effect != PLREFF_COOP_WINGS)
             s_char_info.dead_count++;
 
-        DropPlayer(l_screen->players[p]);
+        XMessage::PushMessage({XMessage::Type::drop_player, (uint8_t)p, 0});
     }
 }
 
@@ -683,7 +684,7 @@ void PlayerBox::UpdatePlayer()
     if(p < l_screen->player_count)
     {
         if(l_screen->charSelect[p] != Player[l_screen->players[p]].Character)
-            SwapCharacter(l_screen->players[p], l_screen->charSelect[p]);
+            XMessage::PushMessage({XMessage::Type::char_swap, (uint8_t)p, (uint8_t)l_screen->charSelect[p]});
     }
     // otherwise, add new player!
     else
@@ -691,32 +692,20 @@ void PlayerBox::UpdatePlayer()
         // swap p with the first non-existent player slot
         Player_Swap(l_screen->player_count, p);
 
-        // after AddPlayer, numPlayers is always the new player
-        AddPlayer(l_screen->charSelect[l_screen->player_count], *l_screen);
+        // check the desired character
+        uint8_t chara = l_screen->charSelect[l_screen->player_count];
 
         // add as dead if dead player was dropped in this level
         if(s_char_info.dead_count > 0)
         {
             s_char_info.dead_count--;
-            Player[numPlayers].Dead = true;
-
-            // initialize ghost logic for player
-            int living = CheckLiving();
-            if(living)
-            {
-                Player[numPlayers].Effect2 = -living;
-                Player[numPlayers].Location.X = Player[living].Location.X;
-                Player[numPlayers].Location.Y = Player[living].Location.Y;
-                Player[numPlayers].Section    = Player[living].Section;
-            }
-            else
-                Player[numPlayers].Effect2 = 0;
-
             PlaySound(SFX_ShellHit);
+            XMessage::PushMessage({XMessage::Type::add_player_dead, 0, chara});
         }
         else
         {
             PlaySound(SFX_DropItem);
+            XMessage::PushMessage({XMessage::Type::add_player, 0, chara});
         }
     }
 }
