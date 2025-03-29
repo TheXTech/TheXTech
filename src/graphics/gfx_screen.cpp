@@ -217,9 +217,9 @@ void DynamicScreen(Screen_t& screen, bool mute)
 
     if(!g_config.multiplayer_pause_controls)
     {
-        for(A = 1; A <= numPlayers; A++)
+        for(int i = 0; i < 2; i++)
         {
-            if(Player[A].Effect == PLREFF_RESPAWN)
+            if(Player[screen.players[i]].Effect == PLREFF_RESPAWN)
                 return;
         }
     }
