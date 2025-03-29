@@ -41,12 +41,17 @@ static Controls_t s_last_controls[maxNetplayPlayers + 1];
 
 void Handle(const Message& m)
 {
+    if(m.screen >= maxNetplayClients)
+        return;
+
+    Screen_t& screen = Screens[m.screen];
+
     if(m.type == Type::press || m.type == Type::release)
     {
-        if(m.screen >= maxNetplayClients || m.player >= maxLocalPlayers || m.message >= Controls::PlayerControls::n_buttons)
+        if(m.player >= maxLocalPlayers || m.message >= Controls::PlayerControls::n_buttons)
             return;
 
-        auto& controls = s_last_controls[Screens[m.screen].players[m.player]];
+        auto& controls = s_last_controls[screen.players[m.player]];
         bool& button = Controls::PlayerControls::GetButton(controls, m.message);
         bool is_press = (m.type == Type::press);
 
@@ -54,21 +59,21 @@ void Handle(const Message& m)
     }
     else if(m.type == Type::char_swap)
     {
-        if(m.screen >= maxNetplayClients || m.player >= Screens[m.screen].player_count || m.message < 1 || m.message > numCharacters || !SwapCharAllowed())
+        if(m.player >= screen.player_count || m.message < 1 || m.message > numCharacters || !SwapCharAllowed())
             return;
 
-        SwapCharacter(Screens[m.screen].players[m.player], m.message);
+        SwapCharacter(screen.players[m.player], m.message);
 
         if(LevelSelect)
             SetupPlayers();
     }
     else if(m.type == Type::add_player || m.type == Type::add_player_dead)
     {
-        if(m.screen >= maxNetplayClients || Screens[m.screen].player_count >= maxLocalPlayers || m.message < 1 || m.message > numCharacters)
+        if(screen.player_count >= maxLocalPlayers || m.message < 1 || m.message > numCharacters)
             return;
 
         // after AddPlayer, numPlayers is always the new player
-        AddPlayer(m.message, Screens[m.screen]);
+        AddPlayer(m.message, screen);
 
         // set the player to be dead if needed
         if(m.type == Type::add_player_dead)
@@ -90,10 +95,10 @@ void Handle(const Message& m)
     }
     else if(m.type == Type::drop_player)
     {
-        if(m.screen >= maxNetplayClients || m.player >= Screens[m.screen].player_count)
+        if(m.player >= screen.player_count)
             return;
 
-        DropPlayer(Screens[m.screen].players[m.player]);
+        DropPlayer(screen.players[m.player]);
     }
     else if(m.type == Type::menu_action)
     {
