@@ -64,7 +64,7 @@ void Logic()
 
     for(int i = 0; i < maxLocalPlayers; i++)
     {
-        if(i >= numPlayers)
+        if(i >= l_screen->player_count)
             continue;
 
         if(i >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[i])
