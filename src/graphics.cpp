@@ -95,7 +95,7 @@ void GetvScreen(vScreen_t& vscreen)
 // Get the average screen position for all players
 void GetvScreenAverage(vScreen_t& vscreen)
 {
-    int A = 0;
+    // int A = 0;
     int B = 0;
     num_t OldX = 0;
     num_t OldY = 0;
@@ -106,18 +106,24 @@ void GetvScreenAverage(vScreen_t& vscreen)
     vscreen.X = 0;
     vscreen.Y = 0;
 
-    for(A = 1; A <= numPlayers; A++)
+    const Screen_t& screen = Screens[vscreen.screen_ref];
+
+    int plr_count = (GameMenu) ? numPlayers : screen.player_count;
+
+    for(int i = 0; i < plr_count; i++)
     {
-        if(!Player[A].Dead && (Player[A].Effect != PLREFF_RESPAWN || g_config.multiplayer_pause_controls))
+        const Player_t& plr = Player[(GameMenu) ? i + 1 : screen.players[i]];
+
+        if(!plr.Dead && (plr.Effect != PLREFF_RESPAWN || g_config.multiplayer_pause_controls))
         {
-            vscreen.X += -Player[A].Location.X - Player[A].Location.Width / 2;
+            vscreen.X += -plr.Location.X - plr.Location.Width / 2;
 
-            num_t pLocY = (Player[A].Effect == PLREFF_RESPAWN) ? Player[A].RespawnY : Player[A].Location.Y;
+            num_t pLocY = (plr.Effect == PLREFF_RESPAWN) ? plr.RespawnY : plr.Location.Y;
 
-            if(Player[A].Mount == 2)
+            if(plr.Mount == 2)
                 vscreen.Y += -pLocY;
             else
-                vscreen.Y += -pLocY - Player[A].Location.Height;
+                vscreen.Y += -pLocY - plr.Location.Height;
 
             B += 1;
         }
@@ -140,9 +146,7 @@ void GetvScreenAverage(vScreen_t& vscreen)
     }
 
     // used ScreenW / ScreenH in VB6 code
-    const Screen_t& screen = Screens[vscreen.screen_ref];
-
-    const SpeedlessLocation_t& section = level[Player[1].Section];
+    const SpeedlessLocation_t& section = level[Player[screen.players[0]].Section];
 
     // remember that the screen will be limited to the section's size in all cases
     num_t use_width  = SDL_min(static_cast<num_t>(screen.W), section.Width  - section.X);
@@ -189,15 +193,19 @@ void GetvScreenAverage2(vScreen_t& vscreen)
     vscreen.X = 0;
     vscreen.Y = 0;
 
-    for(int A = 1; A <= numPlayers; A++)
+    const Screen_t& screen = Screens[vscreen.screen_ref];
+
+    for(int i = 0; i < screen.player_count; i++)
     {
-        if(!Player[A].Dead)
+        const Player_t& plr = Player[screen.players[i]];
+
+        if(!plr.Dead)
         {
-            vscreen.X += -Player[A].Location.X - Player[A].Location.Width / 2;
-            if(Player[A].Mount == 2)
-                vscreen.Y += -Player[A].Location.Y;
+            vscreen.X += -plr.Location.X - plr.Location.Width / 2;
+            if(plr.Mount == 2)
+                vscreen.Y += -plr.Location.Y;
             else
-                vscreen.Y += -Player[A].Location.Y - Player[A].Location.Height;
+                vscreen.Y += -plr.Location.Y - plr.Location.Height;
             B += 1;
         }
     }
@@ -207,9 +215,7 @@ void GetvScreenAverage2(vScreen_t& vscreen)
     if(B == 0)
         return;
 
-    const Screen_t& screen = Screens[vscreen.screen_ref];
-
-    const SpeedlessLocation_t& section = level[Player[1].Section];
+    const SpeedlessLocation_t& section = level[Player[screen.players[0]].Section];
 
     num_t use_width  = SDL_min(static_cast<num_t>(screen.W), section.Width  - section.X);
     num_t use_height = SDL_min(static_cast<num_t>(screen.H), section.Height - section.Y);
