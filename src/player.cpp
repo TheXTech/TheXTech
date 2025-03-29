@@ -4091,10 +4091,10 @@ void RespawnPlayerTo(int A, int TargetPlayer)
     RespawnPlayer(A, Player[TargetPlayer].Direction, CenterX, StopY, target_vscreen);
 
     // if TargetPlayer is scrolling in warp, we can't spawn them directly.
-    if(PlayerScrollingInWarp(Player[TargetPlayer]) || Player[TargetPlayer].CurMazeZone)
+    if(PlayerScrollingInWarp(Player[TargetPlayer]) || Player[TargetPlayer].CurMazeZone || ForcedControls)
     {
         // Give player A wings in shared screen
-        if(screen.Type == ScreenTypes::SharedScreen || Player[TargetPlayer].CurMazeZone)
+        if(screen.Type == ScreenTypes::SharedScreen || Player[TargetPlayer].CurMazeZone || ForcedControls)
         {
             Player[A].Location.Y -= 100;
             Player[A].Dead = true;
