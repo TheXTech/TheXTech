@@ -989,11 +989,11 @@ void DrawBackdrop(const Screen_t& screen)
     if(GFX.Backdrop.inited)
     {
         bool border_valid = GFX.Backdrop_Border.tex.inited && (!GFX.isCustom(71) || GFX.isCustom(72));
-        IntegerLocation_t full{0, 0, XRender::TargetW, XRender::TargetH};
 
         // special case for world map
         if(LevelSelect && !GameMenu && !GameOutro && !LevelEditor)
         {
+            IntegerLocation_t full{0, 0, XRender::TargetW, XRender::TargetH};
             IntegerLocation_t inner{screen.TargetX(), screen.TargetY(), screen.W, screen.H};
 
             // if world map frame assets missing, use the 800x600 area isntead
@@ -1013,6 +1013,8 @@ void DrawBackdrop(const Screen_t& screen)
         for(int i = screen.active_begin(); i < screen.active_end(); i++)
         {
             const auto& s = screen.vScreen(i + 1);
+
+            IntegerLocation_t full{0, 0, XRender::TargetW, XRender::TargetH};
             IntegerLocation_t inner{s.TargetX(), s.TargetY(), (int)s.Width, (int)s.Height};
 
             // horizontal
