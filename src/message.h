@@ -45,6 +45,7 @@ enum class Type : uint8_t
     menu_action,
     char_swap,
     shared_controls,
+    enter_code,
 };
 
 struct Message

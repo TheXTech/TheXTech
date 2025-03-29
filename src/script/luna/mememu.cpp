@@ -686,7 +686,7 @@ public:
             },
             [](const std::string &in)->void
             {
-                cheats_setBuffer(in);
+                cheats_setBuffer(in, true);
             }
         );
 

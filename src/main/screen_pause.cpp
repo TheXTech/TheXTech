@@ -180,7 +180,7 @@ static void s_OptionsScreen_Resume()
 
 static void s_CheatScreen_callback()
 {
-    cheats_setBuffer(TextEntryScreen::Text);
+    cheats_setBuffer(TextEntryScreen::Text, false);
 
     // comment this if you want to return to the pause menu
     s_push_unpause();

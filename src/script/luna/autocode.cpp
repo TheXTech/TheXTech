@@ -885,7 +885,7 @@ void Autocode::Do(bool init)
         {
             if(this->Length <= 1) // Play once when delay runs out
             {
-                cheats_setBuffer(GetS(MyString));
+                cheats_setBuffer(GetS(MyString), true);
                 this->expire();
             }
             break;

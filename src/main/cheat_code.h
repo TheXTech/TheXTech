@@ -23,6 +23,7 @@
 #define CHEAT_CODE_H
 
 #include <string>
+#include "message.h"
 
 //! if true, bitmask merge is forced to occur even when logic ops are supported and merge loses information
 extern bool g_ForceBitmaskMerge;
@@ -74,7 +75,17 @@ extern void cheats_rename(CheatsScope scope,
 extern void cheats_erase(CheatsScope scope, const std::string &source);
 
 
-extern void cheats_setBuffer(const std::string &line);
+/*!
+ * \brief Runs cheat based on saved message
+ */
+extern void run_cheat(XMessage::Message message);
+
+/*!
+ * \brief Sets cheat buffer to string and processes cheats
+ * \param line - cheat string to set
+ * \param instant - for use by scripts: trigger cheat immediately. otherwise, push onto XMessage queue
+ */
+extern void cheats_setBuffer(const std::string &line, bool instant);
 
 extern bool cheats_contains(const std::string &needle);
 extern bool cheats_contains(const char *needle);

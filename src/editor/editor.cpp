@@ -1618,7 +1618,7 @@ void UpdateInterprocess()
 
     case IntProc::Cheat:
     {
-        cheats_setBuffer(IntProc::getCMD());
+        cheats_setBuffer(IntProc::getCMD(), false);
         break;
     }
 

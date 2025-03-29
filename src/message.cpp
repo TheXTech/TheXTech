@@ -25,6 +25,7 @@
 #include "globals.h"
 
 #include "player.h"
+#include "main/cheat_code.h"
 #include "main/screen_pause.h"
 
 #ifdef THEXTECH_ENABLE_SDL_NET
@@ -76,6 +77,8 @@ void Handle(const Message& m)
         else if(m.message == 3)
             SharedPauseLegacy = false;
     }
+    else if(m.type == Type::enter_code)
+        run_cheat(m);
 }
 
 void Tick()
