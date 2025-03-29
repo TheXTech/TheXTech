@@ -6573,7 +6573,7 @@ void AddPlayer(int Character, Screen_t& screen)
     if(LevelSelect)
         return;
 
-    int alivePlayer = CheckLiving();
+    int alivePlayer = CheckNearestLiving(numPlayers);
     if(alivePlayer == 0 || alivePlayer == numPlayers)
         alivePlayer = 1;
 
