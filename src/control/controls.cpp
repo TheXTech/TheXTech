@@ -987,10 +987,6 @@ bool Update(bool check_lost_devices)
     if(((int)g_InputMethods.size() < l_screen->player_count)
        && !SingleCoop && !GameMenu && !LevelEditor && !Record::replay_file && check_lost_devices)
     {
-        // fill with nullptrs
-        while((int)g_InputMethods.size() < l_screen->player_count)
-            g_InputMethods.push_back(nullptr);
-
         okay = false;
     }
 
