@@ -48,6 +48,19 @@ static std::vector<AbstractWindow_t::VideoModeRes> s_availableRes;
 static std::vector<uint8_t> s_availableColours;
 
 
+static uint8_t s_getColorBits(uint32_t format)
+{
+    switch(format)
+    {
+    case SDL_PIXELFORMAT_BGR565:
+        return 16;
+    case SDL_PIXELFORMAT_BGR888:
+    case SDL_PIXELFORMAT_BGRA8888:
+        return 32;
+    }
+}
+
+
 void WindowSDL::setHasFrameBuffer(bool has)
 {
     s_hasFrameBuffer = has;
@@ -78,7 +91,7 @@ static void s_fillScreenModes()
     if(m_listModes.size() == 1)
     {
         auto &e = *m_listModes.begin();
-        s_availableColours.push_back(e.first);
+        s_availableColours.push_back(s_getColorBits(e.first));
 
         for(auto jt = e.second.begin(); jt != e.second.end(); ++jt)
             s_availableRes.push_back(*jt);
@@ -86,6 +99,10 @@ static void s_fillScreenModes()
     else
     {
         bool notEqual = false;
+
+        for(auto it = m_listModes.begin(); it != m_listModes.end(); ++it)
+            s_availableColours.push_back(s_getColorBits(it->first));
+
         auto &first = m_listModes.begin()->second;
 
         auto it = m_listModes.begin();
@@ -806,8 +823,8 @@ int WindowSDL::syncFullScreenRes()
     }
 
     mode.format = SDL_PIXELFORMAT_BGR565;
-    mode.w = closest_w;
-    mode.h = closest_h;
+    mode.w = m_curRes.w;
+    mode.h = m_curRes.h;
     mode.refresh_rate = 60;
     mode.driverdata = nullptr;
 
