@@ -117,6 +117,14 @@ void Handle(const Message& m)
     }
     else if(m.type == Type::enter_code)
         run_cheat(m);
+    else if(m.type == Type::screen_w)
+    {
+        screen.W = m.player * 256 + m.message;
+    }
+    else if(m.type == Type::screen_h)
+    {
+        screen.H = m.player * 256 + m.message;
+    }
 }
 
 void Tick()

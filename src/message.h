@@ -49,6 +49,8 @@ enum class Type : uint8_t
     drop_player,
     shared_controls,
     enter_code,
+    screen_w,
+    screen_h,
 };
 
 struct Message

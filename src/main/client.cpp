@@ -23,6 +23,7 @@
 
 #include "globals.h"
 #include "player.h"
+#include "graphics.h"
 #include "config.h"
 #include "change_res.h"
 #include "sound.h"
@@ -164,6 +165,13 @@ void NetworkClient::SendAll()
     if(!socket)
         return;
 
+    // send some information about the local client once sync is complete
+    if(tick == fast_forward_to + 1)
+    {
+        UpdateInternalRes();
+    }
+
+    // send everything
     std::vector<uint8_t> to_send;
     to_send.reserve(4096);
 
@@ -203,15 +211,27 @@ void NetworkClient::WaitAndFill()
 
             pLogInfo("Added P%d on tick %d", buffer[1] + 1, tick);
 
-            // move last remaining player to new screen upon connection resumption
-            if(Screens[buffer[1]].player_count == 0 && numPlayers == 1 && num_clients == 0)
             {
-                Screens_DropPlayer(1);
-                Screens_AssignPlayer(1, Screens[buffer[1]]);
-                SwapCharacter(1, (buffer[1] % 5) + 1);
+                Screen_t& screen = Screens[buffer[1]];
+                screen.W = 800;
+                screen.H = 600;
+                screen.two_screen_pref = MultiplayerPrefs::Dynamic;
+                screen.four_screen_pref = MultiplayerPrefs::Shared;
+                screen.canonical_screen().two_screen_pref = screen.two_screen_pref;
+                screen.canonical_screen().four_screen_pref = screen.four_screen_pref;
+
+                // move last remaining player to new screen upon connection resumption
+                if(screen.player_count == 0 && numPlayers == 1 && num_clients == 0)
+                {
+                    Screens_DropPlayer(1);
+                    Screens_AssignPlayer(1, screen);
+                    SwapCharacter(1, (buffer[1] % 5) + 1);
+                }
+                else if(Screens[buffer[1]].player_count == 0)
+                    AddPlayer((buffer[1] % 5) + 1, screen);
+
+                SetupScreens();
             }
-            else if(Screens[buffer[1]].player_count == 0)
-                AddPlayer((buffer[1] % 5) + 1, Screens[buffer[1]]);
 
             num_clients++;
             ShiftBuffer(2);
