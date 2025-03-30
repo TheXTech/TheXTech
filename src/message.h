@@ -51,6 +51,7 @@ enum class Type : uint8_t
     enter_code,
     screen_w,
     screen_h,
+    multiplayer_prefs,
 };
 
 struct Message

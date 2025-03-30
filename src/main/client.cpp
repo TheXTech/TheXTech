@@ -169,6 +169,7 @@ void NetworkClient::SendAll()
     if(tick == fast_forward_to + 1)
     {
         UpdateInternalRes();
+        XMessage::PushMessage({XMessage::Type::multiplayer_prefs, (uint8_t)g_config.two_screen_mode.m_value, (uint8_t)g_config.four_screen_mode.m_value});
     }
 
     // send everything

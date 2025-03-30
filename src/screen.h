@@ -143,7 +143,9 @@ namespace MultiplayerPrefs
         Dynamic = 0,
         Split = 1,     // means LeftRight in 2P mode
         Shared = 2,
+        Max_4P = 2,
         TopBottom = 3, // 2P mode only
+        Max_2P = 3,
     };
 }
 

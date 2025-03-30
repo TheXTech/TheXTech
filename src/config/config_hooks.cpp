@@ -34,6 +34,7 @@
 #include "main/menu_main.h"
 #include "main/screen_options.h"
 
+#include "message.h"
 #include "frm_main.h"
 #include "change_res.h"
 #include "globals.h"
@@ -120,14 +121,7 @@ void config_mountdrums_set()
 
 void config_screenmode_set()
 {
-    l_screen->two_screen_pref = g_config.two_screen_mode;
-    l_screen->four_screen_pref = g_config.four_screen_mode;
-
-    l_screen->canonical_screen().two_screen_pref = g_config.two_screen_mode;
-    l_screen->canonical_screen().four_screen_pref = g_config.four_screen_mode;
-
-    SetupScreens();
-    PlayersEnsureNearby(*l_screen);
+    XMessage::PushMessage({XMessage::Type::multiplayer_prefs, (uint8_t)g_config.two_screen_mode.m_value, (uint8_t)g_config.four_screen_mode.m_value});
 }
 
 void config_audiofx_set()

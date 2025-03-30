@@ -24,6 +24,7 @@
 #include "message.h"
 #include "globals.h"
 
+#include "graphics.h"
 #include "player.h"
 #include "main/cheat_code.h"
 #include "main/screen_pause.h"
@@ -124,6 +125,26 @@ void Handle(const Message& m)
     else if(m.type == Type::screen_h)
     {
         screen.H = m.player * 256 + m.message;
+    }
+    else if(m.type == Type::multiplayer_prefs)
+    {
+        int two_screen_pref = m.player;
+        int four_screen_pref = m.message;
+
+        if(two_screen_pref > MultiplayerPrefs::Max_2P)
+            two_screen_pref = 0;
+
+        if(four_screen_pref > MultiplayerPrefs::Max_4P)
+            four_screen_pref = 0;
+
+        screen.two_screen_pref = two_screen_pref;
+        screen.four_screen_pref = four_screen_pref;
+
+        screen.canonical_screen().two_screen_pref = two_screen_pref;
+        screen.canonical_screen().four_screen_pref = four_screen_pref;
+
+        SetupScreens();
+        PlayersEnsureNearby(screen);
     }
 }
 
