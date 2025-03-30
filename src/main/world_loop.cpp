@@ -51,7 +51,7 @@
 ScreenFader g_worldScreenFader;
 
 //! Multiplier for world map qScreen
-double g_worldCamSpeed = 1.5;
+num_t g_worldCamSpeed = 1.5_n;
 
 //! Play sound if world map qScreen stays active next frame
 bool g_worldPlayCamSound = false;
@@ -389,7 +389,7 @@ void WorldLoop()
 
     if(WorldPlayer[1].Move == 0)
     {
-        if(SharedControls.Pause)
+        if(SharedPause)
         {
             PauseInit(PauseCode::PauseScreen, 0);
             return;

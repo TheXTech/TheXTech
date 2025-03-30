@@ -163,7 +163,7 @@ void UpdateGraphics2(bool skipRepaint)
         // reset cam speed
         else
         {
-            g_worldCamSpeed = 1.5;
+            g_worldCamSpeed = 1.5_n;
         }
     }
 

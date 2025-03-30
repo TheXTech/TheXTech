@@ -49,6 +49,10 @@
 #include "xtech_lua_main.h"
 #endif
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+#include "main/client_methods.h"
+#endif
+
 #include "sdl_proxy/sdl_timer.h"
 
 #include "globals.h"
@@ -303,6 +307,10 @@ static void s_ExpandSectionForMenu()
 
 void ReportLoadFailure(const std::string& filename)
 {
+#ifdef THEXTECH_ENABLE_SDL_NET
+    XMessage::Disconnect();
+#endif
+
     g_MessageType = MESSAGE_TYPE_SYS_WARNING;
 
     // temporarily store error code from load process in MessageTitle string
@@ -466,7 +474,7 @@ int GameMain(const CmdLineSetup_t &setup)
     // Set global SMBX64 behaviour at PGE-FL
     FileFormats::SetSMBX64LvlFlags(FileFormats::F_SMBX64_KEEP_LEGACY_NPC_IN_BLOCK_CODES);
 
-    StartMenu = true;
+    // StartMenu = true;
     MenuMode = MENU_INTRO;
 
     // strings and translation initialization moved into MainLoadAll
@@ -981,7 +989,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
             BattleIntro = 0;
             BattleOutro = 0;
-            AllCharBlock = 0;
+            // AllCharBlock = 0;
             Cheater = false;
 
             // in a main menu, reset this into initial state
@@ -998,11 +1006,11 @@ int GameMain(const CmdLineSetup_t &setup)
             MenuCursorCanMove = false;
             BattleMode = false;
 
-            if(MenuMode != MENU_BATTLE_MODE)
-            {
-                PlayerCharacter = 0;
-                PlayerCharacter2 = 0;
-            }
+            // if(MenuMode != MENU_BATTLE_MODE)
+            // {
+            //     PlayerCharacter = 0;
+            //     PlayerCharacter2 = 0;
+            // }
 
             pLogDebug("Clear check-points at Game Menu start");
             Checkpoint.clear();
@@ -1035,7 +1043,10 @@ int GameMain(const CmdLineSetup_t &setup)
             g_ClonedPlayerMode = false;
             g_CheatLogicScreen = false;
             g_CheatEditYourFriends = false;
+            CanWallJump = false;
             g_VanillaCam = false;
+            SharedPause = false;
+            SharedPauseLegacy = false;
             XRender::unloadGifTextures();
 
             Controls::RemoveNullInputMethods();
@@ -1124,7 +1135,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     {
                         if(CheckCollision(p.Location, Block[B].Location))
                         {
-                            p.Location.Y = Block[B].Location.Y - p.Location.Height - 0.1;
+                            p.Location.Y = Block[B].Location.Y - p.Location.Height - 0.1_n;
                             tempBool = false;
                         }
                     }
@@ -1802,8 +1813,8 @@ void NextLevel()
         GameMenu = true;
         MenuMode = MENU_BATTLE_MODE;
         MenuCursor = selWorld - 1;
-        PlayerCharacter = Player[1].Character;
-        PlayerCharacter2 = Player[2].Character;
+        // PlayerCharacter = Player[1].Character;
+        // PlayerCharacter2 = Player[2].Character;
     }
     else
     {
@@ -2118,10 +2129,10 @@ void UpdateMacro()
         if(g_config.EnableInterLevelFade && LevelMacroCounter == 598)
         {
             bool canTrack = (Player[1].Location.X < level[Player[1].Section].Width);
-            double focusX = canTrack ?
+            num_t focusX = (canTrack) ?
                             Player[1].Location.X + Player[1].Location.Width / 2 :
                             level[Player[1].Section].Width;
-            double focusY = Player[1].Location.Y + Player[1].Location.Height / 2;
+            num_t focusY = Player[1].Location.Y + Player[1].Location.Height / 2;
 
             g_levelScreenFader.setupFader(2, 0, 65, ScreenFader::S_CIRCLE, true, (int)focusX, (int)focusY, 1);
 
@@ -2233,7 +2244,7 @@ void CheckActive()
 }
 
 
-Location_t newLoc(double X, double Y, double Width, double Height)
+Location_t newLoc(num_t X, num_t Y, num_t Width, num_t Height)
 {
     Location_t ret;
     ret.X = X;
@@ -2478,6 +2489,7 @@ void StartEpisode()
 
     Integrator::setEpisodeName(WorldName);
 
+#if 0 // unused cheat code from SMBX64
     if(WorldUnlock)
     {
         For(A, 1, numWorldPaths)
@@ -2503,6 +2515,7 @@ void StartEpisode()
         For(A, 1, numWorldLevels)
             WorldLevel[A].Active = true;
     }
+#endif
 
     SetupPlayers();
 

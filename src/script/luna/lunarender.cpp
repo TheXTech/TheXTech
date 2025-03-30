@@ -151,7 +151,7 @@ static bool CompareRenderPriority(const RenderOp *lhs, const RenderOp *rhs)
     return lhs->m_renderPriority < rhs->m_renderPriority;
 }
 
-void Renderer::RenderBelowPriority(double maxPriority)
+void Renderer::RenderBelowPriority(PLANE maxPriority)
 {
     if(!m_queueState.m_InFrameRender) return;
 
@@ -179,10 +179,10 @@ void Renderer::RenderBelowPriority(double maxPriority)
         std::stable_sort(ops.begin() + m_queueState.m_renderOpsSortedCount, ops.end(), CompareRenderPriority);
 
         // Render things as many of the new items as we should before merging the sorted lists
-        double maxPassPriority = maxPriority;
+        PLANE maxPassPriority = maxPriority;
         if(m_queueState.m_renderOpsSortedCount > m_queueState.m_renderOpsProcessedCount)
         {
-            double nextPriorityInOldList = ops[m_queueState.m_renderOpsProcessedCount]->m_renderPriority;
+            PLANE nextPriorityInOldList = ops[m_queueState.m_renderOpsProcessedCount]->m_renderPriority;
             if(nextPriorityInOldList < maxPassPriority)
                 maxPassPriority = nextPriorityInOldList;
         }
@@ -211,7 +211,7 @@ void Renderer::RenderBelowPriority(double maxPriority)
         m_queueState.m_renderOpsProcessedCount++;
     }
 
-    if(maxPriority >= DBL_MAX)
+    if(maxPriority >= RENDEROP_PRIORITY_MAX)
     {
         // Format debug messages and enter them into renderstring list
         int dbg_x = 325;
@@ -219,7 +219,7 @@ void Renderer::RenderBelowPriority(double maxPriority)
 
         for(auto &dbg : m_queueState.m_debugMessages)
         {
-            RenderStringOp(dbg, 4, (float)dbg_x, (float)dbg_y).Draw(this);
+            RenderStringOp(dbg, 4, dbg_x, dbg_y).Draw(this);
             dbg_y += 20;
             if(dbg_y > 560)
             {
@@ -324,10 +324,10 @@ void Renderer::DrawOp(RenderOp &op)
 }
 
 
-bool Render::IsOnScreen(double x, double y, double w, double h)
+bool Render::IsOnScreen(int x, int y, int w, int h)
 {
-    int cam_x = vScreen[1].X;
-    int cam_y = vScreen[1].Y;
+    int cam_x = vScreen[1].CameraAddX();
+    int cam_y = vScreen[1].CameraAddY();
     int cam_w = vScreen[1].Width;
     int cam_h = vScreen[1].Height;
 
@@ -355,7 +355,7 @@ void Render::CalcCameraPos(double *ret_x, double *ret_y)
 }
 #endif
 
-void Render::TranslateScreenCoords(double &x, double &y, double w, double h)
+void Render::TranslateScreenCoords(int &x, int &y, int w, int h)
 {
     // FIXME: What we shall to do with w and h?
     UNUSED(w);
@@ -371,7 +371,7 @@ void Render::TranslateScreenCoords(double &x, double &y, double w, double h)
         x += left;
         y += top;
 
-        if(vScreen[1].Height < 600.0)
-            y *= vScreen[1].Height / 600.0;
+        if(vScreen[1].Height < 600)
+            y = (y * vScreen[1].Height) / 600;
     }
 }

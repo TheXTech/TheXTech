@@ -81,7 +81,6 @@ namespace Controls
 std::vector<InputMethod*> g_InputMethods;
 std::vector<InputMethodType*> g_InputMethodTypes;
 bool g_renderTouchscreen = false;
-static PauseCode s_requestedPause = PauseCode::None;
 HotkeysPressed_t g_hotkeysPressed;
 static HotkeysPressed_t s_hotkeysPressedOld;
 bool g_disallowHotkeys = false;
@@ -148,8 +147,8 @@ void Hotkeys::Activate(size_t i, int player)
         return;
 
     case Buttons::EnterCheats:
-        if(!GameMenu && !GameOutro && !LevelEditor && !BattleMode)
-            s_requestedPause = PauseCode::TextEntry;
+        l_SharedControls.Pause = true;
+        PauseScreen::UnlockCheats();
         return;
 
     case Buttons::ToggleHUD:
@@ -157,8 +156,10 @@ void Hotkeys::Activate(size_t i, int player)
         return;
 
     case Buttons::LegacyPause:
-        // handled elsewhere
-        (void)player;
+        if(player == 0)
+            l_SharedControls.Pause = true;
+
+        l_SharedControls.LegacyPause = true;
         return;
 
     default:
@@ -812,12 +813,16 @@ bool ProcessEvent(const SDL_Event* ev)
 //    a. May call or set changeScreen, frmMain.toggleGifRecorder, TakeScreen, g_stats.enabled, etc
 // 3. Calls the UpdateControlsPost hooks of loaded InputMethodTypes
 //    a. May call or set changeScreen, frmMain.toggleGifRecorder, TakeScreen, g_stats.enabled, etc
-//    b. May update SharedControls or SharedCursor using hardcoded keys
+//    b. May update l_SharedControls or SharedCursor using hardcoded keys
 // 4. Updates speedrun and recording modules
 // 5. Resolves inconsistent control states (Left+Right, etc)
 bool Update(bool check_lost_devices)
 {
     bool okay = true;
+
+    // track whether shared controls buttons were pressed last frame, to modify the global versions
+    bool old_shared_pause = l_SharedControls.Pause;
+    bool old_shared_legacy = l_SharedControls.LegacyPause;
 
     // reset per-frame state for SharedCursor
     SharedCursor.Move = false;
@@ -826,8 +831,8 @@ bool Update(bool check_lost_devices)
     SharedCursor.Tertiary = false;
     SharedCursor.ScrollUp = false;
     SharedCursor.ScrollDown = false;
-    // reset SharedControls
-    SharedControls = SharedControls_t();
+    // reset l_SharedControls
+    l_SharedControls = SharedControls_t();
 
     // reset EditorControls
     ::EditorControls = EditorControls_t();
@@ -848,13 +853,16 @@ bool Update(bool check_lost_devices)
         {
             InputMethod* method = g_InputMethods[i];
 
-            if(!method->Update(l_screen->players[i], newControls, cursor, editor, g_hotkeysPressed) && check_lost_devices)
+            if(!method->Update(i + 1, newControls, cursor, editor, g_hotkeysPressed) && check_lost_devices)
             {
                 okay = false;
                 DeleteInputMethod(method);
                 // the method pointer is no longer valid
             }
         }
+
+        if(g_hotkeysPressed[Hotkeys::Buttons::LegacyPause] == i + 1)
+            newControls.Start = true;
 
         // push messages corresponding to controls press / release
         XMessage::PushControls(i, newControls);
@@ -867,21 +875,29 @@ bool Update(bool check_lost_devices)
     if(GamePaused == PauseCode::PauseScreen)
         PauseScreen::ControlsLogic();
 
+    // trigger hotkeys
+    for(size_t i = 0; i < Hotkeys::n_buttons; i++)
+    {
+        if(s_hotkeysPressedOld[i] != g_hotkeysPressed[i] && g_hotkeysPressed[i] != -1)
+            Hotkeys::Activate(i, g_hotkeysPressed[i]);
+
+        s_hotkeysPressedOld[i] = g_hotkeysPressed[i];
+        g_hotkeysPressed[i] = -1;
+    }
+
+    // push shared controls
+    if(l_SharedControls.Pause && !old_shared_pause)
+        XMessage::PushMessage({XMessage::Type::shared_controls, 0, 0});
+    else if(old_shared_pause && !l_SharedControls.Pause)
+        XMessage::PushMessage({XMessage::Type::shared_controls, 0, 1});
+
+    if(l_SharedControls.LegacyPause && !old_shared_legacy)
+        XMessage::PushMessage({XMessage::Type::shared_controls, 0, 2});
+    else if(old_shared_legacy && !l_SharedControls.LegacyPause)
+        XMessage::PushMessage({XMessage::Type::shared_controls, 0, 3});
+
     // sync any messages, and reset player controls to raw controls
     XMessage::Tick();
-
-    // check for legacy pause key
-    if(g_hotkeysPressed[Hotkeys::Buttons::LegacyPause] != -1)
-    {
-        int A = g_hotkeysPressed[Hotkeys::Buttons::LegacyPause];
-
-        if(A >= 1 && A <= numPlayers)
-            Player[A].Controls.Start = true;
-        else
-            SharedControls.Pause = true;
-
-        SharedControls.LegacyPause = true;
-    }
 
     if(SharedCursor.Move)
     {
@@ -971,43 +987,7 @@ bool Update(bool check_lost_devices)
     if(((int)g_InputMethods.size() < l_screen->player_count)
        && !SingleCoop && !GameMenu && !LevelEditor && !Record::replay_file && check_lost_devices)
     {
-        // fill with nullptrs
-        while((int)g_InputMethods.size() < l_screen->player_count)
-            g_InputMethods.push_back(nullptr);
-
         okay = false;
-    }
-
-    // trigger hotkeys
-    for(size_t i = 0; i < Hotkeys::n_buttons; i++)
-    {
-        if(s_hotkeysPressedOld[i] != g_hotkeysPressed[i] && g_hotkeysPressed[i] != -1)
-            Hotkeys::Activate(i, g_hotkeysPressed[i]);
-
-        s_hotkeysPressedOld[i] = g_hotkeysPressed[i];
-        g_hotkeysPressed[i] = -1;
-    }
-
-    if(s_requestedPause != PauseCode::None && GamePaused != s_requestedPause)
-    {
-        PauseCode p = s_requestedPause;
-        s_requestedPause = PauseCode::None;
-
-        if(p == PauseCode::TextEntry)
-            cheats_setBuffer(TextEntryScreen::Run(g_gameStrings.pauseItemEnterCode));
-        else
-            PauseGame(p);
-
-        MenuCursorCanMove = false;
-        MenuMouseRelease = false;
-        MouseRelease = false;
-    }
-    else if(s_requestedPause != PauseCode::None)
-    {
-        if(s_requestedPause == PauseCode::TextEntry)
-            TextEntryScreen::Commit();
-
-        s_requestedPause = PauseCode::None;
     }
 
     g_disallowHotkeys = false;

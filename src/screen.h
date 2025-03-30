@@ -28,12 +28,14 @@
 #include "range_arr.hpp"
 #include "global_constants.h"
 
+#include "numeric_types.h"
+
 //Public Type vScreen 'Screen controls
 struct qScreen_t
 {
     // previously their own arrays, vScreenX and vScreenY
-    double X = 0.0;
-    double Y = 0.0;
+    num_t X = 0_n;
+    num_t Y = 0_n;
 
 //    Left As Double
     int Left = 0;
@@ -63,9 +65,9 @@ struct vScreen_t : public qScreen_t
     SmallScreenFeatures_t small_screen_features;
 
 //    tempX As Double
-    double tempX = 0.0;
+    num_t tempX = 0_n;
 //    TempY As Double
-    double TempY = 0.0;
+    num_t TempY = 0_n;
 //    TempDelay As Integer
     int TempDelay = 0;
 //    Visible As Boolean
@@ -141,7 +143,9 @@ namespace MultiplayerPrefs
         Dynamic = 0,
         Split = 1,     // means LeftRight in 2P mode
         Shared = 2,
+        Max_4P = 2,
         TopBottom = 3, // 2P mode only
+        Max_2P = 3,
     };
 }
 

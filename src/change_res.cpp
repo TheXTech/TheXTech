@@ -121,7 +121,7 @@ void UpdateInternalRes()
     int canon_w = l_screen->canonical_screen().W;
     int canon_h = l_screen->canonical_screen().H;
 
-    if((!g_config.allow_multires && !ignore_compat) || (XMessage::GetStatus() != XMessage::Status::local))
+    if(!g_config.allow_multires && !ignore_compat)
     {
         if((req_w != 0 && req_w < canon_w) || (req_h != 0 && req_h < canon_h))
         {
@@ -277,34 +277,34 @@ void UpdateInternalRes()
 #endif
 
     // DONE: above should tweak render target resolution. This should tweak game's screen resolution.
-    if(XMessage::GetStatus() != XMessage::Status::local)
-    {
-        l_screen->W = canon_w;
-        l_screen->H = canon_h;
-    }
-    else if(ignore_compat || (g_config.allow_multires && g_config.dynamic_camera_logic))
-    {
-        l_screen->W = XRender::TargetW;
-        l_screen->H = XRender::TargetH;
-    }
-    else if(g_config.allow_multires)
-    {
-        l_screen->W = SDL_min(XRender::TargetW, canon_w);
-        l_screen->H = SDL_min(XRender::TargetH, canon_h);
-    }
-    else
-    {
-        l_screen->W = canon_w;
-        l_screen->H = canon_h;
-    }
-
+    int new_ScreenW, new_ScreenH;
     if(!GameMenu && !GameOutro && !LevelEditor && !BattleMode && g_VanillaCam)
     {
         XRender::TargetW = SDL_max(XRender::TargetW, canon_w);
         XRender::TargetH = SDL_max(XRender::TargetH, canon_h);
-        l_screen->W = canon_w;
-        l_screen->H = canon_h;
+        new_ScreenW = canon_w;
+        new_ScreenH = canon_h;
     }
+    else if(ignore_compat || (g_config.allow_multires && g_config.dynamic_camera_logic))
+    {
+        new_ScreenW = XRender::TargetW;
+        new_ScreenH = XRender::TargetH;
+    }
+    else if(g_config.allow_multires)
+    {
+        new_ScreenW = SDL_min(XRender::TargetW, canon_w);
+        new_ScreenH = SDL_min(XRender::TargetH, canon_h);
+    }
+    else
+    {
+        new_ScreenW = canon_w;
+        new_ScreenH = canon_h;
+    }
+
+    if(l_screen->W != new_ScreenW)
+        XMessage::PushMessage({XMessage::Type::screen_w, (uint8_t)(new_ScreenW / 256), (uint8_t)(new_ScreenW % 256)});
+    if(l_screen->H != new_ScreenH)
+        XMessage::PushMessage({XMessage::Type::screen_h, (uint8_t)(new_ScreenH / 256), (uint8_t)(new_ScreenH % 256)});
 
     if(XRender::is_nullptr() || !GameIsActive)
         return;

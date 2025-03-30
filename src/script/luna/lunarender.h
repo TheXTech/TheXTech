@@ -29,6 +29,7 @@
 #include <list>
 #include <Allocator/PoolAllocator.h>
 
+#include "draw_planes.h"
 #include "lunaimgbox.h"
 
 class RenderOp;
@@ -60,7 +61,7 @@ struct Renderer
     void DebugPrint(const std::string &message);                // Print a debug message on the screen
     void DebugPrint(const std::string &message, double val);    // Print a debug message on the screen and display a related value
 
-    void RenderBelowPriority(double maxPriority);
+    void RenderBelowPriority(PLANE maxPriority);
 
     void ClearAllDebugMessages();
 
@@ -145,9 +146,9 @@ public:
 namespace Render
 {
 
-bool IsOnScreen(double x, double y, double w, double h);              // Returns whether or not the digven rectangle is on screen this frame
+bool IsOnScreen(int x, int y, int w, int h);              // Returns whether or not the digven rectangle is on screen this frame
 // void CalcCameraPos(double *p_X, double *p_Y);                         // Tries to read smbx memory to return the camera coords in the 2 passed args
-void TranslateScreenCoords(double &x, double &y, double w, double h); // Converts 800x600 coordinates to dynamic-res coordinates, depending on config options
+void TranslateScreenCoords(int &x, int &y, int w, int h); // Converts 800x600 coordinates to dynamic-res coordinates, depending on config options
 
 }
 

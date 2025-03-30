@@ -790,6 +790,9 @@ public:
     opt<bool> disable_spin_jump{this, defaults(false), {CompatClass::critical_update, false}, Scope::Creator,
         "disable-spin-jump", "Disable spin jump", "The alt jump key should trigger an ordinary jump instead of a spin jump"};
 
+    opt<bool> no_shell_grab_top{this, defaults(false), {CompatClass::critical_update, false}, Scope::CreatorEpisode,
+        "no-shell-grab-top", "No shell grab from top", nullptr};
+
     /* ---- Compatibility - Autocode ----*/
     subsection compat_autocode{this, "autocode", "Autocode"};
 

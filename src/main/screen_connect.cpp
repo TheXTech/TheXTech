@@ -3,6 +3,7 @@
 #include "core/render.h"
 
 #include "global_constants.h"
+#include "message.h"
 #include "controls.h"
 #include "sound.h"
 #include "globals.h"
@@ -633,7 +634,7 @@ static void Player_Remove(int p)
         if((Player[l_screen->players[p]].Dead || Player[l_screen->players[p]].TimeToLive > 0) && Player[l_screen->players[p]].Effect != PLREFF_COOP_WINGS)
             s_char_info.dead_count++;
 
-        DropPlayer(l_screen->players[p]);
+        XMessage::PushMessage({XMessage::Type::drop_player, (uint8_t)p, 0});
     }
 }
 
@@ -683,7 +684,7 @@ void PlayerBox::UpdatePlayer()
     if(p < l_screen->player_count)
     {
         if(l_screen->charSelect[p] != Player[l_screen->players[p]].Character)
-            SwapCharacter(l_screen->players[p], l_screen->charSelect[p]);
+            XMessage::PushMessage({XMessage::Type::char_swap, (uint8_t)p, (uint8_t)l_screen->charSelect[p]});
     }
     // otherwise, add new player!
     else
@@ -691,32 +692,20 @@ void PlayerBox::UpdatePlayer()
         // swap p with the first non-existent player slot
         Player_Swap(l_screen->player_count, p);
 
-        // after AddPlayer, numPlayers is always the new player
-        AddPlayer(l_screen->charSelect[l_screen->player_count], *l_screen);
+        // check the desired character
+        uint8_t chara = l_screen->charSelect[l_screen->player_count];
 
         // add as dead if dead player was dropped in this level
         if(s_char_info.dead_count > 0)
         {
             s_char_info.dead_count--;
-            Player[numPlayers].Dead = true;
-
-            // initialize ghost logic for player
-            int living = CheckLiving();
-            if(living)
-            {
-                Player[numPlayers].Effect2 = -living;
-                Player[numPlayers].Location.X = Player[living].Location.X;
-                Player[numPlayers].Location.Y = Player[living].Location.Y;
-                Player[numPlayers].Section    = Player[living].Section;
-            }
-            else
-                Player[numPlayers].Effect2 = 0;
-
             PlaySound(SFX_ShellHit);
+            XMessage::PushMessage({XMessage::Type::add_player_dead, 0, chara});
         }
         else
         {
             PlaySound(SFX_DropItem);
+            XMessage::PushMessage({XMessage::Type::add_player, 0, chara});
         }
     }
 }
@@ -2165,10 +2154,10 @@ int PlayerBox::Logic()
         bool play_noise = (s_context != Context::LegacyMenu);
 
         // block back if a new-added player
-        if((int)Controls::g_InputMethods.size() > s_minPlayers && (c.Run || SharedControls.MenuBack))
+        if((int)Controls::g_InputMethods.size() > s_minPlayers && (c.Run || l_SharedControls.MenuBack))
             m_input_ready = false;
         // if pressing back, don't play drop item noise
-        else if(c.Run || SharedControls.MenuBack)
+        else if(c.Run || l_SharedControls.MenuBack)
             play_noise = false;
 
         // if about to move cursor, don't play drop item noise
@@ -2188,8 +2177,8 @@ int PlayerBox::Logic()
     // don't do any logic until all buttons have been released
     if(!m_input_ready)
     {
-        if(!SharedControls.MenuDo && !SharedControls.MenuBack && !SharedControls.MenuDown
-            && !SharedControls.MenuUp && !SharedControls.MenuLeft && !SharedControls.MenuRight
+        if(!l_SharedControls.MenuDo && !l_SharedControls.MenuBack && !l_SharedControls.MenuDown
+            && !l_SharedControls.MenuUp && !l_SharedControls.MenuLeft && !l_SharedControls.MenuRight
             && !c.Jump && !c.Start && !c.Run && !c.Down && !c.Up && !c.Left && !c.Right && !c.Drop && !c.AltRun && !c.AltJump)
         {
             m_input_ready = true;
@@ -2344,12 +2333,12 @@ int PlayerBox::Logic()
 
         return 0;
     }
-    else if(c.Run || (Is1P() && SharedControls.MenuBack))
+    else if(c.Run || (Is1P() && l_SharedControls.MenuBack))
     {
         if(Back())
             return -1;
     }
-    else if(c.Jump || c.Start || (Is1P() && SharedControls.MenuDo))
+    else if(c.Jump || c.Start || (Is1P() && l_SharedControls.MenuDo))
     {
         if(Do())
         {
@@ -2359,19 +2348,19 @@ int PlayerBox::Logic()
             return 1;
         }
     }
-    else if(c.Down || (Is1P() && SharedControls.MenuDown))
+    else if(c.Down || (Is1P() && l_SharedControls.MenuDown))
     {
         Down();
     }
-    else if(c.Up || (Is1P() && SharedControls.MenuUp))
+    else if(c.Up || (Is1P() && l_SharedControls.MenuUp))
     {
         Up();
     }
-    else if(c.Left || (Is1P() && SharedControls.MenuLeft))
+    else if(c.Left || (Is1P() && l_SharedControls.MenuLeft))
     {
         Left();
     }
-    else if(c.Right || (Is1P() && SharedControls.MenuRight))
+    else if(c.Right || (Is1P() && l_SharedControls.MenuRight))
     {
         Right();
     }
@@ -2393,10 +2382,10 @@ int Logic()
     \*-----------------------*/
     if(CheckDone() || (s_context == Context::MainMenu && Controls::g_InputMethods.size() == 0))
     {
-        if(!SharedControls.MenuBack)
+        if(!l_SharedControls.MenuBack)
             MenuCursorCanMove = true;
 
-        if((SharedControls.MenuBack && MenuCursorCanMove) || (SharedCursor.Secondary && MenuMouseRelease))
+        if((l_SharedControls.MenuBack && MenuCursorCanMove) || (SharedCursor.Secondary && MenuMouseRelease))
         {
             PlaySoundMenu(SFX_Slide);
             MenuCursorCanMove = false;

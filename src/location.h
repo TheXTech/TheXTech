@@ -24,21 +24,23 @@
 
 #include <cstdint>
 
+#include "numeric_types.h"
+
 //Public Type Location    'Holds location information for objects
 struct Location_t
 {
 //    X As Double
-    double X = 0.0;
+    num_t X = 0.0_n;
 //    Y As Double
-    double Y = 0.0;
+    num_t Y = 0.0_n;
 //    Height As Double
-    double Height = 0.0;
+    num_t Height = 0.0_n;
 //    Width As Double
-    double Width = 0.0;
+    num_t Width = 0.0_n;
 //    SpeedX As Double
-    double SpeedX = 0.0;
+    num_t SpeedX = 0.0_n;
 //    SpeedY As Double
-    double SpeedY = 0.0;
+    num_t SpeedY = 0.0_n;
 //End Type
 
     // checks if the center is strictly to the right of the other location's center
@@ -48,34 +50,34 @@ struct Location_t
     }
 
     // sets the width, maintaining location center
-    inline void set_width_center(double new_width)
+    inline void set_width_center(num_t new_width)
     {
         X += (Width - new_width) / 2;
         Width = new_width;
     }
 
     // sets the height, maintaining location center
-    inline void set_height_center(double new_height)
+    inline void set_height_center(num_t new_height)
     {
         Y += (Height - new_height) / 2;
         Height = new_height;
     }
 
     // sets the height, maintaining location floor
-    inline void set_height_floor(double new_height)
+    inline void set_height_floor(num_t new_height)
     {
         Y += Height - new_height;
         Height = new_height;
     }
 
     // sees how far this location's center is to the right of the other location
-    inline double minus_center_x(const Location_t& o) const
+    inline num_t minus_center_x(const Location_t& o) const
     {
         return X - o.X + (Width - o.Width) / 2;
     }
 
     // sees how far this location's center is below the other location
-    inline double minus_center_y(const Location_t& o) const
+    inline num_t minus_center_y(const Location_t& o) const
     {
         return Y - o.Y + (Height - o.Height) / 2;
     }
@@ -132,13 +134,13 @@ struct IntegerLocation_t
 struct SpeedlessLocation_t
 {
 //    X As Double
-    double X = 0.0;
+    num_t X = 0_n;
 //    Y As Double
-    double Y = 0.0;
+    num_t Y = 0_n;
 //    Height As Double
-    double Height = 0.0;
+    num_t Height = 0_n;
 //    Width As Double
-    double Width = 0.0;
+    num_t Width = 0_n;
 
     inline SpeedlessLocation_t() = default;
     inline explicit SpeedlessLocation_t(const Location_t& loc) : X(loc.X), Y(loc.Y), Height(loc.Height), Width(loc.Width) {}
@@ -195,8 +197,8 @@ struct PlayerStart_t
 };
 
 // creates a temp Location
-Location_t newLoc(double X, double Y, double Width = 0, double Height = 0);
+Location_t newLoc(num_t X, num_t Y, num_t Width = 0, num_t Height = 0);
 // creates a copy of location with a grid rounding
-Location_t roundLoc(const Location_t &inLoc, double grid);
+Location_t roundLoc(const Location_t &inLoc, num_t grid);
 
 #endif // LOCATION_H

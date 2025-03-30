@@ -37,11 +37,11 @@
 
 #include "main/trees.h"
 
-void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, const bool movingBlock, const int floorBlock, const float oldSpeedY)
+void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, const bool movingBlock, const int floorBlock, const numf_t oldSpeedY)
 {
     int floorNpc1 = 0;
     int floorNpc2 = 0;
-    float tempHitSpeed = 0;
+    numf_t tempHitSpeed = 0;
     bool spinKill = false;
 
     // cleanup variables for NPC collisions
@@ -223,15 +223,15 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 for(int C = 1; C <= 10; ++C)
                                 {
                                     NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[B].Location, NPC[B].Special);
-                                    Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[B].Location.SpeedX / 10;
-                                    Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[B].Location.SpeedY / 10;
+                                    Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5_n + NPC[B].Location.SpeedX / 10;
+                                    Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5_n - NPC[B].Location.SpeedY / 10;
                                     if(Effect[numEffects].Frame == 0)
                                         Effect[numEffects].Frame = -iRand(3);
                                     else
                                         Effect[numEffects].Frame = 5 + iRand(3);
                                 }
-                                NPC[B].Location.X += NPC[B].Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0;
-                                NPC[B].Location.Y += NPC[B].Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0;
+                                NPC[B].Location.X += NPC[B].Location.Width / 2 - EffectWidth[EFFID_SMOKE_S3] * 0.5_n;
+                                NPC[B].Location.Y += NPC[B].Location.Height / 2 - EffectHeight[EFFID_SMOKE_S3] * 0.5_n;
                                 NewEffect(EFFID_SMOKE_S3, NPC[B].Location);
 
                                 treeNPCUpdate(B);
@@ -572,7 +572,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                             {
                                 if(NPC[B]->IsABonus) // Bonus
                                     TouchBonus(A, B);
-                                else if(NPC[B]->IsAShell && NPC[B].Location.SpeedX == 0 && Player[A].HoldingNPC == 0 && Player[A].Controls.Run)
+                                else if(NPC[B]->IsAShell && NPC[B].Location.SpeedX == 0 && Player[A].HoldingNPC == 0 && Player[A].Controls.Run && !g_config.no_shell_grab_top)
                                 {
                                     // grab turtle shells
                                     //if(nPlay.Online == false || nPlay.MySlot + 1 == A)
@@ -817,8 +817,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         if(NPC[B].Type == NPCID_ICE_CUBE && Player[A].Character != 5 && Player[A].State > 1)
                                             NPCHit(B, 3, B);
                                         tempLocation = Player[A].Location;
-                                        Player[A].Location.SpeedY = 0.1 + NPC[B].Location.SpeedY;
-                                        Player[A].Location.Y = NPC[B].Location.Y + NPC[B].Location.Height + 0.1;
+                                        Player[A].Location.SpeedY = 0.1_n + NPC[B].Location.SpeedY;
+                                        Player[A].Location.Y = NPC[B].Location.Y + NPC[B].Location.Height + 0.1_n;
 
                                         // fBlock = FirstBlock[(Player[A].Location.X / 32) - 1];
                                         // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
@@ -861,7 +861,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         }
 
                                         if(!tempBool && NPC[B].Type != NPCID_BULLY)
-                                            Player[A].Location.SpeedX = 0.2 * Player[A].Direction;
+                                            Player[A].Location.SpeedX = 0.2_n * Player[A].Direction;
 
                                         // reset player run count
                                         Player[A].RunCount = 0;
@@ -876,7 +876,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         }
 
                                         // save current X location (for NPCs riding player's vehicle)
-                                        float D = Player[A].Location.X;
+                                        numf_t D = Player[A].Location.X;
 
                                         // actually move the player
                                         if(NPC[B].Location.to_right_of(Player[A].Location))
@@ -889,7 +889,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                                 Player[A].Location.SpeedY = oldSpeedY;
                                             }
                                             else
-                                                Player[A].Location.X = NPC[B].Location.X - Player[A].Location.Width - 0.1;
+                                                Player[A].Location.X = NPC[B].Location.X - Player[A].Location.Width - 0.1_n;
 
                                             if(NPC[Player[A].StandingOnNPC].Type == NPCID_CONVEYOR)
                                                 Player[A].Location.X -= 1;
@@ -917,7 +917,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                                 Player[A].Location.SpeedY = oldSpeedY;
                                             }
                                             else
-                                                Player[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 0.01;
+                                                Player[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 0.01_n;
 
                                             // forget about floors no longer supporting player
                                             if(floorNpc1 > 0)
@@ -967,13 +967,13 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
     if(tempHit2)
     {
         if(Player[A].Location.SpeedX + NPC[Player[A].StandingOnNPC].Location.SpeedX + tempHitSpeed > 0 && Player[A].Controls.Right)
-            Player[A].Location.SpeedX = 0.2 * Player[A].Direction + tempHitSpeed;
+            Player[A].Location.SpeedX = 0.2_n * Player[A].Direction + tempHitSpeed;
         else if(Player[A].Location.SpeedX + NPC[Player[A].StandingOnNPC].Location.SpeedX + tempHitSpeed < 0 && Player[A].Controls.Left)
-            Player[A].Location.SpeedX = 0.2 * Player[A].Direction + tempHitSpeed;
+            Player[A].Location.SpeedX = 0.2_n * Player[A].Direction + tempHitSpeed;
         else
         {
             if(Player[A].Controls.Right || Player[A].Controls.Left)
-                Player[A].Location.SpeedX = -NPC[Player[A].StandingOnNPC].Location.SpeedX + 0.2 * Player[A].Direction;
+                Player[A].Location.SpeedX = -NPC[Player[A].StandingOnNPC].Location.SpeedX + 0.2_n * Player[A].Direction;
             else
                 Player[A].Location.SpeedX = 0;
         }
@@ -1016,13 +1016,13 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
             Player[A].Jump -= 6;
 
         if(Player[A].Wet > 0)
-            Player[A].Location.SpeedY *= 0.3;
+            Player[A].Location.SpeedY *= 0.3_r;
 
         // this is very likely but not certain to be the y value stored when tempHit was set
         Player[A].Location.Y = tempLocation.Y;
 
         if(tempShell)
-            NewEffect(EFFID_STOMP_INIT, newLoc(Player[A].Location.X + Player[A].Location.Width / 2.0 - EffectWidth[EFFID_STOMP_INIT] / 2.0, Player[A].Location.Y + Player[A].Location.Height - EffectHeight[EFFID_STOMP_INIT] / 2.0));
+            NewEffect(EFFID_STOMP_INIT, newLoc(Player[A].Location.X + Player[A].Location.Width / 2 - EffectWidth[EFFID_STOMP_INIT] * 0.5_n, Player[A].Location.Y + Player[A].Location.Height - EffectHeight[EFFID_STOMP_INIT] * 0.5_n));
         else if(!tempSpring)
             NewEffect(EFFID_WHACK, newLoc(Player[A].Location.X + Player[A].Location.Width / 2 - 16, Player[A].Location.Y + Player[A].Location.Height - 16));
         else
@@ -1233,7 +1233,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                 Player[A].StandingOnNPC = 0;
                 Player[A].StandingOnVehiclePlr = 0;
 
-                if(Player[A].Location.SpeedY > 4.1)
+                if(Player[A].Location.SpeedY > 4.1_n)
                 {
                     Player[A].Location.Y += -Player[A].Location.SpeedY;
                     Player[A].Location.SpeedY = NPC[0 /*Player[A].StandingOnNPC*/].Location.SpeedY; // SMBX 1.3 bug

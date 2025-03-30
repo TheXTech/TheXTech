@@ -1816,6 +1816,12 @@ static void editYourFriends()
     PauseGame(PauseCode::Options);
 }
 
+static void bornToClimb()
+{
+    CanWallJump = !CanWallJump;
+    PlaySound(CanWallJump ? SFX_PlayerGrow : SFX_PlayerShrink);
+}
+
 static void newLeaf()
 {
     if(g_config.show_fps.m_set == ConfigSetLevel::cheat || g_config.unlimited_framerate.m_set == ConfigSetLevel::cheat)
@@ -1834,6 +1840,7 @@ static void newLeaf()
     CaptainN = false;
     GrabAll = false;
     ShadowMode = false;
+    CanWallJump = false;
     PlaySound(SFX_VillainKilled);
 }
 
@@ -2206,6 +2213,7 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
 
     {"getmeouttahere", getMeOuttaHere, true},
     {"newleaf", newLeaf, true},
+    {"borntoclimb", bornToClimb, true},
 
     {"holytrinity", holyTrinity, true}, {"passerby", holyTrinity, true},
     {"essentials", essentials, true}, {"holyfour", essentials, true},
@@ -2575,50 +2583,68 @@ SDL_FORCE_INLINE bool cheatCompare(size_t bufLen, const char *buf,
     return SDL_memcmp(buf + (bufLen - keyLen), key, keyLen) == 0;
 }
 
-static void processCheats()
+void run_cheat(XMessage::Message message)
 {
-    std::string oldString;
-    const char *buf = s_buffer.getString();
-    auto bufLen = s_buffer.getBufLen();
-    bool cheated = false;
+    int set = message.player;
 
-    // D_pLogDebug("Cheat buffer [%s]\n", buf);
+    const auto& cheat_list = (set == 0) ? s_cheatsListGlobal
+                            : (set == 1) ? s_cheatsListLevel
+                            : s_cheatsListWorld;
 
-    for(const auto &c : s_cheatsListGlobal)
+    if(set == 1 && LevelSelect)
+        return;
+    else if(set == 2 && !LevelSelect)
+        return;
+
+    if(message.message >= cheat_list.size())
+        return;
+
+    const auto& c = cheat_list[message.message];
+
+    c.call();
+
+    if(c.isCheat)
     {
-        if(!cheatCompare(bufLen, buf, c.keyLen, c.key))
-            continue;
-
-        c.call();
-        oldString = buf;
-        s_buffer.clear();
-        cheated = c.isCheat;
-        break;
-    }
-
-    for(const auto &c : (LevelSelect ? s_cheatsListWorld : s_cheatsListLevel))
-    {
-        if(!cheatCompare(bufLen, buf, c.keyLen, c.key))
-            continue;
-
-        c.call();
-        oldString = buf;
-        s_buffer.clear();
-        cheated = c.isCheat;
-        break;
-    }
-
-    if(cheated)
-    {
-        pLogDebug("Cheating detected!!! [%s]\n", oldString.c_str());
+        pLogDebug("Cheating detected!!! [%s]\n", c.key);
         Cheater = true;
     }
 }
 
-void cheats_setBuffer(const std::string &line)
+static void processCheats(bool instant)
+{
+    const char *buf = s_buffer.getString();
+    auto bufLen = s_buffer.getBufLen();
+
+    for(uint8_t set = 0; set < 3; set++)
+    {
+        const auto& cheat_list = (set == 0) ? s_cheatsListGlobal
+                                : (set == 1) ? s_cheatsListLevel
+                                : s_cheatsListWorld;
+
+        for(size_t i = 0; i < cheat_list.size(); i++)
+        {
+            const auto& c = cheat_list[i];
+
+            if(!cheatCompare(bufLen, buf, c.keyLen, c.key))
+                continue;
+
+            XMessage::Message cheat_message{XMessage::Type::enter_code, set, (uint8_t)i};
+
+            if(instant)
+                run_cheat(cheat_message);
+            else
+                XMessage::PushMessage(cheat_message);
+
+            s_buffer.clear();
+            break;
+        }
+    }
+}
+
+void cheats_setBuffer(const std::string &line, bool instant)
 {
     s_buffer.setBuffer(line);
-    processCheats();
+    processCheats(instant);
 }
 
 void cheats_clearBuffer()
@@ -2640,7 +2666,7 @@ void CheatCode(char sym)
 
     s_buffer.addSym(sym);
 
-    processCheats();
+    processCheats(false);
 }
 
 bool cheats_contains(const std::string &needle)
@@ -2655,9 +2681,4 @@ bool cheats_contains(const char *needle)
     const char *buf = s_buffer.getString();
     auto bufLen = s_buffer.getBufLen();
     return cheatCompare(bufLen, buf, SDL_strlen(needle), needle);
-}
-
-std::string cheats_get()
-{
-    return std::string(s_buffer.getString(), s_buffer.getBufLen());
 }

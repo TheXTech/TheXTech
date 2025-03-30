@@ -82,6 +82,7 @@ static int s_pause_plr = 0;
 static int s_longest_width = 0;
 static std::vector<MenuItem> s_items;
 static int s_cheat_menu_bits = 0;
+static uint32_t s_cheat_menu_frame = 0;
 static std::array<bool, maxLocalPlayers> s_leftright_release;
 
 uint8_t g_pending_action = 255;
@@ -179,7 +180,7 @@ static void s_OptionsScreen_Resume()
 
 static void s_CheatScreen_callback()
 {
-    cheats_setBuffer(TextEntryScreen::Text);
+    cheats_setBuffer(TextEntryScreen::Text, false);
 
     // comment this if you want to return to the pause menu
     s_push_unpause();
@@ -269,6 +270,12 @@ static bool s_Quit()
     return true;
 }
 
+void UnlockCheats()
+{
+    s_cheat_menu_bits = 15;
+    s_cheat_menu_frame = CommonFrame;
+}
+
 void Init(int plr, bool LegacyPause)
 {
     XHints::Select();
@@ -318,7 +325,7 @@ void Init(int plr, bool LegacyPause)
         if(g_config.allow_drop_add)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemPlayerSetup, s_DropAddScreen, true});
 
-        if(!inter_screen && s_cheat_menu_bits == 14 && !BattleMode)
+        if(!inter_screen && s_cheat_menu_bits >= 14 && !BattleMode)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen, true});
 
         s_items.push_back(MenuItem{g_mainMenu.mainOptions, s_OptionsScreen, true});
@@ -334,7 +341,7 @@ void Init(int plr, bool LegacyPause)
         if(g_config.allow_drop_add && s_pause_type != PauseType::Legacy)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemPlayerSetup, s_DropAddScreen, true});
 
-        if(s_cheat_menu_bits == 14 && s_pause_type != PauseType::Legacy && !BattleMode)
+        if(s_cheat_menu_bits >= 14 && s_pause_type != PauseType::Legacy && !BattleMode)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen, true});
 
         if(s_pause_type != PauseType::Legacy)
@@ -351,7 +358,7 @@ void Init(int plr, bool LegacyPause)
         if(g_config.allow_drop_add && s_pause_type != PauseType::Legacy)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemPlayerSetup, s_DropAddScreen, true});
 
-        if(s_cheat_menu_bits == 14 && s_pause_type != PauseType::Legacy && !BattleMode)
+        if(s_cheat_menu_bits >= 14 && s_pause_type != PauseType::Legacy && !BattleMode)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen, true});
 
         if(s_pause_type != PauseType::Legacy)
@@ -386,6 +393,14 @@ void Init(int plr, bool LegacyPause)
     // GBA bounds
     if(total_menu_height > 320 || total_menu_width > 480)
         pLogWarning("Menu doesn't fit within bounds (actual size %dx%d, bounds 480x320)", total_menu_width, total_menu_height);
+
+    // force cheat entry if needed
+    if(s_cheat_menu_bits == 15)
+    {
+        s_cheat_menu_bits = 14;
+        if(CommonFrame - s_cheat_menu_frame < 60)
+            TextEntryScreen::Init(g_gameStrings.pauseItemEnterCode, s_CheatScreen_callback);
+    }
 }
 
 void Render()
@@ -479,13 +494,13 @@ void Render()
 
 void ControlsLogic()
 {
-    bool upPressed = SharedControls.MenuUp;
-    bool downPressed = SharedControls.MenuDown;
-    bool leftPressed = SharedControls.MenuLeft;
-    bool rightPressed = SharedControls.MenuRight;
+    bool upPressed = l_SharedControls.MenuUp;
+    bool downPressed = l_SharedControls.MenuDown;
+    bool leftPressed = l_SharedControls.MenuLeft;
+    bool rightPressed = l_SharedControls.MenuRight;
 
-    bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
-    bool menuBackPress = SharedControls.MenuBack;
+    bool menuDoPress = l_SharedControls.MenuDo || l_SharedControls.Pause;
+    bool menuBackPress = l_SharedControls.MenuBack;
 
     // there was previously code to copy all players' controls from the main player, but this is no longer necessary (and actively harmful in the SingleCoop case)
 
@@ -691,13 +706,7 @@ void ControlsLogic()
                     if(target != Player[A].Character)
                     {
                         snd = SFX_Slide;
-
-                        XMessage::Message swap_char;
-                        swap_char.type = XMessage::Type::char_swap;
-                        swap_char.player = plr_i;
-                        swap_char.message = target;
-
-                        XMessage::PushMessage(swap_char);
+                        XMessage::PushMessage({XMessage::Type::char_swap, (uint8_t)plr_i, (uint8_t)target});
                     }
                 }
 

@@ -36,17 +36,13 @@ void RenderBitmapOp::Draw(Renderer *renderer)
     if(!direct_img || (direct_img->getH() == 0) || (direct_img->getW() == 0))
         return;
 
-    float opacity = this->opacity;
-    if(opacity > 1.0f) opacity = 1.0f;
-    if(opacity < 0.0f) opacity = 0.0f;
-
-    double screenX = this->x;
-    double screenY = this->y;
+    int screenX = this->x;
+    int screenY = this->y;
 
     if(sceneCoords)
     {
-        screenX -= vScreen[renderer->GetCameraIdx()].X;
-        screenY -= vScreen[renderer->GetCameraIdx()].Y;
+        screenX -= vScreen[renderer->GetCameraIdx()].CameraAddX();
+        screenY -= vScreen[renderer->GetCameraIdx()].CameraAddY();
     }
     else
     {
@@ -54,12 +50,12 @@ void RenderBitmapOp::Draw(Renderer *renderer)
     }
 
     // Get integer values as current rendering backends prefer that
-    int x = Maths::iRound(screenX);
-    int y = Maths::iRound(screenY);
-    int sx = Maths::iRound(this->sx);
-    int sy = Maths::iRound(this->sy);
-    int width = Maths::iRound(this->sw);
-    int height = Maths::iRound(this->sh);
+    int x = screenX;
+    int y = screenY;
+    int sx = this->sx;
+    int sy = this->sy;
+    int width = this->sw;
+    int height = this->sh;
 
     // Trim height/width if necessary
     if(direct_img->getW() < width + sx)
@@ -72,5 +68,5 @@ void RenderBitmapOp::Draw(Renderer *renderer)
     if((width <= 0) || (height <= 0))
         return;
 
-    XRender::renderTextureBasic(x, y, width, height, direct_img->m_image, sx, sy, XTAlphaF(opacity));
+    XRender::renderTextureBasic(x, y, width, height, direct_img->m_image, sx, sy, color);
 }

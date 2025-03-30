@@ -18,35 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef RENDEROP_STRING_H
-#define RENDEROP_STRING_H
+#pragma once
+#ifndef XT_NUMERIC_TYPES_H
+#define XT_NUMERIC_TYPES_H
 
-#include "renderop.h"
-#include "graphics.h"
+#include "floating_point.h"
 
-// String object to be rendered later
-class RenderStringOp final : public RenderOp
-{
-public:
-    // Quick ctor
-    RenderStringOp();
-
-    RenderStringOp(const std::string &str, int font_type, int X, int Y);
-
-    ~RenderStringOp() override;
-
-    void Draw(Renderer *renderer) override;
-
-    // FIXME: Replace this with the string data index
-    // Every autocode should use the string index storage, and this thing won't be needed
-    char*  m_String = nullptr;
-    size_t m_StringSize = 0;
-    bool   m_StringDup = false;
-
-    int m_FontType;
-    int m_X;
-    int m_Y;
-    bool   sceneCoords;     // If true, x and y are scene coordinates
-};
-
-#endif // RENDEROP_STRING_H
+#endif // #ifndef XT_NUMERIC_TYPES_H

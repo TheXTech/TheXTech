@@ -28,6 +28,7 @@
 
 #include "std_picture.h"
 
+#include "numeric_types.h"
 #include "location.h"
 #include "pinched_info.h"
 #include "range_arr.hpp"
@@ -130,11 +131,11 @@ extern double vb6Round(double x, int decimals);
 //Public Const HWND_NOTOPMOST As Long = -2
 //const long HWND_NOTOPMOST  = -2;
 //Public myBackBuffer As Long 'Backbuffer
-extern long myBackBuffer;
+// extern long myBackBuffer;
 //Public myBufferBMP As Long 'Backbuffer
-extern long myBufferBMP;
+// extern long myBufferBMP;
 //Public AllCharBlock As Integer
-extern int AllCharBlock;
+// extern int AllCharBlock;
 //Public Const KEY_TOGGLED As Integer = &H1   'For control information
 //const int KEY_TOGGLED = 0x01;
 //Public LocalNick As String  'Online Nickname
@@ -143,7 +144,7 @@ extern int AllCharBlock;
 //Public ServerPassword As String  'Password game server wants the client to use
 //Public ServerClear As Boolean
 //Public StartMenu As Boolean
-extern bool StartMenu;
+// extern bool StartMenu;
 
 //Public BlockFlash As Integer
 // Note: was previously BlockFlash, manually looped by local code to 0-90. Now incremented every frame, should be used with modulus operator.
@@ -157,8 +158,6 @@ extern bool ScrollRelease;
 extern bool TakeScreen;
 // EXTRA: Show any on-screen meta (HUD, debug prints, etc.)
 extern bool ShowOnScreenHUD;
-// EXTRA: Enable the new font engine
-extern bool NewFontRender;
 //Public LB As String  ' Line Break
 //extern std::string LB;
 //Public EoT As String  ' End of Transmission for WINSOCK
@@ -214,20 +213,15 @@ extern bool NewFontRender;
 //End Type
 
 //Public Type EditorControls      'Controls for the editor
-struct OldEditorControls_t
-{
+// struct OldEditorControls_t
+// {
 //    Up As Boolean
-    bool Up = false;
 //    Down As Boolean
-    bool Down = false;
 //    Left As Boolean
-    bool Left = false;
 //    Right As Boolean
-    bool Right = false;
 //    Mouse1 As Boolean
-    bool Mouse1 = false;
 //End Type
-};
+// };
 
 
 // Structures moved into con_control.h
@@ -298,8 +292,8 @@ struct NPC_t
     Location_t Location;
 
 // NEW: position variables (or double counters) used by AI
-    double SpecialX = 0.0;
-    double SpecialY = 0.0;
+    num_t SpecialX = 0_n;
+    num_t SpecialY = 0_n;
 
 //'Secial - misc variables used for NPC AI
 //    Special As Double
@@ -413,11 +407,11 @@ struct NPC_t
 
     // Misc floating-point variables
 //    RealSpeedX As Single 'the real speed of the NPC
-    float RealSpeedX = 0.0f;
+    numf_t RealSpeedX = 0;
 //    BeltSpeed As Single 'The speed of the object this NPC is standing on
-    float BeltSpeed = 0.0f;
+    numf_t BeltSpeed = 0;
 //    oldAddBelt As Single
-    float oldAddBelt = 0.0f;
+    numf_t oldAddBelt = 0;
 //    FrameCount As Single 'The counter for incrementing the frames
     // was previously a float but this didn't accomplish anything
     vbint_t FrameCount = 0;
@@ -491,8 +485,8 @@ struct NPC_t
 //    DefaultSpecial2 As Integer
     vbint_t DefaultSpecial2 = 0;
 //    DefaultLocation As Location
-    double DefaultLocationX = 0;
-    double DefaultLocationY = 0;
+    num_t DefaultLocationX = 0_n;
+    num_t DefaultLocationY = 0_n;
 
     // obsolete and removed fields
 //    PinchCount As Integer 'obsolete
@@ -554,13 +548,13 @@ struct Player_t
 //    FloatTime As Integer
     vbint_t FloatTime = 0;
 //    FloatSpeed As Single
-    float FloatSpeed = 0.0f;
+    numf_t FloatSpeed = 0;
 //    FloatDir As Integer
     vbint_t FloatDir = 0;
 //    GrabTime As Integer 'how long the player has been trying to grab an npc from above
     vbint_t GrabTime = 0;
 //    GrabSpeed As Single
-    float GrabSpeed = 0.0f;
+    numf_t GrabSpeed = 0;
 //    VineNPC As Double 'the NPC that the player is climbing
     vbint_t VineNPC = 0;
 //  EXTRA:  Fence BGO
@@ -620,6 +614,11 @@ struct Player_t
     bool AltRunRelease : 1;
 //    DuckRelease As Boolean
     bool DuckRelease : 1;
+
+    // Can the player NOT currently wall-jump because the wall is slippery?
+    bool SlippyWall : 1;
+    // Is the player's current jump a wall-jump?
+    bool JumpOffWall : 1;
 
 //'yoshi powers
 //    YoshiYellow As Boolean
@@ -700,7 +699,7 @@ struct Player_t
 //    Effect2 As Double 'counter for the effects (was double)
     vbint_t Effect2 = 0;
 //    NEW: this previously used the same storage as Effect2
-    double RespawnY = 0.0;
+    num_t RespawnY = 0_n;
 //    Duck As Boolean 'true if ducking
     bool Duck = false;
 //    DropRelease As Boolean
@@ -784,7 +783,7 @@ struct Player_t
 //    UnStart As Boolean 'Player let go of the start button
     bool UnStart = false;
 //    mountBump As Single 'Player hit something while in a mount
-    float mountBump = 0.0f;
+    numf_t mountBump = 0.0_nf;
 //    SpeedFixY As Single
     // unused since SMBX 1.3
     // float SpeedFixY = 0.0f;
@@ -795,7 +794,7 @@ struct Player_t
     // NEW: status field for maze zone (stores current direction and clearance to leave)
     uint8_t MazeZoneStatus = 0;
 
-    Player_t() : GroundPound(false), GroundPound2(false), CanPound(false), AltRunRelease(false), DuckRelease(false) {}
+    Player_t() : GroundPound(false), GroundPound2(false), CanPound(false), AltRunRelease(false), DuckRelease(false), SlippyWall(false), JumpOffWall(false) {}
 };
 
 //Public Type Background  'Background objects
@@ -919,7 +918,7 @@ public:
         // The block location width isn't set to a non-integer anywhere else in the game, so this is safe.
         // This is a heuristic and has a small CPU tradeoff, but it saves memory.
         // If it fails in some case, we can switch to the below implementation, or we could use this implementation only when LOW_MEM is set.
-        return Location.Width == 31.9;
+        return Location.Width == 31.9_n;
     }
 
 #else
@@ -1424,9 +1423,9 @@ extern RangeArrI<vbint_t, 0, maxPlayers, 0> OwedMountType;
 //EXTRA: set this flag once modern autoscroll used, otherwise, legacy will be used
 extern bool AutoUseModern;
 //Public AutoX(0 To maxSections) As Single 'for autoscroll
-extern RangeArr<float, 0, maxSections> AutoX;
+extern RangeArr<numf_t, 0, maxSections> AutoX;
 //Public AutoY(0 To maxSections) As Single 'for autoscroll
-extern RangeArr<float, 0, maxSections> AutoY;
+extern RangeArr<numf_t, 0, maxSections> AutoY;
 //Public numStars As Integer 'the number of stars the player has
 extern int numStars;
 
@@ -1817,7 +1816,7 @@ extern RangeArrI<vbint_t, 1, 100, 0> LevelFrame2;
 //Public BlockHasNoMask(1 To maxBlockType) As Boolean
 extern RangeArrI<bool, 1, maxBlockType, false> BlockHasNoMask;
 //Public LevelHasNoMask(1 To 100) As Boolean
-extern RangeArrI<bool, 1, 100, false> LevelHasNoMask;
+// extern RangeArrI<bool, 1, 100, false> LevelHasNoMask;
 //Public BlockOnlyHitspot1(0 To maxBlockType) As Boolean
 extern RangeArrI<bool, 0, maxBlockType, false> BlockOnlyHitspot1;
 //Public BlockKills(0 To maxBlockType) As Boolean 'block is lava
@@ -1837,13 +1836,15 @@ extern RangeArrI<vbint_t, 1, 10, 0> CoinFrame2;
 //Public EditorCursor As EditorCursor
 extern EditorCursor_t EditorCursor;
 //Public EditorControls As EditorControls
-extern OldEditorControls_t OldEditorControls;
 
-extern SharedControls_t SharedControls;
+extern SharedControls_t l_SharedControls;
 
 extern CursorControls_t SharedCursor;
 
 extern EditorControls_t EditorControls;
+
+extern bool SharedPause;
+extern bool SharedPauseLegacy;
 
 // extern RangeArr<CursorControls_t, 1, maxLocalPlayers> PlayerCursor;
 
@@ -1878,8 +1879,11 @@ extern int LevelMacroCounter;
 // Card roulette exit: negative value indicates triggered by cheat
 extern int LevelMacroWhich;
 
+//EXTRA: can the player wall-jump?
+extern bool CanWallJump;
+
 //Public numJoysticks As Integer
-extern int numJoysticks;
+// extern int numJoysticks;
 
 //Public FileName As String
 extern std::string FileName;
@@ -1914,9 +1918,9 @@ extern int Lives;
 //NEW: tracker of number of hundreds of coins that have been obtained
 extern int g_100s;
 //Public EndIntro As Boolean
-extern bool EndIntro;
+// extern bool EndIntro;
 //Public ExitMenu As Boolean
-extern bool ExitMenu;
+// extern bool ExitMenu;
 //Public LevelSelect As Boolean 'true if game should load the world map
 extern bool LevelSelect;
 
@@ -2073,15 +2077,15 @@ struct Physics_t
 //    PlayerSpringJumpHeight As Integer
     int PlayerSpringJumpHeight = 0;
 //    PlayerJumpVelocity As Single
-    float PlayerJumpVelocity = 0.0f;
+    numf_t PlayerJumpVelocity = 0_nf;
 //    PlayerRunSpeed As Single
-    float PlayerRunSpeed = 0.0f;
+    numf_t PlayerRunSpeed = 0_nf;
 //    PlayerWalkSpeed As Single
-    float PlayerWalkSpeed = 0.0f;
+    numf_t PlayerWalkSpeed = 0_nf;
 //    PlayerTerminalVelocity As Integer
     int PlayerTerminalVelocity = 0;
 //    PlayerGravity As Single
-    float PlayerGravity = 0.0f;
+    numf_t PlayerGravity = 0_nf;
 //    PlayerHeight(1 To numCharacters, 1 To numStates) As Integer
     RangeArr<RangeArrI<int, 1, numStates, 0>, 1, numCharacters> PlayerHeight;
 //    PlayerDuckHeight(1 To numCharacters, 1 To numStates) As Integer
@@ -2097,19 +2101,19 @@ struct Physics_t
 //    NPCCanHurtWait As Integer
     int NPCCanHurtWait = 0;
 //    NPCShellSpeed As Single
-    float NPCShellSpeed = 0.0f;
+    numf_t NPCShellSpeed = 0_nf;
 //    NPCShellSpeedY As Single
-    float NPCShellSpeedY = 0.0f;
+    numf_t NPCShellSpeedY = 0_nf;
 //    NPCWalkingSpeed As Single
-    float NPCWalkingSpeed = 0.0f;
+    numf_t NPCWalkingSpeed = 0_nf;
 //    NPCWalkingOnSpeed As Single
-    float NPCWalkingOnSpeed = 0.0f;
+    numf_t NPCWalkingOnSpeed = 0_nf;
 //    NPCMushroomSpeed As Single
-    float NPCMushroomSpeed = 0.0f;
+    numf_t NPCMushroomSpeed = 0_nf;
 //    NPCGravity As Single
-    float NPCGravity = 0.0f;
+    numf_t NPCGravity = 0_nf;
 //    NPCGravityReal As Single
-    float NPCGravityReal = 0.0f;
+    numf_t NPCGravityReal = 0_nf;
 //    NPCPSwitch As Integer
     int NPCPSwitch = 0;
 //End Type
@@ -2136,7 +2140,7 @@ extern bool MenuCursorCanMove;
 // Now used to check if it's okay to go back (separately from the other actions)
 extern bool MenuCursorCanMove_Back;
 //Public NextFrame As Boolean
-extern bool NextFrame;
+// extern bool NextFrame;
 //Public StopHit As Integer
 extern int StopHit;
 //Public MouseRelease As Boolean
@@ -2168,7 +2172,7 @@ extern int EndCredits;
 //Public curStars As Integer 'number of stars
 extern int curStars;
 //Public maxStars As Integer 'max number of stars in the game
-extern int maxStars;
+// extern int maxStars;
 //'cheat codes --------------
 //Public ShadowMode As Boolean 'cheat code
 extern bool ShadowMode;
@@ -2189,7 +2193,7 @@ extern bool FlameThrower;
 //Public CoinMode As Boolean 'cheat code
 extern bool CoinMode;
 //Public WorldUnlock As Boolean
-extern bool WorldUnlock;
+// extern bool WorldUnlock;
 // replaced with g_config.unlimited_framerate
 //Public MaxFPS As Boolean
 // extern bool MaxFPS;
@@ -2220,7 +2224,7 @@ extern RangeArrI<int, 1, 13, 0> Points;
 //Public MaxWorldStars As Integer 'maximum number of world stars
 extern int MaxWorldStars;
 //Public Debugger As Boolean 'if the debugger window is open
-extern bool Debugger;
+// extern bool Debugger;
 //Public SavedChar(0 To 10) As Player 'Saves the Player's Status
 extern RangeArr<SavedChar_t, 0, 10> SavedChar;
 
@@ -2483,9 +2487,9 @@ extern RangeArr<StdPicture, 1, numCharacters> GFXPlayerBMP;
 // extern RangeArrI<vbint_t, 1, numCharacters, 0> GFXPlayerWidth;
 
 //Public PlayerCharacter As Integer
-extern int PlayerCharacter;
+// extern int PlayerCharacter;
 //Public PlayerCharacter2 As Integer
-extern int PlayerCharacter2;
+// extern int PlayerCharacter2;
 
 // replaced with SharedCursor.*
 
@@ -2520,9 +2524,9 @@ extern bool ForcedControls;
 //Public ForcedControl As Controls
 extern Controls_t ForcedControl;
 //Public SyncCount As Integer
-extern int SyncCount;
+// extern int SyncCount;
 //Public noUpdate As Boolean
-extern bool noUpdate;
+// extern bool noUpdate;
 //Public gameTime As Double
 //extern double gameTime;
 

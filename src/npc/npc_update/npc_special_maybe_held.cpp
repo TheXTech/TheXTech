@@ -32,6 +32,7 @@
 #include "layers.h"
 #include "blocks.h"
 #include "graphics.h"
+#include "player/player_update_priv.h"
 
 #include "main/trees.h"
 
@@ -299,7 +300,7 @@ void NPCSpecialMaybeHeld(int A)
                 {
                     NPC[A].Special3 += 1;
                     NPC[A].Location.SpeedY = -3;
-                    NPC[A].Location.Y -= 0.1;
+                    NPC[A].Location.Y -= 0.1_n;
                     if(NPC[A].Direction < 0)
                         NPC[A].Frame = 0;
                     else
@@ -342,10 +343,10 @@ void NPCSpecialMaybeHeld(int A)
                 NPC[A].Special3 += 1;
                 NPC[A].Location.SpeedY = -12;
                 NPC[A].BeltSpeed = 0;
-                NPC[A].Location.Y -= 0.1;
+                NPC[A].Location.Y -= 0.1_n;
                 // This formula got been compacted: If something will glitch, feel free to restore back this crap
-                //NPC[A].Location.SpeedX = (static_cast<int>(std::floor(static_cast<double>(((Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0 - 16) + 1) / 32))) * 32 + 1 - NPC[A].Location.X) / 50;
-                double pCenter = pl.X + pl.Width / 2;
+                // NPC[A].Location.SpeedX = (static_cast<int>(std::floor(static_cast<num_t>(((Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2 - 16) + 1) / 32))) * 32 + 1 - NPC[A].Location.X) / 50;
+                num_t pCenter = pl.X + pl.Width / 2;
                 sx = std::floor((pCenter - 15) / 32) * 32 + 1;
                 sx -= NPC[A].Location.X;
                 sx /= 50;
@@ -602,7 +603,7 @@ void NPCSpecialMaybeHeld(int A)
                 NPC[numNPCs].Projectile = true;
                 NPC[numNPCs].TimeLeft = 50;
                 NPC[numNPCs].Location.SpeedY = -8;
-                NPC[numNPCs].Location.SpeedX = 3 * Player[NPC[A].HoldingPlayer].Direction + Player[NPC[A].HoldingPlayer].Location.SpeedX * 0.8;
+                NPC[numNPCs].Location.SpeedX = 3 * Player[NPC[A].HoldingPlayer].Direction + Player[NPC[A].HoldingPlayer].Location.SpeedX * 0.8_r;
                 syncLayers_NPC(numNPCs);
             }
         }
@@ -679,13 +680,13 @@ void NPCSpecialMaybeHeld(int A)
 
             if(NPC[A].HoldingPlayer == 0 && NPC[A].vehiclePlr == 0 && NPC[A].Type == NPCID_CANNONENEMY)
             {
-                double C = 0;
+                num_t C = 0;
                 for(int B = 1; B <= numPlayers; B++)
                 {
                     if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                     {
-                        double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
-                        if(C == 0.0 || dist < C)
+                        num_t dist = NPCPlayerTargetDist(NPC[A], Player[B]);
+                        if(C == 0 || dist < C)
                         {
                             C = dist;
                             if(NPC[A].Location.to_right_of(Player[B].Location))
@@ -753,6 +754,10 @@ void NPCSpecialMaybeHeld(int A)
                         else
                             NPC[numNPCs].Frame = 0;
                         NPC[numNPCs].Location.Y = NPC[A].Location.Y + (NPC[A].Location.Height - NPC[numNPCs].Location.Height) / 2;
+
+                        if(NPC[A].HoldingPlayer)
+                            PlayerThrownNpcMazeCheck(Player[NPC[A].HoldingPlayer], NPC[numNPCs]);
+
                         syncLayers_NPC(numNPCs);
 
                         Location_t tempLocation;
@@ -879,7 +884,7 @@ void NPCSpecialMaybeHeld(int A)
         {
             NPC[A].Special = -1;
             NPC[A].Special2 = 0;
-            NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.98;
+            NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.98_r;
         }
         else
         {
@@ -926,12 +931,12 @@ void NPCSpecialMaybeHeld(int A)
                         NPC[A].Special2 = 0;
                         NPC[A].Special = -1;
                         NPC[A].Location.SpeedY = -3;
-                        NPC[A].Location.SpeedX = 2.5 * NPC[A].Direction;
+                        NPC[A].Location.SpeedX = 2.5_n * NPC[A].Direction;
                     }
                 }
                 else if(NPC[A].Special == 2)
                 {
-                    NPC[A].Location.SpeedX = 0.5 * NPC[A].Direction;
+                    NPC[A].Location.SpeedX = 0.5_n * NPC[A].Direction;
                     NPC[A].Special2 += 1;
                     if(NPC[A].Special2 == 120)
                     {

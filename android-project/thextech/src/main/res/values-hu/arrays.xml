@@ -13,4 +13,5 @@
     <string name="batteryStatusShow0">Soha ne mutasd</string>
     <string name="batteryStatusShow2">Mindig mutatsd</string>
     <string name="speedRunMode3">3-as mód (nyers SMBX 1.3, minden bug engedélyezve)</string>
+    <string name="rendererDefault">Alapértelmezett</string>
 </resources>

@@ -24,13 +24,13 @@
 #include "core/render.h"
 
 RenderStringOp::RenderStringOp() :
-    RenderStringOp(std::string(), 1, 400.f, 400.f)
+    RenderStringOp(std::string(), 1, 400, 400)
 {
     static_assert(sizeof(RenderStringOp) <= c_rAllocChunkSize,
                   "Size of RenderStringOp class must be smaller than c_rAllocChunkSize");
 }
 
-RenderStringOp::RenderStringOp(const std::string &str, int font_type, float X, float Y) :
+RenderStringOp::RenderStringOp(const std::string &str, int font_type, int X, int Y) :
     RenderOp(RENDEROP_DEFAULT_PRIORITY_TEXT),
     m_FontType(font_type),
     m_X(X),
@@ -61,7 +61,7 @@ RenderStringOp::~RenderStringOp()
 void RenderStringOp::Draw(Renderer *renderer)
 {
     //        VB6StrPtr text(m_String);
-    double x = m_X, y = m_Y;
+    int x = m_X, y = m_Y;
 
     if(sceneCoords)
     {

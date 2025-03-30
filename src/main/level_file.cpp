@@ -79,6 +79,10 @@
 #    include "core/opengl/gl_program_bank.h"
 #endif
 
+#ifdef THEXTECH_ENABLE_LUAU
+#    include "script/luau/test.h"
+#endif
+
 
 // warning for improper rects
 static const char* s_improper_rect_warning = "Attempted to set %s %d %s to %f, setting to 0";
@@ -375,7 +379,7 @@ bool OpenLevel_Head(void* userdata, LevelData& head)
     LevelLoad& load = *static_cast<LevelLoad*>(userdata);
 
     // Level-wide settings
-    maxStars = head.stars;
+    // maxStars = head.stars;
     LevelName = head.LevelName;
 
 #ifdef PGEFL_CALLBACK_API
@@ -890,7 +894,7 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
         npc.Location.X = n.x;
         npc.Location.Y = n.y;
         if(!LevelEditor)
-            npc.Location.Y -= 0.01;
+            npc.Location.Y -= 0.01_n;
         npc.Direction = n.direct;
 
         if(n.id > maxNPCType) // Drop ID to 1 for NPCs of out of range IDs
@@ -1407,6 +1411,9 @@ void OpenLevelDataPost()
     if(!GameMenu && !LevelEditor)
         tr.loadLevelTranslation(FileNameFull);
 
+#ifdef THEXTECH_ENABLE_LUAU
+    load_test_script();
+#endif
 
     IsEpisodeIntro = (StartLevel == FileNameFull);
 
@@ -1460,7 +1467,7 @@ void OpenLevelDataPost()
                     block.Location = n_in.Location;
 
                     block.Type = (n_in.Direction > 0) ? BLKID_CONVEYOR_R_CONV : BLKID_CONVEYOR_L_CONV;
-                    block.Location.SpeedX = (n_in.Direction > 0) ? 0.8 : -0.8;
+                    block.Location.SpeedX = (n_in.Direction > 0) ? 0.8_n : -0.8_n;
 
                     block.DefaultType = block.Type;
                     block.Layer = n_in.Layer;
@@ -1636,7 +1643,7 @@ void ClearLevel()
     SetupPhysics();
     LoadNPCDefaults();
     LoadPlayerDefaults();
-    noUpdate = true;
+    // noUpdate = true;
     BlocksSorted = true;
     qScreen = false;
     qScreen_canonical = false;
@@ -1696,7 +1703,7 @@ void ClearLevel()
     Events[2].Name = "P Switch - End";
     curMusic = 0;
     curStars = 0;
-    maxStars = 0;
+    // maxStars = 0;
     g_curLevelMedals.reset_lvl();
 
     PSwitchTime = 0;
@@ -1738,7 +1745,7 @@ void ClearLevel()
 //        frmBlocks.chkFill.Value = 0
 //        frmEvents.txtEvent.Text = ""
 //        noUpdate = True
-        noUpdate = true;
+        // noUpdate = true;
 //        frmEvents.RefreshEvents
 //        frmLayers.lstLayer.Clear
 //        frmLayers.lstLayer.AddItem "Default"
@@ -1793,7 +1800,7 @@ void ClearLevel()
     PlayerStart[1] = BlankLocation;
     PlayerStart[2] = BlankLocation;
 
-    noUpdate = false;
+    // noUpdate = false;
 }
 
 void FindStars()

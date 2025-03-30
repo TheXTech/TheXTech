@@ -120,7 +120,7 @@ static inline void NPCEffectLogic_EmergeDown(int A)
                 {
                     if(CheckCollision(NPC[A].Location, Block[B].Location))
                     {
-                        NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.1;
+                        NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.1_n;
                         break;
                     }
                 }
@@ -164,8 +164,8 @@ static inline void NPCEffectLogic_DropItem(int A)
         vScreen_t& vscreen = vScreenByPlayer(NPC[A].Effect3);
 
         // put above player
-        double target_X = pLoc.X + (pLoc.Width - nLoc.Width) / 2;
-        double target_Y = pLoc.Y + pLoc.Height - 192;
+        num_t target_X = pLoc.X + (pLoc.Width - nLoc.Width) / 2;
+        num_t target_Y = pLoc.Y + pLoc.Height - 192;
 
         // anticipate player movement
         if(PlayerNormal(p))
@@ -179,11 +179,11 @@ static inline void NPCEffectLogic_DropItem(int A)
             target_Y = -vscreen.Y - 8;
 
         // perform movement
-        double delta_X = target_X - nLoc.X;
-        double delta_Y = target_Y - nLoc.Y;
+        num_t delta_X = target_X - nLoc.X;
+        num_t delta_Y = target_Y - nLoc.Y;
 
-        double move_X = delta_X / 8.0;
-        double move_Y = delta_Y / 8.0;
+        num_t move_X = delta_X / 8;
+        num_t move_Y = delta_Y / 8;
 
         double dist_sq = (move_X * move_X + move_Y * move_Y);
 
@@ -219,7 +219,7 @@ static inline void NPCEffectLogic_DropItem(int A)
     }
     else
     {
-        NPC[A].Location.Y += 2.2;
+        NPC[A].Location.Y += 2.2_n;
 
         NPC[A].Effect2 += 1;
         if(NPC[A].Effect2 == 5)
@@ -335,22 +335,24 @@ static inline void NPCEffectLogic_Waiting(int A)
 
 static inline void NPCEffectLogic_Maze(int A)
 {
-    NPCFrames(A);
-    NPCCollide(A);
-
     NPC_t& npc = NPC[A];
+
+    NPCFrames(A);
+    NPCSectionWrap(npc);
+    NPCCollide(A);
 
     if(npc.TurnAround)
     {
-        npc.Effect3 = npc.Effect3 ^ MAZE_DIR_FLIP_BIT;
+        npc.Effect3 = (npc.Effect3 & 3) ^ MAZE_DIR_FLIP_BIT;
         npc.TurnAround = false;
     }
 
     // make balls go very slightly faster, and give them speed when they leave so they don't bounce forever
     bool is_ball = (npc.Type == NPCID_PLR_FIREBALL || npc.Type == NPCID_PLR_ICEBALL);
+    bool is_bullet = (npc.Type == NPCID_BULLET && npc.CantHurt);
     bool is_player_thrown = is_ball || (npc.Type == NPCID_CHAR3_HEAVY || npc.Type == NPCID_BOMB);
 
-    PhysEnv_Maze(npc.Location, npc.Effect2, npc.Effect3, A, 0, npc.Quicksand ? 1 : (npc.Wet ? 2 : 4) + is_player_thrown, {false, false, false, false});
+    PhysEnv_Maze(npc.Location, npc.Effect2, npc.Effect3, A, 0, npc.Quicksand ? 1 : (npc.Wet ? 2 : 4) + is_player_thrown + 4 * is_bullet, {false, false, false, false});
 
     if(npc.Effect3 == MAZE_DIR_LEFT)
         npc.Direction = -1;
@@ -364,7 +366,9 @@ static inline void NPCEffectLogic_Maze(int A)
         bool is_vert = (npc.Effect3 % 4 == MAZE_DIR_UP || npc.Effect3 % 4 == MAZE_DIR_DOWN);
         npc.Effect3 = 0;
 
-        if(is_vert)
+        if(is_bullet)
+            npc.Location.SpeedX = (npc.CantHurt ? 8 : 4) * npc.Direction;
+        else if(is_vert)
         {
             if(!npc.Projectile && !npc.Wet)
             {

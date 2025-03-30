@@ -24,7 +24,9 @@
 #include "message.h"
 #include "globals.h"
 
+#include "graphics.h"
 #include "player.h"
+#include "main/cheat_code.h"
 #include "main/screen_pause.h"
 
 #ifdef THEXTECH_ENABLE_SDL_NET
@@ -40,12 +42,17 @@ static Controls_t s_last_controls[maxNetplayPlayers + 1];
 
 void Handle(const Message& m)
 {
+    if(m.screen >= maxNetplayClients)
+        return;
+
+    Screen_t& screen = Screens[m.screen];
+
     if(m.type == Type::press || m.type == Type::release)
     {
-        if(m.screen >= maxNetplayClients || m.player >= maxLocalPlayers || m.message >= Controls::PlayerControls::n_buttons)
+        if(m.player >= maxLocalPlayers || m.message >= Controls::PlayerControls::n_buttons)
             return;
 
-        auto& controls = s_last_controls[Screens[m.screen].players[m.player]];
+        auto& controls = s_last_controls[screen.players[m.player]];
         bool& button = Controls::PlayerControls::GetButton(controls, m.message);
         bool is_press = (m.type == Type::press);
 
@@ -53,19 +60,91 @@ void Handle(const Message& m)
     }
     else if(m.type == Type::char_swap)
     {
-        if(m.screen >= maxNetplayClients || m.player >= Screens[m.screen].player_count || m.message < 1 || m.message > numCharacters || !SwapCharAllowed())
+        if(m.player >= screen.player_count || m.message < 1 || m.message > numCharacters || !SwapCharAllowed())
             return;
 
-        SwapCharacter(Screens[m.screen].players[m.player], m.message);
+        SwapCharacter(screen.players[m.player], m.message);
 
         if(LevelSelect)
             SetupPlayers();
     }
+    else if(m.type == Type::add_player || m.type == Type::add_player_dead)
+    {
+        if(screen.player_count >= maxLocalPlayers || m.message < 1 || m.message > numCharacters)
+            return;
+
+        // after AddPlayer, numPlayers is always the new player
+        AddPlayer(m.message, screen);
+
+        // set the player to be dead if needed
+        if(m.type == Type::add_player_dead)
+        {
+            Player[numPlayers].Dead = true;
+
+            // initialize ghost logic for player
+            int living = CheckNearestLiving(numPlayers);
+            if(living)
+            {
+                Player[numPlayers].Effect2 = -living;
+                Player[numPlayers].Location.X = Player[living].Location.X;
+                Player[numPlayers].Location.Y = Player[living].Location.Y;
+                Player[numPlayers].Section    = Player[living].Section;
+            }
+            else
+                Player[numPlayers].Effect2 = 0;
+        }
+    }
+    else if(m.type == Type::drop_player)
+    {
+        if(m.player >= screen.player_count)
+            return;
+
+        DropPlayer(screen.players[m.player]);
+    }
     else if(m.type == Type::menu_action)
     {
-        // FIXME: check that screen is the one in control of the pause menu
-
         PauseScreen::g_pending_action = m.message;
+    }
+    else if(m.type == Type::shared_controls)
+    {
+        if(m.message == 0)
+            SharedPause = true;
+        else if(m.message == 1)
+            SharedPause = false;
+        else if(m.message == 2)
+            SharedPauseLegacy = true;
+        else if(m.message == 3)
+            SharedPauseLegacy = false;
+    }
+    else if(m.type == Type::enter_code)
+        run_cheat(m);
+    else if(m.type == Type::screen_w)
+    {
+        screen.W = m.player * 256 + m.message;
+    }
+    else if(m.type == Type::screen_h)
+    {
+        screen.H = m.player * 256 + m.message;
+    }
+    else if(m.type == Type::multiplayer_prefs)
+    {
+        int two_screen_pref = m.player;
+        int four_screen_pref = m.message;
+
+        if(two_screen_pref > MultiplayerPrefs::Max_2P)
+            two_screen_pref = 0;
+
+        if(four_screen_pref > MultiplayerPrefs::Max_4P)
+            four_screen_pref = 0;
+
+        screen.two_screen_pref = two_screen_pref;
+        screen.four_screen_pref = four_screen_pref;
+
+        screen.canonical_screen().two_screen_pref = two_screen_pref;
+        screen.canonical_screen().four_screen_pref = four_screen_pref;
+
+        SetupScreens();
+        PlayersEnsureNearby(screen);
     }
 }
 

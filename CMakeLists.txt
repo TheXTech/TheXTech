@@ -994,6 +994,13 @@ if(THEXTECH_ENABLE_EDITOR)
     )
 endif()
 
+if(THEXTECH_ENABLE_LUAU)
+    target_compile_definitions(A2XT_Int INTERFACE -DTHEXTECH_ENABLE_LUAU)
+    list(APPEND THEXTECH_SRC
+        src/script/luau/test.cpp
+    )
+endif()
+
 if(NINTENDO_3DS)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
     list(APPEND THEXTECH_SRC

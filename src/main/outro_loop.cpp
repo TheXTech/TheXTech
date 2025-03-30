@@ -145,7 +145,7 @@ void OutroLoop()
 {
     Controls::Update(false);
     Integrator::sync();
-    bool quit = SharedControls.QuitCredits;
+    bool quit = l_SharedControls.QuitCredits;
 
     for(int i = 0; i < l_screen->player_count; i++)
         quit |= Controls::g_RawControls[i].Start;
@@ -187,7 +187,7 @@ void OutroLoop()
         // tempLocation = pp.Location; // Why here was the duplicated location assignment?
         tempLocation.SpeedX = 0;
         tempLocation.SpeedY = 0;
-        double pp_bottom = pp.Location.Y + pp.Location.Height;
+        num_t pp_bottom = pp.Location.Y + pp.Location.Height;
         tempLocation.Y = pp_bottom - 8;
         tempLocation.Height = pp.Mount == 1 ? 50 : 25;
         tempLocation.Width = 16;

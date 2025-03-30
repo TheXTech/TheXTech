@@ -943,14 +943,14 @@ bool mainMenuUpdate()
     int menuLen;
     // Player_t blankPlayer;
 
-    bool upPressed = SharedControls.MenuUp;
-    bool downPressed = SharedControls.MenuDown;
-    bool leftPressed = SharedControls.MenuLeft;
-    bool rightPressed = SharedControls.MenuRight;
+    bool upPressed = l_SharedControls.MenuUp;
+    bool downPressed = l_SharedControls.MenuDown;
+    bool leftPressed = l_SharedControls.MenuLeft;
+    bool rightPressed = l_SharedControls.MenuRight;
     bool homePressed = SharedCursor.Tertiary;
 
-    bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
-    bool menuBackPress = SharedControls.MenuBack;
+    bool menuDoPress = l_SharedControls.MenuDo || l_SharedControls.Pause;
+    bool menuBackPress = l_SharedControls.MenuBack;
 
     bool altPressed = false;
 
@@ -1170,8 +1170,8 @@ bool mainMenuUpdate()
             else if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
             {
                 MenuCursorCanMove = false;
-                PlayerCharacter = 0;
-                PlayerCharacter2 = 0;
+                // PlayerCharacter = 0;
+                // PlayerCharacter2 = 0;
 
                 int i = 0;
                 if(MenuCursor == i++)
@@ -2488,6 +2488,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
 
         if(save_configs != 0)
         {
+            // FIXME: unnecessary float
             float rot = 0;
             float op = 1.0f;
             if(A == MenuCursor + 1)
@@ -2966,6 +2967,7 @@ void mainMenuDraw()
             int mode_icon_X = MenuX + 340;
             int mode_icon_Y = MenuY - 34 + (B * 30);
 
+            // FIXME: unnecessary float
             float rot = 0;
             rot = std::abs((int)(CommonFrame % 90) - 45);
             rot = rot - 22.5;

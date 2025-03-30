@@ -45,7 +45,7 @@ struct NPCTraits_t
     //Public NPCHeightGFX(0 To maxNPCType) As Integer 'NPC gfx height
     int16_t HeightGFX = 0;
     //Public NPCSpeedvar(0 To maxNPCType) As Single 'NPC Speed Change
-    float Speedvar = 1.0;
+    numf_t Speedvar = 1;
 
     //Public NPCIsABlock(0 To maxNPCType) As Boolean 'Flag NPC as a block
     bool IsABlock = false;

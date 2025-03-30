@@ -30,7 +30,7 @@
     <string name="cheat_dialog_cancel">Mégse</string>
     <string name="cheat_dialog_ok">Futtatás</string>
     <string name="cheat_dialog_title">Írj be parancsot:</string>
-    <string name="managePermExplainText">Ez a játék olyan forrásokat (mint a pályák, epizódok, grafikák, zene, hangok, konfigurációk, stb...) használ, amiket a felhasználónak kell elhelyeznie közvetlenül a helyi tárolóba. Ez megengedi, hogy módosítsd és bővítsd a játék tartalmát, ahogyan az asztali verziójában is történik. Sajnos az Android 11-es verziójától nem lehet személyi hozzáférést nyerni néhány játékkönyvtárhoz vagy fájlhoz. Hogy futtasd ezt a játékot, hozzáférést kell nyerned az összes játékfájlhoz az említett okok miatt.</string>
+    <string name="managePermExplainText">Ez a játék olyan forrásokat (mint a pályák, epizódok, grafikák, zene, hangok, konfigurációk, stb...) használ, amiket a felhasználónak kell elhelyeznie közvetlenül a helyi tárolóba. Ez megengedi, hogy módosítsd és bővítsd a játék tartalmát, ahogyan az asztali verziójában is történik. Sajnos az Android 11-es verziójától nem lehet egyedi hozzáférést adni néhány játékkönyvtárhoz vagy fájlhoz. Hogy futtasd ezt a játékot, engedélyezned kell a hozzáférést az összes játékfájlhoz az előbbi okokból.</string>
     <string name="launcher_gameSelect_pickTheDir">Könyvtár kiválasztása...</string>
     <string name="launcher_gameSelect_clearList">Lista ürítése</string>
     <string name="launcher_gameselect_clearlist_title">Játéklista ürítése</string>

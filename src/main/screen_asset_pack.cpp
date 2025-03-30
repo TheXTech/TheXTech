@@ -349,11 +349,11 @@ bool Logic()
     if(SharedCursor.Primary || SharedCursor.Secondary || SharedCursor.Tertiary)
         SharedCursor.Move = true;
 
-    bool leftPressed = SharedControls.MenuLeft || SharedCursor.ScrollUp;
-    bool rightPressed = SharedControls.MenuRight || SharedCursor.ScrollDown;
+    bool leftPressed = l_SharedControls.MenuLeft || SharedCursor.ScrollUp;
+    bool rightPressed = l_SharedControls.MenuRight || SharedCursor.ScrollDown;
 
-    bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
-    bool menuBackPress = SharedControls.MenuBack;
+    bool menuDoPress = l_SharedControls.MenuDo || l_SharedControls.Pause;
+    bool menuBackPress = l_SharedControls.MenuBack;
 
     for(int i = 0; i < l_screen->player_count; i++)
     {

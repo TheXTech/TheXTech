@@ -391,13 +391,13 @@ void NPCCollide(int A)
                                     {
                                         if(int(NPC[A].Direction) == -1)
                                         {
-                                            NPC[B].Location.X = Block[C].Location.X + Block[C].Location.Width + 0.1;
-                                            NPC[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 0.1;
+                                            NPC[B].Location.X = Block[C].Location.X + Block[C].Location.Width + 0.1_n;
+                                            NPC[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 0.1_n;
                                         }
                                         else
                                         {
-                                            NPC[B].Location.X = Block[C].Location.X - NPC[B].Location.Width - 0.1;
-                                            NPC[A].Location.X = NPC[B].Location.X - NPC[A].Location.Width - 0.1;
+                                            NPC[B].Location.X = Block[C].Location.X - NPC[B].Location.Width - 0.1_n;
+                                            NPC[A].Location.X = NPC[B].Location.X - NPC[A].Location.Width - 0.1_n;
                                         }
                                     }
                                 }
@@ -491,14 +491,14 @@ void NPCCollide(int A)
             if(NPCIsAParaTroopa(NPC[A]) && NPCIsAParaTroopa(NPC[B]))
             {
                 if(NPC[A].Location.to_right_of(NPC[B].Location))
-                    NPC[A].Location.SpeedX += 0.05;
+                    NPC[A].Location.SpeedX += 0.05_n;
                 else
-                    NPC[A].Location.SpeedX -= 0.05;
+                    NPC[A].Location.SpeedX -= 0.05_n;
 
-                if(NPC[A].Location.Y + NPC[A].Location.Height / 2.0 > NPC[B].Location.Y + NPC[B].Location.Height / 2.0)
-                    NPC[A].Location.SpeedY += 0.05;
+                if(NPC[A].Location.Y + NPC[A].Location.Height / 2 > NPC[B].Location.Y + NPC[B].Location.Height / 2)
+                    NPC[A].Location.SpeedY += 0.05_n;
                 else
-                    NPC[A].Location.SpeedY -= 0.05;
+                    NPC[A].Location.SpeedY -= 0.05_n;
 
                 HitSpot = 0;
             }

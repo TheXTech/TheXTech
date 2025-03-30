@@ -23,16 +23,22 @@
 #ifndef NPC_UPDATE_PRIV_H
 #define NPC_UPDATE_PRIV_H
 
-// most of these routines were originally part of UpdateNPCs
-void NPCMovementLogic(int A, float& speedVar);
+#include "numeric_types.h"
 
-void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA, const int numTempBlock, const float speedVar);
+struct NPC_t;
+
+// most of these routines were originally part of UpdateNPCs
+void NPCMovementLogic(int A, numf_t& speedVar);
+
+void NPCSectionWrap(NPC_t& npc);
+
+void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA, const int numTempBlock, const numf_t speedVar);
 
 void NPCCollide(int A);
 
 void NPCCollideHeld(int A);
 
-void NPCWalkingLogic(int A, const double tempHit, const int tempHitBlock, float tempSpeedA);
+void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, numf_t tempSpeedA);
 
 void NPCEffects(int A);
 

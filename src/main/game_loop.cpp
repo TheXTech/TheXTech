@@ -378,7 +378,7 @@ resume_UpdateEvents:
         if(LevelMacro == LEVELMACRO_OFF && CheckLiving() > 0)
         {
             // this is always able to pause the game even when CaptainN is enabled.
-            if(SharedControls.Pause)
+            if(SharedPause)
                 PauseInit(PauseCode::PauseScreen, 0);
             // don't let double-pause or double-toggle happen
             else
@@ -482,8 +482,9 @@ void MessageScreen_Init()
 
 bool MessageScreen_Logic(int plr)
 {
-    bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
-    bool menuBackPress = SharedControls.MenuBack;
+    // can't check other local shared controls because this is global logic
+    bool menuDoPress = SharedPause;
+    bool menuBackPress = false;
 
     // there was previously code to copy all players' controls from the main player, but this is no longer necessary (and actively harmful in the SingleCoop case)
 
@@ -605,7 +606,7 @@ void PauseInit(PauseCode code, int plr, void (*callback)())
     if(code == PauseCode::Message)
         MessageScreen_Init();
     else if(code == PauseCode::PauseScreen)
-        PauseScreen::Init(s_pauseLoopState.pause_player, SharedControls.LegacyPause);
+        PauseScreen::Init(s_pauseLoopState.pause_player, SharedPauseLegacy);
     else if(code == PauseCode::DropAdd)
         ConnectScreen::DropAdd_Start();
     else if(code == PauseCode::Prompt)

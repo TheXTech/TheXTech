@@ -32,12 +32,12 @@
 
 #include "main/trees.h"
 
-void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA, const int numTempBlock, const float speedVar)
+void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA, const int numTempBlock, const numf_t speedVar)
 {
     bool resetBeltSpeed = false;
     bool beltClear = false; // "stops belt movement when on a wall" (Redigit)
-    float beltCount = 0;
-    float addBelt = 0;
+    numf_t beltCount = 0;
+    numf_t addBelt = 0;
 
     bool SlopeTurn = false;
 
@@ -47,7 +47,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
     int tempHitIsSlope = 0;
 
     int oldSlope = NPC[A].Slope; // previous sloped block the npc was on
-    float oldBeltSpeed = NPC[A].BeltSpeed;
+    numf_t oldBeltSpeed = NPC[A].BeltSpeed;
 
     NPC[A].Slope = 0;
     NPC[A].BeltSpeed = 0;
@@ -324,10 +324,10 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
                                         if(HitSpot == 1)
                                         {
-                                            if(NPC[A].Special == 4 && NPC[A].Location.X + 0.99 == Block[B].Location.X + Block[B].Location.Width)
+                                            if(NPC[A].Special == 4 && NPC[A].Location.X + 0.99_n == Block[B].Location.X + Block[B].Location.Width)
                                                 HitSpot = 0;
 
-                                            if(NPC[A].Special == 2 && NPC[A].Location.X + NPC[A].Location.Width - 0.99 == Block[B].Location.X)
+                                            if(NPC[A].Special == 2 && NPC[A].Location.X + NPC[A].Location.Width - 0.99_n == Block[B].Location.X)
                                                 HitSpot = 0;
                                         }
 
@@ -338,7 +338,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         {
                                             if(NPC[A].Special == 4 && NPC[A].Special2 == -1)
                                             {
-                                                if(NPC[A].Location.X - 0.01 == Block[B].Location.X)
+                                                if(NPC[A].Location.X - 0.01_n == Block[B].Location.X)
                                                 {
                                                     NPC[A].Special = 3;
                                                     NPC[A].Special2 = 1;
@@ -380,8 +380,8 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                     if(BlockSlope2[Block[B].Type] != 0 && HitSpot > 0 && ((NPC[A].Location.Y > Block[B].Location.Y) || ((NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_WALL_TURTLE) && NPC[A].Special == 3)))
                                     {
                                         // the modifications to Special and Special2 here are invalid and could affect any NPC. They were meant to affect wall climbers.
-                                        double NPC_A_Special = NPC[A].Special;
-                                        double NPC_A_Special2 = NPC[A].Special2;
+                                        num_t NPC_A_Special = NPC[A].Special;
+                                        num_t NPC_A_Special2 = NPC[A].Special2;
 
                                         char Special_from = 0;
                                         char Special2_from = 0;
@@ -420,13 +420,13 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         }
 
                                         HitSpot = 0;
-                                        double PlrMid;
+                                        num_t PlrMid;
                                         if(BlockSlope2[Block[B].Type] == 1)
                                             PlrMid = NPC[A].Location.X + NPC[A].Location.Width;
                                         else
                                             PlrMid = NPC[A].Location.X;
 
-                                        double Slope = (PlrMid - Block[B].Location.X) / Block[B].Location.Width;
+                                        num_t Slope = (PlrMid - Block[B].Location.X) / (int_ok)Block[B].Location.Width;
                                         if(BlockSlope2[Block[B].Type] > 0)
                                             Slope = 1 - Slope;
                                         if(Slope < 0)
@@ -434,7 +434,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         if(Slope > 1)
                                             Slope = 1;
 
-                                        if(NPC[A].Location.Y < Block[B].Location.Y + Block[B].Location.Height - (Block[B].Location.Height * Slope) - 0.1)
+                                        if(NPC[A].Location.Y < Block[B].Location.Y + Block[B].Location.Height - ((int_ok)Block[B].Location.Height * Slope) - 0.1_n)
                                         {
                                             if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_PLR_ICEBALL)
                                                 NPCHit(A, 3, A);
@@ -457,15 +457,15 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                 }
 
                                                 PlrMid = NPC[A].Location.Y;
-                                                Slope = (PlrMid - Block[B].Location.Y) / Block[B].Location.Height;
+                                                Slope = (PlrMid - Block[B].Location.Y) / (int_ok)Block[B].Location.Height;
                                                 if(Slope < 0)
                                                     Slope = 0;
                                                 if(Slope > 1)
                                                     Slope = 1;
                                                 if(BlockSlope2[Block[B].Type] < 0)
-                                                    NPC[A].Location.X = Block[B].Location.X + Block[B].Location.Width - (Block[B].Location.Width * Slope);
+                                                    NPC[A].Location.X = Block[B].Location.X + Block[B].Location.Width - ((int_ok)Block[B].Location.Width * Slope);
                                                 else
-                                                    NPC[A].Location.X = Block[B].Location.X + (Block[B].Location.Width * Slope) - NPC[A].Location.Width;
+                                                    NPC[A].Location.X = Block[B].Location.X + ((int_ok)Block[B].Location.Width * Slope) - NPC[A].Location.Width;
                                                 SlopeTurn = true;
                                                 if(NPC[A].Location.SpeedX < 0)
                                                     HitSpot = 2;
@@ -474,7 +474,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                             }
                                             else
                                             {
-                                                NPC[A].Location.Y = Block[B].Location.Y + Block[B].Location.Height - (Block[B].Location.Height * Slope);
+                                                NPC[A].Location.Y = Block[B].Location.Y + Block[B].Location.Height - ((int_ok)Block[B].Location.Height * Slope);
                                                 if(NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_WALL_TURTLE)
                                                 {
                                                     NPC[A].Location.Y += 1;
@@ -482,8 +482,8 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                     tempBlockHit2 = 0;
                                                 }
 
-                                                if(NPC[A].Location.SpeedY < -0.01)
-                                                    NPC[A].Location.SpeedY = -0.01 + Block[B].Location.SpeedY;
+                                                if(NPC[A].Location.SpeedY < -0.01_n)
+                                                    NPC[A].Location.SpeedY = -0.01_n + Block[B].Location.SpeedY;
 
                                                 if(NPCIsAParaTroopa(NPC[A]))
                                                     NPC[A].Location.SpeedY += 2;
@@ -514,13 +514,13 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         {
                                             if(NPC[A].Location.X < Block[B].Location.X + Block[B].Location.Width && NPC[A].Location.X + NPC[A].Location.Width > Block[B].Location.X)
                                             {
-                                                double PlrMid;
+                                                num_t PlrMid;
                                                 if(BlockSlope[Block[B].Type] == 1)
                                                     PlrMid = NPC[A].Location.X;
                                                 else
                                                     PlrMid = NPC[A].Location.X + NPC[A].Location.Width;
 
-                                                double Slope = (PlrMid - Block[B].Location.X) / Block[B].Location.Width;
+                                                num_t Slope = (PlrMid - Block[B].Location.X) / (int_ok)Block[B].Location.Width;
 
                                                 if(BlockSlope[Block[B].Type] < 0)
                                                     Slope = 1 - Slope;
@@ -541,7 +541,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                     }
                                                 }
 
-                                                if(NPC[A].Location.Y >= Block[B].Location.Y + (Block[B].Location.Height * Slope) - NPC[A].Location.Height - 0.1)
+                                                if(NPC[A].Location.Y >= Block[B].Location.Y + ((int_ok)Block[B].Location.Height * Slope) - NPC[A].Location.Height - 0.1_n)
                                                 {
                                                     if(NPC[A].Type == NPCID_EARTHQUAKE_BLOCK && NPC[A].Location.SpeedY > 2)
                                                         NPCHit(A, 4, A);
@@ -562,7 +562,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                     }
                                                     else
                                                     {
-                                                        NPC[A].Location.Y = Block[B].Location.Y + (Block[B].Location.Height * Slope) - NPC[A].Location.Height - 0.1;
+                                                        NPC[A].Location.Y = Block[B].Location.Y + ((int_ok)Block[B].Location.Height * Slope) - NPC[A].Location.Height - 0.1_n;
 
                                                         if(NPC[A]->IsFish)
                                                             NPC[A].TurnAround = true;
@@ -584,9 +584,9 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
                                                         if(NPC[A]->IsAShell || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1) || NPC[A].Type == NPCID_ICE_CUBE)
                                                         {
-                                                            if(NPC[A].Location.SpeedY > NPC[A].Location.SpeedX * (Block[B].Location.Height / Block[B].Location.Width) * BlockSlope[Block[B].Type])
+                                                            if(NPC[A].Location.SpeedY > NPC[A].Location.SpeedX * (int_ok)Block[B].Location.Height / (int_ok)Block[B].Location.Width * BlockSlope[Block[B].Type])
                                                             {
-                                                                NPC[A].Location.SpeedY = NPC[A].Location.SpeedX * (Block[B].Location.Height / Block[B].Location.Width) * BlockSlope[Block[B].Type];
+                                                                NPC[A].Location.SpeedY = NPC[A].Location.SpeedX * (int_ok)Block[B].Location.Height / (int_ok)Block[B].Location.Width * BlockSlope[Block[B].Type];
                                                                 HitSpot = 0;
                                                                 if(NPC[A].Location.SpeedY > 0)
                                                                     NPC[A].Location.SpeedY = 0;
@@ -674,7 +674,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
                                     if(NPC[A].Type == NPCID_ICE_CUBE && (HitSpot == 1 || HitSpot == 3 || HitSpot == 5))
                                     {
-                                        if(NPC[A].Location.SpeedX > -Physics.NPCShellSpeed * 0.8 && NPC[A].Location.SpeedX < Physics.NPCShellSpeed * 0.8)
+                                        if(NPC[A].Location.SpeedX > -Physics.NPCShellSpeed * 0.8_r && NPC[A].Location.SpeedX < Physics.NPCShellSpeed * 0.8_r)
                                         {
                                             if(NPC[A].Location.SpeedY > 5 || NPC[A].Location.SpeedY < -2)
                                                 NPCHit(A, 3, A);
@@ -704,8 +704,8 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                             NPC[A].Pinched.Right4 = 2;
                                         else if(HitSpot == 5)
                                         {
-                                            double dx = Block[B].Location.minus_center_x(NPC[A].Location);
-                                            double dy = Block[B].Location.minus_center_y(NPC[A].Location);
+                                            num_t dx = Block[B].Location.minus_center_x(NPC[A].Location);
+                                            num_t dy = Block[B].Location.minus_center_y(NPC[A].Location);
 
                                             int D = 0;
 
@@ -783,7 +783,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         NPCHit(A, 3, A);
 
                                     // safe to leave uninitialized, they're only read if g_config.fix_npc_downward_clip is set
-                                    double tempHitOld;
+                                    num_t tempHitOld;
                                     int tempHitOldBlock;
 
                                     if(g_config.fix_npc_downward_clip)
@@ -845,7 +845,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         }
                                         else if(NPC[A].Type == NPCID_SLIDE_BLOCK)
                                         {
-                                            if(NPC[A].Special == 1 && NPC[A].Location.SpeedX == 0 && NPC[A].Location.SpeedY > 7.95)
+                                            if(NPC[A].Special == 1 && NPC[A].Location.SpeedX == 0 && NPC[A].Location.SpeedY > 7.95_n)
                                                 NPCHit(A, 4, A);
                                         }
                                         else if(NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG)
@@ -866,16 +866,16 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                             if(Block[B].tempBlockNpcType != 0)
                                             {
                                                 if(Block[B].Location.SpeedY > 0 && Block[B].tempBlockNpcType >= NPCID_YEL_PLATFORM && Block[B].tempBlockNpcType <= NPCID_RED_PLATFORM)
-                                                    tempHit = Block[B].Location.Y - NPC[A].Location.Height - 0.01 + Block[B].Location.SpeedY;
+                                                    tempHit = Block[B].Location.Y - NPC[A].Location.Height - 0.01_n + Block[B].Location.SpeedY;
                                                 else
-                                                    tempHit = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
+                                                    tempHit = Block[B].Location.Y - NPC[A].Location.Height - 0.01_n;
 
                                                 tempHitBlock = B;
                                             }
                                             else
                                             {
                                                 tempHitBlock = B;
-                                                tempHit = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
+                                                tempHit = Block[B].Location.Y - NPC[A].Location.Height - 0.01_n;
                                             }
 
                                             if(Block[B].tempBlockNpcType >= NPCID_YEL_PLATFORM && Block[B].tempBlockNpcType <= NPCID_RED_PLATFORM)
@@ -884,17 +884,17 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                 beltCount = 0;
                                             }
 
-                                            double C = 0;
+                                            num_t C = 0;
 
                                             if(NPC[A].Location.X > Block[B].Location.X)
-                                                C = NPC[A].Location.X - 0.01;
+                                                C = NPC[A].Location.X - 0.01_n;
                                             else
-                                                C = Block[B].Location.X - 0.01;
+                                                C = Block[B].Location.X - 0.01_n;
 
                                             if(NPC[A].Location.X + NPC[A].Location.Width < Block[B].Location.X + Block[B].Location.Width)
-                                                C = (NPC[A].Location.X + NPC[A].Location.Width - C + 0.01);
+                                                C = (NPC[A].Location.X + NPC[A].Location.Width - C + 0.01_n);
                                             else
-                                                C = (Block[B].Location.X + Block[B].Location.Width - C + 0.01);
+                                                C = (Block[B].Location.X + Block[B].Location.Width - C + 0.01_n);
 
                                             if(Block[B].tempBlockVehiclePlr == 0)
                                             {
@@ -903,7 +903,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                 else
                                                     NPC[A].BeltSpeed += (Block[B].Location.SpeedX * C);
 
-                                                beltCount += static_cast<float>(C);
+                                                beltCount += numf_t(C);
                                             }
                                         }
 
@@ -913,10 +913,10 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                             {
                                                 if(NPC[A].Location.SpeedY > 2)
                                                 {
-                                                    NPC[A].Location.SpeedY = -NPC[A].Location.SpeedY * 0.7 + Block[B].Location.SpeedY;
+                                                    NPC[A].Location.SpeedY = -NPC[A].Location.SpeedY * 0.7_r + Block[B].Location.SpeedY;
 
                                                     if(NPC[A].Slope == 0)
-                                                        NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
+                                                        NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01_n;
 
                                                     tempHit = 0;
                                                     tempHitBlock = 0;
@@ -941,7 +941,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                     else
                                                         NPC[A].Location.SpeedY = -5 + Block[B].Location.SpeedY;
                                                     if(NPC[A].Slope == 0)
-                                                        NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
+                                                        NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01_n;
                                                     tempHit = 0;
                                                     tempHitOld = 0;
                                                 }
@@ -949,7 +949,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                 {
                                                     NPC[A].Location.SpeedY = -7 + Block[B].Location.SpeedY;
                                                     if(NPC[A].Slope == 0)
-                                                        NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
+                                                        NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01_n;
                                                     tempHit = 0;
                                                     tempHitOld = 0;
                                                     if(!Block[B].Slippy)
@@ -963,7 +963,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
 
                                                 }
-                                                else if(NPC[A].Bouce || NPC[A].Location.SpeedY > 5.8 || ((NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_TOOTHYPIPE) && (NPC[A].Location.SpeedY > 2 || (NPC[A].Location.SpeedX > 1 || NPC[A].Location.SpeedX < -1))))
+                                                else if(NPC[A].Bouce || NPC[A].Location.SpeedY > 5.8_n || ((NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_TOOTHYPIPE) && (NPC[A].Location.SpeedY > 2 || (NPC[A].Location.SpeedX > 1 || NPC[A].Location.SpeedX < -1))))
                                                 {
                                                     NPC[A].Bouce = false;
                                                     if(NPC[A]->IsAShell || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1) || NPC[A].Type == NPCID_ICE_CUBE)
@@ -988,9 +988,9 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                         NPC[A].Location.SpeedY = 0;
                                                     }
                                                     else
-                                                        NPC[A].Location.SpeedY = -NPC[A].Location.SpeedY * 0.6;
+                                                        NPC[A].Location.SpeedY = -NPC[A].Location.SpeedY * 0.6_r;
                                                     if(NPC[A].Slope == 0)
-                                                        NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
+                                                        NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01_n;
                                                     tempHit = 0;
                                                     tempHitOld = 0;
                                                 }
@@ -1016,7 +1016,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                     }
                                                     else if(NPC[A].Type == NPCID_BULLY)
                                                     {
-                                                        if(NPC[A].Location.SpeedX > -0.1 && NPC[A].Location.SpeedX < 0.1)
+                                                        if(NPC[A].Location.SpeedX > -0.1_n && NPC[A].Location.SpeedX < 0.1_n)
                                                             NPC[A].Projectile = false;
                                                     }
                                                     else if(!(NPC[A]->IsAShell || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1) || NPC[A].Type == NPCID_SPIKY_BALL_S3))
@@ -1056,14 +1056,14 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                             if(NPC[A].Slope == 0 && !SlopeTurn)
                                             {
                                                 if(HitSpot == 2)
-                                                    NPC[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.01;
+                                                    NPC[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.01_n;
                                                 else
-                                                    NPC[A].Location.X = Block[B].Location.X - NPC[A].Location.Width - 0.01;
+                                                    NPC[A].Location.X = Block[B].Location.X - NPC[A].Location.Width - 0.01_n;
                                             }
                                             if(!(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_TANK_TREADS || NPC[A].Type == NPCID_BULLET))
                                                 NPC[A].TurnAround = true;
                                             if(NPCIsAParaTroopa(NPC[A]))
-                                                NPC[A].Location.SpeedX += -Block[B].Location.SpeedX * 1.2;
+                                                NPC[A].Location.SpeedX += -Block[B].Location.SpeedX * 1.2_r;
                                             if(NPC[A]->IsAShell)
                                                 NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
                                             addBelt = NPC[A].Location.X - addBelt;
@@ -1085,7 +1085,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         if(NPCIsAParaTroopa(NPC[A]))
                                         {
                                             NPC[A].Location.SpeedY = 2 + Block[B].Location.SpeedY;
-                                            NPC[A].Location.Y = Block[B].Location.Y + Block[B].Location.Height + 0.1;
+                                            NPC[A].Location.Y = Block[B].Location.Y + Block[B].Location.Height + 0.1_n;
                                         }
                                     }
                                     else if(HitSpot == 5) // Hitspot 5
@@ -1129,17 +1129,17 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         {
                                             addBelt = NPC[A].Location.X;
 
-                                            if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 < Block[B].Location.X + Block[B].Location.Width * 0.5)
-                                                NPC[A].Location.X = Block[B].Location.X - NPC[A].Location.Width - 0.01;
+                                            if(NPC[A].Location.X + NPC[A].Location.Width / 2 < Block[B].Location.X + Block[B].Location.Width / 2)
+                                                NPC[A].Location.X = Block[B].Location.X - NPC[A].Location.Width - 0.01_n;
                                             else
-                                                NPC[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.01;
+                                                NPC[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.01_n;
 
                                             addBelt = NPC[A].Location.X - addBelt;
 
                                             if(NPC[A].Type == NPCID_MINIBOSS)
                                             {
                                                 NPC[A].Location.SpeedY = 0;
-                                                NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
+                                                NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01_n;
                                             }
 
                                             if(NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_TANK_TREADS && NPC[A].Type != NPCID_PLR_ICEBALL)
@@ -1228,7 +1228,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
         {
             if(!(NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG || NPC[A].Type == NPCID_CANNONENEMY))
             {
-                if(NPC[A].Location.SpeedY < -0.05)
+                if(NPC[A].Location.SpeedY < -0.05_n)
                 {
                     BlockHit(winningBlock);
                     PlaySoundSpatial(SFX_BlockHit, NPC[A].Location);
@@ -1242,10 +1242,10 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
         if(!NPCIsAParaTroopa(NPC[A]))
         {
-            NPC[A].Location.Y = Block[winningBlock].Location.Y + Block[winningBlock].Location.Height + 0.01;
+            NPC[A].Location.Y = Block[winningBlock].Location.Y + Block[winningBlock].Location.Height + 0.01_n;
 
             if(g_config.fix_npc_ceiling_speed)
-                NPC[A].Location.SpeedY = 0.01 + Block[winningBlock].Location.SpeedY;
+                NPC[A].Location.SpeedY = 0.01_n + Block[winningBlock].Location.SpeedY;
             else
             {
                 // This is the original extremely buggy line, using an arbitrary B from the end of the old fBlock/lBlock or tempBlock query.
@@ -1279,10 +1279,10 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                     // We could use a quadtree here, but this is a rare case. Just do it.
 
                     // Normally, need to find the first Block (in sorted order) which is to the right of the NPC.
-                    double right_border = NPC[A].Location.X + NPC[A].Location.Width;
+                    num_t right_border = NPC[A].Location.X + NPC[A].Location.Width;
 
                     int first_after_block = -1;
-                    double first_after_x = 0.0, first_after_y = 0.0;
+                    num_t first_after_x = 0, first_after_y = 0;
 
                     // IF PSwitchTime != 0 but the blocks are sorted,
                     // then we would have iterated over the NPC's entire FLBlock column without breaking,
@@ -1303,8 +1303,8 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
                         const Block_t& b = Block[block];
 
-                        double bx = b.Location.X;
-                        double by = b.Location.Y;
+                        num_t bx = b.Location.X;
+                        num_t by = b.Location.Y;
 
                         // sort as they were in the original array
                         if(b.Layer != LAYER_NONE)
@@ -1338,12 +1338,12 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
                 if(B != -1)
                 {
-                    NPC[A].Location.SpeedY = 0.01 + Block[B].Location.SpeedY;
+                    NPC[A].Location.SpeedY = 0.01_n + Block[B].Location.SpeedY;
                     // pLogDebug("NPC %d hits ceiling, set SpeedY using block %d with speed %f\n", A, B, Block[B].Location.SpeedY);
                 }
                 else
                 {
-                    NPC[A].Location.SpeedY = 0.01;
+                    NPC[A].Location.SpeedY = 0.01_n;
                     // pLogDebug("NPC %d hits ceiling, set SpeedY using OOB block with speed 0\n", A);
                 }
             }
@@ -1360,10 +1360,10 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
         {
             NPC[A].BeltSpeed = oldBeltSpeed - NPC[A].oldAddBelt;
             beltCount = 1;
-            if(NPC[A].BeltSpeed >= 2.1f)
-                NPC[A].BeltSpeed -= 0.1f;
-            else if(NPC[A].BeltSpeed <= -2.1f)
-                NPC[A].BeltSpeed += 0.1f;
+            if(NPC[A].BeltSpeed >= 2.1_nf)
+                NPC[A].BeltSpeed -= 0.1_nf;
+            else if(NPC[A].BeltSpeed <= -2.1_nf)
+                NPC[A].BeltSpeed += 0.1_nf;
         }
     }
 
@@ -1372,7 +1372,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
         Location_t preBeltLoc = NPC[A].Location;
         NPC[A].BeltSpeed = NPC[A].BeltSpeed / beltCount;
         NPC[A].BeltSpeed = NPC[A].BeltSpeed * speedVar;
-        NPC[A].Location.X += double(NPC[A].BeltSpeed);
+        NPC[A].Location.X += num_t(NPC[A].BeltSpeed);
 //                            D = NPC[A].BeltSpeed; // Idk why this is needed as this value gets been overriden and never re-used
         Location_t tempLocation = NPC[A].Location;
         tempLocation.Y += 1;

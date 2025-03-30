@@ -185,7 +185,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
         else
             tempLocation.Y = sect.Height - frameH;
 
-        double bottom_Y = tempLocation.Y + frameH;
+        num_t bottom_Y = tempLocation.Y + frameH;
         unsigned int flip = X_FLIP_NONE;
         while(tempLocation.Y + tempLocation.Height > -camY)
         {

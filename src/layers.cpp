@@ -381,7 +381,7 @@ bool DeleteLayer(layerindex_t L, bool killall)
     return true;
 }
 
-void SetLayerSpeed(layerindex_t L, double SpeedX, double SpeedY, bool EffectStop, bool Defective)
+void SetLayerSpeed(layerindex_t L, num_t SpeedX, num_t SpeedY, bool EffectStop, bool Defective)
 {
     if(L == LAYER_NONE)
         return;
@@ -420,9 +420,9 @@ void SetLayerSpeed(layerindex_t L, double SpeedX, double SpeedY, bool EffectStop
         Block[C].Location.SpeedY = 0;
 
         if(Block[C].Type >= BLKID_CONVEYOR_L_START && Block[C].Type <= BLKID_CONVEYOR_L_END)
-            Block[C].Location.SpeedX = -0.8;
+            Block[C].Location.SpeedX = -0.8_n;
         else if(Block[C].Type >= BLKID_CONVEYOR_R_START && Block[C].Type <= BLKID_CONVEYOR_R_END)
-            Block[C].Location.SpeedX = 0.8;
+            Block[C].Location.SpeedX = 0.8_n;
     }
 
     for(int C : Layer[L].NPCs)
@@ -1038,8 +1038,8 @@ static inline bool s_initModernQScreen(Screen_t& screen, const int B, const Spee
 
             int old_w = qScreenLoc[Z_i].Width;
             int old_h = qScreenLoc[Z_i].Height;
-            double old_x = qScreenLoc[Z_i].X;
-            double old_y = qScreenLoc[Z_i].Y;
+            num_t old_x = qScreenLoc[Z_i].X;
+            num_t old_y = qScreenLoc[Z_i].Y;
 
             // (0) player should not have warped
             if(plr.Effect == PLREFF_NO_COLLIDE)
@@ -1061,7 +1061,7 @@ static inline bool s_initModernQScreen(Screen_t& screen, const int B, const Spee
             // (3) qScreen should not have occurred in old game
             if(use_new_resize && !is_reset)
             {
-                double cx, cy, old_cx, old_cy;
+                num_t cx, cy, old_cx, old_cy;
 
                 GetPlayerScreen(800, 600, plr, cx, cy);
 
@@ -1161,8 +1161,8 @@ static inline bool s_initLegacyQScreen(Screen_t& screen, const int B, const Spee
         }
 
         // used ScreenW / H and FrmMain.ScaleWidth / Height in VB6 code
-        double use_width  = SDL_min(static_cast<double>(screen.W), level[B].Width  - level[B].X);
-        double use_height = SDL_min(static_cast<double>(screen.H), level[B].Height - level[B].Y);
+        num_t use_width  = SDL_min(static_cast<num_t>(screen.W), level[B].Width  - level[B].X);
+        num_t use_height = SDL_min(static_cast<num_t>(screen.H), level[B].Height - level[B].Y);
 
         // restrict to old level bounds
         if(-qScreenLoc[Z1].X < level[B].X)
@@ -1691,9 +1691,9 @@ void UpdateLayers()
                     Block[B].Location.SpeedY = 0;
 
                     if(Block[B].Type >= BLKID_CONVEYOR_L_START && Block[B].Type <= BLKID_CONVEYOR_L_END)
-                        Block[B].Location.SpeedX = -0.8;
+                        Block[B].Location.SpeedX = -0.8_n;
                     else if(Block[B].Type >= BLKID_CONVEYOR_R_START && Block[B].Type <= BLKID_CONVEYOR_R_END)
-                        Block[B].Location.SpeedX = 0.8;
+                        Block[B].Location.SpeedX = 0.8_n;
                 }
 
                 if(g_config.enable_climb_bgo_layer_move)
@@ -1757,9 +1757,9 @@ void UpdateLayers()
                     Block[B].Location.SpeedY = Layer[A].SpeedY;
 
                     if(Block[B].Type >= BLKID_CONVEYOR_L_START && Block[B].Type <= BLKID_CONVEYOR_L_END)
-                        Block[B].Location.SpeedX += -0.8;
+                        Block[B].Location.SpeedX += -0.8_n;
                     else if(Block[B].Type >= BLKID_CONVEYOR_R_START && Block[B].Type <= BLKID_CONVEYOR_R_END)
-                        Block[B].Location.SpeedX += 0.8;
+                        Block[B].Location.SpeedX += 0.8_n;
 
                     if(inactive)
                         treeBlockUpdateLayer(A, B);

@@ -32,8 +32,8 @@
 static void s_makeHeavySparkle(const NPC_t& n, int offY)
 {
     NewEffect(EFFID_SPARKLE, newLoc(n.Location.X + n.Location.Width / 2 - 4, n.Location.Y + n.Location.Height / 2 - offY), 1, 0, n.Shadow);
-    Effect[numEffects].Location.SpeedX = dRand() - 0.5;
-    Effect[numEffects].Location.SpeedY = dRand() - 0.5;
+    Effect[numEffects].Location.SpeedX = dRand() - 0.5_n;
+    Effect[numEffects].Location.SpeedY = dRand() - 0.5_n;
 }
 
 
@@ -139,7 +139,7 @@ void NPCFrames(int A)
     {
         int new_frame = 0;
 
-        double min_dist = 0;
+        num_t min_dist = 0;
         for(int B = 1; B <= numPlayers; B++)
         {
             if(!Player[B].Dead && Player[B].Section == NPC[A].Section && Player[B].TimeToLive == 0)
@@ -1260,7 +1260,7 @@ void NPCFrames(int A)
     {
         if(NPC[A].Projectile)
         {
-            if(NPC[A].Location.SpeedX < -0.5 || NPC[A].Location.SpeedX > 0.5)
+            if(NPC[A].Location.SpeedX < -0.5_n || NPC[A].Location.SpeedX > 0.5_n)
                 NPC[A].Frame = 3;
             else
             {
@@ -1669,8 +1669,8 @@ void NPCFrames(int A)
                             tempLocation.Width = EffectWidth[EFFID_SPARKLE];
                             tempLocation.SpeedX = 0;
                             tempLocation.SpeedY = 0;
-                            tempLocation.X = NPC[A].Location.X + dRand() * 16 - EffectWidth[EFFID_SPARKLE] / 2.0 - 4 - NPC[A].Location.SpeedX * 3;
-                            tempLocation.Y = NPC[A].Location.Y + dRand() * 16 - EffectHeight[EFFID_SPARKLE] / 2.0 - 4;
+                            tempLocation.X = NPC[A].Location.X + dRand() * 16 - EffectWidth[EFFID_SPARKLE] * 0.5_n - 4 - NPC[A].Location.SpeedX * 3;
+                            tempLocation.Y = NPC[A].Location.Y + dRand() * 16 - EffectHeight[EFFID_SPARKLE] * 0.5_n - 4;
                             NewEffect(EFFID_SPARKLE, tempLocation);
                             Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX / 2;
                             Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY / 2;

@@ -28,7 +28,7 @@
 extern ScreenFader g_worldScreenFader;
 
 //! Multiplier for world map qScreen
-extern double g_worldCamSpeed;
+extern num_t g_worldCamSpeed;
 
 //! Play sound if world map qScreen stays active next frame
 extern bool g_worldPlayCamSound;
