@@ -187,7 +187,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 
 
 #if defined(_WIN32) && !defined(RENDER_FULLSCREEN_ALWAYS) && defined(RENDER_FULLSCREEN_TYPES_SUPPORTED)
-    if(g_config.fullscreen_type == Config_t::FULLSCREEN_TYPE_REAL)
+    if(g_config.fullscreen_type == Config_t::FULLSCREEN_TYPE_EXCLUSIVE)
     {
         XWindow::setFullScreenType(g_config.fullscreen_type);
         if(g_config.fullscreen)

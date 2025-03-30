@@ -570,13 +570,13 @@ public:
     {
         FULLSCREEN_TYPE_AUTO = 0,
         FULLSCREEN_TYPE_DESKTOP = 1,
-        FULLSCREEN_TYPE_REAL = 2
+        FULLSCREEN_TYPE_EXCLUSIVE = 2
     };
     setup_enum_t fullscreen_type{this,
         {
             {FULLSCREEN_TYPE_AUTO, "auto", "Auto", nullptr},
             {FULLSCREEN_TYPE_DESKTOP, "desktop", "Desktop", "Keep the current screen resolution"},
-            {FULLSCREEN_TYPE_REAL, "real", "Exclusive", "Set physical screen resolution"},
+            {FULLSCREEN_TYPE_EXCLUSIVE, "exclusive", "Exclusive", "Set physical screen resolution"},
         },
         defaults(FULLSCREEN_TYPE_AUTO), {},
         Scope::Config,

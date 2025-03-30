@@ -101,6 +101,11 @@ void config_fullscreen_set()
 }
 
 #ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+void config_video_mode_set()
+{
+
+}
+
 void config_fullscreen_type_set()
 {
     if(!GameIsActive)
@@ -197,3 +202,4 @@ void config_compat_changed()
     if(!g_configInTransaction)
         UpdateConfig();
 }
+

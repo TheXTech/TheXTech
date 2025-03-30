@@ -39,13 +39,88 @@
 
 
 #ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+#   include <map>
+#   include <set>
 #   include "pge_cpu_arch.h"
 
 static bool s_hasFrameBuffer = false;
+static std::vector<AbstractWindow_t::VideoModeRes> s_availableRes;
+static std::vector<uint8_t> s_availableColours;
+
 
 void WindowSDL::setHasFrameBuffer(bool has)
 {
     s_hasFrameBuffer = has;
+}
+
+static void s_fillScreenModes()
+{
+    SDL_DisplayMode mode;
+    int modes = SDL_GetNumDisplayModes(0);
+
+    std::map<uint32_t, std::vector<AbstractWindow_t::VideoModeRes>> m_listModes;
+    std::set<uint32_t> m_listColours;
+
+    pLogDebug("List of available screen modes:");
+    for(int i = modes - 1; i >= 0; --i)
+    {
+        SDL_GetDisplayMode(0, i, &mode);
+        pLogDebug("-- C=%u (%s), W=%d, H=%d, R=%d",
+                  mode.format, SDL_GetPixelFormatName(mode.format), mode.w, mode.h, mode.refresh_rate);
+        m_listModes[mode.format].push_back({mode.w, mode.h});
+        m_listColours.insert(mode.format);
+    }
+
+    // The list should NOT be empty!
+    SDL_assert_release(!m_listModes.empty() && !m_listModes.begin()->second.empty());
+
+    // If only one colour mode caught, just add everything into the list
+    if(m_listModes.size() == 1)
+    {
+        auto &e = *m_listModes.begin();
+        s_availableColours.push_back(e.first);
+
+        for(auto jt = e.second.begin(); jt != e.second.end(); ++jt)
+            s_availableRes.push_back(*jt);
+    }
+    else
+    {
+        bool notEqual = false;
+        auto &first = m_listModes.begin()->second;
+
+        auto it = m_listModes.begin();
+        ++it;
+
+        for( ; it != m_listModes.end(); ++it)
+        {
+            s_availableRes.clear();
+
+            for(auto ft = first.begin(), jt = it->second.begin();  ; ++jt)
+            {
+                if(jt == it->second.end() && ft == first.end())
+                    break; // Both equal
+
+                if(jt == it->second.end() || ft == first.end())
+                {
+                    // Different length
+                    notEqual = true;
+                    break;
+                }
+
+                if(jt->w != ft->w || jt->h != ft->h)
+                {
+                    // Not equal content
+                    notEqual = true;
+                    break;
+                }
+
+                s_availableRes.push_back(*ft);
+            }
+
+            if(notEqual)
+                break; // Work finished!
+        }
+    }
 }
 
 #ifdef _WIN32
@@ -420,6 +495,8 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
 #ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+    s_fillScreenModes();
+
     if(m_screen_orig_w == 0 || m_screen_orig_h == 0)
     {
         int display = SDL_GetWindowDisplayIndex(m_window);
@@ -632,6 +709,29 @@ int WindowSDL::setFullScreen(bool fs)
 
 
 #ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+
+const std::vector<AbstractWindow_t::VideoModeRes> &WindowSDL::getAvailableVideoResolutions()
+{
+    return s_availableRes;
+}
+
+const std::vector<uint8_t> &WindowSDL::getAvailableColourDepths()
+{
+    return s_availableColours;
+}
+
+void WindowSDL::getCurrentVideoMode(VideoModeRes &res, uint8_t &colourDepth)
+{
+    res = m_curRes;
+    colourDepth = m_curColour;
+}
+
+void WindowSDL::setVideoMode(const VideoModeRes &res, uint8_t colourDepth)
+{
+    m_curRes = res;
+    m_curColour = colourDepth;
+    // TODO: Implement toggling logic here!
+}
 
 int WindowSDL::setFullScreenType(int type)
 {
