@@ -681,7 +681,7 @@ public:
         insert(0x00B2C898,
             []()->std::string
             {
-                D_pLogDebug("Attempt to read unsupported field at 0x00B2C898 (cheats buffer)");
+                D_pLogDebugNA("Attempt to read unsupported field at 0x00B2C898 (cheats buffer)");
                 return std::string();
             },
             [](const std::string &in)->void
