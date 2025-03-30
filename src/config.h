@@ -583,6 +583,24 @@ public:
         "fullscreen-type", "Fullscreen type", nullptr,
         config_fullscreen_type_set
     };
+
+    using fullscreen_res_t = ConfigFullscreenRes_t<writable>;
+
+    fullscreen_res_t fullscreen_res{this, defaults(std::pair<int, int>{800, 600}), {}, Scope::Config,
+        "fullscreen-res", "Exclusive res", nullptr,
+        config_fullscreen_type_set
+    };
+
+    setup_enum_t fullscreen_depth{this,
+        {
+            {0, "auto", "Auto", nullptr},
+            {16, "16", "16-bit", nullptr},
+            {32, "32", "32-bit", nullptr},
+        },
+        defaults(0), {}, Scope::Config,
+        "fullscreen-depth", "Exclusive bit depth", nullptr,
+        config_fullscreen_type_set
+    };
 #endif // RENDER_FULLSCREEN_TYPES_SUPPORTED
 
 #ifndef THEXTECH_NO_SDL_BUILD
