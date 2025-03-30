@@ -58,6 +58,8 @@ static uint8_t s_getColorBits(uint32_t format)
     case SDL_PIXELFORMAT_BGRA8888:
         return 32;
     }
+
+    return 32;
 }
 
 
