@@ -343,9 +343,9 @@ bool BeatTheGame = false;
 //bool FrameSkip = false;
 //double GoalTime = 0.0;
 //double overTime = 0.0;
-int worldCurs = 0;
-int minShow = 0;
-int maxShow = 0;
+// int worldCurs = 0;
+// int minShow = 0;
+// int maxShow = 0;
 
 int ReturnWarp = 0;
 int ReturnWarpSaved = 0;

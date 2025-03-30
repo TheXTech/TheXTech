@@ -2108,11 +2108,11 @@ extern bool BeatTheGame;
 //extern double overTime;
 //'------------------
 //Public worldCurs As Integer
-extern int worldCurs;
+// extern int worldCurs;
 //Public minShow As Integer
-extern int minShow;
+// extern int minShow;
 //Public maxShow As Integer
-extern int maxShow;
+// extern int maxShow;
 
 //Public Type Physics
 struct Physics_t
