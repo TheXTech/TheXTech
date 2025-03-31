@@ -486,6 +486,7 @@ public:
     virtual const std::string& get_display_value(std::string& out) const override;
 };
 
+#ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
 template<>
 class ConfigFullscreenRes_t<true> : public ConfigOption_t<true, std::pair<int, int>>
 {
@@ -511,6 +512,7 @@ public:
     virtual bool rotate_right() override;
     virtual bool change() override;
 };
+#endif // RENDER_FULLSCREEN_TYPES_SUPPORTED
 
 template<>
 class ConfigSetupEnum_t<true> : public ConfigEnumOption_t<true, int>

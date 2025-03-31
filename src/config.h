@@ -588,7 +588,7 @@ public:
 
     fullscreen_res_t fullscreen_res{this, defaults(std::pair<int, int>{800, 600}), {}, Scope::Config,
         "fullscreen-res", "Exclusive res", nullptr,
-        config_fullscreen_type_set
+        config_video_mode_set
     };
 
     setup_enum_t fullscreen_depth{this,
@@ -599,7 +599,7 @@ public:
         },
         defaults(0), {}, Scope::Config,
         "fullscreen-depth", "Exclusive bit depth", nullptr,
-        config_fullscreen_type_set
+        config_video_mode_set
     };
 #endif // RENDER_FULLSCREEN_TYPES_SUPPORTED
 

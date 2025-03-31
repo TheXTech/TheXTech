@@ -62,6 +62,23 @@ static uint8_t s_getColorBits(uint32_t format)
     return 32;
 }
 
+static uint32_t s_getColorFromBits(uint8_t bits)
+{
+    switch(bits)
+    {
+    case 16:
+        return SDL_PIXELFORMAT_BGR888;
+    case 32:
+        return SDL_PIXELFORMAT_BGR888;
+    }
+
+    return SDL_PIXELFORMAT_BGR888;
+}
+
+static inline bool s_isExclusiveFullScreen(Uint32 flags)
+{
+    return (flags & SDL_WINDOW_FULLSCREEN) == (flags & SDL_WINDOW_FULLSCREEN_DESKTOP);
+}
 
 void WindowSDL::setHasFrameBuffer(bool has)
 {
@@ -516,6 +533,10 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
 #ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
     s_fillScreenModes();
 
+    m_curColour = g_config.fullscreen_depth;
+    m_curRes.w = g_config.fullscreen_res.m_value.first;
+    m_curRes.h = g_config.fullscreen_res.m_value.second;
+
     if(m_screen_orig_w == 0 || m_screen_orig_h == 0)
     {
         int display = SDL_GetWindowDisplayIndex(m_window);
@@ -749,7 +770,7 @@ void WindowSDL::setVideoMode(const VideoModeRes &res, uint8_t colourDepth)
 {
     m_curRes = res;
     m_curColour = colourDepth;
-    // TODO: Implement toggling logic here!
+    syncFullScreenRes();
 }
 
 int WindowSDL::setFullScreenType(int type)
@@ -793,38 +814,9 @@ int WindowSDL::syncFullScreenRes()
     if(m_fullscreen_type_real != SDL_WINDOW_FULLSCREEN || !m_window)
         return 0; // Nothing to do
 
-    int dst_h = XRender::TargetH;
-    int dst_w = XRender::TargetW;// (dst_h * m_screen_orig_w) / m_screen_orig_h;
-    SDL_DisplayMode mode;
-    SDL_DisplayMode modeDst;
-    SDL_DisplayMode *modeClose = nullptr;
+    SDL_DisplayMode mode, modeDst, *modeClose;
 
-    int modes = SDL_GetNumDisplayModes(0);
-    int closest_w = 0;
-    int closest_h = 0;
-    int clodest_diff_w = 100000;
-    int clodest_diff_h = 100000;
-
-    pLogDebug("List of available screen modes: (Desired resolution: %d x %d)", dst_w, dst_h);
-    for(int i = modes - 1; i >= 0; --i)
-    {
-        SDL_GetDisplayMode(0, i, &mode);
-        pLogDebug("-- C=%u (%s), W=%d, H=%d, R=%d",
-                  mode.format, SDL_GetPixelFormatName(mode.format), mode.w, mode.h, mode.refresh_rate);
-
-        int diff_w = SDL_abs(dst_w - mode.w);
-        int diff_h = SDL_abs(dst_h - mode.h);
-
-        if(diff_w < clodest_diff_w && diff_h < clodest_diff_h)
-        {
-            clodest_diff_w = diff_w;
-            clodest_diff_h = diff_h;
-            closest_w = mode.w;
-            closest_h = mode.h;
-        }
-    }
-
-    mode.format = SDL_PIXELFORMAT_BGR565;
+    mode.format = s_getColorFromBits(m_curColour > 0 ? m_curColour : s_availableColours.front());
     mode.w = m_curRes.w;
     mode.h = m_curRes.h;
     mode.refresh_rate = 60;
@@ -844,10 +836,10 @@ int WindowSDL::syncFullScreenRes()
         pLogDebug("Closest mode is not available, using defaults...");
     }
 
-    if((SDL_GetWindowFlags(m_window) & SDL_WINDOW_FULLSCREEN) == 0)
+    if(s_isExclusiveFullScreen(SDL_GetWindowFlags(m_window)))
     {
-        SDL_SetWindowSize(m_window, closest_w, closest_h);
-        pLogDebug("Toggling screen into %d x %d resolution", dst_w, dst_h);
+        SDL_SetWindowSize(m_window, modeDst.w, modeDst.h);
+        pLogDebug("Toggling screen into %d x %d resolution", modeDst.w, modeDst.h);
 
         if(SDL_SetWindowFullscreen(m_window, m_fullscreen_type_real) < 0)
         {
@@ -862,7 +854,7 @@ int WindowSDL::syncFullScreenRes()
         return -1;
     }
 
-    SDL_SetWindowSize(m_window, closest_w, closest_h);
+    SDL_SetWindowSize(m_window, modeDst.w, modeDst.h);
 
     return 0;
 }
