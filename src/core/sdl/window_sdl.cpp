@@ -67,7 +67,7 @@ static uint32_t s_getColorFromBits(uint8_t bits)
     switch(bits)
     {
     case 16:
-        return SDL_PIXELFORMAT_BGR888;
+        return SDL_PIXELFORMAT_BGR565;
     case 32:
         return SDL_PIXELFORMAT_BGR888;
     }
@@ -782,7 +782,8 @@ int WindowSDL::setFullScreenType(int type)
     if(change_needed && m_fullscreen && m_window)
     {
         // Switch into normal mode temporarily
-        SDL_SetWindowFullscreen(m_window, SDL_FALSE);
+        if((SDL_GetWindowFlags(m_window) & SDL_WINDOW_FULLSCREEN) != 0)
+            SDL_SetWindowFullscreen(m_window, SDL_FALSE);
 
         if(m_fullscreen_type_real == SDL_WINDOW_FULLSCREEN_DESKTOP)
         {
@@ -819,7 +820,9 @@ int WindowSDL::syncFullScreenRes()
 
     SDL_DisplayMode mode, modeDst, *modeClose;
 
-    mode.format = s_getColorFromBits(m_curColour > 0 ? m_curColour : s_availableColours.front());
+    const auto defColour = s_availableColours.empty() ? 32 : s_availableColours.front();
+
+    mode.format = s_getColorFromBits(m_curColour > 0 ? m_curColour : defColour);
     mode.w = m_curRes.w;
     mode.h = m_curRes.h;
     mode.refresh_rate = 60;
