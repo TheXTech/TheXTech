@@ -1041,6 +1041,7 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
         if(wDst < 0)
             return;
     }
+
     if(ySrc + hDst > tx.h)
     {
         hDst = tx.h - ySrc;
