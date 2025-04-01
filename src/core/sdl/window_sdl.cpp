@@ -779,8 +779,11 @@ int WindowSDL::setFullScreenType(int type)
     m_fullscreen_type = type;
     m_fullscreen_type_real = s_fsTypeToSDL(type);
 
-    if(change_needed && m_fullscreen)
+    if(change_needed && m_fullscreen && m_window)
     {
+        // Switch into normal mode temporarily
+        SDL_SetWindowFullscreen(m_window, SDL_FALSE);
+
         if(m_fullscreen_type_real == SDL_WINDOW_FULLSCREEN_DESKTOP)
         {
             if(SDL_SetWindowFullscreen(m_window, m_fullscreen_type_real) < 0)
