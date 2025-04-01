@@ -332,10 +332,6 @@ static void s_updateSysInfo()
 
 static int s_fsTypeToSDL(int type)
 {
-#ifdef _WIN32
-    s_updateSysInfo();
-#endif
-
     switch(type)
     {
     case 0:
@@ -449,6 +445,10 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
     SDL_ClearError();
 
     bool res = true;
+
+#ifdef _WIN32
+    s_updateSysInfo();
+#endif
 
     // SDL_GL_ResetAttributes();
 
