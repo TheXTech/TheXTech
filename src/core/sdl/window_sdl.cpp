@@ -90,6 +90,7 @@ static void s_fillScreenModes()
     SDL_DisplayMode mode;
     int modes = SDL_GetNumDisplayModes(0);
 
+    std::map<uint32_t, std::set<std::pair<int, int>>> m_hasRes;
     std::map<uint32_t, std::vector<AbstractWindow_t::VideoModeRes>> m_listModes;
     std::set<uint32_t> m_listColours;
 
@@ -97,10 +98,21 @@ static void s_fillScreenModes()
     for(int i = modes - 1; i >= 0; --i)
     {
         SDL_GetDisplayMode(0, i, &mode);
+
         pLogDebug("-- C=%u (%s), W=%d, H=%d, R=%d",
                   mode.format, SDL_GetPixelFormatName(mode.format), mode.w, mode.h, mode.refresh_rate);
-        m_listModes[mode.format].push_back({mode.w, mode.h});
-        m_listColours.insert(mode.format);
+
+        auto &hasRes = m_hasRes[mode.format];
+
+        if(hasRes.find({mode.w, mode.h}) == hasRes.end())
+        {
+            pLogDebug("-- Insert C=%u (%s), W=%d, H=%d",
+                      mode.format, SDL_GetPixelFormatName(mode.format), mode.w, mode.h);
+            hasRes.insert({mode.w, mode.h});
+            m_listModes[mode.format].push_back({mode.w, mode.h});
+            if(m_listColours.find(mode.format) == m_listColours.end())
+                m_listColours.insert(mode.format);
+        }
     }
 
     // The list should NOT be empty!
@@ -110,6 +122,7 @@ static void s_fillScreenModes()
     if(m_listModes.size() == 1)
     {
         auto &e = *m_listModes.begin();
+        pLogDebug("Only one colour mode is available - : C=%u (%s):", e.first, SDL_GetPixelFormatName(e.first));
         s_availableColours.push_back(s_getColorBits(e.first));
 
         for(auto jt = e.second.begin(); jt != e.second.end(); ++jt)
@@ -119,26 +132,39 @@ static void s_fillScreenModes()
     {
         bool notEqual = false;
 
+        pLogDebug("List of modes per colour depth:");
+
         for(auto it = m_listModes.begin(); it != m_listModes.end(); ++it)
             s_availableColours.push_back(s_getColorBits(it->first));
 
         auto &first = m_listModes.begin()->second;
 
-        auto it = m_listModes.begin();
-        ++it;
-
-        for( ; it != m_listModes.end(); ++it)
+        for(auto it = m_listModes.begin() ; it != m_listModes.end(); ++it)
         {
             s_availableRes.clear();
 
-            for(auto ft = first.begin(), jt = it->second.begin();  ; ++jt)
+            pLogDebug("-- C=%u (%s):", it->first, SDL_GetPixelFormatName(it->first));
+
+            if(it == m_listModes.begin())
+            {
+                for(auto jt = it->second.begin();  jt != it->second.end() ; ++jt)
+                {
+                    pLogDebug("-- %d x %d", jt->w, jt->h);
+                    s_availableRes.push_back(*jt);
+                }
+
+                continue;
+            }
+
+            for(auto ft = first.begin(), jt = it->second.begin();  ; ++jt, ++ft)
             {
                 if(jt == it->second.end() && ft == first.end())
                     break; // Both equal
 
-                if(jt == it->second.end() || ft == first.end())
+                if((jt == it->second.end()) ^ (ft == first.end()))
                 {
                     // Different length
+                    pLogDebug("-- Not equal by length");
                     notEqual = true;
                     break;
                 }
@@ -146,10 +172,12 @@ static void s_fillScreenModes()
                 if(jt->w != ft->w || jt->h != ft->h)
                 {
                     // Not equal content
+                    pLogDebug("-- Not equal by resolutions: %d x %d vs %d x %d", jt->w, jt->h, ft->w, ft->h);
                     notEqual = true;
                     break;
                 }
 
+                pLogDebug("-- %d x %d", jt->w, jt->h);
                 s_availableRes.push_back(*ft);
             }
 
@@ -819,7 +847,6 @@ int WindowSDL::getFullScreenType()
 
 int WindowSDL::syncFullScreenRes()
 {
-    if(m_fullscreen_type_real != SDL_WINDOW_FULLSCREEN || !m_window)
     if(!m_fullscreen || m_fullscreen_type_real != SDL_WINDOW_FULLSCREEN || !m_window)
         return 0; // Nothing to do
 
