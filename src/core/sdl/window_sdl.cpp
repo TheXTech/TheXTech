@@ -818,6 +818,7 @@ int WindowSDL::getFullScreenType()
 int WindowSDL::syncFullScreenRes()
 {
     if(m_fullscreen_type_real != SDL_WINDOW_FULLSCREEN || !m_window)
+    if(!m_fullscreen || m_fullscreen_type_real != SDL_WINDOW_FULLSCREEN || !m_window)
         return 0; // Nothing to do
 
     SDL_DisplayMode mode, modeDst, *modeClose;
