@@ -27,7 +27,7 @@ jobs:
 
             extra_options: "-DCMAKE_TOOLCHAIN_FILE=$BLOCKSDS/cmake/BlocksDSi.cmake -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON",
 
-            deps_cmdline: "apt install -y cmake",
+            deps_cmdline: "apt update --fix-missing -y && apt install -y cmake",
 
             generator: "Ninja",
             build_type: "RelWithDebInfo",
