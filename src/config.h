@@ -222,6 +222,7 @@ public:
         SCALE_FIXED_05X = 0,
         SCALE_FIXED_1X = 1,
         SCALE_FIXED_2X = 2,
+        SCALE_FIXED_3X = 3,
     };
 
 #if defined(__WII__) || !defined(PGE_MIN_PORT)
@@ -237,6 +238,7 @@ public:
             {SCALE_FIXED_05X, "0_5x", "0.5x"},
             {SCALE_FIXED_1X, "1x", "1x"},
             {SCALE_FIXED_2X, "2x", "2x"},
+            {SCALE_FIXED_3X, "3x", "3x"},
 #   endif
         },
         defaults(SCALE_DYNAMIC_NEAREST), {}, Scope::Config,

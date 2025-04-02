@@ -71,6 +71,8 @@ void SetOrigRes()
         XWindow::setWindowSize(XRender::TargetW / 2, XRender::TargetH / 2);
     else if(g_config.scale_mode == Config_t::SCALE_FIXED_2X)
         XWindow::setWindowSize(XRender::TargetW * 2, XRender::TargetH * 2);
+    else if(g_config.scale_mode == Config_t::SCALE_FIXED_3X)
+        XWindow::setWindowSize(XRender::TargetW * 3, XRender::TargetH * 3);
     else
         XWindow::setWindowSize(XRender::TargetW, XRender::TargetH);
 #endif
@@ -150,6 +152,10 @@ void UpdateInternalRes()
         {
             int_h /= 2;
         }
+        else if(g_config.scale_mode == Config_t::SCALE_FIXED_3X)
+        {
+            int_h /= 3;
+        }
         else if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER)
         {
             if(int_h >= 600)
@@ -181,6 +187,10 @@ void UpdateInternalRes()
         else if(g_config.scale_mode == Config_t::SCALE_FIXED_2X)
         {
             int_w /= 2;
+        }
+        else if(g_config.scale_mode == Config_t::SCALE_FIXED_3X)
+        {
+            int_w /= 3;
         }
         else if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER)
         {
@@ -348,6 +358,8 @@ void UpdateWindowRes()
         XWindow::setWindowSize(w / 2, h / 2);
     else if(g_config.scale_mode == Config_t::SCALE_FIXED_2X)
         XWindow::setWindowSize(w * 2, h * 2);
+    else if(g_config.scale_mode == Config_t::SCALE_FIXED_3X)
+        XWindow::setWindowSize(w * 3, h * 3);
     else
         XWindow::setWindowSize(w, h);
 }
