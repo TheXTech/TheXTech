@@ -539,6 +539,8 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
     m_curRes.w = g_config.fullscreen_res.m_value.first;
     m_curRes.h = g_config.fullscreen_res.m_value.second;
 
+    D_pLogDebug("Loaded video mode from config: %d -> %d x %d", m_curColour, m_curRes.w, m_curRes.h);
+
     if(m_screen_orig_w == 0 || m_screen_orig_h == 0)
     {
         int display = SDL_GetWindowDisplayIndex(m_window);
