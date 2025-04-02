@@ -628,6 +628,8 @@ void RenderGL::updateViewport()
         scale = 1.f;
     if(g_config.scale_mode == Config_t::SCALE_FIXED_2X && scale > 2.f)
         scale = 2.f;
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_3X && scale > 3.f)
+        scale = 3.f;
 
     m_phys_w = XRender::TargetW * scale;
     m_phys_h = XRender::TargetH * scale;

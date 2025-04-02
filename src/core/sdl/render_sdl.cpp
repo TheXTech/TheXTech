@@ -330,6 +330,8 @@ void RenderSDL::updateViewport()
         scale = 1.f;
     if(g_config.scale_mode == Config_t::SCALE_FIXED_2X && scale > 2.f)
         scale = 2.f;
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_3X && scale > 3.f)
+        scale = 3.f;
 
     int game_w = scale * XRender::TargetW;
     int game_h = scale * XRender::TargetH;

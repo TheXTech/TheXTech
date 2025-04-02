@@ -231,6 +231,8 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
         SDL_SetWindowSize(m_window, XRender::TargetW / 2, XRender::TargetH / 2);
     else if(g_config.scale_mode == Config_t::SCALE_FIXED_2X)
         SDL_SetWindowSize(m_window, XRender::TargetW * 2, XRender::TargetH * 2);
+    else if(g_config.scale_mode == Config_t::SCALE_FIXED_3X)
+        SDL_SetWindowSize(m_window, XRender::TargetW * 3, XRender::TargetH * 3);
     else
         SDL_SetWindowSize(m_window, XRender::TargetW, XRender::TargetH);
 #endif //__EMSCRIPTEN__
