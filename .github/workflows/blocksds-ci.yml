@@ -1,4 +1,4 @@
-name: DSi CI
+name: DSi BlocksDS CI
 
 on:
   push:
@@ -17,22 +17,19 @@ jobs:
   build:
     name: "${{ matrix.config.name }} | ${{ matrix.config.build_type }}"
     runs-on: ubuntu-latest
-    container: ghcr.io/thextech/wohlnet-ci-ubuntu2404-dkp-vita:latest
-    env:
-        DEVKITPRO: /opt/devkitpro
-        DEVKITARM: /opt/devkitpro/devkitARM
+    container: skylyrac/blocksds:slim-latest
     strategy:
       fail-fast: false
       matrix:
         config:
         - {
-            name: "DSi build",
+            name: "DSi BlocksDS build",
 
-            extra_options: "-DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/NDS.cmake -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON",
+            extra_options: "-DCMAKE_TOOLCHAIN_FILE=$BLOCKSDS/cmake/BlocksDSi.cmake -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON",
 
-            deps_cmdline: "echo 'DevkitPro SDK is already pre-installed'",
+            deps_cmdline: "apt update --fix-missing -y && apt install -y cmake p7zip-full zip lftp",
 
-            generator: "Ninja",
+            generator: "Unix Makefiles",
             build_type: "RelWithDebInfo",
             executable_name: "thextech",
             subdir_name: "thextech-dsi",
@@ -59,17 +56,6 @@ jobs:
           eval ${{ matrix.config.deps_cmdline }}
         fi
         cmake --version
-
-    - name: Install updated maxmod
-      run: |
-        cd ..
-        git clone https://github.com/ds-sloth/maxmod.git -b master --depth 1 maxmod
-        cd maxmod
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/NDS.cmake -DCMAKE_BUILD_TYPE=MinSizeRel
-        make -j4
-        sudo make install
 
     - uses: TheXTech/checkout@v0.1
 
@@ -109,7 +95,7 @@ jobs:
         cat ../docs/README_DSI.md ../README.md >> "package/${{ matrix.config.subdir_name }}/README.md"
         cp thextech.nds "package/${{ matrix.config.subdir_name }}/"
         cd package
-        zip -9 -r "thextech-calico-${BRANCH_NAME}.zip" "${{ matrix.config.subdir_name }}"
+        zip -9 -r "thextech-blocksds-${BRANCH_NAME}.zip" "${{ matrix.config.subdir_name }}"
         rm -Rf "${{ matrix.config.subdir_name }}"
         cd ../..
 

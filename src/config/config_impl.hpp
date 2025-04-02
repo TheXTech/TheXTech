@@ -293,9 +293,9 @@ void ConfigOption_t<true, std::pair<int, int>>::update_from_ini(IniProcessing* i
         return;
 
     if(argcount == 2)
-        *this = {0, arg1};
-    else
         *this = {arg1, h};
+    else
+        *this = {0, arg1};
 
     m_set = level;
 }
