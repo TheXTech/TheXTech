@@ -157,11 +157,11 @@ constexpr bool NPCIsAVine(const NPC_t& n)
 constexpr bool NPCIsAnExit(int Type)
 {
     return (
-        Type == 11 ||
-        Type == 16 ||
-        Type == 41 ||
-        Type == 97 ||
-        Type == 196
+        Type == NPCID_ITEMGOAL ||
+        Type == NPCID_GOALORB_S3 ||
+        Type == NPCID_GOALORB_S2 ||
+        Type == NPCID_STAR_EXIT ||
+        Type == NPCID_STAR_COLLECT
     );
 }
 
@@ -175,16 +175,16 @@ constexpr bool NPCIsAnExit(const NPC_t& n)
 constexpr bool NPCIsAParaTroopa(int Type)
 {
     return (
-        Type == 244 ||
-        Type == 243 ||
-        Type == 76 ||
-        Type == 161 ||
-        Type == 121 ||
-        Type == 122 ||
-        Type == 123 ||
-        Type == 124 ||
-        Type == 176 ||
-        Type == 177
+        Type == NPCID_FLY_FODDER_S3 ||
+        Type == NPCID_FLY_FODDER_S5 ||
+        Type == NPCID_GRN_FLY_TURTLE_S3 ||
+        Type == NPCID_RED_FLY_TURTLE_S3 ||
+        Type == NPCID_GRN_FLY_TURTLE_S4 ||
+        Type == NPCID_RED_FLY_TURTLE_S4 ||
+        Type == NPCID_BLU_FLY_TURTLE_S4 ||
+        Type == NPCID_YEL_FLY_TURTLE_S4 ||
+        Type == NPCID_GRN_FLY_TURTLE_S1 ||
+        Type == NPCID_RED_FLY_TURTLE_S1
     );
 }
 
@@ -197,7 +197,7 @@ constexpr bool NPCIsAParaTroopa(const NPC_t& n)
 //'npc is a kurbo's shoe
 constexpr bool NPCIsBoot(int Type)
 {
-    return (Type == 35 || Type == 191 || Type == 193);
+    return (Type == NPCID_GRN_BOOT || Type == NPCID_RED_BOOT || Type == NPCID_BLU_BOOT);
 }
 
 constexpr bool NPCIsBoot(const NPC_t& n)
@@ -210,14 +210,14 @@ constexpr bool NPCIsBoot(const NPC_t& n)
 constexpr bool NPCIsYoshi(int Type)
 {
     return (
-        Type == 95 ||
-        Type == 98 ||
-        Type == 99 ||
-        Type == 100 ||
-        Type == 148 ||
-        Type == 149 ||
-        Type == 150 ||
-        Type == 228
+        Type == NPCID_PET_GREEN ||
+        Type == NPCID_PET_BLUE ||
+        Type == NPCID_PET_YELLOW ||
+        Type == NPCID_PET_RED ||
+        Type == NPCID_PET_BLACK ||
+        Type == NPCID_PET_PURPLE ||
+        Type == NPCID_PET_PINK ||
+        Type == NPCID_PET_CYAN
     );
 }
 
@@ -231,12 +231,12 @@ constexpr bool NPCIsYoshi(const NPC_t& n)
 constexpr bool NPCIsToad(int Type)
 {
     return (
-        Type == 75 ||
-        Type == 94 ||
-        Type == 198 ||
-        Type == 101 ||
-        Type == 102 ||
-        Type == 107
+        Type == NPCID_CIVILIAN_SCARED ||
+        Type == NPCID_CIVILIAN ||
+        Type == NPCID_CHAR3 ||
+        Type == NPCID_CHAR2 ||
+        Type == NPCID_CHAR5 ||
+        Type == NPCID_PINK_CIVILIAN
     );
 }
 
@@ -249,7 +249,7 @@ constexpr bool NPCIsToad(const NPC_t& n)
 //'Zelda 2 Bot monster
 constexpr bool NPCIsABot(int Type)
 {
-    return (Type == 126 || Type == 127 || Type == 128);
+    return (Type == NPCID_BLU_SLIME || Type == NPCID_CYAN_SLIME || Type == NPCID_RED_SLIME);
 }
 
 constexpr bool NPCIsABot(const NPC_t& n)
@@ -262,56 +262,56 @@ constexpr bool NPCIsABot(const NPC_t& n)
 constexpr bool NPCDefaultMovement(int Type)
 {
     return (
-        Type == 242 ||
-        Type == 109 ||
-        Type == 110 ||
-        Type == 111 ||
-        Type == 112 ||
-        Type == 117 ||
-        Type == 118 ||
-        Type == 119 ||
-        Type == 120 ||
-        Type == 125 ||
-        Type == 129 ||
-        Type == 130 ||
-        Type == 131 ||
-        Type == 132 ||
-        Type == 135 ||
-        Type == 136 ||
-        Type == 189 ||
-        Type == 173 ||
-        Type == 175 ||
-        Type == 162 ||
-        Type == 165 ||
-        Type == 167 ||
-        Type == 160 ||
-        Type == 1 ||
-        Type == 2 ||
-        Type == 3 ||
-        Type == 4 ||
-        Type == 6 ||
-        Type == 19 ||
-        Type == 20 ||
-        Type == 247 ||
-        Type == 23 ||
-        Type == 27 ||
-        Type == 36 ||
-        Type == 285 ||
-        Type == 50 ||
-        Type == 53 ||
-        Type == 55 ||
-        Type == 59 ||
-        Type == 61 ||
-        Type == 63 ||
-        Type == 65 ||
-        Type == 71 ||
-        Type == 72 ||
-        Type == 77 ||
-        Type == 78 ||
-        Type == 89 ||
-        Type == 91 ||
-        Type == 107 ||
-        Type == 158
+        Type == NPCID_FODDER_S5 ||
+        Type == NPCID_GRN_TURTLE_S4 ||
+        Type == NPCID_RED_TURTLE_S4 ||
+        Type == NPCID_BLU_TURTLE_S4 ||
+        Type == NPCID_YEL_TURTLE_S4 ||
+        Type == NPCID_GRN_HIT_TURTLE_S4 ||
+        Type == NPCID_RED_HIT_TURTLE_S4 ||
+        Type == NPCID_BLU_HIT_TURTLE_S4 ||
+        Type == NPCID_YEL_HIT_TURTLE_S4 ||
+        Type == NPCID_KNIGHT ||
+        Type == NPCID_BIRD ||
+        Type == NPCID_RED_SPIT_GUY ||
+        Type == NPCID_BLU_SPIT_GUY ||
+        Type == NPCID_GRY_SPIT_GUY ||
+        Type == NPCID_WALK_BOMB_S2 ||
+        Type == NPCID_WALK_BOMB_S3 ||
+        Type == NPCID_SKELETON ||
+        Type == NPCID_GRN_TURTLE_S1 ||
+        Type == NPCID_RED_TURTLE_S1 ||
+        Type == NPCID_BRUTE ||
+        Type == NPCID_CARRY_FODDER ||
+        Type == NPCID_FLY_CARRY_FODDER ||
+        Type == NPCID_ROCKET_WOOD ||
+        Type == NPCID_FODDER_S3 ||
+        Type == NPCID_RED_FODDER ||
+        Type == NPCID_RED_FLY_FODDER ||
+        Type == NPCID_GRN_TURTLE_S3 ||
+        Type == NPCID_RED_TURTLE_S3 ||
+        Type == NPCID_BLU_GUY ||
+        Type == NPCID_RED_GUY ||
+        Type == NPCID_STACKER ||
+        Type == NPCID_GLASS_TURTLE ||
+        Type == NPCID_UNDER_FODDER ||
+        Type == NPCID_SPIKY_S3 ||
+        Type == NPCID_SPIKY_S4 ||
+        Type == NPCID_TOOTHY ||
+        Type == NPCID_CRAB ||
+        Type == NPCID_EXT_TURTLE ||
+        Type == NPCID_YELSWITCH_FODDER ||
+        Type == NPCID_BLUSWITCH_FODDER ||
+        Type == NPCID_GRNSWITCH_FODDER ||
+        Type == NPCID_REDSWITCH_FODDER ||
+        Type == NPCID_BIG_FODDER ||
+        Type == NPCID_BIG_TURTLE ||
+        Type == NPCID_JUMPER_S4 ||
+        Type == NPCID_TANK_TREADS ||
+        Type == NPCID_FODDER_S1 ||
+        Type == NPCID_ITEM_BURIED ||
+        Type == NPCID_PINK_CIVILIAN ||
+        Type == NPCID_SATURN
     );
 }
 
@@ -324,7 +324,7 @@ constexpr bool NPCDefaultMovement(const NPC_t& n)
 //'turnips
 constexpr bool NPCIsVeggie(int Type)
 {
-    return Type == 92 || (Type >= 139 && Type <= 147);
+    return Type == NPCID_VEGGIE_1 || (Type >= NPCID_VEGGIE_2 && Type <= NPCID_VEGGIE_RANDOM);
 }
 
 constexpr bool NPCIsVeggie(const NPC_t& n)
