@@ -34,6 +34,18 @@
 
 #include "sdl_proxy/sdl_stdinc.h"
 
+static inline int32_t s_floor_div_32(int32_t x)
+{
+    static_assert(((-1) >> 5) == -1 && (31 >> 5) == 0 && (-3232 >> 5) == -101, "block_table.hpp requires signed right shift to have floor semantics");
+    return (int16_t)(x >> 5);
+}
+
+static inline int32_t s_floor_div_64(int32_t x)
+{
+    static_assert(((-1) >> 6) == -1 && (63 >> 6) == 0 && (-6464 >> 6) == -101, "block_table.hpp requires signed right shift to have floor semantics");
+    return (int16_t)(x >> 6);
+}
+
 enum ContinuedRect
 {
     CONT_NONE = 0,
@@ -242,24 +254,42 @@ struct rect_internal
 
 struct rect_external
 {
-    int32_t l, r, t, b;
+    int16_t l, r, t, b;
 
     rect_external() {}
 
-    rect_external(int32_t l, int32_t r, int32_t t, int32_t b) : l(l), r(r), t(t), b(b) {}
+    rect_external(int16_t l, int16_t r, int16_t t, int16_t b) : l(l), r(r), t(t), b(b) {}
 
     rect_external(const Location_t& loc)
     {
-        l = std::floor(loc.X);
-        r = std::ceil(loc.X + loc.Width);
-        t = std::floor(loc.Y);
-        b = std::ceil(loc.Y + loc.Height);
+        // find which 64x64 tiles contain the object
+        l = s_floor_div_64((int32_t)std::floor(loc.X));
+        r = s_floor_div_64((int32_t)std::ceil(loc.X + loc.Width) + 63);
+        t = s_floor_div_64((int32_t)std::floor(loc.Y));
+        b = s_floor_div_64((int32_t)std::ceil(loc.Y + loc.Height) + 63);
+    }
+
+    void query_from_loc_paranoid(const Location_t& loc)
+    {
+        // find which 64x64 tiles contain the query with a 32px margin in each direction
+        l = s_floor_div_64((int32_t)std::floor(loc.X) - 32);
+        r = s_floor_div_64((int32_t)std::ceil(loc.X + loc.Width) + 32 + 63);
+        t = s_floor_div_64((int32_t)std::floor(loc.Y) - 32);
+        b = s_floor_div_64((int32_t)std::ceil(loc.Y + loc.Height) + 32 + 63);
+    }
+
+    void query_from_loc_standard(const Location_t& loc)
+    {
+        // find which 64x64 tiles contain the query with a 2px margin in each direction
+        l = s_floor_div_64((int32_t)std::floor(loc.X) - 2);
+        r = s_floor_div_64((int32_t)std::ceil(loc.X + loc.Width) + 2 + 63);
+        t = s_floor_div_64((int32_t)std::floor(loc.Y) - 2);
+        b = s_floor_div_64((int32_t)std::ceil(loc.Y + loc.Height) + 2 + 63);
     }
 };
 
 // a screen is 2048x2048.
 // it's made up of node_t's, which are 64x64 each.
-// soon it will have 33x33 nodes instead of 32x32, so that there's some room for shifting the offset for performance
 struct screen_t
 {
     std::array<node_t, 1024> nodes;
@@ -324,7 +354,7 @@ inline Location_t extract_loc(NPCRef_t obj)
         ret.Width = 1;
 
     // for tempBlock queries
-    if(obj->Type == 26)
+    if(obj->Type == NPCID_SPRING)
     {
         ret.Y -= 16;
         ret.Height += 16;
@@ -366,21 +396,11 @@ struct table_t
 private:
     void insert(MyRef_t b, const rect_external& rect)
     {
-        int lcol = rect.l / 2048;
-        if(rect.l < 0 && (rect.l % 2048))
-            lcol -= 1;
+        int lcol = s_floor_div_32(rect.l); // each column contains 32 cells
+        int rcol = s_floor_div_32(rect.r + 31); // ceiling, this column won't get checked
 
-        int rcol = rect.r / 2048;
-        if(rect.r > 0 && (rect.r % 2048))
-            rcol += 1;
-
-        int trow = rect.t / 2048;
-        if(rect.t < 0 && (rect.t % 2048))
-            trow -= 1;
-
-        int brow = rect.b / 2048;
-        if(rect.b > 0 && (rect.b % 2048))
-            brow += 1;
+        int trow = s_floor_div_32(rect.t);
+        int brow = s_floor_div_32(rect.b + 31);
 
         if(columns.size() == 0)
         {
@@ -413,25 +433,16 @@ private:
 
         rect_internal inner_rect;
 
+        inner_rect.l = rect.l - lcol * 32;
+        inner_rect.r = 32;
         inner_rect.cont_axes = CONT_NONE;
 
         for(int col = lcol; col < rcol; col++)
         {
             int internal_col = col - first_col_index;
 
-            int inner_l = 0;
-            if(col == lcol)
-                inner_l = rect.l - lcol * 2048;
-
-            int inner_r = 2048;
             if(col == rcol - 1)
-                inner_r = rect.r - (rcol - 1) * 2048;
-
-            // apply offset if needed
-            inner_rect.l = inner_l / 64;
-            inner_rect.r = inner_r / 64;
-            if(inner_r & 63)
-                inner_rect.r += 1;
+                inner_rect.r = rect.r - (rcol - 1) * 32;
 
             if(columns[internal_col].size() == 0)
             {
@@ -454,106 +465,85 @@ private:
                     columns[internal_col].push_back(new screen_t);
             }
 
+            inner_rect.t = rect.t - trow * 32;
+            inner_rect.b = 32;
+
             for(int row = trow; row < brow; row++)
             {
                 int internal_row = row - col_first_row_index[internal_col];
 
-                int inner_t = 0;
-                if(row == trow)
-                    inner_t = rect.t - trow * 2048;
-
-                int inner_b = 2048;
                 if(row == brow - 1)
-                    inner_b = rect.b - (brow - 1) * 2048;
-
-                // apply offset if needed
-                inner_rect.t = inner_t / 64;
-                inner_rect.b = inner_b / 64;
-                if(inner_b & 63)
-                    inner_rect.b += 1;
+                    inner_rect.b = rect.b - (brow - 1) * 32;
 
                 columns[internal_col][internal_row]->insert(b, inner_rect);
 
+                inner_rect.t = 0;
                 inner_rect.cont_axes |= CONT_Y;
             }
 
+            inner_rect.l = 0;
             inner_rect.cont_axes = CONT_X;
         }
     }
 
     void erase(MyRef_t b, const rect_external& rect)
     {
-        int lcol = rect.l / 2048;
-        if(rect.l < 0 && (rect.l % 2048))
-            lcol -= 1;
+        int lcol = s_floor_div_32(rect.l); // each column contains 32 cells
+        int rcol = s_floor_div_32(rect.r + 31); // ceiling, this column won't get checked
 
-        int rcol = rect.r / 2048;
-        if(rect.r > 0 && (rect.r % 2048))
-            rcol += 1;
-
-        int trow = rect.t / 2048;
-        if(rect.t < 0 && (rect.t % 2048))
-            trow -= 1;
-
-        int brow = rect.b / 2048;
-        if(rect.b > 0 && (rect.b % 2048))
-            brow += 1;
+        int trow = s_floor_div_32(rect.t);
+        int brow = s_floor_div_32(rect.b + 31);
 
         int lcol_check = SDL_max(lcol, first_col_index);
         int rcol_check = SDL_min(rcol, first_col_index + (int)columns.size());
 
         rect_internal inner_rect;
 
+        // initialize l/r bounds of inner query rect
+        inner_rect.l = rect.l - lcol * 32;
+        inner_rect.r = 32;
         inner_rect.cont_axes = CONT_NONE;
+
         if(lcol_check != lcol)
+        {
+            inner_rect.l = 0;
             inner_rect.cont_axes = CONT_X;
+        }
 
         for(int col = lcol_check; col < rcol_check; col++)
         {
             int internal_col = col - first_col_index;
 
-            int inner_l = 0;
-            if(col == lcol)
-                inner_l = rect.l - lcol * 2048;
-
-            int inner_r = 2048;
+            // it's 32 until this point
             if(col == rcol - 1)
-                inner_r = rect.r - (rcol - 1) * 2048;
+                inner_rect.r = rect.r - (rcol - 1) * 32;
 
-            // apply offset if needed
-            inner_rect.l = inner_l / 64;
-            inner_rect.r = inner_r / 64;
-            if(inner_r & 63)
-                inner_rect.r += 1;
+            // initialize t/b bounds of inner query rect
+            inner_rect.t = rect.t - trow * 32;
+            inner_rect.b = 32;
 
             int trow_check = SDL_max(trow, col_first_row_index[internal_col]);
             int brow_check = SDL_min(brow, col_first_row_index[internal_col] + (int)columns[internal_col].size());
             if(trow_check != trow)
+            {
+                inner_rect.t = 0;
                 inner_rect.cont_axes |= CONT_Y;
+            }
 
             for(int row = trow_check; row < brow_check; row++)
             {
                 int internal_row = row - col_first_row_index[internal_col];
 
-                int inner_t = 0;
-                if(row == trow)
-                    inner_t = rect.t - trow * 2048;
-
-                int inner_b = 2048;
                 if(row == brow - 1)
-                    inner_b = rect.b - (brow - 1) * 2048;
-
-                // apply offset if needed
-                inner_rect.t = inner_t / 64;
-                inner_rect.b = inner_b / 64;
-                if(inner_b & 63)
-                    inner_rect.b += 1;
+                    inner_rect.b = rect.b - (brow - 1) * 32;
 
                 columns[internal_col][internal_row]->erase(b, inner_rect);
 
+                inner_rect.t = 0;
                 inner_rect.cont_axes |= CONT_Y;
             }
 
+            inner_rect.l = 0;
             inner_rect.cont_axes = CONT_X;
         }
     }
@@ -564,30 +554,27 @@ public:
         if(columns.size() == 0 || member_rects.size() == 0)
             return;
 
-        int lcol = rect.l / 2048;
-        if(rect.l < 0 && (rect.l % 2048))
-            lcol -= 1;
+        int lcol = s_floor_div_32(rect.l); // each column contains 32 cells
+        int rcol = s_floor_div_32(rect.r + 31); // ceiling, this column won't get checked
 
-        int rcol = rect.r / 2048;
-        if(rect.r > 0 && (rect.r % 2048))
-            rcol += 1;
-
-        int trow = rect.t / 2048;
-        if(rect.t < 0 && (rect.t % 2048))
-            trow -= 1;
-
-        int brow = rect.b / 2048;
-        if(rect.b > 0 && (rect.b % 2048))
-            brow += 1;
+        int trow = s_floor_div_32(rect.t);
+        int brow = s_floor_div_32(rect.b + 31);
 
         int lcol_check = SDL_max(lcol, first_col_index);
         int rcol_check = SDL_min(rcol, first_col_index + (int)columns.size());
 
         rect_internal inner_rect;
 
+        // initialize l/r bounds of inner query rect
+        inner_rect.l = rect.l - lcol * 32;
+        inner_rect.r = 32;
         inner_rect.cont_axes = CONT_NONE;
+
         if(lcol_check != lcol)
+        {
+            inner_rect.l = 0;
             inner_rect.cont_axes = CONT_X;
+        }
 
         for(int col = lcol_check; col < rcol_check; col++)
         {
@@ -595,52 +582,41 @@ public:
 
             if(columns[internal_col].size() == 0)
             {
-                inner_rect.cont_axes |= CONT_X;
+                inner_rect.l = 0;
+                inner_rect.cont_axes = CONT_X;
                 continue;
             }
 
-            int inner_l = 0;
-            if(col == lcol)
-                inner_l = rect.l - lcol * 2048;
-
-            int inner_r = 2048;
+            // it's 32 until this point
             if(col == rcol - 1)
-                inner_r = rect.r - (rcol - 1) * 2048;
+                inner_rect.r = rect.r - (rcol - 1) * 32;
 
-            // apply offset if needed
-            inner_rect.l = inner_l / 64;
-            inner_rect.r = inner_r / 64;
-            if(inner_r & 63)
-                inner_rect.r += 1;
+            // initialize t/b bounds of inner query rect
+            inner_rect.t = rect.t - trow * 32;
+            inner_rect.b = 32;
 
             int trow_check = SDL_max(trow, col_first_row_index[internal_col]);
             int brow_check = SDL_min(brow, col_first_row_index[internal_col] + (int)columns[internal_col].size());
             if(trow_check != trow)
+            {
+                inner_rect.t = 0;
                 inner_rect.cont_axes |= CONT_Y;
+            }
 
             for(int row = trow_check; row < brow_check; row++)
             {
                 int internal_row = row - col_first_row_index[internal_col];
 
-                int inner_t = 0;
-                if(row == trow)
-                    inner_t = rect.t - trow * 2048;
-
-                int inner_b = 2048;
                 if(row == brow - 1)
-                    inner_b = rect.b - (brow - 1) * 2048;
-
-                // apply offset if needed
-                inner_rect.t = inner_t / 64;
-                inner_rect.b = inner_b / 64;
-                if(inner_b & 63)
-                    inner_rect.b += 1;
+                    inner_rect.b = rect.b - (brow - 1) * 32;
 
                 columns[internal_col][internal_row]->query(out, inner_rect);
 
+                inner_rect.t = 0;
                 inner_rect.cont_axes |= CONT_Y;
             }
 
+            inner_rect.l = 0;
             inner_rect.cont_axes = CONT_X;
         }
     }
