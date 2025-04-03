@@ -1706,6 +1706,7 @@ void ClearLevel()
     // maxStars = 0;
     g_curLevelMedals.reset_lvl();
 
+    InvincibilityTime = 0;
     PSwitchTime = 0;
     PSwitchStop = 0;
     BeltDirection = 1;

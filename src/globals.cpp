@@ -338,6 +338,7 @@ int selWorld = 0;
 int selSave = 0;
 int PSwitchTime = 0;
 int PSwitchStop = 0;
+int InvincibilityTime = 0;
 int PSwitchPlayer = 0;
 
 RangeArr<SaveSlotInfo_t, 1, maxSaveSlots> SaveSlotInfo;

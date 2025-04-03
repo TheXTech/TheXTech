@@ -511,7 +511,8 @@ void StartMusic(int A, int fadeInMs)
     else if(A == -1) // P switch music
     {
         StopMusic();
-        if(FreezeNPCs) {
+        if(FreezeNPCs)
+        {
             pLogDebug("Starting special music [2]");
             int index = -1;
             const char* qoa = nullptr;
@@ -522,7 +523,17 @@ void StartMusic(int A, int fadeInMs)
             }
             s_playMusic(index, qoa, fadeInMs);
             musicName = "stmusic";
-        } else {
+        }
+        else if(InvincibilityTime && !PSwitchTime && s_specialMusicMods.size() >= 4)
+        {
+            pLogDebug("Starting special music [4]");
+            int index = s_specialMusicMods[3];
+            const char* qoa = s_specialMusicQoas[3];
+            s_playMusic(index, qoa, fadeInMs);
+            musicName = "smusic4";
+        }
+        else
+        {
             pLogDebug("Starting special music [1]");
             int index = -1;
             const char* qoa = nullptr;

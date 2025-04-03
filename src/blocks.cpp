@@ -1582,6 +1582,12 @@ void SwitchEndResumeMusic()
 {
     StopMusic();
 
+    if(InvincibilityTime)
+    {
+        StartMusic(-1);
+        return;
+    }
+
     int switch_player_section = Player[PSwitchPlayer].Section;
 
 #ifndef THEXTECH_ENABLE_SDL_NET

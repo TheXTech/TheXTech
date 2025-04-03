@@ -894,11 +894,20 @@ void StartMusic(int A, int fadeInMs)
     else if(A == -1) // P switch music
     {
         StopMusic();
-        if(FreezeNPCs) {
+        if(FreezeNPCs)
+        {
             pLogDebug("Starting special music [stmusic]");
             PlayMusic("stmusic", fadeInMs);
             musicName = "stmusic";
-        } else {
+        }
+        else if(InvincibilityTime && !PSwitchTime && g_totalMusicSpecial >= 4)
+        {
+            pLogDebug("Starting special music [smusic4]");
+            PlayMusic("smusic4", fadeInMs);
+            musicName = "smusic4";
+        }
+        else
+        {
             pLogDebug("Starting special music [smusic]");
             PlayMusic("smusic", fadeInMs);
             musicName = "smusic";

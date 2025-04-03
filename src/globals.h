@@ -1968,6 +1968,8 @@ extern int selSave;
 extern int PSwitchTime;
 //Public PSwitchStop As Integer
 extern int PSwitchStop;
+// NEW: tracks period of player's invincibility to all damage except lava, offscreen, and crushing
+extern int InvincibilityTime;
 //Public PSwitchPlayer As Integer
 extern int PSwitchPlayer;
 
