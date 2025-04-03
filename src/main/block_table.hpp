@@ -379,22 +379,21 @@ inline Location_t extract_loc_layer(MyRef_t obj)
 
 // it's a bunch of stacks of screens, which are 2048x2048.
 // will be reallocated as needed
-template<class MyRef_t>
-struct table_t
+struct base_table_t
 {
     typedef std::vector<screen_t*> screen_ptr_arr_t;
     std::vector<screen_ptr_arr_t> columns;
     std::vector<int> col_first_row_index;
-    std::unordered_map<MyRef_t, rect_external> member_rects;
+    std::unordered_map<BaseRef_t, rect_external> member_rects;
     int first_col_index;
 
-    ~table_t()
+    ~base_table_t()
     {
         clear();
     }
 
-private:
-    void insert(MyRef_t b, const rect_external& rect)
+protected:
+    void insert(BaseRef_t b, const rect_external& rect)
     {
         int lcol = s_floor_div_32(rect.l); // each column contains 32 cells
         int rcol = s_floor_div_32(rect.r + 31); // ceiling, this column won't get checked
@@ -486,7 +485,7 @@ private:
         }
     }
 
-    void erase(MyRef_t b, const rect_external& rect)
+    void erase(BaseRef_t b, const rect_external& rect)
     {
         int lcol = s_floor_div_32(rect.l); // each column contains 32 cells
         int rcol = s_floor_div_32(rect.r + 31); // ceiling, this column won't get checked
@@ -621,6 +620,32 @@ public:
         }
     }
 
+    void clear()
+    {
+        // can optimize later
+        for(auto col : columns)
+        {
+            for(screen_t* screen : col)
+                delete screen;
+        }
+
+        columns.clear();
+        col_first_row_index.clear();
+        member_rects.clear();
+    }
+
+    void clear_light()
+    {
+        for(const auto& p : member_rects)
+            base_table_t::erase(p.first, p.second);
+
+        member_rects.clear();
+    }
+};
+
+template<class MyRef_t>
+struct table_t : public base_table_t
+{
     void insert(MyRef_t b)
     {
         Location_t loc = extract_loc<MyRef_t>(b);
@@ -631,7 +656,7 @@ public:
 
         rect_external rect(loc);
         member_rects[b] = rect;
-        insert(b, rect);
+        base_table_t::insert(b, rect);
     }
 
     void insert_layer(MyRef_t b)
@@ -644,7 +669,7 @@ public:
 
         rect_external rect(loc);
         member_rects[b] = rect;
-        insert(b, rect);
+        base_table_t::insert(b, rect);
     }
 
     void erase(MyRef_t b)
@@ -653,7 +678,7 @@ public:
         if(it == member_rects.end())
             return;
 
-        erase(b, it->second);
+        base_table_t::erase(b, it->second);
         member_rects.erase(it);
     }
 
@@ -675,7 +700,7 @@ public:
                 return;
             }
 
-            erase(b, it->second);
+            base_table_t::erase(b, it->second);
         }
 
         // ignore improper rects
@@ -683,38 +708,16 @@ public:
             return;
 
         member_rects[b] = rect;
-        insert(b, rect);
+        base_table_t::insert(b, rect);
     }
 
     void update_layer(MyRef_t b)
     {
         auto it = member_rects.find(b);
         if(it != member_rects.end())
-            erase(b, it->second);
+            base_table_t::erase(b, it->second);
 
         insert_layer(b);
-    }
-
-    void clear()
-    {
-        // can optimize later
-        for(auto col : columns)
-        {
-            for(screen_t* screen : col)
-                delete screen;
-        }
-
-        columns.clear();
-        col_first_row_index.clear();
-        member_rects.clear();
-    }
-
-    void clear_light()
-    {
-        for(const auto& p : member_rects)
-            erase(p.first, p.second);
-
-        member_rects.clear();
     }
 };
 
