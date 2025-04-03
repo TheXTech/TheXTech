@@ -166,7 +166,7 @@ void NPCMovementLogic(int A, numf_t& speedVar)
     else if(NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_SWAP_POWER || NPC[A].Type == NPCID_LIFE_S3 ||
             NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 ||
             NPC[A].Type == NPCID_LIFE_S1 || NPC[A].Type == NPCID_LIFE_S4 || NPC[A].Type == NPCID_BRUTE_SQUISHED ||
-            NPC[A].Type == NPCID_BIG_MOLE)
+            NPC[A].Type == NPCID_BIG_MOLE || NPC[A].Type == NPCID_INVINCIBILITY_POWER)
     {
         if(NPC[A].Direction == 0) // Move toward the closest player
         {

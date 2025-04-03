@@ -386,6 +386,10 @@ void TouchBonus(int A, int B)
     {
         PlayerHurt(A);
     }
+    else if(NPC[B].Type == NPCID_INVINCIBILITY_POWER)
+    {
+        InvincibilityTime = Physics.NPCPSwitch;
+    }
     else if(NPC[B].Type == NPCID_POWER_S3 || NPC[B].Type == NPCID_POWER_S1 || NPC[B].Type == NPCID_POWER_S4 || NPC[B].Type == NPCID_POWER_S2 || NPC[B].Type == NPCID_POWER_S5) // Bonus is a mushroom
     {
         if(Player[A].Character == 5 && Player[A].State == 1)

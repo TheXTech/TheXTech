@@ -1463,6 +1463,9 @@ void SetupVars()
     NPCTraits[NPCID_PINK_CIVILIAN].IsABonus = true;
     NPCTraits[NPCID_POISON].IsABonus = true;
     NPCTraits[NPCID_STAR_COLLECT].IsABonus = true;
+    NPCTraits[NPCID_INVINCIBILITY_POWER].IsABonus = true;
+    NPCTraits[NPCID_INVINCIBILITY_POWER].TFrames = 4;
+    NPCTraits[NPCID_INVINCIBILITY_POWER].FrameSpeed = 4;
     NPCTraits[NPCID_COIN_S3].IsACoin = true;
     NPCTraits[NPCID_COIN_S4].IsACoin = true;
     NPCTraits[NPCID_COIN_5].IsACoin = true;
