@@ -1125,10 +1125,10 @@ interrupt_Activation:
             {
                 if(NPC[A].TimeLeft > 10)
                 {
-                    NPC[A].TimeLeft = 10;
-
                     if(NoTurnBack[NPC[A].Section])
                        NPC[A].TurnBackWipe = true;
+                    else if(NPC[A].DefaultType)
+                        NPC[A].TimeLeft = 10;
                 }
 
                 if(NPC[A].TimeLeft < 1)
