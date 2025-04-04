@@ -381,7 +381,7 @@ void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, numf_t 
         }
 
         if(NPC[A].Type == NPCID_INVINCIBILITY_POWER)
-            NPC[A].Location.SpeedY = -4.5_n;
+            NPC[A].Location.SpeedY = -6_n;
 
         if(tempSpeedA != 0)
             NPC[A].Location.SpeedY = tempSpeedA;
