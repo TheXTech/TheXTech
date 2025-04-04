@@ -1104,10 +1104,10 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
     // COMMON CONTENTS
     if(m_NPC_page == -1 && m_special_page == SPECIAL_PAGE_BLOCK_CONTENTS)
     {
-        SuperPrintR(mode, g_editorStrings.wordCoins, 3, 70, 40);
+        SuperPrintR(mode, g_editorStrings.wordCoins, 3, 110, 40);
 
-        bool currently_coins = EditorCursor.Block.Special > 0 && EditorCursor.Block.Special < 1000;
-        if(UpdateButton(mode, 60 + 4, 60 + 4, GFXNPC[NPCID_COIN_S3], currently_coins, 0, 0, 32, 32) && !currently_coins)
+        bool currently_coins = EditorCursor.Block.Special > 0 && EditorCursor.Block.Special < 100;
+        if(UpdateButton(mode, 100 + 4, 60 + 4, GFXNPC[NPCID_COIN_S3], currently_coins, 0, 0, 32, 32) && !currently_coins)
         {
             EditorCursor.Block.Special = 1;
             currently_coins = true;
@@ -1115,11 +1115,17 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
         if(currently_coins)
         {
-            SuperPrint("x" + std::to_string(EditorCursor.Block.Special), 3, 100, 74);
-            if(EditorCursor.Block.Special > 0 && UpdateButton(mode, 180 + 4, 60 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+            SuperPrint("x" + std::to_string(EditorCursor.Block.Special), 3, 140, 74);
+            if(EditorCursor.Block.Special > 0 && UpdateButton(mode, 220 + 4, 60 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
                 EditorCursor.Block.Special --;
-            if(EditorCursor.Block.Special < 99 && UpdateButton(mode, 220 + 4, 60 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+            if(EditorCursor.Block.Special < 99 && UpdateButton(mode, 260 + 4, 60 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
                 EditorCursor.Block.Special ++;
+        }
+
+        if(FileFormat == FileFormats::LVL_PGEX)
+        {
+            if(UpdateButton(mode, 60 + 4, 60 + 4, (CommonFrame & 32) ? GFXNPC[NPCID_INVINCIBILITY_POWER] : GFXNPC[NPCID_COIN_S3], EditorCursor.Block.Special == 110, 0, 0, 32, 32))
+                EditorCursor.Block.Special = 110;
         }
 
         SuperPrintR(mode, g_mainMenu.caseNone, 3, 40 + 260, 40);
@@ -1142,9 +1148,9 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         static const int p7_smb2[] = {NPCID_COIN_S2, NPCID_POWER_S2, NPCID_BOMB, NPCID_EARTHQUAKE_BLOCK, NPCID_TIMER_S2};
         UpdateNPCGrid(mode, 40, 340, p7_smb2, sizeof(p7_smb2)/sizeof(int), 5);
 
-        SuperPrintR(mode, "*", 3, 40 + 10, 380);
-        static const int p7_misc[] = {NPCID_RING, NPCID_POWER_S5, NPCID_FLY_POWER, NPCID_GEM_1, NPCID_GEM_5, NPCID_GEM_20};
-        UpdateNPCGrid(mode, 40, 400, p7_misc, sizeof(p7_misc)/sizeof(int), 10);
+        SuperPrintR(mode, "X", 3, 40 + 10, 380);
+        static const int p7_misc[] = {NPCID_RING, NPCID_POWER_S5, NPCID_FLY_POWER, NPCID_GEM_1, NPCID_GEM_5, NPCID_GEM_20, NPCID_INVINCIBILITY_POWER};
+        UpdateNPCGrid(mode, 40, 400, p7_misc, sizeof(p7_misc)/sizeof(int) - (FileFormat != FileFormats::LVL_PGEX), 10);
     }
 }
 
@@ -3305,12 +3311,16 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     // Contents
     SuperPrintRightR(mode, g_editorStrings.blockInside, 3, e_ScreenW - 40, 294);
     NPCID n_type = NPCID_NULL;
-    if(EditorCursor.Block.Special > 0 && EditorCursor.Block.Special <= 1000)
+    if(EditorCursor.Block.Special > 0 && EditorCursor.Block.Special <= 100)
     {
         n_type = NPCID_COIN_S3;
         SuperPrintR(mode, "x" + std::to_string(EditorCursor.Block.Special), 3, e_ScreenW-80, 314);
     }
-    else if(EditorCursor.Block.Special != 0)
+    else if(EditorCursor.Block.Special == 110)
+    {
+        n_type = (CommonFrame & 32) ? NPCID_INVINCIBILITY_POWER : NPCID_COIN_S3;
+    }
+    else if(EditorCursor.Block.Special > 1000)
     {
         n_type = NPCID(EditorCursor.Block.Special - 1000);
     }

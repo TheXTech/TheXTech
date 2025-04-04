@@ -243,9 +243,14 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     else // Everything else defaults to SMB3
         newBlock = 2;
 
-
-
-
+    // invincibility continuation block
+    if(b.Special == 110)
+    {
+        if(InvincibilityTime)
+            b.Special = 1000 + NPCID_INVINCIBILITY_POWER;
+        else
+            b.Special = 1;
+    }
 
     if(b.Special > 0 && b.Special < 100) // Block has coins
     {

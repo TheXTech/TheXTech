@@ -57,6 +57,8 @@ void s_drawBlockExtra(int Z, int camX, int camY, const Block_t& b)
             NPCID C = NPCID_NULL;
             if(b.Special > 1000)
                 C = NPCID(b.Special - 1000);
+            else if(b.Special == 110 && (CommonFrame & 32))
+                C = NPCID_INVINCIBILITY_POWER;
             else
                 C = NPCID_COIN_S3;
 
