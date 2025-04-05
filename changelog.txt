@@ -25,6 +25,7 @@ Changelog for 1.3.7.1-dev
 -Added compat flag "no-shell-grab-top" to disable grabbing shells while falling from above, for compatibility with pre-SMBX 1.3 content (@Wohlstand)
 -Fix loading of custom resolution specified in thextech.ini (@ds-sloth)
 -Add 3x scale mode (@ds-sloth, thanks to @Yave-Yu for the request)
+-Fix TheXTech 1.3.7 bug where medals were incorrectly tracked after using Coin Switch in Classic Mode (@ds-sloth, thanks to @Agatha for the report)
 
 Changelog for 1.3.7
 -Fix vanilla peculiarity where medals were sometimes not collected when killed, guarded by "fix-medal-kill" [Modern Mode] (@ds-sloth, thanks to @Superbloxen for the report)

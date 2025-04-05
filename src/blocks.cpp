@@ -454,10 +454,6 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             b.Location.Height = BlockHeight[newBlock];
             b.Location.Width = BlockWidth[newBlock];
         }
-
-
-
-
     }
     else if(b.Special >= 100) // New spawn code
     {
@@ -1419,7 +1415,7 @@ void UpdateBlocks()
         {
             ib.Kill = false;
 
-            if(ib.Special == 0)
+            if(ib.Special <= 0)
             {
                 if(ib.Type == 4 || ib.Type == 60 ||
                    ib.Type == 90 || ib.Type == 188 ||
@@ -1481,7 +1477,7 @@ void PSwitch(bool enabled)
     {
         for(A = 1; A <= numNPCs; A++)
         {
-            bool transform = NPC[A]->IsACoin && NPC[A].coinSwitchBlockType == 0 && !NPC[A].Hidden && NPC[A].Special == 0.0;
+            bool transform = NPC[A]->IsACoin && NPC[A].coinSwitchBlockType == 0 && !NPC[A].Hidden && NPC[A].Special == 0;
 
             if(NPC[A].Type == NPCID_MEDAL && g_config.fix_special_coin_switch)
                 transform = false;
@@ -1518,7 +1514,7 @@ void PSwitch(bool enabled)
                     nb.Location.X += (NPC[A].Location.Width - nb.Location.Width) / 2.0;
                     nb.Location.SpeedX = 0;
                     nb.Location.SpeedY = 0;
-                    nb.Special = 0;
+                    nb.Special = -NPC[A].Variant; // NEW: store Variant to preserve medals tracking
                     nb.Kill = false;
                     nb.coinSwitchNpcType = NPC[A].Type;
 
@@ -1684,6 +1680,7 @@ void PSwitch(bool enabled)
                     nn.DefaultLocationX = nn.Location.X;
                     nn.DefaultLocationY = nn.Location.Y;
                     nn.DefaultType = nn.Type;
+                    nn.Variant = -Block[A].Special;
 
                     // WARNING: this is new logic from #167. Check in case of any inconsistencies after Coin Switch is activated.
                     if(nn->TFrames > 0)
