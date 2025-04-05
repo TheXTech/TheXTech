@@ -43,20 +43,20 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
     int oldStandingOnNpc = Player[A].StandingOnNPC;
 
     int blockPushX = 0;
-    bool tempHit = false;
-    bool tempHit2 = false;
+    bool hitCeiling = false; // previously called tempHit
+    bool hitWall = false; // previously called tempHit2
 
-    int tempSlope = 0;
-    int tempSlope2 = 0;
-    int tempSlope3 = 0; // keeps track of hit 5 for slope detection
+    int ceilingSlope = 0; // was previously called tempSlope
+    int wallBlock = 0; // was previously called tempSlope2
+    int insideBlock = 0; // keeps track of hit 5 for slope detection -- was previously called tempSlope3
 
     int ceilingBlock1 = 0;
     int ceilingBlock2 = 0;
 
     Location_t floorLocation; // was previously called tempLocation3
 
-    // This was previously shared between players, but is safe unless Block[tempSlope2] satisfies certain properties before tempSlope2 gets set
-    num_t tempSlope2X = 0; // The old X before player was moved
+    // This was previously shared between players, but is safe unless Block[wallBlock] satisfies certain properties before wallBlock gets set
+    num_t preWallX = 0; // The old X before player was moved -- was previously called tempSlope2X
 
     if(Player[A].Character == 5 && Player[A].Duck && (Player[A].Location.SpeedY == Physics.PlayerGravity || Player[A].StandingOnNPC != 0 || Player[A].Slope != 0))
         Player[A].Location.set_height_floor(30);
@@ -194,7 +194,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                             if(BlockSlope2[Block[B].Type] != 0 && (Player[A].Location.Y > Block[B].Location.Y || (HitSpot != 2 && HitSpot != 4)) && HitSpot != 1 && !ShadowMode)
                             {
                                 HitSpot = 0;
-                                tempSlope = B;
+                                ceilingSlope = B;
 
                                 num_t PlrMid;
                                 if(BlockSlope2[Block[B].Type] == 1)
@@ -309,20 +309,20 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                         }
                                     }
 
-                                    if(tempHit2)
+                                    if(hitWall)
                                     {
                                         // NOTE: looks like a good place for a vb6-style fEqual
-                                        if(Block[tempSlope2].Location.Y + Block[tempSlope2].Location.Height == Block[B].Location.Y && BlockSlope[Block[tempSlope2].Type] == BlockSlope[Block[B].Type])
+                                        if(Block[wallBlock].Location.Y + Block[wallBlock].Location.Height == Block[B].Location.Y && BlockSlope[Block[wallBlock].Type] == BlockSlope[Block[B].Type])
                                         {
-                                            tempHit2 = false;
-                                            tempSlope2 = 0;
-                                            Player[A].Location.X = tempSlope2X;
+                                            hitWall = false;
+                                            wallBlock = 0;
+                                            Player[A].Location.X = preWallX;
                                         }
                                     }
 
-                                    if(tempSlope3 > 0)
+                                    if(insideBlock > 0)
                                     {
-                                        Player[A].Location.Y = Block[tempSlope3].Location.Y + Block[tempSlope3].Location.Height + 0.01_n;
+                                        Player[A].Location.Y = Block[insideBlock].Location.Y + Block[insideBlock].Location.Height + 0.01_n;
                                         num_t PlrMid = Player[A].Location.Y + Player[A].Location.Height;
                                         num_t Slope = 1 - (PlrMid - Block[B].Location.Y) / (int_ok)Block[B].Location.Height;
 
@@ -573,7 +573,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                 }
                                 else
                                 {
-                                    tempSlope2X = Player[A].Location.X;
+                                    preWallX = Player[A].Location.X;
 
                                     if(HitSpot == 4)
                                     {
@@ -595,11 +595,11 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                     if(Player[A].Mount == 2)
                                     {
                                         // cast to float because in VB6 the old X location was temporarily stored in mountBump, which is a float
-                                        Player[A].mountBump = Player[A].Location.X - (numf_t)tempSlope2X;
+                                        Player[A].mountBump = Player[A].Location.X - (numf_t)preWallX;
                                     }
 
-                                    tempSlope2 = B;
-                                    tempHit2 = true;
+                                    wallBlock = B;
+                                    hitWall = true;
 
                                     // IMPORTANT: this case was truncation until v1.3.7.1-dev. Confirm that changing to VB6 rounding does not cause any issues.
                                     blockPushX = vb6Round(Block[B].Location.SpeedX);
@@ -624,7 +624,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                     Player[A].Pinched.MovingUD = true;
                                 }
 
-                                tempHit = true;
+                                hitCeiling = true;
                                 if(ceilingBlock1 == 0)
                                     ceilingBlock1 = B;
                                 else
@@ -649,7 +649,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                 }
                                 else
                                 {
-                                    tempSlope3 = B;
+                                    insideBlock = B;
 
                                     if(Block[B].Location.to_right_of(Player[A].Location))
                                         Player[A].Pinched.Right4 = 2;
@@ -667,26 +667,26 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                             Player[A].Pinched.MovingUD = true;
                                     }
 
-                                    Location_t tempLocation;
-                                    tempLocation.X = Player[A].Location.X;
-                                    tempLocation.Width = Player[A].Location.Width;
-                                    tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height;
-                                    tempLocation.Height = 0.1_n;
-                                    bool tempBool = false;
+                                    Location_t playerFeet; // previously tempLocation
+                                    playerFeet.X = Player[A].Location.X;
+                                    playerFeet.Width = Player[A].Location.Width;
+                                    playerFeet.Y = Player[A].Location.Y + Player[A].Location.Height;
+                                    playerFeet.Height = 0.1_n;
+                                    bool hasFloor = false; // previously tempBool
 
                                     // this could have caused an unusual TheXTech bug where lBlock would get overwritten
                                     // (this wouldn't affect VB6 because loop bounds are evaluated only on loop start)
 
-                                    // fBlock = FirstBlock[(tempLocation.X / 32) - 1];
-                                    // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
-                                    // blockTileGet(tempLocation, fBlock, lBlock);
+                                    // fBlock = FirstBlock[(playerFeet.X / 32) - 1];
+                                    // lBlock = LastBlock[((playerFeet.X + playerFeet.Width) / 32.0) + 1];
+                                    // blockTileGet(playerFeet, fBlock, lBlock);
 
-                                    for(int C : treeFLBlockQuery(tempLocation, SORTMODE_COMPAT))
+                                    for(int C : treeFLBlockQuery(playerFeet, SORTMODE_COMPAT))
                                     {
-                                        if(CheckCollision(tempLocation, Block[C].Location) && !Block[C].Hidden)
+                                        if(CheckCollision(playerFeet, Block[C].Location) && !Block[C].Hidden)
                                         {
                                             if(BlockSlope[Block[C].Type] == 0)
-                                                tempBool = true;
+                                                hasFloor = true;
                                             else
                                             {
                                                 Player[A].Location.Y = Block[B].Location.Y + Block[B].Location.Height; // + 0.01
@@ -713,7 +713,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                     /// TODO: find all cases where C is set and could "stick", and make them persistent
                                     //// decided whether or not to care about 2P and higher (C values from NPC checks)
 
-                                    if(tempBool)
+                                    if(hasFloor)
                                     {
                                         Player[A].CanJump = false;
                                         Player[A].Jump = 0;
@@ -798,7 +798,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                 DontResetGrabTime = false;
         }
 
-        if(tempHit2)
+        if(hitWall)
         {
             if(WalkingCollision(Player[A].Location, Block[floorBlock].Location))
             {
@@ -964,13 +964,13 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
         }
     }
 
-    if(tempSlope2 > 0 && tempSlope > 0)
+    if(wallBlock > 0 && ceilingSlope > 0)
     {
-        if(Block[tempSlope].Location.Y + Block[tempSlope].Location.Height == Block[tempSlope2].Location.Y + Block[tempSlope2].Location.Height)
-            tempHit2 = false;
+        if(Block[ceilingSlope].Location.Y + Block[ceilingSlope].Location.Height == Block[wallBlock].Location.Y + Block[wallBlock].Location.Height)
+            hitWall = false;
     }
 
-    if(!tempHit && tempHit2)
+    if(!hitCeiling && hitWall)
     {
         if(Player[A].Location.SpeedX + NPC[Player[A].StandingOnNPC].Location.SpeedX > 0 && Player[A].Controls.Right)
         {
@@ -1057,7 +1057,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
     if(Player[A].StandingOnNPC != 0)
     {
-        if(!tempHit2)
+        if(!hitWall)
         {
             // the single Pinched variable has always been false since SMBX64
             // if(!NPC[Player[A].StandingOnNPC].Pinched && !FreezeNPCs)
