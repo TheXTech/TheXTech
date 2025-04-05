@@ -19,6 +19,7 @@
  */
 
 #ifdef _WIN32
+#   include <windows.h>
 #   include <winternl.h>
 #   include <sysinfoapi.h>
 #   include <initguid.h>
