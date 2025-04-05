@@ -46,6 +46,7 @@
 static bool s_hasFrameBuffer = false;
 static std::vector<AbstractWindow_t::VideoModeRes> s_availableRes;
 static std::vector<uint8_t> s_availableColours;
+static std::set<uint8_t> s_availableColoursMap;
 
 
 static uint8_t s_getColorBits(uint32_t format)
@@ -53,22 +54,22 @@ static uint8_t s_getColorBits(uint32_t format)
     switch(format)
     {
     case SDL_PIXELFORMAT_BGR565:
-        return 16;
+        return 16u;
     case SDL_PIXELFORMAT_BGR888:
     case SDL_PIXELFORMAT_BGRA8888:
-        return 32;
+        return 32u;
     }
 
-    return 32;
+    return 32u;
 }
 
 static uint32_t s_getColorFromBits(uint8_t bits)
 {
     switch(bits)
     {
-    case 16:
+    case 16u:
         return SDL_PIXELFORMAT_BGR565;
-    case 32:
+    case 32u:
         return SDL_PIXELFORMAT_BGR888;
     }
 
@@ -93,6 +94,9 @@ static void s_fillScreenModes()
     std::map<uint32_t, std::set<std::pair<int, int>>> m_hasRes;
     std::map<uint32_t, std::vector<AbstractWindow_t::VideoModeRes>> m_listModes;
     std::set<uint32_t> m_listColours;
+
+    s_availableColours.clear();
+    s_availableColoursMap.clear();
 
     pLogDebug("List of available screen modes:");
     for(int i = modes - 1; i >= 0; --i)
@@ -123,7 +127,9 @@ static void s_fillScreenModes()
     {
         auto &e = *m_listModes.begin();
         pLogDebug("Only one colour mode is available - : C=%u (%s):", e.first, SDL_GetPixelFormatName(e.first));
-        s_availableColours.push_back(s_getColorBits(e.first));
+        auto col = s_getColorBits(e.first);
+        s_availableColours.push_back(col);
+        s_availableColoursMap.insert(col);
 
         for(auto jt = e.second.begin(); jt != e.second.end(); ++jt)
             s_availableRes.push_back(*jt);
@@ -135,7 +141,11 @@ static void s_fillScreenModes()
         pLogDebug("List of modes per colour depth:");
 
         for(auto it = m_listModes.begin(); it != m_listModes.end(); ++it)
-            s_availableColours.push_back(s_getColorBits(it->first));
+        {
+            auto col = s_getColorBits(it->first);
+            s_availableColours.push_back(col);
+            s_availableColoursMap.insert(col);
+        }
 
         auto &first = m_listModes.begin()->second;
 
@@ -801,7 +811,12 @@ void WindowSDL::getCurrentVideoMode(VideoModeRes &res, uint8_t &colourDepth)
 void WindowSDL::setVideoMode(const VideoModeRes &res, uint8_t colourDepth)
 {
     m_curRes = res;
-    m_curColour = colourDepth;
+
+    if(colourDepth == 0 || s_availableColoursMap.find(colourDepth) != s_availableColoursMap.end())
+        m_curColour = colourDepth;
+    else
+        m_curColour = 0;
+
     syncFullScreenRes();
 }
 

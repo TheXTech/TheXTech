@@ -102,10 +102,14 @@ void config_video_mode_set()
         return;
 
     AbstractWindow_t::VideoModeRes res;
+    uint8_t depth;
     res.w = g_config.fullscreen_res.m_value.first;
     res.h = g_config.fullscreen_res.m_value.second;
 
     XWindow::setVideoMode(res, g_config.fullscreen_depth);
+
+    XWindow::getCurrentVideoMode(res, depth);
+    g_config.fullscreen_depth.obtained = depth;
 }
 
 void config_fullscreen_type_set()
