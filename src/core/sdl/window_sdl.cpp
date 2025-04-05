@@ -126,8 +126,8 @@ static void s_fillScreenModes()
     if(m_listModes.size() == 1)
     {
         auto &e = *m_listModes.begin();
-        pLogDebug("Only one colour mode is available - : C=%u (%s):", e.first, SDL_GetPixelFormatName(e.first));
         auto col = s_getColorBits(e.first);
+        pLogDebug("Only one colour mode is available - C=%u (%s, %u bits):", e.first, SDL_GetPixelFormatName(e.first), (uint32_t)col);
         s_availableColours.push_back(col);
         s_availableColoursMap.insert(col);
 
@@ -143,6 +143,7 @@ static void s_fillScreenModes()
         for(auto it = m_listModes.begin(); it != m_listModes.end(); ++it)
         {
             auto col = s_getColorBits(it->first);
+            pLogDebug("- C=%u (%s, %u bits):", it->first, SDL_GetPixelFormatName(it->first), (uint32_t)col);
             s_availableColours.push_back(col);
             s_availableColoursMap.insert(col);
         }
