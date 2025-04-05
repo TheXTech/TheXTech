@@ -81,6 +81,12 @@ jobs:
       run: |
         cmake --build build --target all -j4
 
+    - name: Check codesize and RAM usage
+      if: success() && runner.os == 'Linux'
+      shell: bash
+      run: |
+        size build/output/bin/thextech.elf
+
     - name: Create Package
       if: success()
       shell: bash
