@@ -798,77 +798,21 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                 DontResetGrabTime = false;
         }
 
+        bool cancelWalk = false;
+
         if(hitWall)
         {
-            if(WalkingCollision(Player[A].Location, Block[floorBlock].Location))
-            {
-                Player[A].Location.Y = floorLocation.Y - Player[A].Location.Height;
-                if(Player[A].GroundPound)
-                {
-                    YoshiPound(A, Player[A].Mount, true);
-                    Player[A].GroundPound = false;
-                }
-                else if(Player[A].YoshiYellow)
-                    YoshiPound(A, Player[A].Mount);
+            if(!WalkingCollision(Player[A].Location, Block[floorBlock].Location))
+                cancelWalk = true;
 
-                Player[A].Location.SpeedY = 0;
-                if(floorLocation.SpeedX != 0 || floorLocation.SpeedY != 0)
-                {
-                    NPC[-A] = NPC_t();
-                    NPC[-A].Location = floorLocation;
-                    NPC[-A].Type = NPCID_METALBARREL;
-                    NPC[-A].Active = true;
-                    NPC[-A].TimeLeft = 100;
-                    NPC[-A].Section = Player[A].Section;
-                    NPC[-A].Special = floorBlock;
-                    Player[A].StandingOnNPC = -A;
-                    movingBlock = true;
-                    Player[A].Location.SpeedY = 12;
-                }
-
-                if(Block[floorBlock].Type == 55 && !FreezeNPCs) // Make the player jump if the block is bouncy
-                {
-                    if(!Player[A].Slide)
-                        Player[A].Multiplier = 0;
-                    BlockHit(floorBlock, true);
-                    Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
-                    PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
-                    if(Player[A].Controls.Jump || Player[A].Controls.AltJump)
-                    {
-                        PlaySoundSpatial(SFX_Jump, Player[A].Location);
-                        Player[A].Jump = Physics.PlayerBlockJumpHeight;
-                        if(Player[A].Character == 2)
-                            Player[A].Jump += 3;
-                        if(Player[A].SpinJump)
-                            Player[A].Jump -= 6;
-                    }
-                }
-
-                if(Player[A].SpinJump && (Block[floorBlock].Type == 90 || Block[floorBlock].Type == 526) && Player[A].State > 1 && Block[floorBlock].Special == 0)
-                {
-                    Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
-                    Block[floorBlock].Kill = true;
-                    iBlocks += 1;
-                    iBlock[iBlocks] = floorBlock;
-                    // HitSpot = 0; // this definition is never used
-                    floorBlock = 0;
-                    Player[A].Jump = 7;
-
-                    if(Player[A].Character == 2)
-                        Player[A].Jump += 3;
-
-                    if(Player[A].Controls.Down)
-                    {
-                        Player[A].Jump = 0;
-                        Player[A].Location.SpeedY = Physics.PlayerJumpVelocity / 2;
-                    }
-                }
-            }
+            // the logic below was previously duplicated with minor differences depending on the balue of hitWall
         }
-        else
+
+        if(!cancelWalk)
         {
             Player[A].Location.Y = floorLocation.Y - Player[A].Location.Height;
-            if(Player[A].StandingOnNPC != 0)
+
+            if(!hitWall && Player[A].StandingOnNPC != 0)
             {
                 if(NPC[Player[A].StandingOnNPC].Location.Y <= floorLocation.Y && Player[A].StandingOnNPC != Player[A].HoldingNPC)
                     Player[A].Location.Y = NPC[Player[A].StandingOnNPC].Location.Y - Player[A].Location.Height;
@@ -882,7 +826,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
             else if(Player[A].YoshiYellow)
                 YoshiPound(A, Player[A].Mount);
 
-            if(Player[A].Slope == 0 || Player[A].Slide)
+            if(hitWall || Player[A].Slope == 0 || Player[A].Slide)
                 Player[A].Location.SpeedY = 0;
 
             if(floorLocation.SpeedX != 0 || floorLocation.SpeedY != 0)
@@ -899,7 +843,11 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                 Player[A].Location.SpeedY = 12;
             }
 
-            if(Player[A].StandingOnNPC != 0 && !movingBlock)
+            if(hitWall)
+            {
+                // this series of if clauses did not exist in the hitWall case
+            }
+            else if(Player[A].StandingOnNPC != 0 && !movingBlock)
             {
                 Player[A].Location.SpeedY = 1;
                 // the single Pinched variable has always been false since SMBX64
@@ -914,11 +862,14 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                 if(Player[A].Location.SpeedY < 0)
                     Player[A].Location.SpeedY = 0;
             }
+#if 0
+            // in the only case where this code is reachable, it has no effect
             else
             {
                 if(Player[A].Slope == 0 || Player[A].Slide)
                     Player[A].Location.SpeedY = 0;
             }
+#endif
 
             if(Block[floorBlock].Type == 55 && !FreezeNPCs) // Make the player jump if the block is bouncy
             {
@@ -943,12 +894,14 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                 }
             }
 
+            // smash turn blocks
             if(Player[A].SpinJump && (Block[floorBlock].Type == 90 || Block[floorBlock].Type == 526) && Player[A].State > 1 && Block[floorBlock].Special == 0)
             {
                 Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
                 Block[floorBlock].Kill = true;
                 iBlocks += 1;
                 iBlock[iBlocks] = floorBlock;
+                // HitSpot = 0; // this definition is never used
                 floorBlock = 0;
                 Player[A].Jump = 7;
 
