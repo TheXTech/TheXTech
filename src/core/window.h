@@ -170,6 +170,53 @@ E_INLINE int setFullScreen(bool fs) TAIL
 
 
 #ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+
+/*!
+ * \brief Get a list of available video resolutions for exclusive full-screen mode
+ * \return List of full-screen video resolutions
+ */
+E_INLINE const std::vector<AbstractWindow_t::VideoModeRes> &getAvailableVideoResolutions() TAIL
+#ifndef WINDOW_CUSTOM
+{
+    return g_window->getAvailableVideoResolutions();
+}
+#endif
+
+/*!
+ * \brief Get a list of available colour depths for exclusive full-screen mode
+ * \return List of full-screen colour depths
+ */
+E_INLINE const std::vector<uint8_t> &getAvailableColourDepths() TAIL
+#ifndef WINDOW_CUSTOM
+{
+    return g_window->getAvailableColourDepths();
+}
+#endif
+
+/*!
+ * \brief Gets the currently configured exclusive full-screen resolution
+ * \param res Resolution structure
+ * \param colourDepth Color depth in bits
+ */
+E_INLINE void getCurrentVideoMode(AbstractWindow_t::VideoModeRes &res, uint8_t &colourDepth) TAIL
+#ifndef WINDOW_CUSTOM
+{
+    g_window->getCurrentVideoMode(res, colourDepth);
+}
+#endif
+
+/*!
+ * \brief Set the resolution for the exclusive full-screen mode
+ * \param res Desired resolution (It should match one of available in the list!)
+ * \param colourDepth Color depth in bits (16, 32, or 0 as "auto")
+ */
+E_INLINE void setVideoMode(const AbstractWindow_t::VideoModeRes &res, uint8_t colourDepth) TAIL
+#ifndef WINDOW_CUSTOM
+{
+    g_window->setVideoMode(res, colourDepth);
+}
+#endif
+
 /*!
  * \brief Sets the type of fullscreen (desktop or real)
  * \param type Fullscreen type: 0 auto, 1 desktop, 2 real

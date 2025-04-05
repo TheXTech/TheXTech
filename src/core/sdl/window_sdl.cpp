@@ -19,7 +19,11 @@
  */
 
 #ifdef _WIN32
+#   include <windows.h>
 #   include <winternl.h>
+#   include <sysinfoapi.h>
+#   include <initguid.h>
+#   include <dxdiag.h>
 #endif
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_cpuinfo.h>
@@ -36,14 +40,346 @@
 
 
 #ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+#   include <map>
+#   include <set>
 #   include "pge_cpu_arch.h"
 
 static bool s_hasFrameBuffer = false;
+static std::vector<AbstractWindow_t::VideoModeRes> s_availableRes;
+static std::vector<uint8_t> s_availableColours;
+static std::map<uint8_t, uint32_t> s_availableColoursMap;
+
+
+static uint8_t s_getColorBits(uint32_t format)
+{
+    switch(format)
+    {
+    case SDL_PIXELFORMAT_BGR565:
+    case SDL_PIXELFORMAT_RGB565:
+        return 16u;
+    case SDL_PIXELFORMAT_RGB888:
+    case SDL_PIXELFORMAT_BGR888:
+    case SDL_PIXELFORMAT_RGBA8888:
+    case SDL_PIXELFORMAT_BGRA8888:
+        return 32u;
+    }
+
+    return 32u;
+}
+
+static uint32_t s_getColorFromBits(uint8_t bits)
+{
+    auto f = s_availableColoursMap.find(bits);
+    if(f != s_availableColoursMap.end())
+        return f->second;
+
+    switch(bits)
+    {
+    case 16u:
+        return SDL_PIXELFORMAT_RGB565;
+    case 32u:
+        return SDL_PIXELFORMAT_RGB888;
+    }
+
+    return SDL_PIXELFORMAT_RGB888;
+}
+
+static inline bool s_isExclusiveFullScreen(Uint32 flags)
+{
+    return (flags & SDL_WINDOW_FULLSCREEN) == (flags & SDL_WINDOW_FULLSCREEN_DESKTOP);
+}
 
 void WindowSDL::setHasFrameBuffer(bool has)
 {
     s_hasFrameBuffer = has;
 }
+
+static void s_fillScreenModes()
+{
+    SDL_DisplayMode mode;
+    int modes = SDL_GetNumDisplayModes(0);
+
+    std::map<uint32_t, std::set<std::pair<int, int>>> m_hasRes;
+    std::map<uint32_t, std::vector<AbstractWindow_t::VideoModeRes>> m_listModes;
+    std::set<uint32_t> m_listColours;
+
+    s_availableColours.clear();
+    s_availableColoursMap.clear();
+
+    pLogDebug("List of available screen modes:");
+    for(int i = modes - 1; i >= 0; --i)
+    {
+        SDL_GetDisplayMode(0, i, &mode);
+
+        pLogDebug("-- C=%u (%s), W=%d, H=%d, R=%d",
+                  mode.format, SDL_GetPixelFormatName(mode.format), mode.w, mode.h, mode.refresh_rate);
+
+        auto &hasRes = m_hasRes[mode.format];
+
+        if(hasRes.find({mode.w, mode.h}) == hasRes.end())
+        {
+            pLogDebug("-- Insert C=%u (%s), W=%d, H=%d",
+                      mode.format, SDL_GetPixelFormatName(mode.format), mode.w, mode.h);
+            hasRes.insert({mode.w, mode.h});
+            m_listModes[mode.format].push_back({mode.w, mode.h});
+            if(m_listColours.find(mode.format) == m_listColours.end())
+                m_listColours.insert(mode.format);
+        }
+    }
+
+    // The list should NOT be empty!
+    SDL_assert_release(!m_listModes.empty() && !m_listModes.begin()->second.empty());
+
+    // If only one colour mode caught, just add everything into the list
+    if(m_listModes.size() == 1)
+    {
+        auto &e = *m_listModes.begin();
+        auto col = s_getColorBits(e.first);
+        pLogDebug("Only one colour mode is available - C=%u (%s, %u bits):", e.first, SDL_GetPixelFormatName(e.first), (uint32_t)col);
+        s_availableColours.push_back(col);
+        s_availableColoursMap.insert({col, e.first});
+
+        for(auto jt = e.second.begin(); jt != e.second.end(); ++jt)
+            s_availableRes.push_back(*jt);
+    }
+    else
+    {
+        bool notEqual = false;
+
+        pLogDebug("List of modes per colour depth:");
+
+        for(auto it = m_listModes.begin(); it != m_listModes.end(); ++it)
+        {
+            auto col = s_getColorBits(it->first);
+            pLogDebug("- C=%u (%s, %u bits):", it->first, SDL_GetPixelFormatName(it->first), (uint32_t)col);
+            s_availableColours.push_back(col);
+            s_availableColoursMap.insert({col, it->first});
+        }
+
+        auto &first = m_listModes.begin()->second;
+
+        for(auto it = m_listModes.begin() ; it != m_listModes.end(); ++it)
+        {
+            s_availableRes.clear();
+
+            pLogDebug("-- C=%u (%s):", it->first, SDL_GetPixelFormatName(it->first));
+
+            if(it == m_listModes.begin())
+            {
+                for(auto jt = it->second.begin();  jt != it->second.end() ; ++jt)
+                {
+                    pLogDebug("-- %d x %d", jt->w, jt->h);
+                    s_availableRes.push_back(*jt);
+                }
+
+                continue;
+            }
+
+            for(auto ft = first.begin(), jt = it->second.begin();  ; ++jt, ++ft)
+            {
+                if(jt == it->second.end() && ft == first.end())
+                    break; // Both equal
+
+                if((jt == it->second.end()) ^ (ft == first.end()))
+                {
+                    // Different length
+                    pLogDebug("-- Not equal by length");
+                    notEqual = true;
+                    break;
+                }
+
+                if(jt->w != ft->w || jt->h != ft->h)
+                {
+                    // Not equal content
+                    pLogDebug("-- Not equal by resolutions: %d x %d vs %d x %d", jt->w, jt->h, ft->w, ft->h);
+                    notEqual = true;
+                    break;
+                }
+
+                pLogDebug("-- %d x %d", jt->w, jt->h);
+                s_availableRes.push_back(*ft);
+            }
+
+            if(notEqual)
+                break; // Work finished!
+        }
+    }
+}
+
+#ifdef _WIN32
+
+static bool s_hasWinSysInfo = false;
+static int32_t s_suggestedFullscreenType = 0;
+
+#define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }
+
+static HRESULT GetStringValue(IDxDiagContainer* pObject, const wchar_t* wstrName, char* strValue, int nStrLen)
+{
+    HRESULT hr;
+    VARIANT var;
+    VariantInit( &var );
+
+    if(FAILED(hr = pObject->GetProp(wstrName, &var)))
+        return hr;
+
+    if(var.vt != VT_BSTR)
+        return E_INVALIDARG;
+
+    wcstombs(strValue, var.bstrVal, nStrLen);
+    strValue[nStrLen - 1] = '\0';
+    VariantClear(&var);
+
+    return S_OK;
+}
+
+static uint32_t s_getVideoRam()
+{
+    unsigned int ret = 0;
+    HRESULT hr;
+
+    IDxDiagProvider* pProvider = 0;
+    IDxDiagContainer* pRoot = 0;
+    IDxDiagContainer* pObject = 0;
+    IDxDiagContainer* pContainer = 0;
+    DWORD count = 0;
+    WCHAR wszContainer[256];
+    char videoMemoryStr[128] = "";
+
+    DXDIAG_INIT_PARAMS dxDiagInitParam;
+
+    hr = CoCreateInstance(CLSID_DxDiagProvider,
+                          NULL,
+                          CLSCTX_INPROC_SERVER,
+                          IID_IDxDiagProvider,
+                          (LPVOID*)&pProvider);
+
+    if (!pProvider || FAILED(hr))
+        return 0;
+
+    SDL_memset(&dxDiagInitParam, 0, sizeof(DXDIAG_INIT_PARAMS));
+
+    dxDiagInitParam.dwSize = sizeof(DXDIAG_INIT_PARAMS);
+    dxDiagInitParam.dwDxDiagHeaderVersion = DXDIAG_DX9_SDK_VERSION;
+    dxDiagInitParam.bAllowWHQLChecks = true;
+    dxDiagInitParam.pReserved = NULL;
+
+    hr = pProvider->Initialize(&dxDiagInitParam);
+    if(SUCCEEDED(hr))
+    {
+        hr = pProvider->GetRootContainer( &pRoot);
+        if (SUCCEEDED(hr))
+        {
+            // fills in the struct from DXDIAG...
+            HRESULT hr = pRoot->GetChildContainer(L"DxDiag_DisplayDevices", &pContainer);
+            if(FAILED(hr))
+            {
+                SAFE_RELEASE(pProvider);
+                return 0;
+            }
+
+            DWORD nItem = 0;
+
+            if(SUCCEEDED(hr = pContainer->GetNumberOfChildContainers(&count)))
+            {
+                for(; nItem < count&& nItem < 16; nItem++)
+                {
+                    hr = pContainer->EnumChildContainerNames(nItem, wszContainer, 256);
+                    if(FAILED(hr))
+                    {
+                        SAFE_RELEASE(pObject);
+                        SAFE_RELEASE(pContainer);
+                        SAFE_RELEASE(pProvider);
+                        return 0;
+                    }
+
+                    hr = pContainer->GetChildContainer(wszContainer, &pObject);
+                    if(FAILED(hr) || pObject == NULL)
+                    {
+                        SAFE_RELEASE(pObject);
+                        SAFE_RELEASE(pContainer);
+                        SAFE_RELEASE(pProvider);
+                        return 0;
+                    }
+
+                    if(FAILED(hr = GetStringValue(pObject, L"szDisplayMemoryEnglish", videoMemoryStr, sizeof(videoMemoryStr))))
+                    {
+                        SAFE_RELEASE(pObject);
+                        SAFE_RELEASE(pContainer);
+                        SAFE_RELEASE(pProvider);
+                        return 0;
+                    }
+
+                    pLogDebug("Video memory value: %s", videoMemoryStr);
+
+                    char *num = videoMemoryStr;
+                    char *suff = nullptr;
+
+                    for(size_t i = 0; i < sizeof(videoMemoryStr) && videoMemoryStr[i] != '\0'; ++i)
+                    {
+                        if(videoMemoryStr[i] == ' ')
+                        {
+                            videoMemoryStr[i] = '\0';
+                            suff = videoMemoryStr + i + 1;
+                            ret = SDL_strtoul(num, nullptr, 10);
+
+                            if(SDL_strncasecmp(suff, "GB", 2) == 0)
+                                ret *= 1024;
+                            else if(SDL_strncasecmp(suff, "TB", 2) == 0)
+                                ret *= 1024 * 1024;
+
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    SAFE_RELEASE(pObject);
+    SAFE_RELEASE(pContainer);
+    SAFE_RELEASE(pProvider);
+
+    return ret;
+}
+
+static void s_updateSysInfo()
+{
+    if(s_hasWinSysInfo)
+        return;
+
+    // Try to collect various system-wide information to heuristically detect legacy computer
+    OSVERSIONINFO osvi;
+    SYSTEM_INFO sysInfo;
+    uint32_t videoMemSize = 0;
+
+    bool isWinXPorOlder = false;
+
+    SDL_memset(&osvi, 0, sizeof(OSVERSIONINFO));
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    GetVersionEx(&osvi);
+
+    GetSystemInfo(&sysInfo);
+
+    isWinXPorOlder = osvi.dwMajorVersion < 5 || (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion <= 1);
+
+    videoMemSize = s_getVideoRam();
+
+    pLogDebug("Windows Version: %u.%u, CPU type: %u, Video memory: %d MB",
+              osvi.dwMajorVersion,
+              osvi.dwMinorVersion,
+              sysInfo.dwProcessorType,
+              videoMemSize
+    );
+
+    s_suggestedFullscreenType = SDL_WINDOW_FULLSCREEN_DESKTOP;
+
+    if(isWinXPorOlder && videoMemSize > 0 && videoMemSize < 128)
+        s_suggestedFullscreenType = SDL_WINDOW_FULLSCREEN;
+
+    s_hasWinSysInfo = true;
+}
+
+#endif
 
 static int s_fsTypeToSDL(int type)
 {
@@ -51,6 +387,11 @@ static int s_fsTypeToSDL(int type)
     {
     case 0:
     {
+#ifdef _WIN32
+        if(s_suggestedFullscreenType > 0)
+            return s_suggestedFullscreenType;
+#endif
+
 #if defined(PGE_CPU_x86_32) || defined(PGE_CPU_ARM32) || defined(PGE_CPU_PPC32)
         // On 32-bit architecures
         return SDL_WINDOW_FULLSCREEN;
@@ -156,6 +497,10 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
 
     bool res = true;
 
+#ifdef _WIN32
+    s_updateSysInfo();
+#endif
+
     // SDL_GL_ResetAttributes();
 
 #if defined(__SWITCH__) /* On Switch, expect the initial size 1920x1080 */
@@ -239,6 +584,14 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
 #ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+    s_fillScreenModes();
+
+    m_curColour = g_config.fullscreen_depth;
+    m_curRes.w = g_config.fullscreen_res.m_value.first;
+    m_curRes.h = g_config.fullscreen_res.m_value.second;
+
+    D_pLogDebug("Loaded video mode from config: %d -> %d x %d", m_curColour, m_curRes.w, m_curRes.h);
+
     if(m_screen_orig_w == 0 || m_screen_orig_h == 0)
     {
         int display = SDL_GetWindowDisplayIndex(m_window);
@@ -452,14 +805,46 @@ int WindowSDL::setFullScreen(bool fs)
 
 #ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
 
+const std::vector<AbstractWindow_t::VideoModeRes> &WindowSDL::getAvailableVideoResolutions()
+{
+    return s_availableRes;
+}
+
+const std::vector<uint8_t> &WindowSDL::getAvailableColourDepths()
+{
+    return s_availableColours;
+}
+
+void WindowSDL::getCurrentVideoMode(VideoModeRes &res, uint8_t &colourDepth)
+{
+    res = m_curRes;
+    colourDepth = m_curColour;
+}
+
+void WindowSDL::setVideoMode(const VideoModeRes &res, uint8_t colourDepth)
+{
+    m_curRes = res;
+
+    if(colourDepth == 0 || s_availableColoursMap.find(colourDepth) != s_availableColoursMap.end())
+        m_curColour = colourDepth;
+    else
+        m_curColour = 0;
+
+    syncFullScreenRes();
+}
+
 int WindowSDL::setFullScreenType(int type)
 {
     bool change_needed = m_fullscreen_type != type;
     m_fullscreen_type = type;
     m_fullscreen_type_real = s_fsTypeToSDL(type);
 
-    if(change_needed && m_fullscreen)
+    if(change_needed && m_fullscreen && m_window)
     {
+        // Switch into normal mode temporarily
+        if((SDL_GetWindowFlags(m_window) & SDL_WINDOW_FULLSCREEN) != 0)
+            SDL_SetWindowFullscreen(m_window, SDL_FALSE);
+
         if(m_fullscreen_type_real == SDL_WINDOW_FULLSCREEN_DESKTOP)
         {
             if(SDL_SetWindowFullscreen(m_window, m_fullscreen_type_real) < 0)
@@ -490,43 +875,16 @@ int WindowSDL::getFullScreenType()
 
 int WindowSDL::syncFullScreenRes()
 {
-    if(m_fullscreen_type_real != SDL_WINDOW_FULLSCREEN || !m_window)
+    if(!m_fullscreen || m_fullscreen_type_real != SDL_WINDOW_FULLSCREEN || !m_window)
         return 0; // Nothing to do
 
-    int dst_h = XRender::TargetH;
-    int dst_w = XRender::TargetW;// (dst_h * m_screen_orig_w) / m_screen_orig_h;
-    SDL_DisplayMode mode;
-    SDL_DisplayMode modeDst;
-    SDL_DisplayMode *modeClose = nullptr;
+    SDL_DisplayMode mode, modeDst, *modeClose;
 
-    int modes = SDL_GetNumDisplayModes(0);
-    int closest_w = 0;
-    int closest_h = 0;
-    int clodest_diff_w = 100000;
-    int clodest_diff_h = 100000;
+    const auto defColour = s_availableColours.empty() ? 32 : s_availableColours.front();
 
-    pLogDebug("List of available screen modes: (Desired resolution: %d x %d)", dst_w, dst_h);
-    for(int i = modes - 1; i >= 0; --i)
-    {
-        SDL_GetDisplayMode(0, i, &mode);
-        pLogDebug("-- C=%u (%s), W=%d, H=%d, R=%d",
-                  mode.format, SDL_GetPixelFormatName(mode.format), mode.w, mode.h, mode.refresh_rate);
-
-        int diff_w = SDL_abs(dst_w - mode.w);
-        int diff_h = SDL_abs(dst_h - mode.h);
-
-        if(diff_w < clodest_diff_w && diff_h < clodest_diff_h)
-        {
-            clodest_diff_w = diff_w;
-            clodest_diff_h = diff_h;
-            closest_w = mode.w;
-            closest_h = mode.h;
-        }
-    }
-
-    mode.format = SDL_PIXELFORMAT_BGR565;
-    mode.w = closest_w;
-    mode.h = closest_h;
+    mode.format = s_getColorFromBits(m_curColour > 0 ? m_curColour : defColour);
+    mode.w = m_curRes.w;
+    mode.h = m_curRes.h;
     mode.refresh_rate = 60;
     mode.driverdata = nullptr;
 
@@ -544,15 +902,16 @@ int WindowSDL::syncFullScreenRes()
         pLogDebug("Closest mode is not available, using defaults...");
     }
 
-    SDL_SetWindowSize(m_window, closest_w, closest_h);
-
-    pLogDebug("Toggling screen into %d x %d resolution", dst_w, dst_h);
-
-    if((SDL_GetWindowFlags(m_window) & SDL_WINDOW_FULLSCREEN) == 0 &&
-        SDL_SetWindowFullscreen(m_window, m_fullscreen_type_real) < 0)
+    if(s_isExclusiveFullScreen(SDL_GetWindowFlags(m_window)))
     {
-        pLogWarning("Setting fullscreen failed: %s", SDL_GetError());
-        return -1;
+        SDL_SetWindowSize(m_window, modeDst.w, modeDst.h);
+        pLogDebug("Toggling screen into %d x %d resolution", modeDst.w, modeDst.h);
+
+        if(SDL_SetWindowFullscreen(m_window, m_fullscreen_type_real) < 0)
+        {
+            pLogWarning("Setting fullscreen failed: %s", SDL_GetError());
+            return -1;
+        }
     }
 
     if(modeClose && SDL_SetWindowDisplayMode(m_window, &modeDst) < 0)
@@ -560,6 +919,8 @@ int WindowSDL::syncFullScreenRes()
         pLogWarning("Setting fullscreen display mode failed: %s", SDL_GetError());
         return -1;
     }
+
+    SDL_SetWindowSize(m_window, modeDst.w, modeDst.h);
 
     return 0;
 }

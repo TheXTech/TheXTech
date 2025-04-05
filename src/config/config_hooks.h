@@ -28,6 +28,7 @@ void config_language_set();
 void config_rendermode_set();
 void config_fullscreen_set();
 #ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+void config_video_mode_set();
 void config_fullscreen_type_set();
 #endif
 void config_mountdrums_set();
