@@ -317,6 +317,8 @@ static uint32_t s_getVideoRam()
                                 ret *= 1024;
                             else if(SDL_strncasecmp(suff, "TB", 2) == 0)
                                 ret *= 1024 * 1024;
+
+                            break;
                         }
                     }
                 }
@@ -324,6 +326,8 @@ static uint32_t s_getVideoRam()
         }
     }
 
+    SAFE_RELEASE(pObject);
+    SAFE_RELEASE(pContainer);
     SAFE_RELEASE(pProvider);
 
     return ret;
