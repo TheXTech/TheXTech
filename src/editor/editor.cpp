@@ -2837,8 +2837,11 @@ void UpdateInteract()
         if(((select_mode && EditorCursor.InteractFlags < 2) || EditorCursor.InteractMode == 0)
             && (!need_class || need_class == OptCursor_t::LVL_BLOCKS)) // Sizable blocks
         {
-            for(int A : treeBlockQuery(EditorCursor.Location, SORTMODE_ID))
+            auto sentinel = treeBlockQuery(EditorCursor.Location, SORTMODE_Z);
+            for(auto i = sentinel.end(); i > sentinel.begin();)
             {
+                int A = *(--i);
+
                 if(!BlockIsSizable[Block[A].Type] || Block[A].Hidden)
                     continue;
 
