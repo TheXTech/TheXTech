@@ -63,7 +63,7 @@ void p_PlayerMakeFlySparkle(const Location_t& loc, int Frame)
 
 static void UpdateInvincibility()
 {
-    if(InvincibilityTime <= 0 || FreezeNPCs || LevelMacro != LEVELMACRO_OFF)
+    if(InvincibilityTime <= 0 || FreezeNPCs || LevelMacro != LEVELMACRO_OFF || !CheckLiving())
         return;
 
     if(InvincibilityTime == Physics.NPCPSwitch && !GameMenu)
