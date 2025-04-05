@@ -46,7 +46,7 @@
 static bool s_hasFrameBuffer = false;
 static std::vector<AbstractWindow_t::VideoModeRes> s_availableRes;
 static std::vector<uint8_t> s_availableColours;
-static std::set<uint8_t> s_availableColoursMap;
+static std::map<uint8_t, uint32_t> s_availableColoursMap;
 
 
 static uint8_t s_getColorBits(uint32_t format)
@@ -54,8 +54,11 @@ static uint8_t s_getColorBits(uint32_t format)
     switch(format)
     {
     case SDL_PIXELFORMAT_BGR565:
+    case SDL_PIXELFORMAT_RGB565:
         return 16u;
+    case SDL_PIXELFORMAT_RGB888:
     case SDL_PIXELFORMAT_BGR888:
+    case SDL_PIXELFORMAT_RGBA8888:
     case SDL_PIXELFORMAT_BGRA8888:
         return 32u;
     }
@@ -65,15 +68,19 @@ static uint8_t s_getColorBits(uint32_t format)
 
 static uint32_t s_getColorFromBits(uint8_t bits)
 {
+    auto f = s_availableColoursMap.find(bits);
+    if(f != s_availableColoursMap.end())
+        return f->second;
+
     switch(bits)
     {
     case 16u:
-        return SDL_PIXELFORMAT_BGR565;
+        return SDL_PIXELFORMAT_RGB565;
     case 32u:
-        return SDL_PIXELFORMAT_BGR888;
+        return SDL_PIXELFORMAT_RGB888;
     }
 
-    return SDL_PIXELFORMAT_BGR888;
+    return SDL_PIXELFORMAT_RGB888;
 }
 
 static inline bool s_isExclusiveFullScreen(Uint32 flags)
@@ -129,7 +136,7 @@ static void s_fillScreenModes()
         auto col = s_getColorBits(e.first);
         pLogDebug("Only one colour mode is available - C=%u (%s, %u bits):", e.first, SDL_GetPixelFormatName(e.first), (uint32_t)col);
         s_availableColours.push_back(col);
-        s_availableColoursMap.insert(col);
+        s_availableColoursMap.insert({col, e.first});
 
         for(auto jt = e.second.begin(); jt != e.second.end(); ++jt)
             s_availableRes.push_back(*jt);
@@ -145,7 +152,7 @@ static void s_fillScreenModes()
             auto col = s_getColorBits(it->first);
             pLogDebug("- C=%u (%s, %u bits):", it->first, SDL_GetPixelFormatName(it->first), (uint32_t)col);
             s_availableColours.push_back(col);
-            s_availableColoursMap.insert(col);
+            s_availableColoursMap.insert({col, it->first});
         }
 
         auto &first = m_listModes.begin()->second;
