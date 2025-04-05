@@ -475,7 +475,17 @@ void RenderSDL::getRenderSize(int* w, int* h)
     if(saved_target)
         SDL_SetRenderTarget(m_gRenderer, NULL);
 
-    SDL_GetRendererOutputSize(m_gRenderer, w, h);
+    if(SDL_GetRendererOutputSize(m_gRenderer, w, h) < 0)
+    {
+        pLogWarning("Render SDL: SDL_GetRendererOutputSize returned <= 0 (%d x %d)", *w, *h);
+        SDL_GetWindowSize(m_window, w, h);
+        if(*w <= 0 || *h <= 0)
+        {
+            pLogWarning("Render SDL: SDL_GetWindowSize returned <= 0 (%d x %d)", *w, *h);
+            *w = 800;
+            *h = 600;
+        }
+    }
 
     if (saved_target)
         SDL_SetRenderTarget(m_gRenderer, saved_target);
