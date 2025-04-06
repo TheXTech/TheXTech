@@ -39,8 +39,8 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
 
     Water_t& cur_maze = Water[maze_index];
 
-    num_t layer_speed_x = Layer[cur_maze.Layer].ApplySpeedX;
-    num_t layer_speed_y = Layer[cur_maze.Layer].ApplySpeedY;
+    num_t layer_speed_x = (num_t)Layer[cur_maze.Layer].ApplySpeedX;
+    num_t layer_speed_y = (num_t)Layer[cur_maze.Layer].ApplySpeedY;
 
     loc.X += layer_speed_x;
     loc.Y += layer_speed_y;
@@ -286,8 +286,8 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
     loc.X += loc.SpeedX;
     loc.Y += loc.SpeedY;
 
-    loc.SpeedX += Layer[cur_maze.Layer].SpeedX;
-    loc.SpeedY += Layer[cur_maze.Layer].SpeedY;
+    loc.SpeedX += (num_t)Layer[cur_maze.Layer].SpeedX;
+    loc.SpeedY += (num_t)Layer[cur_maze.Layer].SpeedY;
 }
 
 void PhysEnv_Maze_PickDirection(const Location_t& loc, vbint_t maze_index, uint8_t& maze_state)

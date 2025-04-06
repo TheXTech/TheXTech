@@ -96,7 +96,7 @@ void CheckNPCWidth(NPC_t& n)
         //   (cross-ref UpdateNPCs clause updating RealSpeedX for Active, formerly all, NPCs)
         if(n.RealSpeedX != 0)
         {
-            n.Location.SpeedX = n.RealSpeedX;
+            n.Location.SpeedX = (num_t)n.RealSpeedX;
             n.RealSpeedX = 0;
         }
 
@@ -884,7 +884,7 @@ resume_Activation_Chain:
                         Block[numBlock].Location.Height += 16;
                     }
 
-                    Block[numBlock].Location.SpeedX += NPC[A].BeltSpeed;
+                    Block[numBlock].Location.SpeedX += (num_t)NPC[A].BeltSpeed;
                     Block[numBlock].tempBlockNpcType = NPC[A].Type;
                     // not syncing the block layer here because we'll sync all of them together later
                     numTempBlock++;
@@ -1166,7 +1166,7 @@ interrupt_Activation:
 
             if(NPC[A].RealSpeedX != 0)
             {
-                NPC[A].Location.SpeedX = NPC[A].RealSpeedX;
+                NPC[A].Location.SpeedX = (num_t)NPC[A].RealSpeedX;
                 NPC[A].RealSpeedX = 0;
             }
 
@@ -1262,7 +1262,7 @@ interrupt_Activation:
                                 // cancel if not currently moving down
                                 if(NPC[A].Effect3 == MAZE_DIR_DOWN)
                                 {
-                                    num_t rel_speed = NPC[A].Location.SpeedY - Layer[Water[B].Layer].SpeedY;
+                                    num_t rel_speed = NPC[A].Location.SpeedY - (num_t)Layer[Water[B].Layer].SpeedY;
                                     if(rel_speed < 0 || (NPC[A]->IsABlock && rel_speed <= 4))
                                         NPC[A].Effect = NPCEFF_NORMAL;
                                 }
@@ -1855,7 +1855,7 @@ interrupt_Activation:
                         }
 #endif
                     }
-                    Block[NPC[A].tempBlock].Location.SpeedX = NPC[A].Location.SpeedX + NPC[A].BeltSpeed;
+                    Block[NPC[A].tempBlock].Location.SpeedX = NPC[A].Location.SpeedX + (num_t)NPC[A].BeltSpeed;
                 }
 
                 if(NPC[A].Projectile)
@@ -1910,7 +1910,7 @@ interrupt_Activation:
             // Moved here because speedVar is only validly set here.
             if(!fEqual(speedVar, 1) && !fEqual(speedVar, 0))
             {
-                NPC[A].RealSpeedX = float(NPC[A].Location.SpeedX);
+                NPC[A].RealSpeedX = numf_t(NPC[A].Location.SpeedX);
                 NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * double(speedVar);
             }
 

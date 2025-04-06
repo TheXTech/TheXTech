@@ -795,7 +795,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
                                     // hitspot 1
                                     if(HitSpot == 1) // Hitspot 1
                                     {
-                                        tempSpeedA = Block[B].Location.SpeedY;
+                                        tempSpeedA = (numf_t)Block[B].Location.SpeedY;
                                         if(tempSpeedA < 0)
                                             tempSpeedA = 0;
 
@@ -1037,7 +1037,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
                                             beltClear = true;
                                             if(NPC[A].Type == NPCID_VILLAIN_S3)
                                                 NPC[A].Location.SpeedX = 0;
-                                            addBelt = NPC[A].Location.X;
+
                                             resetBeltSpeed = true;
                                             if(NPC[A].Type == NPCID_PLR_FIREBALL && NPC[A].Special == 3)
                                             {
@@ -1053,6 +1053,9 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
                                                 NPCHit(A, 4, A);
                                             if(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1)
                                                 NPCHit(A, 4, A);
+
+                                            addBelt = (numf_t)NPC[A].Location.X;
+
                                             if(NPC[A].Slope == 0 && !SlopeTurn)
                                             {
                                                 if(HitSpot == 2)
@@ -1060,13 +1063,15 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
                                                 else
                                                     NPC[A].Location.X = Block[B].Location.X - NPC[A].Location.Width - 0.01_n;
                                             }
+
+                                            addBelt = (numf_t)(NPC[A].Location.X - (num_t)addBelt);
+
                                             if(!(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_TANK_TREADS || NPC[A].Type == NPCID_BULLET))
                                                 NPC[A].TurnAround = true;
                                             if(NPCIsAParaTroopa(NPC[A]))
                                                 NPC[A].Location.SpeedX += -Block[B].Location.SpeedX * 1.2_r;
                                             if(NPC[A]->IsAShell)
                                                 NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
-                                            addBelt = NPC[A].Location.X - addBelt;
                                         }
                                     }
                                     else if(HitSpot == 3) // Hitspot 3
@@ -1127,14 +1132,14 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
                                         }
                                         else if(NPC[A].Type != NPCID_SPIKY_BALL_S3 && !(NPC[A]->IsABlock && Block[B].tempBlockNpcType > 0) && block_is_not_conveyor)
                                         {
-                                            addBelt = NPC[A].Location.X;
+                                            addBelt = (numf_t)NPC[A].Location.X;
 
                                             if(NPC[A].Location.X + NPC[A].Location.Width / 2 < Block[B].Location.X + Block[B].Location.Width / 2)
                                                 NPC[A].Location.X = Block[B].Location.X - NPC[A].Location.Width - 0.01_n;
                                             else
                                                 NPC[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.01_n;
 
-                                            addBelt = NPC[A].Location.X - addBelt;
+                                            addBelt = (numf_t)(NPC[A].Location.X - (num_t)addBelt);
 
                                             if(NPC[A].Type == NPCID_MINIBOSS)
                                             {

@@ -137,10 +137,10 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                     {
                                         if(Player[A].Mount > 0 && HitSpot == 1)
                                         {
-                                            cursed_value_C = Player[A].Location.Y + Player[A].Location.Height;
+                                            cursed_value_C = numf_t(Player[A].Location.Y + Player[A].Location.Height);
                                             Player[A].Location.Y = Block[B].Location.Y - Player[A].Location.Height;
                                             PlayerHurt(A);
-                                            Player[A].Location.Y = cursed_value_C - Player[A].Location.Height;
+                                            Player[A].Location.Y = (num_t)cursed_value_C - Player[A].Location.Height;
                                         }
                                         else
                                             PlayerHurt(A);
@@ -260,7 +260,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
                             // collision for blocks that are sloped on the top
                             // MOST CURSED LINE: cursed_value_C (C in VB6 code) is entirely arbitrary at this point. BE WARNED, this may be a cause of incompatibilities with SMBX 1.3, and if so, we will need to improve this logic in the future.
-                            if(BlockSlope[Block[B].Type] != 0 && HitSpot != 3 && !(BlockSlope[Block[B].Type] == -1 && HitSpot == 2) && !(BlockSlope[Block[B].Type] == 1 && HitSpot == 4) && (Player[A].Location.Y + Player[A].Location.Height - 4 - cursed_value_C <= Block[B].Location.Y + Block[B].Location.Height || (Player[A].Location.Y + Player[A].Location.Height - 12 <= Block[B].Location.Y + Block[B].Location.Height && Player[A].StandingOnNPC != 0)))
+                            if(BlockSlope[Block[B].Type] != 0 && HitSpot != 3 && !(BlockSlope[Block[B].Type] == -1 && HitSpot == 2) && !(BlockSlope[Block[B].Type] == 1 && HitSpot == 4) && (Player[A].Location.Y + Player[A].Location.Height - 4 - (num_t)cursed_value_C <= Block[B].Location.Y + Block[B].Location.Height || (Player[A].Location.Y + Player[A].Location.Height - 12 <= Block[B].Location.Y + Block[B].Location.Height && Player[A].StandingOnNPC != 0)))
                             {
                                 HitSpot = 0;
                                 if(
@@ -361,8 +361,8 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                             {
                                                 if(!Player[A].WetFrame)
                                                 {
-                                                    cursed_value_C = Player[A].Location.SpeedX * (int_ok)Block[B].Location.Height / (int_ok)Block[B].Location.Width * BlockSlope[Block[B].Type];
-                                                    Player[A].Location.SpeedY = cursed_value_C;
+                                                    cursed_value_C = (numf_t)(Player[A].Location.SpeedX * (int_ok)Block[B].Location.Height / (int_ok)Block[B].Location.Width * BlockSlope[Block[B].Type]);
+                                                    Player[A].Location.SpeedY = (num_t)cursed_value_C;
                                                     if(Player[A].Location.SpeedY > 0 && !Player[A].Slide && Player[A].Mount != 1 && Player[A].Mount != 2)
                                                         Player[A].Location.SpeedY = Player[A].Location.SpeedY * 4;
                                                 }
@@ -594,8 +594,8 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
                                     if(Player[A].Mount == 2)
                                     {
-                                        // cast to float because in VB6 the old X location was temporarily stored in mountBump, which is a float
-                                        Player[A].mountBump = Player[A].Location.X - (numf_t)preWallX;
+                                        // cast through float because in VB6 the old X location was temporarily stored in mountBump, which is a float
+                                        Player[A].mountBump = (numf_t)(Player[A].Location.X - (num_t)(numf_t)preWallX);
                                     }
 
                                     wallBlock = B;
@@ -745,9 +745,9 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
     {
         if(Player[A].Location.SpeedY > 0)
         {
-            numf_t C = Player[A].Location.SpeedX * (int_ok)Block[oldSlope].Location.Height / (int_ok)Block[oldSlope].Location.Width * BlockSlope[Block[oldSlope].Type];
+            numf_t C = (numf_t)(Player[A].Location.SpeedX * (int_ok)Block[oldSlope].Location.Height / (int_ok)Block[oldSlope].Location.Width * BlockSlope[Block[oldSlope].Type]);
             if(C > 0)
-                Player[A].Location.SpeedY = C;
+                Player[A].Location.SpeedY = (num_t)C;
         }
     }
 
@@ -772,7 +772,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
             {
                 if((Player[A].GrabTime >= 12 && Player[A].Character < 3) || (Player[A].GrabTime >= 16 && Player[A].Character == 3) || (Player[A].GrabTime >= 8 && Player[A].Character == 4))
                 {
-                    Player[A].Location.SpeedX = Player[A].GrabSpeed;
+                    Player[A].Location.SpeedX = (num_t)Player[A].GrabSpeed;
                     Player[A].GrabSpeed = 0;
                     Block[floorBlock].Hidden = true;
                     Block[floorBlock].Layer = LAYER_DESTROYED_BLOCKS;
@@ -787,7 +787,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                     {
                         PlaySoundSpatial(SFX_Grab, Player[A].Location);
                         Player[A].FrameCount = 0;
-                        Player[A].GrabSpeed = Player[A].Location.SpeedX;
+                        Player[A].GrabSpeed = (numf_t)Player[A].Location.SpeedX;
                     }
                     Player[A].Location.SpeedX = 0;
                     Player[A].Slide = false;
@@ -853,7 +853,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                 // the single Pinched variable has always been false since SMBX64
                 // if(!NPC[Player[A].StandingOnNPC].Pinched && !FreezeNPCs)
                 if(!FreezeNPCs)
-                    Player[A].Location.SpeedX += -NPC[Player[A].StandingOnNPC].Location.SpeedX - NPC[Player[A].StandingOnNPC].BeltSpeed;
+                    Player[A].Location.SpeedX += -NPC[Player[A].StandingOnNPC].Location.SpeedX - (num_t)NPC[Player[A].StandingOnNPC].BeltSpeed;
                 Player[A].StandingOnNPC = 0;
             }
             else if(movingBlock)
@@ -1015,7 +1015,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
             // the single Pinched variable has always been false since SMBX64
             // if(!NPC[Player[A].StandingOnNPC].Pinched && !FreezeNPCs)
             if(!FreezeNPCs)
-                Player[A].Location.SpeedX += -NPC[Player[A].StandingOnNPC].Location.SpeedX - NPC[Player[A].StandingOnNPC].BeltSpeed;
+                Player[A].Location.SpeedX += -NPC[Player[A].StandingOnNPC].Location.SpeedX - (num_t)NPC[Player[A].StandingOnNPC].BeltSpeed;
         }
     }
 

@@ -190,12 +190,12 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             if(Block[B].Type >= BLKID_CONVEYOR_L_START && Block[B].Type <= BLKID_CONVEYOR_L_END)
             {
                 Block[B].Type += BLKID_CONVEYOR_R_START - BLKID_CONVEYOR_L_START;
-                Block[B].Location.SpeedX = Layer[Block[B].Layer].ApplySpeedX + 0.8_n;
+                Block[B].Location.SpeedX = (num_t)Layer[Block[B].Layer].ApplySpeedX + 0.8_n;
             }
             else if(Block[B].Type >= BLKID_CONVEYOR_R_START && Block[B].Type <= BLKID_CONVEYOR_R_END)
             {
                 Block[B].Type -= BLKID_CONVEYOR_R_START - BLKID_CONVEYOR_L_START;
-                Block[B].Location.SpeedX = Layer[Block[B].Layer].ApplySpeedX - 0.8_n;
+                Block[B].Location.SpeedX = (num_t)Layer[Block[B].Layer].ApplySpeedX - 0.8_n;
             }
         }
     }

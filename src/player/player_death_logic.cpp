@@ -97,7 +97,8 @@ void UpdatePlayerTimeToLive(int A)
 
     if(B > 0 && player_can_move) // Move camera to the other living players
     {
-        numf_t A1, B1;
+        // previously floats
+        num_t A1, B1;
         if(shared_screen)
         {
             const vScreen_t& vscreen = screen.vScreen(screen.active_begin() + 1);

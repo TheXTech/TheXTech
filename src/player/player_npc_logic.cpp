@@ -41,7 +41,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
 {
     int floorNpc1 = 0;
     int floorNpc2 = 0;
-    numf_t tempHitSpeed = 0;
+    // was previously a float
+    num_t tempHitSpeed = 0;
     bool spinKill = false;
 
     // cleanup variables for NPC collisions
@@ -849,7 +850,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     else
                                     {
                                         tempHit2 = true;
-                                        tempHitSpeed = NPC[B].Location.SpeedX + NPC[B].BeltSpeed;
+                                        // this variable was previously a numf_t
+                                        tempHitSpeed = (num_t)(numf_t)(NPC[B].Location.SpeedX + (num_t)NPC[B].BeltSpeed);
 
                                         // reset player speed if not on conveyor belt
                                         bool tempBool = false;
@@ -875,7 +877,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         }
 
                                         // save current X location (for NPCs riding player's vehicle)
-                                        numf_t D = Player[A].Location.X;
+                                        numf_t D = (numf_t)Player[A].Location.X;
 
                                         // actually move the player
                                         if(NPC[B].Location.to_right_of(Player[A].Location))
@@ -885,7 +887,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                             if(floorBlock != 0 && std::abs(Block[floorBlock].Location.X - NPC[B].Location.X) < 1)
                                             {
                                                 Player[A].Location.X = NPC[B].Location.X - Player[A].Location.Width - 1;
-                                                Player[A].Location.SpeedY = oldSpeedY;
+                                                Player[A].Location.SpeedY = (num_t)oldSpeedY;
                                             }
                                             else
                                                 Player[A].Location.X = NPC[B].Location.X - Player[A].Location.Width - 0.1_n;
@@ -913,7 +915,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                             if(floorBlock != 0 && std::abs(Block[floorBlock].Location.X + Block[floorBlock].Location.Width - NPC[B].Location.X - NPC[B].Location.Width) < 1)
                                             {
                                                 Player[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 1;
-                                                Player[A].Location.SpeedY = oldSpeedY;
+                                                Player[A].Location.SpeedY = (num_t)oldSpeedY;
                                             }
                                             else
                                                 Player[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 0.01_n;
@@ -935,13 +937,13 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         // apply speed to vehicle riders if needed
                                         if(Player[A].Mount == 2)
                                         {
-                                            D = Player[A].Location.X - D;
+                                            D = (numf_t)(Player[A].Location.X - (num_t)D);
 
                                             for(int C : NPCQueues::Active.no_change)
                                             {
                                                 if(NPC[C].vehiclePlr == A)
                                                 {
-                                                    NPC[C].Location.X += D;
+                                                    NPC[C].Location.X += (num_t)D;
                                                     treeNPCUpdate(C);
                                                 }
                                             }
@@ -949,7 +951,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                             for(int C = 1; C <= numPlayers; C++)
                                             {
                                                 if(Player[C].StandingOnVehiclePlr && (g_ClonedPlayerMode || Player[C].StandingOnVehiclePlr == A))
-                                                    Player[C].Location.X += D;
+                                                    Player[C].Location.X += (num_t)D;
                                             }
                                         }
                                     }
@@ -1116,9 +1118,9 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
 
     // confusing logic, but safe, because StandingOnNPC gets set in ClownCar()
     if(B == 0 && Player[A].StandingOnVehiclePlr > 0 && Player[A].Mount == 0)
-        Player[A].Location.SpeedX += (NPC[Player[A].StandingOnNPC].Location.SpeedX + NPC[Player[A].StandingOnNPC].BeltSpeed);
+        Player[A].Location.SpeedX += (NPC[Player[A].StandingOnNPC].Location.SpeedX + (num_t)NPC[Player[A].StandingOnNPC].BeltSpeed);
     else if(B > 0 && Player[A].StandingOnNPC == 0 && NPC[B].playerTemp && Player[A].Location.SpeedY >= 0)
-        Player[A].Location.SpeedX += -(NPC[B].Location.SpeedX + NPC[B].BeltSpeed);
+        Player[A].Location.SpeedX += -(NPC[B].Location.SpeedX + (num_t)NPC[B].BeltSpeed);
 
     if(movingBlock) // this is for when the player is standing on a moving block
     {
@@ -1250,7 +1252,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
         // confusing logic, but safe, because StandingOnNPC gets set in ClownCar()
         // NOTE: we know that B == 0!
         if(/*B == 0 &&*/ Player[A].StandingOnVehiclePlr > 0)
-            Player[A].Location.SpeedX += (NPC[Player[A].StandingOnNPC].Location.SpeedX + NPC[Player[A].StandingOnNPC].BeltSpeed);
+            Player[A].Location.SpeedX += (NPC[Player[A].StandingOnNPC].Location.SpeedX + (num_t)NPC[Player[A].StandingOnNPC].BeltSpeed);
         // else if(B > 0 && Player[A].StandingOnNPC == 0 && NPC[B].playerTemp)
         //     Player[A].Location.SpeedX += -(NPC[B].Location.SpeedX + NPC[B].BeltSpeed);
 

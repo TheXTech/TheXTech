@@ -32,7 +32,7 @@ void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, numf_t 
     // tempSpeedA does not check for walking collisions in vanilla
     if(g_config.fix_npc_downward_clip)
     {
-        tempSpeedA = Block[tempHitBlock].Location.SpeedY;
+        tempSpeedA = (numf_t)Block[tempHitBlock].Location.SpeedY;
         if(tempSpeedA < 0)
             tempSpeedA = 0;
     }
@@ -52,7 +52,7 @@ void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, numf_t 
             }
 
             if(tempSpeedA != 0)
-                NPC[A].Location.SpeedY = tempSpeedA;
+                NPC[A].Location.SpeedY = (num_t)tempSpeedA;
         }
         else if(NPC[A].Special == 31)
         {
@@ -90,7 +90,7 @@ void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, numf_t 
             }
 
             if(tempSpeedA != 0)
-                NPC[A].Location.SpeedY = tempSpeedA;
+                NPC[A].Location.SpeedY = (num_t)tempSpeedA;
         }
         else if(NPC[A].Special == 61)
         {
@@ -209,7 +209,7 @@ void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, numf_t 
         }
 
         if(tempSpeedA != 0)
-            NPC[A].Location.SpeedY = tempSpeedA;
+            NPC[A].Location.SpeedY = (num_t)tempSpeedA;
     }
     else if(NPC[A].Type == NPCID_JUMPER_S4) // ninja code
     {
@@ -335,7 +335,7 @@ void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, numf_t 
         }
 
         if(tempSpeedA != 0)
-            NPC[A].Location.SpeedY += tempSpeedA;
+            NPC[A].Location.SpeedY += (num_t)tempSpeedA;
     }
     else // Walking code for everything else
     {
@@ -384,7 +384,7 @@ void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, numf_t 
             NPC[A].Location.SpeedY = -6_n;
 
         if(tempSpeedA != 0)
-            NPC[A].Location.SpeedY = tempSpeedA;
+            NPC[A].Location.SpeedY = (num_t)tempSpeedA;
 
         // assigned to Special in SMBX 1.3
         if(NPC[A].Type == NPCID_SAW)

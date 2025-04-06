@@ -3872,19 +3872,19 @@ void YoshiEatCode(const int A)
 
             p.YoshiTongue.Height = 12;
             p.YoshiTongue.Width = 16;
-            numf_t TongueX = p.Location.X + p.Location.Width / 2;
+            numf_t TongueX = numf_t(p.Location.X + p.Location.Width / 2);
 
             if(p.Controls.Up || (p.StandingOnNPC == 0 && p.Slope == 0 && p.Location.SpeedY != 0 && !p.Controls.Down))
             {
                 TongueX += p.Direction * (22);
                 p.YoshiTongue.Y = p.Location.Y + 8 + (p.Location.Height - 54);
-                p.YoshiTongue.X = TongueX + p.YoshiTongueLength * p.Direction;
+                p.YoshiTongue.X = num_t(TongueX + p.YoshiTongueLength * p.Direction);
             }
             else
             {
                 TongueX += p.Direction * (34);
                 p.YoshiTongue.Y = p.Location.Y + 30 + (p.Location.Height - 54);
-                p.YoshiTongue.X = TongueX + p.YoshiTongueLength * p.Direction;
+                p.YoshiTongue.X = num_t(TongueX + p.YoshiTongueLength * p.Direction);
             }
 
             if(p.Direction == -1)
@@ -4777,7 +4777,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
             {
                 if((p.GrabTime >= 12 && p.Character < 3) || (p.GrabTime >= 16 && p.Character == 3) || (p.GrabTime >= 8 && p.Character == 4))
                 {
-                    p.Location.SpeedX = p.GrabSpeed;
+                    p.Location.SpeedX = (num_t)p.GrabSpeed;
                     p.GrabSpeed = 0;
                     p.GrabTime = 0;
                     p.TailCount = 0;
@@ -4863,7 +4863,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         else
                             PlaySoundSpatial(SFX_Grab, p.Location);
                         p.FrameCount = 0;
-                        p.GrabSpeed = p.Location.SpeedX;
+                        p.GrabSpeed = (numf_t)p.Location.SpeedX;
                     }
                     p.Location.SpeedX = 0;
                     p.GrabTime += 1;

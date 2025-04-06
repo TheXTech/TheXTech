@@ -392,8 +392,8 @@ void SetLayerSpeed(layerindex_t L, num_t SpeedX, num_t SpeedY, bool EffectStop, 
     // relatively simple code to set the layer's speed
     if(SpeedX != 0 || SpeedY != 0 || Defective)
     {
-        Layer[L].SpeedX = SpeedX;
-        Layer[L].SpeedY = SpeedY;
+        Layer[L].SpeedX = (numf_t)SpeedX;
+        Layer[L].SpeedY = (numf_t)SpeedY;
 
         if(!Defective)
             Layer[L].EffectStop = EffectStop;
@@ -1329,7 +1329,7 @@ eventindex_t ProcEvent_Safe(bool is_resume, eventindex_t index, int whichPlayer,
     {
         B = evt.MoveLayer;
 
-        SetLayerSpeed(B, evt.SpeedX, evt.SpeedY, true);
+        SetLayerSpeed(B, (num_t)evt.SpeedX, (num_t)evt.SpeedY, true);
 
         if(Layer[B].SpeedX == 0 && Layer[B].SpeedY == 0)
         {
@@ -1571,10 +1571,10 @@ resume:
     {
         if(AutoX[A] != 0 || AutoY[A] != 0)
         {
-            level[A].X += AutoX[A];
-            level[A].Width += AutoX[A];
-            level[A].Y += AutoY[A];
-            level[A].Height += AutoY[A];
+            level[A].X += (num_t)AutoX[A];
+            level[A].Width += (num_t)AutoX[A];
+            level[A].Y += (num_t)AutoY[A];
+            level[A].Height += (num_t)AutoY[A];
             if(level[A].Width > LevelREAL[A].Width)
             {
                 level[A].Width = LevelREAL[A].Width;
@@ -1714,8 +1714,12 @@ void UpdateLayers()
         {
             // if(!(FreezeLayers && Layer[A].EffectStop))
             {
-                Layer[A].OffsetX += Layer[A].SpeedX;
-                Layer[A].OffsetY += Layer[A].SpeedY;
+                // widen to full precision
+                num_t SpeedX = (num_t)Layer[A].SpeedX;
+                num_t SpeedY = (num_t)Layer[A].SpeedY;
+
+                Layer[A].OffsetX += SpeedX;
+                Layer[A].OffsetY += SpeedY;
 
                 Layer[A].ApplySpeedX = Layer[A].SpeedX;
                 Layer[A].ApplySpeedY = Layer[A].SpeedY;
@@ -1751,10 +1755,10 @@ void UpdateLayers()
                 {
                     // if(Block[B].Layer == Layer[A].Name)
                     //{
-                    Block[B].Location.X += Layer[A].SpeedX;
-                    Block[B].Location.Y += Layer[A].SpeedY;
-                    Block[B].Location.SpeedX = Layer[A].SpeedX;
-                    Block[B].Location.SpeedY = Layer[A].SpeedY;
+                    Block[B].Location.X += SpeedX;
+                    Block[B].Location.Y += SpeedY;
+                    Block[B].Location.SpeedX = SpeedX;
+                    Block[B].Location.SpeedY = SpeedY;
 
                     if(Block[B].Type >= BLKID_CONVEYOR_L_START && Block[B].Type <= BLKID_CONVEYOR_L_END)
                         Block[B].Location.SpeedX += -0.8_n;
@@ -1774,8 +1778,8 @@ void UpdateLayers()
                 {
                     // if(Background[B].Layer == Layer[A].Name)
                     //{
-                    Background[B].Location.X += Layer[A].SpeedX;
-                    Background[B].Location.Y += Layer[A].SpeedY;
+                    Background[B].Location.X += SpeedX;
+                    Background[B].Location.Y += SpeedY;
 
                     if(inactive)
                         treeBackgroundUpdateLayer(A, B);
@@ -1789,8 +1793,8 @@ void UpdateLayers()
                 {
                     // if(Water[B].Layer == Layer[A].Name)
                     //{
-                    Water[B].Location.X += Layer[A].SpeedX;
-                    Water[B].Location.Y += Layer[A].SpeedY;
+                    Water[B].Location.X += SpeedX;
+                    Water[B].Location.Y += SpeedY;
 
                     if(inactive)
                         treeWaterUpdateLayer(A, B);
@@ -1801,8 +1805,8 @@ void UpdateLayers()
                 {
                     // if(NPC[B].Layer == Layer[A].Name)
                     {
-                        NPC[B].DefaultLocationX += Layer[A].SpeedX;
-                        NPC[B].DefaultLocationY += Layer[A].SpeedY;
+                        NPC[B].DefaultLocationX += SpeedX;
+                        NPC[B].DefaultLocationY += SpeedY;
 
                         if(!NPC[B].Active || NPC[B].Generator || NPC[B].Effect != NPCEFF_NORMAL ||
                            NPC[B]->IsACoin || NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_STONE_S3 ||
@@ -1814,13 +1818,13 @@ void UpdateLayers()
                         {
                             if(NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPCID_HOMING_BALL_GEN)
                             {
-                                NPC[B].Location.SpeedX = Layer[A].SpeedX;
-                                NPC[B].Location.SpeedY = Layer[A].SpeedY;
+                                NPC[B].Location.SpeedX = SpeedX;
+                                NPC[B].Location.SpeedY = SpeedY;
                             }
                             else if(NPC[B]->IsAVine)
                             {
-                                NPC[B].Location.SpeedX = Layer[A].SpeedX;
-                                NPC[B].Location.SpeedY = Layer[A].SpeedY;
+                                NPC[B].Location.SpeedX = SpeedX;
+                                NPC[B].Location.SpeedY = SpeedY;
                             }
 
                             if(!NPC[B].Active)
@@ -1844,8 +1848,8 @@ void UpdateLayers()
                             }
                             else
                             {
-                                NPC[B].Location.X += Layer[A].SpeedX;
-                                NPC[B].Location.Y += Layer[A].SpeedY;
+                                NPC[B].Location.X += SpeedX;
+                                NPC[B].Location.Y += SpeedY;
                             }
 
                             if(NPC[B].Effect == NPCEFF_WARP)
@@ -1853,16 +1857,16 @@ void UpdateLayers()
                                 // specialY/X store the NPC's destination position
                                 // this previously changed Effect2
                                 if(NPC[B].Effect3 == 1 || NPC[B].Effect3 == 3)
-                                    NPC[B].SpecialY += Layer[A].SpeedY;
+                                    NPC[B].SpecialY += SpeedY;
                                 else
-                                    NPC[B].SpecialX += Layer[A].SpeedX;
+                                    NPC[B].SpecialX += SpeedX;
                             }
 
                             if(!NPC[B].Active)
                             {
                                 // note: this is the "defective" version of SetLayerSpeed, which (in classic mode) only sets the speed, and does nothing else
                                 if(NPC[B].AttLayer != LAYER_NONE && NPC[B].AttLayer != LAYER_DEFAULT)
-                                    SetLayerSpeed(NPC[B].AttLayer, Layer[A].SpeedX, Layer[A].SpeedY, Layer[A].EffectStop, true);
+                                    SetLayerSpeed(NPC[B].AttLayer, SpeedX, SpeedY, Layer[A].EffectStop, true);
 
                                 // NOTE: this was the source of at least two bugs: (1) won't get reset later; (2) an undefined value of EffectStop will be used by NPC[B].AttLayer
                                 // (1) should be fixed in SetLayerSpeed by checking for inactive NPCs with AttLayers and resetting their speeds
@@ -1876,10 +1880,10 @@ void UpdateLayers()
 
                 for(int B : Layer[A].warps)
                 {
-                    Warp[B].Entrance.X += Layer[A].SpeedX;
-                    Warp[B].Entrance.Y += Layer[A].SpeedY;
-                    Warp[B].Exit.X += Layer[A].SpeedX;
-                    Warp[B].Exit.Y += Layer[A].SpeedY;
+                    Warp[B].Entrance.X += SpeedX;
+                    Warp[B].Entrance.Y += SpeedY;
+                    Warp[B].Exit.X += SpeedX;
+                    Warp[B].Exit.Y += SpeedY;
                 }
             }
         }

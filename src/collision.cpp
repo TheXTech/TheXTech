@@ -188,7 +188,7 @@ int FindCollisionBelt(const Location_t &Loc1, const Location_t &Loc2, numf_t Bel
     {
         tempFindCollisionBelt = COLLISION_TOP;
     }
-    else if(Loc1.X - Loc1.SpeedX - BeltSpeed >= Loc2.X + Loc2.Width - Loc2.SpeedX)
+    else if(Loc1.X - Loc1.SpeedX - (num_t)BeltSpeed >= Loc2.X + Loc2.Width - Loc2.SpeedX)
     {
         tempFindCollisionBelt = COLLISION_RIGHT;
     }
@@ -196,7 +196,7 @@ int FindCollisionBelt(const Location_t &Loc1, const Location_t &Loc2, numf_t Bel
     {
         tempFindCollisionBelt = COLLISION_LEFT;
     }
-    else if(Loc1.Y - Loc1.SpeedY - BeltSpeed > Loc2.Y + Loc2.Height - Loc2.SpeedY - 0.1_n)
+    else if(Loc1.Y - Loc1.SpeedY - (num_t)BeltSpeed > Loc2.Y + Loc2.Height - Loc2.SpeedY - 0.1_n)
     {
         tempFindCollisionBelt = COLLISION_BOTTOM;
     }
@@ -509,9 +509,9 @@ bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, numf_t Be
 {
     bool tempWalkingCollision3 = false;
 
-    if(Loc1.X <= Loc2.X + Loc2.Width - (Loc1.SpeedX + BeltSpeed) - 1)
+    if(Loc1.X <= Loc2.X + Loc2.Width - (Loc1.SpeedX + (num_t)BeltSpeed) - 1)
     {
-        if(Loc1.X + Loc1.Width >= Loc2.X - (Loc1.SpeedX + BeltSpeed) + 1)
+        if(Loc1.X + Loc1.Width >= Loc2.X - (Loc1.SpeedX + (num_t)BeltSpeed) + 1)
         {
             tempWalkingCollision3 = true;
         }

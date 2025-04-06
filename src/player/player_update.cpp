@@ -92,6 +92,10 @@ static void UpdateInvincibility()
 
 bool UpdatePlayer()
 {
+    // these variables do not persist over the interrupt/resume routine
+    num_t SlippySpeedX;
+    numf_t cursed_value_C;
+
     switch(g_gameLoopInterrupt.site)
     {
     case GameLoopInterrupt::UpdatePlayer_MessageNPC:
@@ -127,7 +131,6 @@ bool UpdatePlayer()
         // this was shared over players in SMBX 1.3 -- if the line marked "MOST CURSED LINE" in player_block_logic.cpp becomes a source of incompatibility, we will need to restore that logic
         // this will include modifying the GameLoopInterrupt struct to include it
         // for now, this variable does not persist over the interrupt/resume routine
-        float cursed_value_C;
         cursed_value_C = 0;
 
         if(Player[A].GrabTime > 0) // if grabbing something, take control away from the player
@@ -234,7 +237,6 @@ bool UpdatePlayer()
                 else
                 {
                     // this variable does not persist over the interrupt/resume routine
-                    double SlippySpeedX;
                     SlippySpeedX = Player[A].Location.SpeedX;
 
 
@@ -284,7 +286,7 @@ bool UpdatePlayer()
                         if(Player[A].StandingOnNPC < 0)
                             NPC[Player[A].StandingOnNPC].Location = Block[NPC[Player[A].StandingOnNPC].Special].Location;
 
-                        Player[A].Location.SpeedX += NPC[Player[A].StandingOnNPC].Location.SpeedX + NPC[Player[A].StandingOnNPC].BeltSpeed;
+                        Player[A].Location.SpeedX += NPC[Player[A].StandingOnNPC].Location.SpeedX + (num_t)NPC[Player[A].StandingOnNPC].BeltSpeed;
                     }
 
                     if(GameOutro) // force the player to walk a specific speed during the credits
@@ -449,7 +451,7 @@ bool UpdatePlayer()
 
                 // scoping variables shared between block logic and NPC logic
                 {
-                    numf_t oldSpeedY = Player[A].Location.SpeedY; // holds the players previous Y speed
+                    numf_t oldSpeedY = (numf_t)Player[A].Location.SpeedY; // holds the players previous Y speed
                     bool movingBlock = false; // helps with collisions for moving blocks
                     int floorBlock = 0; // was previously called tempHit3
 
