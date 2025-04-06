@@ -2103,15 +2103,15 @@ struct Physics_t
 //    NPCCanHurtWait As Integer
     int NPCCanHurtWait = 0;
 //    NPCShellSpeed As Single
-    numf_t NPCShellSpeed = 0_nf;
+    num_t NPCShellSpeed = 0_n;
 //    NPCShellSpeedY As Single
-    numf_t NPCShellSpeedY = 0_nf;
+    num_t NPCShellSpeedY = 0_n;
 //    NPCWalkingSpeed As Single
-    numf_t NPCWalkingSpeed = 0_nf;
+    num_t NPCWalkingSpeed = 0_n;
 //    NPCWalkingOnSpeed As Single
-    numf_t NPCWalkingOnSpeed = 0_nf;
+    num_t NPCWalkingOnSpeed = 0_n;
 //    NPCMushroomSpeed As Single
-    numf_t NPCMushroomSpeed = 0_nf;
+    num_t NPCMushroomSpeed = 0_n;
 //    NPCGravity As Single
     // Was previously a float, changed to a double for efficient comparisons. All stores must factor through float.
     num_t NPCGravity = 0_n;

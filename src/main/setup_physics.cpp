@@ -226,14 +226,14 @@ void SetupPhysics()
     Physics.PlayerGrabSpotX[5][7] = 18;     // ---------
     Physics.PlayerGrabSpotY[5][7] = 16;     // ---------
 
-    Physics.NPCTimeOffScreen = 180;         // How long NPCs are active offscreen before being reset
-    Physics.NPCShellSpeed = 7.1_nf;         // Speed of kicked shells
-    Physics.NPCShellSpeedY = 11;            // Vertical Speed of kicked shells
-    Physics.NPCCanHurtWait = 30;            // How long to wait before NPCs can hurt players
-    Physics.NPCGravityReal = 0.26_nf;       // NPC Gravity
-    Physics.NPCGravity = (num_t)Physics.NPCGravityReal;           // NPC Gravity
-    Physics.NPCWalkingSpeed = 1.2_nf;       // NPC Walking Speed
-    Physics.NPCWalkingOnSpeed = 1;          // NPC that can be walked on walking speed
-    Physics.NPCMushroomSpeed = 1.8_nf;      // Mushroom X Speed
-    Physics.NPCPSwitch = 777;               // P Switch time
+    Physics.NPCTimeOffScreen = 180;                     // How long NPCs are active offscreen before being reset
+    Physics.NPCShellSpeed = (num_t)7.1_nf;              // Speed of kicked shells
+    Physics.NPCShellSpeedY = 11;                        // Vertical Speed of kicked shells
+    Physics.NPCCanHurtWait = 30;                        // How long to wait before NPCs can hurt players
+    Physics.NPCGravityReal = 0.26_nf;                   // NPC Gravity
+    Physics.NPCGravity = (num_t)Physics.NPCGravityReal; // NPC Gravity
+    Physics.NPCWalkingSpeed = (num_t)1.2_nf;            // NPC Walking Speed
+    Physics.NPCWalkingOnSpeed = 1;                      // NPC that can be walked on walking speed
+    Physics.NPCMushroomSpeed = (num_t)1.8_nf;           // Mushroom X Speed
+    Physics.NPCPSwitch = 777;                           // P Switch time
 }
