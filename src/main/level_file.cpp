@@ -1687,12 +1687,10 @@ void ClearLevel()
         AutoY[A] = 0;
     }
 
-    numEvents = 0;
+    numEvents = 3;
     newEventNum = 0;
     for(A = 0; A <= maxEvents; A++)
-    {
         InitializeEvent(Events[A]);
-    }
 
     for(A = 0; A <= maxWater; A++)
         Water[A] = blankwater;
@@ -1706,6 +1704,7 @@ void ClearLevel()
     // maxStars = 0;
     g_curLevelMedals.reset_lvl();
 
+    InvincibilityTime = 0;
     PSwitchTime = 0;
     PSwitchStop = 0;
     BeltDirection = 1;
@@ -1722,7 +1721,7 @@ void ClearLevel()
 
     LAYER_USED_P_SWITCH = LAYER_NONE;
 
-    numLayers = 0;
+    numLayers = 3;
     for(A = 3; A <= maxLayers; A++)
     {
         Layer[A] = Layer_t();

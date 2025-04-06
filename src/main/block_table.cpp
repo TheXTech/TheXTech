@@ -134,29 +134,30 @@ struct TableInterface
         if(_loc.Width < 0 || _loc.Height < 0)
             return;
 
-        rect_external loc = _loc;
-
-        // workaround to handle common block push behavior of NPCs -- if NPCs eventually use updatable queries, this can be removed (along with logic below)
-        if(loc.r - loc.l < 32)
-            loc.r = loc.l + 32;
+        rect_external loc;
 
         // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
         //   (such as, when an item is trapped inside a wall during !BlocksSorted)
         // This should be fixed for players now.
         // Conversely, there may be cases where this is too much when BlocksSorted is true and an FLBlock query was made.
         if(g_config.emulate_classic_block_order)
-        {
-            loc.l -= 32;
-            loc.r += 32;
-            loc.t -= 32;
-            loc.b += 32;
-        }
+            loc.query_from_loc_paranoid(_loc);
         else
         {
-            loc.l -= 2;
-            loc.r += 2;
-            loc.t -= 2;
-            loc.b += 2;
+            int32_t l_int = std::floor(_loc.X);
+            int32_t r_int = std::ceil(_loc.X + _loc.Width);
+            int32_t t_int = std::floor(_loc.Y);
+            int32_t b_int = std::ceil(_loc.Y + _loc.Height);
+
+            // workaround to handle common block push behavior of NPCs -- if NPCs eventually use updatable queries, then we can simply use query_from_loc_standard as in other callsites
+            if(r_int < l_int + 32)
+                r_int = l_int + 32;
+
+            // find which 64x64 tiles contain the query with a 2px margin in each direction
+            loc.l = s_floor_div_64(l_int - 2);
+            loc.r = s_floor_div_64(r_int + 2 + 63);
+            loc.t = s_floor_div_64(t_int - 2);
+            loc.b = s_floor_div_64(b_int + 2 + 63);
         }
 
         common_table.query(out, loc);
@@ -171,10 +172,10 @@ struct TableInterface
             {
                 int layer = active_tables[i];
 
-                int32_t offX = std::ceil(Layer[layer].OffsetX);
-                int32_t offY = std::ceil(Layer[layer].OffsetY);
+                int16_t offX = s_floor_div_64(std::floor(-Layer[layer].OffsetX));
+                int16_t offY = s_floor_div_64(std::floor(-Layer[layer].OffsetY));
 
-                rect_external layer_loc{loc.l - offX, loc.r - offX, loc.t - offY, loc.b - offY};
+                rect_external layer_loc{(int16_t)(loc.l + offX), (int16_t)(loc.r + offX), (int16_t)(loc.t + offY), (int16_t)(loc.b + offY)};
 
                 layer_table[layer].query(out, layer_loc);
             }
@@ -382,24 +383,14 @@ void treeTempBlockQuery(std::vector<BaseRef_t>& out,
     if(_loc.Width < 0 || _loc.Height < 0)
         return;
 
-    rect_external loc = _loc;
+    rect_external loc;
 
     // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
     //   (such as, when an item is trapped inside a wall during !BlocksSorted)
     if(g_config.emulate_classic_block_order)
-    {
-        loc.l -= 32;
-        loc.r += 32;
-        loc.t -= 32;
-        loc.b += 32;
-    }
+        loc.query_from_loc_paranoid(_loc);
     else
-    {
-        loc.l -= 2;
-        loc.r += 2;
-        loc.t -= 2;
-        loc.b += 2;
-    }
+        loc.query_from_loc_standard(_loc);
 
 
     s_npc_table.query(out, loc);
@@ -646,24 +637,14 @@ void treeNPCQuery(std::vector<BaseRef_t>& out, const Location_t &_loc, int sort_
     if(_loc.Width < 0 || _loc.Height < 0)
         return;
 
-    rect_external loc = _loc;
+    rect_external loc;
 
     // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
     //   (such as, when an item is trapped inside a wall during !BlocksSorted)
     if(g_config.emulate_classic_block_order)
-    {
-        loc.l -= 32;
-        loc.r += 32;
-        loc.t -= 32;
-        loc.b += 32;
-    }
+        loc.query_from_loc_paranoid(_loc);
     else
-    {
-        loc.l -= 2;
-        loc.r += 2;
-        loc.t -= 2;
-        loc.b += 2;
-    }
+        loc.query_from_loc_standard(_loc);
 
     s_npc_table.query(out, loc);
 

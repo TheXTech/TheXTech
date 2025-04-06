@@ -228,6 +228,26 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
     int B = 0;
     // double C = 0;
     XTColor s = (ShadowMode ? XTColor(64, 64, 64, color.a) : color);
+
+    // color player during invincibility
+    if(InvincibilityTime)
+    {
+        switch(((unsigned)CommonFrame / 4) % 4)
+        {
+        case 0:
+            s.r = 128;
+            break;
+        case 1:
+            s.g = 128;
+            break;
+        case 2:
+            s.b = 128;
+            break;
+        case 3:
+            break;
+        }
+    }
+
     //auto &p = Player[A];
 
     int sX = camX + s_round2int_plr(p.Location.X);

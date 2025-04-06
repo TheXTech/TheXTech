@@ -61,6 +61,35 @@ void p_PlayerMakeFlySparkle(const Location_t& loc, int Frame)
     Effect[numEffects].Frame = Frame;
 }
 
+static void UpdateInvincibility()
+{
+    if(InvincibilityTime <= 0 || FreezeNPCs || LevelMacro != LEVELMACRO_OFF || !CheckLiving())
+        return;
+
+    if(InvincibilityTime == Physics.NPCPSwitch && !GameMenu)
+    {
+        StopMusic();
+        StartMusic(-1);
+    }
+
+    InvincibilityTime--;
+
+    if(InvincibilityTime == 195)
+        PlaySound(SFX_CoinSwitchTimeout);
+
+    if(InvincibilityTime == 0)
+    {
+        for(int A = 1; A <= numPlayers; A++)
+        {
+            if(!Player[A].Dead && Player[A].TimeToLive == 0)
+                Player[A].Immune += 120;
+        }
+
+        if(!GameMenu)
+            SwitchEndResumeMusic();
+    }
+}
+
 bool UpdatePlayer()
 {
     switch(g_gameLoopInterrupt.site)
@@ -81,6 +110,8 @@ bool UpdatePlayer()
     bool tempShell;
     tempSpring = false; // this one is probably safe to not share between players. it is reset between players unless tempShell is also hit
     tempShell = false; // this one marks whether a player has collided with a shell in the current frame and modifies the effects created when any player hits the top of NPC
+
+    UpdateInvincibility(); // updates player invincibility status
 
     StealBonus(); // allows a dead player to come back to life by using a 1-up
     ClownCar(); // updates players in the clown car
@@ -372,7 +403,7 @@ bool UpdatePlayer()
                         (
                                 (!Player[A].YoshiBlue && (Player[A].CanFly || Player[A].CanFly2)) ||
                                 (Player[A].Mount == 3 && Player[A].CanFly2)
-                        ) || Player[A].FlySparks
+                        ) || Player[A].FlySparks || InvincibilityTime
                         )
                 {
                     if(iRand(4) == 0)
@@ -439,7 +470,7 @@ bool UpdatePlayer()
                 }
 
                 // reduce player's multiplier
-                if((Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0) && !Player[A].Slide && !FreezeNPCs)
+                if((Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0) && !Player[A].Slide && !FreezeNPCs && !InvincibilityTime)
                     Player[A].Multiplier = 0;
 
                 if(Player[A].Mount == 2)

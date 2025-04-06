@@ -243,9 +243,14 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     else // Everything else defaults to SMB3
         newBlock = 2;
 
-
-
-
+    // invincibility continuation block
+    if(b.Special == 110)
+    {
+        if(InvincibilityTime)
+            b.Special = 1000 + NPCID_INVINCIBILITY_POWER;
+        else
+            b.Special = 1;
+    }
 
     if(b.Special > 0 && b.Special < 100) // Block has coins
     {
@@ -428,10 +433,6 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             b.Location.Height = BlockHeight[newBlock];
             b.Location.Width = BlockWidth[newBlock];
         }
-
-
-
-
     }
     else if(b.Special >= 100) // New spawn code
     {
@@ -621,7 +622,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     nn.Location.Height = 32;
                     nn.Location.Y = b.Location.Y - 32;
                 }
-                else if(nn.Type == NPCID_LEAF_POWER)
+                else if(nn.Type == NPCID_LEAF_POWER || nn.Type == NPCID_INVINCIBILITY_POWER)
                 {
                     nn.Effect = NPCEFF_NORMAL;
                     nn.Location.Y = b.Location.Y - 32;
@@ -1507,7 +1508,7 @@ resume_TriggerHit:
                    ib.Type == 90 || ib.Type == 188 ||
                    ib.Type == 226 || ib.Type == 293 ||
                    ib.Type == 526); // Check to see if it is breakable
-                bool is_empty = (ib.Special == 0);
+                bool is_empty = (ib.Special <= 0);
                 is_breakable = (is_breakable_type && is_empty);
             }
 
@@ -1582,6 +1583,12 @@ void SwitchEndResumeMusic()
 {
     StopMusic();
 
+    if(InvincibilityTime)
+    {
+        StartMusic(-1);
+        return;
+    }
+
     int switch_player_section = Player[PSwitchPlayer].Section;
 
 #ifndef THEXTECH_ENABLE_SDL_NET
@@ -1623,7 +1630,7 @@ bool PSwitch(bool enabled)
     {
         for(A = 1; A <= numNPCs; A++)
         {
-            bool transform = NPC[A]->IsACoin && NPC[A].coinSwitchBlockType == 0 && !NPC[A].Hidden && NPC[A].Special == 0.0;
+            bool transform = NPC[A]->IsACoin && NPC[A].coinSwitchBlockType == 0 && !NPC[A].Hidden && NPC[A].Special == 0;
 
             if(NPC[A].Type == NPCID_MEDAL && g_config.fix_special_coin_switch)
                 transform = false;
@@ -1660,7 +1667,7 @@ bool PSwitch(bool enabled)
                     nb.Location.X += (NPC[A].Location.Width - nb.Location.Width) / 2;
                     nb.Location.SpeedX = 0;
                     nb.Location.SpeedY = 0;
-                    nb.Special = 0;
+                    nb.Special = -NPC[A].Variant; // NEW: store Variant to preserve medals tracking
                     nb.Kill = false;
                     nb.coinSwitchNpcType = NPC[A].Type;
 
@@ -1829,6 +1836,7 @@ bool PSwitch(bool enabled)
                     nn.DefaultLocationX = nn.Location.X;
                     nn.DefaultLocationY = nn.Location.Y;
                     nn.DefaultType = nn.Type;
+                    nn.Variant = -Block[A].Special;
 
                     // WARNING: this is new logic from #167. Check in case of any inconsistencies after Coin Switch is activated.
                     if(nn->TFrames > 0)

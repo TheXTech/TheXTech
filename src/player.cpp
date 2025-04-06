@@ -577,6 +577,8 @@ void SetupPlayers()
     int A = 0;
     int B = 0;
 //    int C = 0;
+
+    InvincibilityTime = 0;
     FreezeNPCs = false;
     qScreen = false;
     qScreen_canonical = false;
@@ -907,6 +909,9 @@ void PlayerHurt(const int A)
     auto &p = Player[A];
     Location_t tempLocation;
     int B = 0;
+
+    if(InvincibilityTime && !p.Pinched.Moving)
+        return;
 
     if(p.Dead || p.TimeToLive > 0 || p.Stoned || p.Immune > 0 || p.Effect > 0)
         return;
@@ -4397,7 +4402,8 @@ void WaterCheck(const int A)
     if(p.Wet > 0)
     {
         p.Wet -= 1;
-        p.Multiplier = 0;
+        if(!InvincibilityTime)
+            p.Multiplier = 0;
     }
 
     if(p.Quicksand > 0)

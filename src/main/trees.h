@@ -71,6 +71,14 @@ namespace Comparisons
         return a < b;
     }
 
+    // sort blocks by Y, then index
+    template<>
+    inline bool Z<BlockRef_t>(BaseRef_t a, BaseRef_t b)
+    {
+        return (((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y) ||
+            (((BlockRef_t)a)->Location.Y == ((BlockRef_t)b)->Location.Y && a < b);
+    }
+
     // sort BGOs by SortPriority
     template<>
     inline bool Z<BackgroundRef_t>(BaseRef_t a, BaseRef_t b)

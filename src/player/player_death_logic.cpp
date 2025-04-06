@@ -70,11 +70,12 @@ void UpdatePlayerTimeToLive(int A)
 
     // move dead player towards start point in BattleMode
     bool battle_respawn = (BattleMode && BattleLives[A] > 0 && someone_else_alive && BattleWinner == 0);
-    if(battle_respawn)
-        B = 20 + A;
 
-    if(battle_respawn && player_timer_done)
+    if(battle_respawn && player_can_move)
     {
+        // using B as a temporary slot here
+        B = maxPlayers - 1;
+
         Player[B].Location.Width = Player[A].Location.Width;
         Player[B].Location.Height = Player[A].Location.Height;
 

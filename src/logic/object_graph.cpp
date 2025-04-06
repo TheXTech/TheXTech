@@ -96,8 +96,9 @@ void Graph::update()
     this->all_nodes.clear();
     for(const Object& node : this->level.warps)
         this->all_nodes.insert(&node);
-    for(const Object& node : this->level.exits)
-        this->all_nodes.insert(&node);
+    // don't process exits for now, because only medals are tracked for now
+    // for(const Object& node : this->level.exits)
+    //     this->all_nodes.insert(&node);
     for(const Object& node : this->level.items)
         this->all_nodes.insert(&node);
 
@@ -225,7 +226,8 @@ void FillGraph(Graph& graph)
                 ObjectGraph::Object::G_NPC, i));
         }
 
-        if(NPC[i].Type == NPCID_MEDAL || NPC[i].Type == NPCID_STAR_COLLECT || NPC[i].Type == NPCID_KEY)
+        // only track medals for now -- they're all that's used for the time being
+        if(NPC[i].Type == NPCID_MEDAL) // || NPC[i].Type == NPCID_STAR_COLLECT || NPC[i].Type == NPCID_KEY)
         {
             graph.level.items.push_back(o(ObjectGraph::Object::Item,
                 get_center(NPC[i].Location),

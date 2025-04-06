@@ -97,10 +97,10 @@ TreeResult_Sentinel<ItemRef_t> treeWorldQuery(std::unique_ptr<table_t<ItemRef_t>
     if(!p.get())
         return result;
 
-    p->query(*result.i_vec, rect_external(Left,
-                                  Right,
-                                  Top,
-                                  Bottom));
+    p->query(*result.i_vec, rect_external(s_floor_div_64(Left),
+                                  s_floor_div_64(Right + 63),
+                                  s_floor_div_64(Top),
+                                  s_floor_div_64(Bottom + 63)));
 
     if(sort_mode == SORTMODE_ID)
     {

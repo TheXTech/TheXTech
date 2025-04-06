@@ -1167,9 +1167,9 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
 
         bool loc2_exists;
         if(NPC[A].Effect == NPCEFF_NORMAL && NPC[A].HoldingPlayer == 0 && !NPC[A].Generator &&
-                (NPC[A].vehiclePlr > 0 || NPC[A].Type == 56 || NPC[A].Type == 22
-                    || NPC[A].Type == 49 || NPC[A].Type == 91 || NPC[A].Type == 160
-                    || NPC[A].Type == 282 || NPC[A]->IsACoin || NPC[A].Type == 263))
+                (NPC[A].vehiclePlr > 0 || NPC[A].Type == NPCID_VEHICLE || NPC[A].Type == NPCID_CANNONITEM
+                    || NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_ITEM_BURIED || NPC[A].Type == NPCID_ROCKET_WOOD
+                    || NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPC[A]->IsACoin || NPC[A].Type == NPCID_ICE_CUBE))
         {
             loc2_exists = true;
             loc2 = newLoc(NPC[A].Location.X - (NPC[A]->WidthGFX - NPC[A].Location.Width) / 2,

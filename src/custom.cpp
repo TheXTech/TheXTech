@@ -179,10 +179,6 @@ void SaveNPCDefaults()
 
     for(int A = 1; A <= maxNPCType; A++)
     {
-        NPCTraits[A].TFrames = 0;
-        NPCTraits[A].FrameSpeed = 8;
-        NPCTraits[A].FrameStyle = 0;
-
         // Global override of NPC setup
         npcPathRes = NPCDir.resolveFileCaseExistsAbs(fmt::format_ne("npc-{0}.txt", A));
 

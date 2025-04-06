@@ -1892,10 +1892,20 @@ void UpdateLayers()
 
 void syncLayersTrees_AllBlocks()
 {
-    // treeLevelCleanBlockLayers();
+    // would be nice to use a non-deallocating version here
+    treeLevelCleanBlockLayers();
+    invalidateDrawBlocks();
+
+    for(int layer = 0; layer < numLayers; layer++)
+        Layer[layer].blocks.clear();
+
     for(int block = 1; block <= numBlock; block++)
     {
-        syncLayersTrees_Block(block);
+        int layer = Block[block].Layer;
+
+        treeBlockAddLayer(layer, block);
+        if(layer != LAYER_NONE)
+            sorted_insert(Layer[layer].blocks, block);
     }
 }
 
@@ -1941,9 +1951,7 @@ void syncLayers_AllNPCs()
     NPCQueues::clear();
 
     for(int npc = 1; npc <= numNPCs; npc++)
-    {
         syncLayers_NPC(npc);
-    }
 }
 
 void syncLayers_NPC(int npc)
@@ -1968,9 +1976,18 @@ void syncLayers_NPC(int npc)
 
 void syncLayers_AllBGOs()
 {
+    treeLevelCleanBackgroundLayers();
+    invalidateDrawBGOs();
+
+    for(int layer = 0; layer < numLayers; layer++)
+        Layer[layer].BGOs.clear();
+
     for(int bgo = 1; bgo <= numBackground + numLocked; bgo++)
     {
-        syncLayers_BGO(bgo);
+        int layer = Background[bgo].Layer;
+        treeBackgroundAddLayer(layer, bgo);
+        if(layer != LAYER_NONE)
+            sorted_insert(Layer[layer].BGOs, bgo);
     }
 }
 

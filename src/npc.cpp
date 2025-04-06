@@ -3500,7 +3500,7 @@ void SpecialNPC(int A)
         else
             NPC[A].Location.SpeedX = 0;
     }
-    else if(NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_ICE_CUBE) // Yoshi Ice
+    else if(NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_ICE_CUBE || NPC[A].Type == NPCID_INVINCIBILITY_POWER) // Yoshi Ice
     {
         // moved to NPCSpecial
         // if(NPC[A].Type == NPCID_ICE_CUBE && NPC[A].Special == 3)

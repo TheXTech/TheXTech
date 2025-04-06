@@ -373,6 +373,7 @@ enum NPCID : vbint_t
     NPCID_RESERVED_300 = 300,
 
     // TheXTech-exclusive NPCs
+    NPCID_INVINCIBILITY_POWER = 301,
 };
 
 

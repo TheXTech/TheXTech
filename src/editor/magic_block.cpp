@@ -221,6 +221,50 @@ bool s_check_sizable(BlockRef_t B)
 }
 
 template<class ItemRef_t>
+static inline bool s_ban_slope(ItemRef_t B, int dir)
+{
+    UNUSED(B);
+    UNUSED(dir);
+    return false;
+}
+
+template<>
+inline bool s_ban_slope(BlockRef_t B, int dir)
+{
+    int t = B->Type;
+
+    // for cases on left, ban .\ and */ slopes
+    if(dir == 1 || dir == 4 || dir == 7)
+    {
+        if(BlockSlope[t] > 0 || BlockSlope2[t] < 0)
+            return true;
+    }
+
+    // for cases on right, ban /. and \* slopes
+    if(dir == 3 || dir == 6 || dir == 9)
+    {
+        if(BlockSlope[t] < 0 || BlockSlope2[t] > 0)
+            return true;
+    }
+
+    // for cases above, ban \* and */ slopes
+    if(dir == 7 || dir == 8 || dir == 9)
+    {
+        if(BlockSlope2[t])
+            return true;
+    }
+
+    // for cases below, ban /. and .\ slopes
+    if(dir == 1 || dir == 2 || dir == 3)
+    {
+        if(BlockSlope[t])
+            return true;
+    }
+
+    return false;
+}
+
+template<class ItemRef_t>
 struct MagicInfo {};
 
 template<>
@@ -302,7 +346,7 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
                 }
             }
 
-            if(hit || check_level == LEVEL_ALL)
+            if(hit || (check_level == LEVEL_ALL && !s_ban_slope(B, 7)))
             {
                 inferred_type.has_7 = true;
                 break;
@@ -339,7 +383,7 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
                 }
             }
 
-            if(hit || check_level == LEVEL_ALL)
+            if(hit || (check_level == LEVEL_ALL && !s_ban_slope(B, 8)))
             {
                 inferred_type.has_8 = true;
                 break;
@@ -373,7 +417,7 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
                 }
             }
 
-            if(hit || check_level == LEVEL_ALL)
+            if(hit || (check_level == LEVEL_ALL && !s_ban_slope(B, 9)))
             {
                 inferred_type.has_9 = true;
                 break;
@@ -410,7 +454,7 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
                 }
             }
 
-            if(hit || check_level == LEVEL_ALL)
+            if(hit || (check_level == LEVEL_ALL && !s_ban_slope(B, 6)))
             {
                 inferred_type.has_6 = true;
                 break;
@@ -445,7 +489,7 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
                 }
             }
 
-            if(hit || check_level == LEVEL_ALL)
+            if(hit || (check_level == LEVEL_ALL && !s_ban_slope(B, 3)))
             {
                 inferred_type.has_3 = true;
                 break;
@@ -483,7 +527,7 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
                 }
             }
 
-            if(hit || check_level == LEVEL_ALL)
+            if(hit || (check_level == LEVEL_ALL && !s_ban_slope(B, 2)))
             {
                 inferred_type.has_2 = true;
                 break;
@@ -518,7 +562,7 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
                 }
             }
 
-            if(hit || check_level == LEVEL_ALL)
+            if(hit || (check_level == LEVEL_ALL && !s_ban_slope(B, 1)))
             {
                 inferred_type.has_1 = true;
                 break;
@@ -555,7 +599,7 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
                 }
             }
 
-            if(hit || check_level == LEVEL_ALL)
+            if(hit || (check_level == LEVEL_ALL && !s_ban_slope(B, 4)))
             {
                 inferred_type.has_4 = true;
                 break;

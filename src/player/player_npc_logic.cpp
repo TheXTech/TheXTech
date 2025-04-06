@@ -394,8 +394,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                         if(HitSpot == 1) // Player landed on a NPC
                         {
                             // the following code is for spin jumping and landing on things as yoshi/shoe
-                            if(Player[A].Mount == 1 || Player[A].Mount == 3 || Player[A].SpinJump ||
-                               (Player[A].Stoned && !NPC[B]->CanWalkOn))
+                            if(!InvincibilityTime && (Player[A].Mount == 1 || Player[A].Mount == 3 || Player[A].SpinJump || (Player[A].Stoned && !NPC[B]->CanWalkOn)))
                             {
                                 // these types were not hit during spin bounces in SMBX 1.3 (but may be vulnerable to stomps by mounts)
                                 bool dont_hit_spin_bounce = (NPC[B].Type == NPCID_FIRE_PLANT || NPC[B].Type == NPCID_QUAD_SPITTER || NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_LAVABUBBLE ||
@@ -557,7 +556,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                             }
                             else if(NPC[B].Type == NPCID_CANNONITEM || NPC[B].Type == NPCID_KEY ||
                                     NPC[B].Type == NPCID_TOOTHYPIPE || NPC[B].Type == NPCID_TOOTHY ||
-                                    (Player[A].SlideKill && !NPC[B]->WontHurt)) // NPCs that cannot be walked on
+                                    ((Player[A].SlideKill || InvincibilityTime) && !NPC[B]->WontHurt)) // NPCs that cannot be walked on
                             {
                                 // cancel jump
                             }
@@ -778,7 +777,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         {
                                             if(NPC[B].Effect != NPCEFF_DROP_ITEM)
                                             {
-                                                if(Player[A].SlideKill && !NPC[B]->JumpHurt)
+                                                if(InvincibilityTime || (Player[A].SlideKill && !NPC[B]->JumpHurt))
                                                     NPCHit(B, 3, B);
 
                                                 if(NPC[B].Killed == 0)

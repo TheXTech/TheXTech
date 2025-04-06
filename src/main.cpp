@@ -264,6 +264,9 @@ int main(int argc, char**argv)
     vramSetBankI(VRAM_I_SUB_BG_0x06208000);
 
 #ifdef __BLOCKS__
+    // give ourselves an extra 32kb of stack space -- thanks @AntonioND!
+    reduceHeapSize(0x8000);
+
     const int DEFAULT_CONSOLE_MAP_BASE = 22;
     const int DEFAULT_CONSOLE_GFX_BASE = 3;
     const int DEFAULT_CONSOLE_BG_LAYER = 0;
