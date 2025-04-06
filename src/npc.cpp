@@ -4370,12 +4370,12 @@ void SpecialNPC(int A)
 
                 NPC[A].Direction = D;
                 int E = 0; // X
-                float F = -1; // Y
+                int F_div = -1; // Y
 
                 if(NPC[A].Location.Y > Player[target_plr].Location.Y)
-                    F = -1;
+                    F_div = -1;
                 else if(NPC[A].Location.Y < Player[target_plr].Location.Y - 128)
-                    F = 1;
+                    F_div = 1;
 
                 if(NPC[A].Location.X > Player[target_plr].Location.X + Player[target_plr].Location.Width + 64)
                     E = -1;
@@ -4395,25 +4395,25 @@ void SpecialNPC(int A)
                         if(NPC[A].Location.Y < Player[target_plr].Location.Y + Player[target_plr].Location.Height + 160)
                         {
                             if(NPC[A].Location.X + NPC[A].Location.Width + 100 > Player[target_plr].Location.X && NPC[A].Location.X - 100 < Player[target_plr].Location.X + Player[target_plr].Location.Width)
-                                F = 0.2F;
+                                F_div = 5;
                         }
                     }
                     else
                     {
                         E = D;
-                        F = 1;
+                        F_div = 1;
                     }
                 }
 
                 if(NPC[A].Wet == 2)
                 {
-                    NPC[A].Location.SpeedX += 0.025 * E;
-                    NPC[A].Location.SpeedY += 0.025 * F;
+                    NPC[A].Location.SpeedX += 0.025_n * E;
+                    NPC[A].Location.SpeedY += 0.025_n / F_div;
                 }
                 else
                 {
-                    NPC[A].Location.SpeedX += 0.05 * E;
-                    NPC[A].Location.SpeedY += 0.05 * F;
+                    NPC[A].Location.SpeedX += 0.05_n * E;
+                    NPC[A].Location.SpeedY += 0.05_n / F_div;
                 }
 
                 if(NPC[A].Location.SpeedX > 4)
