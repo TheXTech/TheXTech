@@ -199,6 +199,6 @@ struct PlayerStart_t
 // creates a temp Location
 Location_t newLoc(num_t X, num_t Y, num_t Width = 0, num_t Height = 0);
 // creates a copy of location with a grid rounding
-Location_t roundLoc(const Location_t &inLoc, num_t grid);
+// Location_t roundLoc(const Location_t &inLoc, num_t grid);
 
 #endif // LOCATION_H

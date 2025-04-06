@@ -2254,13 +2254,13 @@ Location_t newLoc(num_t X, num_t Y, num_t Width, num_t Height)
     return ret;
 }
 
-Location_t roundLoc(const Location_t &inLoc, double grid)
-{
-    Location_t ret = inLoc;
-    ret.X = Maths::roundTo(ret.X, grid);
-    ret.Y = Maths::roundTo(ret.Y, grid);
-    return ret;
-}
+// Location_t roundLoc(const Location_t &inLoc, double grid)
+// {
+//     Location_t ret = inLoc;
+//     ret.X = Maths::roundTo(ret.X, grid);
+//     ret.Y = Maths::roundTo(ret.Y, grid);
+//     return ret;
+// }
 
 void MoreScore(int addScore, const Location_t &Loc)
 {
