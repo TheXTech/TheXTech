@@ -39,7 +39,7 @@
 
 #include "main/game_loop_interrupt.h"
 
-static void s_makeSparkles(const NPC_t& npc, int speed_random, double speed_mult)
+static void s_makeSparkles(const NPC_t& npc, int speed_random, int speed_mult)
 {
     NewEffect(EFFID_SMOKE_S3, npc.Location);
 
@@ -58,8 +58,8 @@ static void s_makeSparkles(const NPC_t& npc, int speed_random, double speed_mult
         tempLocation.Y = tempLocY_base + dRand() * npc.Location.Height;
         NewEffect(EFFID_SPARKLE, tempLocation);
 
-        Effect[numEffects].Location.SpeedX = (dRand() - 0.5) * speed_random - npc.Location.SpeedX * speed_mult;
-        Effect[numEffects].Location.SpeedY = (dRand() - 0.5) * speed_random + npc.Location.SpeedY * speed_mult;
+        Effect[numEffects].Location.SpeedX = (dRand() - 0.5_n) * speed_random - npc.Location.SpeedX * speed_mult / 10;
+        Effect[numEffects].Location.SpeedY = (dRand() - 0.5_n) * speed_random + npc.Location.SpeedY * speed_mult / 10;
         Effect[numEffects].Frame = iRand(3);
     }
 }
@@ -98,7 +98,7 @@ bool KillNPC(int A, int B)
 
     if(NPC[A].Type == NPCID_ICE_CUBE && NPC[A].Special > 0 && NPC[A].Killed != 9)
     {
-        s_makeSparkles(NPC[A], 4, 0.2);
+        s_makeSparkles(NPC[A], 4, 2);
         PlaySoundSpatial(SFX_Icebreak, NPC[A].Location);
         NPC[A].Type = NPCID(NPC[A].Special);
 
@@ -419,7 +419,7 @@ resume_TriggerLast:
                 }
                 else if(NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_ICE_CUBE)
                 {
-                    s_makeSparkles(NPC[A], 2, 0.3);
+                    s_makeSparkles(NPC[A], 2, 3);
                 }
                 else
                     NewEffect(EFFID_CARRY_FODDER_DIE, NPC[A].Location, NPC[A].Direction);
