@@ -22,6 +22,11 @@
 #ifndef ABSTRACTWINDOW_T_H
 #define ABSTRACTWINDOW_T_H
 
+#ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+#   include <cstdint>
+#   include <vector>
+#endif
+
 #include "window_types.h"
 
 class AbstractWindow_t
@@ -99,6 +104,38 @@ public:
     };
 
 #ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+    struct VideoModeRes
+    {
+        int w;
+        int h;
+    };
+
+    /*!
+     * \brief Get a list of available video resolutions for exclusive full-screen mode
+     * \return List of full-screen video resolutions
+     */
+    virtual const std::vector<VideoModeRes> &getAvailableVideoResolutions() = 0;
+
+    /*!
+     * \brief Get a list of available colour depths for exclusive full-screen mode
+     * \return List of full-screen colour depths
+     */
+    virtual const std::vector<uint8_t> &getAvailableColourDepths() = 0;
+
+    /*!
+     * \brief Gets the currently configured exclusive full-screen resolution
+     * \param res Resolution structure
+     * \param colourDepth Color depth in bits
+     */
+    virtual void getCurrentVideoMode(VideoModeRes &res, uint8_t &colourDepth) = 0;
+
+    /*!
+     * \brief Set the resolution for the exclusive full-screen mode
+     * \param res Desired resolution (It should match one of available in the list!)
+     * \param colourDepth Color depth in bits (16, 32, or 0 as "auto")
+     */
+    virtual void setVideoMode(const VideoModeRes &res, uint8_t colourDepth) = 0;
+
     /*!
      * \brief Sets the type of fullscreen (desktop or real)
      * \param type Fullscreen type: 0 auto, 1 desktop, 2 real

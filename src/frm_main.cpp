@@ -28,6 +28,9 @@
 
 #include "gfx.h"
 #include "config.h"
+#ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+#   include "change_res.h"
+#endif
 
 #include "core/render.h"
 #include "core/window.h"
@@ -182,6 +185,19 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     events->init(this);
 #endif
 
+
+#if defined(_WIN32) && !defined(RENDER_FULLSCREEN_ALWAYS) && defined(RENDER_FULLSCREEN_TYPES_SUPPORTED)
+    if(g_config.fullscreen_type == Config_t::FULLSCREEN_TYPE_EXCLUSIVE)
+    {
+        XWindow::setFullScreenType(g_config.fullscreen_type);
+        if(g_config.fullscreen)
+        {
+            UpdateInternalRes();
+            XWindow::setWindowSize(XRender::TargetW, XRender::TargetH);
+            XWindow::setFullScreen(g_config.fullscreen);
+        }
+    }
+#endif
 
     // Initializing render
     pLogDebug("Init renderer settings...");

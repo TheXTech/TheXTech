@@ -34,6 +34,7 @@
 #include "game_main.h"
 
 #include "core/language.h"
+#include "core/window.h"
 #include "fontman/font_manager.h"
 
 #include "main/translate.h"
@@ -266,7 +267,7 @@ const std::string& ConfigOption_t<true, std::string>::get_display_value(std::str
 template<>
 const std::string& ConfigOption_t<true, std::pair<int, int>>::get_display_value(std::string& out) const
 {
-    out = fmt::format_ne("{0}x{1} (CUSTOM)", m_value.first, m_value.second);
+    out = fmt::format_ne("{0}x{1}", m_value.first, m_value.second);
     return out;
 }
 
@@ -718,6 +719,85 @@ const std::string& ConfigLanguage_t<true>::get_display_value(std::string& out) c
 
     return out;
 }
+
+
+// implementation for ConfigFullscreenRes_t<true>
+#ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+
+size_t ConfigFullscreenRes_t<true>::find_cur_index()
+{
+    const std::vector<AbstractWindow_t::VideoModeRes>& res = g_window->getAvailableVideoResolutions();
+
+    for(size_t i = 0; i < res.size(); i++)
+    {
+        if(res[i].w == m_value.first && res[i].h == m_value.second)
+            return i;
+    }
+
+    return res.size();
+}
+
+bool ConfigFullscreenRes_t<true>::rotate_left()
+{
+    const std::vector<AbstractWindow_t::VideoModeRes>& res = g_window->getAvailableVideoResolutions();
+
+    value_t old_value = m_value;
+
+    if(res.size() == 0)
+        return false;
+
+    size_t new_idx = find_cur_index() - 1;
+    if(new_idx >= res.size())
+        new_idx = res.size() - 1;
+
+    m_value.first = res[new_idx].w;
+    m_value.second = res[new_idx].h;
+
+    if(m_value == old_value)
+        return false;
+
+    if(!is_set())
+        m_set = ConfigSetLevel::set;
+
+    _on_change();
+
+    return true;
+}
+
+bool ConfigFullscreenRes_t<true>::rotate_right()
+{
+    const std::vector<AbstractWindow_t::VideoModeRes>& res = g_window->getAvailableVideoResolutions();
+
+    value_t old_value = m_value;
+
+    if(res.size() == 0)
+        return false;
+
+    size_t new_idx = find_cur_index() + 1;
+    if(new_idx >= res.size())
+        new_idx = 0;
+
+    m_value.first = res[new_idx].w;
+    m_value.second = res[new_idx].h;
+
+    if(m_value == old_value)
+        return false;
+
+    if(!is_set())
+        m_set = ConfigSetLevel::set;
+
+    _on_change();
+
+    return true;
+}
+
+bool ConfigFullscreenRes_t<true>::change()
+{
+    return rotate_right();
+}
+
+#endif // #ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+
 
 // implementation for ConfigSetupEnum_t<true>
 const std::string& ConfigSetupEnum_t<true>::get_display_value(std::string& out) const

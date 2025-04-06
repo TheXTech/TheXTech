@@ -572,18 +572,36 @@ public:
     {
         FULLSCREEN_TYPE_AUTO = 0,
         FULLSCREEN_TYPE_DESKTOP = 1,
-        FULLSCREEN_TYPE_REAL = 2
+        FULLSCREEN_TYPE_EXCLUSIVE = 2
     };
     setup_enum_t fullscreen_type{this,
         {
             {FULLSCREEN_TYPE_AUTO, "auto", "Auto", nullptr},
             {FULLSCREEN_TYPE_DESKTOP, "desktop", "Desktop", "Keep the current screen resolution"},
-            {FULLSCREEN_TYPE_REAL, "real", "Exclusive", "Set physical screen resolution"},
+            {FULLSCREEN_TYPE_EXCLUSIVE, "exclusive", "Exclusive", "Set physical screen resolution"},
         },
         defaults(FULLSCREEN_TYPE_AUTO), {},
         Scope::Config,
         "fullscreen-type", "Fullscreen type", nullptr,
         config_fullscreen_type_set
+    };
+
+    using fullscreen_res_t = ConfigFullscreenRes_t<writable>;
+
+    fullscreen_res_t fullscreen_res{this, defaults(std::pair<int, int>{800, 600}), {}, Scope::Config,
+        "fullscreen-res", "Exclusive res", nullptr,
+        config_video_mode_set
+    };
+
+    setup_enum_t fullscreen_depth{this,
+        {
+            {0, "auto", "Auto", nullptr},
+            {16, "16", "16-bit", nullptr},
+            {32, "32", "32-bit", nullptr},
+        },
+        defaults(0), {}, Scope::Config,
+        "fullscreen-depth", "Exclusive bit depth", nullptr,
+        config_video_mode_set
     };
 #endif // RENDER_FULLSCREEN_TYPES_SUPPORTED
 

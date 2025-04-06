@@ -41,6 +41,8 @@ class WindowSDL final : public AbstractWindow_t
     int m_fullscreen_type_real = 0;
     int m_screen_orig_w = 0;
     int m_screen_orig_h = 0;
+    VideoModeRes m_curRes = {640, 480};
+    uint8_t m_curColour = 0;
 #endif
 
 public:
@@ -113,6 +115,32 @@ public:
 
 #ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
     static void setHasFrameBuffer(bool has);
+
+    /*!
+     * \brief Get a list of available video resolutions for exclusive full-screen mode
+     * \return List of full-screen video resolutions
+     */
+    const std::vector<VideoModeRes> &getAvailableVideoResolutions() override;
+
+    /*!
+     * \brief Get a list of available colour depths for exclusive full-screen mode
+     * \return List of full-screen colour depths
+     */
+    const std::vector<uint8_t> &getAvailableColourDepths() override;
+
+    /*!
+     * \brief Gets the currently configured exclusive full-screen resolution
+     * \param res Resolution structure
+     * \param colourDepth Color depth in bits
+     */
+    void getCurrentVideoMode(VideoModeRes &res, uint8_t &colourDepth) override;
+
+    /*!
+     * \brief Set the resolution for the exclusive full-screen mode
+     * \param res Desired resolution (It should match one of available in the list!)
+     * \param colourDepth Color depth in bits (16, 32, or 0 as "auto")
+     */
+    void setVideoMode(const VideoModeRes &res, uint8_t colourDepth) override;
 
     /*!
      * \brief Sets the type of fullscreen (desktop or real)
