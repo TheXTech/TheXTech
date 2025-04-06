@@ -20,18 +20,6 @@
 
 #include "sdl_proxy/sdl_stdinc.h"
 
-#ifndef THEXTECH_NO_SDL_BUILD
-#include "SDL2/SDL_version.h"
-
-// define SDL_round
-#   if !SDL_VERSION_ATLEAST(2, 0, 16)
-static int SDL_round(double val)
-{
-    return (val > 0) ? val + 0.5 : val - 0.5;
-}
-#   endif
-#endif
-
 #include "../globals.h"
 #include "../graphics.h"
 #include "../collision.h"
@@ -154,7 +142,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
         CanvasH += CanvasOffset * 2;
     }
 
-    Location_t tempLocation;
+    TinyLocation_t tempLocation;
 
     int camX_levelX = camX + sect.X;
     int Left = vScreen[Z].Left;
@@ -185,7 +173,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
         else
             tempLocation.Y = sect.Height - frameH;
 
-        num_t bottom_Y = tempLocation.Y + frameH;
+        int bottom_Y = tempLocation.Y + frameH;
         unsigned int flip = X_FLIP_NONE;
         while(tempLocation.Y + tempLocation.Height > -camY)
         {
@@ -289,9 +277,9 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
     // use the remaining information from the tempLocation (Y and Height, never tiled)
     if(no_tiling)
     {
-        double undrawn_above = tempLocation.Y + camY;
-        double undrawn_below = tempLocation.Y + camY + tempLocation.Height;
-        XRender::renderRect(0, 0, vScreen[Z].Width, std::ceil(undrawn_above),
+        int undrawn_above = tempLocation.Y + camY;
+        int undrawn_below = tempLocation.Y + camY + tempLocation.Height;
+        XRender::renderRect(0, 0, vScreen[Z].Width, undrawn_above,
             GFXBackground2[A].ColorUpper);
         XRender::renderRect(0, undrawn_below, vScreen[Z].Width, vScreen[Z].Height - undrawn_below + 1,
             GFXBackground2[A].ColorLower);
