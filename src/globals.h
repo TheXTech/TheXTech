@@ -2081,9 +2081,9 @@ struct Physics_t
 //    PlayerJumpVelocity As Single
     numf_t PlayerJumpVelocity = 0_nf;
 //    PlayerRunSpeed As Single
-    numf_t PlayerRunSpeed = 0_nf;
+    int PlayerRunSpeed = 0;
 //    PlayerWalkSpeed As Single
-    numf_t PlayerWalkSpeed = 0_nf;
+    int PlayerWalkSpeed = 0;
 //    PlayerTerminalVelocity As Integer
     int PlayerTerminalVelocity = 0;
 //    PlayerGravity As Single
