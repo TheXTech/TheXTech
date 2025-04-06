@@ -2079,7 +2079,7 @@ struct Physics_t
 //    PlayerSpringJumpHeight As Integer
     int PlayerSpringJumpHeight = 0;
 //    PlayerJumpVelocity As Single
-    numf_t PlayerJumpVelocity = 0_nf;
+    num_t PlayerJumpVelocity = 0_n;
 //    PlayerRunSpeed As Single
     int PlayerRunSpeed = 0;
 //    PlayerWalkSpeed As Single
@@ -2087,7 +2087,7 @@ struct Physics_t
 //    PlayerTerminalVelocity As Integer
     int PlayerTerminalVelocity = 0;
 //    PlayerGravity As Single
-    numf_t PlayerGravity = 0_nf;
+    num_t PlayerGravity = 0_n;
 //    PlayerHeight(1 To numCharacters, 1 To numStates) As Integer
     RangeArr<RangeArrI<int, 1, numStates, 0>, 1, numCharacters> PlayerHeight;
 //    PlayerDuckHeight(1 To numCharacters, 1 To numStates) As Integer

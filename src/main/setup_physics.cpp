@@ -23,7 +23,7 @@
 
 void SetupPhysics()
 {
-    Physics.PlayerJumpVelocity = -5.7_nf;   // Jump velocity
+    Physics.PlayerJumpVelocity = -(num_t)5.7_nf; // Jump velocity
     Physics.PlayerJumpHeight = 20;          // Jump height
     Physics.PlayerBlockJumpHeight = 25;     // Jump height off bouncy blocks
     Physics.PlayerHeadJumpHeight = 22;      // Jump height off another players head
@@ -31,7 +31,7 @@ void SetupPhysics()
     Physics.PlayerSpringJumpHeight = 55;    // Jump height off a Spring
     Physics.PlayerRunSpeed = 6;             // Max run speed
     Physics.PlayerWalkSpeed = 3;            // Max walk speed
-    Physics.PlayerGravity = 0.4_nf;         // Player's gravity
+    Physics.PlayerGravity = (num_t)0.4_nf;  // Player's gravity
     Physics.PlayerTerminalVelocity = 12;    // Max falling speed
     Physics.PlayerHeight[1][1] = 30;        // Little Mario
     Physics.PlayerWidth[1][1] = 24;         // ------------
