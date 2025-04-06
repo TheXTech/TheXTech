@@ -64,12 +64,6 @@ void config_res_set()
     if(GameIsActive && (GameMenu || GamePaused == PauseCode::Options || g_config.internal_res.m_set == ConfigSetLevel::cheat))
         UpdateWindowRes();
     UpdateInternalRes();
-
-#ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
-    // Sync the real resolution after applying an update
-    if(!XWindow::is_nullptr())
-        XWindow::syncFullScreenRes();
-#endif // RENDER_FULLSCREEN_TYPES_SUPPORTED
 }
 
 void config_rendermode_set()
@@ -102,6 +96,22 @@ void config_fullscreen_set()
 }
 
 #ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+void config_video_mode_set()
+{
+    if(!GameIsActive)
+        return;
+
+    AbstractWindow_t::VideoModeRes res;
+    uint8_t depth;
+    res.w = g_config.fullscreen_res.m_value.first;
+    res.h = g_config.fullscreen_res.m_value.second;
+
+    XWindow::setVideoMode(res, g_config.fullscreen_depth);
+
+    XWindow::getCurrentVideoMode(res, depth);
+    g_config.fullscreen_depth.obtained = depth;
+}
+
 void config_fullscreen_type_set()
 {
     if(!GameIsActive)
@@ -191,3 +201,4 @@ void config_compat_changed()
     if(!g_configInTransaction)
         UpdateConfig();
 }
+

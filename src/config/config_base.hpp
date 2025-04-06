@@ -62,6 +62,9 @@ template<bool writable>
 class ConfigLanguage_t;
 
 template<bool writable>
+class ConfigFullscreenRes_t;
+
+template<bool writable>
 class ConfigSetupEnum_t;
 
 template<bool writable>
@@ -252,6 +255,22 @@ class ConfigLanguage_t<false> : public ConfigOption_t<false, std::string>
 
 public:
     ConfigLanguage_t(_Config_t<false>* parent,
+        const value_t default_value,
+        const ConfigCompatInfo_t<value_t>& compat_info, uint8_t scope,
+        const char* internal_name, const char* display_name, const char* display_tooltip,
+        void (*onupdate)() = nullptr, bool (*active)() = nullptr, bool (*validate)(void*) = nullptr) :
+            ConfigOption_t<false, value_t>(parent, default_value, compat_info, scope,
+                internal_name, display_name, display_tooltip,
+                onupdate, active, validate)  {}
+};
+
+template<>
+class ConfigFullscreenRes_t<false> : public ConfigOption_t<false, std::pair<int, int>>
+{
+    using value_t = std::pair<int, int>;
+
+public:
+    ConfigFullscreenRes_t(_Config_t<false>* parent,
         const value_t default_value,
         const ConfigCompatInfo_t<value_t>& compat_info, uint8_t scope,
         const char* internal_name, const char* display_name, const char* display_tooltip,
@@ -466,6 +485,34 @@ public:
 
     virtual const std::string& get_display_value(std::string& out) const override;
 };
+
+#ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+template<>
+class ConfigFullscreenRes_t<true> : public ConfigOption_t<true, std::pair<int, int>>
+{
+    using value_t = std::pair<int, int>;
+
+public:
+    using BaseConfigOption_t<true>::m_set;
+    using BaseConfigOption_t<true>::m_base;
+    using ConfigOption_t<true, value_t>::operator=;
+
+    ConfigFullscreenRes_t(_Config_t<true>* parent,
+        const value_t default_value,
+        const ConfigCompatInfo_t<value_t>& compat_info, uint8_t scope,
+        const char* internal_name, const char* display_name, const char* display_tooltip,
+        void (*onupdate)() = nullptr, bool (*active)() = nullptr, bool (*validate)(void*) = nullptr) :
+            ConfigOption_t<true, value_t>(parent, default_value, compat_info, scope,
+                internal_name, display_name, display_tooltip,
+                onupdate, active, validate) {}
+
+    size_t find_cur_index();
+
+    virtual bool rotate_left() override;
+    virtual bool rotate_right() override;
+    virtual bool change() override;
+};
+#endif // RENDER_FULLSCREEN_TYPES_SUPPORTED
 
 template<>
 class ConfigSetupEnum_t<true> : public ConfigEnumOption_t<true, int>
