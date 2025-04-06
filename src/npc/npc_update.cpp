@@ -1160,7 +1160,7 @@ interrupt_Activation:
             num_t prevH = NPC[A].Location.Height;
 
             // all this cleanup code was moved here from the top of the loop
-            Physics.NPCGravity = Physics.NPCGravityReal;
+            Physics.NPCGravity = (num_t)Physics.NPCGravityReal;
 
             StopHit = 0;
 
@@ -1327,10 +1327,10 @@ interrupt_Activation:
                 if(NPC[A].Type == NPCID_ICE_CUBE)
                 {
                     NPC[A].Projectile = true;
-                    Physics.NPCGravity = -Physics.NPCGravityReal / 5;
+                    Physics.NPCGravity = num_t(-Physics.NPCGravityReal / 5);
                 }
                 else
-                    Physics.NPCGravity = Physics.NPCGravityReal / 5;
+                    Physics.NPCGravity = num_t(Physics.NPCGravityReal / 5);
 
                 if(NPC[A].Type == NPCID_FLIPPED_RAINBOW_SHELL && NPC[A].Special4 == 1)
                     NPC[A].Special5 = 0;

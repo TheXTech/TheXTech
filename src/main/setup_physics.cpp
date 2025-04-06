@@ -230,8 +230,8 @@ void SetupPhysics()
     Physics.NPCShellSpeed = 7.1_nf;         // Speed of kicked shells
     Physics.NPCShellSpeedY = 11;            // Vertical Speed of kicked shells
     Physics.NPCCanHurtWait = 30;            // How long to wait before NPCs can hurt players
-    Physics.NPCGravity = 0.26_nf;           // NPC Gravity
     Physics.NPCGravityReal = 0.26_nf;       // NPC Gravity
+    Physics.NPCGravity = (num_t)Physics.NPCGravityReal;           // NPC Gravity
     Physics.NPCWalkingSpeed = 1.2_nf;       // NPC Walking Speed
     Physics.NPCWalkingOnSpeed = 1;          // NPC that can be walked on walking speed
     Physics.NPCMushroomSpeed = 1.8_nf;      // Mushroom X Speed

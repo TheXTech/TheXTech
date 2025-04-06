@@ -2113,7 +2113,8 @@ struct Physics_t
 //    NPCMushroomSpeed As Single
     numf_t NPCMushroomSpeed = 0_nf;
 //    NPCGravity As Single
-    numf_t NPCGravity = 0_nf;
+    // Was previously a float, changed to a double for efficient comparisons. All stores must factor through float.
+    num_t NPCGravity = 0_n;
 //    NPCGravityReal As Single
     numf_t NPCGravityReal = 0_nf;
 //    NPCPSwitch As Integer
