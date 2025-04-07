@@ -1562,7 +1562,7 @@ void RenderGL::renderTextureScale(int xDst, int yDst, int wDst, int hDst,
     m_drawQueued = true;
 }
 
-void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hDstD,
+void RenderGL::renderTexture(int xDst, int yDst, int wDst, int hDst,
                                 StdPicture &tx,
                                 int xSrc, int ySrc,
                                 XTColor color)
@@ -1584,19 +1584,6 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
     }
 
     SDL_assert_release(tx.d.texture_id);
-
-#ifdef MUTABLE_PARTICLES_DEMO
-    if(&tx >= &GFXMario[1] && &tx <= &GFXMario[7])
-    {
-        if(s_sparkle)
-            spawnParticle(*s_sparkle, xDstD - vScreen[1].X, yDstD - vScreen[1].Y, ParticleVertexAttrs_t());
-    }
-#endif
-
-    int xDst = Maths::iRound(xDstD);
-    int yDst = Maths::iRound(yDstD);
-    int wDst = Maths::iRound(wDstD);
-    int hDst = Maths::iRound(hDstD);
 
     // Don't go more than size of texture
     if(xSrc + wDst > tx.w)
@@ -1623,28 +1610,6 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
     Vertex_t::Tint tint = F_TO_B(color);
 
     int16_t cur_depth = m_render_planes.next();
-
-#ifdef LIGHTING_DEMO
-    if(m_lighting_calc_program.inited() && m_light_count < (int)m_light_queue.lights.size())
-    {
-        if(&tx == &GFXNPC[NPCID_HOMING_BALL])
-            m_light_queue.lights[m_light_count++] = GLLight::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, GLLightColor(64, 32, 32), 250.0);
-
-        if(&tx == &GFXEffect[EFFID_SMOKE_S3])
-            m_light_queue.lights[m_light_count++] = GLLight::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, GLLightColor(96, 96, 96), 350.0);
-
-        if(&tx == &GFXNPC[NPCID_CANNONITEM])
-        {
-            int frame = (int)ySrc / 32;
-            if(frame >= 0 || frame < 5)
-            {
-                GLLightColor colors[5] = {GLLightColor(0, 0, 48), GLLightColor(0, 32, 0), GLLightColor(24, 24, 0), GLLightColor(24, 0, 24), GLLightColor(24, 16, 32)};
-
-                m_light_queue.lights[m_light_count++] = GLLight::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, colors[frame], 400.0);
-            }
-        }
-    }
-#endif
 
     bool draw_opaque = (tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program);
     auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, cur_depth));
@@ -1742,7 +1707,7 @@ void RenderGL::renderTextureFL(int xDst, int yDst, int wDst, int hDst,
     m_drawQueued = true;
 }
 
-void RenderGL::renderTexture(float xDst, float yDst,
+void RenderGL::renderTexture(int xDst, int yDst,
                                 StdPicture &tx,
                                 XTColor color)
 {

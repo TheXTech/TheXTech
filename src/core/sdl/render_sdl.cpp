@@ -1026,7 +1026,7 @@ void RenderSDL::renderTextureScale(int xDst, int yDst, int wDst, int hDst,
     op.color = color;
 }
 
-void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double hDstD,
+void RenderSDL::renderTexture(int xDst, int yDst, int wDst, int hDst,
                                 StdPicture &tx,
                                 int xSrc, int ySrc,
                                 XTColor color)
@@ -1042,9 +1042,6 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
         D_pLogWarningNA("Attempt to render an empty texture!");
         return;
     }
-
-    int wDst = Maths::iRound(wDstD);
-    int hDst = Maths::iRound(hDstD);
 
     // Don't go more than size of texture
     if(xSrc + wDst > tx.w)
@@ -1069,8 +1066,8 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
 
     op.texture = &tx;
 
-    op.xDst = Maths::iRound(xDstD) + m_viewport_offset_x;
-    op.yDst = Maths::iRound(yDstD) + m_viewport_offset_y;
+    op.xDst = xDst + m_viewport_offset_x;
+    op.yDst = yDst + m_viewport_offset_y;
     op.wDst = wDst;
     op.hDst = hDst;
 
@@ -1096,7 +1093,7 @@ void RenderSDL::renderTextureFL(int xDst, int yDst, int wDst, int hDst,
                          color);
 }
 
-void RenderSDL::renderTexture(float xDst, float yDst,
+void RenderSDL::renderTexture(int xDst, int yDst,
                                 StdPicture &tx,
                                 XTColor color)
 {
@@ -1123,8 +1120,8 @@ void RenderSDL::renderTexture(float xDst, float yDst,
 
     op.texture = &tx;
 
-    op.xDst = Maths::iRound(xDst) + m_viewport_offset_x;
-    op.yDst = Maths::iRound(yDst) + m_viewport_offset_y;
+    op.xDst = xDst + m_viewport_offset_x;
+    op.yDst = yDst + m_viewport_offset_y;
     op.wDst = tx.w;
     op.hDst = tx.h;
 

@@ -305,7 +305,7 @@ public:
                             StdPicture &tx,
                             XTColor color = XTColor()) = 0;
 
-    virtual void renderTexture(double xDst, double yDst, double wDst, double hDst,
+    virtual void renderTexture(int xDst, int yDst, int wDst, int hDst,
                                StdPicture &tx,
                                int xSrc, int ySrc,
                                XTColor color = XTColor()) = 0;
@@ -316,7 +316,7 @@ public:
                                  int16_t rotateAngle = 0, Point_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
                                  XTColor color = XTColor()) = 0;
 
-    virtual void renderTexture(float xDst, float yDst, StdPicture &tx,
+    virtual void renderTexture(int xDst, int yDst, StdPicture &tx,
                                XTColor color = XTColor()) = 0;
 
     void renderSizableBlock(int xDst, int yDst, int wDst, int hDst, StdPicture &tx);
