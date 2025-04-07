@@ -32,13 +32,6 @@ enum NPCID : vbint_t;
 extern std::string Backup_FullFileName;
 extern int editor_section_toast;
 
-struct Point_t
-{
-    int X = 0;
-    int Y = 0;
-};
-
-extern Point_t CursorPos;
 extern bool HasCursor;
 extern bool NoReallyKillIt;
 extern int curSection;

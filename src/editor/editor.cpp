@@ -78,8 +78,6 @@
 
 std::string Backup_FullFileName;
 
-Point_t CursorPos;
-
 bool MouseCancel = false;
 bool HasCursor = false;
 // bool NoReallyKillIt = false; //Unused
