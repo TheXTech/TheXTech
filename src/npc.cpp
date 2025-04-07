@@ -3652,7 +3652,7 @@ void SpecialNPC(int A)
                     NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
                     NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
 
-                    if(fEqual(NPC[numNPCs].Location.Width, 16))
+                    if(NPC[numNPCs]->TWidth == 16)
                     {
                         NPC[numNPCs].Location.X = NPC[A].Location.X + 8;
                         NPC[numNPCs].Location.Y = NPC[A].Location.Y + 8;
