@@ -37,7 +37,8 @@
 #include "../lunanpc.h"
 
 
-#define PI 3.1415926535897932384626433832795_r
+#define PI 3.14159_r
+#define PI_DIV 3.14159_ri
 
 #define NPCID_SIGN 151
 #define NPCID_COIN 10
@@ -203,7 +204,7 @@ void Phase3()
 
     int dir = (int)(num_t::atan2((demo->Location.Y + demo->Location.Height / 2) - (calleoca_y + 32),
                               -(demo->Location.X + demo->Location.Width / 2) + (calleoca_x + 32))
-                                * 180 / PI);
+                                * 180 / PI_DIV);
 
     missile_direction += AngleDifference((int)missile_direction, dir) * 0.015_n;
 
