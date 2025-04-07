@@ -486,7 +486,7 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
                                     x + static_cast<int32_t>(offsetX + m_glyphOffsetX),
                                     y + static_cast<int32_t>(offsetY + m_glyphOffsetY) - 2 + y_offset,
                                     font_size_use,
-                                    (doublePixel ? 2.0 : 1.0),
+                                    (doublePixel ? 2 : 1),
                                     m_ttfOutlines,
                                     (color * m_ttfColour).with_alpha(letter_alpha),
                                     m_ttfOutlinesColour);

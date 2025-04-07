@@ -489,7 +489,7 @@ static void minport_usedTexture(StdPicture &tx)
 
 // public draw methods
 
-void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
+void renderTextureScale(int xDst, int yDst, int wDst, int hDst,
                             StdPicture &tx,
                             XTColor color)
 {
@@ -499,21 +499,6 @@ void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
         div_x, div_y, FLOORDIV2(xDst + wDst) - div_x, FLOORDIV2(yDst + hDst) - div_y,
         tx,
         0, 0, tx.w / 2, tx.h / 2,
-        0, nullptr, X_FLIP_NONE,
-        color);
-}
-
-void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
-                            StdPicture &tx,
-                            int xSrc, int ySrc, int wSrc, int hSrc,
-                            XTColor color)
-{
-    auto div_x = FLOORDIV2(xDst), div_y = FLOORDIV2(yDst);
-
-    minport_RenderTexturePrivate_2(
-        div_x, div_y, FLOORDIV2(xDst + wDst) - div_x, FLOORDIV2(yDst + hDst) - div_y,
-        tx,
-        xSrc / 2, ySrc / 2, wSrc / 2, hSrc / 2,
         0, nullptr, X_FLIP_NONE,
         color);
 }
@@ -534,35 +519,6 @@ void renderTextureBasic(int xDst, int yDst, int wDst, int hDst,
         color);
 }
 
-void renderTexture(double xDst, double yDst, double wDst, double hDst,
-                            StdPicture &tx,
-                            int xSrc, int ySrc,
-                            XTColor color)
-{
-    auto div_x = FLOORDIV2(xDst), div_y = FLOORDIV2(yDst);
-    auto div_w = FLOORDIV2(xDst + wDst) - div_x;
-    auto div_h = FLOORDIV2(yDst + hDst) - div_y;
-
-    minport_RenderTexturePrivate_Basic_2(
-        div_x, div_y, div_w, div_h,
-        tx,
-        FLOORDIV2(xSrc), FLOORDIV2(ySrc),
-        color);
-}
-
-void renderTexture(float xDst, float yDst, StdPicture &tx,
-                   XTColor color)
-{
-    int w = tx.w / 2;
-    int h = tx.h / 2;
-
-    minport_RenderTexturePrivate_Basic_2(
-        FLOORDIV2(xDst), FLOORDIV2(yDst), w, h,
-        tx,
-        0, 0,
-        color);
-}
-
 void renderTextureBasic(int xDst, int yDst, StdPicture &tx,
                    XTColor color)
 {
@@ -573,20 +529,6 @@ void renderTextureBasic(int xDst, int yDst, StdPicture &tx,
         FLOORDIV2(xDst), FLOORDIV2(yDst), w, h,
         tx,
         0, 0,
-        color);
-}
-
-void renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, XTColor color)
-{
-    auto div_x = FLOORDIV2(xDst), div_y = FLOORDIV2(yDst);
-    auto div_w = FLOORDIV2(xDst + wDst) - div_x;
-    auto div_h = FLOORDIV2(yDst + hDst) - div_y;
-
-    minport_RenderTexturePrivate_2(
-        div_x, div_y, div_w, div_h,
-        tx,
-        0, 0, tx.w / 2, tx.h / 2,
-        0, nullptr, X_FLIP_NONE,
         color);
 }
 

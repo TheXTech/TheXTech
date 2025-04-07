@@ -357,8 +357,8 @@ PGE_Size TtfFont::printText(const char *text, size_t text_size,
                 int32_t glyph_x = x + static_cast<int32_t>(offsetX);
                 int32_t glyph_y = y + static_cast<int32_t>(offsetY + fontSize);
                 XRender::renderTextureScale(
-                    static_cast<float>(glyph_x + glyph.left),
-                    static_cast<float>(glyph_y - glyph.top),
+                    glyph_x + glyph.left,
+                    glyph_y - glyph.top,
                     (m_doublePixel ? (glyph.width * 2) : glyph.width),
                     (m_doublePixel ? (glyph.height * 2) : glyph.height),
                     *glyph.tx,
@@ -401,7 +401,7 @@ BaseFontEngine::FontType TtfFont::getFontType() const
 }
 
 uint32_t TtfFont::drawGlyph(const char *u8char,
-                            int32_t x, int32_t y, uint32_t fontSize, double scaleSize,
+                            int32_t x, int32_t y, uint32_t fontSize, int scaleSize,
                             bool drawOutlines,
                             XTColor color,
                             XTColor OL_color)
@@ -414,12 +414,12 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
 
         if(drawOutlines)
         {
-            const double offsets[4][2] =
+            const int offsets[4][2] =
             {
-                {-scaleSize, 0.0},
-                { scaleSize, 0.0},
-                {0.0, -scaleSize},
-                {0.0,  scaleSize}
+                {-scaleSize, 0},
+                { scaleSize, 0},
+                {0, -scaleSize},
+                {0,  scaleSize}
             };
 
             // take square of Alpha to match blend of normal text
@@ -428,10 +428,10 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
             for(size_t i = 0; i < 4; ++i)
             {
                 XRender::renderTextureScale(
-                    static_cast<float>(glyph_x + glyph.left + offsets[i][0]),
-                    static_cast<float>(glyph_y - glyph.top + offsets[i][1]),
-                    glyph.width * static_cast<float>(scaleSize),
-                    glyph.height * static_cast<float>(scaleSize),
+                    glyph_x + glyph.left + offsets[i][0],
+                    glyph_y - glyph.top + offsets[i][1],
+                    glyph.width * scaleSize,
+                    glyph.height * scaleSize,
                     *glyph.tx,
                     color.with_alpha(scaled_a) * OL_color
                 );
@@ -439,10 +439,10 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
         }
 
         XRender::renderTextureScale(
-            static_cast<float>(glyph_x + glyph.left),
-            static_cast<float>(glyph_y - glyph.top),
-            glyph.width * static_cast<float>(scaleSize),
-            glyph.height * static_cast<float>(scaleSize),
+            glyph_x + glyph.left,
+            glyph_y - glyph.top,
+            glyph.width * scaleSize,
+            glyph.height * scaleSize,
             *glyph.tx,
             color
         );

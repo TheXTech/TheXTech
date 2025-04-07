@@ -1518,7 +1518,7 @@ void RenderGL::renderTextureScaleEx(int xDst, int yDst, int wDst, int hDst,
     m_drawQueued = true;
 }
 
-void RenderGL::renderTextureScale(double xDst, double yDst, double wDst, double hDst,
+void RenderGL::renderTextureScale(int xDst, int yDst, int wDst, int hDst,
                                      StdPicture &tx,
                                      XTColor color)
 {

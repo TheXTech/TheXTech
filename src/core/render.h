@@ -652,7 +652,7 @@ void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
                           double rotateAngle = 0.0, Point_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
                           XTColor color = XTColor()) = delete;
 
-E_INLINE void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
+E_INLINE void renderTextureScale(int xDst, int yDst, int wDst, int hDst,
                         StdPicture &tx,
                         XTColor color = XTColor()) TAIL
 #ifndef RENDER_CUSTOM

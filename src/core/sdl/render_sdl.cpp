@@ -987,7 +987,7 @@ void RenderSDL::renderTextureScaleEx(int xDst, int yDst, int wDst, int hDst,
     }
 }
 
-void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double hDst,
+void RenderSDL::renderTextureScale(int xDst, int yDst, int wDst, int hDst,
                                      StdPicture &tx,
                                      XTColor color)
 {
@@ -1010,10 +1010,10 @@ void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double
 
     op.texture = &tx;
 
-    op.xDst = Maths::iRound(xDst) + m_viewport_offset_x;
-    op.yDst = Maths::iRound(yDst) + m_viewport_offset_y;
-    op.wDst = Maths::iRound(wDst);
-    op.hDst = Maths::iRound(hDst);
+    op.xDst = xDst + m_viewport_offset_x;
+    op.yDst = yDst + m_viewport_offset_y;
+    op.wDst = wDst;
+    op.hDst = hDst;
 
     if(m_pow2)
     {

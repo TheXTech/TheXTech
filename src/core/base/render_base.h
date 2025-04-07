@@ -301,7 +301,7 @@ public:
                               int16_t rotateAngle = 0, Point_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
                               XTColor color = XTColor()) = 0;
 
-    virtual void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
+    virtual void renderTextureScale(int xDst, int yDst, int wDst, int hDst,
                             StdPicture &tx,
                             XTColor color = XTColor()) = 0;
 

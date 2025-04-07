@@ -122,7 +122,7 @@ public:
      * @return Width of the glypth
      */
     uint32_t drawGlyph(const char* u8char,
-                       int32_t x, int32_t y, uint32_t fontSize, double scaleSize = 1.0,
+                       int32_t x, int32_t y, uint32_t fontSize, int scaleSize = 1,
                        bool drawOutlines = false,
                        XTColor color = XTColor(),
                        XTColor OL_color = XTColor());

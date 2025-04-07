@@ -368,7 +368,7 @@ inline void i_renderTexturePrivate_Basic(int16_t, int16_t, int16_t, int16_t,
 
 // public draw methods
 
-void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
+void renderTextureScale(int xDst, int yDst, int wDst, int hDst,
                             StdPicture &tx,
                             int xSrc, int ySrc, int wSrc, int hSrc,
                             XTColor color)
@@ -378,23 +378,6 @@ void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
         div_x, div_y, ROUNDDIV2(xDst + wDst) - div_x, ROUNDDIV2(yDst + hDst) - div_y,
         tx,
         xSrc / 2, ySrc / 2, wSrc / 2, hSrc / 2,
-        0, nullptr, X_FLIP_NONE,
-        color);
-}
-
-void renderTexture(double xDst, double yDst, double wDst, double hDst,
-                            StdPicture &tx,
-                            int xSrc, int ySrc,
-                            XTColor color)
-{
-    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
-    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
-    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
-
-    i_renderTexturePrivate(
-        div_x, div_y, div_w, div_h,
-        tx,
-        xSrc / 2, ySrc / 2, div_w, div_h,
         0, nullptr, X_FLIP_NONE,
         color);
 }
