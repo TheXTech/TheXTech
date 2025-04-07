@@ -499,7 +499,7 @@ bool EditorScreen::UpdateButton(CallMode mode, int x, int y, StdPicture &im, boo
         D_pLogCriticalNA("Editor upscaling image (should never happen)");
 
 
-    XRender::renderTextureScaleEx((double)dst_x, (double)dst_y, (double)dst_w, (double)dst_h, im, src_x, src_y, src_w, src_h);
+    XRender::renderTextureScaleEx(dst_x, dst_y, dst_w, dst_h, im, src_x, src_y, src_w, src_h);
     return false;
 }
 

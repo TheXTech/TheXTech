@@ -908,11 +908,11 @@ void RenderSDL::txColorMod(StdPictureData &tx, XTColor color)
     }
 }
 
-void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, double hDstD,
+void RenderSDL::renderTextureScaleEx(int xDst, int yDst, int wDst, int hDst,
                                        StdPicture &tx,
                                        int xSrc, int ySrc,
                                        int wSrc, int hSrc,
-                                       double rotateAngle, FPoint_t *center, unsigned int flip,
+                                       int16_t rotateAngle, Point_t *center, unsigned int flip,
                                        XTColor color)
 {
     if(!tx.inited)
@@ -947,10 +947,10 @@ void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, d
     op.type = RenderOp::Type::texture;
     op.texture = &tx;
 
-    op.xDst = Maths::iRound(xDstD) + m_viewport_offset_x;
-    op.yDst = Maths::iRound(yDstD) + m_viewport_offset_y;
-    op.wDst = Maths::iRound(wDstD);
-    op.hDst = Maths::iRound(hDstD);
+    op.xDst = xDst + m_viewport_offset_x;
+    op.yDst = yDst + m_viewport_offset_y;
+    op.wDst = wDst;
+    op.hDst = hDst;
 
     op.xSrc = tx.d.w_scale * xSrc;
     op.ySrc = tx.d.h_scale * ySrc;
@@ -962,16 +962,16 @@ void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, d
     op.traits = (flip & 3) | RenderOp::Traits::src_rect;
     op.angle = 0;
 
-    if(rotateAngle != 0.)
+    if(rotateAngle != 0)
     {
         op.traits |= RenderOp::Traits::rotation;
-        op.angle = (uint16_t)(std::fmod(rotateAngle, 360.) * (65536. / 360.));
+        op.angle = (uint16_t)(((int)rotateAngle % 360) * 65536 / 360);
 
         // calculate new offset now
         if(center)
         {
-            double orig_offsetX = wDstD / 2 - center->x;
-            double orig_offsetY = hDstD / 2 - center->y;
+            double orig_offsetX = wDst / 2 - center->x;
+            double orig_offsetY = hDst / 2 - center->y;
             double sin_theta = -sin(rotateAngle * (M_PI / 180.));
             double cos_theta = cos(rotateAngle * (M_PI / 180.));
 
@@ -981,8 +981,8 @@ void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, d
             double shiftX = rot_offsetX - orig_offsetX;
             double shiftY = rot_offsetY - orig_offsetY;
 
-            op.xDst = Maths::iRound(xDstD + shiftX) + m_viewport_offset_x;
-            op.yDst = Maths::iRound(yDstD + shiftY) + m_viewport_offset_y;
+            op.xDst = round(xDst + shiftX) + m_viewport_offset_x;
+            op.yDst = round(yDst + shiftY) + m_viewport_offset_y;
         }
     }
 }
@@ -1082,16 +1082,16 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
     op.color = color;
 }
 
-void RenderSDL::renderTextureFL(double xDstD, double yDstD, double wDstD, double hDstD,
+void RenderSDL::renderTextureFL(int xDst, int yDst, int wDst, int hDst,
                                   StdPicture &tx,
                                   int xSrc, int ySrc,
-                                  double rotateAngle, FPoint_t *center, unsigned int flip,
+                                  int16_t rotateAngle, Point_t *center, unsigned int flip,
                                   XTColor color)
 {
-    renderTextureScaleEx(xDstD, yDstD, wDstD, hDstD,
+    renderTextureScaleEx(xDst, yDst, wDst, hDst,
                          tx,
                          xSrc, ySrc,
-                         Maths::iRound(wDstD), Maths::iRound(hDstD),
+                         wDst, hDst,
                          rotateAngle, center, flip,
                          color);
 }

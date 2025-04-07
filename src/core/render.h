@@ -628,11 +628,11 @@ E_INLINE void renderCircleHole(int cx, int cy, int radius,
 
 // Draw texture
 
-E_INLINE void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
+E_INLINE void renderTextureScaleEx(int xDst, int yDst, int wDst, int hDst,
                           StdPicture &tx,
                           int xSrc, int ySrc,
                           int wSrc, int hSrc,
-                          double rotateAngle = 0.0, FPoint_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
+                          int16_t rotateAngle = 0, Point_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
                           XTColor color = XTColor()) TAIL
 #ifndef RENDER_CUSTOM
 {
@@ -644,6 +644,13 @@ E_INLINE void renderTextureScaleEx(double xDst, double yDst, double wDst, double
                                    color);
 }
 #endif
+
+void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
+                          StdPicture &tx,
+                          int xSrc, int ySrc,
+                          int wSrc, int hSrc,
+                          double rotateAngle = 0.0, Point_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
+                          XTColor color = XTColor()) = delete;
 
 E_INLINE void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                         StdPicture &tx,
@@ -675,23 +682,10 @@ void renderTextureBasic(double xDst, double yDst, double wDst, double hDst,
                        double xSrc, double ySrc,
                        XTColor color = XTColor()) = delete;
 
-E_INLINE void renderTexture(double xDst, double yDst, double wDst, double hDst,
-                           StdPicture &tx,
-                           int xSrc, int ySrc,
-                           XTColor color = XTColor()) TAIL
-#ifndef RENDER_CUSTOM
-{
-    g_render->renderTexture(xDst, yDst, wDst, hDst,
-                            tx,
-                            xSrc, ySrc,
-                            color);
-}
-#endif
-
-E_INLINE void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
+E_INLINE void renderTextureFL(int xDst, int yDst, int wDst, int hDst,
                              StdPicture &tx,
                              int xSrc, int ySrc,
-                             double rotateAngle = 0.0, FPoint_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
+                             int16_t rotateAngle = 0, Point_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
                              XTColor color = XTColor()) TAIL
 #ifndef RENDER_CUSTOM
 {
@@ -703,14 +697,11 @@ E_INLINE void renderTextureFL(double xDst, double yDst, double wDst, double hDst
 }
 #endif
 
-E_INLINE void renderTexture(float xDst, float yDst, StdPicture &tx,
-                           XTColor color = XTColor()) TAIL
-#ifndef RENDER_CUSTOM
-{
-    g_render->renderTexture(xDst, yDst, tx,
-                            color);
-}
-#endif
+void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
+                     StdPicture &tx,
+                     int xSrc, int ySrc,
+                     double rotateAngle = 0, Point_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
+                     XTColor color = XTColor()) = delete;
 
 E_INLINE void renderTextureBasic(int xDst, int yDst, StdPicture &tx,
                            XTColor color = XTColor()) TAIL

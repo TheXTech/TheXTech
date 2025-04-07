@@ -186,14 +186,14 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
                     GFXBackground2[A],
                     0, frameH * SpecialFrame[3],
                     GFXBackground2[A].w, 1,
-                    0., nullptr, flip);
+                    0, nullptr, flip);
                 // draw the frame
                 XRender::renderTextureScaleEx(tempLocation.X, camY + tempLocation.Y + 1,
                     GFXBackground2[A].w, tempLocation.Height - 1,
                     GFXBackground2[A],
                     0, frameH * SpecialFrame[3],
                     GFXBackground2[A].w, tempLocation.Height - 1,
-                    0., nullptr, flip);
+                    0, nullptr, flip);
             }
             else if(anim)
             {
@@ -202,7 +202,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
                     GFXBackground2[A],
                     0, frameH * SpecialFrame[3],
                     GFXBackground2[A].w, tempLocation.Height,
-                    0., nullptr, flip);
+                    0, nullptr, flip);
             }
             else
             {
@@ -211,7 +211,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
                     GFXBackground2[A],
                     0, 0,
                     GFXBackground2[A].w, tempLocation.Height,
-                    0., nullptr, flip);
+                    0, nullptr, flip);
             }
 
             if(no_tiling)
@@ -247,7 +247,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
                     GFXBackground2[A],
                     0, frameH * SpecialFrame[3] + (frameH - 1) - tempLocation.Height,
                     GFXBackground2[A].w, tempLocation.Height,
-                    0., nullptr, flip);
+                    0, nullptr, flip);
             }
             else if(anim)
             {
@@ -256,7 +256,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
                     GFXBackground2[A],
                     0, frameH * SpecialFrame[3] + frameH - tempLocation.Height,
                     GFXBackground2[A].w, tempLocation.Height,
-                    0., nullptr, flip);
+                    0, nullptr, flip);
             }
             else
             {
@@ -265,7 +265,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
                     GFXBackground2[A],
                     0, frameH - tempLocation.Height,
                     GFXBackground2[A].w, tempLocation.Height,
-                    0., nullptr, flip);
+                    0, nullptr, flip);
             }
 
             tempLocation.Y += tempLocation.Height;

@@ -1286,7 +1286,7 @@ static void minport_RenderBoxFilled(int x1, int y1, int x2, int y2, XTColor colo
 static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                                   StdPicture& tx,
                                   int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
-                                  float rotateAngle, FPoint_t* center, unsigned int flip,
+                                  int16_t rotateAngle, Point_t* center, unsigned int flip,
                                   XTColor color)
 {
     if(!tx.inited)
@@ -1322,8 +1322,8 @@ static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDs
 
         if(center)
         {
-            cx = center->x / 2.0f + 0.5f;
-            cy = center->y / 2.0f + 0.5f;
+            cx = center->x / 2;
+            cy = center->y / 2;
         }
         else
         {

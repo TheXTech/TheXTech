@@ -1435,11 +1435,11 @@ void RenderGL::renderCircleHole(int cx, int cy, int radius, XTColor color)
 }
 
 
-void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, double hDstD,
+void RenderGL::renderTextureScaleEx(int xDst, int yDst, int wDst, int hDst,
                                        StdPicture &tx,
                                        int xSrc, int ySrc,
                                        int wSrc, int hSrc,
-                                       double rotateAngle, FPoint_t *center, unsigned int flip,
+                                       int16_t rotateAngle, Point_t *center, unsigned int flip,
                                        XTColor color)
 {
 #ifdef USE_RENDER_BLOCKING
@@ -1459,11 +1459,6 @@ void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, do
 
     SDL_assert_release(tx.d.texture_id);
 
-    int xDst = Maths::iRound(xDstD);
-    int yDst = Maths::iRound(yDstD);
-    int wDst = Maths::iRound(wDstD);
-    int hDst = Maths::iRound(hDstD);
-
     // Don't go more than size of texture
     if(xSrc + wSrc > tx.w)
     {
@@ -1480,7 +1475,7 @@ void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, do
 
     QuadI draw_loc;
 
-    if(rotateAngle != 0.0)
+    if(rotateAngle != 0)
     {
         int cx = center ? center->x : wDst / 2;
         int cy = center ? center->y : hDst / 2;
@@ -1664,10 +1659,10 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
     m_drawQueued = true;
 }
 
-void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double hDstD,
+void RenderGL::renderTextureFL(int xDst, int yDst, int wDst, int hDst,
                                   StdPicture &tx,
                                   int xSrc, int ySrc,
-                                  double rotateAngle, FPoint_t *center, unsigned int flip,
+                                  int16_t rotateAngle, Point_t *center, unsigned int flip,
                                   XTColor color)
 {
 #ifdef USE_RENDER_BLOCKING
@@ -1686,11 +1681,6 @@ void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double 
     }
 
     SDL_assert_release(tx.d.texture_id);
-
-    int xDst = Maths::iRound(xDstD);
-    int yDst = Maths::iRound(yDstD);
-    int wDst = Maths::iRound(wDstD);
-    int hDst = Maths::iRound(hDstD);
 
     // Don't go more than size of texture
     if(xSrc + wDst > tx.w)

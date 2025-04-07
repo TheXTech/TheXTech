@@ -23,6 +23,7 @@
 #define RENDER_MINPORT_SHARED_H
 
 struct StdPicture;
+struct Point_t;
 
 namespace XRender
 {
@@ -132,7 +133,7 @@ static void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, XTColor co
 static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                              StdPicture &tx,
                              int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
-                             float rotateAngle, FPoint_t *center, unsigned int flip,
+                             int16_t rotateAngle, Point_t *center, unsigned int flip,
                              XTColor color);
 
 static void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,

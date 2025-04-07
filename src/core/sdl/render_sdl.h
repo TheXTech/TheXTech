@@ -234,11 +234,11 @@ public:
 
     // Draw texture
 
-    void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
+    void renderTextureScaleEx(int xDst, int yDst, int wDst, int hDst,
                               StdPicture &tx,
                               int xSrc, int ySrc,
                               int wSrc, int hSrc,
-                              double rotateAngle =.0, FPoint_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
+                              int16_t rotateAngle = 0, Point_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
                               XTColor color = XTColor()) override;
 
     void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
@@ -250,10 +250,10 @@ public:
                        int xSrc, int ySrc,
                        XTColor color = XTColor()) override;
 
-    void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
+    void renderTextureFL(int xDst, int yDst, int wDst, int hDst,
                          StdPicture &tx,
                          int xSrc, int ySrc,
-                         double rotateAngle =.0, FPoint_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
+                         int16_t rotateAngle = 0, Point_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
                          XTColor color = XTColor()) override;
 
     void renderTexture(float xDst, float yDst, StdPicture &tx,

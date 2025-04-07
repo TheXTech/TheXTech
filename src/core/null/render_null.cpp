@@ -351,10 +351,10 @@ void renderCircleHole(int cx, int cy,
     } while(dy + line_size <= radius);
 }
 
-inline void i_renderTexturePrivate(float, float, float, float,
+inline void i_renderTexturePrivate(int, int, int, int,
                              StdPicture&,
-                             float, float, float, float,
-                             float, FPoint_t*, unsigned int,
+                             int, int, int, int,
+                             uint16_t, Point_t*, unsigned int,
                              XTColor)
 {
 }
@@ -378,7 +378,7 @@ void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
         div_x, div_y, ROUNDDIV2(xDst + wDst) - div_x, ROUNDDIV2(yDst + hDst) - div_y,
         tx,
         xSrc / 2, ySrc / 2, wSrc / 2, hSrc / 2,
-        0.0f, nullptr, X_FLIP_NONE,
+        0, nullptr, X_FLIP_NONE,
         color);
 }
 
@@ -395,7 +395,7 @@ void renderTexture(double xDst, double yDst, double wDst, double hDst,
         div_x, div_y, div_w, div_h,
         tx,
         xSrc / 2, ySrc / 2, div_w, div_h,
-        0.0f, nullptr, X_FLIP_NONE,
+        0, nullptr, X_FLIP_NONE,
         color);
 }
 
@@ -423,8 +423,8 @@ void renderTexture(float xDst, float yDst, StdPicture &tx,
     i_renderTexturePrivate(
         ROUNDDIV2(xDst), ROUNDDIV2(yDst), w, h,
         tx,
-        0.0f, 0.0f, w, h,
-        0.0f, nullptr, X_FLIP_NONE,
+        0, 0, w, h,
+        0, nullptr, X_FLIP_NONE,
         color);
 }
 
@@ -435,7 +435,7 @@ void renderTextureBasic(int xDst, int yDst, StdPicture &tx, XTColor color)
     i_renderTexturePrivate_Basic(
         ROUNDDIV2(xDst), ROUNDDIV2(yDst), w, h,
         tx,
-        0.0f, 0.0f,
+        0, 0,
         color);
 }
 
@@ -444,15 +444,15 @@ void renderTextureScale(double xDst, double yDst, double wDst, double hDst, StdP
     i_renderTexturePrivate(
         ROUNDDIV2(xDst), ROUNDDIV2(yDst), tx.w / 2, tx.h / 2,
         tx,
-        0.0f, 0.0f, wDst / 2, hDst / 2,
-        0.0f, nullptr, X_FLIP_NONE,
+        0, 0, wDst / 2, hDst / 2,
+        0, nullptr, X_FLIP_NONE,
         color);
 }
 
-void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
+void renderTextureFL(int xDst, int yDst, int wDst, int hDst,
                           StdPicture &tx,
                           int xSrc, int ySrc,
-                          double rotateAngle, FPoint_t *center, unsigned int flip,
+                          int16_t rotateAngle, Point_t *center, unsigned int flip,
                           XTColor color)
 {
     auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
@@ -467,11 +467,11 @@ void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
         color);
 }
 
-void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
+void renderTextureScaleEx(int xDst, int yDst, int wDst, int hDst,
                           StdPicture &tx,
                           int xSrc, int ySrc,
                           int wSrc, int hSrc,
-                          double rotateAngle, FPoint_t *center, unsigned int flip,
+                          int16_t rotateAngle, Point_t *center, unsigned int flip,
                           XTColor color)
 {
     auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);

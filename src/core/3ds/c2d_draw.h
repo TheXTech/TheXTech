@@ -86,7 +86,7 @@ static inline bool C2D_DrawImage_Custom_Basic(C2D_Image img,
 static inline bool C2D_DrawImage_Custom_Rotated(C2D_Image img,
     float x, float y, float w, float h,
     float src_x, float src_y, float src_w, float src_h,
-    unsigned int flip, FPoint_t *center, float angle,
+    unsigned int flip, Point_t *center, float angle,
     XTColor color)
 {
     const Tex3DS_SubTexture* old_subtex = img.subtex;

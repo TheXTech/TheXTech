@@ -1349,7 +1349,7 @@ inline bool GX_DrawImage_Custom_Rotated(GXTexObj* img,
                                         GXTlutObj* palette,
                                         float x, float y, float w, float h,
                                         float src_x, float src_y, float src_w, float src_h,
-                                        unsigned int flip, FPoint_t* center, float angle,
+                                        unsigned int flip, Point_t* center, int16_t angle,
                                         XTColor color)
 {
     Mtx rotated;
@@ -1358,8 +1358,8 @@ inline bool GX_DrawImage_Custom_Rotated(GXTexObj* img,
 
     if(center)
     {
-        cx = center->x / 2.0f;
-        cy = center->y / 2.0f;
+        cx = (float)center->x / 2.0f;
+        cy = (float)center->y / 2.0f;
     }
     else
     {
@@ -1394,7 +1394,7 @@ inline bool GX_DrawImage_Custom_Rotated(GXTexObj* img,
 static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                                   StdPicture& tx,
                                   int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
-                                  float rotateAngle, FPoint_t* center, unsigned int flip,
+                                  int16_t rotateAngle, Point_t* center, unsigned int flip,
                                   XTColor color)
 {
     if(!tx.inited)
@@ -1500,7 +1500,7 @@ static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDs
         // draw the left pic
         if(to_draw_2 != nullptr)
         {
-            if(rotateAngle != 0.0)
+            if(rotateAngle != 0)
             {
                 // TODO: use correct center to support big textures being rotated
                 GX_DrawImage_Custom_Rotated(to_draw_2, to_mask_2, to_palette_2, xDst, yDst, (1024 - xSrc) * wDst / wSrc, hDst,
@@ -1574,7 +1574,7 @@ static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDs
         // draw the top pic
         if(to_draw_2 != nullptr)
         {
-            if(rotateAngle != 0.0)
+            if(rotateAngle != 0)
             {
                 // TODO: use correct center to support big textures being rotated
                 GX_DrawImage_Custom_Rotated(to_draw_2, to_mask_2, to_palette_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
@@ -1605,7 +1605,7 @@ static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDs
 
     if(to_draw == nullptr) return;
 
-    if(rotateAngle != 0.0)
+    if(rotateAngle != 0)
         GX_DrawImage_Custom_Rotated(to_draw, to_mask, to_palette, xDst, yDst, wDst, hDst,
                                     xSrc, ySrc, wSrc, hSrc, flip, center, rotateAngle, color);
     else

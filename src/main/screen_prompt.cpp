@@ -152,7 +152,7 @@ void Render()
     if(GFX.PCursor.inited)
         XRender::renderTextureBasic(menu_left_X - 20, menu_top_Y + (s_cur_item * 36), GFX.PCursor);
     else
-        XRender::renderTextureFL(menu_left_X - 20, menu_top_Y + (s_cur_item * 36), GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, 90.0, nullptr, X_FLIP_NONE);
+        XRender::renderTextureFL(menu_left_X - 20, menu_top_Y + (s_cur_item * 36), GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, 90, nullptr, X_FLIP_NONE);
 
     for(int plr_i = 0; plr_i < l_screen->player_count; plr_i++)
         speedRun_renderControls(plr_i, -1);

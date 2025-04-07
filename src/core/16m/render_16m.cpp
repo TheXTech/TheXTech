@@ -896,7 +896,7 @@ void unloadTexture(StdPicture &tx)
 static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                              StdPicture &tx,
                              int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
-                             float rotateAngle, FPoint_t *center, unsigned int flip,
+                             int16_t rotateAngle, Point_t *center, unsigned int flip,
                              XTColor color)
 {
     if(!tx.inited)
@@ -923,7 +923,8 @@ static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDs
         }
 
         glTranslatef32(xDst + cx, yDst + cy, 0);
-        glRotateZ(rotateAngle);
+
+        glRotateZi(rotateAngle * 32768 / 360);
 
         xDst = -cx;
         yDst = -cy;

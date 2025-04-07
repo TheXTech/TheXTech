@@ -262,13 +262,13 @@ static inline void Render_PCursor(int x, int y)
     if(GFX.PCursor.inited)
         XRender::renderTextureBasic(x, y, GFX.PCursor);
     else
-        XRender::renderTextureFL(x, y, GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, 90.0, nullptr, X_FLIP_NONE);
+        XRender::renderTextureFL(x, y, GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, 90, nullptr, X_FLIP_NONE);
 }
 
 static inline void Render_PCursorDownwards(int x, int y, XTColor color = XTColor())
 {
     if(GFX.PCursor.inited)
-        XRender::renderTextureFL(x - GFX.PCursor.h / 2, y - GFX.PCursor.w, GFX.PCursor.w, GFX.PCursor.h, GFX.PCursor, 0, 0, 90.0, nullptr, X_FLIP_NONE, color);
+        XRender::renderTextureFL(x - GFX.PCursor.h / 2, y - GFX.PCursor.w, GFX.PCursor.w, GFX.PCursor.h, GFX.PCursor, 0, 0, 90, nullptr, X_FLIP_NONE, color);
     else
         XRender::renderTextureBasic(x - GFX.MCursor[2].w / 2, y - GFX.MCursor[2].h, GFX.MCursor[2], color);
 }
@@ -1346,13 +1346,13 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h, bool show_name)
         }
         else if(GFX.CharSelIcons.inited)
         {
-            XRender::renderTextureFL(x - 24 - 4, y + h / 2 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0, 0.0, nullptr, X_FLIP_HORIZONTAL, arrow_color);
+            XRender::renderTextureFL(x - 24 - 4, y + h / 2 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0, 0, nullptr, X_FLIP_HORIZONTAL, arrow_color);
             XRender::renderTextureBasic(x + w + 4, y + h / 2 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0, arrow_color);
         }
         else
         {
-            XRender::renderTextureFL(x - GFX.MCursor[1].h - 4, y + h / 2 - GFX.MCursor[1].w / 2, GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, -90.0, nullptr, X_FLIP_NONE, arrow_color);
-            XRender::renderTextureFL(x + w + 4, y + h / 2 - GFX.MCursor[2].w / 2, GFX.MCursor[2].w, GFX.MCursor[2].h, GFX.MCursor[2], 0, 0, -90.0, nullptr, X_FLIP_NONE, arrow_color);
+            XRender::renderTextureFL(x - GFX.MCursor[1].h - 4, y + h / 2 - GFX.MCursor[1].w / 2, GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, -90, nullptr, X_FLIP_NONE, arrow_color);
+            XRender::renderTextureFL(x + w + 4, y + h / 2 - GFX.MCursor[2].w / 2, GFX.MCursor[2].w, GFX.MCursor[2].h, GFX.MCursor[2], 0, 0, -90, nullptr, X_FLIP_NONE, arrow_color);
         }
     }
 

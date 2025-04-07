@@ -395,7 +395,7 @@ void unloadGifTextures()
 static inline void minport_RenderTexturePrivate_2(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                              StdPicture &tx,
                              int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
-                             float rotateAngle, FPoint_t *center, unsigned int flip,
+                             int16_t rotateAngle, Point_t *center, unsigned int flip,
                              XTColor color)
 {
     if(wDst <= 0 || hDst <= 0)
@@ -498,8 +498,8 @@ void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
     minport_RenderTexturePrivate_2(
         div_x, div_y, FLOORDIV2(xDst + wDst) - div_x, FLOORDIV2(yDst + hDst) - div_y,
         tx,
-        0.0f, 0.0f, tx.w / 2, tx.h / 2,
-        0.0f, nullptr, X_FLIP_NONE,
+        0, 0, tx.w / 2, tx.h / 2,
+        0, nullptr, X_FLIP_NONE,
         color);
 }
 
@@ -514,7 +514,7 @@ void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
         div_x, div_y, FLOORDIV2(xDst + wDst) - div_x, FLOORDIV2(yDst + hDst) - div_y,
         tx,
         xSrc / 2, ySrc / 2, wSrc / 2, hSrc / 2,
-        0.0f, nullptr, X_FLIP_NONE,
+        0, nullptr, X_FLIP_NONE,
         color);
 }
 
@@ -585,15 +585,15 @@ void renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, 
     minport_RenderTexturePrivate_2(
         div_x, div_y, div_w, div_h,
         tx,
-        0.0f, 0.0f, tx.w / 2, tx.h / 2,
-        0.0f, nullptr, X_FLIP_NONE,
+        0, 0, tx.w / 2, tx.h / 2,
+        0, nullptr, X_FLIP_NONE,
         color);
 }
 
-void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
+void renderTextureFL(int xDst, int yDst, int wDst, int hDst,
                           StdPicture &tx,
                           int xSrc, int ySrc,
-                          double rotateAngle, FPoint_t *center, unsigned int flip,
+                          int16_t rotateAngle, Point_t *center, unsigned int flip,
                           XTColor color)
 {
     auto div_x = FLOORDIV2(xDst), div_y = FLOORDIV2(yDst);
@@ -608,11 +608,11 @@ void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
         color);
 }
 
-void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
+void renderTextureScaleEx(int xDst, int yDst, int wDst, int hDst,
                           StdPicture &tx,
                           int xSrc, int ySrc,
                           int wSrc, int hSrc,
-                          double rotateAngle, FPoint_t *center, unsigned int flip,
+                          int16_t rotateAngle, Point_t *center, unsigned int flip,
                           XTColor color)
 {
     auto div_x = FLOORDIV2(xDst), div_y = FLOORDIV2(yDst);

@@ -106,7 +106,7 @@ static void s_renderBackground(AssetPack_t::Gfx& gfx, XTColor bg_color)
                                       gfx.background,
                                       (gfx.background.w - show_width) / 2, background_height * background_frame + (background_height - show_height) / 2,
                                       show_width, show_height,
-                                      0.0, nullptr, X_FLIP_NONE,
+                                      0, nullptr, X_FLIP_NONE,
                                       bg_color);
     }
     else
@@ -271,13 +271,13 @@ void DrawBackground(double fade)
         int offset = SDL_min(XRender::TargetW / 2 - 8, 250);
         if(GFX.CharSelIcons.inited)
         {
-            XRender::renderTextureFL(XRender::TargetW / 2 - offset, XRender::TargetH / 2 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0, 0.0, nullptr, X_FLIP_HORIZONTAL);
+            XRender::renderTextureFL(XRender::TargetW / 2 - offset, XRender::TargetH / 2 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0, 0, nullptr, X_FLIP_HORIZONTAL);
             XRender::renderTextureBasic(XRender::TargetW / 2 + offset - 24, XRender::TargetH / 2, 24, 24, GFX.CharSelIcons, 72, 0);
         }
         else
         {
-            XRender::renderTextureFL(XRender::TargetW / 2 - offset, XRender::TargetH / 2 - GFX.MCursor[1].w / 2, GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, -90.0);
-            XRender::renderTextureFL(XRender::TargetW / 2 + offset - GFX.MCursor[1].h, XRender::TargetH / 2 - GFX.MCursor[2].w / 2, GFX.MCursor[2].w, GFX.MCursor[2].h, GFX.MCursor[2], 0, 0, -90.0);
+            XRender::renderTextureFL(XRender::TargetW / 2 - offset, XRender::TargetH / 2 - GFX.MCursor[1].w / 2, GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, -90);
+            XRender::renderTextureFL(XRender::TargetW / 2 + offset - GFX.MCursor[1].h, XRender::TargetH / 2 - GFX.MCursor[2].w / 2, GFX.MCursor[2].w, GFX.MCursor[2].h, GFX.MCursor[2], 0, 0, -90);
         }
     }
 

@@ -35,10 +35,10 @@ enum RendererFlip_t
     X_FLIP_VERTICAL   = 0x00000002     /**< flip vertically */
 };
 
-struct FPoint_t
+struct Point_t
 {
-    float x;
-    float y;
+    int x;
+    int y;
 };
 
 using ParticleVertexAttrs_t = std::array<GLubyte, 4>;

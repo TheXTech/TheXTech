@@ -346,13 +346,13 @@ static void s_draw_infobox_switch_arrows(int infobox_x, int infobox_y)
 
     if(GFX.CharSelIcons.inited)
     {
-        XRender::renderTextureFL(infobox_x + 8, infobox_y + 34 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0, 0.0, nullptr, X_FLIP_HORIZONTAL);
+        XRender::renderTextureFL(infobox_x + 8, infobox_y + 34 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0, 0, nullptr, X_FLIP_HORIZONTAL);
         XRender::renderTextureBasic(infobox_x + 480 - 8 - 24, infobox_y + 34 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0);
     }
     else
     {
-        XRender::renderTextureFL(infobox_x + 8, infobox_y + 34 - GFX.MCursor[1].w / 2, GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, -90.0);
-        XRender::renderTextureFL(infobox_x + 480 - 8 - GFX.MCursor[1].h, infobox_y + 34 - GFX.MCursor[2].w / 2, GFX.MCursor[2].w, GFX.MCursor[2].h, GFX.MCursor[2], 0, 0, -90.0);
+        XRender::renderTextureFL(infobox_x + 8, infobox_y + 34 - GFX.MCursor[1].w / 2, GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, -90);
+        XRender::renderTextureFL(infobox_x + 480 - 8 - GFX.MCursor[1].h, infobox_y + 34 - GFX.MCursor[2].w / 2, GFX.MCursor[2].w, GFX.MCursor[2].h, GFX.MCursor[2], 0, 0, -90);
     }
 }
 
@@ -2488,42 +2488,37 @@ static void s_drawGameSaves(int MenuX, int MenuY)
 
         if(save_configs != 0)
         {
-            // FIXME: unnecessary float
-            float rot = 0;
-            float op = 1.0f;
+            uint16_t rot = 0;
+            uint8_t op = 255;
             if(A == MenuCursor + 1)
             {
-                rot = std::abs((int)(CommonFrame % 90) - 45);
-                rot = rot - 22.5;
+                rot = SDL_abs((int)(CommonFrame % 64) - 32);
+                rot = rot - 16;
             }
 
             if(info.ConfigDefaults == 0)
-            {
-                op = std::abs((int)(CommonFrame % 30) - 15);
-                op /= 100.0f;
-                op += 0.5f;
-            }
+                op = SDL_abs((int)(CommonFrame % 32) - 16) * 3 + 128;
 
             if(save_configs == Config_t::MODE_CLASSIC + 1)
             {
-                XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFXNPC[NPCID_POWER_S3], 0, 0, 32, 32, rot, nullptr, X_FLIP_NONE, XTAlphaF(op));
+                XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFXNPC[NPCID_POWER_S3], 0, 0, 32, 32, rot, nullptr, X_FLIP_NONE, XTAlpha(op));
             }
             else if(save_configs == Config_t::MODE_VANILLA + 1)
             {
-                XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFXNPC[NPCID_FODDER_S3], 0, 0, 32, 32, rot, nullptr, X_FLIP_NONE, XTAlphaF(op));
+                XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFXNPC[NPCID_FODDER_S3], 0, 0, 32, 32, rot, nullptr, X_FLIP_NONE, XTAlpha(op));
             }
             else if(save_configs < 0)
             {
-                XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFXNPC[NPCID_TIMER_S2], 0, 0, 32, 32, rot, nullptr, X_FLIP_NONE, XTAlphaF(op));
+                XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFXNPC[NPCID_TIMER_S2], 0, 0, 32, 32, rot, nullptr, X_FLIP_NONE, XTAlpha(op));
                 if(save_configs > -10)
                     XRender::renderTextureBasic(mode_icon_X + 12, mode_icon_Y + 12, GFX.Font1[-save_configs]);
             }
             else
             {
                 if(GFX.EIcons.inited)
-                    XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFX.EIcons, 0, 32*Icon::thextech, 32, 32, rot, nullptr, X_FLIP_NONE, XTAlphaF(op));
+                    XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFX.EIcons, 0, 32*Icon::thextech, 32, 32, rot, nullptr, X_FLIP_NONE, XTAlpha(op));
                 else
-                    XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFXNPC[NPCID_ICE_POWER_S3], 0, 0, 32, 32, rot, nullptr, X_FLIP_NONE, XTAlphaF(op));
+                    XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFXNPC[NPCID_ICE_POWER_S3], 0, 0, 32, 32, rot, nullptr, X_FLIP_NONE, XTAlpha(op));
             }
         }
     }
@@ -2967,10 +2962,8 @@ void mainMenuDraw()
             int mode_icon_X = MenuX + 340;
             int mode_icon_Y = MenuY - 34 + (B * 30);
 
-            // FIXME: unnecessary float
-            float rot = 0;
-            rot = std::abs((int)(CommonFrame % 90) - 45);
-            rot = rot - 22.5;
+            uint16_t rot = SDL_abs((int)(CommonFrame % 64) - 32);
+            rot = rot - 16;
 
             if(!s_editor_target_thextech)
                 XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFXNPC[NPCID_POWER_S3], 0, 0, 32, 32, rot, nullptr, X_FLIP_NONE);
