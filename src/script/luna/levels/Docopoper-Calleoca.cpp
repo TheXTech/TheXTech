@@ -28,7 +28,6 @@
 #include <cstdlib>
 #include <cmath>
 
-#include <Utils/maths.h>
 #include "sdl_proxy/sdl_stdinc.h"
 
 #include "Docopoper-Calleoca.h"

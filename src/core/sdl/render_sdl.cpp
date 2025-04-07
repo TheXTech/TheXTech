@@ -25,7 +25,6 @@
 
 #include <FreeImageLite.h>
 #include <Logger/logger.h>
-#include <Utils/maths.h>
 
 #include "render_sdl.h"
 #include "config.h"

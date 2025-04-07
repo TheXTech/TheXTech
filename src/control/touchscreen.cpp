@@ -21,7 +21,6 @@
 #include <SDL2/SDL.h>
 
 #include <Logger/logger.h>
-#include <Utils/maths.h>
 #ifdef __ANDROID__
 #   include <Utils/files.h>
 #endif
@@ -1488,10 +1487,10 @@ void TouchScreenController::render(int player_no)
             continue;
 
         const auto& k = g_touchKeyMap.touchKeysMap[key];
-        int x1 = Maths::iRound((k.x1 / g_touchKeyMap.touchCanvasWidth) * float(m_renderWidth));
-        int y1 = Maths::iRound((k.y1 / g_touchKeyMap.touchCanvasHeight) * float(m_renderHeight));
-        int x2 = Maths::iRound((k.x2 / g_touchKeyMap.touchCanvasWidth) * float(m_renderWidth));
-        int y2 = Maths::iRound((k.y2 / g_touchKeyMap.touchCanvasHeight) * float(m_renderHeight));
+        int x1 = round((k.x1 / g_touchKeyMap.touchCanvasWidth) * float(m_renderWidth));
+        int y1 = round((k.y1 / g_touchKeyMap.touchCanvasHeight) * float(m_renderHeight));
+        int x2 = round((k.x2 / g_touchKeyMap.touchCanvasWidth) * float(m_renderWidth));
+        int y2 = round((k.y2 / g_touchKeyMap.touchCanvasHeight) * float(m_renderHeight));
         int w = x2 - x1;
         int h = y2 - y1;
 

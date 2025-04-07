@@ -5,8 +5,6 @@ set(UTILS_SRCS)
 set(UTILS_LIBS)
 
 list(APPEND UTILS_SRCS
-    ${CMAKE_CURRENT_LIST_DIR}/maths.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/maths.h
     ${CMAKE_CURRENT_LIST_DIR}/files.cpp
     ${CMAKE_CURRENT_LIST_DIR}/files.h
     ${CMAKE_CURRENT_LIST_DIR}/strings.cpp

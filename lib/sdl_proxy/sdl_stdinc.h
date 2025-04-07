@@ -94,6 +94,11 @@ inline value_t SDL_max(value_t x, value_t y)
     return x > y ? x : y;
 }
 
+inline double SDL_fmod(double x, double y)
+{
+    return fmod(x, y);
+}
+
 SDL_IMPORT(malloc)
 SDL_IMPORT(free)
 
@@ -114,7 +119,6 @@ SDL_IMPORT(getenv)
 
 SDL_IMPORT_MATH(abs)
 SDL_IMPORT_MATH(fabs)
-SDL_IMPORT(fmod)
 SDL_IMPORT_MATH(floor)
 SDL_IMPORT_MATH(ceil)
 SDL_IMPORT_MATH(round)

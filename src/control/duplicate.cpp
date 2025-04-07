@@ -19,7 +19,6 @@
  */
 
 #include <Logger/logger.h>
-#include <Utils/maths.h>
 
 #include "duplicate.h"
 #include "../globals.h"

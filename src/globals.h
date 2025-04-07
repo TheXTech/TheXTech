@@ -34,7 +34,6 @@
 #include "range_arr.hpp"
 #include "ref_type.h"
 #include "rand.h"
-#include "floats.h"
 #include "npc_id.h"
 #include "phys_id.h"
 #include "npc_effect.h"
@@ -97,15 +96,8 @@ extern std::string AppPath;
  * @param x Floating point value to round
  * @return rounded result
  */
-extern int vb6Round(double x);
-
-/**
- * @brief Rounding function that works same as in VB6
- * @param x Floating point value to round
- * @param decimals Round to a specific number of decimals
- * @return rounded result
- */
-extern double vb6Round(double x, int decimals);
+// moved to num_t::vb6round
+// extern int vb6Round(double x);
 
 
 //'Saved Events

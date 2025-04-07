@@ -20,7 +20,6 @@
 
 #include "renderop_bitmap.h"
 #include "core/render.h"
-#include <Utils/maths.h>
 #include "globals.h"
 #include "lunaimgbox.h"
 

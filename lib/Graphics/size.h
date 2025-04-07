@@ -20,14 +20,11 @@
 #ifndef PGE_Size_H
 #define PGE_Size_H
 
-class PGE_SizeF;
 class PGE_Size
 {
-    friend class PGE_SizeF;
 public:
     PGE_Size();
     PGE_Size(const PGE_Size &p) = default;
-    PGE_Size(const PGE_SizeF &p);
     PGE_Size(int w, int h);
     ~PGE_Size() = default;
     void setSize(int w, int h);

@@ -41,7 +41,6 @@
 
 #include "../controls.h"
 
-#include <Utils/maths.h>
 #include <Logger/logger.h>
 #ifdef THEXTECH_INTERPROC_SUPPORTED
 #   include <InterProcess/intproc.h>

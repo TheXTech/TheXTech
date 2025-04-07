@@ -722,11 +722,6 @@ endif()
 if(NOT THEXTECH_NO_SDL_BUILD)
 list(APPEND LIB_SRC
     lib/Graphics/graphics_funcs.cpp
-    lib/Graphics/sizef.cpp
-    lib/Graphics/rect.cpp
-    lib/Graphics/rectf.cpp
-    lib/Graphics/point.cpp
-    lib/Graphics/pointf.cpp
 )
 endif()
 

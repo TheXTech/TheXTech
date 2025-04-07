@@ -52,8 +52,6 @@
 #include "npc/section_overlap.h"
 #include "npc/npc_update/npc_update_priv.h"
 
-#include <Utils/maths.h>
-
 // moved into the function, as a static array
 // static RangeArr<int, 0, maxNPCs> newAct;
 // Why this array is here? to don't reallocate it every call of UpdateNPCs()

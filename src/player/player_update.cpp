@@ -21,7 +21,6 @@
 #include <algorithm>
 
 #include <Logger/logger.h>
-#include <Utils/maths.h>
 
 #include "../globals.h"
 #include "../config.h"

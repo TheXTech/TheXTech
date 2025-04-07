@@ -17,18 +17,11 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
-#include "sizef.h"
 #include "size.h"
 
 PGE_Size::PGE_Size()
 {
     setSize(0, 0);
-}
-
-PGE_Size::PGE_Size(const PGE_SizeF &p)
-{
-    m_w = static_cast<int>(p.m_w);
-    m_h = static_cast<int>(p.m_h);
 }
 
 PGE_Size::PGE_Size(int w, int h)

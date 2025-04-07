@@ -20,7 +20,6 @@
 
 #include <cmath>
 #include <ctime>
-#include <Utils/maths.h>
 #include <pge_delay.h>
 #include <Logger/logger.h>
 

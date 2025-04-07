@@ -38,8 +38,6 @@
 #include "config.h"
 #include "npc_traits.h"
 
-#include <Utils/maths.h>
-
 
 //  Get the screen position
 void GetvScreen(vScreen_t& vscreen)

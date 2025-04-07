@@ -44,8 +44,6 @@
 #include "npc/section_overlap.h"
 #include "npc/npc_cockpit_bits.h"
 
-#include <Utils/maths.h>
-
 void NPC_t::ResetLocation()
 {
     Location.X = DefaultLocationX;

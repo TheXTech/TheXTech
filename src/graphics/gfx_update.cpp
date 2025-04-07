@@ -71,7 +71,6 @@
 #endif
 
 #include <fmt_format_ne.h>
-#include <Utils/maths.h>
 
 struct ScreenShake_t
 {
