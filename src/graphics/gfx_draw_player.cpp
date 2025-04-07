@@ -31,17 +31,17 @@
 
 #include "graphics/gfx_keyhole.h"
 
-static inline int s_round2int(double d)
+static inline int s_round2int(num_t d)
 {
-    return std::floor(d + 0.5);
+    return num_t::floor(d + 0.5_n);
 }
 
-static inline int s_round2int_plr(double d)
+static inline int s_round2int_plr(num_t d)
 {
 #ifdef PGE_MIN_PORT
-    return (int)(std::floor(d / 2 + 0.5)) * 2;
+    return (int)(num_t::floor(d / 2 + 0.5_n)) * 2;
 #else
-    return std::floor(d + 0.5);
+    return num_t::floor(d + 0.5_n);
 #endif
 }
 

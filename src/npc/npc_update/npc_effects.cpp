@@ -185,21 +185,21 @@ static inline void NPCEffectLogic_DropItem(int A)
         num_t move_X = delta_X / 8;
         num_t move_Y = delta_Y / 8;
 
-        double dist_sq = (move_X * move_X + move_Y * move_Y);
+        num_t dist = num_t::dist(move_X, move_Y);
 
-        if(dist_sq > 0.0 && dist_sq < 128.0)
+        // this magic number is 8 * sqrt(2)
+        if(dist > 0 && dist < 11.31371_n)
         {
-            double dist = SDL_sqrt(dist_sq);
-            move_X *= (8.0 * 1.4142135623730951) / dist;
-            move_Y *= (8.0 * 1.4142135623730951) / dist;
+            move_X = (move_X * 11.31371_r).divided_by(dist);
+            move_Y = (move_Y * 11.31371_r).divided_by(dist);
         }
 
-        if(std::abs(delta_Y) < std::abs(move_Y) || NPC[A].Special5 <= 66)
+        if(num_t::abs(delta_Y) < num_t::abs(move_Y) || NPC[A].Special5 <= 66)
             nLoc.Y = target_Y;
         else
             nLoc.Y += move_Y;
 
-        if(std::abs(delta_X) < std::abs(move_X) || NPC[A].Special5 <= 66)
+        if(num_t::abs(delta_X) < num_t::abs(move_X) || NPC[A].Special5 <= 66)
             nLoc.X = target_X;
         else
             nLoc.X += move_X;

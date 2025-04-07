@@ -272,8 +272,8 @@ static void s_makePetMount(int A)
     NPC[numNPCs].Location.Height = 32;
     NPC[numNPCs].Location.Width = 32;
     NPC[numNPCs].Location.Y = p.Location.Y + p.Location.Height - 32;
-    NPC[numNPCs].Location.X = SDL_floor(p.Location.X + p.Location.Width / 2 - 16);
-    NPC[numNPCs].Location.SpeedY = 0.5;
+    NPC[numNPCs].Location.X = num_t::floor(p.Location.X + p.Location.Width / 2 - 16);
+    NPC[numNPCs].Location.SpeedY = 0.5_n;
     NPC[numNPCs].Location.SpeedX = 0;
     NPC[numNPCs].CantHurt = 10;
     NPC[numNPCs].CantHurtPlayer = A;
@@ -300,8 +300,8 @@ static void s_makeVehicleMount(int A)
 
     NPC[numNPCs].Location.Height = 128;
     NPC[numNPCs].Location.Width = 128;
-    NPC[numNPCs].Location.Y = SDL_floor(p.Location.Y);
-    NPC[numNPCs].Location.X = SDL_floor(p.Location.X);
+    NPC[numNPCs].Location.Y = num_t::floor(p.Location.Y);
+    NPC[numNPCs].Location.X = num_t::floor(p.Location.X);
     NPC[numNPCs].Location.SpeedY = 0;
     NPC[numNPCs].Location.SpeedX = 0;
 
@@ -396,7 +396,7 @@ void DodgePlayers(int plr_A)
             failed = true;
 
         // also check being too far from start point (Shared Screen mode)
-        if(!failed && plr_screen.Type == ScreenTypes::SharedScreen && std::abs(pLoc.X - orig_X) > plr_screen.W * 0.75)
+        if(!failed && plr_screen.Type == ScreenTypes::SharedScreen && num_t::abs(pLoc.X - orig_X) > plr_screen.W * 0.75_n)
             failed = true;
 
 
@@ -495,7 +495,7 @@ void DodgePlayers(int plr_A)
             failed = true;
 
         // check being too far from original position (Shared Screen mode)
-        if(!failed && plr_screen.Type == ScreenTypes::SharedScreen && std::abs(pLoc.Y - orig_Y) > plr_screen.H * 0.75)
+        if(!failed && plr_screen.Type == ScreenTypes::SharedScreen && num_t::abs(pLoc.Y - orig_Y) > plr_screen.H * 0.75_n)
             failed = true;
 
         // check we didn't cross a ceiling block (in the previous column)
@@ -1409,7 +1409,7 @@ int CheckNearestLiving(const int A)
 
         if(o_A != A && !o_p.Dead && o_p.TimeToLive == 0 && o_A != p.YoshiPlayer)
         {
-            double dist = (o_p.Location.X - p.Location.X) * (o_p.Location.X - p.Location.X) + (o_p.Location.Y - p.Location.Y) * (o_p.Location.Y - p.Location.Y);
+            num_t dist = num_t::dist2(o_p.Location.X - p.Location.X, o_p.Location.Y - p.Location.Y);
 
             if(closest == 0 || closest_dist > dist)
             {
@@ -1429,7 +1429,7 @@ int CheckNearestLiving(const int A)
 
         if(o_A != A && !o_p.Dead && o_p.TimeToLive == 0 && o_A != p.YoshiPlayer)
         {
-            double dist = (o_p.Location.X - p.Location.X) * (o_p.Location.X - p.Location.X) + (o_p.Location.Y - p.Location.Y) * (o_p.Location.Y - p.Location.Y);
+            num_t dist = num_t::dist2(o_p.Location.X - p.Location.X, o_p.Location.Y - p.Location.Y);
 
             if(closest == 0 || closest_dist > dist)
             {
@@ -1844,12 +1844,12 @@ void PlayerFrame(Player_t &p)
         {
             const Layer_t& layer = Layer[Background[p.VineBGO].Layer];
 
-            doesPlayerMoves = !fEqual(p.Location.SpeedX,  (double)layer.ApplySpeedX) ||
-                               p.Location.SpeedY < layer.ApplySpeedY - 0.1_n;
+            doesPlayerMoves = !num_t::fEqual_d(p.Location.SpeedX, (num_t)layer.ApplySpeedX) ||
+                               p.Location.SpeedY < (num_t)layer.ApplySpeedY - 0.1_n;
         }
         else
         {
-            doesPlayerMoves = !fEqual(p.Location.SpeedX,  NPC[p.VineNPC].Location.SpeedX) ||
+            doesPlayerMoves = !num_t::fEqual_d(p.Location.SpeedX, NPC[p.VineNPC].Location.SpeedX) ||
                                p.Location.SpeedY < NPC[p.VineNPC].Location.SpeedY - 0.1_n;
         }
 
@@ -2451,7 +2451,7 @@ void PlayerFrame(Player_t &p)
                     if(p.Effect == PLREFF_NORMAL)
                     {
                         // IMPORTANT: this case was truncation until v1.3.7.1-dev. Confirm that changing to VB6 rounding does not cause any issues.
-                        p.YoshiBFrameCount += 1 + vb6Round(std::abs(p.Location.SpeedX * 0.7));
+                        p.YoshiBFrameCount += 1 + num_t::vb6round(num_t::abs(p.Location.SpeedX * 0.7_r));
                     }
 
                     if((p.Direction == -1 && p.Location.SpeedX > 0) || (p.Direction == 1 && p.Location.SpeedX < 0))
@@ -3433,7 +3433,7 @@ void PlayerDismount(const int A)
         NPC[numNPCs].Location.Height = 32;
         NPC[numNPCs].Location.Width = 32;
         NPC[numNPCs].Location.Y = Player[A].Location.Y + Player[A].Location.Height - 32;
-        NPC[numNPCs].Location.X = std::floor(Player[A].Location.X + Player[A].Location.Width / 2 - 16);
+        NPC[numNPCs].Location.X = num_t::floor(Player[A].Location.X + Player[A].Location.Width / 2 - 16);
         NPC[numNPCs].Location.SpeedY = 1;
         NPC[numNPCs].Location.SpeedX = (Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX) * 0.8_r;
         NPC[numNPCs].CantHurt = 10;
@@ -4984,7 +4984,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
         if(p.Controls.Run || p.ForceHold > 0)
         {
             // fix a graphical bug where the NPC would stutter in the player's hands
-            num_t use_w = (g_config.fix_visual_bugs) ? std::round(NPC[p.HoldingNPC].Location.Width) : NPC[p.HoldingNPC].Location.Width;
+            num_t use_w = (g_config.fix_visual_bugs) ? num_t::round(NPC[p.HoldingNPC].Location.Width) : NPC[p.HoldingNPC].Location.Width;
 
         // hold above head
             if(p.Character == 3 || p.Character == 4 || (p.Duck))
@@ -6125,8 +6125,8 @@ void PlayerEffects(const int A)
     {
         for(B = 1; B <= 2; B++)
         {
-            NewEffect(EFFID_SPARKLE, newLoc(p.Location.X + dRand() * ((int_ok)p.Location.Width + 8) - 8,
-                                 p.Location.Y + dRand() * ((int_ok)p.Location.Height + 8) - 4), 1, 0, ShadowMode);
+            NewEffect(EFFID_SPARKLE, newLoc(p.Location.X + dRand() * ((int)p.Location.Width + 8) - 8,
+                                 p.Location.Y + dRand() * ((int)p.Location.Height + 8) - 4), 1, 0, ShadowMode);
             Effect[numEffects].Location.SpeedX = dRand() * 2 - 1;
             Effect[numEffects].Location.SpeedY = dRand() * 2 - 1;
         }
@@ -6423,7 +6423,7 @@ void PlayersEnsureNearby(const Screen_t& screen)
         if(!p.Dead && p.TimeToLive == 0)
         {
             num_t p_top = (p.Effect == PLREFF_RESPAWN) ? p.RespawnY : pLoc.Y;
-            double dist = (pLoc.X - cx) * (pLoc.X - cx) + (p_top - cy) * (p_top - cy);
+            num_t dist = num_t::dist2(pLoc.X - cx, p_top - cy);
 
             if(closest == 0 || closest_dist > dist)
             {

@@ -126,12 +126,12 @@ void UpdatePlayerTimeToLive(int A)
                 B1 = ((-vscreen.Y + vscreen.Height / 2) - Player[A].Location.Y - Player[A].Location.Height);
         }
 
-        float C1 = std::sqrt((A1 * A1) + (B1 * B1));
-        float X, Y;
+        num_t C1 = num_t::dist(A1, B1);
+        num_t X, Y;
         if(C1 != 0)
         {
-            X = A1 / C1;
-            Y = B1 / C1;
+            X = A1.divided_by(C1);
+            Y = B1.divided_by(C1);
         }
         else
         {

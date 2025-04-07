@@ -1462,7 +1462,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
 
-        if(fEqual(Location.SpeedY, 0.123))
+        if(num_t::fEqual_d(Location.SpeedY, 0.123_n))
         {
             ne.Location.SpeedY = 1;
             ne.Location.SpeedX = 0;
@@ -1957,8 +1957,8 @@ void NewEffect_IceSparkle(const NPC_t& n, Location_t& tempLocation)
     tempLocation.Width = EffectWidth[EFFID_SPARKLE];
     tempLocation.SpeedX = 0;
     tempLocation.SpeedY = 0;
-    tempLocation.X = n.Location.X - tempLocation.Width / 2 + dRand() * n.Location.Width - 4;
-    tempLocation.Y = n.Location.Y - tempLocation.Height / 2 + dRand() * n.Location.Height - 4;
+    tempLocation.X = n.Location.X - tempLocation.Width / 2 + dRand().times(n.Location.Width) - 4;
+    tempLocation.Y = n.Location.Y - tempLocation.Height / 2 + dRand().times(n.Location.Height) - 4;
     NewEffect(EFFID_SPARKLE, tempLocation, 1, 0, n.Shadow);
 }
 

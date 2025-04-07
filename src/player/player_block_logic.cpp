@@ -222,7 +222,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                     }
 
                                     if(Player[A].Location.SpeedY == 0 ||
-                                       fEqual(float(Player[A].Location.SpeedY), Physics.PlayerGravity) || Player[A].Slope > 0 || Player[A].StandingOnNPC != 0)
+                                       num_t::fEqual_f(Player[A].Location.SpeedY, Physics.PlayerGravity) || Player[A].Slope > 0 || Player[A].StandingOnNPC != 0)
                                     {
                                         num_t PlrMid = Player[A].Location.Y;
                                         Slope = (PlrMid - Block[B].Location.Y) / (int_ok)Block[B].Location.Height;
@@ -443,7 +443,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                     {
                                         Location_t tempLocation;
                                         tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 2;
-                                        tempLocation.X = Player[A].Location.X - 4 + dRand() * (Player[A].Location.Width + 8) - 4;
+                                        tempLocation.X = Player[A].Location.X - 4 + dRand() * ((int)Player[A].Location.Width + 8) - 4;
                                         NewEffect(EFFID_SKID_DUST, tempLocation);
                                     }
                                 }
@@ -548,11 +548,14 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                         }
                                         else
                                         {
-                                            cursed_value_C = std::abs(Block[B].Location.minus_center_x(Player[A].Location));
-                                            float D = std::abs(Block[floorBlock].Location.minus_center_x(Player[A].Location));
+                                            num_t C = num_t::abs(Block[B].Location.minus_center_x(Player[A].Location));
+                                            num_t D = num_t::abs(Block[floorBlock].Location.minus_center_x(Player[A].Location));
 
-                                            if(cursed_value_C < D)
+                                            if(C < D)
                                                 floorBlock = B;
+
+                                            // this is the case where an unbound C gets written to
+                                            cursed_value_C = (numf_t)C;
                                         }
 
                                         // if this block is moving up give it priority
@@ -602,7 +605,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                     hitWall = true;
 
                                     // IMPORTANT: this case was truncation until v1.3.7.1-dev. Confirm that changing to VB6 rounding does not cause any issues.
-                                    blockPushX = vb6Round(Block[B].Location.SpeedX);
+                                    blockPushX = num_t::vb6round(Block[B].Location.SpeedX);
 
                                     if(Block[B].Slippy)
                                         Player[A].SlippyWall = true;
@@ -953,8 +956,8 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
     if(ceilingBlock2 != 0) // Hitting a block from below
     {
-        float C = std::abs(Block[ceilingBlock1].Location.minus_center_x(Player[A].Location));
-        float D = std::abs(Block[ceilingBlock2].Location.minus_center_x(Player[A].Location));
+        num_t C = num_t::abs(Block[ceilingBlock1].Location.minus_center_x(Player[A].Location));
+        num_t D = num_t::abs(Block[ceilingBlock2].Location.minus_center_x(Player[A].Location));
 
         if(C < D)
             ceilingBlock = ceilingBlock1;
@@ -1041,5 +1044,5 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
     // else
     //     Player[A].SlideKill = false;
 
-    Player[A].SlideKill = Player[A].Slide && (std::abs(Player[A].Location.SpeedX) > 1);
+    Player[A].SlideKill = Player[A].Slide && (num_t::abs(Player[A].Location.SpeedX) > 1);
 }

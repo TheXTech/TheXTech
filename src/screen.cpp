@@ -48,18 +48,18 @@ int vScreen_t::TargetY() const
 int vScreen_t::CameraAddX() const
 {
 #ifdef PGE_MIN_PORT
-    return (int)(std::ceil(X / 2 - 0.5)) * 2;
+    return (int)(num_t::ceil(X / 2 - 0.5_n)) * 2;
 #else
-    return std::ceil(X - 0.5);
+    return num_t::ceil(X - 0.5_n);
 #endif
 }
 
 int vScreen_t::CameraAddY() const
 {
 #ifdef PGE_MIN_PORT
-    return (int)(std::ceil(Y / 2 - 0.5)) * 2;
+    return (int)(num_t::ceil(Y / 2 - 0.5_n)) * 2;
 #else
-    return std::ceil(Y - 0.5);
+    return num_t::ceil(Y - 0.5_n);
 #endif
 }
 

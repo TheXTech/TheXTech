@@ -350,11 +350,11 @@ void AutocodeManager::Parse(SDL_RWops *code_file, bool add_to_globals, const std
             // Check for hexadecimal inputs
             //if(true) // Always true
             {
-                target = (num_t)(dtarget);
-                param1 = (num_t)(dparam1);
-                param2 = (num_t)(dparam2);
-                param3 = (num_t)(dparam3);
-                length = (num_t)(dlength);
+                target = num_t::from_double(dtarget);
+                param1 = num_t::from_double(dparam1);
+                param2 = num_t::from_double(dparam2);
+                param3 = num_t::from_double(dparam3);
+                length = num_t::from_double(dlength);
 
                 if(target == 0 && btarget != 0)
                     target = btarget;
@@ -642,12 +642,12 @@ bool AutocodeManager::VarOperation(const std::string &var_name, num_t value, OPT
             m_UserVars[var_name] = var_val - value;
             return true;
         case OP_Mult:
-            m_UserVars[var_name] = var_val * value;
+            m_UserVars[var_name] = var_val.times(value);
             return true;
         case OP_Div:
             if(value == 0)
                 return false;
-            m_UserVars[var_name] = var_val / value;
+            m_UserVars[var_name] = var_val.divided_by(value);
             return true;
         case OP_XOR:
             m_UserVars[var_name] = (int)var_val ^ (int)value;

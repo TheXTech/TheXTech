@@ -43,9 +43,9 @@
 #   include <InterProcess/intproc.h>
 #endif
 
-static inline int s_round2int(double d)
+static inline int s_round2int(num_t d)
 {
-    return std::floor(d + 0.5);
+    return num_t::floor(d + 0.5_n);
 }
 
 void s_drawBlockExtra(int Z, int camX, int camY, const Block_t& b)

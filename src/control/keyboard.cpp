@@ -77,14 +77,14 @@ bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m
 
     // consume parent's precise scrolling
     if(k->m_scroll_x_precise < 0)
-        e.ScrollLeft += -k->m_scroll_x_precise * 32.0;
+        e.ScrollLeft -= num_t::from_double(k->m_scroll_x_precise) * 32;
     else if(k->m_scroll_x_precise > 0)
-        e.ScrollRight += k->m_scroll_x_precise * 32.0;
+        e.ScrollRight += num_t::from_double(k->m_scroll_x_precise) * 32;
 
     if(k->m_scroll_y_precise < 0)
-        e.ScrollUp += -k->m_scroll_y_precise * 32.0;
+        e.ScrollUp -= num_t::from_double(k->m_scroll_y_precise) * 32;
     else if(k->m_scroll_y_precise > 0)
-        e.ScrollDown += k->m_scroll_y_precise * 32.0;
+        e.ScrollDown += num_t::from_double(k->m_scroll_y_precise) * 32;
 
     k->m_scroll_x_precise = 0;
     k->m_scroll_y_precise = 0;

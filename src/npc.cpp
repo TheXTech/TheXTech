@@ -70,10 +70,10 @@ num_t NPCPlayerTargetDist(const NPC_t& npc, const Player_t& player)
     if(g_config.fix_multiplayer_targeting)
     {
         num_t dy = npc.Location.minus_center_y(player.Location);
-        return (dx * dx) + (dy * dy);
+        return num_t::dist2(dx, dy);
     }
     else
-        return SDL_fabs(dx);
+        return num_t::abs(dx);
 }
 
 int NPCTargetPlayer(const NPC_t& npc)
@@ -135,7 +135,7 @@ static void s_NPCSetSpeedTarget_FixedX_dist(NPC_t& npc, num_t dist_x, num_t dist
         dist_x = -0.00001_n;
 
     npc.Location.SpeedX = speed_x * npc.Direction;
-    npc.Location.SpeedY = speed_x * npc.Direction * dist_y / dist_x;
+    npc.Location.SpeedY = speed_x * npc.Direction * dist_y.divided_by(dist_x);
 
     if(NPC[numNPCs].Location.SpeedY > speed_y_cap)
         NPC[numNPCs].Location.SpeedY = speed_y_cap;
@@ -164,10 +164,10 @@ void NPCSetSpeedTarget_FixedSpeed(NPC_t& npc, const Location_t& target, int spee
     num_t dist_x = target.minus_center_x(npc.Location);
     num_t dist_y = target.minus_center_y(npc.Location);
 
-    double dist = SDL_sqrt(dist_x * dist_x + dist_y * dist_y);
+    num_t dist = num_t::dist(dist_x, dist_y);
 
-    npc.Location.SpeedX = speed * dist_x / dist;
-    npc.Location.SpeedY = speed * dist_y / dist;
+    npc.Location.SpeedX = speed * dist_x.divided_by(dist);
+    npc.Location.SpeedY = speed * dist_y.divided_by(dist);
 }
 
 void CheckSectionNPC(int A)
@@ -360,7 +360,7 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
             {
                 A = NPC[i].Location.X + NPC[i].Location.Width / 2 - X;
                 B = NPC[i].Location.Y + NPC[i].Location.Height / 2 - Y;
-                C = std::sqrt(std::pow(A, 2) + std::pow(B, 2));
+                C = num_t::dist(A, B);
 
                 if(C <= Radius + NPC[i].Location.Width / 4 + NPC[i].Location.Height / 4)
                 {
@@ -383,7 +383,8 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
         {
             A = Block[i].Location.X + Block[i].Location.Width / 2 - X;
             B = Block[i].Location.Y + Block[i].Location.Height / 2 - Y;
-            C = std::sqrt(std::pow(A, 2) + std::pow(B, 2));
+            C = num_t::dist(A, B);
+
             if(C <= Radius + Block[i].Location.Width / 4 + Block[i].Location.Height / 4)
             {
                 BlockHit(i);
@@ -402,7 +403,8 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
             {
                 A = Player[i].Location.X + Player[i].Location.Width / 2 - X;
                 B = Player[i].Location.Y + Player[i].Location.Height / 2 - Y;
-                C = std::sqrt(std::pow(A, 2) + std::pow(B, 2));
+                C = num_t::dist(A, B);
+
                 if(C <= Radius + Player[i].Location.Width / 4 + Player[i].Location.Height / 4)
                     PlayerHurt(i);
             }
@@ -557,13 +559,13 @@ static void s_alignRuftCell(NPC_t &me, const Location_t &alignAt)
         do
         {
             p -= w;
-        } while(SDL_fabs(p - me.Location.X) >= w / 2 && p > me.Location.X);
+        } while(num_t::abs(p - me.Location.X) >= w / 2 && p > me.Location.X);
         me.Location.X = p;
     }
     else
     {
         auto p = alignAt.X + alignAt.Width;
-        while(SDL_fabs(p - me.Location.X) >= w / 2 && p < me.Location.X + me.Location.Width)
+        while(num_t::abs(p - me.Location.X) >= w / 2 && p < me.Location.X + me.Location.Width)
         {
             p += w;
         }
@@ -762,7 +764,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Type = NPCID_GRN_VINE_S3;
             else if(npc.Type == NPCID_GRN_VINE_TOP_S4)
                 NPC[numNPCs].Type = NPCID_GRN_VINE_S4;
-            NPC[numNPCs].Location.Y = vb6Round(npc.Location.Y / 32) * 32;
+            NPC[numNPCs].Location.Y = num_t::vb6round(npc.Location.Y / 32) * 32;
             NPC[numNPCs].Location.Height = 32;
             NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
             NPC[numNPCs].Location.X = npc.Location.X + (npc.Location.Width - NPC[numNPCs].Location.Width) / 2;
@@ -951,9 +953,9 @@ void NPCSpecial(int A)
         {
             npc.Location.SpeedY += Physics.NPCGravity;
             npc.Location.SpeedX *= 0.987_r;
+
             if(npc.Location.SpeedX > -0.1_n && npc.Location.SpeedX < 0.1_n)
                 npc.Location.SpeedX = 0;
-
         }
     }
     else if(npc.Type == NPCID_RANDOM_POWER)
@@ -1202,7 +1204,7 @@ void NPCSpecial(int A)
         }
         else
         {
-            npc.Location.SpeedX = (3 - std::abs(npc.Location.SpeedY)) * npc.Direction;
+            npc.Location.SpeedX = (3 - num_t::abs(npc.Location.SpeedY)) * npc.Direction;
             if((npc.Location.SpeedY > 0 && npc.Location.Y > npc.SpecialY) || (npc.Location.SpeedY < 0 && npc.Location.Y < npc.SpecialY))
             {
                 npc.Location.SpeedY = npc.Location.SpeedY * 0.98_r;
@@ -1274,7 +1276,7 @@ void NPCSpecial(int A)
         }
         else if(npc.Special == 1)
         {
-            if(npc.Type == NPCID_FIRE_BOSS_SHELL && fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
+            if(npc.Type == NPCID_FIRE_BOSS_SHELL && num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity))
                 npc.Location.SpeedX += 0.1_n * npc.Direction;
             else
                 npc.Location.SpeedX += 0.2_n * npc.Direction;
@@ -1300,7 +1302,7 @@ void NPCSpecial(int A)
                     npc.Location.SpeedX = -5;
             }
 
-            if(npc.Type == NPCID_FIRE_BOSS_SHELL && fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
+            if(npc.Type == NPCID_FIRE_BOSS_SHELL && num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity))
             {
                 npc.Special3 += 1;
                 if((npc.Location.SpeedX < -2 && npc.Direction < 0) || (npc.Location.SpeedX > 2 && npc.Direction > 0))
@@ -1315,7 +1317,7 @@ void NPCSpecial(int A)
 
             npc.Special2 += 1;
 
-            if(npc.Special2 >= 300 && fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
+            if(npc.Special2 >= 300 && num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity))
             {
                 npc.Special = 2;
                 npc.Special2 = 0;
@@ -1416,7 +1418,7 @@ void NPCSpecial(int A)
                 npc.Special2 = -1;
 
             // jumping
-            if(fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
+            if(num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity))
             {
                 npc.Special3 += 1;
                 if(npc.Special3 > 30 + iRand(100))
@@ -1430,7 +1432,7 @@ void NPCSpecial(int A)
 
             // attack timer
             npc.Special4 += 1;
-            if(npc.Special4 > 100 + iRand(100) && fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
+            if(npc.Special4 > 100 + iRand(100) && num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity))
             {
                 npc.Special = 1;
                 npc.Special5 = 0;
@@ -1559,6 +1561,7 @@ void NPCSpecial(int A)
                     npc.Location.SpeedX = -1.5_n;
                 else
                     npc.Location.SpeedX = 1.5_n;
+
                 // movement
                 if(npc.Location.X < Player[npc.Special5].Location.X - 400)
                     npc.Special2 = 1;
@@ -1568,13 +1571,13 @@ void NPCSpecial(int A)
             else
             {
                 npc.Location.SpeedX = npc.Location.SpeedX * 0.98_r;
-                if(fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
+                if(num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity))
                     npc.Location.SpeedX = 0;
 
             }
 
             // attack timer
-            if(fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
+            if(num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity))
                 npc.SpecialX += 1;
 
             if(npc.SpecialX == 20 || npc.SpecialX == 40 || npc.SpecialX == 60 || (npc.Damage >= 5 && npc.SpecialX == 80) || (npc.Damage >= 10 && npc.SpecialX == 100))
@@ -1588,7 +1591,7 @@ void NPCSpecial(int A)
             if(npc.Damage >= 10 && npc.Special == 0 && npc.SpecialX >= 100)
                 npc.SpecialX = 200;
 
-            if(npc.SpecialX >= 160 && fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
+            if(npc.SpecialX >= 160 && num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity))
             {
                 npc.SpecialX = 0;
                 npc.Special = 3;
@@ -1731,7 +1734,7 @@ void NPCSpecial(int A)
             npc.Location.SpeedX = 0;
         else if(npc.Special == 0)
         {
-            if(fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
+            if(num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity))
             {
                 if(npc.Special2 == 0)
                     npc.Special2 = npc.Direction;
@@ -1791,7 +1794,6 @@ void NPCSpecial(int A)
             else
                 npc.Special -= 1;
         }
-
     }
     else if(npc.Type == NPCID_WALK_PLANT) // muncher thing
     {
@@ -1805,6 +1807,7 @@ void NPCSpecial(int A)
                     tempLocation = npc.Location;
                     tempLocation.Height = 256;
                     tempLocation.Y -= tempLocation.Height;
+
                     if(CheckCollision(tempLocation, p.Location))
                     {
                         npc.Special = 1;
@@ -1814,7 +1817,7 @@ void NPCSpecial(int A)
                 }
             }
         }
-        else if(fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
+        else if(num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity))
             npc.Special = 0;
 
         if(!npc.Stuck && npc.Special == 0)
@@ -1826,16 +1829,16 @@ void NPCSpecial(int A)
                 else if(npc.Location.X > npc.DefaultLocationX + 128 && npc.Direction == 1)
                     npc.Special2 = 60;
 
-                npc.Location.SpeedX = 1.4 * npc.Direction;
+                npc.Location.SpeedX = 1.4_n * npc.Direction;
 
-                if(fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
-                    npc.Location.SpeedY = -1.5;
+                if(num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity))
+                    npc.Location.SpeedY = -1.5_n;
             }
             else
             {
                 npc.Special2 -= 1;
 
-                if(fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
+                if(num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity))
                     npc.Location.SpeedX = 0;
 
                 if(npc.Special2 == 0)
@@ -2022,7 +2025,6 @@ void NPCSpecial(int A)
                 NPCSetSpeedTarget_FixedSpeed(npc, Player[ip].Location, 3);
             }
         }
-
     }
     else if(npc.Type == NPCID_HOMING_BALL_GEN) // Metroid O shooter thing
     {
@@ -2778,7 +2780,7 @@ void NPCSpecial(int A)
                 // deferring tree update to end of the NPC physics update
             }
 
-            if(npc.Location.SpeedX == 0 && fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
+            if(npc.Location.SpeedX == 0 && num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity))
             {
                 npc.Location.SpeedX = speed * npc.Direction;
                 npc.SpecialX = npc.Location.SpeedX;
@@ -2887,14 +2889,13 @@ void NPCSpecial(int A)
                 if(npc.Location.X > npc.DefaultLocationX + npc.Location.Width * 1.5_rb)
                     npc.Special2 = 0;
             }
-            if(fEqual(npc.Location.SpeedY, double(Physics.NPCGravity)) || npc.Slope > 0)
+
+            if(num_t::fEqual_d(npc.Location.SpeedY, Physics.NPCGravity) || npc.Slope > 0)
             {
                 if(iRand(100) == 0)
                     npc.Location.SpeedY = -8;
             }
         }
-
-
     }
     else if(npc.Type == NPCID_GOALTAPE) // SMW Exit
     {
@@ -2944,7 +2945,7 @@ void NPCSpecial(int A)
                         {
                             if(CheckCollision(p.Location, npc.Location))
                             {
-                                MoreScore(vb6Round((1 - (npc.Location.Y - npc.DefaultLocationY) / (npc.SpecialY - npc.DefaultLocationY)) * 10) + 1, npc.Location);
+                                MoreScore(num_t::vb6round((1 - (npc.Location.Y - npc.DefaultLocationY).divided_by(npc.SpecialY - npc.DefaultLocationY)) * 10) + 1, npc.Location);
                                 npc.Killed = 9;
                                 NPCQueues::Killed.push_back(A);
                                 PlaySoundSpatial(SFX_Stone, npc.Location);
@@ -3096,7 +3097,7 @@ void NPCSpecial(int A)
                 {
                     npc.Special = 140;
                     npc.Special3 -= 1;
-                    if(fEqual((float)npc.Location.SpeedY, Physics.NPCGravity) || npc.Slope > 0)
+                    if(num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity) || npc.Slope > 0)
                         npc.Special2 = 90;
                 }
 
@@ -3104,7 +3105,7 @@ void NPCSpecial(int A)
                     npc.Special3 = 2;
             }
 
-            if(fEqual((float)npc.Location.SpeedY, Physics.NPCGravity) || npc.Slope > 0)
+            if(num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity) || npc.Slope > 0)
             {
                 npc.Special2 += 1;
                 if(npc.Special2 >= 100)
@@ -3394,13 +3395,13 @@ void SpecialNPC(int A)
         {
             NPC[A].Location.SpeedY -= 0.2_n;
             if(NPC[A].Location.SpeedY > 0 && NPC[A].Direction != NPC[A].Special4)
-                NPC[A].Location.SpeedY += -std::abs(NPC[A].Location.SpeedY) / 25;
+                NPC[A].Location.SpeedY += -num_t::abs(NPC[A].Location.SpeedY) / 25;
         }
         else if(NPC[A].Location.Y + NPC[A].Location.Height / 2 < playerVCenter)
         {
             NPC[A].Location.SpeedY += 0.2_n;
             if(NPC[A].Location.SpeedY < 0 && NPC[A].Direction != NPC[A].Special4)
-                NPC[A].Location.SpeedY += std::abs(NPC[A].Location.SpeedY) / 25;
+                NPC[A].Location.SpeedY += num_t::abs(NPC[A].Location.SpeedY) / 25;
         }
         NPC[A].Location.SpeedY += (playerVCenter - NPC[A].Location.Y + NPC[A].Location.Height / 2) / 250;
 
@@ -3859,7 +3860,7 @@ void SpecialNPC(int A)
                 {
                     if(g_config.fix_plant_wobble)
                     {
-                        NPC[A].Location.Y = vb6Round(NPC[A].Location.Y);
+                        NPC[A].Location.Y = num_t::round(NPC[A].Location.Y);
                         NPC[A].Location.Height = NPC[A]->THeight;
                     }
 
@@ -4746,7 +4747,7 @@ void SpecialNPC(int A)
 
             // speed control code: check distance to player
             num_t dx = NPC[A].Location.minus_center_x(p.Location);
-            double speed_bound = SDL_fabs(dx) / 100 + SDL_fabs(p.Location.SpeedX) / 2 + 5;
+            num_t speed_bound = num_t::abs(dx) / 100 + num_t::abs(p.Location.SpeedX) / 2 + 5;
 
             // adjust expected distance by player's speed
             dx -= p.Location.SpeedX * 15;
@@ -4876,7 +4877,7 @@ void SpecialNPC(int A)
             }
 
             // yes, it's a VB6 bug, p.Location.Width / 2 should be subtracted, not added
-            if(SDL_fabs(NPC[A].Location.X - p.Location.X + (NPC[A].Location.Width + p.Location.Width) / 2) < 100)
+            if(num_t::abs(NPC[A].Location.X - p.Location.X + (NPC[A].Location.Width + p.Location.Width) / 2) < 100)
             {
                 if(NPC[A].Special4 == 0)
                 {
@@ -5035,7 +5036,7 @@ void SpecialNPC(int A)
                     NPC[numNPCs].Location.Height = 32;
                     NPC[numNPCs].Location.Width = 32;
 
-                    NPC[numNPCs].Location.SpeedX = (1.5 + std::abs(p.Location.SpeedX) * 0.75) * NPC[numNPCs].Direction;
+                    NPC[numNPCs].Location.SpeedX = (1.5_n + num_t::abs(p.Location.SpeedX) * 0.75_rb) * NPC[numNPCs].Direction;
                     NPC[numNPCs].Location.SpeedY = -8;
 
                     // tempNPC = NPC[A];
@@ -5097,7 +5098,6 @@ void SpecialNPC(int A)
                     tempLocation.Height = 32;
                     tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - 16;
 
-
 //                    tempLocation.X = NPC[A].Location.X;
                     tempLocation.X = (NPC[A].Location.X + NPC[A].Location.Width / 8);
                     NewEffect(EFFID_SMOKE_S3, tempLocation);
@@ -5107,7 +5107,6 @@ void SpecialNPC(int A)
                     tempLocation.X = (NPC[A].Location.X + NPC[A].Location.Width - EffectWidth[EFFID_SMOKE_S3]) - (NPC[A].Location.Width / 8);
                     NewEffect(EFFID_SMOKE_S3, tempLocation);
                     Effect[numEffects].Location.SpeedX = 1.5_n;
-
                 }
                 NPC[A].Location.SpeedY = 0;
                 if(NPC[A].Slope > 0)
@@ -5256,7 +5255,7 @@ void SpecialNPC(int A)
         if(NPC[A].Special4 >= ((NPC[A].Special == 0) ? 5 : 10))
         {
             NPC[A].Special4 = 0;
-            NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + dRand() * NPC[A].Location.Width - 2, NPC[A].Location.Y + dRand() * NPC[A].Location.Height));
+            NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + dRand().times(NPC[A].Location.Width) - 2, NPC[A].Location.Y + dRand().times(NPC[A].Location.Height)));
             Effect[numEffects].Location.SpeedX = dRand() - 0.5_n;
             Effect[numEffects].Location.SpeedY = dRand() - 0.5_n;
 
@@ -5408,7 +5407,7 @@ void SpecialNPC(int A)
         {
             if(NPC[A].Type != NPCID_BLU_HIT_TURTLE_S4)
             {
-                if(fEqual((float)NPC[A].Location.SpeedY, Physics.NPCGravity))
+                if(num_t::fEqual_f(NPC[A].Location.SpeedY, Physics.NPCGravity))
                 {
                     tempLocation = NPC[A].Location;
                     tempLocation.Width += 32;

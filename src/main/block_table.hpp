@@ -263,28 +263,28 @@ struct rect_external
     rect_external(const Location_t& loc)
     {
         // find which 64x64 tiles contain the object
-        l = s_floor_div_64((int32_t)std::floor(loc.X));
-        r = s_floor_div_64((int32_t)std::ceil(loc.X + loc.Width) + 63);
-        t = s_floor_div_64((int32_t)std::floor(loc.Y));
-        b = s_floor_div_64((int32_t)std::ceil(loc.Y + loc.Height) + 63);
+        l = s_floor_div_64((int32_t)num_t::floor(loc.X));
+        r = s_floor_div_64((int32_t)num_t::ceil(loc.X + loc.Width) + 63);
+        t = s_floor_div_64((int32_t)num_t::floor(loc.Y));
+        b = s_floor_div_64((int32_t)num_t::ceil(loc.Y + loc.Height) + 63);
     }
 
     void query_from_loc_paranoid(const Location_t& loc)
     {
         // find which 64x64 tiles contain the query with a 32px margin in each direction
-        l = s_floor_div_64((int32_t)std::floor(loc.X) - 32);
-        r = s_floor_div_64((int32_t)std::ceil(loc.X + loc.Width) + 32 + 63);
-        t = s_floor_div_64((int32_t)std::floor(loc.Y) - 32);
-        b = s_floor_div_64((int32_t)std::ceil(loc.Y + loc.Height) + 32 + 63);
+        l = s_floor_div_64((int32_t)num_t::floor(loc.X) - 32);
+        r = s_floor_div_64((int32_t)num_t::ceil(loc.X + loc.Width) + 32 + 63);
+        t = s_floor_div_64((int32_t)num_t::floor(loc.Y) - 32);
+        b = s_floor_div_64((int32_t)num_t::ceil(loc.Y + loc.Height) + 32 + 63);
     }
 
     void query_from_loc_standard(const Location_t& loc)
     {
         // find which 64x64 tiles contain the query with a 2px margin in each direction
-        l = s_floor_div_64((int32_t)std::floor(loc.X) - 2);
-        r = s_floor_div_64((int32_t)std::ceil(loc.X + loc.Width) + 2 + 63);
-        t = s_floor_div_64((int32_t)std::floor(loc.Y) - 2);
-        b = s_floor_div_64((int32_t)std::ceil(loc.Y + loc.Height) + 2 + 63);
+        l = s_floor_div_64((int32_t)num_t::floor(loc.X) - 2);
+        r = s_floor_div_64((int32_t)num_t::ceil(loc.X + loc.Width) + 2 + 63);
+        t = s_floor_div_64((int32_t)num_t::floor(loc.Y) - 2);
+        b = s_floor_div_64((int32_t)num_t::ceil(loc.Y + loc.Height) + 2 + 63);
     }
 };
 

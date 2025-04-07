@@ -89,9 +89,9 @@ static inline int computeStarsShowingPolicy(int ll, int cur)
 }
 
 
-static inline int s_round2int(double d)
+static inline int s_round2int(num_t d)
 {
-    return std::floor(d + 0.5);
+    return num_t::floor(d + 0.5_n);
 }
 
 // draws GFX to screen when on the world map/world map editor

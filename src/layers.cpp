@@ -907,8 +907,8 @@ static inline bool s_initModernQScreen(Screen_t& screen, const int B, const Spee
 
         bool screen2_was_visible = vScreen[Z2].Visible;
 
-        double tX = 0.0;
-        double tY = 0.0;
+        num_t tX = 0;
+        num_t tY = 0;
 
         if(warped_plr == p1 || warped_plr == p2)
         {
@@ -962,11 +962,11 @@ static inline bool s_initModernQScreen(Screen_t& screen, const int B, const Spee
         if((tX || tY) && (screen2_was_visible && !vScreen[Z2].Visible))
         {
             // total distance of warp
-            double dSquare = tX * tX + tY * tY;
+            num_t dSquare = num_t::dist2(tX, tY);
 
             // project onto the circle: proportion of distance from each axis
-            double xProp = tX * tX / dSquare;
-            double yProp = tY * tY / dSquare;
+            num_t xProp = tX.times(tX).divided_by(dSquare);
+            num_t yProp = tY.times(tY).divided_by(dSquare);
 
             if(tX < 0)
                 xProp *= -1;
@@ -975,8 +975,8 @@ static inline bool s_initModernQScreen(Screen_t& screen, const int B, const Spee
                 yProp *= -1;
 
             // maximum total shift of 1/4 of the vScreen's size; also limit by 200x150 (SMBX64 amount)
-            double maxShiftX = vScreen[Z1].Width / 4;
-            double maxShiftY = vScreen[Z1].Height / 4;
+            int maxShiftX = vScreen[Z1].Width / 4;
+            int maxShiftY = vScreen[Z1].Height / 4;
 
             if(maxShiftX > 200)
                 maxShiftX = 200;
@@ -1069,7 +1069,7 @@ static inline bool s_initModernQScreen(Screen_t& screen, const int B, const Spee
                 GetPlayerScreen(800, 600, plr, old_cx, old_cy);
                 level[B] = newLevel;
 
-                if(std::abs(cx - old_cx) > 32 || std::abs(cy - old_cy) > 32)
+                if(num_t::abs(cx - old_cx) > 32 || num_t::abs(cy - old_cy) > 32)
                     use_new_resize = false;
             }
 
@@ -1096,12 +1096,12 @@ static inline bool s_initModernQScreen(Screen_t& screen, const int B, const Spee
                     // otherwise, limit distance
                     else
                     {
-                        double distance = SDL_sqrt((vScreen[Z_i].X - qScreenLoc[Z_i].X) * (vScreen[Z_i].X - qScreenLoc[Z_i].X) + (vScreen[Z_i].Y - qScreenLoc[Z_i].Y) * (vScreen[Z_i].Y - qScreenLoc[Z_i].Y));
+                        num_t distance = num_t::dist(vScreen[Z_i].X - qScreenLoc[Z_i].X, vScreen[Z_i].Y - qScreenLoc[Z_i].Y);
 
                         if(distance > 400)
                         {
-                            qScreenLoc[Z_i].X = (qScreenLoc[Z_i].X - vScreen[Z_i].X) * 400 / distance + vScreen[Z_i].X;
-                            qScreenLoc[Z_i].Y = (qScreenLoc[Z_i].Y - vScreen[Z_i].Y) * 400 / distance + vScreen[Z_i].Y;
+                            qScreenLoc[Z_i].X = ((qScreenLoc[Z_i].X - vScreen[Z_i].X) * 400).divided_by(distance) + vScreen[Z_i].X;
+                            qScreenLoc[Z_i].Y = ((qScreenLoc[Z_i].Y - vScreen[Z_i].Y) * 400).divided_by(distance) + vScreen[Z_i].Y;
                         }
                     }
                 }
@@ -1450,7 +1450,7 @@ event_resume:
             newEventNum++;
             NewEvent[newEventNum] = evt.TriggerEvent;
             // note: this should be rounded towards even, this is non-trivial to implement as integer logic even though all variables involved are integers
-            newEventDelay[newEventNum] = vb6Round(evt.TriggerDelay * 6.5);
+            newEventDelay[newEventNum] = num_t::vb6round(evt.TriggerDelay * 6.5_n);
             newEventPlayer[newEventNum] = static_cast<uint8_t>(whichPlayer);
         }
         else
@@ -1734,18 +1734,18 @@ void UpdateLayers()
 
                 if(!Layer[A].blocks.empty())
                 {
-                    if(std::abs(Layer[A].SpeedX) > g_drawBlocks_invalidate_rate)
-                        g_drawBlocks_invalidate_rate = std::abs(Layer[A].SpeedX);
-                    if(std::abs(Layer[A].SpeedY) > g_drawBlocks_invalidate_rate)
-                        g_drawBlocks_invalidate_rate = std::abs(Layer[A].SpeedY);
+                    if(num_t::abs(SpeedX) > g_drawBlocks_invalidate_rate)
+                        g_drawBlocks_invalidate_rate = num_t::abs(SpeedX);
+                    if(num_t::abs(SpeedY) > g_drawBlocks_invalidate_rate)
+                        g_drawBlocks_invalidate_rate = num_t::abs(SpeedY);
                 }
 
                 if(!Layer[A].BGOs.empty())
                 {
-                    if(std::abs(Layer[A].SpeedX) > g_drawBGOs_invalidate_rate)
-                        g_drawBGOs_invalidate_rate = std::abs(Layer[A].SpeedX);
-                    if(std::abs(Layer[A].SpeedY) > g_drawBGOs_invalidate_rate)
-                        g_drawBGOs_invalidate_rate = std::abs(Layer[A].SpeedY);
+                    if(num_t::abs(SpeedX) > g_drawBGOs_invalidate_rate)
+                        g_drawBGOs_invalidate_rate = num_t::abs(SpeedX);
+                    if(num_t::abs(SpeedY) > g_drawBGOs_invalidate_rate)
+                        g_drawBGOs_invalidate_rate = num_t::abs(SpeedY);
                 }
 
                 // is the layer currently included in the main block quadtree?

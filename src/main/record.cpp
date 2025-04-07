@@ -615,17 +615,18 @@ static void read_status()
             break;
         }
 
+        num_t dx = num_t::abs(num_t::from_double(px) - Player[i].Location.X);
+        num_t dy = num_t::abs(num_t::from_double(py) - Player[i].Location.Y);
+
         // quite non-strict because in a true divergence situation, it will get continually worse
-        if(SDL_fabs(px - Player[i].Location.X) > 0.01 ||
-           SDL_fabs(py - Player[i].Location.Y) > 0.01)
+        if(dx > 0.01_n || dy > 0.01_n)
         {
             pLogWarning("player %d position diverged (old x=%f new x=%f, old y=%f new y=%f) at frame %" PRId64 ".",
                         i,
                         px, (double)Player[i].Location.X,
                         py, (double)Player[i].Location.Y, frame_no);
             diverged_minor = true;
-            if(SDL_fabs(px - Player[i].Location.X) > 1 ||
-               SDL_fabs(py - Player[i].Location.Y) > 1)
+            if(dx > 1 || dy > 1)
             {
                 pLogWarning("  this is a major divergence.");
                 diverged_major = true;
@@ -733,25 +734,25 @@ static void read_NPCs()
                 diverged_minor = true;
             }
 
-            if(SDL_fabs(X - n.Location.X) > 0.01 ||
-               SDL_fabs(Y - n.Location.Y) > 0.01 ||
-               SDL_fabs(W - n.Location.Width) > 0.01 ||
-               SDL_fabs(H - n.Location.Height) > 0.01)
+            if(num_t::abs(num_t::from_double(X) - n.Location.X) > 0.01_n ||
+               num_t::abs(num_t::from_double(Y) - n.Location.Y) > 0.01_n ||
+               num_t::abs(num_t::from_double(W) - n.Location.Width) > 0.01_n ||
+               num_t::abs(num_t::from_double(H) - n.Location.Height) > 0.01_n)
             {
                 pLogWarning("NPC[%d].Location diverged (old %lf %lf %lf %lf, new %lf %lf %lf %lf; type %d) at frame %" PRId64 ".", i,
                     X, Y, W, H, (double)n.Location.X, (double)n.Location.Y, (double)n.Location.Width, (double)n.Location.Height, n.Type, frame_no);
                 diverged_minor = true;
             }
 
-            double sOld[] = {S1, S2, S3, S4, S5, S6, S7};
-            double sNew[] = {(double)n.Special, (double)n.Special2, (double)n.Special3, (double)n.Special4, (double)n.Special5, (double)n.SpecialX, (double)n.SpecialY};
+            num_t sOld[] = {num_t::from_double(S1), num_t::from_double(S2), num_t::from_double(S3), num_t::from_double(S4), num_t::from_double(S5), num_t::from_double(S6), num_t::from_double(S7)};
+            num_t sNew[] = {n.Special, n.Special2, n.Special3, n.Special4, n.Special5, n.SpecialX, n.SpecialY};
 
             for(int s = 0; s < 7; ++s)
             {
-                if(!fEqual(sOld[s], sNew[s]))
+                if(!num_t::fEqual_d(sOld[s], sNew[s]))
                 {
                     pLogWarning("NPC[%d].Special%d diverged (old %f => new %f; type %d) at frame %" PRId64 ".",
-                                i, s + 1, sOld[s], sNew[s], n.Type, frame_no);
+                                i, s + 1, (double)sOld[s], (double)sNew[s], n.Type, frame_no);
                     diverged_minor = true;
                 }
             }

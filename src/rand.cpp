@@ -114,5 +114,7 @@ num_t dRand()
     g_random_calls.push_back(stack[1]);
 #endif
 
-    return std::ldexp(g_random_engine(), -32);
+#ifndef THEXTECH_FIXED_POINT
+    return num_t(std::ldexp(g_random_engine(), -32), nullptr);
+#endif
 }

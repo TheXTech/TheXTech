@@ -64,9 +64,9 @@ void SavedVariableBank::ImportBank()
         InitSaveFile();
 
     for(auto &d : gLunaVarBank.data)
-        SetVar(d.key, std::atof(d.value.c_str()));
+        SetVar(d.key, num_t::from_double(std::atof(d.value.c_str())));
 
-    lastStarsNumber = Maths::iRound(GetVar(SPECIAL_SAVE_STR));
+    lastStarsNumber = num_t::round(GetVar(SPECIAL_SAVE_STR));
 }
 
 // SET VAR

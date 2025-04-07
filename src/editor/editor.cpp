@@ -343,8 +343,8 @@ void UpdateEditor()
         else
             ScrollRelease = true;
 
-        vScreen[1].Y = SDL_floor((((vScreen[1].Y + 8) / 32))) * 32 - 8;
-        vScreen[1].X = SDL_floor(((vScreen[1].X / 32))) * 32;
+        vScreen[1].Y = num_t::floor((vScreen[1].Y + 8) / 32) * 32 - 8;
+        vScreen[1].X = num_t::floor(vScreen[1].X / 32) * 32;
     }
     else
     {
@@ -1871,8 +1871,8 @@ int EditorNPCFrame(const NPCID A, vbint_t& C, int N)
                     Player[D].Character != 4 && Player[D].TimeToLive == 0)
                 {
                     // this logic is expensive and broken but must be kept because this NPC's frame affects the RNG state (via effect spawning)
-                    int dist = (int)(std::abs(NPC[N].Location.minus_center_x(Player[D].Location))
-                        + std::abs(NPC[N].Location.minus_center_y(Player[D].Location)));
+                    int dist = (int)(num_t::abs(NPC[N].Location.minus_center_x(Player[D].Location))
+                        + num_t::abs(NPC[N].Location.minus_center_y(Player[D].Location)));
 
                     // dist should get compared to E, but instead it's compared to D
                     if(E == 0 || dist < D)
@@ -2321,23 +2321,19 @@ void PositionCursor()
     {
         if(!(EditorCursor.Mode == OptCursor_t::LVL_NPCS && EditorCursor.NPC.Type == 52))
         {
-            if(std::fmod(EditorCursor.Location.Width, 32) != 0.0)
+            num_t odd_width = EditorCursor.Location.Width - num_t::floor(EditorCursor.Location.Width / 32) * 32;
+            num_t odd_height = EditorCursor.Location.Height - num_t::floor(EditorCursor.Location.Height / 32) * 32;
+
+            if(odd_width != 0)
             {
                 if(EditorCursor.Location.Width > 32)
-                    EditorCursor.Location.X += -std::fmod(EditorCursor.Location.Width, 32) / 2.0;
-                else if(EditorCursor.Location.Width <= 16)
-                {
-                    EditorCursor.Location.X += std::fmod(32, EditorCursor.Location.Width) / 2.0;
-                    EditorCursor.Location.X += (32 - EditorCursor.Location.Width) / 2.0;
-                }
-                else if(EditorCursor.Location.Width < 32)
-                    EditorCursor.Location.X += std::fmod(32, EditorCursor.Location.Width) / 2.0;
+                    EditorCursor.Location.X += -odd_width / 2;
                 else
-                    EditorCursor.Location.X += std::fmod(32, EditorCursor.Location.Width) / 2.0;
+                    EditorCursor.Location.X += 16 - odd_width / 2;
             }
 
-            if(std::fmod(EditorCursor.Location.Height, 32) != 0.0)
-                EditorCursor.Location.Y += -std::fmod(EditorCursor.Location.Height, 32);
+            if(odd_height != 0)
+                EditorCursor.Location.Y += -odd_height;
         }
     }
 
@@ -2356,8 +2352,8 @@ void PositionCursor()
     {
         if(EditorCursor.NPC.Type == 245 || EditorCursor.NPC.Type == 8 ||
            EditorCursor.NPC.Type == 270 || EditorCursor.NPC.Type == 93 ||
-           EditorCursor.NPC.Type == 180 || EditorCursor.NPC.Type ==179 ||
-           EditorCursor.NPC.Type == 37 || EditorCursor.NPC.Type ==51) // Piranha Plants
+           EditorCursor.NPC.Type == 180 || EditorCursor.NPC.Type == 179 ||
+           EditorCursor.NPC.Type == 37 || EditorCursor.NPC.Type == 51) // Piranha Plants
             EditorCursor.Location.X += 16;
         else if(EditorCursor.NPC.Type == 197)
         {
@@ -3087,7 +3083,7 @@ void InteractResizeSection(IntegerLocation_t& section)
 
     if(EditorCursor.InteractFlags & IF_ResizeT)
     {
-        int new_Y = static_cast<int>(round(static_cast<double>(EditorCursor.Location.Y / 32))) * 32;
+        int new_Y = num_t::round(EditorCursor.Location.Y / 32) * 32;
         if(section.Height - new_Y < 600)
             new_Y = section.Height - 600;
 
@@ -3100,7 +3096,7 @@ void InteractResizeSection(IntegerLocation_t& section)
 
     if(EditorCursor.InteractFlags & IF_ResizeL)
     {
-        int new_X = static_cast<int>(round(static_cast<double>(EditorCursor.Location.X / 32))) * 32;
+        int new_X = num_t::round(EditorCursor.Location.X / 32) * 32;
         if(section.Width - new_X < 800)
             new_X = section.Width - 800;
 
@@ -3113,7 +3109,7 @@ void InteractResizeSection(IntegerLocation_t& section)
 
     if(EditorCursor.InteractFlags & IF_ResizeR)
     {
-        int new_Width = static_cast<int>(round(static_cast<double>(EditorCursor.Location.X / 32))) * 32;
+        int new_Width = num_t::round(EditorCursor.Location.X / 32) * 32;
         if(new_Width - section.X < 800)
             new_Width = section.X + 800;
 
@@ -3126,7 +3122,7 @@ void InteractResizeSection(IntegerLocation_t& section)
 
     if(EditorCursor.InteractFlags & IF_ResizeB)
     {
-        int new_Height = static_cast<int>(round(static_cast<double>(EditorCursor.Location.Y / 32))) * 32;
+        int new_Height = num_t::round(EditorCursor.Location.Y / 32) * 32;
         if(new_Height - section.Y < 600)
             new_Height = section.Y + 600;
 
@@ -3180,8 +3176,8 @@ void MouseMove(int X, int Y, bool /*nCur*/)
     // translate into layer coordinates to snap to layer's grid
     if(MagicHand && EditorCursor.Layer != LAYER_NONE)
     {
-        lX = 32 - (Layer[EditorCursor.Layer].OffsetX - SDL_floor(Layer[EditorCursor.Layer].OffsetX / 32) * 32);
-        lY = 32 - (Layer[EditorCursor.Layer].OffsetY - SDL_floor(Layer[EditorCursor.Layer].OffsetY / 32) * 32);
+        lX = 32 - (Layer[EditorCursor.Layer].OffsetX - num_t::floor(Layer[EditorCursor.Layer].OffsetX / 32) * 32);
+        lY = 32 - (Layer[EditorCursor.Layer].OffsetY - num_t::floor(Layer[EditorCursor.Layer].OffsetY / 32) * 32);
         X += (int)lX;
         Y += (int)lY;
     }
@@ -3194,8 +3190,8 @@ void MouseMove(int X, int Y, bool /*nCur*/)
     }
     else
     {
-        int vScreenX = SDL_floor(((vScreen[A].X / 32))) * 32;
-        int vScreenY = SDL_floor((((vScreen[A].Y + 8) / 32))) * 32 - 8;
+        int vScreenX = num_t::floor(vScreen[A].X / 32) * 32;
+        int vScreenY = num_t::floor((vScreen[A].Y + 8) / 32) * 32 - 8;
 
         X += (int)(vScreenX - vScreen[A].X);
         Y += (int)(vScreenY - vScreen[A].Y);

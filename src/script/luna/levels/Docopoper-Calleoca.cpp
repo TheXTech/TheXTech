@@ -133,7 +133,7 @@ void Phase0()
 void Phase1()
 {
     thwomp_hspeed += (demo->Location.X - calleoca_x) / 1000;
-    if(SDL_abs(thwomp_height - calleoca_y) < 8)
+    if(num_t::abs(thwomp_height - calleoca_y) < 8)
     {
         thwomp_hspeed = Clamp<num_t>(thwomp_hspeed, -9, 9);
 
@@ -200,9 +200,9 @@ void Phase2()
 //Missile
 void Phase3()
 {
-    calleoca_npc1->Frame = 3 + Maths::iRound(missile_direction / 45) % 8;
+    calleoca_npc1->Frame = 3 + num_t::round(missile_direction / 45) % 8;
 
-    int dir = (int)(std::atan2((demo->Location.Y + demo->Location.Height / 2) - (calleoca_y + 32),
+    int dir = (int)(num_t::atan2((demo->Location.Y + demo->Location.Height / 2) - (calleoca_y + 32),
                               -(demo->Location.X + demo->Location.Width / 2) + (calleoca_x + 32))
                                 * 180 / PI);
 
@@ -213,8 +213,8 @@ void Phase3()
     else if(missile_direction < 0)
         missile_direction += 360;
 
-    missile_hspeed += std::cos(missile_direction * PI / 180) * 0.25;
-    missile_vspeed -= std::sin(missile_direction * PI / 180) * 0.25;
+    missile_hspeed += num_t::cos(missile_direction * PI / 180) / 4;
+    missile_vspeed -= num_t::sin(missile_direction * PI / 180) / 4;
 
     missile_hspeed = Clamp<num_t>(missile_hspeed * 0.975_r, -15, 15);
     missile_vspeed = Clamp<num_t>(missile_vspeed * 0.975_r, -15, 15);
@@ -257,8 +257,8 @@ void Phase4()
     }
     else
     {
-        fishingboo_hspeed += (demo->Location.X - calleoca_x) * 0.001 * fishingboo_ferocity;
-        fishingboo_vspeed += (demo->Location.Y - calleoca_y) * 0.001 * fishingboo_ferocity;
+        fishingboo_hspeed += (demo->Location.X - calleoca_x).times(fishingboo_ferocity) / 1000;
+        fishingboo_vspeed += (demo->Location.Y - calleoca_y).times(fishingboo_ferocity) / 1000;
         fishingboo_hspeed = Clamp<num_t>(fishingboo_hspeed, -7 * fishingboo_ferocity, 7 * fishingboo_ferocity);
         fishingboo_vspeed = Clamp<num_t>(fishingboo_vspeed, -0.5_rb * fishingboo_ferocity, 0.5_rb * fishingboo_ferocity);
 

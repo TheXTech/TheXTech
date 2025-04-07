@@ -54,8 +54,8 @@ static void s_makeSparkles(const NPC_t& npc, int speed_random, int speed_mult)
 
     for(int C = 1; C <= 50; C++)
     {
-        tempLocation.X = tempLocX_base + dRand() * npc.Location.Width;
-        tempLocation.Y = tempLocY_base + dRand() * npc.Location.Height;
+        tempLocation.X = tempLocX_base + dRand().times(npc.Location.Width);
+        tempLocation.Y = tempLocY_base + dRand().times(npc.Location.Height);
         NewEffect(EFFID_SPARKLE, tempLocation);
 
         Effect[numEffects].Location.SpeedX = (dRand() - 0.5_n) * speed_random - npc.Location.SpeedX * speed_mult / 10;
@@ -434,7 +434,7 @@ resume_TriggerLast:
         {
             PlaySoundSpatial(SFX_SMGlass, NPC[A].Location);
             for(C = 1; C <= 100; C++)
-                NewEffect(EFFID_BOSS_CASE_BREAK, newLoc(NPC[A].Location.X + dRand() * NPC[A].Location.Width - 16, NPC[A].Location.Y + dRand() * NPC[A].Location.Height - 16));
+                NewEffect(EFFID_BOSS_CASE_BREAK, newLoc(NPC[A].Location.X + dRand().times(NPC[A].Location.Width) - 16, NPC[A].Location.Y + dRand().times(NPC[A].Location.Height) - 16));
         }
         else if(NPC[A].Type == NPCID_BOSS_FRAGILE)
         {

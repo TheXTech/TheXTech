@@ -107,13 +107,13 @@ void ScienceCode()
 
             x_diff = doughnut->Location.X - demo->Location.X;
             y_diff = doughnut->Location.Y - demo->Location.Y;
-            m = SDL_sqrt(x_diff * x_diff + y_diff * y_diff);
+            m = num_t::dist(x_diff, y_diff);
 
             if(m == 0)
                 continue;
 
-            x_diff /= m;
-            y_diff /= m;
+            x_diff = x_diff.divided_by(m);
+            y_diff = y_diff.divided_by(m);
 
             doughnut->Location.X += x_diff * 15;
             doughnut->Location.Y += y_diff * 15;

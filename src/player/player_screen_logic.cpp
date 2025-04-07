@@ -208,12 +208,12 @@ void PlayerEffectWings(int A)
         num_t target_SpeedX = (target_X - center_X);
         num_t target_SpeedY = (target_Y - center_Y);
 
-        double target_speed = SDL_sqrt(target_SpeedX * target_SpeedX + target_SpeedY * target_SpeedY);
+        num_t target_speed = num_t::dist(target_SpeedX, target_SpeedY);
 
         if(target_speed != 0)
         {
-            target_SpeedX *= 8 / target_speed;
-            target_SpeedY *= 8 / target_speed;
+            target_SpeedX = (target_SpeedX * 8).divided_by(target_speed);
+            target_SpeedY = (target_SpeedY * 8).divided_by(target_speed);
         }
 
         p.Location.SpeedX = (p.Location.SpeedX + target_SpeedX) / 2;
@@ -228,7 +228,7 @@ void PlayerEffectWings(int A)
     // deceleration
     else
     {
-        double sq_speed = p.Location.SpeedX * p.Location.SpeedX + p.Location.SpeedY * p.Location.SpeedY;
+        num_t sq_speed = num_t::dist2(p.Location.SpeedX, p.Location.SpeedY);
         qdec_t decelerate_rate = (sq_speed > 4) ? 0.95_r : (sq_speed > 1) ? 0.99_r : 0.999_r;
 
         if(sq_speed <= 4)

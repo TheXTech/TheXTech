@@ -403,7 +403,7 @@ void LoadCustomNPC(int A, std::string cFileName)
     if(npc.en_foreground)
         traits.Foreground = npc.foreground;
     if(npc.en_speed)
-        traits.Speedvar = float(npc.speed);
+        traits.Speedvar = (numf_t)num_t::from_double((float)npc.speed);
     if(npc.en_nofireball)
         traits.NoFireBall = npc.nofireball;
     if(npc.en_noiceball)

@@ -347,7 +347,7 @@ void NPCSpecialMaybeHeld(int A)
                 // This formula got been compacted: If something will glitch, feel free to restore back this crap
                 // NPC[A].Location.SpeedX = (static_cast<int>(std::floor(static_cast<num_t>(((Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2 - 16) + 1) / 32))) * 32 + 1 - NPC[A].Location.X) / 50;
                 num_t pCenter = pl.X + pl.Width / 2;
-                sx = std::floor((pCenter - 15) / 32) * 32 + 1;
+                sx = num_t::floor((pCenter - 15) / 32) * 32 + 1;
                 sx -= NPC[A].Location.X;
                 sx /= 50;
                 if(sx > 15)

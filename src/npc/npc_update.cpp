@@ -60,7 +60,7 @@
 
 void CheckNPCWidth(NPC_t& n)
 {
-    if(fEqual(n.Location.Width, 32.0))
+    if(num_t::fEqual_d(n.Location.Width, 32))
     {
         if(n.Type != NPCID_CONVEYOR && n.Type != NPCID_STATUE_S3)
         {
@@ -75,10 +75,10 @@ void CheckNPCWidth(NPC_t& n)
             n.Location.Width -= 0.03_n;
         }
     }
-    else if(fEqual(n.Location.Width, 256.0))
+    else if(num_t::fEqual_d(n.Location.Width, 256))
         n.Location.Width = 255.9_n;
-    else if(fEqual(n.Location.Width, 128.0))
-        n.Location.Width = 127.9;
+    else if(num_t::fEqual_d(n.Location.Width, 128))
+        n.Location.Width = 127.9_n;
 
     // unset a bunch of variables that would normally decay for inactive NPCs
     if(!n.Active)
@@ -863,7 +863,7 @@ resume_Activation_Chain:
                     Block[numBlock] = blankBlock;
                     Block[numBlock].Type = 0;
                     Block[numBlock].Location = NPC[A].Location;
-                    Block[numBlock].Location.Y = floor(Block[numBlock].Location.Y + 0.02);
+                    Block[numBlock].Location.Y = num_t::floor(Block[numBlock].Location.Y + 0.02_n);
                     Block[numBlock].tempBlockVehiclePlr = NPC[A].vehiclePlr;
                     Block[numBlock].tempBlockVehicleYOffset = NPC[A].vehicleYOffset;
                     Block[numBlock].tempBlockNpcIdx = A;
@@ -913,9 +913,9 @@ interrupt_Activation:
             Block[numBlock] = blankBlock;
             Block[numBlock].Type = 25;
             Block[numBlock].Location = Player[A].Location;
-            Block[numBlock].Location.X = static_cast<int>(floor(static_cast<double>(Block[numBlock].Location.X))) + 1;
-            Block[numBlock].Location.Y = static_cast<int>(floor(static_cast<double>(Block[numBlock].Location.Y))) + 1;
-            Block[numBlock].Location.Width = static_cast<int>(floor(static_cast<double>(Block[numBlock].Location.Width))) + 1;
+            Block[numBlock].Location.X = num_t::floor(Block[numBlock].Location.X) + 1;
+            Block[numBlock].Location.Y = num_t::floor(Block[numBlock].Location.Y) + 1;
+            Block[numBlock].Location.Width = num_t::floor(Block[numBlock].Location.Width) + 1;
             Block[numBlock].tempBlockVehiclePlr = A;
 
             // delay add to below if it will be sorted
@@ -1194,7 +1194,7 @@ interrupt_Activation:
 #endif
 
             if(!NPC[A].Projectile)
-                speedVar = speedVar * NPC[A]->Speedvar;
+                speedVar = speedVar.times(NPC[A]->Speedvar);
 
             // water check
 
@@ -1364,11 +1364,8 @@ interrupt_Activation:
                 else if(NPC[A].Location.SpeedY > 0.5_n)
                     NPC[A].Location.SpeedY = 0.5_n;
 
-                speedVar *= 0.3_r;
+                speedVar = speedVar * 3 / 10;
             }
-
-
-
 
             if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
             {
@@ -1908,10 +1905,10 @@ interrupt_Activation:
 
             // Originally applied for all NPCs, even if inactive.
             // Moved here because speedVar is only validly set here.
-            if(!fEqual(speedVar, 1) && !fEqual(speedVar, 0))
+            if(!num_t::fEqual_f(speedVar, 1) && !num_t::fEqual_f(speedVar, 0))
             {
                 NPC[A].RealSpeedX = numf_t(NPC[A].Location.SpeedX);
-                NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * double(speedVar);
+                NPC[A].Location.SpeedX = NPC[A].Location.SpeedX.times(num_t(speedVar));
             }
 
             // finally update NPC's tree status if needed, and split the tempBlock (since it has not been updated)

@@ -716,8 +716,8 @@ bool OpenLevel_Event(void* userdata, LevelSMBX64Event& e)
             // Simple style is only supported yet
             if(s.autoscroll_style == LevelEvent_Sets::AUTOSCROLL_SIMPLE)
             {
-                ss.autoscroll_x = s.autoscrol_x;
-                ss.autoscroll_y = s.autoscrol_y;
+                ss.autoscroll_x = (numf_t)num_t::from_double((float)s.autoscrol_x);
+                ss.autoscroll_y = (numf_t)num_t::from_double((float)s.autoscrol_y);
             }
         }
 
@@ -740,11 +740,11 @@ bool OpenLevel_Event(void* userdata, LevelSMBX64Event& e)
 
         event.AutoStart = e.autostart;
         event.MoveLayer = load.FindLayer(e.movelayer);
-        event.SpeedX = float(e.layer_speed_x);
-        event.SpeedY = float(e.layer_speed_y);
+        event.SpeedX = (numf_t)num_t::from_double((float)e.layer_speed_x);
+        event.SpeedY = (numf_t)num_t::from_double((float)e.layer_speed_y);
 
-        event.AutoX = float(e.move_camera_x);
-        event.AutoY = float(e.move_camera_y);
+        event.AutoX = (numf_t)num_t::from_double((float)e.move_camera_x);
+        event.AutoY = (numf_t)num_t::from_double((float)e.move_camera_y);
         event.AutoSection = int(e.scroll_section);
     }
 

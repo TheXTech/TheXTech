@@ -22,6 +22,10 @@
 #ifndef XT_NUMERIC_TYPES_H
 #define XT_NUMERIC_TYPES_H
 
+#ifndef THEXTECH_FIXED_POINT
+
 #include "floating_point.h"
+
+#endif
 
 #endif // #ifndef XT_NUMERIC_TYPES_H

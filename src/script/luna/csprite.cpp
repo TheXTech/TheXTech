@@ -222,12 +222,12 @@ void CSprite::SetCustomVar(std::string var_name, OPTYPE operation_to_do, num_t v
             m_CustomVars[var_name] = var_val - value;
             break;
         case OP_Mult:
-            m_CustomVars[var_name] = var_val * value;
+            m_CustomVars[var_name] = var_val.times(value);
             break;
         case OP_Div:
             if(value == 0)
                 break;
-            m_CustomVars[var_name] = var_val / value;
+            m_CustomVars[var_name] = var_val.divided_by(value);
             break;
         case OP_XOR:
             m_CustomVars[var_name] = (int)var_val ^ (int)value;

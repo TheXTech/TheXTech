@@ -37,7 +37,7 @@
 
 static inline int s_round2int(num_t d)
 {
-    return std::floor(d + 0.5);
+    return num_t::floor(d + 0.5_n);
 }
 
 
@@ -82,7 +82,7 @@ void SpriteFunc::WaitForPlayer(CSprite *me, SpriteComponent *obj)
         auto ftype = (FIELDTYPE)SDL_atoi(obj->data5.c_str());
 //        uint8_t *ptr = (uint8_t *)demo;
 //        ptr += (int)obj->data1; // offset
-        bool triggered = CheckMem(demo, (int)obj->data1, std::floor(obj->data2), (COMPARETYPE)(int)obj->data3, ftype);
+        bool triggered = CheckMem(demo, (int)obj->data1, num_t::floor(obj->data2), (COMPARETYPE)(int)obj->data3, ftype);
         if(triggered)
         {
             //TODO: FINISH IT
@@ -341,8 +341,8 @@ void SpriteFunc::OnPlayerDistance(CSprite *me, SpriteComponent *obj)
     Player_t *demo = PlayerF::Get(1);
     if(demo)
     {
-        double xdist = std::abs(demo->Location.X - me->m_Xpos);
-        double ydist = std::abs(demo->Location.Y - me->m_Ypos);
+        num_t xdist = num_t::abs(demo->Location.X - me->m_Xpos);
+        num_t ydist = num_t::abs(demo->Location.Y - me->m_Ypos);
 
         // Checking farness or nearness?
         if(obj->data2 == 0)
@@ -395,10 +395,10 @@ void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
 
             if(me->m_CollisionCode == -1)   // default solid collision
             {
-                num_t block_topcol = std::abs(block->Location.Y - sprite_bot);
-                num_t block_botcol = std::abs((block->Location.Y + block->Location.Height) - sprite_top);
-                num_t block_leftcol = std::abs(block->Location.X - sprite_right);
-                num_t block_rightcol = std::abs((block->Location.X + block->Location.Width) - sprite_left);
+                num_t block_topcol = num_t::abs(block->Location.Y - sprite_bot);
+                num_t block_botcol = num_t::abs((block->Location.Y + block->Location.Height) - sprite_top);
+                num_t block_leftcol = num_t::abs(block->Location.X - sprite_right);
+                num_t block_rightcol = num_t::abs((block->Location.X + block->Location.Width) - sprite_left);
 
                 // Determine best direction to free sprite
                 // Top collision, push sprite up and out
@@ -406,7 +406,7 @@ void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
                    block_topcol <= block_rightcol && !collided_top)
                 {
                     me->m_Ypos = (block->Location.Y - me->m_Hitbox.H) - 1;
-                    me->m_Yspd = -(me->m_Yspd * energy_loss_mod);
+                    me->m_Yspd = -(me->m_Yspd.times(energy_loss_mod));
                     collided_top = true;
                 }
 
@@ -414,7 +414,7 @@ void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
                 else if(block_botcol <= block_leftcol && block_botcol <= block_rightcol && !collided_right)
                 {
                     me->m_Ypos = ((block->Location.Y + block->Location.Height) - me->m_Hitbox.Top_off) + 1;
-                    me->m_Yspd = -(me->m_Yspd * energy_loss_mod);
+                    me->m_Yspd = -(me->m_Yspd.times(energy_loss_mod));
                     // collided_bot = true;
                 }
 
@@ -422,7 +422,7 @@ void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
                 else if(block_leftcol <= block_rightcol && !collided_left)
                 {
                     me->m_Xpos = (block->Location.X - me->m_Hitbox.W) - 1;
-                    me->m_Xspd = -(me->m_Xspd  * energy_loss_mod);
+                    me->m_Xspd = -(me->m_Xspd.times(energy_loss_mod));
                     collided_left = true;
                 }
 
@@ -430,7 +430,7 @@ void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
                 else if(!collided_right)
                 {
                     me->m_Xpos = ((block->Location.X + block->Location.Width) - me->m_Hitbox.Left_off) + 1;
-                    me->m_Xspd = -(me->m_Xspd  * energy_loss_mod);
+                    me->m_Xspd = -(me->m_Xspd.times(energy_loss_mod));
                     collided_right = true;
                 }
             }
@@ -506,8 +506,8 @@ void SpriteFunc::TeleportNearPlayer(CSprite *me, SpriteComponent *obj)
         num_t cx = demo->Location.X;
         num_t cy = demo->Location.Y;
         num_t phase = iRand2(360);
-        double xoff = std::sin(phase) * obj->data1;
-        double yoff = std::cos(phase) * obj->data1;
+        num_t xoff = num_t::sin(phase).times(obj->data1);
+        num_t yoff = num_t::cos(phase).times(obj->data1);
         me->m_Xpos = cx + xoff;
         me->m_Ypos = cy + yoff;
     }
@@ -561,8 +561,8 @@ void SpriteFunc::GenerateAtAngle(CSprite *me, SpriteComponent *obj)
     num_t angle = me->GetCustomVar(CVAR_GEN_ANGLE);
     num_t speed = obj->data3;
 
-    double vx = std::cos(angle) * speed;                 // vector x speed
-    double vy = std::sin(angle) * speed;                 // vector y speed
+    num_t vx = num_t::cos(angle).times(speed);     // vector x speed
+    num_t vy = num_t::sin(angle).times(speed);     // vector y speed
     num_t gx = me->m_Hitbox.CenterX() + (vx * 2);  // generation point
     num_t gy = me->m_Hitbox.CenterY() + (vy * 2);  // generation point
 
@@ -647,11 +647,11 @@ void SpriteFunc::AnimateFloat(CSprite *me, SpriteComponent *obj)
     num_t y_mag = obj->data3;
     if(speed != 0 && (x_mag != 0 || y_mag != 0))
     {
-        double frame_val = me->m_FrameCounter / speed;
+        num_t frame_val = num_t(me->m_FrameCounter).divided_by(speed);
         if(x_mag != 0)
-            me->m_GfxXOffset = (int)(std::cos(frame_val) * x_mag);
+            me->m_GfxXOffset = (int)(num_t::cos(frame_val).times(x_mag));
         if(y_mag != 0)
-            me->m_GfxYOffset = (int)(std::sin(frame_val) * y_mag);
+            me->m_GfxYOffset = (int)(num_t::sin(frame_val).times(y_mag));
     }
 }
 

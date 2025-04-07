@@ -714,8 +714,8 @@ bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &refere
     }
 
     // Break tie based on x-proximity
-    num_t newBlockDist = std::abs((newBlock.Location.X + newBlock.Location.Width / 2) - refX);
-    num_t oldBlockDist = std::abs((oldBlock.Location.X + oldBlock.Location.Width / 2) - refX);
+    num_t newBlockDist = num_t::abs((newBlock.Location.X + newBlock.Location.Width / 2) - refX);
+    num_t oldBlockDist = num_t::abs((oldBlock.Location.X + oldBlock.Location.Width / 2) - refX);
 
     if(newBlockDist < oldBlockDist)
     {

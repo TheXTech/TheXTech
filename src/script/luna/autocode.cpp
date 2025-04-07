@@ -57,9 +57,9 @@
 
 #include "main/trees.h"
 
-static inline int s_round2int(double d)
+static inline int s_round2int(num_t d)
 {
-    return std::floor(d + 0.5);
+    return num_t::floor(d + 0.5_n);
 }
 
 static FIELDTYPE StrToFieldtype(std::string string)
@@ -902,7 +902,7 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                LayerF::SetXSpeed(layer, (float)SDL_atof(GetS(MyString).c_str()));
+                LayerF::SetXSpeed(layer, num_t::from_double(SDL_atof(GetS(MyString).c_str())));
                 if(Length == 1 && Param1 != 0)
                     LayerF::SetXSpeed(layer, 0.0001_n);
             }
@@ -914,7 +914,7 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                LayerF::SetYSpeed(layer, (float)SDL_atof(GetS(MyString).c_str()));
+                LayerF::SetYSpeed(layer, num_t::from_double(SDL_atof(GetS(MyString).c_str())));
                 if(Length == 1 && Param1 != 0)
                     LayerF::SetYSpeed(layer, 0.0001_n);
             }
@@ -926,8 +926,8 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                auto accel = (float)SDL_atof(GetS(MyString).c_str());
-                if(std::abs(layer->SpeedX) + std::abs(accel) >= std::abs((float)Param1))
+                num_t accel = num_t::from_double(SDL_atof(GetS(MyString).c_str()));
+                if(num_t::abs((num_t)layer->SpeedX) + num_t::abs(accel) >= num_t::abs(Param1))
                     LayerF::SetXSpeed(layer, Param1);
                 else
                     LayerF::SetXSpeed(layer, (num_t)layer->SpeedX + accel);
@@ -940,8 +940,8 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                auto accel = (float)SDL_atof(GetS(MyString).c_str());
-                if(std::abs(layer->SpeedY) + std::abs(accel) >= std::abs((float)Param1))
+                num_t accel = num_t::from_double(SDL_atof(GetS(MyString).c_str()));
+                if(num_t::abs((num_t)layer->SpeedY) + num_t::abs(accel) >= num_t::abs((num_t)Param1))
                     LayerF::SetYSpeed(layer, Param1);
                 else
                     LayerF::SetYSpeed(layer, (num_t)layer->SpeedY + accel);
@@ -954,8 +954,8 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                auto deccel = (float)SDL_atof(GetS(MyString).c_str());
-                deccel = std::abs(deccel);
+                num_t deccel = num_t::from_double(SDL_atof(GetS(MyString).c_str()));
+                deccel = num_t::abs(deccel);
                 if(layer->SpeedX > 0)
                 {
                     layer->SpeedX = numf_t((num_t)layer->SpeedX - deccel);
@@ -978,8 +978,8 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                auto deccel = (float)SDL_atof(GetS(MyString).c_str());
-                deccel = std::abs(deccel);
+                num_t deccel = num_t::from_double(SDL_atof(GetS(MyString).c_str()));
+                deccel = num_t::abs(deccel);
                 if(layer->SpeedY > 0)
                 {
                     layer->SpeedY = numf_t((num_t)layer->SpeedY - deccel);
@@ -1026,7 +1026,7 @@ void Autocode::Do(bool init)
         {
             int sec = (int)Target - 1;
             if(sec >= 0 && sec < numSections && Param1 >= 0 && Param1 < 5)
-                LevelF::PushSectionBoundary(sec, (int)Param1, SDL_atof(GetS(MyString).c_str()));
+                LevelF::PushSectionBoundary(sec, (int)Param1, num_t::from_double(SDL_atof(GetS(MyString).c_str())));
             break;
         }
 
@@ -1314,7 +1314,7 @@ void Autocode::SelfTick()
     else if(Length == 0)
         return;
     else
-        Length--;
+        Length -= 1;
 }
 
 // DO PREDICATE
@@ -1399,7 +1399,7 @@ bool Autocode::CheckConditionD(num_t value1, num_t value2, COMPARETYPE cond)
     switch(cond)
     {
     case CMPT_EQUALS:
-        if(fEqual(value1, value2))
+        if(num_t::fEqual_d(value1, value2))
             return true;
         break;
     case CMPT_GREATER:
@@ -1411,7 +1411,7 @@ bool Autocode::CheckConditionD(num_t value1, num_t value2, COMPARETYPE cond)
             return true;
         break;
     case CMPT_NOTEQ:
-        if(!fEqual(value1, value2))
+        if(!num_t::fEqual_d(value1, value2))
             return true;
         break;
     default:
@@ -1541,10 +1541,10 @@ void Autocode::modParam(num_t &dst, num_t src, OPTYPE operation)
         dst -= src;
         break;
     case OP_Mult:
-        dst *= src;
+        dst = dst.times(src);
         break;
     case OP_Div:
-        dst /= src;
+        dst = dst.divided_by(src);
         break;
     case OP_XOR:
         dst = (int)dst ^ (int)src;

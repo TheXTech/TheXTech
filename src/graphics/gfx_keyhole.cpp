@@ -34,7 +34,7 @@ void RenderKeyhole(int Z)
     Background_t& keyhole = Background[LevelMacroWhich];
 
     num_t realKeyholeBottom = keyhole.Location.Y + 24;
-    num_t idealKeyholeBottom = 32 * std::ceil(realKeyholeBottom / 32);
+    num_t idealKeyholeBottom = 32 * num_t::ceil(realKeyholeBottom / 32);
 
     // basis of 128
     unsigned keyholeGrowthCoord = ratio;
@@ -51,8 +51,8 @@ void RenderKeyhole(int Z)
     num_t keyholeBottom = (realKeyholeBottom * (128 - keyholeGrowthCoord) + idealKeyholeBottom * keyholeGrowthCoord) / 128;
 
     RenderTexturePlayerScale(Z,
-        vScreen[Z].X + keyhole.Location.X + keyhole.Location.Width / 2 - keyhole.Location.Width * keyholeScale / 256,
-        vScreen[Z].Y + keyholeBottom - 24 * keyholeScale / 128,
+        num_t::round(vScreen[Z].X + keyhole.Location.X + keyhole.Location.Width / 2 - keyhole.Location.Width * keyholeScale / 256),
+        num_t::round(vScreen[Z].Y + keyholeBottom - 24 * keyholeScale / 128),
         (int)(keyhole.Location.Width) * keyholeScale / 128,
         (int)(keyhole.Location.Height) * keyholeScale / 128,
         GFXBackgroundBMP[keyhole.Type],

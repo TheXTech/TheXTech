@@ -445,7 +445,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
                                                     NPCHit(A, 3, A);
                                             }
 
-                                            if(fEqual(NPC[A].Location.SpeedY, double(Physics.NPCGravity)) || NPC[A].Slope > 0 || oldSlope > 0)
+                                            if(num_t::fEqual_d(NPC[A].Location.SpeedY, Physics.NPCGravity) || NPC[A].Slope > 0 || oldSlope > 0)
                                             {
                                                 if((NPC_A_Special == 2 || NPC_A_Special == 4) && NPC_A_Special2 == -1)
                                                 {
@@ -899,9 +899,9 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
                                             if(Block[B].tempBlockVehiclePlr == 0)
                                             {
                                                 if(Block[B].tempBlockNpcType > 0)
-                                                    NPC[A].BeltSpeed += (Block[B].Location.SpeedX * C) * blk_npc_tr.Speedvar;
+                                                    NPC[A].BeltSpeed = (numf_t)((num_t)NPC[A].BeltSpeed + Block[B].Location.SpeedX.times(C).times((num_t)blk_npc_tr.Speedvar));
                                                 else
-                                                    NPC[A].BeltSpeed += (Block[B].Location.SpeedX * C);
+                                                    NPC[A].BeltSpeed = (numf_t)((num_t)NPC[A].BeltSpeed + Block[B].Location.SpeedX.times(C));
 
                                                 beltCount += numf_t(C);
                                             }
@@ -926,7 +926,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
                                             if(((NPC[A]->StandsOnPlayer && !NPC[A].Projectile) || (NPC[A]->IsAShell && NPC[A].Location.SpeedX == 0)) && Block[B].tempBlockVehiclePlr > 0)
                                             {
                                                 // IMPORTANT: this case was truncation until v1.3.7.1-dev. Confirm that changing to VB6 rounding does not cause any issues.
-                                                NPC[A].vehicleYOffset = Block[B].tempBlockVehicleYOffset + vb6Round(NPC[A].Location.Height);
+                                                NPC[A].vehicleYOffset = Block[B].tempBlockVehicleYOffset + num_t::vb6round(NPC[A].Location.Height);
                                                 NPC[A].vehiclePlr = Block[B].tempBlockVehiclePlr;
                                                 if(NPC[A].vehiclePlr == 0 && Block[B].tempBlockNpcType == NPCID_VEHICLE)
                                                     NPC[A].TimeLeft = 100;
@@ -1217,8 +1217,8 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
             winningBlock = tempBlockHit1;
         else
         {
-            double C = std::abs(Block[tempBlockHit1].Location.minus_center_x(NPC[A].Location));
-            double D = std::abs(Block[tempBlockHit2].Location.minus_center_x(NPC[A].Location));
+            num_t C = num_t::abs(Block[tempBlockHit1].Location.minus_center_x(NPC[A].Location));
+            num_t D = num_t::abs(Block[tempBlockHit2].Location.minus_center_x(NPC[A].Location));
 
             if(C < D)
                 winningBlock = tempBlockHit1;
@@ -1295,7 +1295,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
                     // To emulate, move the right_border to the end of its FLBlock column.
                     // vb6 rounds its array indexes from doubles to integers
                     if(PSwitchTime != 0)
-                        right_border = vb6Round(right_border / 32.0 + 1) * 32;
+                        right_border = num_t::vb6round(right_border / 32 + 1) * 32;
 
                     // If the loop never invoked break and was not over a single column,
                     // then the game would have accessed numBlock + 1 here, but we won't.
@@ -1375,8 +1375,8 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
     if(NPC[A].BeltSpeed != 0)
     {
         Location_t preBeltLoc = NPC[A].Location;
-        NPC[A].BeltSpeed = NPC[A].BeltSpeed / beltCount;
-        NPC[A].BeltSpeed = NPC[A].BeltSpeed * speedVar;
+        NPC[A].BeltSpeed = NPC[A].BeltSpeed.divided_by(beltCount);
+        NPC[A].BeltSpeed = NPC[A].BeltSpeed.times(speedVar);
         NPC[A].Location.X += num_t(NPC[A].BeltSpeed);
 //                            D = NPC[A].BeltSpeed; // Idk why this is needed as this value gets been overriden and never re-used
         Location_t tempLocation = NPC[A].Location;

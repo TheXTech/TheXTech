@@ -85,7 +85,7 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
         exit_check_x = maze_center_x;
         target_speed_x = (maze_center_x - center_x) / 8;
 
-        if(std::abs(target_speed_x) < 0.25_n)
+        if(num_t::abs(target_speed_x) < 0.25_n)
         {
             loc.X = maze_center_x - loc.Width / 2;
             loc.SpeedX = 0;
@@ -118,7 +118,7 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
 
         target_speed_y = (maze_center_y - center_y) / 8;
 
-        if(std::abs(target_speed_y) < 0.25_n)
+        if(num_t::abs(target_speed_y) < 0.25_n)
         {
             loc.Y = maze_center_y - loc.Height / 2;
             loc.SpeedY = 0;

@@ -282,7 +282,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     }
                                     else if((Player[A].Controls.Up ||
                                              (Player[A].Controls.Down &&
-                                              !fEqual(Player[A].Location.SpeedY, 0.0) && // Not .Location.SpeedY = 0
+                                              !num_t::fEqual_d(Player[A].Location.SpeedY, 0) && // Not .Location.SpeedY = 0
                                               Player[A].StandingOnNPC == 0 && // Not .StandingOnNPC <> 0
                                               Player[A].Slope <= 0) // Not .Slope > 0
                                             ) && Player[A].Jump == 0)
@@ -479,8 +479,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 else if(Player[A].StandingOnNPC == B)
                                 {
                                     // if standing on 2 or more NPCs find out the best one to stand on
-                                    float C = std::abs(NPC[floorNpc1].Location.minus_center_x(Player[A].Location));
-                                    float D = std::abs(NPC[floorNpc2].Location.minus_center_x(Player[A].Location));
+                                    num_t C = num_t::abs(NPC[floorNpc1].Location.minus_center_x(Player[A].Location));
+                                    num_t D = num_t::abs(NPC[floorNpc2].Location.minus_center_x(Player[A].Location));
 
                                     if(C < D)
                                         floorNpc2 = B;
@@ -884,7 +884,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         {
                                             Player[A].Pinched.Right4 = 2;
 
-                                            if(floorBlock != 0 && std::abs(Block[floorBlock].Location.X - NPC[B].Location.X) < 1)
+                                            if(floorBlock != 0 && num_t::abs(Block[floorBlock].Location.X - NPC[B].Location.X) < 1)
                                             {
                                                 Player[A].Location.X = NPC[B].Location.X - Player[A].Location.Width - 1;
                                                 Player[A].Location.SpeedY = (num_t)oldSpeedY;
@@ -912,7 +912,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         {
                                             Player[A].Pinched.Left2 = 2;
 
-                                            if(floorBlock != 0 && std::abs(Block[floorBlock].Location.X + Block[floorBlock].Location.Width - NPC[B].Location.X - NPC[B].Location.Width) < 1)
+                                            if(floorBlock != 0 && num_t::abs(Block[floorBlock].Location.X + Block[floorBlock].Location.Width - NPC[B].Location.X - NPC[B].Location.Width) < 1)
                                             {
                                                 Player[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 1;
                                                 Player[A].Location.SpeedY = (num_t)oldSpeedY;
@@ -1055,8 +1055,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
     {
         if(NPC[floorNpc1].Location.Y == NPC[floorNpc2].Location.Y)
         {
-            float C = std::abs(NPC[floorNpc1].Location.minus_center_x(Player[A].Location));
-            float D = std::abs(NPC[floorNpc2].Location.minus_center_x(Player[A].Location));
+            num_t C = num_t::abs(NPC[floorNpc1].Location.minus_center_x(Player[A].Location));
+            num_t D = num_t::abs(NPC[floorNpc2].Location.minus_center_x(Player[A].Location));
 
             if(C < D)
                 B = floorNpc1;

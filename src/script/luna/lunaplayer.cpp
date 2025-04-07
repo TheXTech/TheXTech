@@ -139,10 +139,10 @@ LunaRect PlayerF::GetScreenPosition(Player_t *player)
     //    double cam_r = cam_x + 800;
 
     LunaRect ret_rect;
-    ret_rect.left = Maths::iRound(player->Location.X - cam_x);
-    ret_rect.top = Maths::iRound(player->Location.Y - cam_y);
-    ret_rect.right = Maths::iRound(ret_rect.left + player->Location.Width);
-    ret_rect.bottom = Maths::iRound(ret_rect.top + player->Location.Height);
+    ret_rect.left = num_t::round(player->Location.X - cam_x);
+    ret_rect.top = num_t::round(player->Location.Y - cam_y);
+    ret_rect.right = num_t::round(ret_rect.left + player->Location.Width);
+    ret_rect.bottom = num_t::round(ret_rect.top + player->Location.Height);
     return ret_rect;
 }
 

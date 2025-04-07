@@ -125,21 +125,27 @@ SDL_FORCE_INLINE void fromX86Endian(const uint8_t in[8], num_t &out_d)
 template<class T>
 T f2i_cast(num_t in)
 {
+#ifndef THEXTECH_FIXED_POINT
     if(std::is_same<T, uint64_t>::value)
     {
-        if(in < static_cast<double>(std::numeric_limits<uint64_t>::min()) || (in > 2.0 * 0x8000000000000000))
-            in = SDL_fmod(in, 2.0 * 0x8000000000000000);
+        if(in < static_cast<num_t>(std::numeric_limits<uint64_t>::min()) || (in > 2.0_n * 0x8000000000000000))
+            in = num_t::from_double(SDL_fmod((double)in, 2.0 * 0x8000000000000000));
         return static_cast<T>(in);
     }
 
-    if(in < static_cast<double>(std::numeric_limits<int64_t>::min()) || in > static_cast<double>(std::numeric_limits<int64_t>::max()))
-        in = SDL_fmod(in, 0x8000000000000000);
+    if(in < static_cast<num_t>(std::numeric_limits<int64_t>::min()) || in > static_cast<num_t>(std::numeric_limits<int64_t>::max()))
+        in = num_t::from_double(SDL_fmod((double)in, 0x8000000000000000));
+#endif
 
     return static_cast<T>(static_cast<int64_t>(in));
 }
 
 SDL_FORCE_INLINE void modifyByteX86(num_t &dst, size_t byte, uint8_t data)
 {
+#ifdef THEXTECH_FIXED_POINT
+    return;
+#endif
+
     auto *in = reinterpret_cast<uint8_t*>(&dst);
     SDL_assert(byte < 8);
 
@@ -155,6 +161,10 @@ SDL_FORCE_INLINE void modifyByteX86(num_t &dst, size_t byte, uint8_t data)
 
 SDL_FORCE_INLINE void modifyByteX86(numf_t &dst, size_t byte, uint8_t data)
 {
+#ifdef THEXTECH_FIXED_POINT
+    return;
+#endif
+
     auto *in = reinterpret_cast<uint8_t*>(&dst);
     SDL_assert(byte < 4);
 
@@ -180,6 +190,10 @@ SDL_FORCE_INLINE void modifyByteX86(int16_t &dst, size_t byte, uint8_t data)
 
 SDL_FORCE_INLINE uint8_t getByteX86(const num_t &src, size_t byte)
 {
+#ifdef THEXTECH_FIXED_POINT
+    return 0;
+#endif
+
     const auto *in = reinterpret_cast<const uint8_t*>(&src);
     SDL_assert(byte < 8);
 #if defined(THEXTECH_BIG_ENDIAN)
@@ -194,6 +208,10 @@ SDL_FORCE_INLINE uint8_t getByteX86(const num_t &src, size_t byte)
 
 SDL_FORCE_INLINE uint8_t getByteX86(const numf_t &src, size_t byte)
 {
+#ifdef THEXTECH_FIXED_POINT
+    return 0;
+#endif
+
     const auto *in = reinterpret_cast<const uint8_t*>(&src);
     SDL_assert(byte < 4);
 #if defined(THEXTECH_BIG_ENDIAN)
@@ -2308,12 +2326,44 @@ SDL_FORCE_INLINE void opMul(D &mem, size_t addr, num_t o2, FIELDTYPE ftype)
     mem.setValue(addr, static_cast<num_t>(res), ftype);
 }
 
+template<class D>
+SDL_FORCE_INLINE void opMul_numf_t(D &mem, size_t addr, num_t o2, FIELDTYPE ftype)
+{
+    num_t o1 = mem.getValue(addr, ftype);
+    numf_t res = static_cast<numf_t>(o1).times(static_cast<numf_t>(o2));
+    mem.setValue(addr, static_cast<num_t>(res), ftype);
+}
+
+template<class D>
+SDL_FORCE_INLINE void opMul_num_t(D &mem, size_t addr, num_t o2, FIELDTYPE ftype)
+{
+    num_t o1 = mem.getValue(addr, ftype);
+    num_t res = o1.times(o2);
+    mem.setValue(addr, static_cast<num_t>(res), ftype);
+}
+
 template<typename T, class D>
 SDL_FORCE_INLINE void opDiv(D &mem, size_t addr, num_t o2, FIELDTYPE ftype)
 {
     num_t o1 = mem.getValue(addr, ftype);
     T res = static_cast<T>(o1) / static_cast<T>(o2);
-    mem.setValue(addr, static_cast<double>(res), ftype);
+    mem.setValue(addr, static_cast<num_t>(res), ftype);
+}
+
+template<class D>
+SDL_FORCE_INLINE void opDiv_numf_t(D &mem, size_t addr, num_t o2, FIELDTYPE ftype)
+{
+    num_t o1 = mem.getValue(addr, ftype);
+    numf_t res = static_cast<numf_t>(o1).divided_by(static_cast<numf_t>(o2));
+    mem.setValue(addr, static_cast<num_t>(res), ftype);
+}
+
+template<class D>
+SDL_FORCE_INLINE void opDiv_num_t(D &mem, size_t addr, num_t o2, FIELDTYPE ftype)
+{
+    num_t o1 = mem.getValue(addr, ftype);
+    num_t res = o1.divided_by(o2);
+    mem.setValue(addr, static_cast<num_t>(res), ftype);
 }
 
 template<typename T, class D>
@@ -2432,11 +2482,11 @@ void MemAssign(size_t address, num_t value, OPTYPE operation, FIELDTYPE ftype)
         }
         case FT_FLOAT:
         {
-            opMul<numf_t>(s_emu, address, value, ftype);
+            opMul_numf_t(s_emu, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
-            opMul<double>(s_emu, address, value, ftype);
+            opMul_num_t(s_emu, address, value, ftype);
             break;
         default:
             break;
@@ -2465,11 +2515,11 @@ void MemAssign(size_t address, num_t value, OPTYPE operation, FIELDTYPE ftype)
         }
         case FT_FLOAT:
         {
-            opDiv<numf_t>(s_emu, address, value, ftype);
+            opDiv_numf_t(s_emu, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
-            opDiv<double>(s_emu, address, value, ftype);
+            opDiv_num_t(s_emu, address, value, ftype);
             break;
         default:
             break;
@@ -2529,9 +2579,9 @@ bool CheckMem(size_t address, num_t value, COMPARETYPE ctype, FIELDTYPE ftype)
         case FT_DWORD:
             return static_cast<int32_t>(cur) == static_cast<int32_t>(value);
         case FT_FLOAT:
-            return fEqual(static_cast<float>(cur), static_cast<float>(value));
+            return num_t::fEqual_f(static_cast<numf_t>(cur), static_cast<numf_t>(value));
         case FT_DFLOAT:
-            return fEqual(cur, value);
+            return num_t::fEqual_d(cur, value);
         default:
             return false;
         }
@@ -2580,9 +2630,9 @@ bool CheckMem(size_t address, num_t value, COMPARETYPE ctype, FIELDTYPE ftype)
         case FT_DWORD:
             return static_cast<int32_t>(cur) != static_cast<int32_t>(value);
         case FT_FLOAT:
-            return !fEqual(static_cast<float>(cur), static_cast<float>(value));
+            return !num_t::fEqual_f(static_cast<numf_t>(cur), static_cast<numf_t>(value));
         case FT_DFLOAT:
-            return !fEqual(cur, value);
+            return !num_t::fEqual_d(cur, value);
         default:
             return false;
         }
@@ -2639,7 +2689,23 @@ SDL_FORCE_INLINE void opMul(D &mem, U *obj, size_t addr, num_t o2, FIELDTYPE fty
 {
     num_t o1 = mem.getValue(obj, addr, ftype);
     T res = static_cast<T>(o1) * static_cast<T>(o2);
-    mem.setValue(obj, addr, static_cast<double>(res), ftype);
+    mem.setValue(obj, addr, static_cast<num_t>(res), ftype);
+}
+
+template<class D, class U>
+SDL_FORCE_INLINE void opMul_numf_t(D &mem, U *obj, size_t addr, num_t o2, FIELDTYPE ftype)
+{
+    num_t o1 = mem.getValue(obj, addr, ftype);
+    numf_t res = static_cast<numf_t>(o1).times(static_cast<numf_t>(o2));
+    mem.setValue(obj, addr, static_cast<num_t>(res), ftype);
+}
+
+template<class D, class U>
+SDL_FORCE_INLINE void opMul_num_t(D &mem, U *obj, size_t addr, num_t o2, FIELDTYPE ftype)
+{
+    num_t o1 = mem.getValue(obj, addr, ftype);
+    num_t res = o1.times(o2);
+    mem.setValue(obj, addr, static_cast<num_t>(res), ftype);
 }
 
 template<typename T, class D, class U>
@@ -2647,7 +2713,23 @@ SDL_FORCE_INLINE void opDiv(D &mem, U *obj, size_t addr, num_t o2, FIELDTYPE fty
 {
     num_t o1 = mem.getValue(obj, addr, ftype);
     T res = static_cast<T>(o1) / static_cast<T>(o2);
-    mem.setValue(obj, addr, static_cast<double>(res), ftype);
+    mem.setValue(obj, addr, static_cast<num_t>(res), ftype);
+}
+
+template<class D, class U>
+SDL_FORCE_INLINE void opDiv_numf_t(D &mem, U *obj, size_t addr, num_t o2, FIELDTYPE ftype)
+{
+    num_t o1 = mem.getValue(obj, addr, ftype);
+    numf_t res = static_cast<numf_t>(o1).divided_by(static_cast<numf_t>(o2));
+    mem.setValue(obj, addr, static_cast<num_t>(res), ftype);
+}
+
+template<class D, class U>
+SDL_FORCE_INLINE void opDiv_num_t(D &mem, U *obj, size_t addr, num_t o2, FIELDTYPE ftype)
+{
+    num_t o1 = mem.getValue(obj, addr, ftype);
+    num_t res = o1.divided_by(o2);
+    mem.setValue(obj, addr, static_cast<num_t>(res), ftype);
 }
 
 template<typename T, class D, class U>
@@ -2760,11 +2842,11 @@ static void MemAssignType(T &mem, U *obj, size_t address, num_t value, OPTYPE op
         }
         case FT_FLOAT:
         {
-            opMul<numf_t>(mem, obj, address, value, ftype);
+            opMul_numf_t(mem, obj, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
-            opMul<double>(mem, obj, address, value, ftype);
+            opMul_num_t(mem, obj, address, value, ftype);
             break;
         default:
             break;
@@ -2793,11 +2875,11 @@ static void MemAssignType(T &mem, U *obj, size_t address, num_t value, OPTYPE op
         }
         case FT_FLOAT:
         {
-            opDiv<numf_t>(mem, obj, address, value, ftype);
+            opDiv_numf_t(mem, obj, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
-            opDiv<double>(mem, obj, address, value, ftype);
+            opDiv_num_t(mem, obj, address, value, ftype);
             break;
         default:
             break;
@@ -2852,9 +2934,9 @@ static bool ChecmMemType(T &mem, U *obj, size_t offset, num_t value, COMPARETYPE
         case FT_DWORD:
             return static_cast<int32_t>(cur) == static_cast<int32_t>(value);
         case FT_FLOAT:
-            return fEqual(static_cast<float>(cur), static_cast<float>(value));
+            return num_t::fEqual_f(static_cast<numf_t>(cur), static_cast<numf_t>(value));
         case FT_DFLOAT:
-            return fEqual(cur, value);
+            return num_t::fEqual_d(cur, value);
         default:
             return false;
         }
@@ -2903,9 +2985,9 @@ static bool ChecmMemType(T &mem, U *obj, size_t offset, num_t value, COMPARETYPE
         case FT_DWORD:
             return static_cast<int32_t>(cur) != static_cast<int32_t>(value);
         case FT_FLOAT:
-            return !fEqual(static_cast<float>(cur), static_cast<float>(value));
+            return !num_t::fEqual_f(static_cast<numf_t>(cur), static_cast<numf_t>(value));
         case FT_DFLOAT:
-            return !fEqual(cur, value);
+            return !num_t::fEqual_d(cur, value);
         default:
             return false;
         }

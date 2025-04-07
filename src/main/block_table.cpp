@@ -144,10 +144,10 @@ struct TableInterface
             loc.query_from_loc_paranoid(_loc);
         else
         {
-            int32_t l_int = std::floor(_loc.X);
-            int32_t r_int = std::ceil(_loc.X + _loc.Width);
-            int32_t t_int = std::floor(_loc.Y);
-            int32_t b_int = std::ceil(_loc.Y + _loc.Height);
+            int32_t l_int = num_t::floor(_loc.X);
+            int32_t r_int = num_t::ceil(_loc.X + _loc.Width);
+            int32_t t_int = num_t::floor(_loc.Y);
+            int32_t b_int = num_t::ceil(_loc.Y + _loc.Height);
 
             // workaround to handle common block push behavior of NPCs -- if NPCs eventually use updatable queries, then we can simply use query_from_loc_standard as in other callsites
             if(r_int < l_int + 32)
@@ -172,8 +172,8 @@ struct TableInterface
             {
                 int layer = active_tables[i];
 
-                int16_t offX = s_floor_div_64(std::floor(-Layer[layer].OffsetX));
-                int16_t offY = s_floor_div_64(std::floor(-Layer[layer].OffsetY));
+                int16_t offX = s_floor_div_64(num_t::floor(-Layer[layer].OffsetX));
+                int16_t offY = s_floor_div_64(num_t::floor(-Layer[layer].OffsetY));
 
                 rect_external layer_loc{(int16_t)(loc.l + offX), (int16_t)(loc.r + offX), (int16_t)(loc.t + offY), (int16_t)(loc.b + offY)};
 

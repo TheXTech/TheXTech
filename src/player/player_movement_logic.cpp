@@ -131,10 +131,14 @@ void PlayerMovementX(int A, numf_t& cursed_value_C)
         }
     }
 
+    qdec_t local_C = 1.0_r;
     cursed_value_C = 1;
     // If .Character = 5 Then C = 0.94
     if(Player[A].Character == 5)
+    {
         cursed_value_C = 0.95_nf;
+        local_C = 0.95_r;
+    }
 
     // deduplicated (was previously separate sections for holding Left and Right)
     if((Player[A].Controls.Left || Player[A].Controls.Right) &&
@@ -150,14 +154,14 @@ void PlayerMovementX(int A, numf_t& cursed_value_C)
         if(Player[A].Controls.Run || dir * Player[A].Location.SpeedX < Physics.PlayerWalkSpeed * (num_t)speedVar || Player[A].Character == 5)
         {
             // turning around or not yet walking
-            if(dir * Player[A].Location.SpeedX < Physics.PlayerWalkSpeed * speedVar * cursed_value_C)
+            if(dir * Player[A].Location.SpeedX < Physics.PlayerWalkSpeed * (num_t)speedVar * local_C)
             {
                 if(Player[A].Character == 2) // LUIGI
-                    Player[A].Location.SpeedX += dir * (-0.1 * 0.175);
+                    Player[A].Location.SpeedX += dir * num_t::from_double(-0.1 * 0.175);
                 else if(Player[A].Character == 3) // PEACH
-                    Player[A].Location.SpeedX += dir * (-0.05 * 0.175);
+                    Player[A].Location.SpeedX += dir * num_t::from_double(-0.05 * 0.175);
                 else if(Player[A].Character == 4) // toad
-                    Player[A].Location.SpeedX += dir * (0.05 * 0.175);
+                    Player[A].Location.SpeedX += dir * num_t::from_double(0.05 * 0.175);
 
                 Player[A].Location.SpeedX += dir * (num_t)speedVar / 10;
             }
@@ -165,11 +169,11 @@ void PlayerMovementX(int A, numf_t& cursed_value_C)
             else
             {
                 if(Player[A].Character == 2) // LUIGI
-                    Player[A].Location.SpeedX += dir * (-0.05 * 0.175);
+                    Player[A].Location.SpeedX += dir * num_t::from_double(-0.05 * 0.175);
                 else if(Player[A].Character == 3) // PEACH
-                    Player[A].Location.SpeedX += dir * (-0.025 * 0.175);
+                    Player[A].Location.SpeedX += dir * num_t::from_double(-0.025 * 0.175);
                 else if(Player[A].Character == 4) // toad
-                    Player[A].Location.SpeedX += dir * (0.025 * 0.175);
+                    Player[A].Location.SpeedX += dir * num_t::from_double(0.025 * 0.175);
 
                 if(Player[A].Character == 5) // Link
                     Player[A].Location.SpeedX += dir * (num_t)speedVar / 40;
@@ -181,11 +185,11 @@ void PlayerMovementX(int A, numf_t& cursed_value_C)
             if(dir * Player[A].Location.SpeedX < 0)
             {
                 if(Player[A].Character == 2) // LUIGI
-                    Player[A].Location.SpeedX += dir * (-0.18 * 0.29 + 0.18);
+                    Player[A].Location.SpeedX += dir * num_t::from_double(-0.18 * 0.29 + 0.18);
                 else if(Player[A].Character == 3) // PEACH
-                    Player[A].Location.SpeedX += dir * (-0.09 * 0.29 + 0.18);
+                    Player[A].Location.SpeedX += dir * num_t::from_double(-0.09 * 0.29 + 0.18);
                 else if(Player[A].Character == 4) // toad
-                    Player[A].Location.SpeedX += dir * (0.09 * 0.29 + 0.18);
+                    Player[A].Location.SpeedX += dir * num_t::from_double(0.09 * 0.29 + 0.18);
                 else
                     Player[A].Location.SpeedX += dir * 0.18_n;
 
@@ -260,7 +264,7 @@ void PlayerMovementX(int A, numf_t& cursed_value_C)
             Player[A].Location.SpeedX -= 0.1_n;
         else if(Player[A].Location.SpeedX < -Physics.PlayerWalkSpeed - (num_t)speedVar / 10)
             Player[A].Location.SpeedX += 0.1_n;
-        else if(std::abs(Player[A].Location.SpeedX) > Physics.PlayerWalkSpeed * speedVar)
+        else if(num_t::abs(Player[A].Location.SpeedX) > Physics.PlayerWalkSpeed * (num_t)speedVar)
         {
             if(Player[A].Location.SpeedX > 0)
                 Player[A].Location.SpeedX = Physics.PlayerWalkSpeed * (num_t)speedVar;
@@ -298,8 +302,8 @@ void PlayerMovementX(int A, numf_t& cursed_value_C)
     if((Player[A].State == 4 || Player[A].State == 5) && Player[A].Wet == 0)
     {
         // note: RunCount was previously a float, so its values have been multiplied by 10 everywhere
-        bool is_running = (std::abs(Player[A].Location.SpeedX) >= double(Physics.PlayerRunSpeed) ||
-            (Player[A].Character == 3 && std::abs(Player[A].Location.SpeedX) >= 5.58 - 0.001)); // Rounding error of SpeedX makes an evil here
+        bool is_running = (num_t::abs(Player[A].Location.SpeedX) >= Physics.PlayerRunSpeed ||
+            (Player[A].Character == 3 && num_t::abs(Player[A].Location.SpeedX) >= 5.579_n)); // Rounding error of SpeedX makes an evil here (FIXME: does this match VB6?)
 
         if( (Player[A].Location.SpeedY == 0 ||
              Player[A].CanFly2 ||
@@ -621,7 +625,7 @@ void PlayerMovementY(int A)
             {
                 NewEffect(EFFID_SPARKLE, tempLocation);
                 Effect[numEffects].Location.SpeedX = (dRand() * 3) - 1.5_n;
-                Effect[numEffects].Location.SpeedY = (dRand() / 2) + (1.5 - std::abs(Effect[numEffects].Location.SpeedX)) / 2;
+                Effect[numEffects].Location.SpeedY = (dRand() / 2) + (1.5_n - num_t::abs(Effect[numEffects].Location.SpeedX)) / 2;
                 Effect[numEffects].Location.SpeedX += -Player[A].Location.SpeedX / 5;
             }
         }
@@ -661,8 +665,8 @@ void PlayerMovementY(int A)
             if(iRand(10) >= 3)
             {
                 Location_t tempLocation;
-                tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 2 + dRand() * (NPC[Player[A].StandingOnNPC].Location.Height - 8) + 4;
-                tempLocation.X = Player[A].Location.X - 4 + dRand() * (Player[A].Location.Width - 8) + 4 - 8 * Player[A].Direction;
+                tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 2 + dRand().times(NPC[Player[A].StandingOnNPC].Location.Height - 8) + 4;
+                tempLocation.X = Player[A].Location.X - 4 + dRand() * ((int)Player[A].Location.Width - 8) + 4 - 8 * Player[A].Direction;
                 NewEffect(EFFID_SPARKLE, tempLocation, 1, 0, ShadowMode);
                 Effect[numEffects].Frame = iRand(3);
                 Effect[numEffects].Location.SpeedY = (Player[A].Location.Y + Player[A].Location.Height + NPC[Player[A].StandingOnNPC].Location.Height / 32 - tempLocation.Y + 12) / 20;

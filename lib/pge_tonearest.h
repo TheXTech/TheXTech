@@ -10,6 +10,10 @@
 
 // https://github.com/llvm/llvm-project/blob/main/libc/utils/FPUtil/NearestIntegerOperations.h
 
+#pragma once
+#ifndef PGE_TO_NEAREST
+#define PGE_TO_NEAREST
+
 #include <cstdint>
 #include "sdl_proxy/sdl_stdinc.h"
 
@@ -232,3 +236,5 @@ SDL_FORCE_INLINE double pge_toNearest(double x)
     else
         return truncValue;
 }
+
+#endif // #ifndef PGE_TO_NEAREST

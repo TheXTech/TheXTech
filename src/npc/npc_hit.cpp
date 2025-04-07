@@ -130,14 +130,14 @@ void NPCHit(int A, int B, int C)
             if(NPC[A].Type == NPCID_SIDE_PLANT)
             {
                 if(NPC[A].Direction == -1)
-                    NPC[A].Location.Width = static_cast<int>(floor(static_cast<double>(NPC[A].Location.Width))) - 0.01;
+                    NPC[A].Location.Width = num_t::floor(NPC[A].Location.Width) - 0.01_n;
                 else
-                    NPC[A].Location.X = static_cast<int>(floor(static_cast<double>(NPC[A].Location.X))) + 0.01;
+                    NPC[A].Location.X = num_t::floor(NPC[A].Location.X) + 0.01_n;
 
                 NPCQueues::Unchecked.push_back(A);
             }
 
-            NPC[A].Location.Height = static_cast<int>(floor(static_cast<double>(NPC[A].Location.Height)));
+            NPC[A].Location.Height = num_t::floor(NPC[A].Location.Height);
             NPC[A].Type = NPCID_ICE_CUBE;
             NPC[A].BeltSpeed = 0;
             NPC[A].RealSpeedX = 0;
@@ -1346,7 +1346,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].RealSpeedX = 0;
             NPC[A].Special = 0;
             NPC[A].Frame = 0;
-            pLogDebug("Shell stomp, X distance: [%g], Y=[%g]", std::abs(NPC[numNPCs].Location.X - NPC[A].Location.X), NPC[numNPCs].Location.Y);
+            pLogDebug("Shell stomp, X distance: [%g], Y=[%g]", (double)num_t::abs(NPC[numNPCs].Location.X - NPC[A].Location.X), (double)NPC[numNPCs].Location.Y);
             if(NPC[A].Type >= NPCID_GRN_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_HIT_TURTLE_S4)
                 NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
         }
@@ -1520,7 +1520,7 @@ void NPCHit(int A, int B, int C)
         else if(B == 6)
         {
             tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - 2;
-            tempLocation.X = NPC[A].Location.X - 4 + dRand() * (NPC[A].Location.Width + 8) - 4;
+            tempLocation.X = NPC[A].Location.X - 4 + dRand().times(NPC[A].Location.Width + 8) - 4;
             NewEffect(EFFID_SKID_DUST, tempLocation);
         }
         else if(B == 8)
@@ -1573,7 +1573,7 @@ void NPCHit(int A, int B, int C)
             if(NPC[A].Type == NPCID_FLIPPED_RAINBOW_SHELL)
             {
                 tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - 2;
-                tempLocation.X = NPC[A].Location.X - 4 + dRand() * (NPC[A].Location.Width + 8) - 4;
+                tempLocation.X = NPC[A].Location.X - 4 + dRand().times(NPC[A].Location.Width + 8) - 4;
                 NewEffect(EFFID_SKID_DUST, tempLocation);
             }
             else
@@ -1928,7 +1928,7 @@ void NPCHit(int A, int B, int C)
                 {
                     tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - 2;
                     // tempLocation.X = .Location.X + .Location.Width / 2 - 4 '+ 4 * .Direction
-                    tempLocation.X = NPC[A].Location.X - 4 + dRand() * (NPC[A].Location.Width + 8) - 4;
+                    tempLocation.X = NPC[A].Location.X - 4 + dRand().times(NPC[A].Location.Width + 8) - 4;
                     NewEffect(EFFID_SKID_DUST, tempLocation);
                 }
                 else
@@ -2026,7 +2026,7 @@ void NPCHit(int A, int B, int C)
                 if(NPC[A].Type == NPCID_SATURN && B == 7)
                 {
                     NPC[A].Direction = Player[C].Direction;
-                    NPC[A].Location.SpeedX = std::abs(NPC[A].Location.SpeedX) * NPC[A].Direction;
+                    NPC[A].Location.SpeedX = num_t::abs(NPC[A].Location.SpeedX) * NPC[A].Direction;
                     NPC[A].TurnAround = false;
                     NPC[A].Location.SpeedY = -6;
                     NPC[A].Projectile = true;
@@ -2153,7 +2153,7 @@ void NPCHit(int A, int B, int C)
                (NPC[A].Type >= NPCID_FIRE_POWER_S1 && NPC[A].Type <= NPCID_3_LIFE) || NPC[A].Type == NPCID_HEAVY_POWER)
             {
                 NPC[A].Direction = Player[C].Direction;
-                NPC[A].Location.SpeedX = std::abs(NPC[A].Location.SpeedX) * NPC[A].Direction;
+                NPC[A].Location.SpeedX = num_t::abs(NPC[A].Location.SpeedX) * NPC[A].Direction;
                 NPC[A].TurnAround = false;
                 NPC[A].Location.SpeedY = -6;
                 PlaySoundSpatial(SFX_Stomp, NPC[A].Location);

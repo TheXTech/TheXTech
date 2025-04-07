@@ -144,7 +144,7 @@ void NPCFrames(int A)
         {
             if(!Player[B].Dead && Player[B].Section == NPC[A].Section && Player[B].TimeToLive == 0)
             {
-                auto L1_dist = std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) + std::abs(NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - (Player[B].Location.Y + Player[B].Location.Height / 2.0));
+                auto L1_dist = num_t::abs(NPC[A].Location.minus_center_x(Player[B].Location)) + num_t::abs(NPC[A].Location.minus_center_y(Player[B].Location));
                 if(min_dist == 0 || L1_dist < min_dist)
                 {
                     min_dist = L1_dist;

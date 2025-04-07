@@ -560,10 +560,10 @@ void NPCMovementLogic(int A, numf_t& speedVar)
 
     if(NPC[A].Type == NPCID_STACKER && !NPC[A].Projectile)
     {
-        speedVar = speedVar * 0.7_r;
+        speedVar = speedVar * 7 / 10;
         if(NPC[A].Special2 < 2)
         {
-            speedVar = speedVar * 0.7_r;
+            speedVar = speedVar * 7 / 10;
             NPC[A].Special2 += 1;
         }
     }
@@ -585,7 +585,7 @@ void NPCMovementLogic(int A, numf_t& speedVar)
         // ParaTroopa speed application happens in SpecialNPC, buried item can't move at all
         if(!NPCIsAParaTroopa(NPC[A]) && NPC[A].Type != NPCID_ITEM_BURIED)
         {
-            NPC[A].Location.X += NPC[A].Location.SpeedX * speedVar;
+            NPC[A].Location.X += NPC[A].Location.SpeedX.times((num_t)speedVar);
             NPC[A].Location.Y += NPC[A].Location.SpeedY;
         }
     }

@@ -219,6 +219,8 @@ option(THEXTECH_NO_BUILD_DATE "Disables the using of the build timestamp in orde
 
 option(THEXTECH_ENABLE_AUDIO_FX "Enable real-time audio effects support" ON)
 
+option(THEXTECH_FIXED_POINT "Experimental: use fixed-point arithmetic for gameplay logic" OFF)
+
 option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
 
 # ============ Customization ==============
@@ -703,6 +705,19 @@ set(LIB_SRC
     ${LIB_SRC_EXTRA}
     ${SDLPROXY_SRCS}
 )
+
+if(THEXTECH_FIXED_POINT)
+    list(APPEND LIB_SRC
+        lib/fixed_point.cpp
+    )
+    target_compile_definitions(A2XT_Int INTERFACE
+        -DTHEXTECH_FIXED_POINT
+    )
+else()
+    list(APPEND LIB_SRC
+        lib/floating_point.cpp
+    )
+endif()
 
 if(NOT THEXTECH_NO_SDL_BUILD)
 list(APPEND LIB_SRC

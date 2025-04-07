@@ -174,7 +174,7 @@ static void s_CheckWarpLevelExit(Player_t& plr, const Warp_t& warp, int lvl_coun
 
 static void s_InitWarpScroll(Player_t& p, const Location_t& warp_enter, const Location_t& warp_exit, int min_frames = 0)
 {
-    int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
+    unsigned int warp_dist = (int)num_t::dist(warp_enter.X - warp_exit.X, warp_enter.Y - warp_exit.Y);
 
     int scroll_frames = warp_dist / plr_warp_scroll_speed;
     if(scroll_frames < min_frames)
@@ -233,8 +233,8 @@ static void s_WarpFaderLogic(bool is_reverse, int A, int transitEffect, const Lo
         if(ready)
             fader.setupFader(rate, fade_from, fade_to, transitEffect,
                              true,
-                             Maths::iRound(focus.X + focus.Width / 2),
-                             Maths::iRound(focus.Y + focus.Height / 2),
+                             num_t::round(focus.X + focus.Width / 2),
+                             num_t::round(focus.Y + focus.Height / 2),
                              fader_index);
         break;
     }

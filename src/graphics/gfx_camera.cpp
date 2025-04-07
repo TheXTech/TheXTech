@@ -40,8 +40,8 @@ static inline num_t s_small_screen_rate(const Screen_t& screen, const Screen_t& 
     num_t rate = 1;
     if(screen.Type == ScreenTypes::Dynamic && (screen.W < c_screen.W || screen.H < c_screen.H))
     {
-        num_t dx = std::abs(screen.vScreen(1).X - screen.vScreen(2).X);
-        num_t dy = std::abs(screen.vScreen(1).Y - screen.vScreen(2).Y);
+        num_t dx = num_t::abs(screen.vScreen(1).X - screen.vScreen(2).X);
+        num_t dy = num_t::abs(screen.vScreen(1).Y - screen.vScreen(2).Y);
         num_t d = dx + dy;
         const int screen_join = (screen.W + screen.H) / 2;
 
@@ -236,9 +236,9 @@ void DrawSmallScreenCam(vScreen_t& vscreen)
         color = XTColorF(0.5f, 1.0f, 0.5f, 0.7f);
 
         if(vscreen.small_screen_features.offset_y > 0)
-            XRender::renderTextureBasic(CamX + 4, CamY - 18, GFX.MCursor[1], XTAlphaF(0.7f * rate));
+            XRender::renderTextureBasic(CamX + 4, CamY - 18, GFX.MCursor[1], XTAlphaF(0.7_r * rate));
         else
-            XRender::renderTextureBasic(CamX + 4, CamY + 18, GFX.MCursor[2], XTAlphaF(0.7f * rate));
+            XRender::renderTextureBasic(CamX + 4, CamY + 18, GFX.MCursor[2], XTAlphaF(0.7_r * rate));
     }
     else if(vscreen.small_screen_features.offset_y <= -48 || vscreen.small_screen_features.offset_y >= 48)
     {

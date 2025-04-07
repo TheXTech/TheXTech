@@ -82,8 +82,8 @@ void RandomPointInRadius(num_t *ox, num_t *oy, num_t cx, num_t cy, int radius)
     num_t phase1 = iRand2(360);
     num_t phase2 = iRand2(360);
 
-    num_t xoff = std::sin(phase1) * radius;
-    num_t yoff = std::cos(phase2) * radius;
+    num_t xoff = num_t::sin(phase1) * radius;
+    num_t yoff = num_t::cos(phase2) * radius;
 
     *ox = cx + xoff;
     *oy = cy + yoff;

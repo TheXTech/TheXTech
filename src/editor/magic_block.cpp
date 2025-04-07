@@ -303,8 +303,8 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
     ItemType_t inferred_type;
 
     inferred_type.type = A->Type;
-    inferred_type.width = std::round(A->Location.Width / 32);
-    inferred_type.height = std::round(A->Location.Height / 32);
+    inferred_type.width = num_t::round(A->Location.Width / 32);
+    inferred_type.height = num_t::round(A->Location.Height / 32);
 
     for(ItemType_t t : family.types)
     {

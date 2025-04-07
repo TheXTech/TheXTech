@@ -1514,8 +1514,8 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         layer_line ++;
 
         // settings for this...
-        int sy = vb6Round(Events[m_current_event].SpeedY*10);
-        int sx = vb6Round(Events[m_current_event].SpeedX*10);
+        int sy = num_t::round((num_t)Events[m_current_event].SpeedY * 10);
+        int sx = num_t::round((num_t)Events[m_current_event].SpeedX * 10);
 
         if(sy < 0)
             SuperPrintR(mode, g_editorStrings.letterUp + std::to_string(-sy), 3, e_ScreenW - 240, 40 + (20 * layer_line));
@@ -1959,7 +1959,7 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
     {
         SuperPrintR(mode, g_editorStrings.sectionScroll, 3, 10, 430);
 
-        int sy = vb6Round(Events[0].AutoY*10);
+        int sy = num_t::round((num_t)Events[0].AutoY * 10);
         if(sy < 0)
             SuperPrintR(mode, g_editorStrings.letterUp    + std::to_string(-sy), 3, 180, 422);
         else if(sy > 0)
@@ -1967,7 +1967,7 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
         else
             SuperPrintR(mode, "-", 3, 180, 422);
 
-        int sx = vb6Round(Events[0].AutoX*10);
+        int sx = num_t::round((num_t)Events[0].AutoX * 10);
         if(sx < 0)
             SuperPrintR(mode, g_editorStrings.letterLeft  + std::to_string(-sx), 3, 180, 440);
         else if(sx > 0)

@@ -499,8 +499,8 @@ void CenterScreens(Screen_t& screen)
             continue;
 
         // restrict the vScreen to the level if the level is smaller than the screen
-        int MaxWidth = Maths::iRound(section.Width - section.X);
-        int MaxHeight = Maths::iRound(section.Height - section.Y);
+        int MaxWidth = num_t::round(section.Width - section.X);
+        int MaxHeight = num_t::round(section.Height - section.Y);
 
         // on 3DS allow a slight amount of expansion for 3D overdraw, if the vscreen covers (and will cover) the entire screen
         int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !screen.is_canonical()) ? XRender::TargetCameraOverscanX : 0;
@@ -553,8 +553,8 @@ void CenterScreens(Screen_t& screen)
                 GetPlayerScreen(screen.canonical_screen().W, screen.canonical_screen().H, Player[screen.players[0]], cX1, cY1);
                 GetPlayerScreen(screen.canonical_screen().W, screen.canonical_screen().H, Player[screen.players[1]], cX2, cY2);
 
-                int screen_X_distance = SDL_abs(cX1 - cX2);
-                int screen_Y_distance = SDL_abs(cY1 - cY2);
+                int screen_X_distance = (int)num_t::abs(cX1 - cX2);
+                int screen_Y_distance = (int)num_t::abs(cY1 - cY2);
 
                 MinWidth = SDL_min(MinWidth, screen_X_distance);
                 MinHeight = SDL_min(MinHeight, screen_Y_distance);
@@ -626,21 +626,21 @@ bool Update_qScreen(int Z, num_t camRate, num_t resizeRate)
     int resizeRateX = int(resizeRate);
     int resizeRateY = int(resizeRate);
 
-    double camFramesX = std::abs(vScreen[Z].X - qScreenLoc[Z].X) / camRateX;
-    double camFramesY = std::abs(vScreen[Z].Y - qScreenLoc[Z].Y) / camRateY;
+    num_t camFramesX = num_t::abs(vScreen[Z].X - qScreenLoc[Z].X).divided_by(camRateX);
+    num_t camFramesY = num_t::abs(vScreen[Z].Y - qScreenLoc[Z].Y).divided_by(camRateY);
 
     // qScreenLoc Width and Height values are only valid if modern section change is disabled
     if(g_config.modern_section_change)
     {
-        double camFramesX_r = std::abs(vScreen[Z].X - vScreen[Z].Width - qScreenLoc[Z].X + qScreenLoc[Z].Width) / camRateX;
-        double camFramesY_b = std::abs(vScreen[Z].Y - vScreen[Z].Height - qScreenLoc[Z].Y + qScreenLoc[Z].Height) / camRateY;
+        num_t camFramesX_r = num_t::abs(vScreen[Z].X - vScreen[Z].Width - qScreenLoc[Z].X + qScreenLoc[Z].Width).divided_by(camRateX);
+        num_t camFramesY_b = num_t::abs(vScreen[Z].Y - vScreen[Z].Height - qScreenLoc[Z].Y + qScreenLoc[Z].Height).divided_by(camRateY);
 
         camFramesX = SDL_min(camFramesX, camFramesX_r);
         camFramesY = SDL_min(camFramesY, camFramesY_b);
     }
 
-    double resizeFramesX = std::abs(vScreen[Z].Width - qScreenLoc[Z].Width) / resizeRateX;
-    double resizeFramesY = std::abs(vScreen[Z].Height - qScreenLoc[Z].Height) / resizeRateY;
+    num_t resizeFramesX = num_t::abs(vScreen[Z].Width - qScreenLoc[Z].Width) / resizeRateX;
+    num_t resizeFramesY = num_t::abs(vScreen[Z].Height - qScreenLoc[Z].Height) / resizeRateY;
 
     if(!g_config.modern_section_change)
     {
@@ -666,14 +666,14 @@ bool Update_qScreen(int Z, num_t camRate, num_t resizeRate)
     if(qFramesY < 1)
         qFramesY = 1;
 
-    camRateX = std::abs(vScreen[Z].X - qScreenLoc[Z].X) / qFramesX;
-    camRateY = std::abs(vScreen[Z].Y - qScreenLoc[Z].Y) / qFramesY;
+    camRateX = num_t::abs(vScreen[Z].X - qScreenLoc[Z].X).divided_by(qFramesX);
+    camRateY = num_t::abs(vScreen[Z].Y - qScreenLoc[Z].Y).divided_by(qFramesY);
 
-    resizeRateX = (int)(std::abs(vScreen[Z].Width - qScreenLoc[Z].Width) / qFramesX);
-    resizeRateY = (int)(std::abs(vScreen[Z].Height - qScreenLoc[Z].Height) / qFramesY);
+    resizeRateX = (int)(num_t::abs(vScreen[Z].Width - qScreenLoc[Z].Width).divided_by(qFramesX));
+    resizeRateY = (int)(num_t::abs(vScreen[Z].Height - qScreenLoc[Z].Height).divided_by(qFramesY));
 
-    int screenRateX = (int)(std::abs(vScreen[Z].ScreenLeft - qScreenLoc[Z].ScreenLeft) / qFramesX);
-    int screenRateY = (int)(std::abs(vScreen[Z].ScreenTop - qScreenLoc[Z].ScreenTop) / qFramesY);
+    int screenRateX = (int)(num_t::abs(vScreen[Z].ScreenLeft - qScreenLoc[Z].ScreenLeft).divided_by(qFramesX));
+    int screenRateY = (int)(num_t::abs(vScreen[Z].ScreenTop - qScreenLoc[Z].ScreenTop).divided_by(qFramesY));
 
     if(vScreen[Z].X < qScreenLoc[Z].X - camRateX)
         qScreenLoc[Z].X -= camRateX;

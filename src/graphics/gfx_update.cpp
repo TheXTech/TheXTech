@@ -183,17 +183,17 @@ static std::array<bool, c_vScreenCount_visible + 1> s_forcedShakeScreen{false};
 //static double s_shakeScreenDuration = 0;
 //static double s_shakeScreenSign = +1.0;
 
-static inline int s_round2int(double d)
+static inline int s_round2int(num_t d)
 {
-    return std::floor(d + 0.5);
+    return num_t::floor(d + 0.5_n);
 }
 
-static inline int s_round2int_plr(double d)
+static inline int s_round2int_plr(num_t d)
 {
 #ifdef PGE_MIN_PORT
-    return (int)(std::floor(d / 2 + 0.5)) * 2;
+    return (int)(num_t::floor(d / 2 + 0.5_n)) * 2;
 #else
-    return std::floor(d + 0.5);
+    return num_t::floor(d + 0.5_n);
 #endif
 }
 
@@ -1672,7 +1672,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
                             {
                                 if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section && vScreenCollision(Z, Player[B].Location))
                                 {
-                                    double dx = std::abs(Player[A].Location.minus_center_x(Player[B].Location));
+                                    num_t dx = num_t::abs(Player[A].Location.minus_center_x(Player[B].Location));
                                     if(C == 0 || dx < C)
                                     {
                                         C = dx;
@@ -1687,7 +1687,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
                                 {
                                     if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section)
                                     {
-                                        double dx = std::abs(Player[A].Location.minus_center_x(Player[B].Location));
+                                        num_t dx = num_t::abs(Player[A].Location.minus_center_x(Player[B].Location));
                                         if(C == 0 || dx < C)
                                         {
                                             C = dx;
