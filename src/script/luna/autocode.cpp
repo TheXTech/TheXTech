@@ -47,7 +47,6 @@
 #include "lunanpc.h"
 #include "lunalayer.h"
 #include "lunablock.h"
-#include "lunacell.h"
 #include "lunaspriteman.h"
 #include "lunainput.h"
 #include "lunavarbank.h"
@@ -1208,13 +1207,7 @@ void Autocode::Do(bool init)
             Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("BlueePrints: {0}", gSpriteMan.CountBlueprints()), 3, 50, 380));
             Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("Components: {0}", gSpriteMan.m_ComponentList.size()), 3, 50, 400));
 
-            int buckets = 0, cells = 0, objs = 0;
-            gCellMan.CountAll(&buckets, &cells, &objs);
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("Buckets={0} Cells={1} Objs={2}", buckets, cells, objs), 3, 50, 420));
-
-            std::list<CellObj> cellobjs;
-            gCellMan.GetObjectsOfInterest(&cellobjs, demo->Location.X, demo->Location.Y, (int)demo->Location.Width, (int)demo->Location.Height);
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("NEAR: {0}", cellobjs.size()), 3, 50, 440));
+            // some stats of lunacell were printed here
 
             Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("STRINGS: {0}", StringsBankSize()), 3, 50, 460));
             Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("STRINGS-Unused: {0}", StringsUnusedEntries()), 3, 50, 480));
@@ -1230,7 +1223,7 @@ void Autocode::Do(bool init)
 
         case AT_CollisionScan:
         {
-            gCellMan.ScanLevel(true);
+            // this is now a no-op because the block lookup table is always filled
             break;
         }
 

@@ -26,7 +26,6 @@
 #include "lunainput.h"
 #include "lunarender.h"
 #include "lunaspriteman.h"
-#include "lunacell.h"
 #include "lunaplayer.h"
 #include "lunacounter.h"
 #include "lunalevels.h"
@@ -69,7 +68,6 @@ void lunaReset()
     Renderer::Get().ClearAllLoadedImages();
     Renderer::Get().ClearQueue();
     gSpriteMan.ResetSpriteManager();
-    gCellMan.Reset();
     Input::ResetAll();
 
     gDeathCounter.quit();

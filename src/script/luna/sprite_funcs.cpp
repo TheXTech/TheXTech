@@ -29,7 +29,7 @@
 #include "rand.h"
 #include "lunarender.h"
 #include "lunaplayer.h"
-#include "lunacell.h"
+#include "main/trees.h"
 #include "lunamisc.h"
 #include "lunaspriteman.h"
 #include "renderop_bitmap.h"
@@ -370,7 +370,7 @@ void SpriteFunc::PhaseMove(CSprite *me, SpriteComponent *obj)
 // BUMP MOVE
 void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
 {
-    double energy_loss_mod = (100 - obj->data2) / 100;
+    num_t energy_loss_mod = (100 - obj->data2) / 100;
 
     me->m_Xpos += me->m_Xspd;
     me->m_Ypos += me->m_Yspd;
@@ -382,105 +382,57 @@ void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
     bool collided_top = false;
 //    bool collided_bot = false;
 
-    std::list<CellObj> nearby_list;
-    gCellMan.GetObjectsOfInterest(&nearby_list, me->m_Hitbox.CalcLeft(),
-                                  me->m_Hitbox.CalcTop(),
-                                  (int)me->m_Hitbox.W,
-                                  (int)me->m_Hitbox.H);
+    // NOTE: these were previously sorted closest first. If we keep this function, we should replicate that logic here.
 
-    // Get all blocks being collided with into collide_list
-    std::list<CellObj> collide_list;
-    for(const auto cellobj : nearby_list)
+    for(BlockRef_t block : treeBlockQuery(newLoc(me->m_Hitbox.CalcLeft(), me->m_Hitbox.CalcRight(), me->m_Hitbox.W, me->m_Hitbox.H), SORTMODE_COMPAT))
     {
-        bool collide = false;
-        if(cellobj.Type == CLOBJ_SMBXBLOCK)
+        if(!block->Invis && !block->Hidden
+           && me->m_Hitbox.Test((int)block->Location.X, (int)block->Location.Y, (int)block->Location.Width, (int)block->Location.Height))
         {
-            auto *block = (Block_t *)cellobj.pObj;
-            if(!block->Invis && !block->Hidden)
-            {
-                collide = me->m_Hitbox.Test((int)block->Location.X, (int)block->Location.Y, (int)block->Location.Width, (int)block->Location.Height);
-                if(collide)
-                    collide_list.push_back(cellobj);
-            }
-        }
-    }
+            num_t sprite_bot = me->m_Hitbox.CalcBottom();
+            num_t sprite_right = me->m_Hitbox.CalcRight();
+            num_t sprite_top = me->m_Hitbox.CalcTop();
+            num_t sprite_left = me->m_Hitbox.CalcLeft();
 
-    // Sort the blocks by distance to find the best one
-    CellManager::SortByNearest(&collide_list, me->m_Hitbox.CenterX(), me->m_Hitbox.CenterY());
-
-    // Force sprite out of block if colliding with block, and reverse speed according to energy_loss_mod
-    if(!collide_list.empty())
-    {
-        for(const auto cellobj : collide_list)
-        {
-            if(cellobj.Type == CLOBJ_SMBXBLOCK)
+            if(me->m_CollisionCode == -1)   // default solid collision
             {
-                auto *block = (Block_t *)cellobj.pObj;
-                if(!block->Invis && !block->Hidden
-                   && me->m_Hitbox.Test((int)block->Location.X, (int)block->Location.Y, (int)block->Location.Width, (int)block->Location.Height))
+                num_t block_topcol = std::abs(block->Location.Y - sprite_bot);
+                num_t block_botcol = std::abs((block->Location.Y + block->Location.Height) - sprite_top);
+                num_t block_leftcol = std::abs(block->Location.X - sprite_right);
+                num_t block_rightcol = std::abs((block->Location.X + block->Location.Width) - sprite_left);
+
+                // Determine best direction to free sprite
+                // Top collision, push sprite up and out
+                if(block_topcol <= block_botcol && block_topcol <= block_leftcol &&
+                   block_topcol <= block_rightcol && !collided_top)
                 {
-                    double sprite_bot = me->m_Hitbox.CalcBottom();
-                    double sprite_right = me->m_Hitbox.CalcRight();
-                    double sprite_top = me->m_Hitbox.CalcTop();
-                    double sprite_left = me->m_Hitbox.CalcLeft();
+                    me->m_Ypos = (block->Location.Y - me->m_Hitbox.H) - 1;
+                    me->m_Yspd = -(me->m_Yspd * energy_loss_mod);
+                    collided_top = true;
+                }
 
-//                    if(false)   // debugging
-//                    {
-                        //double camtop = -vScreen[1].Y;
-                        //double camleft = -vScreen[1].X;
-                        //debug_rect.color = COLOR;
+                // Bot collision, push sprite down
+                else if(block_botcol <= block_leftcol && block_botcol <= block_rightcol && !collided_right)
+                {
+                    me->m_Ypos = ((block->Location.Y + block->Location.Height) - me->m_Hitbox.Top_off) + 1;
+                    me->m_Yspd = -(me->m_Yspd * energy_loss_mod);
+                    // collided_bot = true;
+                }
 
-                        //COLOR += 0x55000055; // ACTUALLY UNUSED
+                // Left collision, push sprite left
+                else if(block_leftcol <= block_rightcol && !collided_left)
+                {
+                    me->m_Xpos = (block->Location.X - me->m_Hitbox.W) - 1;
+                    me->m_Xspd = -(me->m_Xspd  * energy_loss_mod);
+                    collided_left = true;
+                }
 
-                        //debug_rect.m_FramesLeft = 1;
-                        //debug_rect.x1 = block->XPos - camleft;
-                        //debug_rect.y1 = block->YPos - camtop;
-                        //debug_rect.x2 = (block->XPos + block->W) - camleft;
-                        //debug_rect.y2 = (block->YPos + block->H) - camtop;
-                        //debug_rect.Draw(&Renderer::Get());
-//                    }
-
-                    if(me->m_CollisionCode == -1)   // default solid collision
-                    {
-                        double block_topcol = std::abs(block->Location.Y - sprite_bot);
-                        double block_botcol = std::abs((block->Location.Y + block->Location.Height) - sprite_top);
-                        double block_leftcol = std::abs(block->Location.X - sprite_right);
-                        double block_rightcol = std::abs((block->Location.X + block->Location.Width) - sprite_left);
-
-                        // Determine best direction to free sprite
-                        // Top collision, push sprite up and out
-                        if(block_topcol <= block_botcol && block_topcol <= block_leftcol &&
-                           block_topcol <= block_rightcol && !collided_top)
-                        {
-                            me->m_Ypos = (block->Location.Y - me->m_Hitbox.H) - 1;
-                            me->m_Yspd = -(me->m_Yspd * energy_loss_mod);
-                            collided_top = true;
-                        }
-
-                        // Bot collision, push sprite down
-                        else if(block_botcol <= block_leftcol && block_botcol <= block_rightcol && !collided_right)
-                        {
-                            me->m_Ypos = ((block->Location.Y + block->Location.Height) - me->m_Hitbox.Top_off) + 1;
-                            me->m_Yspd = -(me->m_Yspd * energy_loss_mod);
-                            // collided_bot = true;
-                        }
-
-                        // Left collision, push sprite left
-                        else if(block_leftcol <= block_rightcol && !collided_left)
-                        {
-                            me->m_Xpos = (block->Location.X - me->m_Hitbox.W) - 1;
-                            me->m_Xspd = -(me->m_Xspd  * energy_loss_mod);
-                            collided_left = true;
-                        }
-
-                        // Right collision, push sprite right
-                        else if(!collided_right)
-                        {
-                            me->m_Xpos = ((block->Location.X + block->Location.Width) - me->m_Hitbox.Left_off) + 1;
-                            me->m_Xspd = -(me->m_Xspd  * energy_loss_mod);
-                            collided_right = true;
-                        }
-                    }
+                // Right collision, push sprite right
+                else if(!collided_right)
+                {
+                    me->m_Xpos = ((block->Location.X + block->Location.Width) - me->m_Hitbox.Left_off) + 1;
+                    me->m_Xspd = -(me->m_Xspd  * energy_loss_mod);
+                    collided_right = true;
                 }
             }
         }
@@ -494,28 +446,17 @@ void SpriteFunc::CrashMove(CSprite *me, SpriteComponent *obj)
     me->m_Xpos += me->m_Xspd;
     me->m_Ypos += me->m_Yspd;
 
-    std::list<CellObj> collide_list;
-    gCellMan.GetObjectsOfInterest(&collide_list, me->m_Hitbox.CalcLeft(),
-                                  me->m_Hitbox.CalcTop(),
-                                  (int)me->m_Hitbox.W,
-                                  (int)me->m_Hitbox.H);
-    if(!collide_list.empty())
+    for(BlockRef_t block : treeBlockQuery(newLoc(me->m_Hitbox.CalcLeft(), me->m_Hitbox.CalcRight(), me->m_Hitbox.W, me->m_Hitbox.H), SORTMODE_NONE))
     {
-        for(const auto cellobj : collide_list)
+        if(!block->Invis && !block->Hidden &&
+            me->m_Hitbox.Test((int)block->Location.X,
+                              (int)block->Location.Y,
+                              (int)block->Location.Width,
+                              (int)block->Location.Height))
         {
-            if(cellobj.Type == CLOBJ_SMBXBLOCK)
-            {
-                auto *block = (Block_t *)cellobj.pObj;
-                if(!block->Invis && !block->Hidden &&
-                    me->m_Hitbox.Test((int)block->Location.X,
-                                      (int)block->Location.Y,
-                                      (int)block->Location.Width,
-                                      (int)block->Location.Height))
-                {
-                    me->Die();
-                    gSpriteMan.m_hasInvalid = true;
-                }
-            }
+            me->Die();
+            gSpriteMan.m_hasInvalid = true;
+            break;
         }
     }
 }

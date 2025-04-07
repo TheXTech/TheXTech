@@ -954,7 +954,6 @@ if(THEXTECH_ENABLE_LUNA_AUTOCODE)
         src/script/luna/lunamisc.cpp
         src/script/luna/lunalevel.cpp
         src/script/luna/lunarender.cpp
-        src/script/luna/lunacell.cpp
         src/script/luna/lunainput.cpp
         src/script/luna/lunavarbank.cpp
         src/script/luna/renderop_bitmap.cpp
