@@ -907,15 +907,15 @@ static inline bool s_initModernQScreen(Screen_t& screen, const int B, const Spee
 
         bool screen2_was_visible = vScreen[Z2].Visible;
 
-        num_t tX = 0;
-        num_t tY = 0;
+        int32_t tX = 0;
+        int32_t tY = 0;
 
         if(warped_plr == p1 || warped_plr == p2)
         {
             int warped_Z = (warped_plr == p1) ? Z1 : Z2;
             int onscreen_Z = (onscreen_plr == p1) ? Z1 : Z2;
-            tX = vScreen[warped_Z].X - vScreen[onscreen_Z].X;
-            tY = vScreen[warped_Z].Y - vScreen[onscreen_Z].Y;
+            tX = (int)vScreen[warped_Z].X - (int)vScreen[onscreen_Z].X;
+            tY = (int)vScreen[warped_Z].Y - (int)vScreen[onscreen_Z].Y;
         }
 
         SoundPause[SFX_Camera] = 10;
@@ -962,17 +962,16 @@ static inline bool s_initModernQScreen(Screen_t& screen, const int B, const Spee
         if((tX || tY) && (screen2_was_visible && !vScreen[Z2].Visible))
         {
             // total distance of warp
-            num_t dSquare = num_t::dist2(tX, tY);
+            int xSq = tX * tX;
+            int ySq = tY * tY;
+            int dSquare = xSq + ySq;
 
             // project onto the circle: proportion of distance from each axis
-            num_t xProp = tX.times(tX).divided_by(dSquare);
-            num_t yProp = tY.times(tY).divided_by(dSquare);
-
             if(tX < 0)
-                xProp *= -1;
+                xSq *= -1;
 
             if(tY < 0)
-                yProp *= -1;
+                ySq *= -1;
 
             // maximum total shift of 1/4 of the vScreen's size; also limit by 200x150 (SMBX64 amount)
             int maxShiftX = vScreen[Z1].Width / 4;
@@ -985,8 +984,8 @@ static inline bool s_initModernQScreen(Screen_t& screen, const int B, const Spee
                 maxShiftY = 150;
 
             // apply the shift
-            qScreenLoc[Z1].X += maxShiftX * xProp;
-            qScreenLoc[Z1].Y += maxShiftY * yProp;
+            qScreenLoc[Z1].X += maxShiftX * xSq / dSquare;
+            qScreenLoc[Z1].Y += maxShiftY * ySq / dSquare;
 
             // restrict to old level bounds
             if(-qScreenLoc[Z1].X < level[B].X)
