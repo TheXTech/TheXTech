@@ -138,15 +138,15 @@ namespace Controls
 || implementation for InputMethod_GameCube            ||
 \*====================================================*/
 
-static inline double s_s8_to_dbl(int8_t in)
+static inline num_t s_s8_to_dbl(int8_t in)
 {
     if(in <= 32)
         return 0;
 
-    return SDL_min((in - 32) / 64.0, 1.0);
+    return SDL_min(num_t(in - 32) / 64, 1.0_n);
 }
 
-static inline double s_get_thumb_dbl(const PADStatus* data, uint32_t button)
+static inline num_t s_get_thumb_dbl(const PADStatus* data, uint32_t button)
 {
     switch(button)
     {
@@ -181,20 +181,20 @@ static bool s_get_button(const PADStatus* data, uint32_t button)
 
     // thumbstick button
     if(button <= PAD_STICK_RD)
-        return s_get_thumb_dbl(data, button) > 0.25;
+        return s_get_thumb_dbl(data, button) > 0.25_n;
 
     return false;
 }
 
-static double s_get_button_dbl(const PADStatus* data, uint32_t button)
+static num_t s_get_button_dbl(const PADStatus* data, uint32_t button)
 {
     if(button >= PAD_STICK_LL && button <= PAD_STICK_RD)
         return s_get_thumb_dbl(data, button);
 
     if(s_get_button(data, button))
-        return 0.5;
+        return 0.5_n;
     else
-        return 0.0;
+        return 0.0_n;
 }
 
 /*====================================================*\
@@ -335,8 +335,8 @@ bool InputMethod_GameCube::Update(int player, Controls_t& c, CursorControls_t& m
     }
 
     // analogue controls
-    double cursor[4] = {0, 0, 0, 0};
-    double scroll[4] = {0, 0, 0, 0};
+    num_t cursor[4] = {0, 0, 0, 0};
+    num_t scroll[4] = {0, 0, 0, 0};
 
     for(int i = 0; i < 4; i++)
     {
@@ -355,9 +355,9 @@ bool InputMethod_GameCube::Update(int player, Controls_t& c, CursorControls_t& m
     }
 
     // Scroll control (UDLR)
-    double* const scroll_dest[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
+    num_t* const scroll_dest[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
     for(int i = 0; i < 4; i++)
-        *scroll_dest[i] += scroll[i] * 10.;
+        *scroll_dest[i] += scroll[i] * 10;
 
     // Cursor control (UDLR)
     if(cursor[0] || cursor[1] || cursor[2] || cursor[3])
@@ -370,8 +370,8 @@ bool InputMethod_GameCube::Update(int player, Controls_t& c, CursorControls_t& m
         if(m.Y < 0)
             m.Y = XRender::TargetH / 2;
 
-        m.X += (cursor[3] - cursor[2]) * 16.;
-        m.Y += (cursor[1] - cursor[0]) * 16.;
+        m.X += (cursor[3] - cursor[2]) * 16;
+        m.Y += (cursor[1] - cursor[0]) * 16;
 
         if(m.X < 0)
         {

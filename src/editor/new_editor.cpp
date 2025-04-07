@@ -5060,7 +5060,7 @@ inline void swap_screens()
 {
 #ifdef __3DS__
     int win_x, win_y;
-    XRender::mapFromScreen(SharedCursor.X, SharedCursor.Y, &win_x, &win_y);
+    XRender::mapFromScreen((int)SharedCursor.X, (int)SharedCursor.Y, &win_x, &win_y);
 #endif
 
     editorScreen.active = !editorScreen.active;

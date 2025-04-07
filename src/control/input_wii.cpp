@@ -136,7 +136,7 @@ static const char* s_get_name(uint32_t button, uint8_t expansion)
     return g_controlsStrings.sharedCaseInvalid.c_str();
 }
 
-static inline double i_get_thumb_dbl(WPADData* data, uint32_t button, uint8_t expansion)
+static inline num_t i_get_thumb_dbl(WPADData* data, uint32_t button, uint8_t expansion)
 {
     const joystick_t& js = (expansion == WPAD_EXP_NUNCHUK)
         ? data->exp.nunchuk.js
@@ -147,7 +147,7 @@ static inline double i_get_thumb_dbl(WPADData* data, uint32_t button, uint8_t ex
     if(button >= 0x8000)
         button -= 0x8000;
 
-    double center, max, val;
+    int max, center, val;
     if(button == WPAD_STICK_LL)
     {
         center = js.center.x;
@@ -173,11 +173,11 @@ static inline double i_get_thumb_dbl(WPADData* data, uint32_t button, uint8_t ex
         val = js.pos.y;
     }
 
-    double decode = (val - center) / (max - center);
-    decode -= 0.1;
-    decode /= 0.9;
-    if(decode < 0.1)
-        decode = 0.0;
+    num_t decode = (num_t)(val - center) / (max - center);
+    decode -= 0.1_n;
+    decode /= 0.9_ri;
+    if(decode < 0.1_n)
+        decode = 0;
 
     return decode;
 }
@@ -223,7 +223,7 @@ static bool s_get_button(WPADData* data, uint32_t button, uint8_t expansion)
 
     // thumbstick button
     if(button <= WPAD_STICK_RU)
-        return i_get_thumb_dbl(data, button, expansion) > 0.25;
+        return i_get_thumb_dbl(data, button, expansion) > 0.25_n;
 
     // expansion button, WPAD makes this easy :)
     return button & data->btns_h;
@@ -231,7 +231,7 @@ static bool s_get_button(WPADData* data, uint32_t button, uint8_t expansion)
     return false;
 }
 
-static double s_get_button_dbl(WPADData* data, uint32_t button, uint8_t expansion)
+static num_t s_get_button_dbl(WPADData* data, uint32_t button, uint8_t expansion)
 {
     if(button >= WPAD_STICK_LL && button <= WPAD_STICK_RU)
     {
@@ -239,9 +239,9 @@ static double s_get_button_dbl(WPADData* data, uint32_t button, uint8_t expansio
     }
 
     if(s_get_button(data, button, expansion))
-        return 0.5;
+        return 0.5_n;
     else
-        return 0.0;
+        return 0.0_n;
 }
 
 namespace XRender
@@ -408,23 +408,23 @@ bool InputMethod_Wii::Update(int player, Controls_t& c, CursorControls_t& m, Edi
         }
     }
 
-    double* const scroll[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
+    num_t* const scroll[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
 
     for(int i = 0; i < 4; i++)
     {
         int key = p->m_editor_keys[i];
         int key2 = p->m_editor_keys2[i];
 
-        *scroll[i] += s_get_button_dbl(data, key, p->m_expansion) * 32.0;
-        *scroll[i] += s_get_button_dbl(data, key2, p->m_expansion) * 32.0;
+        *scroll[i] += s_get_button_dbl(data, key, p->m_expansion) * 32;
+        *scroll[i] += s_get_button_dbl(data, key2, p->m_expansion) * 32;
     }
 
-    double cursor[4];
+    num_t cursor[4];
 
     for(int i = 0; i < 4; i++)
     {
         int key = p->m_cursor_keys2[i];
-        cursor[i] = s_get_button_dbl(data, key, p->m_expansion) * 32.0;
+        cursor[i] = s_get_button_dbl(data, key, p->m_expansion) * 32;
     }
 
     // Cursor control (UDLR)

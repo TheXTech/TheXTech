@@ -192,7 +192,7 @@ bool InputMethod_3DS::Update(int player, Controls_t& c, CursorControls_t& m, Edi
         }
     }
 
-    double* const scroll[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
+    num_t* const scroll[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
 
     for(int i = 0; i < 4; i++)
     {
@@ -200,9 +200,9 @@ bool InputMethod_3DS::Update(int player, Controls_t& c, CursorControls_t& m, Edi
         int key2 = p->m_editor_keys2[i];
 
         if(key != null_key && BIT(key) & keys_held)
-            *scroll[i] += 10.0;
+            *scroll[i] += 10;
         else if(key2 != null_key && BIT(key2) & keys_held)
-            *scroll[i] += 10.0;
+            *scroll[i] += 10;
     }
 
     bool cursor[4];
@@ -223,16 +223,16 @@ bool InputMethod_3DS::Update(int player, Controls_t& c, CursorControls_t& m, Edi
             m.Y = XRender::TargetH / 2;
 
         if(cursor[3])
-            m.X += 16.0;
+            m.X += 16;
 
         if(cursor[2])
-            m.X -= 16.0;
+            m.X -= 16;
 
         if(cursor[1])
-            m.Y += 16.0;
+            m.Y += 16;
 
         if(cursor[0])
-            m.Y -= 16.0;
+            m.Y -= 16;
 
         if(m.X < 0)
             m.X = 0;
