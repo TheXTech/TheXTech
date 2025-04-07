@@ -221,16 +221,6 @@ void AutocodeManager::Parse(SDL_RWops *code_file, bool add_to_globals, const std
     char combuf[150];
     int cur_section = 0;
     AutocodeType ac_type = AT_Invalid;
-    double target = 0;
-    double param1 = 0;
-    double param2 = 0;
-    double param3 = 0;
-    double length = 0;
-    int btarget = 0;
-    int bparam1 = 0;
-    int bparam2 = 0;
-    int bparam3 = 0;
-    int blength = 0;
 
     char wstrbuf[1000];
     char wrefbuf[128];
@@ -265,16 +255,22 @@ void AutocodeManager::Parse(SDL_RWops *code_file, bool add_to_globals, const std
         SDL_memset(wstrbuf, 0, sizeof(wstrbuf));
         SDL_memset(wrefbuf, 0, sizeof(wrefbuf));
         SDL_memset(combuf, 0, sizeof(combuf));
-        target = 0;
-        param1 = 0;
-        param2 = 0;
-        param3 = 0;
-        length = 0;
-        btarget = 0;
-        bparam1 = 0;
-        bparam2 = 0;
-        bparam3 = 0;
-        blength = 0;
+
+        num_t target = 0;
+        num_t param1 = 0;
+        num_t param2 = 0;
+        num_t param3 = 0;
+        num_t length = 0;
+        double dtarget = 0;
+        double dparam1 = 0;
+        double dparam2 = 0;
+        double dparam3 = 0;
+        double dlength = 0;
+        int btarget = 0;
+        int bparam1 = 0;
+        int bparam2 = 0;
+        int bparam3 = 0;
+        int blength = 0;
 
         if(!readbuf.fgets(wbuf, 2000, code_file))
             break; // End of file has reached
@@ -339,7 +335,7 @@ void AutocodeManager::Parse(SDL_RWops *code_file, bool add_to_globals, const std
             ac_type = Autocode::EnumerizeCommand(wbuf, lineNum);
 
             // Decimal pass
-            int hits = XTECH_sscanf(wbuf, PARSE_FMT_STR, combuf, &target, &param1, &param2, &param3, &length, wstrbuf);
+            int hits = XTECH_sscanf(wbuf, PARSE_FMT_STR, combuf, &dtarget, &dparam1, &dparam2, &dparam3, &dlength, wstrbuf);
 
             // Integer pass
             int bhits = XTECH_sscanf(wbuf, PARSE_FMT_STR_2, combuf, &btarget, &bparam1, &bparam2, &bparam3, &blength, wstrbuf);
@@ -354,6 +350,12 @@ void AutocodeManager::Parse(SDL_RWops *code_file, bool add_to_globals, const std
             // Check for hexadecimal inputs
             //if(true) // Always true
             {
+                target = (num_t)(dtarget);
+                param1 = (num_t)(dparam1);
+                param2 = (num_t)(dparam2);
+                param3 = (num_t)(dparam3);
+                length = (num_t)(dlength);
+
                 if(target == 0 && btarget != 0)
                     target = btarget;
                 if(param1 == 0 && bparam1 != 0)
@@ -617,14 +619,14 @@ Autocode *AutocodeManager::FindMatching(int section, const std::string &soughtst
 }
 
 // VAR OPERATION -- Do something to a variable in the user variable bank
-bool AutocodeManager::VarOperation(const std::string &var_name, double value, OPTYPE operation_to_do)
+bool AutocodeManager::VarOperation(const std::string &var_name, num_t value, OPTYPE operation_to_do)
 {
     if(var_name.length() > 0)
     {
         // Create var if doesn't exist
         InitIfMissing(&gAutoMan.m_UserVars, var_name, 0);
 
-        double var_val = m_UserVars[var_name];
+        num_t var_val = m_UserVars[var_name];
 
         // Do the operation
         OPTYPE oper = operation_to_do;
@@ -777,7 +779,7 @@ bool AutocodeManager::VarExists(const std::string &var_name)
 }
 
 // GET VAR
-double AutocodeManager::GetVar(const std::string &var_name)
+num_t AutocodeManager::GetVar(const std::string &var_name)
 {
     if(!VarExists(var_name))
         return 0;

@@ -31,24 +31,22 @@ Layer_t *LayerF::Get(int layerIdx)
 void LayerF::Stop(Layer_t *layer)
 {
     layer->EffectStop = false;
-    layer->SpeedX = 0.0001f;
-    layer->SpeedY = 0.0001f;
+    layer->SpeedX = 0.0001_nf;
+    layer->SpeedY = 0.0001_nf;
 
     // NOTE from ds-sloth: why non-zero? probably, to make sure all objects get updated.
     // It would be better to set all objects (Blocks, BGOs, NPCs) in layer to speed 0.
     // keep it this way to preserve compatibility with existing Autocode content.
 }
 
-void LayerF::SetYSpeed(Layer_t *layer, float setY)
+void LayerF::SetYSpeed(Layer_t *layer, num_t setY)
 {
-    setY = (setY == 0 ?  0.0001f : setY);
-    layer->SpeedY = setY;
+    layer->SpeedY = (setY == 0 ?  0.0001_nf : (numf_t)setY);
     layer->EffectStop = true;
 }
 
-void LayerF::SetXSpeed(Layer_t *layer, float setX)
+void LayerF::SetXSpeed(Layer_t *layer, num_t setX)
 {
-    setX = (setX == 0 ?  0.0001f : setX);
-    layer->SpeedX = setX;
+    layer->SpeedX = (setX == 0 ?  0.0001_nf : (numf_t)setX);
     layer->EffectStop = true;
 }

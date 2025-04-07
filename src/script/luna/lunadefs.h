@@ -22,6 +22,8 @@
 #ifndef LUNADEFS_H
 #define LUNADEFS_H
 
+#include "numeric_types.h"
+
 #define LUNA_VERSION    9
 
 enum FIELDTYPE

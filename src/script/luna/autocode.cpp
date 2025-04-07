@@ -85,8 +85,8 @@ Autocode::Autocode()
     m_Type = AT_Invalid;
 }
 
-Autocode::Autocode(AutocodeType iType, double iTarget, double ip1, double ip2, double ip3,
-                   const stringindex_t& ip4, double iLength, int iSection, const stringindex_t& iVarRef)
+Autocode::Autocode(AutocodeType iType, num_t iTarget, num_t ip1, num_t ip2, num_t ip3,
+                   const stringindex_t& ip4, num_t iLength, int iSection, const stringindex_t& iVarRef)
 {
     m_Type = iType;
     Target = iTarget;
@@ -244,7 +244,7 @@ void Autocode::Do(bool init)
                     case 0: // UP
                     {
                         //double* pCamera = vScreenY;
-                        double top = -vscreen.Y;
+                        num_t top = -vscreen.Y;
                         if(npc->Location.Y < top + Param2)
                         {
                             npc->Location.Y = (top + Param2) + 1;
@@ -256,7 +256,7 @@ void Autocode::Do(bool init)
                     case 1:  // DOWN
                     {
                         //double* pCamera = GM_CAMERA_Y;
-                        double bot = -vscreen.Y + vscreen.Height;
+                        num_t bot = -vscreen.Y + vscreen.Height;
                         if(npc->Location.Y > bot - Param2)
                         {
                             npc->Location.Y = (bot - Param2) - 1;
@@ -268,7 +268,7 @@ void Autocode::Do(bool init)
                     case 2: // LEFT
                     {
                         //double* pCamera = GM_CAMERA_X;
-                        double left = -vscreen.X;
+                        num_t left = -vscreen.X;
                         if(npc->Location.X < left + Param2)
                         {
                             npc->Location.X = (left + Param2) + 1;
@@ -280,7 +280,7 @@ void Autocode::Do(bool init)
                     case 3: // RIGHT
                     {
                         //double* pCamera = GM_CAMERA_X;
-                        double rt = -vscreen.X + vscreen.Width;
+                        num_t rt = -vscreen.X + vscreen.Width;
                         if(npc->Location.Y > rt - Param2)
                         {
                             npc->Location.Y = (rt - Param2) - 1;
@@ -357,7 +357,7 @@ void Autocode::Do(bool init)
             {
                 // Play built in sound
                 if(Param1 > 0)
-                    PlaySound((int)Param1, (int)Param2, (int)(Param3 <= 0.0 ? 128 : Param3));
+                    PlaySound((int)Param1, (int)Param2, (int)(Param3 <= 0 ? 128 : Param3));
                 else
                 {
                     // Sound from level folder
@@ -365,7 +365,7 @@ void Autocode::Do(bool init)
                     {
                         //char* dbg = "CUSTOM SOUND PLAY DBG";
                         std::string full_path = g_dirCustom.resolveFileCaseAbs(GetS(MyString));
-                        PlayExtSound(full_path, (int)Param2, (int)(Param3 <= 0.0 ? 128 : Param3));
+                        PlayExtSound(full_path, (int)Param2, (int)(Param3 <= 0 ? 128 : Param3));
                     }
 
                 }
@@ -411,7 +411,7 @@ void Autocode::Do(bool init)
             int sec = (int)Target - 1;
             if(sec >= 0 && sec < numSections)
             {
-                if(Param1 >= 0.0 && Param1 <= 24)
+                if(Param1 >= 0 && Param1 <= 24)
                     bgMusic[sec] = (int)Param1;
                 if(GetS(MyString).length() >= 5)
                     CustomMusic[sec] = GetS(MyString);
@@ -438,7 +438,7 @@ void Autocode::Do(bool init)
         }
 
         case AT_Timer:
-            if(Param2 != 0.0) // Display timer?
+            if(Param2 != 0) // Display timer?
             {
                 Renderer::Get().AddOp(new RenderStringOp("TIMER", 3, 600, 27));
                 Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("{0}", (int64_t)Length / 60), 3, 618, 48));
@@ -452,7 +452,7 @@ void Autocode::Do(bool init)
                 Autocode::DoPredicate((int)Target, (int)Param1);
 
                 // Reset time?
-                if(Param3 != 0.0)
+                if(Param3 != 0)
                 {
                     Activated = true;
                     Expired = false;
@@ -696,7 +696,7 @@ void Autocode::Do(bool init)
             // Get the memory
             //uint8_t *ptr = (uint8_t *)demo;
             //ptr += (int)Param1; // offset
-            double gotval = GetMem(demo, (size_t)Param1, ftype);
+            num_t gotval = GetMem(demo, (size_t)Param1, ftype);
 
             // Perform the load/add/sub/etc operation on the banked variable using the ref as the name
             gAutoMan.VarOperation(GetS(MyRef), gotval, (OPTYPE)(int)Param2);
@@ -717,7 +717,7 @@ void Autocode::Do(bool init)
             NPC_t *pFound_npc = NpcF::GetFirstMatch((int)Target, (int)Param3);
             if(pFound_npc != nullptr)
             {
-                double gotval = GetMem(pFound_npc, (size_t)Param1, ftype);
+                num_t gotval = GetMem(pFound_npc, (size_t)Param1, ftype);
                 gAutoMan.VarOperation(GetS(MyRef), gotval, (OPTYPE)(int)Param2);
             }
 
@@ -735,7 +735,7 @@ void Autocode::Do(bool init)
                 }
 
                 // byte *ptr = (byte *)(int)Target;
-                double gotval = GetMem((size_t)Target, ftype);
+                num_t gotval = GetMem((size_t)Target, ftype);
                 gAutoMan.VarOperation(GetS(MyRef), gotval, (OPTYPE)(int)Param1);
             }
             break;
@@ -747,7 +747,7 @@ void Autocode::Do(bool init)
             {
                 InitIfMissing(&gAutoMan.m_UserVars, GetS(MyString), 0);// Initalize var if not existing
             }
-            double varval;
+            num_t varval;
             if(ReferenceOK())
                 varval = gAutoMan.m_UserVars[GetS(MyRef)];
             else
@@ -768,8 +768,8 @@ void Autocode::Do(bool init)
                 InitIfMissing(&gAutoMan.m_UserVars, GetS(MyString), 0);
                 InitIfMissing(&gAutoMan.m_UserVars, GetS(MyRef), 0);
 
-                double var1 = gAutoMan.m_UserVars[GetS(MyRef)];
-                double var2 = gAutoMan.m_UserVars[GetS(MyString)];
+                num_t var1 = gAutoMan.m_UserVars[GetS(MyRef)];
+                num_t var2 = gAutoMan.m_UserVars[GetS(MyString)];
 
                 if(CheckConditionD(var1, var2, compare_type))
                     gAutoMan.ActivateCustomEvents(0, (int)Param3);
@@ -781,7 +781,7 @@ void Autocode::Do(bool init)
         {
             if(ReferenceOK())
             {
-                std::string str = fmt::format_ne("{0}", gAutoMan.GetVar(GetS(MyRef)));
+                std::string str = fmt::format_ne("{0}", (double)gAutoMan.GetVar(GetS(MyRef)));
                 if(GetS(MyString).length() > 0)
                     str = GetS(MyString) + str;
                 Renderer::Get().AddOp(new RenderStringOp(str, (int)Param3, s_round2int(Param1), s_round2int(Param2)));
@@ -903,8 +903,8 @@ void Autocode::Do(bool init)
             if(layer)
             {
                 LayerF::SetXSpeed(layer, (float)SDL_atof(GetS(MyString).c_str()));
-                if(Length == 1 && Param1 != 0.0)
-                    LayerF::SetXSpeed(layer, 0.0001f);
+                if(Length == 1 && Param1 != 0)
+                    LayerF::SetXSpeed(layer, 0.0001_n);
             }
             break;
         }
@@ -915,8 +915,8 @@ void Autocode::Do(bool init)
             if(layer)
             {
                 LayerF::SetYSpeed(layer, (float)SDL_atof(GetS(MyString).c_str()));
-                if(Length == 1 && Param1 != 0.0)
-                    LayerF::SetYSpeed(layer, 0.0001f);
+                if(Length == 1 && Param1 != 0)
+                    LayerF::SetYSpeed(layer, 0.0001_n);
             }
             break;
         }
@@ -928,9 +928,9 @@ void Autocode::Do(bool init)
             {
                 auto accel = (float)SDL_atof(GetS(MyString).c_str());
                 if(std::abs(layer->SpeedX) + std::abs(accel) >= std::abs((float)Param1))
-                    LayerF::SetXSpeed(layer, (float)Param1);
+                    LayerF::SetXSpeed(layer, Param1);
                 else
-                    LayerF::SetXSpeed(layer, layer->SpeedX + (float)accel);
+                    LayerF::SetXSpeed(layer, (num_t)layer->SpeedX + accel);
             }
             break;
         }
@@ -942,9 +942,9 @@ void Autocode::Do(bool init)
             {
                 auto accel = (float)SDL_atof(GetS(MyString).c_str());
                 if(std::abs(layer->SpeedY) + std::abs(accel) >= std::abs((float)Param1))
-                    LayerF::SetYSpeed(layer, (float)Param1);
+                    LayerF::SetYSpeed(layer, Param1);
                 else
-                    LayerF::SetYSpeed(layer, layer->SpeedY + (float)accel);
+                    LayerF::SetYSpeed(layer, (num_t)layer->SpeedY + accel);
             }
             break;
         }
@@ -958,13 +958,13 @@ void Autocode::Do(bool init)
                 deccel = std::abs(deccel);
                 if(layer->SpeedX > 0)
                 {
-                    layer->SpeedX -= deccel;
+                    layer->SpeedX = numf_t((num_t)layer->SpeedX - deccel);
                     if(layer->SpeedX < 0)
                         LayerF::Stop(layer);
                 }
                 else if(layer->SpeedX < 0)
                 {
-                    layer->SpeedX += deccel;
+                    layer->SpeedX = numf_t((num_t)layer->SpeedX + deccel);
                     if(layer->SpeedX > 0)
                         LayerF::Stop(layer);
                 }
@@ -982,13 +982,13 @@ void Autocode::Do(bool init)
                 deccel = std::abs(deccel);
                 if(layer->SpeedY > 0)
                 {
-                    layer->SpeedY -= deccel;
+                    layer->SpeedY = numf_t((num_t)layer->SpeedY - deccel);
                     if(layer->SpeedY < 0)
                         LayerF::Stop(layer);
                 }
                 else if(layer->SpeedY < 0)
                 {
-                    layer->SpeedY += deccel;
+                    layer->SpeedY = numf_t((num_t)layer->SpeedY + deccel);
                     if(layer->SpeedY > 0)
                         LayerF::Stop(layer);
                 }
@@ -1070,7 +1070,7 @@ void Autocode::Do(bool init)
         // SET HITS
         case AT_SetHits:
         {
-            NpcF::AllSetHits((int)Target, (int)Param1 - 1, (float)Param2);
+            NpcF::AllSetHits((int)Target, (int)Param1 - 1, (int)Param2);
             break;
         }
 
@@ -1141,7 +1141,7 @@ void Autocode::Do(bool init)
             // Assign the mem
             if(ReferenceOK())   // Use referenced var as value
             {
-                double gotval = gAutoMan.GetVar(GetS(MyRef));
+                num_t gotval = gAutoMan.GetVar(GetS(MyRef));
                 NpcF::MemSet((int)Target, (size_t)Param1, gotval, (OPTYPE)(int)Param3, ftype);
             }
             else   // Use given value as value
@@ -1163,7 +1163,7 @@ void Autocode::Do(bool init)
 
             if(ReferenceOK())
             {
-                double gotval = gAutoMan.GetVar(GetS(MyRef));
+                num_t gotval = gAutoMan.GetVar(GetS(MyRef));
                 PlayerF::MemSet((size_t)Param1, gotval, (OPTYPE)(int)Param3, ftype);
             }
             else
@@ -1185,7 +1185,7 @@ void Autocode::Do(bool init)
 
                 if(ReferenceOK())
                 {
-                    double gotval = gAutoMan.GetVar(GetS(MyRef));
+                    num_t gotval = gAutoMan.GetVar(GetS(MyRef));
                     MemAssign((size_t)Target, gotval, (OPTYPE)(int)Param2, ftype);
                 }
                 else
@@ -1394,7 +1394,7 @@ bool Autocode::CheckConditionI(int value1, int value2, COMPARETYPE cond)
     return false;
 }
 
-bool Autocode::CheckConditionD(double value1, double value2, COMPARETYPE cond)
+bool Autocode::CheckConditionD(num_t value1, num_t value2, COMPARETYPE cond)
 {
     switch(cond)
     {
@@ -1525,7 +1525,7 @@ void Autocode::expire()
     gAutoMan.m_hasExpired = true;
 }
 
-void Autocode::modParam(double &dst, double src, OPTYPE operation)
+void Autocode::modParam(num_t &dst, num_t src, OPTYPE operation)
 {
     switch(operation)
     {

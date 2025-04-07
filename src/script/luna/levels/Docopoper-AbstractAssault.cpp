@@ -49,7 +49,7 @@ void AbstractAssaultCode()
     SDL_assert_release(layerDefault);
     SDL_assert_release(layerStartingPlatform);
 
-    static float hspeed = 0, vspeed = 0;
+    static num_t hspeed = 0, vspeed = 0;
     static char gameStarted = 0;
     static unsigned short noControlTimer = 0;
 
@@ -86,7 +86,7 @@ void AbstractAssaultCode()
 
         demo -> SpinJump = false;
 
-        layerDefault -> SpeedX = (float) X_MAX(layerDefault -> SpeedX - 0.015, -2.5);
+        layerDefault -> SpeedX = (numf_t) X_MAX((num_t)layerDefault -> SpeedX - 0.015_n, -2.5_n);
 
         if(demo -> Hearts > 1)
             powerup = 6;
@@ -96,16 +96,16 @@ void AbstractAssaultCode()
 
         if(noControlTimer == 0)
         {
-            vspeed = (float) X_CLAMP(vspeed + (press_down - press_up) * 0.5, -10, 10);
-            hspeed = (float) X_CLAMP(hspeed + (press_right - press_left) * 0.5, -10, 10);
+            vspeed = X_CLAMP(vspeed + (press_down - press_up) * 0.5_n, -10, 10);
+            hspeed = X_CLAMP(hspeed + (press_right - press_left) * 0.5_n, -10, 10);
         }
         else
             noControlTimer--;
 
-        demo->Location.SpeedY = -0.4 + vspeed;
+        demo->Location.SpeedY = -0.4_n + vspeed;
         demo->Location.SpeedX = hspeed;
 
-        hspeed *= (float) 0.9;
-        vspeed *= (float) 0.9;
+        hspeed *= 0.9_r;
+        vspeed *= 0.9_r;
     }
 }

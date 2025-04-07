@@ -141,9 +141,9 @@ void Renderer::DebugPrint(const std::string &message)
     this->m_queueState.m_debugMessages.push_back(message);
 }
 
-void Renderer::DebugPrint(const std::string &message, double val)
+void Renderer::DebugPrint(const std::string &message, num_t val)
 {
-    this->m_queueState.m_debugMessages.push_back(fmt::format_ne("{0} {1}", message, val));
+    this->m_queueState.m_debugMessages.push_back(fmt::format_ne("{0} {1}", message, (double)val));
 }
 
 static bool CompareRenderPriority(const RenderOp *lhs, const RenderOp *rhs)

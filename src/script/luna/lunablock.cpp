@@ -92,10 +92,10 @@ void BlocksF::HideAll(int type)
 bool BlocksF::IsPlayerTouchingType(int type, int sought, Player_t *demo)
 {
     //    Block* blocks = Blocks::GetBase();
-    double playerX = demo->Location.X - 0.20;
-    double playerY = demo->Location.Y - 0.20;
-    double playerX2 = demo->Location.X + demo->Location.Width + 0.20;
-    double playerY2 = demo->Location.Y + demo->Location.Height + 0.20;
+    num_t playerX = demo->Location.X - 0.20_n;
+    num_t playerY = demo->Location.Y - 0.20_n;
+    num_t playerX2 = demo->Location.X + demo->Location.Width + 0.20_n;
+    num_t playerY2 = demo->Location.Y + demo->Location.Height + 0.20_n;
 
     for(Block_t* block : treeFLBlockQuery(demo->Location, SORTMODE_NONE))
     {

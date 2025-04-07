@@ -23,6 +23,7 @@
 #define HitBox_HHHHH
 
 #include <cstddef>
+#include "numeric_types.h"
 
 class CSprite;
 
@@ -39,12 +40,12 @@ struct Hitbox
 {
     Hitbox() = default;
 
-    double CalcLeft() const;      // Get the left absolute position (with parent base coords)
-    double CalcRight() const;     // Get the right absolute position (with parent base coords)
-    double CalcTop() const;       // Get the top absolute position (with parent base coords)
-    double CalcBottom() const;    // Get the bottom absolute position (with parent base coords)
-    double CenterX() const;       // Get the center X position (from parent base coords)
-    double CenterY() const;       // Get the center Y position (from parent base coords)
+    num_t CalcLeft() const;      // Get the left absolute position (with parent base coords)
+    num_t CalcRight() const;     // Get the right absolute position (with parent base coords)
+    num_t CalcTop() const;       // Get the top absolute position (with parent base coords)
+    num_t CalcBottom() const;    // Get the bottom absolute position (with parent base coords)
+    num_t CenterX() const;       // Get the center X position (from parent base coords)
+    num_t CenterY() const;       // Get the center Y position (from parent base coords)
 
     bool Test(int left, int up, int iW, int iH) const; // Test hitbox against given rect
     bool Test(int cx, int cy, int radius) const;              // Test hitbox against given circle

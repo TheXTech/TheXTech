@@ -52,8 +52,8 @@ void TheFloorisLavaCode()
     Layer_t *layerSinUpDownWeakAlt = LayerF::Get(8);
     Layer_t *layerSinRightLeftAlternate = LayerF::Get(9);
 
-    static double layerSinUpDown_displacement = 0;
-    static double layerSinRightLeft_displacement = 0;
+    static num_t layerSinUpDown_displacement = 0;
+    static num_t layerSinRightLeft_displacement = 0;
     static char secretExitFailedStage = 0;
 
     if(!demo)
@@ -71,32 +71,32 @@ void TheFloorisLavaCode()
     if(demo->Slippy && secretExitFailedStage == 0)
     {
         secretExitFailedStage = 1;
-        layerSecretExit -> SpeedY = (float) -0.4;
+        layerSecretExit -> SpeedY = -0.4_nf;
     }
 
     //different movements to create the dropping off the world effect
     switch(secretExitFailedStage)
     {
     case 0:
-        layerSecretExit -> SpeedY = (float)0;
+        layerSecretExit -> SpeedY = 0;
         break;
 
     case 1:
-        layerSecretExit -> SpeedY -= (float)0.2;
+        layerSecretExit -> SpeedY -= 0.2_nf;
 
         if(layerSecretExit -> SpeedY < -4)
             secretExitFailedStage = 2;
         break;
 
     case 2:
-        layerSecretExit -> SpeedY += (float)0.4;
+        layerSecretExit -> SpeedY += 0.4_nf;
 
-        if(layerSecretExit -> SpeedY > -2.5)
+        if(layerSecretExit -> SpeedY > -2.5_nf)
             secretExitFailedStage = 3;
         break;
 
     case 3:
-        layerSecretExit -> SpeedY += 1.5;
+        layerSecretExit -> SpeedY += 1.5_nf;
 
         if(layerSecretExit -> SpeedY > 50)
             secretExitFailedStage = 4;
@@ -123,19 +123,19 @@ void TheFloorisLavaCode()
         layerSinUpDown -> SpeedY = 3;
     }
 
-    layerSinUpDown -> SpeedY -= (float)layerSinUpDown_displacement / 1000;
-    layerSinUpDown_displacement += layerSinUpDown -> SpeedY;
+    layerSinUpDown -> SpeedY -= (numf_t)layerSinUpDown_displacement / 1000;
+    layerSinUpDown_displacement += (num_t)layerSinUpDown -> SpeedY;
 
     layerSinUpDownAlternate -> SpeedY = -(layerSinUpDown -> SpeedY);
     layerSinUpDownWeak -> SpeedY = (layerSinUpDown -> SpeedY) / 3;
     layerSinUpDownWeakAlt -> SpeedY = -(layerSinUpDown -> SpeedY) / 3;
 
     //stop the initial trigger going off again
-    if(layerSinUpDown -> SpeedY == (float)0)
-        layerSinUpDown -> SpeedY = (float)0.001;
+    if(layerSinUpDown -> SpeedY == 0)
+        layerSinUpDown -> SpeedY = 0.001_nf;
 
     //Right Left sine wave motion
-    layerSinRightLeft -> SpeedX -= (float)layerSinRightLeft_displacement / 2000;
-    layerSinRightLeft_displacement += layerSinRightLeft -> SpeedX;
+    layerSinRightLeft -> SpeedX -= (numf_t)layerSinRightLeft_displacement / 2000;
+    layerSinRightLeft_displacement += (num_t)layerSinRightLeft -> SpeedX;
     layerSinRightLeftAlternate -> SpeedX = -(layerSinRightLeft -> SpeedX);
 }

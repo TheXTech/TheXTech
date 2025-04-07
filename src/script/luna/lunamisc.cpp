@@ -26,7 +26,7 @@
 #include "global_dirs.h"
 
 
-void InitIfMissing(std::map<std::string, double> *pMap, const std::string& sought_key, double init_val)
+void InitIfMissing(std::map<std::string, num_t> *pMap, const std::string& sought_key, num_t init_val)
 {
     if(pMap->find(sought_key) == pMap->end())
         (*pMap)[sought_key] = init_val;
@@ -76,12 +76,14 @@ int ComputeLevelSection(int x, int y)
     return ret;
 }
 
-void RandomPointInRadius(double *ox, double *oy, double cx, double cy, int radius)
+void RandomPointInRadius(num_t *ox, num_t *oy, num_t cx, num_t cy, int radius)
 {
-    double phase1 = iRand2(360);
-    double phase2 = iRand2(360);
-    double xoff = std::sin(phase1) * radius;
-    double yoff = std::cos(phase2) * radius;
+    // this does not do what the author thinks it does -- terribly biased towards the edges of the square enclosing the circle of interest
+    num_t phase1 = iRand2(360);
+    num_t phase2 = iRand2(360);
+
+    num_t xoff = std::sin(phase1) * radius;
+    num_t yoff = std::cos(phase2) * radius;
 
     *ox = cx + xoff;
     *oy = cy + yoff;

@@ -24,7 +24,7 @@
 #include "npc/section_overlap.h"
 
 
-void LevelF::PushSectionBoundary(int section, int which_boundary_UDLR, double push_val)
+void LevelF::PushSectionBoundary(int section, int which_boundary_UDLR, num_t push_val)
 {
     SpeedlessLocation_t &boundarray = level[section];
 
@@ -53,7 +53,7 @@ void LevelF::PushSectionBoundary(int section, int which_boundary_UDLR, double pu
     UpdateSectionOverlaps(section);
 }
 
-void LevelF::SetSectionBounds(int section, double left_bound, double top_bound, double right_bound, double bot_bound)
+void LevelF::SetSectionBounds(int section, num_t left_bound, num_t top_bound, num_t right_bound, num_t bot_bound)
 {
     SpeedlessLocation_t &boundarray = level[section];
     boundarray.X = left_bound;
@@ -63,7 +63,7 @@ void LevelF::SetSectionBounds(int section, double left_bound, double top_bound, 
     UpdateSectionOverlaps(section);
 }
 
-double LevelF::GetBoundary(int section, int which_boundary_UDLR)
+num_t LevelF::GetBoundary(int section, int which_boundary_UDLR)
 {
     const SpeedlessLocation_t &boundarray = level[section];
 

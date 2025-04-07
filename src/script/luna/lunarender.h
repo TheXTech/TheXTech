@@ -22,6 +22,8 @@
 #ifndef LUNARENDER_H
 #define LUNARENDER_H
 
+#include "numeric_types.h"
+
 #include <unordered_map>
 #include <memory>
 #include <vector>
@@ -59,7 +61,7 @@ struct Renderer
     // void GLCmd(const std::shared_ptr<GLEngineCmd>& cmd, double renderPriority = 1.0);
 
     void DebugPrint(const std::string &message);                // Print a debug message on the screen
-    void DebugPrint(const std::string &message, double val);    // Print a debug message on the screen and display a related value
+    void DebugPrint(const std::string &message, num_t val);    // Print a debug message on the screen and display a related value
 
     void RenderBelowPriority(PLANE maxPriority);
 

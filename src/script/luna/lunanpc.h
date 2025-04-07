@@ -40,11 +40,11 @@ void FindAll(int ID, int section, std::list<NPC_t *> *return_list);
 // GET FIRST MATCH
 NPC_t *GetFirstMatch(int ID, int section);
 
-void MemSet(int ID, size_t offset, double value, OPTYPE operation, FIELDTYPE ftype); // ID -1 for ALL
+void MemSet(int ID, size_t offset, num_t value, OPTYPE operation, FIELDTYPE ftype); // ID -1 for ALL
 
 // ITERATORS
-void AllSetHits(int identity, int section, float hits);		// Set all specified NPC hits
-void AllFace(int identity, int section, double x);	// All specified NPCs face the supplied x/y point
+void AllSetHits(int identity, int section, int hits);		// Set all specified NPC hits
+void AllFace(int identity, int section, num_t x);	// All specified NPCs face the supplied x/y point
 
 } // NpcF
 

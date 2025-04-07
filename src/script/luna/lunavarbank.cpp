@@ -70,16 +70,16 @@ void SavedVariableBank::ImportBank()
 }
 
 // SET VAR
-void SavedVariableBank::SetVar(const std::string &k, double v)
+void SavedVariableBank::SetVar(const std::string &k, num_t v)
 {
     m_VarBank[k] = v;
 }
 
 // GET VAR
-double SavedVariableBank::GetVar(const std::string &key)
+num_t SavedVariableBank::GetVar(const std::string &key)
 {
     if(!VarExists(key))
-        return 0.0;
+        return 0;
     return m_VarBank[key];
 }
 
@@ -112,7 +112,7 @@ void SavedVariableBank::WriteBank()
     {
         saveUserData::DataEntry de;
         de.key = it.first;
-        de.value = fmt::format_ne("{0}", it.second);
+        de.value = fmt::format_ne("{0}", (double)it.second);
         gLunaVarBank.data.push_back(std::move(de));
     }
 }
@@ -130,7 +130,7 @@ void SavedVariableBank::SaveIfNeeded()
 }
 
 //COPY BANK
-void SavedVariableBank::CopyBank(std::map<std::string, double> *target_map)
+void SavedVariableBank::CopyBank(std::map<std::string, num_t> *target_map)
 {
     if(!target_map)
         return;

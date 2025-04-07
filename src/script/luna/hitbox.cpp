@@ -75,40 +75,40 @@ bool Hitbox::Test(int cx, int cy, int radius) const
     return true;
 }
 
-double Hitbox::CalcLeft() const
+num_t Hitbox::CalcLeft() const
 {
     if(pParent)
         return pParent->m_Xpos + Left_off;
     return 0;
 }
 
-double Hitbox::CalcTop() const
+num_t Hitbox::CalcTop() const
 {
     if(pParent)
         return pParent->m_Ypos + Top_off;
     return 0;
 }
 
-double Hitbox::CalcBottom() const
+num_t Hitbox::CalcBottom() const
 {
     if(pParent)
         return pParent->m_Ypos + H;
     return 0;
 }
 
-double Hitbox::CalcRight() const
+num_t Hitbox::CalcRight() const
 {
     if(pParent)
         return pParent->m_Xpos + W;
     return 0;
 }
 
-double Hitbox::CenterX() const
+num_t Hitbox::CenterX() const
 {
-    return CalcLeft() + (W / 2.0);
+    return CalcLeft() + W * 0.5_n;
 }
 
-double Hitbox::CenterY() const
+num_t Hitbox::CenterY() const
 {
-    return CalcTop() + (H / 2.0);
+    return CalcTop() + H * 0.5_n;
 }

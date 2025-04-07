@@ -24,6 +24,7 @@
 
 #include <string>
 
+#include "numeric_types.h"
 #include "lunadefs.h"
 #include "global_strings.h"
 
@@ -224,8 +225,8 @@ class Autocode
 public:
     // Ctors
     Autocode();
-    Autocode(AutocodeType, double Target, double p1, double p2, double p3,
-             const stringindex_t &p4, double Length, int Section, const stringindex_t &VarRef);
+    Autocode(AutocodeType, num_t Target, num_t p1, num_t p2, num_t p3,
+             const stringindex_t &p4, num_t Length, int Section, const stringindex_t &VarRef);
     Autocode(const Autocode &o);
     ~Autocode() = default;
 
@@ -236,7 +237,7 @@ public:
 
     static bool NPCConditional(int NPCID, int condition);
     static bool CheckConditionI(int value1, int value2, COMPARETYPE cond);
-    static bool CheckConditionD(double value1, double value2, COMPARETYPE cond);
+    static bool CheckConditionD(num_t value1, num_t value2, COMPARETYPE cond);
 
     static AutocodeType EnumerizeCommand(char *wbuf, int lineNumber = -1);
     static SpriteComponent GenerateComponent(const Autocode &obj_to_convert); // Convert an autocode object to a sprite component
@@ -250,15 +251,15 @@ public:
     /// Members ///
     AutocodeType m_Type = AT_Invalid;
 
-    double Target = 0.0;                       // arg 1 "Target"
-    double Param1 = 0.0;                       // arg 2 "Param 1"
-    double Param2 = 0.0;                       // arg 3 "Param 2"
-    double Param3 = 0.0;                       // arg 4 "Param 3"
-    double Length = 0.0;                       // arg 5 "Length"
+    num_t Target = 0;                          // arg 1 "Target"
+    num_t Param1 = 0;                          // arg 2 "Param 1"
+    num_t Param2 = 0;                          // arg 3 "Param 2"
+    num_t Param3 = 0;                          // arg 4 "Param 3"
+    num_t Length = 0;                          // arg 5 "Length"
     stringindex_t MyString = STRINGINDEX_NONE; // arg 6 "string"
     stringindex_t MyRef = STRINGINDEX_NONE;    // Optional arg 0 value
 
-    double m_OriginalTime = 0.0;
+    num_t m_OriginalTime = 0;
     int ActiveSection = 0;          // Section to be active in, or custom event ID if > 1000
     FIELDTYPE ftype = FT_INVALID;
     bool Activated = false;             // False for custom event blueprints
@@ -269,7 +270,7 @@ public:
     //SpriteComponent* comp;
 
 private:
-    static void modParam(double &dst, double src, OPTYPE operation);
+    static void modParam(num_t &dst, num_t src, OPTYPE operation);
     void SelfTick();
     void RunSelfOption(); // activate the string portion of this code on self
     bool ReferenceOK() const; // check if this object has a valid reference (not empty)

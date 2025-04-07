@@ -35,7 +35,7 @@
 #include "renderop_bitmap.h"
 #include "mememu.h"
 
-static inline int s_round2int(double d)
+static inline int s_round2int(num_t d)
 {
     return std::floor(d + 0.5);
 }
@@ -116,10 +116,9 @@ void SpriteFunc::IfSpriteVar(CSprite *me, SpriteComponent *obj)
     {
         if(me->CustomVarExists(obj->data5))
         {
-
-            double var_val = me->GetCustomVar(obj->data5);
-            double check_against = obj->data3;
-            double component_to_activate = obj->data4;
+            num_t var_val = me->GetCustomVar(obj->data5);
+            num_t check_against = obj->data3;
+            num_t component_to_activate = obj->data4;
 
             switch((COMPARETYPE)(int)obj->data2)
             {
@@ -153,9 +152,9 @@ void SpriteFunc::IfLunaVar(CSprite *me, SpriteComponent *obj)
     {
         if(gAutoMan.VarExists(obj->data5))
         {
-            double var_val = gAutoMan.GetVar(obj->data5);
-            double check_against = obj->data3;
-            double component_to_activate = obj->data4;
+            num_t var_val = gAutoMan.GetVar(obj->data5);
+            num_t check_against = obj->data3;
+            num_t component_to_activate = obj->data4;
 
             switch((COMPARETYPE)(int)obj->data2)
             {
@@ -230,10 +229,10 @@ void SpriteFunc::Die(CSprite *me, SpriteComponent *obj)
 // DECCELERATE
 void SpriteFunc::Deccelerate(CSprite *me, SpriteComponent *obj)
 {
-    double XRate = obj->data1;
-    double YRate = obj->data2;
-    double Min  = obj->data3;
-    double accum = 0;
+    num_t XRate = obj->data1;
+    num_t YRate = obj->data2;
+    num_t Min  = obj->data3;
+    num_t accum = 0;
     if(me->m_Xspd >= 0 && XRate != 0)
     {
         accum = me->m_Xspd - XRate;
@@ -279,7 +278,7 @@ void SpriteFunc::AccelToPlayer(CSprite *me, SpriteComponent *obj)
     Player_t *demo = PlayerF::Get(1);
     if(demo)
     {
-        double negmax = obj->data3 * -1;
+        num_t negmax = obj->data3 * -1;
         if(demo->Location.X < me->m_Xpos)
             me->m_Xspd -= obj->data1;
         else
@@ -305,7 +304,7 @@ void SpriteFunc::AccelToPlayer(CSprite *me, SpriteComponent *obj)
 // APPLY VARIABLE GRAVITY
 void SpriteFunc::ApplyVariableGravity(CSprite *me, SpriteComponent *obj)
 {
-    double var = gAutoMan.GetVar(obj->data5);
+    num_t var = gAutoMan.GetVar(obj->data5);
     if(obj->data2 == 0)  // x
         me->m_Xspd += var;
     else   // y
@@ -326,10 +325,10 @@ void SpriteFunc::OnPlayerCollide(CSprite *me, SpriteComponent *obj)
         }
         else   // special small circle hitbox
         {
-            double extent = obj->data2 / 2;
+            num_t extent = obj->data2 / 2;
 
-            double cx = demo->Location.X + (demo->Location.Width / 2);
-            double cy = demo->Location.Y + (demo->Location.Height / 2);
+            num_t cx = demo->Location.X + (demo->Location.Width / 2);
+            num_t cy = demo->Location.Y + (demo->Location.Height / 2);
             if(me->m_Hitbox.Test((int)cx, (int)cy, (int)extent))
                 Activate((int)obj->data4, me);
         }
@@ -504,9 +503,9 @@ void SpriteFunc::TeleportNearPlayer(CSprite *me, SpriteComponent *obj)
     Player_t *demo = PlayerF::Get(1);
     if(demo)
     {
-        double cx = demo->Location.X;
-        double cy = demo->Location.Y;
-        double phase = iRand2(360);
+        num_t cx = demo->Location.X;
+        num_t cy = demo->Location.Y;
+        num_t phase = iRand2(360);
         double xoff = std::sin(phase) * obj->data1;
         double yoff = std::cos(phase) * obj->data1;
         me->m_Xpos = cx + xoff;
@@ -540,8 +539,8 @@ void SpriteFunc::HarmPlayer(CSprite *me, SpriteComponent *obj)
 // GENERATE IN RADIUS
 void SpriteFunc::GenerateInRadius(CSprite *me, SpriteComponent *obj)
 {
-    double rand_x;
-    double rand_y;
+    num_t rand_x;
+    num_t rand_y;
     RandomPointInRadius(&rand_x, &rand_y, me->m_Hitbox.CenterX(), me->m_Hitbox.CenterY(), (int)obj->data3);
 
     CSpriteRequest req;
@@ -559,13 +558,13 @@ void SpriteFunc::GenerateInRadius(CSprite *me, SpriteComponent *obj)
 // GENERATE AT ANGLE
 void SpriteFunc::GenerateAtAngle(CSprite *me, SpriteComponent *obj)
 {
-    double angle = me->GetCustomVar(CVAR_GEN_ANGLE);
-    double speed = obj->data3;
+    num_t angle = me->GetCustomVar(CVAR_GEN_ANGLE);
+    num_t speed = obj->data3;
 
     double vx = std::cos(angle) * speed;                 // vector x speed
     double vy = std::sin(angle) * speed;                 // vector y speed
-    double gx = me->m_Hitbox.CenterX() + (vx * 2);  // generation point
-    double gy = me->m_Hitbox.CenterY() + (vy * 2);  // generation point
+    num_t gx = me->m_Hitbox.CenterX() + (vx * 2);  // generation point
+    num_t gy = me->m_Hitbox.CenterY() + (vy * 2);  // generation point
 
     CSpriteRequest req;
     req.type = 0;
@@ -643,9 +642,9 @@ void SpriteFunc::BasicAnimate(CSprite *me, SpriteComponent *obj)
 // ANIMATE FLOAT
 void SpriteFunc::AnimateFloat(CSprite *me, SpriteComponent *obj)
 {
-    double speed = obj->data1;
-    double x_mag = obj->data2;
-    double y_mag = obj->data3;
+    num_t speed = obj->data1;
+    num_t x_mag = obj->data2;
+    num_t y_mag = obj->data3;
     if(speed != 0 && (x_mag != 0 || y_mag != 0))
     {
         double frame_val = me->m_FrameCounter / speed;

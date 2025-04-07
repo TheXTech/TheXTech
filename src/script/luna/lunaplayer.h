@@ -34,7 +34,7 @@ Player_t *Get(int num);
 
 // PLAYER MANAGEMENT
 
-void MemSet(size_t offset, double value, OPTYPE operation, FIELDTYPE ftype);
+void MemSet(size_t offset, num_t value, OPTYPE operation, FIELDTYPE ftype);
 
 // PLAYER BUTTONS
 bool PressingDown(Player_t* player);

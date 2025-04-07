@@ -33,7 +33,7 @@ Player_t *PlayerF::Get(int num)
     return &Player[num];
 }
 
-void PlayerF::MemSet(size_t offset, double value, OPTYPE operation, FIELDTYPE ftype)
+void PlayerF::MemSet(size_t offset, num_t value, OPTYPE operation, FIELDTYPE ftype)
 {
     //    char* dbg =  "PLAYER MEM SET";
     if(ftype == FT_INVALID || offset > (0x184 * 99))
@@ -133,8 +133,8 @@ LunaRect PlayerF::GetScreenPosition(Player_t *player)
         plr_index = 1;
 
     const auto& vscreen = vScreenByPlayer(plr_index);
-    double cam_y = -vscreen.Y;
-    double cam_x = -vscreen.X;
+    num_t cam_y = -vscreen.Y;
+    num_t cam_x = -vscreen.X;
     //    double cam_d = cam_y + 600;
     //    double cam_r = cam_x + 800;
 

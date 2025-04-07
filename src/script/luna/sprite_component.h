@@ -22,7 +22,7 @@
 #ifndef SpriteComponent_HHH
 #define SpriteComponent_HHH
 
-
+#include "numeric_types.h"
 #include <string>
 
 struct SpriteComponent;
@@ -51,10 +51,10 @@ struct SpriteComponent
 
     void Tick();            // Tick down the timer of this component. Expires self when run_time reaches 1
 
-    double data1 = 0.0;
-    double data2 = 0.0;
-    double data3 = 0.0;
-    double data4 = 0.0;
+    num_t data1 = 0;
+    num_t data2 = 0;
+    num_t data3 = 0;
+    num_t data4 = 0;
     pfnSprFunc func = nullptr;
     int lookup_code = 0;        // Which "bucket" of custom components this component is a part of
     int run_time = 0;           // Run time frame countdown. 0 = infinite lifetime, always run

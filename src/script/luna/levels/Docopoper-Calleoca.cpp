@@ -38,7 +38,7 @@
 #include "../lunanpc.h"
 
 
-#define PI 3.1415926535897932384626433832795
+#define PI 3.1415926535897932384626433832795_r
 
 #define NPCID_SIGN 151
 #define NPCID_COIN 10
@@ -52,7 +52,7 @@
 
 NPC_t* FindNPC(vbint_t identity);
 void HurtPlayer();
-bool TriggerBox(double x1, double y1, double x2, double y2);
+bool TriggerBox(num_t x1, num_t y1, num_t x2, num_t y2);
 int AngleDifference(int angle1, int angle2);
 
 static bool init_doonce = false;
@@ -67,21 +67,21 @@ static NPC_t* goal_npc = nullptr;
 static int win_timer = 0;
 static int freeze_timer = 0;
 static int phase = 0;
-static double calleoca_x = 0.0, calleoca_y = 0.0, storage_x = 0.0, storage_y = 0.0;
+static num_t calleoca_x = 0, calleoca_y = 0, storage_x = 0, storage_y = 0;
 
-static double thwomp_hspeed = 0;
-static double thwomp_vspeed = 0;
-static double thwomp_height = 0, thwomp_bottom = 0;
+static num_t thwomp_hspeed = 0;
+static num_t thwomp_vspeed = 0;
+static num_t thwomp_height = 0, thwomp_bottom = 0;
 
-static double missile_direction = 0;
-static double missile_hspeed = 0;
-static double missile_vspeed = 0;
-static double missile_top = 0, missile_bottom = 0;
+static num_t missile_direction = 0;
+static num_t missile_hspeed = 0;
+static num_t missile_vspeed = 0;
+static num_t missile_top = 0, missile_bottom = 0;
 static int missile_fuel = 0;
 
-static double fishingboo_hspeed = 0;
-static double fishingboo_vspeed = 0;
-static double fishingboo_ferocity = 1;
+static num_t fishingboo_hspeed = 0;
+static num_t fishingboo_vspeed = 0;
+static num_t fishingboo_ferocity = 1;
 
 template <typename T> T Clamp(const T& value, const T& low, const T& high)
 {
@@ -132,10 +132,10 @@ void Phase0()
 //Standing there
 void Phase1()
 {
-    thwomp_hspeed += (demo->Location.X - calleoca_x) * 0.001;
+    thwomp_hspeed += (demo->Location.X - calleoca_x) / 1000;
     if(SDL_abs(thwomp_height - calleoca_y) < 8)
     {
-        thwomp_hspeed = Clamp<double>(thwomp_hspeed, -9, 9);
+        thwomp_hspeed = Clamp<num_t>(thwomp_hspeed, -9, 9);
 
         if (TriggerBox(calleoca_x, calleoca_y + 64, calleoca_x + 64, calleoca_y + 512))
             phase = 2;
@@ -143,8 +143,8 @@ void Phase1()
     else
         thwomp_hspeed = 0;
 
-    thwomp_vspeed = (thwomp_height - calleoca_y) * 0.1;
-    thwomp_vspeed = Clamp<double>(thwomp_vspeed, -6.0, 6.0);
+    thwomp_vspeed = (thwomp_height - calleoca_y) / 10;
+    thwomp_vspeed = Clamp<num_t>(thwomp_vspeed, -6, 6);
 
     if(freeze_timer > 0)
     {
@@ -170,12 +170,12 @@ void Phase1()
 //Thwomp rising / moving
 void Phase2()
 {
-    thwomp_hspeed *= 0.9;
+    thwomp_hspeed *= 0.9_r;
     if(demo->Location.Y <= calleoca_y)
-        thwomp_hspeed *= 0.9;
+        thwomp_hspeed *= 0.9_r;
 
-    thwomp_vspeed += (thwomp_bottom - calleoca_y) * 0.05;
-    thwomp_vspeed = Clamp<double>(thwomp_vspeed, -8.0, 8.0);
+    thwomp_vspeed += (thwomp_bottom - calleoca_y) / 20;
+    thwomp_vspeed = Clamp<num_t>(thwomp_vspeed, -8, 8);
 
     calleoca_x += thwomp_hspeed;
     calleoca_y += thwomp_vspeed;
@@ -206,7 +206,7 @@ void Phase3()
                               -(demo->Location.X + demo->Location.Width / 2) + (calleoca_x + 32))
                                 * 180 / PI);
 
-    missile_direction += AngleDifference((int)missile_direction, dir) * 0.015;
+    missile_direction += AngleDifference((int)missile_direction, dir) * 0.015_n;
 
     if(missile_direction >= 360)
         missile_direction -= 360;
@@ -216,8 +216,8 @@ void Phase3()
     missile_hspeed += std::cos(missile_direction * PI / 180) * 0.25;
     missile_vspeed -= std::sin(missile_direction * PI / 180) * 0.25;
 
-    missile_hspeed = Clamp<double>(missile_hspeed * 0.975, -15, 15);
-    missile_vspeed = Clamp<double>(missile_vspeed * 0.975, -15, 15);
+    missile_hspeed = Clamp<num_t>(missile_hspeed * 0.975_r, -15, 15);
+    missile_vspeed = Clamp<num_t>(missile_vspeed * 0.975_r, -15, 15);
 
     if(freeze_timer > 0)
     {
@@ -234,8 +234,8 @@ void Phase3()
     }
 
 
-    calleoca_x = Clamp<double>(calleoca_x + missile_hspeed, demo->Location.X - 464, demo->Location.X + 464);
-    calleoca_y = Clamp<double>(calleoca_y + missile_vspeed, missile_top, missile_bottom);
+    calleoca_x = Clamp<num_t>(calleoca_x + missile_hspeed, demo->Location.X - 464, demo->Location.X + 464);
+    calleoca_y = Clamp<num_t>(calleoca_y + missile_vspeed, missile_top, missile_bottom);
 
     if(TriggerBox(calleoca_x + 18, calleoca_y + 18, calleoca_x + 46, calleoca_y + 46))
         HurtPlayer();
@@ -259,16 +259,16 @@ void Phase4()
     {
         fishingboo_hspeed += (demo->Location.X - calleoca_x) * 0.001 * fishingboo_ferocity;
         fishingboo_vspeed += (demo->Location.Y - calleoca_y) * 0.001 * fishingboo_ferocity;
-        fishingboo_hspeed = Clamp<double>(fishingboo_hspeed, -7 * fishingboo_ferocity, 7 * fishingboo_ferocity);
-        fishingboo_vspeed = Clamp<double>(fishingboo_vspeed, -0.5 * fishingboo_ferocity, 0.5 * fishingboo_ferocity);
+        fishingboo_hspeed = Clamp<num_t>(fishingboo_hspeed, -7 * fishingboo_ferocity, 7 * fishingboo_ferocity);
+        fishingboo_vspeed = Clamp<num_t>(fishingboo_vspeed, -0.5_rb * fishingboo_ferocity, 0.5_rb * fishingboo_ferocity);
 
         calleoca_x += fishingboo_hspeed;
         calleoca_y += fishingboo_vspeed;
 
-        fishingboo_ferocity += 0.0002;
+        fishingboo_ferocity += 0.0002_n;
     }
 
-    calleoca_x = Clamp<double>(calleoca_x, demo->Location.X - 512, demo->Location.X + 464);
+    calleoca_x = Clamp<num_t>(calleoca_x, demo->Location.X - 512, demo->Location.X + 464);
 }
 
 void CalleocaCode()
@@ -393,7 +393,7 @@ NPC_t* FindNPC(vbint_t identity)
     return nullptr;
 }
 
-bool TriggerBox(double x1, double y1, double x2, double y2)
+bool TriggerBox(num_t x1, num_t y1, num_t x2, num_t y2)
 {
     return (demo->Location.X + demo->Location.Width     > x1 &&
             demo->Location.X                            < x2 &&

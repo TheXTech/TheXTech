@@ -47,7 +47,7 @@ namespace ScienceBattle
 
 static NPC_t *FindNPC(short identity);
 static std::vector<NPC_t *> FindAllNPC(short identity);
-static bool TriggerBox(double x1, double y1, double x2, double y2);
+static bool TriggerBox(num_t x1, num_t y1, num_t x2, num_t y2);
 static void HurtPlayer();
 
 static bool init_doonce;
@@ -103,7 +103,7 @@ void ScienceCode()
     {
         for(auto doughnut : doughnuts)
         {
-            double x_diff, y_diff, m;
+            num_t x_diff, y_diff, m;
 
             x_diff = doughnut->Location.X - demo->Location.X;
             y_diff = doughnut->Location.Y - demo->Location.Y;
@@ -135,12 +135,12 @@ void ScienceCode()
                 //   2) +16 made an offset with 16 steps of int, i.e. 4 bytes. So, offset is 4x16 = 64
                 //   3) at 64 (0x40) position, the "Hidden" field, not "generator"
 
-                double x1, x2, y1, y2;
+                num_t x1, x2, y1, y2;
 
-                x1 = doughnut->Location.X + 28 * 0.42;
-                y1 = doughnut->Location.Y + 32 * 0.42;
-                x2 = doughnut->Location.X + 28 * 0.57;
-                y2 = doughnut->Location.Y + 32 * 0.57;
+                x1 = doughnut->Location.X + 28 * 0.42_n;
+                y1 = doughnut->Location.Y + 32 * 0.42_n;
+                x2 = doughnut->Location.X + 28 * 0.57_n;
+                y2 = doughnut->Location.Y + 32 * 0.57_n;
 
                 if(TriggerBox(x1, y1, x2, y2))
                     HurtPlayer();
@@ -188,7 +188,7 @@ static void HurtPlayer()
     grace_timer = 120;
 }
 
-static bool TriggerBox(double x1, double y1, double x2, double y2)
+static bool TriggerBox(num_t x1, num_t y1, num_t x2, num_t y2)
 {
     return (demo->Location.X + demo->Location.Width     > x1 &&
             demo->Location.X                            < x2 &&

@@ -68,8 +68,8 @@ void CSpriteManager::InitializeDimensions(CSprite *spr, bool center_coords)
         spr->m_GfxRects.clear();
         spr->m_GfxRects.push_back(rect);
 
-        spr->m_Ht = (double)rect.bottom;
-        spr->m_Wd = (double)rect.right;
+        spr->m_Ht = rect.bottom;
+        spr->m_Wd = rect.right;
         spr->m_AnimationSet = false;
 
         spr->m_Hitbox.Left_off = 0;
@@ -81,8 +81,8 @@ void CSpriteManager::InitializeDimensions(CSprite *spr, bool center_coords)
 
         if(center_coords) // Fix to generate with x/y as center instead of minimum left/top
         {
-            spr->m_Xpos -= spr->m_Wd / 2;
-            spr->m_Ypos -= spr->m_Ht / 2;
+            spr->m_Xpos -= spr->m_Wd * 0.5_n;
+            spr->m_Ypos -= spr->m_Ht * 0.5_n;
         }
     }
 }
@@ -170,9 +170,9 @@ void CSpriteManager::InstantiateSprite(CSpriteRequest *req, bool center_coords)
                 // Always Decelerate
                 comp.Init(0);
                 comp.func = SpriteFunc::Deccelerate;
-                comp.data1 = 0.04;
-                comp.data2 = 0.04;
-                comp.data3 = 0.00;
+                comp.data1 = 0.04_n;
+                comp.data2 = 0.04_n;
+                comp.data3 = 0.00_n;
                 spr->AddBehaviorComponent(comp);
 
                 // Wait for player to have key -- activate 100
@@ -196,9 +196,9 @@ void CSpriteManager::InstantiateSprite(CSpriteRequest *req, bool center_coords)
                 // #100 -- Chase player / active mode
                 comp.Init(1);
                 comp.func = SpriteFunc::AccelToPlayer;
-                comp.data1 = 0.11;
-                comp.data2 = 0.11;
-                comp.data3 = 5.6;
+                comp.data1 = 0.11_n;
+                comp.data2 = 0.11_n;
+                comp.data3 = 5.6_n;
                 comp.lookup_code = 100;
                 gSpriteMan.m_ComponentList.push_back(comp);
 
@@ -313,7 +313,7 @@ void CSpriteManager::RunSprites()
         {
             if(!iter->m_Invalidated)
             {
-                if(iter->m_StaticScreenPos || Render::IsOnScreen(iter->m_Xpos, iter->m_Ypos, iter->m_Wd, iter->m_Ht))
+                if(iter->m_StaticScreenPos || Render::IsOnScreen((int)iter->m_Xpos, (int)iter->m_Ypos, (int)iter->m_Wd, (int)iter->m_Ht))
                     iter->Draw();
             }
             else

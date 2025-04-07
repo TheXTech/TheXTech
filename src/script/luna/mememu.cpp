@@ -52,7 +52,7 @@
 
 
 #if 0 // Unused yet
-SDL_FORCE_INLINE void toX86Endian(double in_d, uint8_t out[8])
+SDL_FORCE_INLINE void toX86Endian(num_t in_d, uint8_t out[8])
 {
     auto *in = reinterpret_cast<uint8_t*>(&in_d);
 
@@ -86,7 +86,7 @@ SDL_FORCE_INLINE void toX86Endian(double in_d, uint8_t out[8])
 #endif
 }
 
-SDL_FORCE_INLINE void fromX86Endian(const uint8_t in[8], double &out_d)
+SDL_FORCE_INLINE void fromX86Endian(const uint8_t in[8], num_t &out_d)
 {
     auto *out = reinterpret_cast<uint8_t*>(&out_d);
 
@@ -123,7 +123,7 @@ SDL_FORCE_INLINE void fromX86Endian(const uint8_t in[8], double &out_d)
 
 
 template<class T>
-T f2i_cast(double in)
+T f2i_cast(num_t in)
 {
     if(std::is_same<T, uint64_t>::value)
     {
@@ -138,7 +138,7 @@ T f2i_cast(double in)
     return static_cast<T>(static_cast<int64_t>(in));
 }
 
-SDL_FORCE_INLINE void modifyByteX86(double &dst, size_t byte, uint8_t data)
+SDL_FORCE_INLINE void modifyByteX86(num_t &dst, size_t byte, uint8_t data)
 {
     auto *in = reinterpret_cast<uint8_t*>(&dst);
     SDL_assert(byte < 8);
@@ -153,7 +153,7 @@ SDL_FORCE_INLINE void modifyByteX86(double &dst, size_t byte, uint8_t data)
 #endif
 }
 
-SDL_FORCE_INLINE void modifyByteX86(float &dst, size_t byte, uint8_t data)
+SDL_FORCE_INLINE void modifyByteX86(numf_t &dst, size_t byte, uint8_t data)
 {
     auto *in = reinterpret_cast<uint8_t*>(&dst);
     SDL_assert(byte < 4);
@@ -178,7 +178,7 @@ SDL_FORCE_INLINE void modifyByteX86(int16_t &dst, size_t byte, uint8_t data)
 }
 
 
-SDL_FORCE_INLINE uint8_t getByteX86(const double &src, size_t byte)
+SDL_FORCE_INLINE uint8_t getByteX86(const num_t &src, size_t byte)
 {
     const auto *in = reinterpret_cast<const uint8_t*>(&src);
     SDL_assert(byte < 8);
@@ -192,7 +192,7 @@ SDL_FORCE_INLINE uint8_t getByteX86(const double &src, size_t byte)
 #endif
 }
 
-SDL_FORCE_INLINE uint8_t getByteX86(const float &src, size_t byte)
+SDL_FORCE_INLINE uint8_t getByteX86(const numf_t &src, size_t byte)
 {
     const auto *in = reinterpret_cast<const uint8_t*>(&src);
     SDL_assert(byte < 4);
@@ -219,21 +219,21 @@ SDL_FORCE_INLINE uint8_t getByteX86(const int16_t &src, size_t byte)
  *          Write memory value                  *
  *----------------------------------------------*/
 
-SDL_FORCE_INLINE void memToValue(double &target, double value, FIELDTYPE ftype)
+SDL_FORCE_INLINE void memToValue(num_t &target, num_t value, FIELDTYPE ftype)
 {
     switch(ftype)
     {
     case FT_BYTE:
-        target =static_cast<double>(f2i_cast<uint8_t>(value));
+        target =static_cast<num_t>(f2i_cast<uint8_t>(value));
         break;
     case FT_WORD:
-        target =static_cast<double>(static_cast<int16_t>(f2i_cast<uint16_t>(value)));
+        target =static_cast<num_t>(static_cast<int16_t>(f2i_cast<uint16_t>(value)));
         break;
     case FT_DWORD:
-        target =static_cast<double>(f2i_cast<int32_t>(value));
+        target =static_cast<num_t>(f2i_cast<int32_t>(value));
         break;
     case FT_FLOAT:
-        target =static_cast<double>(static_cast<float>(value));
+        target =static_cast<num_t>(static_cast<numf_t>(value));
         break;
     case FT_DFLOAT:
         target = value;
@@ -243,31 +243,31 @@ SDL_FORCE_INLINE void memToValue(double &target, double value, FIELDTYPE ftype)
     }
 }
 
-SDL_FORCE_INLINE void memToValue(float &target, double value, FIELDTYPE ftype)
+SDL_FORCE_INLINE void memToValue(numf_t &target, num_t value, FIELDTYPE ftype)
 {
     switch(ftype)
     {
     case FT_BYTE:
-        target = static_cast<float>(f2i_cast<uint8_t>(value));
+        target = static_cast<numf_t>(f2i_cast<uint8_t>(value));
         break;
     case FT_WORD:
-        target = static_cast<float>(static_cast<int16_t>(f2i_cast<uint16_t>(value)));
+        target = static_cast<numf_t>(static_cast<int16_t>(f2i_cast<uint16_t>(value)));
         break;
     case FT_DWORD:
-        target = static_cast<float>(f2i_cast<int32_t>(value));
+        target = static_cast<numf_t>(f2i_cast<int32_t>(value));
         break;
     case FT_FLOAT:
-        target = static_cast<float>(value);
+        target = static_cast<numf_t>(value);
         break;
     case FT_DFLOAT:
-        target = static_cast<double>(static_cast<float>(value));
+        target = static_cast<numf_t>(value);
         break;
     default: //Don't change
         break;
     }
 }
 
-SDL_FORCE_INLINE void memToValue(int &target, double value, FIELDTYPE ftype)
+SDL_FORCE_INLINE void memToValue(int &target, num_t value, FIELDTYPE ftype)
 {
     switch(ftype)
     {
@@ -282,7 +282,7 @@ SDL_FORCE_INLINE void memToValue(int &target, double value, FIELDTYPE ftype)
         target = static_cast<int32_t>(value);
         break;
     case FT_FLOAT:
-        target = static_cast<int32_t>(f2i_cast<float>(value));
+        target = static_cast<int32_t>(f2i_cast<numf_t>(value));
         break;
 //    case FT_DFLOAT: // United with FT_DWORD
 //        target = static_cast<int32_t>(value);
@@ -292,7 +292,7 @@ SDL_FORCE_INLINE void memToValue(int &target, double value, FIELDTYPE ftype)
     }
 }
 
-SDL_FORCE_INLINE void memToValue(short &target, double value, FIELDTYPE ftype)
+SDL_FORCE_INLINE void memToValue(short &target, num_t value, FIELDTYPE ftype)
 {
     switch(ftype)
     {
@@ -307,7 +307,7 @@ SDL_FORCE_INLINE void memToValue(short &target, double value, FIELDTYPE ftype)
         target = static_cast<int16_t>(value);
         break;
     case FT_FLOAT:
-        target = static_cast<int16_t>(f2i_cast<float>(value));
+        target = static_cast<int16_t>(f2i_cast<numf_t>(value));
         break;
 //    case FT_DFLOAT: // United with FT_DWORD
 //        target = static_cast<int32_t>(value);
@@ -317,7 +317,7 @@ SDL_FORCE_INLINE void memToValue(short &target, double value, FIELDTYPE ftype)
     }
 }
 
-SDL_FORCE_INLINE void memToValue(uint8_t &target, double value, FIELDTYPE ftype)
+SDL_FORCE_INLINE void memToValue(uint8_t &target, num_t value, FIELDTYPE ftype)
 {
     switch(ftype)
     {
@@ -332,7 +332,7 @@ SDL_FORCE_INLINE void memToValue(uint8_t &target, double value, FIELDTYPE ftype)
         target = static_cast<uint8_t>(value);
         break;
     case FT_FLOAT:
-        target = static_cast<uint8_t>(f2i_cast<float>(value));
+        target = static_cast<uint8_t>(f2i_cast<numf_t>(value));
         break;
 //    case FT_DFLOAT: // United with FT_DWORD
 //        target = static_cast<int32_t>(value);
@@ -342,10 +342,10 @@ SDL_FORCE_INLINE void memToValue(uint8_t &target, double value, FIELDTYPE ftype)
     }
 }
 
-SDL_FORCE_INLINE void memToValue(bool &target, double value, FIELDTYPE ftype)
+SDL_FORCE_INLINE void memToValue(bool &target, num_t value, FIELDTYPE ftype)
 {
     UNUSED(ftype);
-    target = (value != 0.0);
+    target = (value != 0);
 }
 
 
@@ -353,96 +353,96 @@ SDL_FORCE_INLINE void memToValue(bool &target, double value, FIELDTYPE ftype)
  *           Read memory value                  *
  *----------------------------------------------*/
 
-SDL_FORCE_INLINE double valueToMem(const double &source, FIELDTYPE ftype)
+SDL_FORCE_INLINE num_t valueToMem(const num_t &source, FIELDTYPE ftype)
 {
     switch(ftype)
     {
     case FT_BYTE:
-        return static_cast<double>(static_cast<uint8_t>(source));
+        return static_cast<num_t>(static_cast<uint8_t>(source));
     case FT_WORD:
-        return static_cast<double>(static_cast<int16_t>(static_cast<uint16_t>(source)));
+        return static_cast<num_t>(static_cast<int16_t>(static_cast<uint16_t>(source)));
     case FT_DWORD:
-        return static_cast<double>(static_cast<int32_t>(source));
+        return static_cast<num_t>(static_cast<int32_t>(source));
     case FT_FLOAT:
-        return static_cast<double>(static_cast<float>(source));
+        return static_cast<num_t>(static_cast<numf_t>(source));
     default:
     case FT_DFLOAT:
         return source;
     }
 }
 
-SDL_FORCE_INLINE double valueToMem(const float &source, FIELDTYPE ftype)
+SDL_FORCE_INLINE num_t valueToMem(const numf_t &source, FIELDTYPE ftype)
 {
     switch(ftype)
     {
     case FT_BYTE:
-        return static_cast<double>(static_cast<uint8_t>(source));
+        return static_cast<num_t>(static_cast<uint8_t>(source));
     case FT_WORD:
-        return static_cast<double>(static_cast<int16_t>(static_cast<uint16_t>(source)));
+        return static_cast<num_t>(static_cast<int16_t>(static_cast<uint16_t>(source)));
     case FT_DWORD:
-        return static_cast<double>(static_cast<int32_t>(source));
+        return static_cast<num_t>(static_cast<int32_t>(source));
     default:
     case FT_FLOAT:
     case FT_DFLOAT:
-        return static_cast<double>(source);
+        return static_cast<num_t>(source);
     }
 }
 
-SDL_FORCE_INLINE double valueToMem(const int &source, FIELDTYPE ftype)
+SDL_FORCE_INLINE num_t valueToMem(const int &source, FIELDTYPE ftype)
 {
     switch(ftype)
     {
     case FT_BYTE:
-        return static_cast<double>(static_cast<uint8_t>(source));
+        return static_cast<num_t>(static_cast<uint8_t>(source));
     case FT_WORD:
-        return static_cast<double>(static_cast<int16_t>(source));
+        return static_cast<num_t>(static_cast<int16_t>(source));
     default:
     case FT_DWORD:
-        return static_cast<double>(source);
+        return static_cast<num_t>(source);
     case FT_FLOAT:
-        return static_cast<double>(static_cast<float>(source));
+        return static_cast<num_t>(static_cast<numf_t>(source));
     case FT_DFLOAT:
-        return static_cast<double>(source);
+        return static_cast<num_t>(source);
     }
 }
 
-SDL_FORCE_INLINE double valueToMem(const short &source, FIELDTYPE ftype)
+SDL_FORCE_INLINE num_t valueToMem(const short &source, FIELDTYPE ftype)
 {
     switch(ftype)
     {
     case FT_BYTE:
-        return static_cast<double>(static_cast<uint8_t>(source));
+        return static_cast<num_t>(static_cast<uint8_t>(source));
     case FT_WORD:
-        return static_cast<double>(static_cast<int16_t>(source));
+        return static_cast<num_t>(static_cast<int16_t>(source));
     default:
     case FT_DWORD:
-        return static_cast<double>(source);
+        return static_cast<num_t>(source);
     case FT_FLOAT:
-        return static_cast<double>(static_cast<float>(source));
+        return static_cast<num_t>(static_cast<numf_t>(source));
     case FT_DFLOAT:
-        return static_cast<double>(source);
+        return static_cast<num_t>(source);
     }
 }
 
-SDL_FORCE_INLINE double valueToMem(const uint8_t &source, FIELDTYPE ftype)
+SDL_FORCE_INLINE num_t valueToMem(const uint8_t &source, FIELDTYPE ftype)
 {
     switch(ftype)
     {
     case FT_BYTE:
-        return static_cast<double>(static_cast<uint8_t>(source));
+        return static_cast<num_t>(static_cast<uint8_t>(source));
     case FT_WORD:
-        return static_cast<double>(static_cast<int16_t>(source));
+        return static_cast<num_t>(static_cast<int16_t>(source));
     default:
     case FT_DWORD:
-        return static_cast<double>(source);
+        return static_cast<num_t>(source);
     case FT_FLOAT:
-        return static_cast<double>(static_cast<float>(source));
+        return static_cast<num_t>(static_cast<numf_t>(source));
     case FT_DFLOAT:
-        return static_cast<double>(source);
+        return static_cast<num_t>(source);
     }
 }
 
-SDL_FORCE_INLINE double valueToMem(const bool &source, FIELDTYPE ftype)
+SDL_FORCE_INLINE num_t valueToMem(const bool &source, FIELDTYPE ftype)
 {
     UNUSED(ftype);
     return source ? 0xFFFF : 0;
@@ -480,15 +480,15 @@ static const char *FieldtypeToStr(FIELDTYPE ftype)
  */
 class SMBXMemoryEmulator
 {
-    std::unordered_map<size_t, double *> m_df;
-    std::unordered_map<size_t, float *>  m_ff;
+    std::unordered_map<size_t, num_t *> m_df;
+    std::unordered_map<size_t, numf_t *>  m_ff;
     std::unordered_map<size_t, short *>  m_i16f;
     std::unordered_map<size_t, int *>    m_i32f;
     std::unordered_map<size_t, bool *>   m_bf;
     std::unordered_map<size_t, std::string *>   m_sf;
 
-    typedef std::function<double(FIELDTYPE)> Getter;
-    typedef std::function<void(double,FIELDTYPE)> Setter;
+    typedef std::function<num_t(FIELDTYPE)> Getter;
+    typedef std::function<void(num_t,FIELDTYPE)> Setter;
     std::unordered_map<size_t, std::pair<Getter, Setter>> m_lff;
 
     typedef std::function<std::string()> StrGetter;
@@ -522,13 +522,13 @@ class SMBXMemoryEmulator
         m_type.insert({address, VT_INT32});
     }
 
-    void insert(size_t address, double *field)
+    void insert(size_t address, num_t *field)
     {
         m_df.insert({address, field});
         m_type.insert({address, VT_DOUBLE});
     }
 
-    void insert(size_t address, float *field)
+    void insert(size_t address, numf_t *field)
     {
         m_ff.insert({address, field});
         m_type.insert({address, VT_FLOAT});
@@ -569,12 +569,12 @@ public:
         insert(0x00B2504C, &TakeScreen);
         insert(0x00B250D6, &numLocked);
         insert(0x00B250E2, // Pause menu visible
-            [](FIELDTYPE ftype)->double
+            [](FIELDTYPE ftype)->num_t
             {
                 bool tmp = (GamePaused != PauseCode::None);
                 return valueToMem(tmp, ftype);
             },
-            [](double in, FIELDTYPE ftype)->void
+            [](num_t in, FIELDTYPE ftype)->void
             {
                 // FIXME: Verify this, if it needs to be written, try to work around this
                 pLogWarning("Attempt to write the read-only field at 0x00B250E2 "
@@ -604,7 +604,7 @@ public:
 
         insert(0x00B2C5A8, &Coins); // HUD coins count
         insert(0x00B2C5AC, // HUD lives count
-            [](FIELDTYPE ftype)->double
+            [](FIELDTYPE ftype)->num_t
             {
                 int tmp = g_config.modern_lives_system ? g_100s : Lives;
                 if(tmp < 0)
@@ -613,7 +613,7 @@ public:
                     tmp = 99;
                 return valueToMem(tmp, ftype);
             },
-            [](double in, FIELDTYPE ftype)->void
+            [](num_t in, FIELDTYPE ftype)->void
             {
                 if(!g_config.modern_lives_system)
                     memToValue(Lives, in, ftype);
@@ -665,12 +665,12 @@ public:
         // insert(0x00B2C884, ???}; // Key Released!!!
         // insert(0x00B2C894, &BlocksSorted); // removed by block quadtree
         insert(0x00B2C894,
-            [](FIELDTYPE ftype)->double
+            [](FIELDTYPE ftype)->num_t
             {
                 bool ret = true;
                 return valueToMem(ret, ftype);
             },
-            [](double in, FIELDTYPE ftype)->void
+            [](num_t in, FIELDTYPE ftype)->void
             {
                 pLogWarning("Attempt to write the read-only field at 0x00B2C894 "
                             "(BlocksSorted) with value %g as %s", in, FieldtypeToStr(ftype));
@@ -734,19 +734,19 @@ public:
         // insert(0x00B2D734, &noSound);
     }
 
-    double getValue(size_t address, FIELDTYPE ftype)
+    num_t getValue(size_t address, FIELDTYPE ftype)
     {
         if(ftype == FT_INVALID)
         {
             pLogWarning("MemEmu: Requested value of invalid type: <Global> 0x%x", address);
-            return 0.0;
+            return 0;
         }
 
         auto ft = m_type.find(address);
         if(ft == m_type.end())
         {
             pLogWarning("MemEmu: Unknown %s address to read: <Global> 0x%x", FieldtypeToStr(ftype), address);
-            return 0.0;
+            return 0;
         }
 
         switch(ft->second)
@@ -830,10 +830,10 @@ public:
             break;
         }
 
-        return 0.0;
+        return 0;
     }
 
-    void setValue(size_t address, double value, FIELDTYPE ftype)
+    void setValue(size_t address, num_t value, FIELDTYPE ftype)
     {
         if(ftype == FT_INVALID)
         {
@@ -913,7 +913,7 @@ public:
             {
                 if(ftype != FT_WORD && ftype != FT_BYTE)
                     pLogWarning("MemEmu: Write type missmatched at 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", address, FieldtypeToStr(ftype));
-                *bres->second = (value != 0.0);
+                *bres->second = (value != 0);
                 return;
             }
             break;
@@ -944,8 +944,8 @@ class SMBXObjectMemoryEmulator
 {
 protected:
 
-    typedef std::function<double(const T&,FIELDTYPE)> Getter;
-    typedef std::function<void(T&,double,FIELDTYPE)> Setter;
+    typedef std::function<num_t(const T&,FIELDTYPE)> Getter;
+    typedef std::function<void(T&,num_t,FIELDTYPE)> Setter;
 
     // typedef std::function<std::string(const T&)> StrGetter;
     // typedef std::function<void(T&,const std::string&)> StrSetter;
@@ -978,9 +978,9 @@ protected:
         union
         {
             //! Double-type field pointer
-            double      T::* d = nullptr;
+            num_t       T::* d = nullptr;
             //! Float-type field pointer
-            float       T::* f;
+            numf_t      T::* f;
             //! UInt8-type field pointer (note: used exclusively for i16s converted to u8s)
             uint8_t     T::* u8;
             //! Int-type field pointer
@@ -1057,7 +1057,7 @@ protected:
         }
     }
 
-    void insert(size_t address, double T::*field)
+    void insert(size_t address, num_t T::*field)
     {
         Value v;
 
@@ -1079,7 +1079,7 @@ protected:
         }
     }
 
-    void insert(size_t address, float T::*field)
+    void insert(size_t address, numf_t T::*field)
     {
         Value v;
 
@@ -1144,20 +1144,20 @@ public:
     SMBXObjectMemoryEmulator() noexcept
     {}
 
-    virtual double getValue(T *obj, size_t address, FIELDTYPE ftype)
+    virtual num_t getValue(T *obj, size_t address, FIELDTYPE ftype)
     {
         Value *t = nullptr;
 
         if(address >= maxAddr)
         {
             pLogWarning("MemEmu: Requested value of out-of-range address: %s 0x%x", objName, address);
-            return 0.0;
+            return 0;
         }
 
         if(ftype == FT_INVALID)
         {
             pLogWarning("MemEmu: Requested value of invalid type: %s 0x%x", objName, address);
-            return 0.0;
+            return 0;
         }
 
         t = &m_type[address];
@@ -1172,7 +1172,7 @@ public:
         if(vtype == VT_UNKNOWN)
         {
             pLogWarning("MemEmu: Unknown %s::%s address to read: 0x%x", objName, FieldtypeToStr(ftype), address);
-            return 0.0;
+            return 0;
         }
 
         switch(vtype)
@@ -1240,7 +1240,7 @@ public:
                 SDL_assert(bt.type == VT_DOUBLE && bt.field.d);
                 if(ftype != FT_BYTE)
                     pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-                return (double)getByteX86(obj->*(bt.field.d), t->offset);
+                return (num_t)getByteX86(obj->*(bt.field.d), t->offset);
             }
 
             case VT_FLOAT:
@@ -1249,7 +1249,7 @@ public:
                 SDL_assert(bt.type == VT_FLOAT && bt.field.f);
                 if(ftype != FT_BYTE)
                     pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-                return (double)getByteX86(obj->*(bt.field.f), t->offset);
+                return (num_t)getByteX86(obj->*(bt.field.f), t->offset);
             }
 
             case VT_INT16:
@@ -1259,7 +1259,7 @@ public:
                 if(ftype != FT_BYTE)
                     pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
                 int16_t s = static_cast<int16_t>(obj->*(bt.field.i16));
-                return (double)getByteX86(s, t->offset);
+                return (num_t)getByteX86(s, t->offset);
             }
 
             case VT_INT32:
@@ -1269,7 +1269,7 @@ public:
                 if(ftype != FT_BYTE)
                     pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
                 int16_t s = static_cast<int16_t>(obj->*(bt.field.i32));
-                return (double)getByteX86(s, t->offset);
+                return (num_t)getByteX86(s, t->offset);
             }
 
             default:
@@ -1283,10 +1283,10 @@ public:
             break;
         }
 
-        return 0.0;
+        return 0;
     }
 
-    virtual void setValue(T *obj, size_t address, double value, FIELDTYPE ftype)
+    virtual void setValue(T *obj, size_t address, num_t value, FIELDTYPE ftype)
     {
         Value *t = nullptr;
 
@@ -1610,11 +1610,11 @@ public:
 
         // CanAltJump -- enforce read-only if compat flag `disable-spin-jump` is set
         insert(0x00000120, // CanAltJump
-            [](const Player_t& p, FIELDTYPE ftype)->double
+            [](const Player_t& p, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(p.CanAltJump, ftype);
             },
-            [](Player_t& p, double in, FIELDTYPE ftype)->void
+            [](Player_t& p, num_t in, FIELDTYPE ftype)->void
             {
                 bool temp = p.CanAltJump;
                 memToValue(temp, in, ftype);
@@ -1671,7 +1671,7 @@ public:
         // insert(0x00000180, &Player_t::SpeedFixY);
     }
 
-    double getValue(Player_t *obj, size_t address, FIELDTYPE ftype) override
+    num_t getValue(Player_t *obj, size_t address, FIELDTYPE ftype) override
     {
         if(address >= 0x80 && address < 0xB0) // YoshiTongue
             return s_spLocMem.getValue(&obj->YoshiTongue, address - 0x80, ftype);
@@ -1718,7 +1718,7 @@ public:
         return PlayerParent::getValue(obj, address, ftype);
     }
 
-    void setValue(Player_t *obj, size_t address, double value, FIELDTYPE ftype) override
+    void setValue(Player_t *obj, size_t address, num_t value, FIELDTYPE ftype) override
     {
         if(address >= 0x80 && address < 0xB0) // YoshiTongue
         {
@@ -1821,11 +1821,11 @@ public:
         // insert(0x00000000, &NPC_t::AttLayer);
         insert(0x00000004, &NPC_t::Quicksand);
         insert(0x00000006, // RespawnDelay
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.RespawnDelay, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 memToValue(n.RespawnDelay, in, ftype);
 
@@ -1836,11 +1836,11 @@ public:
             }
         );
         insert(0x00000008, // Bouce
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.Bouce, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 bool temp = n.Bouce;
                 memToValue(temp, in, ftype);
@@ -1857,11 +1857,11 @@ public:
 
         // insert(0x00000014, &NPC_t::NetTimeout); // unused since SMBX64, now removed
         insert(0x00000018, // RealSpeedX
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.RealSpeedX, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 memToValue(n.RealSpeedX, in, ftype);
                 NPCQueues::Unchecked.push_back(n);
@@ -1870,11 +1870,11 @@ public:
         insert(0x0000001c, &NPC_t::Wet);
         // insert(0x0000001e, &NPC_t::Settings); // unused since SMBX64, now removed
         insert(0x00000020, // NoLavaSplash
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.NoLavaSplash, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 bool temp = n.NoLavaSplash;
                 memToValue(temp, in, ftype);
@@ -1883,22 +1883,22 @@ public:
         );
         insert(0x00000022, &NPC_t::Slope);
         insert(0x00000024, // Multiplier
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.Multiplier, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 memToValue(n.Multiplier, in, ftype);
                 NPCQueues::Unchecked.push_back(n);
             }
         );
         insert(0x00000026, // TailCD
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.TailCD, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 memToValue(n.TailCD, in, ftype);
                 NPCQueues::Unchecked.push_back(n);
@@ -1912,11 +1912,11 @@ public:
         // insert(0x0000003c, &NPC_t::Layer);
         insert(0x00000040, &NPC_t::Hidden);
         insert(0x00000042, // Legacy
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.Legacy, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 bool temp = n.Legacy;
                 memToValue(temp, in, ftype);
@@ -1924,11 +1924,11 @@ public:
             }
         );
         insert(0x00000044, // Chat
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.Chat, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 bool temp = n.Chat;
                 memToValue(temp, in, ftype);
@@ -1938,11 +1938,11 @@ public:
         insert(0x00000046, &NPC_t::Inert);
         insert(0x00000048, &NPC_t::Stuck);
         insert(0x0000004a, // DefaultStuck
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.DefaultStuck, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 bool temp = n.DefaultStuck;
                 memToValue(temp, in, ftype);
@@ -1958,11 +1958,11 @@ public:
         insert(0x00000060, &NPC_t::vehiclePlr);
         insert(0x00000062, &NPC_t::vehicleYOffset);
         insert(0x00000064, // Generator
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.Generator, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 memToValue(n.Generator, in, ftype);
 
@@ -1977,11 +1977,11 @@ public:
         insert(0x00000070, &NPC_t::GeneratorDirection);
         insert(0x00000072, &NPC_t::GeneratorEffect);
         insert(0x00000074, // GeneratorActive
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.GeneratorActive, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 bool temp = n.GeneratorActive;
                 memToValue(temp, in, ftype);
@@ -1989,11 +1989,11 @@ public:
             }
         );
         insert(0x00000076, // playerTemp
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.playerTemp, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 bool prev = n.playerTemp;
 
@@ -2010,13 +2010,13 @@ public:
         insert(0x000000a8, &NPC_t::DefaultLocationX); // 0xA8
         insert(0x000000b0, &NPC_t::DefaultLocationY); // 0xB0
         insert(0x000000d8, // DefaultDirection
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
-                return valueToMem((float)n.DefaultDirection, ftype);
+                return valueToMem((numf_t)n.DefaultDirection, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
-                float direction = 0.0;
+                numf_t direction = 0;
                 memToValue(direction, in, ftype);
 
                 n.DefaultDirection = (int8_t)direction;
@@ -2027,11 +2027,11 @@ public:
         insert(0x000000de, &NPC_t::DefaultSpecial);
         insert(0x000000e0, &NPC_t::DefaultSpecial2);
         insert(0x000000e2, // Type
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.Type, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 int type = NPCID(0);
                 memToValue(type, in, ftype);
@@ -2055,11 +2055,11 @@ public:
         insert(0x00000110, &NPC_t::Special5);
         // insert(0x00000118, &NPC_t::Special6); // removed!
         insert(0x00000120, // TurnAround
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.TurnAround, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 bool temp = n.TurnAround;
                 memToValue(temp, in, ftype);
@@ -2067,11 +2067,11 @@ public:
             }
         );
         insert(0x00000122, // Killed
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.Killed, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 bool prev = (n.Killed != 0);
 
@@ -2082,11 +2082,11 @@ public:
             }
         );
         insert(0x00000124, // Active
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.Active, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 memToValue(n.Active, in, ftype);
 
@@ -2114,11 +2114,11 @@ public:
         insert(0x00000146, &NPC_t::Section);
         insert(0x00000148, &NPC_t::Damage);
         insert(0x0000014c, // JustActivated
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.JustActivated, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 memToValue(n.JustActivated, in, ftype);
 
@@ -2131,11 +2131,11 @@ public:
         insert(0x0000014e, &NPC_t::coinSwitchBlockType);
         insert(0x00000150, &NPC_t::tempBlock);
         insert(0x00000152, // onWall
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.onWall, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 bool temp = n.onWall;
                 memToValue(temp, in, ftype);
@@ -2143,11 +2143,11 @@ public:
             }
         );
         insert(0x00000154, // TurnBackWipe
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.TurnBackWipe, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 bool temp = n.TurnBackWipe;
                 memToValue(temp, in, ftype);
@@ -2155,11 +2155,11 @@ public:
             }
         );
         insert(0x00000156, // Immune
-            [](const NPC_t& n, FIELDTYPE ftype)->double
+            [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
                 return valueToMem(n.Immune, ftype);
             },
-            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
                 memToValue(n.Immune, in, ftype);
                 NPCQueues::Unchecked.push_back(n);
@@ -2167,7 +2167,7 @@ public:
         );
     }
 
-    double getValue(NPC_t *obj, size_t address, FIELDTYPE ftype) override
+    num_t getValue(NPC_t *obj, size_t address, FIELDTYPE ftype) override
     {
         if(address >= 0x78 && address < 0xA8) // Location
             return s_locMem.getValue(&obj->Location, address - 0x78, ftype);
@@ -2199,7 +2199,7 @@ public:
         return NpcParent::getValue(obj, address, ftype);
     }
 
-    void setValue(NPC_t *obj, size_t address, double value, FIELDTYPE ftype) override
+    void setValue(NPC_t *obj, size_t address, num_t value, FIELDTYPE ftype) override
     {
         if(address >= 0x78 && address < 0xA8) // Location
         {
@@ -2285,47 +2285,47 @@ static PlayerMemory         s_emuPlayer;
 static NPCMemory            s_emuNPC;
 
 template<typename T, class D>
-SDL_FORCE_INLINE void opAdd(D &mem, size_t addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opAdd(D &mem, size_t addr, num_t o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getValue(addr, ftype);
+    num_t o1 = mem.getValue(addr, ftype);
     T res = static_cast<T>(o1) + static_cast<T>(o2);
-    mem.setValue(addr, static_cast<double>(res), ftype);
+    mem.setValue(addr, static_cast<num_t>(res), ftype);
 }
 
 template<typename T, class D>
-SDL_FORCE_INLINE void opSub(D &mem, size_t addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opSub(D &mem, size_t addr, num_t o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getValue(addr, ftype);
+    num_t o1 = mem.getValue(addr, ftype);
     T res = static_cast<T>(o1) - static_cast<T>(o2);
-    mem.setValue(addr, static_cast<double>(res), ftype);
+    mem.setValue(addr, static_cast<num_t>(res), ftype);
 }
 
 template<typename T, class D>
-SDL_FORCE_INLINE void opMul(D &mem, size_t addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opMul(D &mem, size_t addr, num_t o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getValue(addr, ftype);
+    num_t o1 = mem.getValue(addr, ftype);
     T res = static_cast<T>(o1) * static_cast<T>(o2);
-    mem.setValue(addr, static_cast<double>(res), ftype);
+    mem.setValue(addr, static_cast<num_t>(res), ftype);
 }
 
 template<typename T, class D>
-SDL_FORCE_INLINE void opDiv(D &mem, size_t addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opDiv(D &mem, size_t addr, num_t o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getValue(addr, ftype);
+    num_t o1 = mem.getValue(addr, ftype);
     T res = static_cast<T>(o1) / static_cast<T>(o2);
     mem.setValue(addr, static_cast<double>(res), ftype);
 }
 
 template<typename T, class D>
-SDL_FORCE_INLINE void opXor(D &mem, size_t addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opXor(D &mem, size_t addr, num_t o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getValue(addr, ftype);
+    num_t o1 = mem.getValue(addr, ftype);
     T res = static_cast<T>(o1) ^ static_cast<T>(o2);
-    mem.setValue(addr, static_cast<double>(res), ftype);
+    mem.setValue(addr, static_cast<num_t>(res), ftype);
 }
 
 
-void MemAssign(size_t address, double value, OPTYPE operation, FIELDTYPE ftype)
+void MemAssign(size_t address, num_t value, OPTYPE operation, FIELDTYPE ftype)
 {
     if(address < GM_BASE || address > GM_END)
     {
@@ -2366,11 +2366,11 @@ void MemAssign(size_t address, double value, OPTYPE operation, FIELDTYPE ftype)
         }
         case FT_FLOAT:
         {
-            opAdd<float>(s_emu, address, value, ftype);
+            opAdd<numf_t>(s_emu, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
-            opAdd<double>(s_emu, address, value, ftype);
+            opAdd<num_t>(s_emu, address, value, ftype);
             break;
         default:
             break;
@@ -2399,11 +2399,11 @@ void MemAssign(size_t address, double value, OPTYPE operation, FIELDTYPE ftype)
         }
         case FT_FLOAT:
         {
-            opSub<float>(s_emu, address, value, ftype);
+            opSub<numf_t>(s_emu, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
-            opSub<double>(s_emu, address, value, ftype);
+            opSub<num_t>(s_emu, address, value, ftype);
             break;
         default:
             break;
@@ -2432,7 +2432,7 @@ void MemAssign(size_t address, double value, OPTYPE operation, FIELDTYPE ftype)
         }
         case FT_FLOAT:
         {
-            opMul<float>(s_emu, address, value, ftype);
+            opMul<numf_t>(s_emu, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
@@ -2465,7 +2465,7 @@ void MemAssign(size_t address, double value, OPTYPE operation, FIELDTYPE ftype)
         }
         case FT_FLOAT:
         {
-            opDiv<float>(s_emu, address, value, ftype);
+            opDiv<numf_t>(s_emu, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
@@ -2507,7 +2507,7 @@ void MemAssign(size_t address, double value, OPTYPE operation, FIELDTYPE ftype)
     }// switch on op
 }
 
-bool CheckMem(size_t address, double value, COMPARETYPE ctype, FIELDTYPE ftype)
+bool CheckMem(size_t address, num_t value, COMPARETYPE ctype, FIELDTYPE ftype)
 {
     if(address < GM_BASE || address > GM_END)
     {
@@ -2515,7 +2515,7 @@ bool CheckMem(size_t address, double value, COMPARETYPE ctype, FIELDTYPE ftype)
         return false;
     }
 
-    double cur = s_emu.getValue(address, ftype);
+    num_t cur = s_emu.getValue(address, ftype);
 
     switch(ctype)
     {
@@ -2546,7 +2546,7 @@ bool CheckMem(size_t address, double value, COMPARETYPE ctype, FIELDTYPE ftype)
         case FT_DWORD:
             return static_cast<int32_t>(cur) > static_cast<int32_t>(value);
         case FT_FLOAT:
-            return static_cast<float>(cur) > static_cast<float>(value);
+            return static_cast<numf_t>(cur) > static_cast<numf_t>(value);
         case FT_DFLOAT:
             return cur > value;
         default:
@@ -2563,7 +2563,7 @@ bool CheckMem(size_t address, double value, COMPARETYPE ctype, FIELDTYPE ftype)
         case FT_DWORD:
             return static_cast<int32_t>(cur) < static_cast<int32_t>(value);
         case FT_FLOAT:
-            return static_cast<float>(cur) < static_cast<float>(value);
+            return static_cast<numf_t>(cur) < static_cast<numf_t>(value);
         case FT_DFLOAT:
             return cur < value;
         default:
@@ -2591,26 +2591,26 @@ bool CheckMem(size_t address, double value, COMPARETYPE ctype, FIELDTYPE ftype)
     return false;
 }
 
-double GetMem(size_t addr, FIELDTYPE ftype)
+num_t GetMem(size_t addr, FIELDTYPE ftype)
 {
     if(addr < GM_BASE || addr > GM_END)
     {
         pLogWarning("MemEmu: GetMem Requested value of out-of-range global address: 0x%x", addr);
-        return 0.0;
+        return 0;
     }
 
-    double cur = s_emu.getValue(addr, ftype);
+    num_t cur = s_emu.getValue(addr, ftype);
 
     switch(ftype)
     {
     case FT_BYTE:
-        return static_cast<double>(static_cast<uint8_t>(cur));
+        return static_cast<num_t>(static_cast<uint8_t>(cur));
     case FT_WORD:
-        return static_cast<double>(static_cast<int16_t>(cur));
+        return static_cast<num_t>(static_cast<int16_t>(cur));
     case FT_DWORD:
-        return static_cast<double>(static_cast<int32_t>(cur));
+        return static_cast<num_t>(static_cast<int32_t>(cur));
     case FT_FLOAT:
-        return static_cast<double>(static_cast<float>(cur));
+        return static_cast<num_t>(static_cast<numf_t>(cur));
     default:
     case FT_DFLOAT:
         return cur;
@@ -2619,47 +2619,47 @@ double GetMem(size_t addr, FIELDTYPE ftype)
 
 
 template<typename T, class D, class U>
-SDL_FORCE_INLINE void opAdd(D &mem, U *obj, size_t addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opAdd(D &mem, U *obj, size_t addr, num_t o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getValue(obj, addr, ftype);
+    num_t o1 = mem.getValue(obj, addr, ftype);
     T res = static_cast<T>(o1) + static_cast<T>(o2);
-    mem.setValue(obj, addr, static_cast<double>(res), ftype);
+    mem.setValue(obj, addr, static_cast<num_t>(res), ftype);
 }
 
 template<typename T, class D, class U>
-SDL_FORCE_INLINE void opSub(D &mem, U *obj, size_t addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opSub(D &mem, U *obj, size_t addr, num_t o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getValue(obj, addr, ftype);
+    num_t o1 = mem.getValue(obj, addr, ftype);
     T res = static_cast<T>(o1) - static_cast<T>(o2);
-    mem.setValue(obj, addr, static_cast<double>(res), ftype);
+    mem.setValue(obj, addr, static_cast<num_t>(res), ftype);
 }
 
 template<typename T, class D, class U>
-SDL_FORCE_INLINE void opMul(D &mem, U *obj, size_t addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opMul(D &mem, U *obj, size_t addr, num_t o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getValue(obj, addr, ftype);
+    num_t o1 = mem.getValue(obj, addr, ftype);
     T res = static_cast<T>(o1) * static_cast<T>(o2);
     mem.setValue(obj, addr, static_cast<double>(res), ftype);
 }
 
 template<typename T, class D, class U>
-SDL_FORCE_INLINE void opDiv(D &mem, U *obj, size_t addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opDiv(D &mem, U *obj, size_t addr, num_t o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getValue(obj, addr, ftype);
+    num_t o1 = mem.getValue(obj, addr, ftype);
     T res = static_cast<T>(o1) / static_cast<T>(o2);
     mem.setValue(obj, addr, static_cast<double>(res), ftype);
 }
 
 template<typename T, class D, class U>
-SDL_FORCE_INLINE void opXor(D &mem, U *obj, size_t addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opXor(D &mem, U *obj, size_t addr, num_t o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getValue(obj, addr, ftype);
+    num_t o1 = mem.getValue(obj, addr, ftype);
     T res = static_cast<T>(o1) ^ static_cast<T>(o2);
-    mem.setValue(obj, addr, static_cast<double>(res), ftype);
+    mem.setValue(obj, addr, static_cast<num_t>(res), ftype);
 }
 
 template<class T, class U>
-static void MemAssignType(T &mem, U *obj, size_t address, double value, OPTYPE operation, FIELDTYPE ftype)
+static void MemAssignType(T &mem, U *obj, size_t address, num_t value, OPTYPE operation, FIELDTYPE ftype)
 {
     if(ftype == FT_INVALID)
         return;
@@ -2694,11 +2694,11 @@ static void MemAssignType(T &mem, U *obj, size_t address, double value, OPTYPE o
         }
         case FT_FLOAT:
         {
-            opAdd<float>(mem, obj, address, value, ftype);
+            opAdd<numf_t>(mem, obj, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
-            opAdd<double>(mem, obj, address, value, ftype);
+            opAdd<num_t>(mem, obj, address, value, ftype);
             break;
         default:
             break;
@@ -2727,11 +2727,11 @@ static void MemAssignType(T &mem, U *obj, size_t address, double value, OPTYPE o
         }
         case FT_FLOAT:
         {
-            opSub<float>(mem, obj, address, value, ftype);
+            opSub<numf_t>(mem, obj, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
-            opSub<double>(mem, obj, address, value, ftype);
+            opSub<num_t>(mem, obj, address, value, ftype);
             break;
         default:
             break;
@@ -2760,7 +2760,7 @@ static void MemAssignType(T &mem, U *obj, size_t address, double value, OPTYPE o
         }
         case FT_FLOAT:
         {
-            opMul<float>(mem, obj, address, value, ftype);
+            opMul<numf_t>(mem, obj, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
@@ -2793,7 +2793,7 @@ static void MemAssignType(T &mem, U *obj, size_t address, double value, OPTYPE o
         }
         case FT_FLOAT:
         {
-            opDiv<float>(mem, obj, address, value, ftype);
+            opDiv<numf_t>(mem, obj, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
@@ -2836,9 +2836,9 @@ static void MemAssignType(T &mem, U *obj, size_t address, double value, OPTYPE o
 }
 
 template<class T, class U>
-static bool ChecmMemType(T &mem, U *obj, size_t offset, double value, COMPARETYPE ctype, FIELDTYPE ftype)
+static bool ChecmMemType(T &mem, U *obj, size_t offset, num_t value, COMPARETYPE ctype, FIELDTYPE ftype)
 {
-    double cur = mem.getValue(obj, offset, ftype);
+    num_t cur = mem.getValue(obj, offset, ftype);
 
     switch(ctype)
     {
@@ -2869,7 +2869,7 @@ static bool ChecmMemType(T &mem, U *obj, size_t offset, double value, COMPARETYP
         case FT_DWORD:
             return static_cast<int32_t>(cur) > static_cast<int32_t>(value);
         case FT_FLOAT:
-            return static_cast<float>(cur) > static_cast<float>(value);
+            return static_cast<numf_t>(cur) > static_cast<numf_t>(value);
         case FT_DFLOAT:
             return cur > value;
         default:
@@ -2886,7 +2886,7 @@ static bool ChecmMemType(T &mem, U *obj, size_t offset, double value, COMPARETYP
         case FT_DWORD:
             return static_cast<int32_t>(cur) < static_cast<int32_t>(value);
         case FT_FLOAT:
-            return static_cast<float>(cur) < static_cast<float>(value);
+            return static_cast<numf_t>(cur) < static_cast<numf_t>(value);
         case FT_DFLOAT:
             return cur < value;
         default:
@@ -2917,7 +2917,7 @@ static bool ChecmMemType(T &mem, U *obj, size_t offset, double value, COMPARETYP
 
 // #define DEBUG_MEMEMU_TRACE
 
-void MemAssign(Player_t *obj, size_t address, double value, OPTYPE operation, FIELDTYPE ftype)
+void MemAssign(Player_t *obj, size_t address, num_t value, OPTYPE operation, FIELDTYPE ftype)
 {
 #ifdef DEBUG_MEMEMU_TRACE
     D_pLogDebug("Player mem TRACE: Write 0x%08X, %g, op-%d, ft-%d", address, value, (int)operation, (int)ftype);
@@ -2925,7 +2925,7 @@ void MemAssign(Player_t *obj, size_t address, double value, OPTYPE operation, FI
     MemAssignType(s_emuPlayer, obj, address, value, operation, ftype);
 }
 
-bool CheckMem(Player_t *obj, size_t offset, double value, COMPARETYPE ctype, FIELDTYPE ftype)
+bool CheckMem(Player_t *obj, size_t offset, num_t value, COMPARETYPE ctype, FIELDTYPE ftype)
 {
 #ifdef DEBUG_MEMEMU_TRACE
     D_pLogDebug("Player mem TRACE: Compare 0x%08X, %g, cp-%d, ft-%d", offset, value, (int)ctype, (int)ftype);
@@ -2933,10 +2933,10 @@ bool CheckMem(Player_t *obj, size_t offset, double value, COMPARETYPE ctype, FIE
     return ChecmMemType(s_emuPlayer, obj, offset, value, ctype, ftype);
 }
 
-double GetMem(Player_t *obj, size_t offset, FIELDTYPE ftype)
+num_t GetMem(Player_t *obj, size_t offset, FIELDTYPE ftype)
 {
 #ifdef DEBUG_MEMEMU_TRACE
-    double value = s_emuPlayer.getValue(obj, offset, ftype);
+    num_t value = s_emuPlayer.getValue(obj, offset, ftype);
     D_pLogDebug("Player mem TRACE: Read 0x%08X, %g, ft-%d", offset, value, (int)ftype);
     return value;
 #else
@@ -2945,7 +2945,7 @@ double GetMem(Player_t *obj, size_t offset, FIELDTYPE ftype)
 }
 
 
-void MemAssign(NPC_t *obj, size_t address, double value, OPTYPE operation, FIELDTYPE ftype)
+void MemAssign(NPC_t *obj, size_t address, num_t value, OPTYPE operation, FIELDTYPE ftype)
 {
 #ifdef DEBUG_MEMEMU_TRACE
     D_pLogDebug("NPC mem TRACE: Write 0x%08X, %g, op-%d, ft-%d", address, value, (int)operation, (int)ftype);
@@ -2953,7 +2953,7 @@ void MemAssign(NPC_t *obj, size_t address, double value, OPTYPE operation, FIELD
     MemAssignType(s_emuNPC, obj, address, value, operation, ftype);
 }
 
-bool CheckMem(NPC_t *obj, size_t offset, double value, COMPARETYPE ctype, FIELDTYPE ftype)
+bool CheckMem(NPC_t *obj, size_t offset, num_t value, COMPARETYPE ctype, FIELDTYPE ftype)
 {
 #ifdef DEBUG_MEMEMU_TRACE
     D_pLogDebug("NPC mem TRACE: Compare 0x%08X, %g, cp-%d, ft-%d", offset, value, (int)ctype, (int)ftype);
@@ -2961,10 +2961,10 @@ bool CheckMem(NPC_t *obj, size_t offset, double value, COMPARETYPE ctype, FIELDT
     return ChecmMemType(s_emuNPC, obj, offset, value, ctype, ftype);
 }
 
-double GetMem(NPC_t *obj, size_t offset, FIELDTYPE ftype)
+num_t GetMem(NPC_t *obj, size_t offset, FIELDTYPE ftype)
 {
 #ifdef DEBUG_MEMEMU_TRACE
-    double value = s_emuNPC.getValue(obj, offset, ftype);
+    num_t value = s_emuNPC.getValue(obj, offset, ftype);
     D_pLogDebug("NPC mem TRACE: Read 0x%08X, %g, ft-%d", offset, value, (int)ftype);
     return value;
 #else

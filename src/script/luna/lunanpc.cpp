@@ -73,7 +73,7 @@ NPC_t *NpcF::GetFirstMatch(int ID, int section)
     return nullptr; //not matched
 }
 
-void NpcF::MemSet(int ID, size_t offset, double value, OPTYPE operation, FIELDTYPE ftype)
+void NpcF::MemSet(int ID, size_t offset, num_t value, OPTYPE operation, FIELDTYPE ftype)
 {
     //    char* dbg =  "MemSetDbg";
     if(ftype == FT_INVALID || offset > 0x15C)
@@ -90,7 +90,7 @@ void NpcF::MemSet(int ID, size_t offset, double value, OPTYPE operation, FIELDTY
     }//for
 }
 
-void NpcF::AllSetHits(int identity, int section, float hits)
+void NpcF::AllSetHits(int identity, int section, int hits)
 {
     bool anyID = (identity == -1);
     bool anySec = (section == -1);
@@ -107,7 +107,7 @@ void NpcF::AllSetHits(int identity, int section, float hits)
     }
 }
 
-void NpcF::AllFace(int identity, int section, double x)
+void NpcF::AllFace(int identity, int section, num_t x)
 {
     bool anyID = (identity == -1);
     bool anySec = (section == -1);

@@ -22,6 +22,8 @@
 #ifndef LUNALAYER_H
 #define LUNALAYER_H
 
+#include "numeric_types.h"
+
 struct Layer_t;
 
 namespace LayerF
@@ -32,9 +34,9 @@ Layer_t *Get(int layerIdx);
 // Stop a layer
 void Stop(Layer_t *layer);
 
-void SetYSpeed(Layer_t *layer, float setY);
+void SetYSpeed(Layer_t *layer, num_t setY);
 
-void SetXSpeed(Layer_t *layer, float setX);
+void SetXSpeed(Layer_t *layer, num_t setX);
 
 } // LayerF
 

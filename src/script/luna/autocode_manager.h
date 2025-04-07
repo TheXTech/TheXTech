@@ -64,9 +64,9 @@ struct AutocodeManager
     Autocode *FindMatching(int section, const std::string &string);
 
     // Variable bank funcs
-    double GetVar(const std::string &var_name);        // returns 0 if var doesn't exist in bank
+    num_t GetVar(const std::string &var_name);        // returns 0 if var doesn't exist in bank
     bool VarExists(const std::string &var_name);
-    bool VarOperation(const std::string &var_name, double value, OPTYPE operation_to_do);
+    bool VarOperation(const std::string &var_name, num_t value, OPTYPE operation_to_do);
 
     // Members
     bool                    m_Enabled = false;          // Whether or not individual level scripts enabled
@@ -106,7 +106,7 @@ struct AutocodeManager
     void addError(int lineNumber, const std::string &line, const std::string &msg);
     void showErrors(const std::string &file);
 
-    std::map<std::string, double> m_UserVars;
+    std::map<std::string, num_t> m_UserVars;
 
     // Hearts manager stuff
     int m_Hearts = 2;

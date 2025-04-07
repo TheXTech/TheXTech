@@ -22,17 +22,19 @@
 #ifndef LUNAMISC_H
 #define LUNAMISC_H
 
+#include "numeric_types.h"
+
 #include <map>
 #include <string>
 
-extern void InitIfMissing(std::map<std::string, double>* pMap, const std::string& sought_key, double init_val);
+extern void InitIfMissing(std::map<std::string, num_t>* pMap, const std::string& sought_key, num_t init_val);
 
 extern bool FastTestCollision(int Left1, int Up1, int Right1, int Down1, int Left2, int Up2, int Right2, int Down2);
 
 // Compute the current SMBX level section for the given coords, or -1 if invalid
 extern int ComputeLevelSection(int x, int y);
 
-extern void RandomPointInRadius(double* ox, double* oy, double cx, double cy, int radius);
+extern void RandomPointInRadius(num_t* ox, num_t* oy, num_t cx, num_t cy, int radius);
 
 extern std::string resolveIfNotAbsolutePath(const std::string &filename);
 

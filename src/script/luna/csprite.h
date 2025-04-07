@@ -66,9 +66,9 @@ public:
     void Draw();
     void Die();
 
-    void SetCustomVar(std::string var_name, OPTYPE operation, double val);
+    void SetCustomVar(std::string var_name, OPTYPE operation, num_t val);
     bool CustomVarExists(std::string var_name);
-    double GetCustomVar(std::string var_name);
+    num_t GetCustomVar(std::string var_name);
 
     /// Members///
     //! Image bank code of image resource the sprite uses
@@ -104,14 +104,14 @@ public:
     //! Whether or not this sprite should be processed regardless of player's current section
     bool m_AlwaysProcess = false;
 
-    double m_Xpos;
-    double m_Ypos;
+    num_t m_Xpos;
+    num_t m_Ypos;
     //! Height Of loaded image graphic for backwards compat with native SMBX sprites
-    double m_Ht;
+    int m_Ht;
     //! Width Of loaded image graphic for backwards compat with native SMBX sprites
-    double m_Wd;
-    double m_Xspd;
-    double m_Yspd;
+    int m_Wd;
+    num_t m_Xspd;
+    num_t m_Yspd;
 
     //! Hitbox relative to sprite position
     Hitbox m_Hitbox;
@@ -132,7 +132,7 @@ public:
     std::list<SpriteComponent> m_DeathComponents;
 
     //! User-defined vars
-    std::map<std::string, double> m_CustomVars;
+    std::map<std::string, num_t> m_CustomVars;
 };
 
 
@@ -149,8 +149,8 @@ struct CSpriteRequest
     std::string str;
 
     // Optional parameters
-    double x_speed = 0.0;
-    double y_speed = 0.0;
+    num_t x_speed = 0;
+    num_t y_speed = 0;
     //! "spawned" means the sprite will be deleted after being offscreen for some time
     bool spawned = false;
 };

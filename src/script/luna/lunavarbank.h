@@ -22,6 +22,8 @@
 #ifndef LUNAVARBANK_H
 #define LUNAVARBANK_H
 
+#include "numeric_types.h"
+
 #include <string>
 #include <map>
 #include <PGE_File_Formats/save_filedata.h>
@@ -49,7 +51,7 @@ public:
      * \param key Key
      * \param val Value
      */
-    void SetVar(const std::string &key, double val);
+    void SetVar(const std::string &key, num_t val);
 
     /*!
      * \brief Returns whether or not this var exists in the bank
@@ -63,13 +65,13 @@ public:
      * \param key Key
      * \return Value
      */
-    double GetVar(const std::string &key);
+    num_t GetVar(const std::string &key);
 
     /*!
      * \brief Copy all k,v pairs of variable bank to another map
      * \param target Destination map of copy
      */
-    void CopyBank(std::map<std::string, double> *target);
+    void CopyBank(std::map<std::string, num_t> *target);
 
     void ClearBank();
 
@@ -84,7 +86,7 @@ public:
     void SaveIfNeeded();
 
     /// Members ///
-    std::map<std::string, double> m_VarBank;
+    std::map<std::string, num_t> m_VarBank;
 
 private:
     // Init the object
