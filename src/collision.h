@@ -63,7 +63,7 @@ bool WarpCollision(const Location_t &Loc1, const SpeedlessLocation_t &entrance, 
 int FindCollision(const Location_t &Loc1, const Location_t &Loc2);
 // Public Function FindCollisionBelt(Loc1 As Location, Loc2 As Location, BeltSpeed As Single) As Integer  'Whats side the collision happened for belts
 // Whats side the collision happened for belts
-int FindCollisionBelt(const Location_t &Loc1, const Location_t &Loc2, numf_t BeltSpeed);
+int FindCollisionBelt(const Location_t &Loc1, const Location_t &Loc2, tempf_t BeltSpeed);
 // Public Function NPCFindCollision(Loc1 As Location, Loc2 As Location) As Integer 'Whats side the collision happened for NPCs
 // Whats side the collision happened for NPCs
 int NPCFindCollision(const Location_t &Loc1, const Location_t &Loc2);
@@ -99,7 +99,7 @@ bool WalkingCollision(const Location_t &Loc1, const Location_t &Loc2);
 // bool WalkingCollision2(const Location_t &Loc1, const Location_t &Loc2);
 // Public Function WalkingCollision3(Loc1 As Location, Loc2 As Location, BeltSpeed As Single) As Boolean 'Factors in beltspeed
 // Factors in beltspeed
-bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, numf_t BeltSpeed);
+bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, tempf_t BeltSpeed);
 // Public Function FindRunningCollision(Loc1 As Location, Loc2 As Location) As Integer 'Helps the player to walk over 1 unit cracks
 // Helps the player to walk over 1 unit cracks
 // NEW: BeltSpeedX accounts for the speed of a conveyor belt when testing side collisions

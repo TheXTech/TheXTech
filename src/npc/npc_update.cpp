@@ -1175,7 +1175,7 @@ interrupt_Activation:
             if(NPC[A].Type == NPCID_VEHICLE && NPC[A].TimeLeft > 1)
                 NPC[A].TimeLeft = 100;
 
-            numf_t speedVar = 1; // percent of the NPC it should actually moved. this helps when underwater
+            tempf_t speedVar = 1; // percent of the NPC it should actually moved. this helps when underwater
 
             // dead code in VB6
 #if 0
@@ -1192,7 +1192,7 @@ interrupt_Activation:
 #endif
 
             if(!NPC[A].Projectile)
-                speedVar = speedVar.times(NPC[A]->Speedvar);
+                speedVar = (tempf_t)NPC[A]->Speedvar;
 
             // water check
 
@@ -1325,10 +1325,10 @@ interrupt_Activation:
                 if(NPC[A].Type == NPCID_ICE_CUBE)
                 {
                     NPC[A].Projectile = true;
-                    Physics.NPCGravity = num_t(-Physics.NPCGravityReal / 5);
+                    Physics.NPCGravity = num_t(-(tempf_t)Physics.NPCGravityReal / 5);
                 }
                 else
-                    Physics.NPCGravity = num_t(Physics.NPCGravityReal / 5);
+                    Physics.NPCGravity = num_t((tempf_t)Physics.NPCGravityReal / 5);
 
                 if(NPC[A].Type == NPCID_FLIPPED_RAINBOW_SHELL && NPC[A].Special4 == 1)
                     NPC[A].Special5 = 0;
@@ -1723,7 +1723,7 @@ interrupt_Activation:
 
                         num_t tempHit = 0; // height of block NPC is walking on
                         int tempHitBlock = 0; // index of block NPC is walking on
-                        numf_t tempSpeedA = 0; // speed of ground the NPC is possibly standing on
+                        tempf_t tempSpeedA = 0; // speed of ground the NPC is possibly standing on
 
                         NPCBlockLogic(A, tempHit, tempHitBlock, tempSpeedA, numTempBlock, speedVar);
 

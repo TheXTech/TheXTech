@@ -29,29 +29,29 @@
 #include "player/player_update_priv.h"
 #include "npc/npc_cockpit_bits.h"
 
-void PlayerMovementX(int A, numf_t& cursed_value_C)
+void PlayerMovementX(int A, tempf_t& cursed_value_C)
 {
     // Modify player's speed if he is running up/down hill
-    numf_t speedVar = 1; // Speed var is a percentage of the player's speed
+    tempf_t speedVar = 1; // Speed var is a percentage of the player's speed
     if(Player[A].Slope > 0)
     {
         if(
                 (Player[A].Location.SpeedX > 0 && BlockSlope[Block[Player[A].Slope].Type] == -1) ||
                 (Player[A].Location.SpeedX < 0 && BlockSlope[Block[Player[A].Slope].Type] == 1)
                 )
-            speedVar = (numf_t)(1 - Block[Player[A].Slope].Location.Height / (int_ok)Block[Player[A].Slope].Location.Width / 2);
+            speedVar = (tempf_t)(1 - Block[Player[A].Slope].Location.Height / (int_ok)Block[Player[A].Slope].Location.Width / 2);
         else if(!Player[A].Slide)
-            speedVar = (numf_t)(1 + (Block[Player[A].Slope].Location.Height / (int_ok)Block[Player[A].Slope].Location.Width / 4));
+            speedVar = (tempf_t)(1 + (Block[Player[A].Slope].Location.Height / (int_ok)Block[Player[A].Slope].Location.Width / 4));
     }
 
     if(Player[A].Stoned) // if statue form reset to normal
         speedVar = 1;
 
     if(Player[A].Character == 3)
-        speedVar = (numf_t)((num_t)speedVar * 0.93_r);
+        speedVar = (tempf_t)((num_t)speedVar * 0.93_r);
 
     if(Player[A].Character == 4)
-        speedVar = (numf_t)((num_t)speedVar * 1.07_r);
+        speedVar = (tempf_t)((num_t)speedVar * 1.07_r);
 
     // modify speedvar to slow the player down under water
     if(Player[A].Wet > 0)
@@ -136,7 +136,7 @@ void PlayerMovementX(int A, numf_t& cursed_value_C)
     // If .Character = 5 Then C = 0.94
     if(Player[A].Character == 5)
     {
-        cursed_value_C = 0.95_nf;
+        cursed_value_C = (tempf_t)0.95_n;
         local_C = 0.95_r;
     }
 
@@ -913,17 +913,19 @@ void PlayerMovementY(int A)
     {
         if((Player[A].Controls.Jump || Player[A].Controls.AltJump) && Player[A].Vine == 0)
         {
-            Player[A].FloatTime -= 1;
-            Player[A].FloatSpeed += Player[A].FloatDir * 0.1_nf;
+            tempf_t floatSpeed = (tempf_t)Player[A].FloatSpeed;
+            floatSpeed += Player[A].FloatDir * (tempf_t)0.1_n;
 
-            if(Player[A].FloatSpeed > 0.8_nf)
+            if(floatSpeed > (tempf_t)0.8_n)
                 Player[A].FloatDir = -1;
 
-            if(Player[A].FloatSpeed < -0.8_nf)
+            if(floatSpeed < -(tempf_t)0.8_n)
                 Player[A].FloatDir = 1;
 
-            Player[A].Location.SpeedY = (num_t)Player[A].FloatSpeed;
+            Player[A].Location.SpeedY = (num_t)floatSpeed;
+            Player[A].FloatSpeed = (numf_t)floatSpeed;
 
+            Player[A].FloatTime -= 1;
             if(Player[A].FloatTime == 0 && Player[A].Location.SpeedY == 0)
                 Player[A].Location.SpeedY = 0.1_n;
         }

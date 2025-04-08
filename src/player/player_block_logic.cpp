@@ -35,7 +35,7 @@
 
 #include "main/trees.h"
 
-void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontResetGrabTime, numf_t cursed_value_C)
+void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontResetGrabTime, tempf_t cursed_value_C)
 {
     int oldSlope = Player[A].Slope;
     Player[A].Slope = 0;
@@ -137,7 +137,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                     {
                                         if(Player[A].Mount > 0 && HitSpot == 1)
                                         {
-                                            cursed_value_C = numf_t(Player[A].Location.Y + Player[A].Location.Height);
+                                            cursed_value_C = tempf_t(Player[A].Location.Y + Player[A].Location.Height);
                                             Player[A].Location.Y = Block[B].Location.Y - Player[A].Location.Height;
                                             PlayerHurt(A);
                                             Player[A].Location.Y = (num_t)cursed_value_C - Player[A].Location.Height;
@@ -361,7 +361,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                             {
                                                 if(!Player[A].WetFrame)
                                                 {
-                                                    cursed_value_C = (numf_t)(Player[A].Location.SpeedX * (int_ok)Block[B].Location.Height / (int_ok)Block[B].Location.Width * BlockSlope[Block[B].Type]);
+                                                    cursed_value_C = (tempf_t)(Player[A].Location.SpeedX * (int_ok)Block[B].Location.Height / (int_ok)Block[B].Location.Width * BlockSlope[Block[B].Type]);
                                                     Player[A].Location.SpeedY = (num_t)cursed_value_C;
                                                     if(Player[A].Location.SpeedY > 0 && !Player[A].Slide && Player[A].Mount != 1 && Player[A].Mount != 2)
                                                         Player[A].Location.SpeedY = Player[A].Location.SpeedY * 4;
@@ -555,7 +555,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                                 floorBlock = B;
 
                                             // this is the case where an unbound C gets written to
-                                            cursed_value_C = (numf_t)C;
+                                            cursed_value_C = (tempf_t)C;
                                         }
 
                                         // if this block is moving up give it priority
@@ -598,7 +598,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                     if(Player[A].Mount == 2)
                                     {
                                         // cast through float because in VB6 the old X location was temporarily stored in mountBump, which is a float
-                                        Player[A].mountBump = (numf_t)(Player[A].Location.X - (num_t)(numf_t)preWallX);
+                                        Player[A].mountBump = (numf_t)(Player[A].Location.X - (num_t)(tempf_t)preWallX);
                                     }
 
                                     wallBlock = B;
@@ -748,7 +748,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
     {
         if(Player[A].Location.SpeedY > 0)
         {
-            numf_t C = (numf_t)(Player[A].Location.SpeedX * (int_ok)Block[oldSlope].Location.Height / (int_ok)Block[oldSlope].Location.Width * BlockSlope[Block[oldSlope].Type]);
+            tempf_t C = (tempf_t)(Player[A].Location.SpeedX * (int_ok)Block[oldSlope].Location.Height / (int_ok)Block[oldSlope].Location.Width * BlockSlope[Block[oldSlope].Type]);
             if(C > 0)
                 Player[A].Location.SpeedY = (num_t)C;
         }

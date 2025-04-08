@@ -28,9 +28,9 @@
 void p_PlayerMakeFlySparkle(const Location_t& loc, int Frame = 1);
 
 // most of these routines were originally part of UpdatePlayer
-void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, const bool movingBlock, const int floorBlock, const numf_t oldSpeedY);
+void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, const bool movingBlock, const int floorBlock, const tempf_t oldSpeedY);
 
-void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontResetGrabTime, numf_t cursed_value_C);
+void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontResetGrabTime, tempf_t cursed_value_C);
 
 void PlayerVineLogic(int A);
 bool PlayerFairyOnVine(int A);
@@ -47,7 +47,7 @@ void PlayerFairyMovementY(int A);
 void PlayerPinchedTimerUpdate(int A);
 void PlayerPinchedDeathCheck(int A);
 
-void PlayerMovementX(int A, numf_t& cursed_value_C);
+void PlayerMovementX(int A, tempf_t& cursed_value_C);
 void PlayerSlideMovementX(int A);
 void PlayerCockpitMovementX(int A);
 void PlayerMovementY(int A);

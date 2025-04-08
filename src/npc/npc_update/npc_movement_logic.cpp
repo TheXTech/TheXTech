@@ -32,7 +32,7 @@ static inline bool s_use_default_movement(int A)
     return (NPCDefaultMovement(NPC[A]) || (NPC[A]->IsFish && NPC[A].Special != 2)) && !((NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[A].Special > 0);
 }
 
-void NPCMovementLogic(int A, numf_t& speedVar)
+void NPCMovementLogic(int A, tempf_t& speedVar)
 {
     // POSSIBLE SUBROUTINE: setSpeed
 

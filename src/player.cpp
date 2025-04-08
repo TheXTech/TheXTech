@@ -3871,7 +3871,8 @@ void YoshiEatCode(const int A)
 
             p.YoshiTongue.Height = 12;
             p.YoshiTongue.Width = 16;
-            numf_t TongueX = numf_t(p.Location.X + p.Location.Width / 2);
+
+            tempf_t TongueX = tempf_t(p.Location.X + p.Location.Width / 2);
 
             if(p.Controls.Up || (p.StandingOnNPC == 0 && p.Slope == 0 && p.Location.SpeedY != 0 && !p.Controls.Down))
             {

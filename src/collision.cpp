@@ -180,7 +180,7 @@ int FindCollision(const Location_t &Loc1, const Location_t &Loc2)
 }
 
 // Whats side the collision happened for belts
-int FindCollisionBelt(const Location_t &Loc1, const Location_t &Loc2, numf_t BeltSpeed)
+int FindCollisionBelt(const Location_t &Loc1, const Location_t &Loc2, tempf_t BeltSpeed)
 {
     int tempFindCollisionBelt = COLLISION_NONE;
 
@@ -505,7 +505,7 @@ bool WalkingCollision2(const Location_t &Loc1, const Location_t &Loc2)
 #endif
 
 // Factors in beltspeed
-bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, numf_t BeltSpeed)
+bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, tempf_t BeltSpeed)
 {
     bool tempWalkingCollision3 = false;
 

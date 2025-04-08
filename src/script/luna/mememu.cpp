@@ -300,7 +300,7 @@ SDL_FORCE_INLINE void memToValue(int &target, num_t value, FIELDTYPE ftype)
         target = static_cast<int32_t>(value);
         break;
     case FT_FLOAT:
-        target = static_cast<int32_t>(f2i_cast<numf_t>(value));
+        target = static_cast<int32_t>(f2i_cast<tempf_t>(value));
         break;
 //    case FT_DFLOAT: // United with FT_DWORD
 //        target = static_cast<int32_t>(value);
@@ -325,7 +325,7 @@ SDL_FORCE_INLINE void memToValue(short &target, num_t value, FIELDTYPE ftype)
         target = static_cast<int16_t>(value);
         break;
     case FT_FLOAT:
-        target = static_cast<int16_t>(f2i_cast<numf_t>(value));
+        target = static_cast<int16_t>(f2i_cast<tempf_t>(value));
         break;
 //    case FT_DFLOAT: // United with FT_DWORD
 //        target = static_cast<int32_t>(value);
@@ -350,7 +350,7 @@ SDL_FORCE_INLINE void memToValue(uint8_t &target, num_t value, FIELDTYPE ftype)
         target = static_cast<uint8_t>(value);
         break;
     case FT_FLOAT:
-        target = static_cast<uint8_t>(f2i_cast<numf_t>(value));
+        target = static_cast<uint8_t>(f2i_cast<tempf_t>(value));
         break;
 //    case FT_DFLOAT: // United with FT_DWORD
 //        target = static_cast<int32_t>(value);

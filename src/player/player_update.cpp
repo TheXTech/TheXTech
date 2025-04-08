@@ -93,7 +93,7 @@ bool UpdatePlayer()
 {
     // these variables do not persist over the interrupt/resume routine
     num_t SlippySpeedX;
-    numf_t cursed_value_C;
+    tempf_t cursed_value_C;
 
     switch(g_gameLoopInterrupt.site)
     {
@@ -450,7 +450,7 @@ bool UpdatePlayer()
 
                 // scoping variables shared between block logic and NPC logic
                 {
-                    numf_t oldSpeedY = (numf_t)Player[A].Location.SpeedY; // holds the players previous Y speed
+                    tempf_t oldSpeedY = (tempf_t)Player[A].Location.SpeedY; // holds the players previous Y speed
                     bool movingBlock = false; // helps with collisions for moving blocks
                     int floorBlock = 0; // was previously called tempHit3
 

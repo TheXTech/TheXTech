@@ -28,17 +28,17 @@
 struct NPC_t;
 
 // most of these routines were originally part of UpdateNPCs
-void NPCMovementLogic(int A, numf_t& speedVar);
+void NPCMovementLogic(int A, tempf_t& speedVar);
 
 void NPCSectionWrap(NPC_t& npc);
 
-void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA, const int numTempBlock, const numf_t speedVar);
+void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA, const int numTempBlock, const tempf_t speedVar);
 
 void NPCCollide(int A);
 
 void NPCCollideHeld(int A);
 
-void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, numf_t tempSpeedA);
+void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, tempf_t tempSpeedA);
 
 void NPCEffects(int A);
 

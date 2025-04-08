@@ -27,12 +27,12 @@
 
 #include "main/trees.h"
 
-void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, numf_t tempSpeedA)
+void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, tempf_t tempSpeedA)
 {
     // tempSpeedA does not check for walking collisions in vanilla
     if(g_config.fix_npc_downward_clip)
     {
-        tempSpeedA = (numf_t)Block[tempHitBlock].Location.SpeedY;
+        tempSpeedA = (tempf_t)Block[tempHitBlock].Location.SpeedY;
         if(tempSpeedA < 0)
             tempSpeedA = 0;
     }

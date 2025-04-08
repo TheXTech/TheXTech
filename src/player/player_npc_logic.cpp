@@ -37,7 +37,7 @@
 
 #include "main/trees.h"
 
-void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, const bool movingBlock, const int floorBlock, const numf_t oldSpeedY)
+void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, const bool movingBlock, const int floorBlock, const tempf_t oldSpeedY)
 {
     int floorNpc1 = 0;
     int floorNpc2 = 0;
@@ -851,7 +851,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     {
                                         tempHit2 = true;
                                         // this variable was previously a numf_t
-                                        tempHitSpeed = (num_t)(numf_t)(NPC[B].Location.SpeedX + (num_t)NPC[B].BeltSpeed);
+                                        tempHitSpeed = (num_t)(tempf_t)(NPC[B].Location.SpeedX + (num_t)NPC[B].BeltSpeed);
 
                                         // reset player speed if not on conveyor belt
                                         bool tempBool = false;
@@ -877,7 +877,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         }
 
                                         // save current X location (for NPCs riding player's vehicle)
-                                        numf_t D = (numf_t)Player[A].Location.X;
+                                        tempf_t D = (tempf_t)Player[A].Location.X;
 
                                         // actually move the player
                                         if(NPC[B].Location.to_right_of(Player[A].Location))
@@ -937,7 +937,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         // apply speed to vehicle riders if needed
                                         if(Player[A].Mount == 2)
                                         {
-                                            D = (numf_t)(Player[A].Location.X - (num_t)D);
+                                            D = (tempf_t)(Player[A].Location.X - (num_t)D);
 
                                             for(int C : NPCQueues::Active.no_change)
                                             {

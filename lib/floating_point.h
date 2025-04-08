@@ -557,6 +557,9 @@ static inline constexpr num_t operator !=(unsigned long long a, num_t b) { retur
 // this operator should be used to indicate that a num_t contains an int and may be treated as an int if needed
 using int_ok = num_muldiv_t;
 
+// this is used for temporary values that were Singles in VB6
+using tempf_t = numf_t;
+
 static inline constexpr XTColor XTAlphaF(num_t a)
 {
     return XTColor().with_alpha(XTColor::from_float((double)a));

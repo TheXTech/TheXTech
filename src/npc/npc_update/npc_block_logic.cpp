@@ -32,12 +32,12 @@
 
 #include "main/trees.h"
 
-void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA, const int numTempBlock, const numf_t speedVar)
+void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA, const int numTempBlock, const tempf_t speedVar)
 {
     bool resetBeltSpeed = false;
     bool beltClear = false; // "stops belt movement when on a wall" (Redigit)
-    numf_t beltCount = 0;
-    numf_t addBelt = 0;
+    tempf_t beltCount = 0;
+    tempf_t addBelt = 0;
 
     bool SlopeTurn = false;
 
@@ -47,10 +47,12 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
     int tempHitIsSlope = 0;
 
     int oldSlope = NPC[A].Slope; // previous sloped block the npc was on
-    numf_t oldBeltSpeed = NPC[A].BeltSpeed;
+    tempf_t oldBeltSpeed = (tempf_t)NPC[A].BeltSpeed;
 
     NPC[A].Slope = 0;
-    NPC[A].BeltSpeed = 0;
+    // now, use tempf_t to do all BeltSpeed computations (accumulation, etc) in full precision in fixed-point builds
+    // NPC[A].BeltSpeed = 0;
+    tempf_t beltSpeed = 0;
 
     if((!NPC[A]->NoClipping || NPC[A].Projectile) &&
        !(NPC[A].Type == NPCID_SPIT_BOSS_BALL && NPC[A].Projectile) && NPC[A].Type != NPCID_TOOTHY &&
@@ -795,7 +797,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
                                     // hitspot 1
                                     if(HitSpot == 1) // Hitspot 1
                                     {
-                                        tempSpeedA = (numf_t)Block[B].Location.SpeedY;
+                                        tempSpeedA = (tempf_t)Block[B].Location.SpeedY;
                                         if(tempSpeedA < 0)
                                             tempSpeedA = 0;
 
@@ -880,7 +882,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
 
                                             if(Block[B].tempBlockNpcType >= NPCID_YEL_PLATFORM && Block[B].tempBlockNpcType <= NPCID_RED_PLATFORM)
                                             {
-                                                NPC[A].BeltSpeed = 0;
+                                                beltSpeed = 0;
                                                 beltCount = 0;
                                             }
 
@@ -899,11 +901,11 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
                                             if(Block[B].tempBlockVehiclePlr == 0)
                                             {
                                                 if(Block[B].tempBlockNpcType > 0)
-                                                    NPC[A].BeltSpeed = (numf_t)((num_t)NPC[A].BeltSpeed + Block[B].Location.SpeedX.times(C).times((num_t)blk_npc_tr.Speedvar));
+                                                    beltSpeed = (tempf_t)((num_t)beltSpeed + Block[B].Location.SpeedX.times(C).times((num_t)blk_npc_tr.Speedvar));
                                                 else
-                                                    NPC[A].BeltSpeed = (numf_t)((num_t)NPC[A].BeltSpeed + Block[B].Location.SpeedX.times(C));
+                                                    beltSpeed = (tempf_t)((num_t)beltSpeed + Block[B].Location.SpeedX.times(C));
 
-                                                beltCount += numf_t(C);
+                                                beltCount += tempf_t(C);
                                             }
                                         }
 
@@ -1054,7 +1056,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
                                             if(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1)
                                                 NPCHit(A, 4, A);
 
-                                            addBelt = (numf_t)NPC[A].Location.X;
+                                            addBelt = (tempf_t)NPC[A].Location.X;
 
                                             if(NPC[A].Slope == 0 && !SlopeTurn)
                                             {
@@ -1064,7 +1066,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
                                                     NPC[A].Location.X = Block[B].Location.X - NPC[A].Location.Width - 0.01_n;
                                             }
 
-                                            addBelt = (numf_t)(NPC[A].Location.X - (num_t)addBelt);
+                                            addBelt = (tempf_t)(NPC[A].Location.X - (num_t)addBelt);
 
                                             if(!(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_TANK_TREADS || NPC[A].Type == NPCID_BULLET))
                                                 NPC[A].TurnAround = true;
@@ -1132,14 +1134,14 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
                                         }
                                         else if(NPC[A].Type != NPCID_SPIKY_BALL_S3 && !(NPC[A]->IsABlock && Block[B].tempBlockNpcType > 0) && block_is_not_conveyor)
                                         {
-                                            addBelt = (numf_t)NPC[A].Location.X;
+                                            addBelt = (tempf_t)NPC[A].Location.X;
 
                                             if(NPC[A].Location.X + NPC[A].Location.Width / 2 < Block[B].Location.X + Block[B].Location.Width / 2)
                                                 NPC[A].Location.X = Block[B].Location.X - NPC[A].Location.Width - 0.01_n;
                                             else
                                                 NPC[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.01_n;
 
-                                            addBelt = (numf_t)(NPC[A].Location.X - (num_t)addBelt);
+                                            addBelt = (tempf_t)(NPC[A].Location.X - (num_t)addBelt);
 
                                             if(NPC[A].Type == NPCID_MINIBOSS)
                                             {
@@ -1363,28 +1365,27 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
 
         if(oldBeltSpeed >= 1 || oldBeltSpeed <= -1)
         {
-            NPC[A].BeltSpeed = oldBeltSpeed - NPC[A].oldAddBelt;
+            beltSpeed = oldBeltSpeed - (tempf_t)NPC[A].oldAddBelt;
             beltCount = 1;
-            if(NPC[A].BeltSpeed >= 2.1_nf)
-                NPC[A].BeltSpeed -= 0.1_nf;
-            else if(NPC[A].BeltSpeed <= -2.1_nf)
-                NPC[A].BeltSpeed += 0.1_nf;
+            if(beltSpeed >= (tempf_t)2.1_n)
+                beltSpeed -= (tempf_t)0.1_n;
+            else if(beltSpeed <= -(tempf_t)2.1_n)
+                beltSpeed += (tempf_t)0.1_n;
         }
     }
 
-    if(NPC[A].BeltSpeed != 0)
+    if(beltSpeed != 0)
     {
         Location_t preBeltLoc = NPC[A].Location;
-        NPC[A].BeltSpeed = NPC[A].BeltSpeed.divided_by(beltCount);
-        NPC[A].BeltSpeed = NPC[A].BeltSpeed.times(speedVar);
-        NPC[A].Location.X += num_t(NPC[A].BeltSpeed);
+        beltSpeed = beltSpeed.divided_by(beltCount).times(speedVar);
+        NPC[A].Location.X += num_t(beltSpeed);
 //                            D = NPC[A].BeltSpeed; // Idk why this is needed as this value gets been overriden and never re-used
         Location_t tempLocation = NPC[A].Location;
         tempLocation.Y += 1;
         tempLocation.Height -= 2;
         tempLocation.Width = tempLocation.Width / 2;
 
-        if(NPC[A].BeltSpeed > 0)
+        if(beltSpeed > 0)
             tempLocation.X += tempLocation.Width;
 
         if(!(NPC[A].Type >= NPCID_SHORT_WOOD && NPC[A].Type <= NPCID_SLANT_WOOD_M) && !NPC[A].Inert)
@@ -1422,7 +1423,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
 
         if(NPC[A].Location.X == preBeltLoc.X)
         {
-            NPC[A].BeltSpeed = 0;
+            beltSpeed = 0;
             addBelt = 0;
             if(NPC[A].tempBlock > 0)
                 Block[NPC[A].tempBlock].Location.SpeedX = 0;
@@ -1430,13 +1431,12 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, numf_t& tempSpeedA,
     }
 
     if(!NPC[A].onWall)
-        NPC[A].BeltSpeed += addBelt;
+        beltSpeed += addBelt;
 
-    NPC[A].oldAddBelt = addBelt;
+    NPC[A].oldAddBelt = (numf_t)addBelt;
 
-    if(beltClear)
+    if(beltClear || NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_STONE_S4)
         NPC[A].BeltSpeed = 0;
-
-    if(NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_STONE_S4)
-        NPC[A].BeltSpeed = 0;
+    else
+        NPC[A].BeltSpeed = (numf_t)beltSpeed;
 }
