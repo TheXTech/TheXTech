@@ -2012,11 +2012,11 @@ public:
         insert(0x000000d8, // DefaultDirection
             [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
-                return valueToMem((numf_t)n.DefaultDirection, ftype);
+                return valueToMem((vbint_t)n.DefaultDirection, ftype);
             },
             [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
             {
-                numf_t direction = 0;
+                vbint_t direction = 0;
                 memToValue(direction, in, ftype);
 
                 n.DefaultDirection = (int8_t)direction;
