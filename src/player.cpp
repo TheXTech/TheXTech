@@ -98,8 +98,8 @@ static void setupPlayerAtCheckpoints(NPC_t &npc, Checkpoint_t &cp)
         Player[B].Location.Y = Block[C].Location.Y - Player[B].Location.Height;
         Player[B].Location.X = npc.Location.X + (npc.Location.Width - Player[B].Location.Width) / 2;
         CheckSection(B);
-        pLogDebug("Restore player %d at checkpoint ID=%d by X=%g, Y=%g",
-                  B, cp.id, Player[B].Location.X, Player[B].Location.Y);
+        pLogDebug("Restore player %d at checkpoint ID=%d by X=%d, Y=%d",
+                  B, cp.id, (int)Player[B].Location.X, (int)Player[B].Location.Y);
     }
 
     if(numPlayers > 1 && g_config.multiplayer_pause_controls && !g_ClonedPlayerMode)
@@ -5486,7 +5486,6 @@ void PlayerEffects(const int A)
     // float C = 0;
     // float D = 0;
     bool tempBool = false;
-    Location_t tempLocation;
     auto &p = Player[A];
 
     if(p.Effect != PLREFF_WAITING && p.Fairy)
