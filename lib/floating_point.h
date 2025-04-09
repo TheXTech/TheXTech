@@ -330,22 +330,22 @@ public:
         return num_t(x.i > 0 ? x.i : -x.i, nullptr);
     }
 
-    static inline constexpr int32_t round(num_t x)
+    static inline int32_t round(num_t x)
     {
         return std::round(x.i);
     }
 
-    static inline constexpr int32_t ceil(num_t x)
+    static inline int32_t ceil(num_t x)
     {
         return std::ceil(x.i);
     }
 
-    static inline constexpr int32_t floor(num_t x)
+    static inline int32_t floor(num_t x)
     {
         return std::floor(x.i);
     }
 
-    static inline constexpr num_t roundn(num_t x)
+    static inline num_t roundn(num_t x)
     {
         return num_t(std::round(x.i), nullptr);
     }
