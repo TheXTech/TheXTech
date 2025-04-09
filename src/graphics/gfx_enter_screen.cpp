@@ -161,7 +161,7 @@ static void placePlayers(Player_t tempPlayer[maxLocalPlayers])
     }
     else
     {
-        int start_x = XRender::TargetW / 2.0 - (numPlayers - 1) * 32;
+        int start_x = XRender::TargetW / 2 - (numPlayers - 1) * 32;
 
         for(int i = 0; i < numPlayers && i < maxLocalPlayers; i++)
         {

@@ -250,8 +250,8 @@ void UpdateInternalRes()
             int_w = 480;
 
         // maximum 2.4 (cinematic) aspect ratio
-        if(int_w > int_h*2.4)
-            int_w = (int)(int_h*2.4);
+        if(int_w > int_h * 24 / 10)
+            int_w = int_h * 24 / 10;
 
         // force even dimensions
         int_w -= int_w & 1;

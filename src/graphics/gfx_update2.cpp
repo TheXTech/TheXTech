@@ -565,7 +565,7 @@ void UpdateGraphics2(bool skipRepaint)
 
             // could make these arrays if multiple world players ever supported
             static vbint_t cache_LevelIndex;
-            static double cache_vScreen_W = 0.0;
+            static int cache_vScreen_W = 0;
 
             static std::string cache_LevelName_Split;
             static int cache_LevelName_H = 0;

@@ -4893,7 +4893,9 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 NPC[p.HoldingNPC].Special = 1;
             else if(p.Jump > 0 && NPC[p.HoldingNPC].Special == 1)
             {
-                p.Jump = p.Jump * 1.5;
+                // IMPORTANT: this was truncated until v1.3.8-dev. The new behavior is accurate to VB6. Confirm that it does not cause issues.
+                // FIXME: simplify this -- add a new vb6round_div2 call
+                p.Jump = num_t::vb6round(p.Jump * 1.5_n);
                 NPC[p.HoldingNPC].Special = 0;
             }
             if(NPC[p.HoldingNPC].Type == NPCID_FLY_CANNON)
@@ -5482,7 +5484,7 @@ void PlayerEffects(const int A)
 {
     int B = 0;
     // float C = 0;
-    float D = 0;
+    // float D = 0;
     bool tempBool = false;
     Location_t tempLocation;
     auto &p = Player[A];
@@ -6217,7 +6219,7 @@ void PlayerEffects(const int A)
         }
         else if(p.Effect2 > 0)
         {
-            D = float(p.Effect2);
+            int D = p.Effect2;
 
             if(Player[D].Effect == PLREFF_NORMAL)
                 p.Effect2 = 0;

@@ -1346,7 +1346,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].RealSpeedX = 0;
             NPC[A].Special = 0;
             NPC[A].Frame = 0;
-            pLogDebug("Shell stomp, X distance: [%g], Y=[%g]", (double)num_t::abs(NPC[numNPCs].Location.X - NPC[A].Location.X), (double)NPC[numNPCs].Location.Y);
+            D_pLogDebug("Shell stomp, X distance: [%g], Y=[%g]", (double)num_t::abs(NPC[numNPCs].Location.X - NPC[A].Location.X), (double)NPC[numNPCs].Location.Y);
             if(NPC[A].Type >= NPCID_GRN_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_HIT_TURTLE_S4)
                 NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
         }

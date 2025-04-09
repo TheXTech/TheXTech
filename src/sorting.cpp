@@ -33,7 +33,7 @@ void qSortBlocksY(int min, int max)
     int i = 0;
     if(min >= max)
         return;
-    i = floor((max + min) / 2.0);
+    i = (max + min) / 2;
     medBlock = Block[i];
     Block[i] = Block[min];
     lo = min;
@@ -80,7 +80,7 @@ void qSortBlocksX(int min, int max)
     int i = 0;
     if(min >= max)
         return;
-    i = floor((max + min) / 2.0);
+    i = (max + min) / 2;
     medBlock = Block[i];
     Block[i] = Block[min];
     lo = min;
@@ -615,7 +615,7 @@ void qSortNPCsY(int min, int max)
     int i = 0;
     if(min >= max)
         return;
-    i = floor((max + min) / 2.0);
+    i = (max + min) / 2;
     medNPC = NPC[i];
     NPC[i] = NPC[min];
     lo = min;

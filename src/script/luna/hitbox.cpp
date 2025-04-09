@@ -51,8 +51,8 @@ bool Hitbox::Test(int Left2, int Up2, int iW, int iH) const
         {
             int hW = iW / 2;
             int hH = iH / 2;
-            double halfwidth = hW;
-            double halfheight = hH;
+            int halfwidth = hW;
+            int halfheight = hH;
             return Test((int)(Left2 + halfwidth), (int)(Up2 + halfheight), (int)(halfwidth <= halfheight ? halfwidth : halfheight));
         }
     }

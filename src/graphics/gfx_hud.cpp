@@ -248,7 +248,7 @@ void DrawInterface(int Z, int numScreens)
         {
             int nextPlr = 1;
 
-            int nextY = -96 + vScreen[Z].Height / 2.0 - 24 * (numPlayers / 2 - 1);
+            int nextY = -96 + vScreen[Z].Height / 2 - 24 * (numPlayers / 2 - 1);
 
             while(numPlayers > nextPlr)
             {

@@ -1449,6 +1449,7 @@ event_resume:
             newEventNum++;
             NewEvent[newEventNum] = evt.TriggerEvent;
             // note: this should be rounded towards even, this is non-trivial to implement as integer logic even though all variables involved are integers
+            // FIXME: simplify this -- add a new vb6round_div2 call
             newEventDelay[newEventNum] = num_t::vb6round(evt.TriggerDelay * 6.5_n);
             newEventPlayer[newEventNum] = static_cast<uint8_t>(whichPlayer);
         }

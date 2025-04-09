@@ -380,7 +380,7 @@ static inline void xtech_nanosleep(nanotime_t sleepTime)
 {
     if(sleepTime <= 0)
         return;
-    PGE_Delay((uint32_t)SDL_ceil(sleepTime / 1000000.0));
+    PGE_Delay((uint32_t)(sleepTime + 999999 / 1000000));
 }
 
 
@@ -420,15 +420,15 @@ static nanotime_t        s_doUpdate = 0;
 
 //Public Const frameRate As Double = 15 'for controlling game speed
 //const int frameRate = 15;
-static const  double c_frameRate = 15.0;
+static const  int64_t c_frameRate = 15;
 
-static double s_overTime = 0;
-static double s_goalTime = 0;
-static double s_fpsCount = 0.0;
-static double s_fpsTime = 0.0;
+static int64_t s_overTime = 0;
+static int64_t s_goalTime = 0;
+static int64_t s_fpsCount = 0;
+static int64_t s_fpsTime = 0;
 static int    s_cycleCount = 0;
-static double s_gameTime = 0.0;
-static double s_currentTicks = 0.0;
+static int64_t s_gameTime = 0;
+static int64_t s_currentTicks = 0;
 
 
 void resetFrameTimer()

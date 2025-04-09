@@ -99,6 +99,11 @@ inline double SDL_fmod(double x, double y)
     return fmod(x, y);
 }
 
+inline int SDL_abs(int i)
+{
+    return (i < 0) ? -i : i;
+}
+
 SDL_IMPORT(malloc)
 SDL_IMPORT(free)
 
@@ -117,7 +122,6 @@ SDL_IMPORT(strcasecmp)
 SDL_IMPORT(strncasecmp)
 SDL_IMPORT(getenv)
 
-SDL_IMPORT_MATH(abs)
 SDL_IMPORT_MATH(fabs)
 SDL_IMPORT_MATH(floor)
 SDL_IMPORT_MATH(ceil)
