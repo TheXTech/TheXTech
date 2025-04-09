@@ -350,7 +350,7 @@ public:
 
     static inline constexpr num_t PI()
     {
-        return 3.14159265358979323846264338327950288_n;
+        return num_t(3.14159265358979323846264338327950288, nullptr);
     }
 
     static inline num_t dist2(num_t dx, num_t dy)
