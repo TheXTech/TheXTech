@@ -85,7 +85,7 @@
 
 
 // warning for improper rects
-static const char* s_improper_rect_warning = "Attempted to set %s %d %s to %f, setting to 0";
+static const char* s_improper_rect_warning = "Attempted to set %s %d %s to %d, setting to 0";
 
 // used to signal a total failure in a callback
 #ifdef PGEFL_CALLBACK_API
@@ -552,13 +552,13 @@ bool OpenLevel_PlayerStart(void* userdata, PlayerPoint& p)
         // don't allow improper rects
         if(PlayerStart[A].Width < 0)
         {
-            pLogWarning(s_improper_rect_warning, "PlayerStart", A, "Width", PlayerStart[A].Width);
+            pLogWarning(s_improper_rect_warning, "PlayerStart", A, "Width", (int)p.w);
             PlayerStart[A].Width = 0;
         }
 
         if(PlayerStart[A].Height < 0)
         {
-            pLogWarning(s_improper_rect_warning, "PlayerStart", A, "Height", PlayerStart[A].Height);
+            pLogWarning(s_improper_rect_warning, "PlayerStart", A, "Height", (int)p.h);
             PlayerStart[A].Height = 0;
         }
 
@@ -775,13 +775,13 @@ bool OpenLevel_Block(void* userdata, LevelBlock& b)
         // don't allow improper rects
         if(block.Location.Width < 0)
         {
-            pLogWarning(s_improper_rect_warning, "Block", numBlock, "Width", block.Location.Width);
+            pLogWarning(s_improper_rect_warning, "Block", numBlock, "Width", (int)b.w);
             block.Location.Width = 0;
         }
 
         if(block.Location.Height < 0)
         {
-            pLogWarning(s_improper_rect_warning, "Block", numBlock, "Height", block.Location.Height);
+            pLogWarning(s_improper_rect_warning, "Block", numBlock, "Height", (int)b.h);
             block.Location.Height = 0;
         }
 
@@ -1125,13 +1125,13 @@ bool OpenLevel_Water(void* userdata, LevelPhysEnv& w)
         // don't allow improper rects
         if(water.Location.Width < 0)
         {
-            pLogWarning(s_improper_rect_warning, "Water", numWater, "Width", water.Location.Width);
+            pLogWarning(s_improper_rect_warning, "Water", numWater, "Width", (int)w.w);
             water.Location.Width = 0;
         }
 
         if(water.Location.Height < 0)
         {
-            pLogWarning(s_improper_rect_warning, "Water", numWater, "Height", water.Location.Height);
+            pLogWarning(s_improper_rect_warning, "Water", numWater, "Height", (int)w.h);
             water.Location.Height = 0;
         }
 
