@@ -114,7 +114,7 @@ struct GifRecorder
     uint32_t    delay       = 4;
     uint32_t    delayTimer  = 0;
     bool        fadeForward = true;
-    float       fadeValue = 0.5f;
+    int         fadeValue = 128;
 
     void init(AbstractRender_t *self);
     void quit();
@@ -1202,33 +1202,33 @@ void GifRecorder::drawRecCircle(bool saving, int frame_count)
 {
     if(fadeForward)
     {
-        fadeValue += 0.01f;
-        if(fadeValue >= 1.0f)
+        fadeValue += 3;
+        if(fadeValue >= 255)
         {
-            fadeValue = 1.0f;
+            fadeValue = 255;
             fadeForward = !fadeForward;
         }
     }
     else
     {
-        fadeValue -= 0.01f;
-        if(fadeValue < 0.5f)
+        fadeValue -= 3;
+        if(fadeValue < 128)
         {
-            fadeValue = 0.5f;
+            fadeValue = 128;
             fadeForward = !fadeForward;
         }
     }
 
     m_self->offsetViewportIgnore(true);
 
-    XTColor circ_color = (saving) ? XTColorF(0.f, 0.6f, 0.f, fadeValue) : XTColorF(1.f, 0.f, 0.f, fadeValue);
+    XTColor circ_color = (saving) ? XTColor(0, 153, 0, fadeValue) : XTColor(255, 0, 0, fadeValue);
     const char* text = (saving) ? "SAVING" : "REC";
     int text_offset = (saving) ? 2 : 25;
 
     if(frame_count == 1)
         frame_count = 0;
 
-    m_self->renderCircle(50, 50, 20, XTColorF(0.5f, 0.5f, 0.5f, fadeValue), true);
+    m_self->renderCircle(50, 50, 20, XTColor(128, 128, 128, fadeValue), true);
     m_self->renderCircle(50, 50, 20 * (65 - frame_count) / 65, circ_color, true);
 
     SuperPrint(text, 3, text_offset, 80, circ_color);
