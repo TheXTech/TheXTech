@@ -52,7 +52,7 @@ static int s_target_idx = -1;
 static int s_cur_idx = -1;
 
 // how far to scroll the logos. ranges from -1 (halfway through a right rotation) to +1 (halfway through a left rotation)
-static float s_switch_coord = 0.0f;
+static num_t s_switch_coord = 0.0_n;
 
 static bool s_ensure_idx_valid()
 {
@@ -116,16 +116,16 @@ static void s_renderBackground(AssetPack_t::Gfx& gfx, XTColor bg_color)
 }
 
 // this method is public so that it is possible to fade in the asset pack screen from the main menu
-void DrawBackground(double fade)
+void DrawBackground(int fade)
 {
     if(!s_ensure_idx_valid())
         return;
 
     // used for things that are scaled in special ways during switch
-    XTColor color_no_switch = XTAlphaF(static_cast<float>(fade));
+    XTColor color_no_switch = XTAlpha(fade * 4 - 1);
 
     // used for things linked to the central pack
-    XTColor color = XTAlphaF(static_cast<float>(fade) * (1.0f - SDL_fabs(s_switch_coord)));
+    XTColor color = XTAlphaF(fade * (1.0_n - num_t::abs(s_switch_coord)) / 64);
 
     const AssetPack_t& pack = GetAssetPacks()[s_cur_idx];
 
@@ -152,7 +152,7 @@ void DrawBackground(double fade)
     if(s_AnimatingBack)
     {
         for(int i = 0; i < curtain_horiz_reps; i++)
-            XRender::renderTextureBasic(curtain_draw_w * i, -(int)(GFX.MenuGFX[1].h * fade), curtain_draw_w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
+            XRender::renderTextureBasic(curtain_draw_w * i, -(GFX.MenuGFX[1].h * fade / 64), curtain_draw_w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
     }
 
     // draw background logo
@@ -172,7 +172,7 @@ void DrawBackground(double fade)
     if(!g_LoopActive && !s_AnimatingBack)
     {
         for(int i = 0; i < curtain_horiz_reps; i++)
-            XRender::renderTextureBasic(curtain_draw_w * i, -(int)(GFX.MenuGFX[1].h * fade), curtain_draw_w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
+            XRender::renderTextureBasic(curtain_draw_w * i, -(GFX.MenuGFX[1].h * fade / 64), curtain_draw_w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
     }
 
     // show previous / next packs
@@ -188,14 +188,14 @@ void DrawBackground(double fade)
     const AssetPack_t& next_pack = GetAssetPacks()[next_index];
 
     // cross-fade background
-    if(s_switch_coord > 0.0f && prev_pack.gfx)
+    if(s_switch_coord > 0 && prev_pack.gfx)
     {
-        XTColor bg_color = color_no_switch * XTAlphaF(0.5f * s_switch_coord);
+        XTColor bg_color = color_no_switch * XTAlphaF(s_switch_coord / 2);
         s_renderBackground(*prev_pack.gfx, bg_color);
     }
-    else if(s_switch_coord < 0.0f && next_pack.gfx)
+    else if(s_switch_coord < 0 && next_pack.gfx)
     {
-        XTColor bg_color = color_no_switch * XTAlphaF(-0.5f * s_switch_coord);
+        XTColor bg_color = color_no_switch * XTAlphaF(-s_switch_coord / 2);
         s_renderBackground(*next_pack.gfx, bg_color);
     }
 
@@ -204,7 +204,7 @@ void DrawBackground(double fade)
 
     // fade the existing display
     if(!g_LoopActive && XRender::TargetH <= 480)
-        XRender::targetFade(static_cast<uint8_t>(255 * (1.0f - fade)));
+        XRender::targetFade(256 - fade * 4);
 #endif
 
     // calculate how much the pack logos should be shifted
@@ -212,9 +212,9 @@ void DrawBackground(double fade)
 
     if(prev_pack.gfx && prev_pack.gfx->logo.inited)
     {
-        float cX = 100 + logo_shift * s_switch_coord / 2.0f;
-        XTColor pack_color = (s_switch_coord == 0.0f) ? color * XTAlpha(127) : color_no_switch * XTAlphaF(0.25f + 0.25f * (s_switch_coord + 1.0f));
-        XRender::renderTextureBasic((int)(cX + prev_pack.gfx->logo.w * (s_switch_coord / 4.0f - 1.0f)),
+        num_t cX = 100 + logo_shift * s_switch_coord / 2;
+        XTColor pack_color = (s_switch_coord == 0) ? color * XTAlpha(127) : color_no_switch * XTAlphaF(0.25_n + (s_switch_coord + 1.0_n) / 4);
+        XRender::renderTextureBasic((int)(cX + prev_pack.gfx->logo.w * (s_switch_coord / 4 - 1)),
             XRender::TargetH / 2 - prev_pack.gfx->logo.h / 2,
             prev_pack.gfx->logo,
             pack_color);
@@ -222,9 +222,9 @@ void DrawBackground(double fade)
 
     if(next_pack.gfx && next_pack.gfx->logo.inited)
     {
-        float cX = (XRender::TargetW - 100) + logo_shift * s_switch_coord / 2.0f;
-        XTColor pack_color = (s_switch_coord == 0.0f) ? color * XTAlpha(127) : color_no_switch * XTAlphaF(0.25f + 0.25f * (1.0f - s_switch_coord));
-        XRender::renderTextureBasic((int)(cX + prev_pack.gfx->logo.w * (s_switch_coord / 4.0f)),
+        num_t cX = (XRender::TargetW - 100) + logo_shift * s_switch_coord / 2;
+        XTColor pack_color = (s_switch_coord == 0) ? color * XTAlpha(127) : color_no_switch * XTAlphaF(0.25_n + (1.0_n - s_switch_coord) / 4);
+        XRender::renderTextureBasic((int)(cX + prev_pack.gfx->logo.w * (s_switch_coord / 4)),
             XRender::TargetH / 2 - next_pack.gfx->logo.h / 2,
             next_pack.gfx->logo,
             pack_color);
@@ -238,18 +238,18 @@ void DrawBackground(double fade)
     }
     else if(g_LoopActive || s_AnimatingBack || pack.logo_override)
     {
-        float cX = (XRender::TargetW / 2) + logo_shift * s_switch_coord / 2.0f;
-        XTColor main_color = color_no_switch * XTAlphaF(0.75f + 0.25f * (1.0f - SDL_fabs(s_switch_coord)));
-        XRender::renderTextureBasic((int)(cX + gfx.logo.w * (s_switch_coord / 4.0f - 0.5f)), XRender::TargetH / 2 - gfx.logo.h / 2, gfx.logo, main_color);
+        num_t cX = (XRender::TargetW / 2) + logo_shift * s_switch_coord / 2;
+        XTColor main_color = color_no_switch * XTAlphaF(0.75_n + (1.0_n - num_t::abs(s_switch_coord)) / 4);
+        XRender::renderTextureBasic((int)(cX + gfx.logo.w * (s_switch_coord / 4 - 0.5_n)), XRender::TargetH / 2 - gfx.logo.h / 2, gfx.logo, main_color);
     }
     else
     {
-        float cX = (XRender::TargetW / 2) + logo_shift * s_switch_coord * fade / 2.0f;
+        num_t cX = (XRender::TargetW / 2) + logo_shift * s_switch_coord * fade / (64 * 2);
 
         int center_Y = XRender::TargetH / 2 - gfx.logo.h / 2;
-        int place_Y = (center_Y * fade) + (menu_logo_y * (1.0 - fade));
+        int place_Y = (center_Y * fade / 64) + (menu_logo_y * (64 - fade) / 64);
 
-        XRender::renderTextureBasic((int)(cX + gfx.logo.w * (s_switch_coord * fade / 4.0f - 0.5f)),
+        XRender::renderTextureBasic((int)(cX + gfx.logo.w * (s_switch_coord * fade / (64 * 4) - 0.5_n)),
             place_Y,
             gfx.logo);
     }
@@ -258,15 +258,15 @@ void DrawBackground(double fade)
     bool show_version = pack.show_version && !pack.version.empty();
     if(pack.show_id || show_version || pack.id.empty())
     {
-        float cX = (XRender::TargetW / 2) + logo_shift * s_switch_coord / 2.0f;
+        num_t cX = (XRender::TargetW / 2) + logo_shift * s_switch_coord / 2;
         int text_Y = XRender::TargetH / 2 + gfx.logo.h / 2 + 8;
 
         const std::string& display = (pack.show_id) ? pack.full_id() : ((show_version) ? pack.version : "<legacy>");
-        SuperPrintCenter(display, 3, cX, text_Y, color);
+        SuperPrintCenter(display, 3, (int)cX, text_Y, color);
     }
 
     // show scroll indicators
-    if(g_LoopActive && CommonFrame % 90 >= 45 && s_cur_idx == s_target_idx && s_switch_coord == 0.0f)
+    if(g_LoopActive && CommonFrame % 90 >= 45 && s_cur_idx == s_target_idx && s_switch_coord == 0)
     {
         int offset = SDL_min(XRender::TargetW / 2 - 8, 250);
         if(GFX.CharSelIcons.inited)
@@ -284,12 +284,12 @@ void DrawBackground(double fade)
     drawGameVersion(true, false);
 
     // reset all variables when alpha is low enough during exit
-    if(fade < 3.0 / 60.0)
+    if(fade < 3)
     {
         s_AnimatingBack = false;
         s_cur_idx = -1;
         s_target_idx = -1;
-        s_switch_coord = 0.0f;
+        s_switch_coord = 0;
     }
 
     if(g_LoopActive)
@@ -306,7 +306,7 @@ void Render(bool now_loading = false)
 
     CommonFrame++;
 
-    DrawBackground(1.0);
+    DrawBackground(64);
 
     // Mouse cursor
     XRender::renderTextureBasic(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
@@ -475,7 +475,7 @@ bool Logic()
     MenuMouseClick = false;
 
     // 16 frames to switch
-    constexpr float move_rate = 0.125f;
+    constexpr num_t move_rate = 0.125_n;
 
     // make s_switch_coord approach the target
     if(s_target_idx != s_cur_idx)
@@ -485,10 +485,10 @@ bool Logic()
     else if(s_switch_coord > move_rate)
         s_switch_coord -= move_rate;
     else
-        s_switch_coord = 0.0f;
+        s_switch_coord = 0.0_n;
 
     // actually switch the index when switch coord grows enough
-    if(s_switch_coord >= 1.0f)
+    if(s_switch_coord >= 1.0_n)
     {
         s_cur_idx--;
         if(s_cur_idx < 0)
@@ -499,9 +499,9 @@ bool Logic()
             s_cur_idx = (int)GetAssetPacks().size() - 1;
         }
 
-        s_switch_coord -= 2.0f;
+        s_switch_coord -= 2.0_n;
     }
-    else if(s_switch_coord <= -1.0f)
+    else if(s_switch_coord <= -1.0_n)
     {
         s_cur_idx++;
         if(s_cur_idx >= (int)GetAssetPacks().size())
@@ -512,7 +512,7 @@ bool Logic()
             s_cur_idx = 0;
         }
 
-        s_switch_coord += 2.0f;
+        s_switch_coord += 2.0_n;
     }
 
     return false;

@@ -986,7 +986,7 @@ bool mainMenuUpdate()
     if(should_enter_ap_screen && GetAssetPacks().size() > 1)
     {
         s_startAssetPackTimer++;
-        if(s_startAssetPackTimer == 60)
+        if(s_startAssetPackTimer == 64)
         {
             PlaySoundMenu(SFX_Do);
             FadeOutMusic(500);
@@ -3085,7 +3085,7 @@ void mainMenuDraw()
     // fade to / from asset pack screen
     if(s_can_enter_ap_screen() && s_startAssetPackTimer > 0)
     {
-        ScreenAssetPack::DrawBackground(s_startAssetPackTimer / 60.0);
+        ScreenAssetPack::DrawBackground(s_startAssetPackTimer);
         g_levelScreenFader.clearFader();
     }
 

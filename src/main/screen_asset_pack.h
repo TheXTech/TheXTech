@@ -33,7 +33,8 @@ namespace ScreenAssetPack
 extern bool g_LoopActive;
 
 // this method is public so that it is possible to fade in the asset pack screen from the main menu
-void DrawBackground(double fade);
+// fade goes from 0 to 64
+void DrawBackground(int fade);
 
 void Loop();
 
