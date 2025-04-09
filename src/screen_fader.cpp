@@ -248,12 +248,12 @@ void ScreenFader::draw(bool fullscreen)
             XRender::renderRect(0, 0, drawW, drawH, color.with_alpha(alpha), true);
         else
         {
-            float rightW = (drawW - focusX),
-                    bottomH = (drawH - focusY),
-                    leftW = focusX * m_current_fade / 65, // left side
-                    topY = focusY * m_current_fade / 65, // top side
-                    rightX = drawW - SDL_ceil(rightW * m_current_fade / 65) + 1, // right side
-                    bottomY = drawH - SDL_ceil(bottomH * m_current_fade / 65) + 1; // bottom side
+            int rightW = (drawW - focusX),
+                bottomH = (drawH - focusY),
+                leftW = focusX * m_current_fade / 65, // left side
+                topY = focusY * m_current_fade / 65, // top side
+                rightX = drawW - ((rightW * m_current_fade + 64) / 65) + 1, // right side
+                bottomY = drawH - ((bottomH * m_current_fade + 64) / 65) + 1; // bottom side
 
             // Left side
             XRender::renderRect(0, 0, leftW, drawH, color, true);
@@ -275,22 +275,22 @@ void ScreenFader::draw(bool fullscreen)
             int maxRadius = 0, maxRadiusPre;
 
             // top-left corner
-            maxRadiusPre = std::sqrt(SDL_pow(focusX, 2) + SDL_pow(focusY, 2));
+            maxRadiusPre = (int)num_t::sqrt(focusX * focusX + focusY * focusY);
             if(maxRadius < maxRadiusPre)
                 maxRadius = maxRadiusPre;
 
             // top-right corner
-            maxRadiusPre = std::sqrt(SDL_pow(drawW - focusX,  2) + SDL_pow(focusY, 2));
+            maxRadiusPre = (int)num_t::sqrt((drawW - focusX) * (drawW - focusX) + focusY * focusY);
             if(maxRadius < maxRadiusPre)
                 maxRadius = maxRadiusPre;
 
             // bottom-left corner
-            maxRadiusPre = std::sqrt(SDL_pow(focusX, 2) + SDL_pow(drawH - focusY, 2));
+            maxRadiusPre = (int)num_t::sqrt(focusX * focusX + (drawH - focusY) * (drawH - focusY));
             if(maxRadius < maxRadiusPre)
                 maxRadius = maxRadiusPre;
 
             // bottom-right corner
-            maxRadiusPre = std::sqrt(SDL_pow(drawW - focusX, 2) + SDL_pow(drawH - focusY, 2));
+            maxRadiusPre = (int)num_t::sqrt((drawW - focusX) * (drawW - focusX) + (drawH - focusY) * (drawH - focusY));
             if(maxRadius < maxRadiusPre)
                 maxRadius = maxRadiusPre;
 
