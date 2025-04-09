@@ -596,7 +596,7 @@ public:
             {
                 // FIXME: Verify this, if it needs to be written, try to work around this
                 pLogWarning("Attempt to write the read-only field at 0x00B250E2 "
-                            "(GamePaused) with value %g as %s", in, FieldtypeToStr(ftype));
+                            "(GamePaused) with value %d as %s", (int)in, FieldtypeToStr(ftype));
             }
         );
         insert(0x00B25134, &LevelEditor);
@@ -691,7 +691,7 @@ public:
             [](num_t in, FIELDTYPE ftype)->void
             {
                 pLogWarning("Attempt to write the read-only field at 0x00B2C894 "
-                            "(BlocksSorted) with value %g as %s", in, FieldtypeToStr(ftype));
+                            "(BlocksSorted) with value %d as %s", (int)in, FieldtypeToStr(ftype));
             }
         );
 

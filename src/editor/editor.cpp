@@ -1062,7 +1062,7 @@ void UpdateEditor()
                                ffEqual(EditorCursor.Location.Y, Block[A].Location.Y))
                             {
                                 if(MouseRelease)
-                                    pLogDebug("Sizable block was rejected at block at EC Loc (%f, %f), other block loc (%f, %f)", EditorCursor.Location.X, EditorCursor.Location.Y, Block[A].Location.X, Block[A].Location.Y);
+                                    pLogDebug("Sizable block was rejected at block at EC Loc (%d, %d), other block loc (%d, %d)", (int)EditorCursor.Location.X, (int)EditorCursor.Location.Y, (int)Block[A].Location.X, (int)Block[A].Location.Y);
 
                                 CanPlace = false;
                                 break;
