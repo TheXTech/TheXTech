@@ -399,6 +399,11 @@ public:
         return num_t::round(x);
     }
 
+    static inline constexpr num_t PI()
+    {
+        return num_t(int64_t(13493037705LL), nullptr);
+    }
+
     static inline num_t dist2(num_t dx, num_t dy)
     {
         // FIXME

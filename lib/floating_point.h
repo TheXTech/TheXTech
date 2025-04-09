@@ -349,6 +349,11 @@ public:
         return num_t(std::round(x.i), nullptr);
     }
 
+    static inline constexpr num_t PI()
+    {
+        return 3.14159265358979323846264338327950288_n;
+    }
+
     static inline num_t dist2(num_t dx, num_t dy)
     {
         return dx.times(dx) + dy.times(dy);

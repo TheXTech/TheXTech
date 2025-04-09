@@ -172,10 +172,10 @@ void RenderControls_priv(int player, const Controls_t* controls, int x, int y, i
 
     if(missing)
     {
-        float tick = (CommonFrame % 128) / 128.0f * 2.0f * static_cast<float>(M_PI);
-        float coord = (sinf(tick) + 1.0f) * 0.5f + 0.25f;
-        alphaBtn *= coord;
-        alphaText *= coord;
+        num_t tick = 2 * num_t::PI() * (CommonFrame % 128) / 128;
+        num_t coord = (num_t::sin(tick) + 1) / 2 + 0.25_n;
+        alphaBtn = (uint8_t)(coord * alphaBtn);
+        alphaText = (uint8_t)(coord * alphaText);
     }
 
     const Controls_t& c = (controls) ? *controls : s_displayControls[player];
@@ -473,15 +473,15 @@ void speedRun_renderControls(int player, int screenZ, int align)
 
         if(time_from_edge < 33)
         {
-            float linear_coord = (33 - time_from_edge) / 33.0f;
-            alpha = XTColor::from_float(cosf(linear_coord * M_PI) * 0.5f + 0.5f);
+            num_t linear_coord = num_t::PI() * (33 - time_from_edge) / 33;
+            XTColor alpha = XTAlphaF(num_t::cos(linear_coord) / 2 + 0.5_n);
 
             if(!show_always && toast_duration < 33)
-                controls_alpha = alpha;
+                controls_alpha = alpha.a;
 
             // battery just appeared
             if(toast_duration > 33)
-                battery_alpha = alpha;
+                battery_alpha = alpha.a;
         }
 
         // code for lower-resolution case
