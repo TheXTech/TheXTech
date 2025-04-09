@@ -22,6 +22,7 @@
 #ifndef XT_FLOATING_POINT_H
 #define XT_FLOATING_POINT_H
 
+#include <stdint.h>
 #include <stddef.h>
 #include <math.h>
 
