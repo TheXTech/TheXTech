@@ -95,8 +95,8 @@ public:
     numf_t() {}
     constexpr numf_t(const numf_t& o) : i(o.i) {}
     constexpr numf_t(int _i) : i((int32_t)_i << 24) {}
-    explicit constexpr numf_t(int32_t _i, nullptr_t) : i(_i) {}
-    explicit constexpr numf_t(double _i, nullptr_t) : i((int32_t)(_i * (1 << 24))) {}
+    explicit constexpr numf_t(int32_t _i, std::nullptr_t) : i(_i) {}
+    explicit constexpr numf_t(double _i, std::nullptr_t) : i((int32_t)(_i * (1 << 24))) {}
 
     explicit constexpr operator bool() const
     {
@@ -189,8 +189,8 @@ public:
     constexpr num_t(unsigned long long _i) : i((int64_t)_i << 32) {}
     constexpr num_t(double _i) = delete;
 
-    explicit constexpr num_t(int64_t _i, nullptr_t) : i(_i) {}
-    explicit constexpr num_t(double _i, nullptr_t) : i((int64_t)(_i * ((int64_t)1 << 32))) {}
+    explicit constexpr num_t(int64_t _i, std::nullptr_t) : i(_i) {}
+    explicit constexpr num_t(double _i, std::nullptr_t) : i((int64_t)(_i * ((int64_t)1 << 32))) {}
 
     explicit constexpr num_t(numf_t _i) : i(int64_t(_i.i) * 256) {}
 

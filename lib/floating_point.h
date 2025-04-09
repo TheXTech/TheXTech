@@ -23,7 +23,7 @@
 #define XT_FLOATING_POINT_H
 
 #include <stdint.h>
-#include <stddef.h>
+#include <cstddef>
 #include <cmath>
 
 struct num_t;
@@ -59,7 +59,7 @@ public:
     constexpr numf_t(long long _i) : i(_i) {}
     constexpr numf_t(float _i) = delete;
 
-    explicit constexpr numf_t(float _i, nullptr_t) : i(_i) {}
+    explicit constexpr numf_t(float _i, std::nullptr_t) : i(_i) {}
 
     numf_t& operator=(const numf_t&) = default;
 
@@ -187,9 +187,9 @@ public:
     constexpr num_t(unsigned long long _i) : i(_i) {}
     constexpr num_t(double _i) = delete;
 
-    constexpr num_t(int64_t _i, nullptr_t) : i(_i) {}
-    explicit constexpr num_t(long double _i, nullptr_t) : i(_i) {}
-    explicit constexpr num_t(double _i, nullptr_t) : i(_i) {}
+    constexpr num_t(int64_t _i, std::nullptr_t) : i(_i) {}
+    explicit constexpr num_t(long double _i, std::nullptr_t) : i(_i) {}
+    explicit constexpr num_t(double _i, std::nullptr_t) : i(_i) {}
 
     explicit constexpr num_t(numf_t _i) : i(_i.i) {}
 
