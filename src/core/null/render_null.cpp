@@ -368,20 +368,6 @@ inline void i_renderTexturePrivate_Basic(int16_t, int16_t, int16_t, int16_t,
 
 // public draw methods
 
-void renderTextureScale(int xDst, int yDst, int wDst, int hDst,
-                            StdPicture &tx,
-                            int xSrc, int ySrc, int wSrc, int hSrc,
-                            XTColor color)
-{
-    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
-    i_renderTexturePrivate(
-        div_x, div_y, ROUNDDIV2(xDst + wDst) - div_x, ROUNDDIV2(yDst + hDst) - div_y,
-        tx,
-        xSrc / 2, ySrc / 2, wSrc / 2, hSrc / 2,
-        0, nullptr, X_FLIP_NONE,
-        color);
-}
-
 void renderTextureBasic(int xDst, int yDst, int wDst, int hDst,
                             StdPicture &tx,
                             int xSrc, int ySrc,
@@ -398,19 +384,6 @@ void renderTextureBasic(int xDst, int yDst, int wDst, int hDst,
         color);
 }
 
-void renderTexture(float xDst, float yDst, StdPicture &tx,
-                   XTColor color)
-{
-    int w = tx.w / 2;
-    int h = tx.h / 2;
-    i_renderTexturePrivate(
-        ROUNDDIV2(xDst), ROUNDDIV2(yDst), w, h,
-        tx,
-        0, 0, w, h,
-        0, nullptr, X_FLIP_NONE,
-        color);
-}
-
 void renderTextureBasic(int xDst, int yDst, StdPicture &tx, XTColor color)
 {
     int w = tx.w / 2;
@@ -422,7 +395,7 @@ void renderTextureBasic(int xDst, int yDst, StdPicture &tx, XTColor color)
         color);
 }
 
-void renderTextureScale(double xDst, double yDst, double wDst, double hDst, StdPicture &tx, XTColor color)
+void renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, XTColor color)
 {
     i_renderTexturePrivate(
         ROUNDDIV2(xDst), ROUNDDIV2(yDst), tx.w / 2, tx.h / 2,
