@@ -429,6 +429,8 @@ public:
     static num_t dist(num_t dx, num_t dy);
     static num_t idist(num_t dx, num_t dy);
 
+    static num_t sqrt(num_t dx);
+
     static num_t cos(num_t dx);
     static num_t sin(num_t dx);
     static num_t atan2(num_t y, num_t x);

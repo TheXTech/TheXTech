@@ -88,6 +88,11 @@ num_t num_t::divided_by(num_t o) const
     return num_t(Fixed64::DivPrecise(i, o.i), nullptr);
 }
 
+num_t num_t::sqrt(num_t x)
+{
+    return num_t(Fixed64::Sqrt(x.i), nullptr);
+}
+
 num_t num_t::sin(num_t x)
 {
     return num_t(Fixed64::Cos(x.i), nullptr);

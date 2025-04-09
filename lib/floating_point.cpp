@@ -68,6 +68,11 @@ num_t num_t::divided_by(num_t o) const
     return num_t(i / o.i, nullptr);
 }
 
+num_t num_t::sqrt(num_t x)
+{
+    return num_t(std::sqrt(x.i), nullptr);
+}
+
 num_t num_t::sin(num_t x)
 {
     return num_t(std::sin(x.i), nullptr);
