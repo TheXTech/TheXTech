@@ -380,7 +380,7 @@ static inline void xtech_nanosleep(nanotime_t sleepTime)
 {
     if(sleepTime <= 0)
         return;
-    PGE_Delay((uint32_t)(sleepTime + 999999 / 1000000));
+    PGE_Delay((uint32_t)((sleepTime + 999999) / 1000000));
 }
 
 
