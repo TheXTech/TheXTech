@@ -472,7 +472,7 @@ StatusInfo InputMethod_Wii::GetStatus()
 
     res.power_status = StatusInfo::POWER_DISCHARGING;
 
-    res.power_level = m_battery_status / 105.f;
+    res.power_level = numf_t(m_battery_status) / 105;
 
     return res;
 }

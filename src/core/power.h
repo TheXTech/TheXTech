@@ -22,6 +22,8 @@
 #ifndef POWER_HHHH
 #define POWER_HHHH
 
+#include "numeric_types.h"
+
 namespace XPower
 {
 
@@ -38,7 +40,7 @@ struct StatusInfo
         POWER_CHARGED
     } PowerStatus;
     PowerStatus power_status = POWER_DISABLED;
-    float power_level = 1.f;
+    numf_t power_level = 1;
     const char *info_string = nullptr;
 };
 

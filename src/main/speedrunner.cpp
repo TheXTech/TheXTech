@@ -256,7 +256,7 @@ void RenderPowerInfo(int player, int bx, int by, int bw, int bh, uint8_t alpha, 
 
     // don't draw segments for states without battery info
     if(status_info.power_status == XPower::StatusInfo::POWER_WIRED || status_info.power_status == XPower::StatusInfo::POWER_UNKNOWN)
-        status_info.power_level = 0.0f;
+        status_info.power_level = 0;
 
     if(status_info.power_status != XPower::StatusInfo::POWER_DISABLED)
     {
@@ -265,13 +265,14 @@ void RenderPowerInfo(int player, int bx, int by, int bw, int bh, uint8_t alpha, 
         XRender::renderRect(bx + 36, by + 6, 4, 10, {0, 0, 0, alphaBox}, true);//Edge
         XRender::renderRect(bx + 34, by + 8, 4, 6, {color, alphaBox}, true);//Box
 
+        // segment count
         int segments;
 
-        if(status_info.power_level > .90f)
+        if(status_info.power_level > 0.90_nf)
             segments = 4;
-        else if(status_info.power_level > .60f)
+        else if(status_info.power_level > 0.60_nf)
             segments = 3;
-        else if(status_info.power_level > .30f)
+        else if(status_info.power_level > 0.30_nf)
             segments = 2;
         else
             segments = 1;
@@ -279,7 +280,7 @@ void RenderPowerInfo(int player, int bx, int by, int bw, int bh, uint8_t alpha, 
         // new color for the inner segments
         color = XTColor(0, 0, 0);
 
-        if(status_info.power_level <= .5f)
+        if(status_info.power_level <= 0.5_nf)
             color.r = (255 - uint8_t(status_info.power_level * 510));
 
         if(status_info.power_status == XPower::StatusInfo::POWER_CHARGING)
@@ -294,30 +295,35 @@ void RenderPowerInfo(int player, int bx, int by, int bw, int bh, uint8_t alpha, 
             color.g = XTColor::from_num(0.4_n);
         }
 
+        // size for segment
         int s;
 
         switch(segments)
         {
         case 4:
-            s = 2.f * (status_info.power_level - 0.9f) / 0.1f;
+            // 2 is the width of the segment, 10 lets us scale to the last 0.1_nf
+            s = (int32_t)((status_info.power_level - 0.9_nf) * (2 * 10));
             if(s > 2) s = 2;
             // if(flash && status_info.power_status == XPower::StatusInfo::POWER_CHARGING)
             //     s = 2;
             XRender::renderRect(bx + 34, by + 10, s, 2, {color, alphaBtn}, true); // fallthrough
         case 3:
-            s = 4.f * (status_info.power_level - 0.6f) / 0.3f;
+            // 4 is the width of the segment, 10 / 3 lets us scale to the 0.6-0.9 segment
+            s = (int32_t)((status_info.power_level - 0.6_nf) * (4 * 10) / 3);
             if(s > 4) s = 4;
             // if(flash && status_info.power_status == XPower::StatusInfo::POWER_CHARGING)
             //     s = 4;
             XRender::renderRect(bx + 24, by + 4, s*2, 14, {color, alphaBtn}, true); // fallthrough
         case 2:
-            s = 4.f * (status_info.power_level - 0.3f) / 0.3f;
+            // 4 is the width of the segment, 10 / 3 lets us scale to the 0.3-0.6 segment
+            s = (int32_t)((status_info.power_level - 0.3_nf) * (4 * 10) / 3);
             if(s > 4) s = 4;
             // if(flash && status_info.power_status == XPower::StatusInfo::POWER_CHARGING)
             //     s = 4;
             XRender::renderRect(bx + 14, by + 4, s*2, 14, {color, alphaBtn}, true); // fallthrough
         case 1:
-            s = 4.f * status_info.power_level / 0.3f;
+            // 4 is the width of the segment, 10 / 3 lets us scale to the 0.0-0.3 segment
+            s = (int32_t)(status_info.power_level * (4 * 10) / 3);
             if(s > 4) s = 4;
             // if(flash && status_info.power_status == XPower::StatusInfo::POWER_CHARGING)
             //     s = 4;

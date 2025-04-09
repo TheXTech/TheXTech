@@ -61,7 +61,7 @@ static StatusInfo s_devicePowerStatus_REAL()
         res.power_status = StatusInfo::POWER_UNKNOWN;
 
     if(pct != -1)
-        res.power_level = pct / 100.0f;
+        res.power_level = 0.01_nf * pct;
 
     return res;
 }

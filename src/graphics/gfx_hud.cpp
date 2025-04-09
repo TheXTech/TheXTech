@@ -519,7 +519,7 @@ void DrawDeviceBattery()
     if(status_info.power_status == XPower::StatusInfo::POWER_DISABLED || status_info.power_status == XPower::StatusInfo::POWER_UNKNOWN || status_info.power_status == XPower::StatusInfo::POWER_WIRED)
         return;
 
-    bool isLow = (status_info.power_level <= 0.35f);
+    bool isLow = (status_info.power_level <= 0.35_nf);
 
     if(g_config.show_battery_status == Config_t::BATTERY_STATUS_LOW && !isLow)
         return;

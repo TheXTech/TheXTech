@@ -672,23 +672,23 @@ StatusInfo InputMethod_Joystick::GetStatus()
         else if(level == SDL_JOYSTICK_POWER_MAX)
         {
             res.power_status = StatusInfo::POWER_CHARGED;
-            res.power_level = 1.f;
+            res.power_level = 1.0_nf;
         }
         else
         {
             res.power_status = StatusInfo::POWER_DISCHARGING;
 
             if(level == SDL_JOYSTICK_POWER_EMPTY)
-                res.power_level = 0.15f;
+                res.power_level = 0.15_nf;
 
             if(level == SDL_JOYSTICK_POWER_LOW)
-                res.power_level = 0.3f;
+                res.power_level = 0.3_nf;
 
             if(level == SDL_JOYSTICK_POWER_MEDIUM)
-                res.power_level = 0.6f;
+                res.power_level = 0.6_nf;
 
             if(level == SDL_JOYSTICK_POWER_FULL)
-                res.power_level = 0.9f;
+                res.power_level = 0.9_nf;
         }
 
         m_last_power_check = ticks;

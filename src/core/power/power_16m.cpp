@@ -45,20 +45,20 @@ StatusInfo devicePowerStatus()
     StatusInfo res;
 
     res.power_status = StatusInfo::POWER_DISCHARGING;
-    res.power_level = 0.5f;
+    res.power_level = 0.5_nf;
 
     if(s_sys_status & 0x80)
         res.power_status = StatusInfo::POWER_CHARGING;
     else if(s_sys_status == 0xf)
-        res.power_level = 1.0f;
+        res.power_level = 1.0_nf;
     else if(s_sys_status == 0xb)
-        res.power_level = 0.75f;
+        res.power_level = 0.75_nf;
     else if(s_sys_status == 0x7)
-        res.power_level = 0.5f;
+        res.power_level = 0.5_nf;
     else if(s_sys_status == 0x3)
-        res.power_level = 0.25f;
+        res.power_level = 0.25_nf;
     else if(s_sys_status == 0x1)
-        res.power_level = 0.1f;
+        res.power_level = 0.1_nf;
     else
         res.power_status = StatusInfo::POWER_UNKNOWN;
 

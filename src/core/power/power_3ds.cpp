@@ -56,7 +56,7 @@ static StatusInfo s_devicePowerStatus_REAL()
     else
         res.power_status = StatusInfo::POWER_DISCHARGING;
 
-    res.power_level = percent / 100.f;
+    res.power_level = 0.01_nf * percent;
 
     return res;
 }
