@@ -24,7 +24,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include <math.h>
+#include <cmath>
 
 struct num_t;
 
