@@ -254,12 +254,12 @@ void renderCircleHole(int cx, int cy,
     if(radius <= 0)
         return; // Nothing to draw
 
-    double line_size = 4;
-    double dy = line_size;
+    int line_size = 4;
+    int dy = line_size;
 
     do
     {
-        double dx = std::floor(std::sqrt((2.0 * radius * dy) - (dy * dy)));
+        int dx = num_t::floor(num_t::sqrt((2 * radius * dy) - (dy * dy)));
 
         renderRectBR(cx - radius, cy + dy - radius - line_size, cx - dx, cy + dy - radius + line_size,
             color);
