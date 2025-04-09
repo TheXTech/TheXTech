@@ -98,6 +98,8 @@ public:
     explicit constexpr numf_t(int32_t _i, std::nullptr_t) : i(_i) {}
     explicit constexpr numf_t(double _i, std::nullptr_t) : i((int32_t)(_i * (1 << 24))) {}
 
+    numf_t& operator=(const numf_t&) = default;
+
     explicit constexpr operator bool() const
     {
         return (bool)i;
