@@ -24,6 +24,8 @@
 #include <cstdint>
 #include <string>
 
+#include "numeric_types.h"
+
 /**
  * \brief Updates a progress screen for a long main thread operation
  *
@@ -33,6 +35,6 @@
  *
  * Will perform an events update and other actions required during main loop
  **/
-void IndicateProgress(uint32_t start_time, double progress, const std::string& message);
+void IndicateProgress(uint32_t start_time, num_t progress, const std::string& message);
 
 #endif // SCREEN_PROGRESS_H

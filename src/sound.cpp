@@ -1298,7 +1298,7 @@ void InitSound()
     if(LoadingInProcess)
         UpdateLoad();
     else
-        IndicateProgress(start_time, 0.01, "");
+        IndicateProgress(start_time, 0.01_n, "");
 
     IniProcessing sounds = Files::load_ini(sfxIni);
     sounds.beginGroup("sound-main");
@@ -1321,7 +1321,7 @@ void InitSound()
     if(LoadingInProcess)
         UpdateLoad();
     else
-        IndicateProgress(start_time, 0.75 / g_totalSounds, "");
+        IndicateProgress(start_time, 0.75_n / g_totalSounds, "");
 
     for(unsigned int i = 1; i <= g_totalSounds; ++i)
     {
@@ -1330,7 +1330,7 @@ void InitSound()
         AddSfx(SoundScope::global, sounds, alias, group);
 
         if(!LoadingInProcess)
-            IndicateProgress(start_time, (double)i / g_totalSounds, "");
+            IndicateProgress(start_time, num_t(i) / g_totalSounds, "");
 #ifdef PGE_NO_THREADING
         else
             UpdateLoad();

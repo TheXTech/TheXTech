@@ -40,7 +40,7 @@
 static const uint32_t c_progress_screen_min_elapsed = 1000;
 static const uint32_t c_progress_screen_tick_duration = 250;
 
-void IndicateProgress(uint32_t start_time, double progress, const std::string& message)
+void IndicateProgress(uint32_t start_time, num_t progress, const std::string& message)
 {
 #ifdef USE_RENDER_BLOCKING
     if(XRender::renderBlocked())
@@ -54,7 +54,7 @@ void IndicateProgress(uint32_t start_time, double progress, const std::string& m
 
     uint32_t cur_time = SDL_GetTicks();
     uint32_t elapsed = cur_time - start_time;
-    uint32_t total = progress_valid ? uint32_t(elapsed / progress) : 0;
+    uint32_t total = progress_valid ? uint32_t(1024 * elapsed / uint16_t(1024 * progress)) : 0;
 
     if(elapsed < c_progress_screen_min_elapsed && total < c_progress_screen_min_elapsed)
         return;
@@ -76,12 +76,12 @@ void IndicateProgress(uint32_t start_time, double progress, const std::string& m
     int time_y = XRender::TargetH / 2 - 20;
 
     // outline
-    XRender::renderRect(XRender::TargetW * 0.25, time_y + 4, XRender::TargetW * 0.50, 32, {255, 255, 255});
+    XRender::renderRect(XRender::TargetW / 4, time_y + 4, XRender::TargetW / 2, 32, {255, 255, 255});
     // empty progress
-    XRender::renderRect(XRender::TargetW * 0.25 + 2, time_y + 6, XRender::TargetW * 0.50 - 4, 28, {0, 0, 0});
+    XRender::renderRect(XRender::TargetW / 4 + 2, time_y + 6, XRender::TargetW / 2 - 4, 28, {0, 0, 0});
     // progress fill
     if(progress > 0)
-        XRender::renderRect(XRender::TargetW * 0.25 + 2, time_y + 6, (XRender::TargetW * 0.50 - 4) * progress, 28, {127, 255, 127});
+        XRender::renderRect(XRender::TargetW / 4 + 2, time_y + 6, (int)((XRender::TargetW / 2 - 4) * progress), 28, {127, 255, 127});
     // push text down
     time_y += 60;
 

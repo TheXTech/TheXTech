@@ -707,7 +707,7 @@ void FindWldStars()
 
     for(int A = 1; A <= numWorldLevels; A++)
     {
-        IndicateProgress(start_time, (double)A / numWorldLevels, g_gameStrings.messageScanningLevels);
+        IndicateProgress(start_time, num_t(A) / numWorldLevels, g_gameStrings.messageScanningLevels);
 
         auto &l = WorldLevel[A];
 

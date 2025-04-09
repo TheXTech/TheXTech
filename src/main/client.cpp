@@ -298,7 +298,7 @@ void NetworkClient::WaitAndFill()
             if(tick == fast_forward_to)
                 UpdateMusicVolume();
             else if(tick < fast_forward_to)
-                IndicateProgress(start_fast_forward, (double)tick / fast_forward_to, "Loading game history...");
+                IndicateProgress(start_fast_forward, num_t(tick) / fast_forward_to, "Loading game history...");
 
             return;
 

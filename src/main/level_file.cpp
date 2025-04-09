@@ -1813,7 +1813,7 @@ void FindStars()
 
     for(int A = 1; A <= numWarps; A++)
     {
-        IndicateProgress(start_time, (double)A / numWarps, g_gameStrings.messageScanningLevels);
+        IndicateProgress(start_time, num_t(A) / numWarps, g_gameStrings.messageScanningLevels);
 
         auto &warp = Warp[A];
 
