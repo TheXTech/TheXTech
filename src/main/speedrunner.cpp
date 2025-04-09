@@ -69,12 +69,12 @@ void speedRun_resetTotal()
     s_gamePlayTimer.reset();
 }
 
-static constexpr XTColor s_green  = XTColorF(0.0f, 1.0f, 0.0f);
-static constexpr XTColor s_blue   = XTColorF(0.0f, 0.0f, 1.0f);
-static constexpr XTColor s_red    = XTColorF(1.0f, 0.0f, 0.0f);
-static constexpr XTColor s_yellow = XTColorF(0.9f, 0.9f, 0.0f);
-static constexpr XTColor s_gray   = XTColorF(0.9f, 0.9f, 0.9f);
-static constexpr XTColor s_legacy = XTColorF(0.7f, 0.7f, 0.7f);
+static constexpr XTColor s_green  = XTColorF(0.0_n, 1.0_n, 0.0_n);
+static constexpr XTColor s_blue   = XTColorF(0.0_n, 0.0_n, 1.0_n);
+static constexpr XTColor s_red    = XTColorF(1.0_n, 0.0_n, 0.0_n);
+static constexpr XTColor s_yellow = XTColorF(0.9_n, 0.9_n, 0.0_n);
+static constexpr XTColor s_gray   = XTColorF(0.9_n, 0.9_n, 0.9_n);
+static constexpr XTColor s_legacy = XTColorF(0.7_n, 0.7_n, 0.7_n);
 
 static constexpr inline XTColor bool2(XTColor color, bool btn, uint8_t alpha)
 {
@@ -94,10 +94,10 @@ void speedRun_renderTimer()
         // place speedrun mode below game version display on main menu
         int topY = (GameMenu) ? 22 : 2;
 
-        SuperPrintRightAlign(fmt::format_ne(Cheater ? "CMode {0}" : "Mode {0}", g_config.speedrun_mode), 3, XRender::TargetW - XRender::TargetOverscanX - 2, topY, XTColorF(1.f, 0.3f, 0.3f, 0.5f));
+        SuperPrintRightAlign(fmt::format_ne(Cheater ? "CMode {0}" : "Mode {0}", g_config.speedrun_mode), 3, XRender::TargetW - XRender::TargetOverscanX - 2, topY, XTColorF(1.0_n, 0.3_n, 0.3_n, 0.5_n));
 
         if(g_config.allow_multires)
-            SuperPrintRightAlign(fmt::format_ne("{0}x{1}", l_screen->W, l_screen->H), 3, XRender::TargetW - XRender::TargetOverscanX - 2, topY + 20, XTColorF(1.f, 0.3f, 0.3f, 0.5f));
+            SuperPrintRightAlign(fmt::format_ne("{0}x{1}", l_screen->W, l_screen->H), 3, XRender::TargetW - XRender::TargetOverscanX - 2, topY + 20, XTColorF(1.0_n, 0.3_n, 0.3_n, 0.5_n));
     }
 
     if(GameMenu || GameOutro || BattleMode || LevelEditor)
@@ -108,7 +108,7 @@ void speedRun_renderTimer()
 
 static void GetControllerColor(int l_player_i, XTColor& color, bool* drawLabel = nullptr)
 {
-    color = XTColorF(0.4f, 0.4f, 0.4f);
+    color = XTColorF(0.4_n, 0.4_n, 0.4_n);
     if(drawLabel)
         *drawLabel = false;
 
@@ -130,16 +130,16 @@ static void GetControllerColor(int l_player_i, XTColor& color, bool* drawLabel =
         switch(p.Character) // TODO: Add changing of these colors by gameinfo.ini
         {
         case 1:
-            color = XTColorF(0.7f, 0.3f, 0.3f);
+            color = XTColorF(0.7_n, 0.3_n, 0.3_n);
             break;
         case 2:
-            color = XTColorF(0.3f, 0.7f, 0.3f);
+            color = XTColorF(0.3_n, 0.7_n, 0.3_n);
             break;
         case 3:
-            color = XTColorF(1.0f, 0.6f, 0.7f);
+            color = XTColorF(1.0_n, 0.6_n, 0.7_n);
             break;
         case 4:
-            color = XTColorF(0.04f, 0.43f, 1.0f);
+            color = XTColorF(0.04_n, 0.43_n, 1.0_n);
             break;
         case 5:
             color = {192, 168, 72};
@@ -165,7 +165,7 @@ void RenderControls_priv(int player, const Controls_t* controls, int x, int y, i
     if(!connect_screen)
         GetControllerColor(player, color, &drawLabel);
     else if(player == -1)
-        color = XTColorF(0.4f, 0.4f, 0.4f);
+        color = XTColorF(0.4_n, 0.4_n, 0.4_n);
 
     XRender::renderRect(x, y, w, h, {0, 0, 0, alpha}, true);//Edge
     XRender::renderRect(x + 2, y + 2, w - 4, h - 4, {color, alpha}, true);//Box
@@ -290,8 +290,8 @@ void RenderPowerInfo(int player, int bx, int by, int bw, int bh, uint8_t alpha, 
 
         if(status_info.power_status == XPower::StatusInfo::POWER_CHARGED)
         {
-            color.b = XTColor::from_float(0.8f);
-            color.g = XTColor::from_float(0.4f);
+            color.b = XTColor::from_num(0.8_n);
+            color.g = XTColor::from_num(0.4_n);
         }
 
         int s;

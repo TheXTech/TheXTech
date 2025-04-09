@@ -290,18 +290,18 @@ bool UpdateButton(int x, int y, int size, const char* c, bool sel, bool render)
         if(sel)
         {
             if(coll && s_mouse_state == MouseState::down)
-                XRender::renderRect(x, y, width, size, XTColorF(0.f, 0.5f, 0.5f, 1.0f), true);
+                XRender::renderRect(x, y, width, size, XTColorF(0.0_n, 0.5_n, 0.5_n, 1.0_n), true);
             else
-                XRender::renderRect(x, y, width, size, XTColorF(0.f, 1.0f, 1.0f, 1.0f), true);
+                XRender::renderRect(x, y, width, size, XTColorF(0.0_n, 1.0_n, 1.0_n, 1.0_n), true);
         }
         else if(coll && s_mouse_state == MouseState::down)
-            XRender::renderRect(x, y, width, size, XTColorF(0.f, 0.f, 0.f, 1.0f), true);
+            XRender::renderRect(x, y, width, size, XTColorF(0.0_n, 0.0_n, 0.0_n, 1.0_n), true);
 
         // background:
         if(s_mouse_state == MouseState::down && coll)
-            XRender::renderRect(x+2, y+2, width-4, size-4, XTColorF(0.2f, 0.2f, 0.2f, 1.0f), true);
+            XRender::renderRect(x+2, y+2, width-4, size-4, XTColorF(0.2_n, 0.2_n, 0.2_n, 1.0_n), true);
         else
-            XRender::renderRect(x+2, y+2, width-4, size-4, XTColorF(0.5f, 0.5f, 0.6f, 1.0f), true);
+            XRender::renderRect(x+2, y+2, width-4, size-4, XTColorF(0.5_n, 0.5_n, 0.6_n, 1.0_n), true);
 
         SuperPrintCenter(print_char, 4, x+width/2, y+size/2-10);
     }
@@ -549,7 +549,7 @@ bool KeyboardMouseRender(bool mouse, bool render)
 
     if(render)
     {
-        XRender::renderRect(win_x, win_y, win_width, win_height, XTColorF(0.6f, 0.6f, 1.f, 0.8f));
+        XRender::renderRect(win_x, win_y, win_width, win_height, XTColorF(0.6_n, 0.6_n, 1.0_n, 0.8_n));
         for(int i = 0; i < n_prompt_lines; i ++)
         {
             if(n_prompt_chars * (i + 1) < (int)s_Prompt_UTF_offsets.size())
@@ -558,7 +558,7 @@ bool KeyboardMouseRender(bool mouse, bool render)
                 SuperPrint(s_Prompt.c_str() + s_Prompt_UTF_offsets[n_prompt_chars * i], 4, win_x + 10, win_y + 6 + 20*i);
         }
 
-        XRender::renderRect(win_x + 20, win_y + n_prompt_lines * 20 + 4, win_width - 40, n_text_lines * 20, XTColorF(0.06f, 0.06f, 0.1f, 1.0f));
+        XRender::renderRect(win_x + 20, win_y + n_prompt_lines * 20 + 4, win_width - 40, n_text_lines * 20, XTColorF(0.06_n, 0.06_n, 0.1_n, 1.0_n));
         for(int i = 0; i < n_text_lines; i ++)
         {
             if(n_text_chars * (i + 1) < (int)s_Text_UTF_offsets.size())
@@ -570,11 +570,11 @@ bool KeyboardMouseRender(bool mouse, bool render)
             if(CommonFrame % 64 < 32 && ((s_cursor >= i * n_text_chars && s_cursor < (i + 1) * n_text_chars) || (s_cursor == (i + 1) * n_text_chars && s_cursor == (int)s_Text_UTF_offsets.size() - 1)))
             {
                 int cursor_offset = SuperTextPixLen(s_Text_UTF_offsets[s_cursor] - s_Text_UTF_offsets[n_text_chars * i], Text.c_str() + s_Text_UTF_offsets[n_text_chars * i], 4);
-                XRender::renderRect(win_x + 10 + 16 + cursor_offset - 2, win_y + 4 + 20 * (n_prompt_lines + i), 2, 20, XTColorF(0.7f, 0.7f, 0.7f, 1.f));
+                XRender::renderRect(win_x + 10 + 16 + cursor_offset - 2, win_y + 4 + 20 * (n_prompt_lines + i), 2, 20, XTColorF(0.7_n, 0.7_n, 0.7_n, 1.0_n));
             }
         }
 
-        XRender::renderRect(kb_x, kb_y, kb_width, kb_height, XTColorF(0.45f, 0.45f, 0.75f, 1.0f));
+        XRender::renderRect(kb_x, kb_y, kb_width, kb_height, XTColorF(0.45_n, 0.45_n, 0.75_n, 1.0_n));
     }
 
     for(int row = 0; row < s_current_keymap_rows; row ++)

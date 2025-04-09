@@ -1520,12 +1520,12 @@ int PlayerBox::Mouse_Render_1P(bool render)
     {
         int infobox_y = MenuY + 145;
 
-        XRender::renderRect(XRender::TargetW / 2 - 240, infobox_y, 480, 68, XTColorF(0, 0, 0, 0.5));
+        XRender::renderRect(XRender::TargetW / 2 - 240, infobox_y, 480, 68, XTColorF(0, 0, 0, 0.5_n));
 
         // disconnection hint
         if(p >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[p])
         {
-            SuperPrintScreenCenter(g_gameStrings.connectWaitingForInputDevice, 3, infobox_y + 4, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
+            SuperPrintScreenCenter(g_gameStrings.connectWaitingForInputDevice, 3, infobox_y + 4, XTColorF(0.8_n, 0.8_n, 0.8_n, 0.8_n));
         }
         else
         {
@@ -1537,8 +1537,8 @@ int PlayerBox::Mouse_Render_1P(bool render)
                 SuperPrintScreenCenter(Controls::g_InputMethods[p]->Name, 3, infobox_y + 4);
         }
 
-        SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P1, 3, infobox_y + 24, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
-        SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P2, 3, infobox_y + 44, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
+        SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P1, 3, infobox_y + 24, XTColorF(0.8_n, 0.8_n, 0.8_n, 0.8_n));
+        SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P2, 3, infobox_y + 44, XTColorF(0.8_n, 0.8_n, 0.8_n, 0.8_n));
     }
 
     // do char transform thing!
@@ -1598,21 +1598,21 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
         ch = 0;
 
     // calculate box color
-    XTColor color = XTColorF(0.4f, 0.4f, 0.4f);
+    XTColor color = XTColorF(0.4_n, 0.4_n, 0.4_n);
 
     switch(ch)
     {
     case 1:
-        color = XTColorF(1.0f, 0.0f, 0.0f);
+        color = XTColorF(1.0_n, 0.0_n, 0.0_n);
         break;
     case 2:
-        color = XTColorF(0.0f, 1.0f, 0.0f);
+        color = XTColorF(0.0_n, 1.0_n, 0.0_n);
         break;
     case 3:
-        color = XTColorF(1.0f, 0.4f, 0.5f);
+        color = XTColorF(1.0_n, 0.4_n, 0.5_n);
         break;
     case 4:
-        color = XTColorF(0.0f, 0.4f, 1.0f);
+        color = XTColorF(0.0_n, 0.4_n, 1.0_n);
         break;
     case 5:
         color = {255, 204, 0};
@@ -1631,13 +1631,13 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
     {
         // background
         XRender::renderRect(x + 0, y + 0, w - 0, h - 0, {0, 0, 0});
-        XRender::renderRect(x + 2, y + 2, w - 4, h - 4, color * 0.95f);
-        XRender::renderRect(x + 4, y + 4, w - 8, h - 8, color * 0.75f);
+        XRender::renderRect(x + 2, y + 2, w - 4, h - 4, color * 0.95_n);
+        XRender::renderRect(x + 4, y + 4, w - 8, h - 8, color * 0.75_n);
 
         if(m_state != PlayerState::SelectProfile)
         {
             // middle dividing line (bg)
-            XRender::renderRect(x + 2, info_y - 2, w - 4, 6, color * 0.95f);
+            XRender::renderRect(x + 2, info_y - 2, w - 4, 6, color * 0.95_n);
 
             // middle dividing line (fg)
             XRender::renderRect(x, info_y, w, 2, {0, 0, 0});
@@ -1880,7 +1880,7 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
             if(input_method && input_method->Profile != nullptr)
             {
                 message = &input_method->Profile->Name;
-                message_color = XTAlphaF(0.75);
+                message_color = XTAlphaF(0.75_n);
             }
         }
         else if(m_state == PlayerState::ControlsMenu)
@@ -2001,9 +2001,9 @@ int Mouse_Render(bool mouse, bool render)
         if(render)
         {
             if(full_width < 440)
-                XRender::renderRect((XRender::TargetW / 2 - 440 / 2) & ~1, draw_y, 440, full_height, XTColorF(0.0f, 0.0f, 0.0f, 0.5f));
+                XRender::renderRect((XRender::TargetW / 2 - 440 / 2) & ~1, draw_y, 440, full_height, XTColorF(0.0_n, 0.0_n, 0.0_n, 0.5_n));
             else
-                XRender::renderRect(start_x, draw_y, full_width, full_height, XTColorF(0.0f, 0.0f, 0.0f, 0.5f));
+                XRender::renderRect(start_x, draw_y, full_width, full_height, XTColorF(0.0_n, 0.0_n, 0.0_n, 0.5_n));
 
             SuperPrintScreenCenter(g_gameStrings.pauseItemPlayerSetup, 3, draw_y + 8);
         }

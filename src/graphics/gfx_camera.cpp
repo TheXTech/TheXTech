@@ -224,7 +224,7 @@ void DrawSmallScreenCam(vScreen_t& vscreen)
 
     if(vscreen.small_screen_features.offset_y_hold != 0)
     {
-        color = XTColorF(1.0f, 0.2f, 0.2f, 1.0f);
+        color = XTColorF(1.0_n, 0.2_n, 0.2_n, 1.0_n);
 
         if(vscreen.small_screen_features.offset_y_hold > 0)
             XRender::renderTextureBasic(CamX + 4, CamY - 18, GFX.MCursor[1], XTAlphaF(rate));
@@ -233,7 +233,7 @@ void DrawSmallScreenCam(vScreen_t& vscreen)
     }
     else if(vscreen.small_screen_features.offset_y < -max_offsetY * 4 / 5 || vscreen.small_screen_features.offset_y > max_offsetY * 4 / 5)
     {
-        color = XTColorF(0.5f, 1.0f, 0.5f, 0.7f);
+        color = XTColorF(0.5_n, 1.0_n, 0.5_n, 0.7_n);
 
         if(vscreen.small_screen_features.offset_y > 0)
             XRender::renderTextureBasic(CamX + 4, CamY - 18, GFX.MCursor[1], XTAlphaF(0.7_r * rate));
@@ -242,11 +242,11 @@ void DrawSmallScreenCam(vScreen_t& vscreen)
     }
     else if(vscreen.small_screen_features.offset_y <= -48 || vscreen.small_screen_features.offset_y >= 48)
     {
-        color = XTAlphaF(0.5f);
+        color = XTAlphaF(0.5_n);
     }
     else
     {
-        color = XTColorF(0.0f, 0.0f, 0.0f, 0.3f);
+        color = XTColorF(0.0_n, 0.0_n, 0.0_n, 0.3_n);
     }
 
     color.a = int(rate * color.a);

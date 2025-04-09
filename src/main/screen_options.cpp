@@ -758,7 +758,7 @@ bool Mouse_Render(bool mouse, bool render)
 
         // for subsection headers, indent to left and allow to fill screen
         int lX = is_header ? cursor_x : cursor_x + 24;
-        XTColor name_color = is_header ? XTColorF(0.7f, 0.7f, 0.7f) : XTColor();
+        XTColor name_color = is_header ? XTColorF(0.7_n, 0.7_n, 0.7_n) : XTColor();
         int name_font = is_header ? 3 : 5;
 
         name_marquee_spec.marquee_width = is_header ? total_width : main_width;
@@ -797,37 +797,37 @@ bool Mouse_Render(bool mouse, bool render)
         case(ConfigSetLevel::debug):
         case(ConfigSetLevel::script):
         case(ConfigSetLevel::cheat):
-            vcolor = XTColorF(1.0f, 0.0f, 1.0f, 1.0f);
+            vcolor = XTColorF(1.0_n, 0.0_n, 1.0_n, 1.0_n);
             break;
         case(ConfigSetLevel::compat):
         case(ConfigSetLevel::speedrun):
-            vcolor = XTColorF(0.7f, 0.5f, 0.2f, 1.0f);
+            vcolor = XTColorF(0.7_n, 0.5_n, 0.2_n, 1.0_n);
             break;
         case(ConfigSetLevel::cmdline):
-            vcolor = XTColorF(0.0f, 0.5f, 1.0f, 1.0f);
+            vcolor = XTColorF(0.0_n, 0.5_n, 1.0_n, 1.0_n);
             break;
         case(ConfigSetLevel::file_compat):
         case(ConfigSetLevel::ep_compat):
-            vcolor = XTColorF(1.0f, 1.0f, 0.0f, 1.0f);
+            vcolor = XTColorF(1.0_n, 1.0_n, 0.0_n, 1.0_n);
             break;
         default:
         case(ConfigSetLevel::user_config):
             if(s_temp_string == "✓" || s_temp_string == "+")
-                vcolor = XTColorF(0.5f, 1.0f, 0.5f, 1.0f);
+                vcolor = XTColorF(0.5_n, 1.0_n, 0.5_n, 1.0_n);
             else if(s_temp_string == "×" || s_temp_string == "-")
-                vcolor = XTColorF(1.0f, 0.5f, 0.5f, 1.0f);
+                vcolor = XTColorF(1.0_n, 0.5_n, 0.5_n, 1.0_n);
             else
-                vcolor = XTColorF(1.0f, 1.0f, 1.0f, 1.0f);
+                vcolor = XTColorF(1.0_n, 1.0_n, 1.0_n, 1.0_n);
             break;
         case(ConfigSetLevel::game_info):
         case(ConfigSetLevel::game_defaults):
         case(ConfigSetLevel::bugfix_defaults):
             if(s_temp_string == "✓" || s_temp_string == "+")
-                vcolor = XTColorF(0.25f, 0.5f, 0.25f, 1.0f);
+                vcolor = XTColorF(0.25_n, 0.5_n, 0.25_n, 1.0_n);
             else if(s_temp_string == "×" || s_temp_string == "-")
-                vcolor = XTColorF(0.5f, 0.25f, 0.25f, 1.0f);
+                vcolor = XTColorF(0.5_n, 0.25_n, 0.25_n, 1.0_n);
             else
-                vcolor = XTColorF(0.5f, 0.5f, 0.5f, 1.0f);
+                vcolor = XTColorF(0.5_n, 0.5_n, 0.5_n, 1.0_n);
             break;
         }
 

@@ -408,7 +408,7 @@ void UpdateGraphics2(bool skipRepaint)
             if(vScreenCollision(Z, static_cast<Location_t>(area.Location)))
             {
                 // single color for now
-                XTColor color = XTColorF(1.0f, 0.8f, 0.2f);
+                XTColor color = XTColorF(1.0_n, 0.8_n, 0.2_n);
 
                 // draw rect with outline
                 XRender::renderRect(camX + area.Location.X, camY + area.Location.Y,
@@ -427,7 +427,7 @@ void UpdateGraphics2(bool skipRepaint)
                 // highlight selectable area
                 XRender::renderRect(camX + area.Location.X + 4, camY + area.Location.Y + 4,
                     28, 28,
-                    XTColorF(1.0f, 1.0f, 0.0f, 0.5f), true);
+                    XTColorF(1.0_n, 1.0_n, 0.0_n, 0.5_n), true);
 
                 // label with index
                 SuperPrint(std::to_string(A), 1, camX + area.Location.X + 4, camY + area.Location.Y + 4);

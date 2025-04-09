@@ -32,8 +32,6 @@
 #include <cstdint>
 #include <stdexcept>
 
-#include "xt_color.h"
-
 struct q_t
 {
     const int16_t num;
@@ -635,10 +633,5 @@ using int_ok = int;
 
 // this is used for temporary values that were Singles in VB6
 using tempf_t = num_t;
-
-static inline constexpr XTColor XTAlphaF(num_t a)
-{
-    return XTColor().with_alpha(static_cast<uint8_t>(a.i >> 24));
-}
 
 #endif // #ifndef XT_FIXED_POINT_H

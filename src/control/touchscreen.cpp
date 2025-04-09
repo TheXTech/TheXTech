@@ -1494,7 +1494,7 @@ void TouchScreenController::render(int player_no)
         int w = x2 - x1;
         int h = y2 - y1;
 
-        const uint8_t a = XTColor::from_float(m_keysHeld[key] ? 0.9f : 0.3f);
+        const uint8_t a = XTColor::from_num(m_keysHeld[key] ? 0.9_n : 0.3_n);
 
         switch(key)
         {

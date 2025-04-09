@@ -25,6 +25,8 @@
 #include <cstdint>
 #include <string>
 
+#include "numeric_types.h"
+
 /*!
  * \brief RGBA pixel color
  */
@@ -41,9 +43,9 @@ struct alignas(uint32_t) XTColor
         return uint8_t((uint16_t(a) * uint16_t(b)) >> 8);
     }
 
-    static inline constexpr uint8_t from_float(float f)
+    static inline constexpr uint8_t from_num(num_t f)
     {
-        return static_cast<uint8_t>(f * 255.0f);
+        return static_cast<uint8_t>(f * 255);
     }
 
     // initializers
@@ -58,7 +60,7 @@ struct alignas(uint32_t) XTColor
     }
 
     // intensity scale
-    inline constexpr XTColor operator*(float o) const
+    inline constexpr XTColor operator*(num_t o) const
     {
         return XTColor(uint8_t(r * o), uint8_t(g * o), uint8_t(b * o), a);
     }
@@ -85,18 +87,18 @@ struct alignas(uint32_t) XTColor
         return XTColor(r, g, b, new_a);
     }
 
-    inline constexpr XTColor with_alphaF(float new_a) const
+    inline constexpr XTColor with_alphaF(num_t new_a) const
     {
-        return XTColor(r, g, b, from_float(new_a));
+        return XTColor(r, g, b, from_num(new_a));
     }
 };
 
-static inline constexpr XTColor XTColorF(float r, float g, float b, float a = 1.0f)
+static inline constexpr XTColor XTColorF(num_t r, num_t g, num_t b, num_t a = 1)
 {
-    return XTColor(XTColor::from_float(r),
-        XTColor::from_float(g),
-        XTColor::from_float(b),
-        XTColor::from_float(a));
+    return XTColor(XTColor::from_num(r),
+        XTColor::from_num(g),
+        XTColor::from_num(b),
+        XTColor::from_num(a));
 }
 
 static inline constexpr XTColor XTAlpha(uint8_t a)
@@ -104,9 +106,9 @@ static inline constexpr XTColor XTAlpha(uint8_t a)
     return XTColor().with_alpha(a);
 }
 
-static inline constexpr XTColor XTAlphaF(float a)
+static inline constexpr XTColor XTAlphaF(num_t a)
 {
-    return XTColor().with_alpha(XTColor::from_float(a));
+    return XTColor().with_alpha(XTColor::from_num(a));
 }
 
 /**

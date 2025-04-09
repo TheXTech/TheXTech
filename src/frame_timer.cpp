@@ -184,7 +184,7 @@ static void s_print_ram(int x, int y)
     items++; // VRAM
 #   endif
 
-    XRender::renderRect(x, y, 340, 12 + (18 * items), XTColorF(0.0f, 0.0f, 0.0f, 0.3f), true);
+    XRender::renderRect(x, y, 340, 12 + (18 * items), XTColorF(0.0_n, 0.0_n, 0.0_n, 0.3_n), true);
 
     if(x < 200)
         y += 6;
@@ -195,7 +195,7 @@ static void s_print_ram(int x, int y)
     SuperPrint(fmt::sprintf_ne(" RAM: %4d/%4dkb", m.uordblks/1024, s_heap_size/1024),
                3, x + 4, YLINE);
     SuperPrint(fmt::sprintf_ne("VRAM: %4d/%4dkb", XRender::s_loadedVRAM/1024, 512),
-               3, x + 4, YLINE, XTColorF(0.5f, 1.0f, 0.5f));
+               3, x + 4, YLINE, XTColorF(0.5_n, 1.0_n, 0.5_n));
 #   else
     SuperPrint(fmt::sprintf_ne(" RAM: %5d/%5dkb", m.uordblks/1024, s_heap_size/1024),
                3, x + 4, YLINE);
@@ -203,7 +203,7 @@ static void s_print_ram(int x, int y)
 
 #   ifdef __3DS__
     SuperPrint(fmt::sprintf_ne("VRAM: %5d/%5dkb", (__ctru_linear_heap_size - linearSpaceFree())/1024, __ctru_linear_heap_size / 1024),
-               3, x + 4, YLINE, XTColorF(0.5f, 1.0f, 0.5f));
+               3, x + 4, YLINE, XTColorF(0.5_n, 1.0_n, 0.5_n));
 #   endif
 }
 #else
@@ -215,19 +215,19 @@ void PerformanceStats_t::print_filenames(int x, int y)
     int items = (GameMenu) ? 4 : 3;
     int row = 0;
 
-    XRender::renderRect(x, y, 745, 6 + (18 * items), XTColorF(0.0f, 0.0f, 0.0f, 0.3f), true);
+    XRender::renderRect(x, y, 745, 6 + (18 * items), XTColorF(0.0_n, 0.0_n, 0.0_n, 0.3_n), true);
 
     SuperPrint(fmt::sprintf_ne("FILE: %s", FileNameFull.empty() ? "<none>" : FileNameFull.c_str()),
-               3, x + 4, YLINE, XTColorF(1.f, 0.5f, 1.f));
+               3, x + 4, YLINE, XTColorF(1.0_n, 0.5_n, 1.0_n));
     SuperPrint(fmt::sprintf_ne("MUSK: %s", currentMusic.empty() ? "<none>" : currentMusic.c_str()),
-               3, x + 4, YLINE, XTColorF(1.f, 0.5f, 1.f));
+               3, x + 4, YLINE, XTColorF(1.0_n, 0.5_n, 1.0_n));
     SuperPrint(fmt::sprintf_ne("MUSF: %s", currentMusicFile.empty() ? "<none>" : currentMusicFile.c_str()),
-               3, x + 4, YLINE, XTColorF(1.f, 0.5f, 1.f));
+               3, x + 4, YLINE, XTColorF(1.0_n, 0.5_n, 1.0_n));
 
     if(GameMenu)
     {
         SuperPrint(fmt::sprintf_ne("MENU-MODE: %d", MenuMode),
-                   3, x + 4, YLINE, XTColorF(0.5f, 1.f, 1.f));
+                   3, x + 4, YLINE, XTColorF(0.5_n, 1.0_n, 1.0_n));
     }
 }
 
@@ -236,26 +236,26 @@ void PerformanceStats_t::print_obj_stats(int x, int y)
     int items = 5;
     int row = 0;
 
-    XRender::renderRect(x, y, 340, 6 + (18 * items), XTColorF(0.0f, 0.0f, 0.0f, 0.3f), true);
+    XRender::renderRect(x, y, 340, 6 + (18 * items), XTColorF(0.0_n, 0.0_n, 0.0_n, 0.3_n), true);
 
     SuperPrint(fmt::sprintf_ne("   DRAW/ACTV/TOTAL"),
-        3, x + 4, YLINE, XTColorF(1.f, 1.f, 1.f));
+        3, x + 4, YLINE, XTColorF(1.0_n, 1.0_n, 1.0_n));
 
     SuperPrint(fmt::sprintf_ne("B: %04d/%04d/%05d", renderedBlocks, checkedBlocks, numBlock),
-        3, x + 4, YLINE, XTColorF(0.5f, 1.f, 1.f));
+        3, x + 4, YLINE, XTColorF(0.5_n, 1.0_n, 1.0_n));
     SuperPrint(fmt::sprintf_ne("G: %04d/%04d/%05d", renderedBGOs, checkedBGOs, numBackground),
-        3, x + 4, YLINE, XTColorF(0.5f, 1.f, 1.f));
+        3, x + 4, YLINE, XTColorF(0.5_n, 1.0_n, 1.0_n));
     SuperPrint(fmt::sprintf_ne("N: %04d/%04d/%05d", renderedNPCs, NPCQueues::Active.no_change.size(), numNPCs),
-        3, x + 4, YLINE, XTColorF(0.5f, 1.f, 1.f));
+        3, x + 4, YLINE, XTColorF(0.5_n, 1.0_n, 1.0_n));
     SuperPrint(fmt::sprintf_ne("E: %04d/%04d", renderedEffects, numEffects),
-        3, x + 4, YLINE, XTColorF(0.5f, 1.f, 1.f));
+        3, x + 4, YLINE, XTColorF(0.5_n, 1.0_n, 1.0_n));
 }
 
 void PerformanceStats_t::print_cpu_stats(int x, int y)
 {
     int items = 6;
 
-    XRender::renderRect(x, y, 340, 6 + (18 * items), XTColorF(0.0f, 0.0f, 0.0f, 0.3f), true);
+    XRender::renderRect(x, y, 340, 6 + (18 * items), XTColorF(0.0_n, 0.0_n, 0.0_n, 0.3_n), true);
 
     SuperPrint(fmt::sprintf_ne("CPU: %05dms/s",
                                g_microStats.view_total),
@@ -267,7 +267,7 @@ void PerformanceStats_t::print_cpu_stats(int x, int y)
                                g_microStats.task_names[2], g_microStats.view_timer[2],
                                g_microStats.task_names[3], g_microStats.view_timer[3],
                                g_microStats.task_names[4], g_microStats.view_timer[4]),
-               3, x + 4, y + 2 + 18, XTColorF(1.f, 1.f, 0.5f));
+               3, x + 4, y + 2 + 18, XTColorF(1.0_n, 1.0_n, 0.5_n));
 
     SuperPrint(fmt::sprintf_ne("%s %04d\n%s %04d\n%s %04d\n%s %04d\n%s %04d",
                                g_microStats.task_names[5], g_microStats.view_timer[5],
@@ -275,7 +275,7 @@ void PerformanceStats_t::print_cpu_stats(int x, int y)
                                g_microStats.task_names[7], g_microStats.view_timer[7],
                                g_microStats.task_names[8], g_microStats.view_timer[8],
                                g_microStats.task_names[9], g_microStats.view_timer[9]),
-               3, x + 164, y + 2 + 18, XTColorF(1.f, 1.f, 0.5f));
+               3, x + 164, y + 2 + 18, XTColorF(1.0_n, 1.0_n, 0.5_n));
 }
 
 void PerformanceStats_t::print()
@@ -286,17 +286,17 @@ void PerformanceStats_t::print()
     if(LevelSelect && !GameMenu)
     {
         int items = 5;
-        XRender::renderRect(6 + XRender::TargetOverscanX, 6, 745, 6 + (18 * items), XTColorF(0.0f, 0.0f, 0.0f, 0.3f), true);
+        XRender::renderRect(6 + XRender::TargetOverscanX, 6, 745, 6 + (18 * items), XTColorF(0.0_n, 0.0_n, 0.0_n, 0.3_n), true);
 
         int y = 6;
         int row = 0;
 
         SuperPrint(fmt::sprintf_ne("FILE: %s", FileNameFull.empty() ? "<none>" : FileNameFull.c_str()),
-                   3, 10 + XRender::TargetOverscanX, YLINE, XTColorF(0.5f, 1.f, 1.f));
+                   3, 10 + XRender::TargetOverscanX, YLINE, XTColorF(0.5_n, 1.0_n, 1.0_n));
         SuperPrint(fmt::sprintf_ne("MUSK: %s", currentMusic.empty() ? "<none>" : currentMusic.c_str()),
-                   3, 10 + XRender::TargetOverscanX, YLINE, XTColorF(0.5f, 1.f, 1.f));
+                   3, 10 + XRender::TargetOverscanX, YLINE, XTColorF(0.5_n, 1.0_n, 1.0_n));
         SuperPrint(fmt::sprintf_ne("MUSF: %s", currentMusicFile.empty() ? "<none>" : currentMusicFile.c_str()),
-                   3, 10 + XRender::TargetOverscanX, YLINE, XTColorF(0.5f, 1.f, 1.f));
+                   3, 10 + XRender::TargetOverscanX, YLINE, XTColorF(0.5_n, 1.0_n, 1.0_n));
 
         SuperPrint(fmt::sprintf_ne("DRAW: T=%03d S=%03d P=%03d L=%03d, SUM=%03d",
                                    renderedTiles, renderedScenes, renderedPaths, renderedLevels,

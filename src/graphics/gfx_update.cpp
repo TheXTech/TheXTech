@@ -466,7 +466,7 @@ static inline void s_get_NPC_tint(int A, XTColor& cn)
         {
             if(!NPC_InactiveRender(n) || g_CheatLogicScreen)
             {
-                cn = XTColorF(0.0f, 0.0f, 0.0f, 0.4f);
+                cn = XTColorF(0.0_n, 0.0_n, 0.0_n, 0.4_n);
                 return;
             }
         }
@@ -3324,7 +3324,7 @@ void UpdateGraphicsMeta()
         else if(g_config.show_episode_title == Config_t::EPISODE_TITLE_BOTTOM)
         {
             int y = XRender::TargetH - 60;
-            SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(0.75f));
+            SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(0.75_n));
         }
     }
 

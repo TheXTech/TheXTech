@@ -460,20 +460,20 @@ bool EditorScreen::UpdateButton(CallMode mode, int x, int y, StdPicture &im, boo
     if(sel)
     {
         if(coll && SharedCursor.Primary)
-            XRender::renderRect(x - 2, y - 2, 36, 36, XTColorF(0.f, 0.5f, 0.f, 1.0f), true);
+            XRender::renderRect(x - 2, y - 2, 36, 36, XTColorF(0.0_n, 0.5_n, 0.0_n, 1.0_n), true);
         else
-            XRender::renderRect(x - 2, y - 2, 36, 36, XTColorF(0.f, 1.0f, 0.f, 1.0f), true);
+            XRender::renderRect(x - 2, y - 2, 36, 36, XTColorF(0.0_n, 1.0_n, 0.0_n, 1.0_n), true);
     }
     else if(coll && SharedCursor.Primary)
-        XRender::renderRect(x - 2, y - 2, 36, 36, XTColorF(0.f, 0.f, 0.f, 1.0f), true);
+        XRender::renderRect(x - 2, y - 2, 36, 36, XTColorF(0.0_n, 0.0_n, 0.0_n, 1.0_n), true);
     else
-        XRender::renderRect(x - 2, y - 2, 36, 36, XTColorF(1.f, 1.f, 1.f, 0.5f), true);
+        XRender::renderRect(x - 2, y - 2, 36, 36, XTColorF(1.0_n, 1.0_n, 1.0_n, 0.5_n), true);
 
     // background:
     if(SharedCursor.Primary && coll)
-        XRender::renderRect(x, y, 32, 32, XTColorF(0.2f, 0.2f, 0.2f), true);
+        XRender::renderRect(x, y, 32, 32, XTColorF(0.2_n, 0.2_n, 0.2_n), true);
     else
-        XRender::renderRect(x, y, 32, 32, XTColorF(0.5f, 0.5f, 0.5f), true);
+        XRender::renderRect(x, y, 32, 32, XTColorF(0.5_n, 0.5_n, 0.5_n), true);
 
     // scale and center image
     int dst_x, dst_y, dst_h, dst_w;
@@ -572,9 +572,9 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
     // NPC GUI
     if(mode == CallMode::Render)
     {
-        XRender::renderRect(e_ScreenW - 200, 40, 200, e_ScreenH - 40, XTColorF(0.7f, 0.7f, 0.9f, 0.75f), true);
-        XRender::renderRect(0, 40, 40, e_ScreenH - 40, XTColorF(0.7f, 0.7f, 0.9f, 0.75f), true);
-        XRender::renderRect(38, 40, 2, e_ScreenH - 40, XTColorF(0.25f, 0.0f, 0.5f), true);
+        XRender::renderRect(e_ScreenW - 200, 40, 200, e_ScreenH - 40, XTColorF(0.7_n, 0.7_n, 0.9_n, 0.75_n), true);
+        XRender::renderRect(0, 40, 40, e_ScreenH - 40, XTColorF(0.7_n, 0.7_n, 0.9_n, 0.75_n), true);
+        XRender::renderRect(38, 40, 2, e_ScreenH - 40, XTColorF(0.25_n, 0.0_n, 0.5_n), true);
     }
 
     if(m_special_page == SPECIAL_PAGE_BLOCK_CONTENTS && UpdateButton(mode, e_ScreenW - 40 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
@@ -593,7 +593,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             last_category = page.category;
 
             if(mode == CallMode::Render && index != 0)
-                XRender::renderRect(0, 40 + -2 + (40 * index), 40, 4, XTColorF(0.25f, 0.0f, 0.5f), true);
+                XRender::renderRect(0, 40 + -2 + (40 * index), 40, 4, XTColorF(0.25_n, 0.0_n, 0.5_n), true);
         }
 
         index++;
@@ -603,7 +603,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
     }
 
     if(m_special_page == SPECIAL_PAGE_BLOCK_CONTENTS && mode == CallMode::Render)
-        XRender::renderRect(0, (40 * index) + 40 + -2, 40, 4, XTColorF(0.25f, 0.0f, 0.5f), true);
+        XRender::renderRect(0, (40 * index) + 40 + -2, 40, 4, XTColorF(0.25_n, 0.0_n, 0.5_n), true);
 
     if(m_special_page == SPECIAL_PAGE_BLOCK_CONTENTS && UpdateNPCButton(mode, 4, 4 + (40 * index) + 40, NPCID_COIN_S3, m_NPC_page == -1))
         m_NPC_page = -1;
@@ -1416,7 +1416,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
 
     // RIGHT PANE: layers
     if(mode == CallMode::Render)
-        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, XTColorF(0.7f, 0.7f, 0.9f, 0.75f), true);
+        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, XTColorF(0.7_n, 0.7_n, 0.9_n, 0.75_n), true);
 
     if(UpdateButton(mode, e_ScreenW - 40 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
     {
@@ -1572,7 +1572,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
 
     // BOTTOM PANE: sections - background, music, autoscroll
     if(mode == CallMode::Render)
-        XRender::renderRect(0, e_ScreenH - 180, e_ScreenW - 240, 180, XTColorF(0.6f, 0.6f, 0.8f), true);
+        XRender::renderRect(0, e_ScreenH - 180, e_ScreenW - 240, 180, XTColorF(0.6_n, 0.6_n, 0.8_n), true);
 
     if(m_special_subpage > 0 && UpdateButton(mode, 40 + 4, e_ScreenH - 180 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         m_special_subpage --;
@@ -2612,7 +2612,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
 {
     // render shared GUI elements on right
     if(mode == CallMode::Render)
-        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, XTColorF(0.7f, 0.7f, 0.9f, 0.75f), true);
+        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, XTColorF(0.7_n, 0.7_n, 0.9_n, 0.75_n), true);
 
     // back button
     if(UpdateButton(mode, e_ScreenW - 40 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
@@ -2917,7 +2917,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
 
     // render shared GUI elements on right
     if(mode == CallMode::Render && m_special_page != SPECIAL_PAGE_LAYERS && m_special_page != SPECIAL_PAGE_EVENT_LAYERS)
-        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, XTColorF(0.7f, 0.7f, 0.9f, 0.75f), true);
+        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, XTColorF(0.7_n, 0.7_n, 0.9_n, 0.75_n), true);
 
     if(m_special_page != SPECIAL_PAGE_LAYERS && UpdateButton(mode, e_ScreenW - 40 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
     {
@@ -3227,9 +3227,9 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     // Block GUI
     if(mode == CallMode::Render)
     {
-        XRender::renderRect(e_ScreenW - 160, 40, 160, e_ScreenH - 40, XTColorF(0.7f, 0.7f, 0.9f, 0.75f), true);
-        XRender::renderRect(0, 40, 40, e_ScreenH - 40, XTColorF(0.7f, 0.7f, 0.9f, 0.75f), true);
-        XRender::renderRect(38, 40, 2, e_ScreenH - 40, XTColorF(0.25f, 0.0f, 0.5f), true);
+        XRender::renderRect(e_ScreenW - 160, 40, 160, e_ScreenH - 40, XTColorF(0.7_n, 0.7_n, 0.9_n, 0.75_n), true);
+        XRender::renderRect(0, 40, 40, e_ScreenH - 40, XTColorF(0.7_n, 0.7_n, 0.9_n, 0.75_n), true);
+        XRender::renderRect(38, 40, 2, e_ScreenH - 40, XTColorF(0.25_n, 0.0_n, 0.5_n), true);
     }
 
     // Page selector
@@ -3243,7 +3243,7 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
             last_category = page.category;
 
             if(mode == CallMode::Render && index != 0)
-                XRender::renderRect(0, 40 + -2 + (40 * index), 40, 4, XTColorF(0.25f, 0.0f, 0.5f), true);
+                XRender::renderRect(0, 40 + -2 + (40 * index), 40, 4, XTColorF(0.25_n, 0.0_n, 0.5_n), true);
         }
 
         index++;
@@ -3418,9 +3418,9 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
     // BGO GUI
     if(mode == CallMode::Render)
     {
-        XRender::renderRect(e_ScreenW - 160, 40, 160, e_ScreenH - 40, XTColorF(0.7f, 0.7f, 0.9f, 0.75f), true);
-        XRender::renderRect(0, 40, 40, e_ScreenH - 40, XTColorF(0.7f, 0.7f, 0.9f, 0.75f), true);
-        XRender::renderRect(38, 40, 2, e_ScreenH - 40, XTColorF(0.25f, 0.0f, 0.5f), true);
+        XRender::renderRect(e_ScreenW - 160, 40, 160, e_ScreenH - 40, XTColorF(0.7_n, 0.7_n, 0.9_n, 0.75_n), true);
+        XRender::renderRect(0, 40, 40, e_ScreenH - 40, XTColorF(0.7_n, 0.7_n, 0.9_n, 0.75_n), true);
+        XRender::renderRect(38, 40, 2, e_ScreenH - 40, XTColorF(0.25_n, 0.0_n, 0.5_n), true);
     }
 
 
@@ -3435,7 +3435,7 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
             last_category = page.category;
 
             if(mode == CallMode::Render && index != 0)
-                XRender::renderRect(0, 40 + -2 + (40 * index), 40, 4, XTColorF(0.25f, 0.0f, 0.5f), true);
+                XRender::renderRect(0, 40 + -2 + (40 * index), 40, 4, XTColorF(0.25_n, 0.0_n, 0.5_n), true);
         }
 
         index++;
@@ -3648,9 +3648,9 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
 {
     // Warp GUI
     if(mode == CallMode::Render)
-        XRender::renderRect(0, 40, e_ScreenW - 240, 140, XTColorF(0.7f, 0.7f, 0.9f, 0.75f), true);
+        XRender::renderRect(0, 40, e_ScreenW - 240, 140, XTColorF(0.7_n, 0.7_n, 0.9_n, 0.75_n), true);
     if(mode == CallMode::Render)
-        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, XTColorF(0.7f, 0.7f, 0.9f, 0.75f), true);
+        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, XTColorF(0.7_n, 0.7_n, 0.9_n, 0.75_n), true);
 
     SuperPrintR(mode, g_editorStrings.warpTitle, 3, 200, 50);
 
@@ -4061,8 +4061,8 @@ void EditorScreen::UpdateTileScreen(CallMode mode)
     // Block GUI
     if(mode == CallMode::Render)
     {
-        XRender::renderRect(0, 40, 40, e_ScreenH - 40, XTColorF(0.7f, 0.7f, 0.9f, 0.75f), true);
-        XRender::renderRect(38, 40, 2, e_ScreenH - 40, XTColorF(0.25f, 0.0f, 0.5f), true);
+        XRender::renderRect(0, 40, 40, e_ScreenH - 40, XTColorF(0.7_n, 0.7_n, 0.9_n, 0.75_n), true);
+        XRender::renderRect(38, 40, 2, e_ScreenH - 40, XTColorF(0.25_n, 0.0_n, 0.5_n), true);
     }
 
 
@@ -4077,7 +4077,7 @@ void EditorScreen::UpdateTileScreen(CallMode mode)
             last_category = page.category;
 
             if(mode == CallMode::Render && index != 0)
-                XRender::renderRect(0, 40 + -2 + (40 * index), 40, 4, XTColorF(0.25f, 0.0f, 0.5f), true);
+                XRender::renderRect(0, 40 + -2 + (40 * index), 40, 4, XTColorF(0.25_n, 0.0_n, 0.5_n), true);
         }
 
         index++;
@@ -4188,7 +4188,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
 {
     // World Level GUI
     if(mode == CallMode::Render)
-        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, XTColorF(0.7f, 0.7f, 0.9f, 0.75f), true);
+        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, XTColorF(0.7_n, 0.7_n, 0.9_n, 0.75_n), true);
 
     // SuperPrintR(mode, "LEVEL GRAPHIC", 3, 10, 40);
     static const int levels[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32};
@@ -4270,7 +4270,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
 
     // bottom pane: level filename, entrance and exits
     if(mode == CallMode::Render)
-        XRender::renderRect(0, e_ScreenH - 240, e_ScreenW - 240, 240, XTColorF(0.6f, 0.6f, 0.8f), true);
+        XRender::renderRect(0, e_ScreenH - 240, e_ScreenW - 240, 240, XTColorF(0.6_n, 0.6_n, 0.8_n), true);
 
     // level name - LevelName
     SuperPrintR(mode, g_editorStrings.levelName, 3, 10 + 44, e_ScreenH - 240 + 2);
@@ -5100,7 +5100,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
     {
         uint8_t alpha = 255;
         if(select_bar_only && MagicHand)
-            alpha = XTColor::from_float(0.7f);
+            alpha = XTColor::from_num(0.7_n);
 
         for(int i = 0; i < 5; i++)
         {
@@ -5415,9 +5415,9 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
         if(e_tooltip)
         {
             if(e_CursorX + 28 < sx + e_ScreenW / 2)
-                SuperPrint(e_tooltip, 3, e_CursorX + 28, e_CursorY + 34, XTColorF(1.0f, 0.7f, 0.7f));
+                SuperPrint(e_tooltip, 3, e_CursorX + 28, e_CursorY + 34, XTColorF(1.0_n, 0.7_n, 0.7_n));
             else
-                SuperPrintRightAlign(e_tooltip, 3, e_CursorX + 10, e_CursorY + 34, XTColorF(1.0f, 0.7f, 0.7f));
+                SuperPrintRightAlign(e_tooltip, 3, e_CursorX + 10, e_CursorY + 34, XTColorF(1.0_n, 0.7_n, 0.7_n));
         }
     }
 }
@@ -5483,7 +5483,7 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
     //     e_CursorY += 8;
 
     if(mode == CallMode::Render)
-        XRender::renderRect(0, 0, e_ScreenW, e_ScreenH, XTColorF(0.4f, 0.4f, 0.8f, 0.75f), true);
+        XRender::renderRect(0, 0, e_ScreenW, e_ScreenH, XTColorF(0.4_n, 0.4_n, 0.8_n, 0.75_n), true);
 
     UpdateSelectorBar(mode, false);
 
@@ -5545,9 +5545,9 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
         if(e_tooltip)
         {
             if(e_CursorX + 28 < e_ScreenW / 2)
-                SuperPrint(e_tooltip, 3, e_CursorX + 28, e_CursorY + 34, XTColorF(1.0f, 0.7f, 0.7f));
+                SuperPrint(e_tooltip, 3, e_CursorX + 28, e_CursorY + 34, XTColorF(1.0_n, 0.7_n, 0.7_n));
             else
-                SuperPrintRightAlign(e_tooltip, 3, e_CursorX + 10, e_CursorY + 34, XTColorF(1.0f, 0.7f, 0.7f));
+                SuperPrintRightAlign(e_tooltip, 3, e_CursorX + 10, e_CursorY + 34, XTColorF(1.0_n, 0.7_n, 0.7_n));
         }
     }
 

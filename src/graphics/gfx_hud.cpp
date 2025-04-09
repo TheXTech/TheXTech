@@ -362,9 +362,9 @@ static inline void s_DrawMedal(int i, int x, int y, int coin_width, int coin_hei
         if(level == MedalDrawLevel::Shiny || level == MedalDrawLevel::Got)
             XRender::renderTextureBasic(x, y, GFX.Interface[2]);
         else if(level == MedalDrawLevel::Prev)
-            XRender::renderTextureBasic(x, y, GFX.Interface[2], XTColorF(0.5f, 0.5f, 0.5f));
+            XRender::renderTextureBasic(x, y, GFX.Interface[2], XTColorF(0.5_n, 0.5_n, 0.5_n));
         else
-            XRender::renderTextureBasic(x, y, GFX.Interface[2], XTColorF(0.5f, 0.5f, 0.5f, 0.5f));
+            XRender::renderTextureBasic(x, y, GFX.Interface[2], XTColorF(0.5_n, 0.5_n, 0.5_n, 0.5_n));
     }
 
     // render sparkles for shiny
@@ -390,7 +390,7 @@ static inline void s_DrawMedal(int i, int x, int y, int coin_width, int coin_hei
             sparkle_X &= ~1;
             sparkle_Y &= ~1;
 
-            XRender::renderTextureBasic(x + sparkle_X, y + sparkle_Y, EffectWidth[EFFID_COIN_COLLECT], EffectHeight[EFFID_COIN_COLLECT], GFXEffect[EFFID_COIN_COLLECT], 0, EffectHeight[EFFID_COIN_COLLECT] * sparkle_frame, XTAlphaF(0.8f));
+            XRender::renderTextureBasic(x + sparkle_X, y + sparkle_Y, EffectWidth[EFFID_COIN_COLLECT], EffectHeight[EFFID_COIN_COLLECT], GFXEffect[EFFID_COIN_COLLECT], 0, EffectHeight[EFFID_COIN_COLLECT] * sparkle_frame, XTAlphaF(0.8_n));
         }
     }
 }

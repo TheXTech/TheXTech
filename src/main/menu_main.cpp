@@ -2423,18 +2423,18 @@ void drawGameVersion(bool disable_git, bool git_only)
 static void s_drawGameTypeTitle(int x, int y)
 {
     if(MenuMode == MENU_EDITOR)
-        SuperPrint(g_mainMenu.mainEditor, 3, x, y, XTColorF(0.8f, 0.8f, 0.3f));
+        SuperPrint(g_mainMenu.mainEditor, 3, x, y, XTColorF(0.8_n, 0.8_n, 0.3_n));
     else if(menuBattleMode)
-        SuperPrint(g_mainMenu.mainBattleGame, 3, x, y, XTColorF(0.3f, 0.3f, 1.0f));
+        SuperPrint(g_mainMenu.mainBattleGame, 3, x, y, XTColorF(0.3_n, 0.3_n, 1.0_n));
     else
     {
         // show "Play Episode" when at the save slot selecting and adjusting settings (not when the game was started in compat / speedrun mode)
         if(!s_show_separate_2P())
-            SuperPrint(g_mainMenu.mainPlayEpisode, 3, x, y, XTColorF(1.0f, 0.3f, 0.3f));
+            SuperPrint(g_mainMenu.mainPlayEpisode, 3, x, y, XTColorF(1.0_n, 0.3_n, 0.3_n));
         else if(menuPlayersNum == 1)
-            SuperPrint(g_mainMenu.main1PlayerGame, 3, x, y, XTColorF(1.0f, 0.3f, 0.3f));
+            SuperPrint(g_mainMenu.main1PlayerGame, 3, x, y, XTColorF(1.0_n, 0.3_n, 0.3_n));
         else
-            SuperPrint(g_mainMenu.mainMultiplayerGame, 3, x, y, XTColorF(0.3f, 1.0f, 0.3f));
+            SuperPrint(g_mainMenu.mainMultiplayerGame, 3, x, y, XTColorF(0.3_n, 1.0_n, 0.3_n));
     }
 }
 
@@ -2543,10 +2543,10 @@ static void s_drawGameSaves(int MenuX, int MenuY)
     if((int)g_config.speedrun_mode != 0 && g_config.speedrun_mode != -info.ConfigDefaults
         && (info.ConfigDefaults != 0 || info.Progress >= 0))
     {
-        XRender::renderRect(XRender::TargetW / 2 - 240, infobox_y, 480, 68, XTColorF(0, 0, 0, 1.0f));
-        SuperPrintScreenCenter("SAVE INCOMPATIBLE", 3, infobox_y + 4, XTColorF(1.0f, 0.0f, 0.0f, 1.0f));
-        SuperPrintScreenCenter(fmt::format_ne("WITH SPEEDRUN MODE {0}", (int)g_config.speedrun_mode), 3, infobox_y + 24, XTColorF(1.0f, 0.0f, 0.0f, 1.0f));
-        SuperPrintScreenCenter("(COMMAND LINE FLAG)", 3, infobox_y + 44, XTColorF(0.8f, 0.8f, 0.8f, 1.0f));
+        XRender::renderRect(XRender::TargetW / 2 - 240, infobox_y, 480, 68, XTColorF(0, 0, 0, 1.0_n));
+        SuperPrintScreenCenter("SAVE INCOMPATIBLE", 3, infobox_y + 4, XTColorF(1.0_n, 0.0_n, 0.0_n, 1.0_n));
+        SuperPrintScreenCenter(fmt::format_ne("WITH SPEEDRUN MODE {0}", (int)g_config.speedrun_mode), 3, infobox_y + 24, XTColorF(1.0_n, 0.0_n, 0.0_n, 1.0_n));
+        SuperPrintScreenCenter("(COMMAND LINE FLAG)", 3, infobox_y + 44, XTColorF(0.8_n, 0.8_n, 0.8_n, 1.0_n));
     }
     // initialize config
     else if(info.ConfigDefaults == 0)
@@ -2556,11 +2556,11 @@ static void s_drawGameSaves(int MenuX, int MenuY)
         XTColor color;
 
         if(s_episode_playstyle == Config_t::MODE_MODERN)
-            color = XTColorF(0.5f, 0.8f, 1.0f);
+            color = XTColorF(0.5_n, 0.8_n, 1.0_n);
         else if(s_episode_playstyle == Config_t::MODE_CLASSIC)
-            color = XTColorF(1.0f, 0.5f, 0.5f);
+            color = XTColorF(1.0_n, 0.5_n, 0.5_n);
         else
-            color = XTColorF(0.8f, 0.5f, 0.2f);
+            color = XTColorF(0.8_n, 0.5_n, 0.2_n);
 
         if(s_episode_speedrun_mode != 0)
         {
@@ -2784,7 +2784,7 @@ void mainMenuDraw()
     {
         s_drawGameTypeTitle(MenuX, MenuY - 70);
         const auto& world_list = (MenuMode == MENU_CHARACTER_SELECT_NEW) ? SelectWorld : SelectBattle;
-        SuperPrint(world_list[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6f, 1.f, 1.f));
+        SuperPrint(world_list[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6_n, 1.0_n, 1.0_n));
 
         ConnectScreen::Render();
     }
@@ -2823,7 +2823,7 @@ void mainMenuDraw()
         C = 0;
 
         s_drawGameTypeTitle(MenuX, 280);
-        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, 310, XTColorF(0.6f, 1.f, 1.f));
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, 310, XTColorF(0.6_n, 1.0_n, 1.0_n));
 
         // TODO: Make a custom playable character names print here
         if(!blockCharacter[1])
@@ -2981,9 +2981,9 @@ void mainMenuDraw()
             XTColor color;
 
             if(s_editor_target_thextech)
-                color = XTColorF(0.5f, 0.8f, 1.0f);
+                color = XTColorF(0.5_n, 0.8_n, 1.0_n);
             else
-                color = XTColorF(1.0f, 0.5f, 0.5f);
+                color = XTColorF(1.0_n, 0.5_n, 0.5_n);
 
             SuperPrintScreenCenter(g_mainMenu.editorMakeFor, 3, infobox_y + 14, color);
 
@@ -3011,7 +3011,7 @@ void mainMenuDraw()
     else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P) // Save Select
     {
         s_drawGameTypeTitle(MenuX, MenuY - 70);
-        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6f, 1.f, 1.f));
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6_n, 1.0_n, 1.0_n));
         s_drawGameSaves(MenuX, MenuY);
         XRender::renderTextureBasic(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
@@ -3020,13 +3020,13 @@ void mainMenuDraw()
             MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2) // Copy save
     {
         s_drawGameTypeTitle(MenuX, MenuY - 70);
-        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6f, 1.f, 1.f));
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6_n, 1.0_n, 1.0_n));
         s_drawGameSaves(MenuX, MenuY);
 
         if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1)
-            SuperPrint(g_mainMenu.gameSourceSlot, 3, MenuX, MenuY + c_menuSavesFooterHint, XTColorF(0.7f, 0.7f, 1.0f));
+            SuperPrint(g_mainMenu.gameSourceSlot, 3, MenuX, MenuY + c_menuSavesFooterHint, XTColorF(0.7_n, 0.7_n, 1.0_n));
         else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
-            SuperPrint(g_mainMenu.gameTargetSlot, 3, MenuX, MenuY + c_menuSavesFooterHint, XTColorF(0.7f, 1.0f, 0.7f));
+            SuperPrint(g_mainMenu.gameTargetSlot, 3, MenuX, MenuY + c_menuSavesFooterHint, XTColorF(0.7_n, 1.0_n, 0.7_n));
 
         if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
         {
@@ -3040,10 +3040,10 @@ void mainMenuDraw()
     else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE) // Delete save
     {
         s_drawGameTypeTitle(MenuX, MenuY - 70);
-        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6f, 1.f, 1.f));
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6_n, 1.0_n, 1.0_n));
         s_drawGameSaves(MenuX, MenuY);
 
-        SuperPrint(g_mainMenu.gameEraseSlot, 3, MenuX, MenuY + c_menuSavesFooterHint, XTColorF(1.0f, 0.7f, 0.7f));
+        SuperPrint(g_mainMenu.gameEraseSlot, 3, MenuX, MenuY + c_menuSavesFooterHint, XTColorF(1.0_n, 0.7_n, 0.7_n));
 
         XRender::renderTextureBasic(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
@@ -3051,16 +3051,16 @@ void mainMenuDraw()
     else if(MenuMode == MENU_SELECT_SLOT_1P_ADVMODE || MenuMode == MENU_SELECT_SLOT_2P_ADVMODE) // Advanced mode select
     {
         s_drawGameTypeTitle(MenuX, MenuY - 70);
-        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6f, 1.f, 1.f));
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6_n, 1.0_n, 1.0_n));
 
         int A = 0;
 
-        SuperPrint("Modern Game", 3, MenuX, MenuY + (A++ * 30), XTColorF(0.5f, 0.7f, 1.0f));
-        SuperPrint("Classic Game", 3, MenuX, MenuY + (A++ * 30), XTColorF(1.0f, 0.7f, 0.7f));
-        SuperPrint("Vanilla Game", 3, MenuX, MenuY + (A++ * 30), XTColorF(0.8f, 0.5f, 0.2f));
-        SuperPrint("Speedrun Mode 1", 3, MenuX, MenuY + (A++ * 30), XTColorF(0.5f, 0.7f, 1.0f));
-        SuperPrint("Speedrun Mode 2", 3, MenuX, MenuY + (A++ * 30), XTColorF(1.0f, 0.7f, 0.7f));
-        SuperPrint("Speedrun Mode 3", 3, MenuX, MenuY + (A++ * 30), XTColorF(0.8f, 0.5f, 0.2f));
+        SuperPrint("Modern Game", 3, MenuX, MenuY + (A++ * 30), XTColorF(0.5_n, 0.7_n, 1.0_n));
+        SuperPrint("Classic Game", 3, MenuX, MenuY + (A++ * 30), XTColorF(1.0_n, 0.7_n, 0.7_n));
+        SuperPrint("Vanilla Game", 3, MenuX, MenuY + (A++ * 30), XTColorF(0.8_n, 0.5_n, 0.2_n));
+        SuperPrint("Speedrun Mode 1", 3, MenuX, MenuY + (A++ * 30), XTColorF(0.5_n, 0.7_n, 1.0_n));
+        SuperPrint("Speedrun Mode 2", 3, MenuX, MenuY + (A++ * 30), XTColorF(1.0_n, 0.7_n, 0.7_n));
+        SuperPrint("Speedrun Mode 3", 3, MenuX, MenuY + (A++ * 30), XTColorF(0.8_n, 0.5_n, 0.2_n));
 
         XRender::renderTextureBasic(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }

@@ -95,7 +95,7 @@ void s_drawBlockExtra(int Z, int camX, int camY, const Block_t& b)
             int sX = s_round2int(b.Location.X + b.Location.Width / 2) - GFX.Chat.w / 2;
             int sY = s_round2int(b.Location.Y) - GFX.Chat.h - 8;
 
-            XRender::renderTextureBasic(camX + sX, camY + sY, GFX.Chat, XTColorF(1., 0., 0., 0.7f));
+            XRender::renderTextureBasic(camX + sX, camY + sY, GFX.Chat, XTColorF(1.0_n, 0.0_n, 0.0_n, 0.7_n));
         }
     }
 }
@@ -151,7 +151,7 @@ void s_drawNpcExtra(int Z, int camX, int camY, const NPC_t& n)
 
             int sY = s_round2int(n.Location.Y) - GFX.Chat.h - 8;
 
-            XRender::renderTextureBasic(camX + sX, camY + sY, GFX.Chat, XTColorF(1., 0., 0., 0.7f));
+            XRender::renderTextureBasic(camX + sX, camY + sY, GFX.Chat, XTColorF(1.0_n, 0.0_n, 0.0_n, 0.7_n));
         }
     }
 
@@ -168,7 +168,7 @@ void s_drawNpcExtra(int Z, int camX, int camY, const NPC_t& n)
 
             int sY = s_round2int(n.Location.Y) - GFX.Chat.h - 8;
 
-            XRender::renderTextureBasic(camX + sX, camY + sY, GFX.Chat, XTColorF(1., 1., 1., 0.7f));
+            XRender::renderTextureBasic(camX + sX, camY + sY, GFX.Chat, XTColorF(1.0_n, 1.0_n, 1.0_n, 0.7_n));
         }
     }
 }
@@ -283,7 +283,7 @@ void DrawEditorLevel(int Z)
             if(Warp[A].Direction > 0 && !Warp[A].Hidden)
             {
                 bool complete = Warp[A].PlacedEnt && Warp[A].PlacedExit;
-                XTColor color = complete ? XTColorF(1.f, 0.f, 1.f) : XTColorF(0.7f, 0.3f, 0.f);
+                XTColor color = complete ? XTColorF(1.0_n, 0.0_n, 1.0_n) : XTColorF(0.7_n, 0.3_n, 0.0_n);
 
                 if(Warp[A].PlacedEnt)
                 {
@@ -528,7 +528,7 @@ void DrawEditorLevel(int Z)
         else if(EditorCursor.Mode == OptCursor_t::LVL_WARPS)
         {
             XRender::renderRect(camX + s_round2int(EditorCursor.Location.X), camY + s_round2int(EditorCursor.Location.Y), (int)EditorCursor.Location.Width, (int)EditorCursor.Location.Height,
-                XTColorF(1.f, 0.f, 0.f, 1.f), false);
+                XTColorF(1.0_n, 0.0_n, 0.0_n, 1.0_n), false);
         }
 
         if(EditorCursor.Mode == 0 || EditorCursor.Mode == 6) // Eraser
@@ -565,7 +565,7 @@ void DrawEditorLevel(int Z)
         else if(EditorCursor.Mode == 13 || EditorCursor.Mode == 14) // Selector
         {
             if(MagicBlock::enabled)
-                XRender::renderTextureBasic(curX, curY, GFX.ECursor[2], XTColorF(0.7f, 1.0f, 0.7f, 1.0f));
+                XRender::renderTextureBasic(curX, curY, GFX.ECursor[2], XTColorF(0.7_n, 1.0_n, 0.7_n, 1.0_n));
             else
                 XRender::renderTextureBasic(curX, curY, GFX.ECursor[2]);
 
@@ -579,7 +579,7 @@ void DrawEditorLevel(int Z)
         else
         {
             if(MagicBlock::enabled)
-                XRender::renderTextureBasic(curX, curY, GFX.ECursor[2], XTColorF(0.7f, 1.0f, 0.7f, 1.0f));
+                XRender::renderTextureBasic(curX, curY, GFX.ECursor[2], XTColorF(0.7_n, 1.0_n, 0.7_n, 1.0_n));
             else
                 XRender::renderTextureBasic(curX, curY, GFX.ECursor[2]);
 
@@ -587,7 +587,7 @@ void DrawEditorLevel(int Z)
             {
                 // there might be a tooltip in this case
                 if(editorScreen.active || EditorCursor.Y < 40)
-                    SuperPrint(GetL(e.Layer), 3, curX + 28 , curY + 34, XTColorF(1., 1., 1., 0.3f));
+                    SuperPrint(GetL(e.Layer), 3, curX + 28 , curY + 34, XTColorF(1.0_n, 1.0_n, 1.0_n, 0.3_n));
                 else
                     SuperPrint(GetL(e.Layer), 3, curX + 28 , curY + 34);
             }
@@ -706,14 +706,14 @@ void DrawEditorWorld()
     else if(EditorCursor.Mode == OptCursor_t::WLD_MUSIC)
     {
         XRender::renderRect(camX + EditorCursor.WorldMusic.Location.X, camY + EditorCursor.WorldMusic.Location.Y, 32, 32,
-            XTColorF(1.f, 0.f, 1.f), false);
+            XTColorF(1.0_n, 0.0_n, 1.0_n), false);
         SuperPrint(std::to_string(EditorCursor.WorldMusic.Type), 1, camX + EditorCursor.WorldMusic.Location.X + 2, camY + EditorCursor.WorldMusic.Location.Y + 2);
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_AREA)
     {
         XRender::renderRect(camX + EditorCursor.WorldArea.Location.X, camY + EditorCursor.WorldArea.Location.Y,
             EditorCursor.WorldArea.Location.Width, EditorCursor.WorldArea.Location.Height,
-            XTColorF(1.0f, 0.8f, 0.2f), false);
+            XTColorF(1.0_n, 0.8_n, 0.2_n), false);
     }
 
     int X = (int)EditorCursor.X - vScreen[Z].TargetX();
