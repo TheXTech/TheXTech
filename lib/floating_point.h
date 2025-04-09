@@ -53,6 +53,7 @@ public:
     float i;
 
     numf_t() {}
+    constexpr numf_t(const numf_t& o) : i(o.i) {}
     constexpr numf_t(int _i) : i(_i) {}
     constexpr numf_t(long _i) : i(_i) {}
     constexpr numf_t(long long _i) : i(_i) {}

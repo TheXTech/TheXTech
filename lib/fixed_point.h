@@ -93,6 +93,7 @@ public:
     int32_t i;
 
     numf_t() {}
+    constexpr numf_t(const numf_t& o) : i(o.i) {}
     constexpr numf_t(int _i) : i((int32_t)_i << 24) {}
     explicit constexpr numf_t(int32_t _i, nullptr_t) : i(_i) {}
     explicit constexpr numf_t(double _i, nullptr_t) : i((int32_t)(_i * (1 << 24))) {}
