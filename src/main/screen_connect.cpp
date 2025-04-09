@@ -1656,7 +1656,7 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
                 menu_max = 66 * 12;
             }
 
-            XTColor shade = color * 0.95f;
+            XTColor shade = color * XTColor::from_num(0.95_n);
             XRender::renderRect(x + 4, info_y + 4, (w - 8) * menu_progress / menu_max, info_height - 8, shade);
 
             // move infotext y up a bit, since controls will be drawn in main box (if at all)

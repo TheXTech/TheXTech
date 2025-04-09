@@ -764,7 +764,7 @@ bool Mouse_Render(bool mouse, bool render)
         name_marquee_spec.marquee_width = is_header ? total_width : main_width;
 
         if(tight_mode && i != cur_item)
-            name_color = name_color * 0.6f;
+            name_color = name_color * XTColor::from_num(0.6_n);
 
         if(opt == &g_config.compat || opt == &g_config.reset_all)
             name_color.g = 0;
@@ -832,7 +832,7 @@ bool Mouse_Render(bool mouse, bool render)
         }
 
         if(tight_mode && i != cur_item)
-            vcolor = vcolor * 0.6f;
+            vcolor = vcolor * XTColor::from_num(0.6_n);
 
         const int rX = tight_mode ? sX + width - 8 : sX + width - 16;
         // SuperPrintRightAlign(s_temp_string, 3, rX, sY + (i - cur_scroll + first_display_row) * line, vr, vg, vb, va * name_opacity);
