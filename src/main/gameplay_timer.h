@@ -24,6 +24,8 @@
 
 #include <string>
 
+#include "xt_color.h"
+
 class GameplayTimer
 {
     bool    m_invalidContinue = false;
@@ -36,11 +38,11 @@ class GameplayTimer
 
     bool    m_levelBlinkActive = false;
     bool    m_worldBlinkActive = false;
-    float   m_blinkingFactor = 0.f;
-    float   m_blinkingDir = 1.0f;
-    float   m_colorSpin[3] = {0.0f, 0.8f, 0.8f};
-    float   m_colorSpinHue = 0.f;
-    void    updateColorSpin(float delta);
+    int     m_blinkingFactor = 0;
+    int     m_blinkingDir = 1;
+    XTColor m_colorSpin;
+    int     m_colorSpinHue = 0;
+    void    updateColorSpin(int delta);
 
 public:
     static std::string formatTime(int64_t t);

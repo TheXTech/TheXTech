@@ -58,70 +58,50 @@ std::string GameplayTimer::formatTime(int64_t t)
     return displayTime;
 }
 
-void GameplayTimer::updateColorSpin(float delta)
+void GameplayTimer::updateColorSpin(int delta)
 {
-    float in_s = 0.7f;
-    float in_v = 1.0f;
-    double      hh, p, q, t, ff;
-    long        i;
+    const int in_s = 178;
+    const int in_v = 255;
 
+    // note: changed from 360 degrees to 384 (64 * 6) degrees
     m_colorSpinHue += delta;
-    if(m_colorSpinHue >= 360.f)
-        m_colorSpinHue -= 360.f;
-    else if(m_colorSpinHue < 0.f)
-        m_colorSpinHue += 360.f;
+    if(m_colorSpinHue >= 384)
+        m_colorSpinHue -= 384;
+    else if(m_colorSpinHue < 0)
+        m_colorSpinHue += 384;
 
-    if(in_s <= 0.0) // < is bogus, just shuts up warnings
+    if(in_s <= 0) // < is bogus, just shuts up warnings
     {
-        m_colorSpin[0] = in_v;
-        m_colorSpin[1] = in_v;
-        m_colorSpin[2] = in_v;
+        m_colorSpin = XTColor(in_v, in_v, in_v);
         return;
     }
 
-    hh = m_colorSpinHue;
-    if(hh >= 360.0f)
-        hh = 0.0f;
+    int ff = m_colorSpinHue % 64;
+    int p = in_v * (256 - in_s) / 256;
+    int q = in_v * (256 - (in_s * ff) / 64) / 256;
+    int t = in_v * (256 - (in_s * (64 - ff)) / 64) / 256;
 
-    hh /= 60.0f;
-    i = (long)hh;
-    ff = hh - i;
-    p = in_v * (1.0f - in_s);
-    q = in_v * (1.0f - (in_s * ff));
-    t = in_v * (1.0f - (in_s * (1.0f - ff)));
-
+    int i = m_colorSpinHue / 64;
     switch(i)
     {
     case 0:
-        m_colorSpin[0] = in_v;
-        m_colorSpin[1] = t;
-        m_colorSpin[2] = p;
+        m_colorSpin = XTColor(in_v, t, p);
         break;
     case 1:
-        m_colorSpin[0] = q;
-        m_colorSpin[1] = in_v;
-        m_colorSpin[2] = p;
+        m_colorSpin = XTColor(q, in_v, p);
         break;
     case 2:
-        m_colorSpin[0] = p;
-        m_colorSpin[1] = in_v;
-        m_colorSpin[2] = t;
+        m_colorSpin = XTColor(p, in_v, t);
         break;
     case 3:
-        m_colorSpin[0] = p;
-        m_colorSpin[1] = q;
-        m_colorSpin[2] = in_v;
+        m_colorSpin = XTColor(p, q, in_v);
         break;
     case 4:
-        m_colorSpin[0] = t;
-        m_colorSpin[1] = p;
-        m_colorSpin[2] = in_v;
+        m_colorSpin = XTColor(t, p, in_v);
         break;
     case 5:
     default:
-        m_colorSpin[0] = in_v;
-        m_colorSpin[1] = p;
-        m_colorSpin[2] = q;
+        m_colorSpin = XTColor(in_v, p, q);
         break;
     }
 }
@@ -139,7 +119,7 @@ void GameplayTimer::reset()
     m_cyclesTotal = 0;
     m_levelBlinkActive = false;
     m_worldBlinkActive = false;
-    m_blinkingFactor = 0.0f;
+    m_blinkingFactor = 0;
 }
 
 void GameplayTimer::resetCurrent()
@@ -147,7 +127,7 @@ void GameplayTimer::resetCurrent()
     m_cyclesCurrent = 0;
     m_levelBlinkActive = false;
     m_worldBlinkActive = false;
-    m_blinkingFactor = 0.0f;
+    m_blinkingFactor = 0;
 }
 
 void GameplayTimer::load()
@@ -215,7 +195,7 @@ void GameplayTimer::tick()
         m_cyclesAtWinDisplay = 0;
         m_levelBlinkActive = false;
         m_worldBlinkActive = false;
-        m_blinkingFactor = 0.0f;
+        m_blinkingFactor = 0;
     }
 
     bool in_leveltest_restart_screen = (GamePaused == PauseCode::PauseScreen && LevelBeatCode < 0);
@@ -229,13 +209,13 @@ void GameplayTimer::tick()
     m_cyclesTotal += 1;
 
     if(m_levelBlinkActive)
-        updateColorSpin(5.0f);
+        updateColorSpin(5);
 
     if(m_worldBlinkActive)
     {
-        m_blinkingFactor += m_blinkingDir * 0.02;
-        if(m_blinkingFactor >= 0.3f || m_blinkingFactor <= -0.3f)
-            m_blinkingDir *= -1.0f;
+        m_blinkingFactor += m_blinkingDir * 5;
+        if(m_blinkingFactor >= 75 || m_blinkingFactor <= -75)
+            m_blinkingDir *= -1;
     }
 }
 
@@ -252,28 +232,23 @@ void GameplayTimer::onBossDead()
 
 void GameplayTimer::render()
 {
-    float a = (g_config.show_playtime_counter == Config_t::PLAYTIME_COUNTER_SUBTLE) ? 0.5f : 1.f;
+    uint8_t a = (g_config.show_playtime_counter == Config_t::PLAYTIME_COUNTER_SUBTLE) ? 127 : 255;
     // int x = (XRender::TargetW / 2) - (144 / 2);
     int y = XRender::TargetH;
 
-    float lc[3] =
-    {
-        m_levelBlinkActive ? m_colorSpin[0] : 0.6f,
-        m_levelBlinkActive ? m_colorSpin[1] : 0.6f,
-        m_levelBlinkActive ? m_colorSpin[2] : 0.6f
-    };
-    float wc = m_worldBlinkActive ? 0.5f + m_blinkingFactor : 1.f;
+    XTColor lc = m_levelBlinkActive ? m_colorSpin : XTColor(154, 154, 154);
+    uint8_t wc = m_worldBlinkActive ? (128 + m_blinkingFactor) : 255;
 
-    SuperPrintScreenCenter(formatTime(m_cyclesCurrent), 3, y - 34, XTColorF(lc[0], lc[1], lc[2], a));
+    SuperPrintScreenCenter(formatTime(m_cyclesCurrent), 3, y - 34, lc.with_alpha(a));
 
     if(m_invalidContinue)
-        SuperPrintScreenCenter(g_mainMenu.caseNone,         3, y - 18, XTColorF(0.5f, 0.5f, 0.5f, a));
+        SuperPrintScreenCenter(g_mainMenu.caseNone,         3, y - 18, XTColor(127, 127, 127, a));
     else if(!TestLevel)
     {
         int64_t use_total = m_cyclesTotal;
         if(m_cyclesAtWinDisplay)
             use_total = m_cyclesAtWinDisplay;
 
-        SuperPrintScreenCenter(formatTime(use_total),       3, y - 18, XTColorF(wc, 1.0f, wc, a));
+        SuperPrintScreenCenter(formatTime(use_total),       3, y - 18, XTColor(wc, 255, wc, a));
     }
 }
