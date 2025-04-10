@@ -658,6 +658,10 @@ static void s_LoadWorldArchive(const std::string& archive)
         return;
     }
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+    ini.read("source-hash", w.lz4_content_hash, 0);
+#endif
+
     ini.endGroup();
 
     // load properties
@@ -696,19 +700,22 @@ static void s_LoadWorldArchive(const std::string& archive)
     w.editable = false;
 
 #ifdef THEXTECH_ENABLE_SDL_NET
-    SDL_RWops* rw = Files::open_file(archive, "rb");
-    if(rw)
+    if(!w.lz4_content_hash)
     {
-        SDL_RWseek(rw, -4, RW_SEEK_END);
-        uint8_t hash[4];
-        if(SDL_RWread(rw, hash, 1, 4) == 4)
+        SDL_RWops* rw = Files::open_file(archive, "rb");
+        if(rw)
         {
-            w.lz4_content_hash = (hash[0])
-                | ((uint32_t)(hash[1]) <<  8)
-                | ((uint32_t)(hash[2]) << 16)
-                | ((uint32_t)(hash[3]) << 24);
+            SDL_RWseek(rw, -4, RW_SEEK_END);
+            uint8_t hash[4];
+            if(SDL_RWread(rw, hash, 1, 4) == 4)
+            {
+                w.lz4_content_hash = (hash[0])
+                    | ((uint32_t)(hash[1]) <<  8)
+                    | ((uint32_t)(hash[2]) << 16)
+                    | ((uint32_t)(hash[3]) << 24);
+            }
+            SDL_RWclose(rw);
         }
-        SDL_RWclose(rw);
     }
 #endif
 
