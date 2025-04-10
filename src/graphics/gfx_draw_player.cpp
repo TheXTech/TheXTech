@@ -190,7 +190,7 @@ int pfrOffY(const StdPicture& tx, const Player_t& p)
     return offY;
 }
 
-using plr_pic_arr = RangeArr<StdPicture, 1, 10>;
+using plr_pic_arr = RangeArr<StdPicture, 1, numStates>;
 static constexpr std::array<plr_pic_arr*, 5> s_char_tex = {&GFXMario, &GFXLuigi, &GFXPeach, &GFXToad, &GFXLink};
 
 void DrawPlayerRaw(int X, int Y, int Character, int State, int Frame, int Direction)

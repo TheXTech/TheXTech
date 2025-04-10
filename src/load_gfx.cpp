@@ -859,7 +859,7 @@ void LoadGFX()
     {
         LoaderUpdateDebugString(fmt::format_ne("Character {0}", c));
         CurDir.setCurDir(getGfxDir() + GFXPlayerNames[c]);
-        For(A, 1, 10)
+        For(A, 1, numStates)
         {
             s_find_image(p, CurDir, fmt::format_ne("{1}-{0}", A, GFXPlayerNames[c]));
             if(!p.empty())

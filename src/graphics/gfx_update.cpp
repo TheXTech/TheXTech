@@ -2365,7 +2365,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
                         // DONE: Convert this mess of duplicated code into united with usage of references, pointers, and ternary expressions
 
-                        using plr_pic_arr = RangeArr<StdPicture, 1, 10>;
+                        using plr_pic_arr = RangeArr<StdPicture, 1, numStates>;
                         constexpr std::array<plr_pic_arr*, 5> char_tex = {&GFXMario, &GFXLuigi, &GFXPeach, &GFXToad, &GFXLink};
 
                         StdPicture& tx = (*char_tex[p.Character - 1])[p.State];
@@ -2773,7 +2773,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
             {
                 const Player_t& p = Player[A];
 
-                using plr_pic_arr = RangeArr<StdPicture, 1, 10>;
+                using plr_pic_arr = RangeArr<StdPicture, 1, numStates>;
                 constexpr std::array<plr_pic_arr*, 5> char_tex = {&GFXMario, &GFXLuigi, &GFXPeach, &GFXToad, &GFXLink};
 
                 StdPicture& tx = (*char_tex[p.Character - 1])[p.State];

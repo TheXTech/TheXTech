@@ -435,7 +435,7 @@ const char *GFXPlayerNames[numCharacters] =
 {
     "mario", "luigi", "peach", "toad", "link"
 };
-RangeArr<StdPicture, 1, 10> *GFXCharacterBMP[numCharacters] =
+RangeArr<StdPicture, 1, numStates> *GFXCharacterBMP[numCharacters] =
 {
     &GFXMarioBMP, &GFXLuigiBMP, &GFXPeachBMP, &GFXToadBMP, &GFXLinkBMP
 };
@@ -455,28 +455,28 @@ RangeArr<StdPicture, 1, 10> *GFXCharacterBMP[numCharacters] =
 // RangeArrI<bool, 1, 10, false> GFXMarioCustom;
 //RangeArrI<long, 1, 10, 0> GFXMario;
 //RangeArrI<long, 1, 10, 0> GFXMarioMask;
-RangeArr<StdPicture, 1, 10> GFXMarioBMP;
+RangeArr<StdPicture, 1, numStates> GFXMarioBMP;
 //RangeArr<StdPicture, 1, 10> GFXMarioMaskBMP;
 // RangeArrI<vbint_t, 1, 10, 0> GFXMarioHeight;
 // RangeArrI<vbint_t, 1, 10, 0> GFXMarioWidth;
 // RangeArrI<bool, 1, 10, false> GFXLuigiCustom;
 //RangeArrI<long, 1, 10, 0> GFXLuigi;
 //RangeArrI<long, 1, 10, 0> GFXLuigiMask;
-RangeArr<StdPicture, 1, 10> GFXLuigiBMP;
+RangeArr<StdPicture, 1, numStates> GFXLuigiBMP;
 //RangeArr<StdPicture, 1, 10> GFXLuigiMaskBMP;
 // RangeArrI<vbint_t, 1, 10, 0> GFXLuigiHeight;
 // RangeArrI<vbint_t, 1, 10, 0> GFXLuigiWidth;
 // RangeArrI<bool, 1, 10, false> GFXPeachCustom;
 //RangeArrI<long, 1, 10, 0> GFXPeach;
 //RangeArrI<long, 1, 10, 0> GFXPeachMask;
-RangeArr<StdPicture, 1, 10> GFXPeachBMP;
+RangeArr<StdPicture, 1, numStates> GFXPeachBMP;
 //RangeArr<StdPicture, 1, 10> GFXPeachMaskBMP;
 // RangeArrI<vbint_t, 1, 10, 0> GFXPeachHeight;
 // RangeArrI<vbint_t, 1, 10, 0> GFXPeachWidth;
 // RangeArrI<bool, 1, 10, false> GFXToadCustom;
 //RangeArrI<long, 1, 10, 0> GFXToad;
 //RangeArrI<long, 1, 10, 0> GFXToadMask;
-RangeArr<StdPicture, 1, 10> GFXToadBMP;
+RangeArr<StdPicture, 1, numStates> GFXToadBMP;
 //RangeArr<StdPicture, 1, 10> GFXToadMaskBMP;
 // RangeArrI<vbint_t, 1, 10, 0> GFXToadHeight;
 // RangeArrI<vbint_t, 1, 10, 0> GFXToadWidth;
@@ -484,7 +484,7 @@ RangeArr<StdPicture, 1, 10> GFXToadBMP;
 // RangeArrI<bool, 1, 10, false> GFXLinkCustom;
 //RangeArrI<long, 1, 10, 0> GFXLink;
 //RangeArrI<long, 1, 10, 0> GFXLinkMask;
-RangeArr<StdPicture, 1, 10> GFXLinkBMP;
+RangeArr<StdPicture, 1, numStates> GFXLinkBMP;
 //RangeArr<StdPicture, 1, 10> GFXLinkMaskBMP;
 // RangeArrI<vbint_t, 1, 10, 0> GFXLinkHeight;
 // RangeArrI<vbint_t, 1, 10, 0> GFXLinkWidth;

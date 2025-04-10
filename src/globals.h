@@ -2302,9 +2302,9 @@ extern RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundBMP;
 // extern RangeArrI<vbint_t, 1, maxBackgroundType, 0> GFXBackgroundWidth;
 
 extern const char *GFXPlayerNames[numCharacters];
-extern RangeArr<StdPicture, 1, 10> *GFXCharacterBMP[numCharacters];
-extern RangeArrI<vbint_t, 1, 10, 0> *GFXCharacterWidth[numCharacters];
-extern RangeArrI<vbint_t, 1, 10, 0> *GFXCharacterHeight[numCharacters];
+extern RangeArr<StdPicture, 1, numStates> *GFXCharacterBMP[numCharacters];
+extern RangeArrI<vbint_t, 1, numStates, 0> *GFXCharacterWidth[numCharacters];
+extern RangeArrI<vbint_t, 1, numStates, 0> *GFXCharacterHeight[numCharacters];
 // extern RangeArrI<bool, 1, 10, false> *GFXCharacterCustom[numCharacters];
 
 //Public GFXMarioCustom(1 To 10) As Boolean
@@ -2315,7 +2315,7 @@ extern RangeArrI<vbint_t, 1, 10, 0> *GFXCharacterHeight[numCharacters];
 //Public GFXMarioMask(1 To 10) As Long
 //extern RangeArrI<long, 1, 10, 0> GFXMarioMask;
 //Public GFXMarioBMP(1 To 10) As StdPicture
-extern RangeArr<StdPicture, 1, 10> GFXMarioBMP;
+extern RangeArr<StdPicture, 1, numStates> GFXMarioBMP;
 //Public GFXMarioMaskBMP(1 To 10) As StdPicture
 //extern RangeArr<StdPicture, 1, 10> GFXMarioMaskBMP;
 //Public GFXMarioHeight(1 To 10) As Integer
@@ -2330,7 +2330,7 @@ extern RangeArr<StdPicture, 1, 10> GFXMarioBMP;
 //Public GFXLuigiMask(1 To 10) As Long
 //extern RangeArrI<long, 1, 10, 0> GFXLuigiMask;
 //Public GFXLuigiBMP(1 To 10) As StdPicture
-extern RangeArr<StdPicture, 1, 10> GFXLuigiBMP;
+extern RangeArr<StdPicture, 1, numStates> GFXLuigiBMP;
 //Public GFXLuigiMaskBMP(1 To 10) As StdPicture
 //extern RangeArr<StdPicture, 1, 10> GFXLuigiMaskBMP;
 //Public GFXLuigiHeight(1 To 10) As Integer
@@ -2345,7 +2345,7 @@ extern RangeArr<StdPicture, 1, 10> GFXLuigiBMP;
 //Public GFXPeachMask(1 To 10) As Long
 //extern RangeArrI<long, 1, 10, 0> GFXPeachMask;
 //Public GFXPeachBMP(1 To 10) As StdPicture
-extern RangeArr<StdPicture, 1, 10> GFXPeachBMP;
+extern RangeArr<StdPicture, 1, numStates> GFXPeachBMP;
 //Public GFXPeachMaskBMP(1 To 10) As StdPicture
 //extern RangeArr<StdPicture, 1, 10> GFXPeachMaskBMP;
 //Public GFXPeachHeight(1 To 10) As Integer
@@ -2360,7 +2360,7 @@ extern RangeArr<StdPicture, 1, 10> GFXPeachBMP;
 //Public GFXToadMask(1 To 10) As Long
 //extern RangeArrI<long, 1, 10, 0> GFXToadMask;
 //Public GFXToadBMP(1 To 10) As StdPicture
-extern RangeArr<StdPicture, 1, 10> GFXToadBMP;
+extern RangeArr<StdPicture, 1, numStates> GFXToadBMP;
 //Public GFXToadMaskBMP(1 To 10) As StdPicture
 //extern RangeArr<StdPicture, 1, 10> GFXToadMaskBMP;
 //Public GFXToadHeight(1 To 10) As Integer
@@ -2376,7 +2376,7 @@ extern RangeArr<StdPicture, 1, 10> GFXToadBMP;
 //Public GFXLinkMask(1 To 10) As Long
 //extern RangeArrI<long, 1, 10, 0> GFXLinkMask;
 //Public GFXLinkBMP(1 To 10) As StdPicture
-extern RangeArr<StdPicture, 1, 10> GFXLinkBMP;
+extern RangeArr<StdPicture, 1, numStates> GFXLinkBMP;
 //Public GFXLinkMaskBMP(1 To 10) As StdPicture
 //extern RangeArr<StdPicture, 1, 10> GFXLinkMaskBMP;
 //Public GFXLinkHeight(1 To 10) As Integer
