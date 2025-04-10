@@ -47,7 +47,7 @@ void IndicateProgress(uint32_t start_time, num_t progress, const std::string& me
         return;
 #endif
 
-    bool progress_valid = (progress > 0);
+    bool progress_valid = (uint16_t(1024 * progress) > 0);
 
     if(progress > 1)
         progress = 1;
