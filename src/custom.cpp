@@ -45,8 +45,8 @@ static struct PlayerBackup
 {
     struct FramePos
     {
-        vbint_t x;
-        vbint_t y;
+        int8_t x;
+        int8_t y;
     } p[maxPlayerFrames + 1];
 
     struct Calibration
@@ -59,7 +59,7 @@ static struct PlayerBackup
     } c[numStates];
 } s_playerFramesBackup[numCharacters];
 
-typedef RangeArrI<vbint_t, 0, maxPlayerFrames, 0> PlayerOffsetArray;
+typedef RangeArrI<int8_t, 0, maxPlayerFrames, 0> PlayerOffsetArray;
 
 static PlayerOffsetArray *s_playerFrameX[numCharacters + 1] = {
     nullptr, &MarioFrameX, &LuigiFrameX, &PeachFrameX, &ToadFrameX, &LinkFrameX

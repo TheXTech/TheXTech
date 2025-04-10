@@ -152,16 +152,16 @@ RangeArr<NPC_t, -128, maxNPCs> NPC;
 RangeArr<Block_t, 0, maxBlocks> Block;
 
 RangeArr<Player_t, 0, maxPlayers> Player;
-RangeArrI<vbint_t, 0, maxPlayerFrames, 0> MarioFrameX;
-RangeArrI<vbint_t, 0, maxPlayerFrames, 0> MarioFrameY;
-RangeArrI<vbint_t, 0, maxPlayerFrames, 0> LuigiFrameX;
-RangeArrI<vbint_t, 0, maxPlayerFrames, 0> LuigiFrameY;
-RangeArrI<vbint_t, 0, maxPlayerFrames, 0> PeachFrameX;
-RangeArrI<vbint_t, 0, maxPlayerFrames, 0> PeachFrameY;
-RangeArrI<vbint_t, 0, maxPlayerFrames, 0> ToadFrameX;
-RangeArrI<vbint_t, 0, maxPlayerFrames, 0> ToadFrameY;
-RangeArrI<vbint_t, 0, maxPlayerFrames, 0> LinkFrameX;
-RangeArrI<vbint_t, 0, maxPlayerFrames, 0> LinkFrameY;
+RangeArrI<int8_t, 0, maxPlayerFrames, 0> MarioFrameX;
+RangeArrI<int8_t, 0, maxPlayerFrames, 0> MarioFrameY;
+RangeArrI<int8_t, 0, maxPlayerFrames, 0> LuigiFrameX;
+RangeArrI<int8_t, 0, maxPlayerFrames, 0> LuigiFrameY;
+RangeArrI<int8_t, 0, maxPlayerFrames, 0> PeachFrameX;
+RangeArrI<int8_t, 0, maxPlayerFrames, 0> PeachFrameY;
+RangeArrI<int8_t, 0, maxPlayerFrames, 0> ToadFrameX;
+RangeArrI<int8_t, 0, maxPlayerFrames, 0> ToadFrameY;
+RangeArrI<int8_t, 0, maxPlayerFrames, 0> LinkFrameX;
+RangeArrI<int8_t, 0, maxPlayerFrames, 0> LinkFrameY;
 RangeArrI<bool, 0, maxBackgroundType, false> BackgroundFence;
 
 RangeArr<NPCTraits_t, 0, maxNPCType> NPCTraits;
