@@ -542,7 +542,7 @@ bool KeyboardMouseRender(bool mouse, bool render)
     int kb_x = win_x + 10;
 
     // bias towards bottom of screen
-    int win_y = (cur_ScreenH - win_height) * 5 / 4;
+    int win_y = (cur_ScreenH - win_height) * 4 / 5;
     // force even
     win_y &= ~1;
     int kb_y = win_y + 10 + n_prompt_lines * 20 + n_text_lines * 20;
