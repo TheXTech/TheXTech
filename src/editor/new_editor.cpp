@@ -530,7 +530,7 @@ bool EditorScreen::UpdateNPCButton(CallMode mode, int x, int y, NPCID type, bool
 
 void EditorScreen::UpdateNPC(CallMode mode, int x, int y, NPCID type)
 {
-    if((type < 1) || (type >= maxNPCType))
+    if((type < 1) || (type > maxNPCType))
     {
         pLogWarning("Attempted to render NPC type %d, but the max NPC type is %d!", type, maxNPCType);
         return;
