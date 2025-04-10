@@ -1032,7 +1032,7 @@ void PlayerHurt(const int A)
                     if(p.Hearts == 2 && p.State != PLR_STATE_SMALL)
                     {
                         // TODO: State-dependent moment
-                        if(p.State == PLR_STATE_FIRE || p.State == PLR_STATE_ICE)
+                        if(p.State == PLR_STATE_FIRE || p.State == PLR_STATE_ICE || p.State == PLR_STATE_CYCLONE)
                         {
                             p.Effect = (PlayerEffect)(PLREFF_STATE_TO_BIG + p.State);
                             p.Effect2 = 0;
@@ -2725,7 +2725,15 @@ void UpdatePlayerBonus(const int A, const NPCID B)
                     p.HeldBonus = NPCID_ICE_POWER_S3;
             }
 
-            // TODO: State-dependent moment, extend for states > 7, using the 38A NPCIDs and then our own dedicated range. It's not safe to rely on StateNPC because it doesn't get saved.
+            // State-dependent moment, extend for states > 7, using the 38A NPCIDs and then our own dedicated range. It's not safe to rely on StateNPC because it doesn't get saved.
+            if(p.State == PLR_STATE_AQUATIC || effect_state == PLR_STATE_AQUATIC)
+                p.HeldBonus = NPCID_AQUATIC_POWER;
+            else if(p.State == PLR_STATE_POLAR || effect_state == PLR_STATE_POLAR)
+                p.HeldBonus = NPCID_POLAR_POWER;
+            else if(p.State == PLR_STATE_CYCLONE || effect_state == PLR_STATE_CYCLONE)
+                p.HeldBonus = NPCID_CYCLONE_POWER;
+            else if(p.State == PLR_STATE_SHELL || effect_state == PLR_STATE_SHELL)
+                p.HeldBonus = NPCID_SHELL_POWER;
         }
     }
 

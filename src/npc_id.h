@@ -374,6 +374,10 @@ enum NPCID : vbint_t
 
     // TheXTech-exclusive NPCs
     NPCID_INVINCIBILITY_POWER = 301,
+    NPCID_AQUATIC_POWER = 302,
+    NPCID_POLAR_POWER = 303,
+    NPCID_CYCLONE_POWER = 304,
+    NPCID_SHELL_POWER = 305,
 };
 
 

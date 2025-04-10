@@ -260,7 +260,9 @@ void TouchBonus(int A, int B)
         if(NPC[B].Type == NPCID_LEAF_POWER || NPC[B].Type == NPCID_STATUE_POWER || NPC[B].Type == NPCID_HEAVY_POWER
             || NPC[B].Type == NPCID_POWER_S3 || NPC[B].Type == NPCID_POWER_S1 || NPC[B].Type == NPCID_POWER_S4 || NPC[B].Type == NPCID_POWER_S2 || NPC[B].Type == NPCID_POWER_S5
             || NPC[B].Type == NPCID_FIRE_POWER_S3 || NPC[B].Type == NPCID_FIRE_POWER_S1 || NPC[B].Type == NPCID_FIRE_POWER_S4
-            || NPC[B].Type == NPCID_ICE_POWER_S3 || NPC[B].Type == NPCID_ICE_POWER_S4)
+            || NPC[B].Type == NPCID_ICE_POWER_S3 || NPC[B].Type == NPCID_ICE_POWER_S4
+            || NPC[B].Type == NPCID_AQUATIC_POWER || NPC[B].Type == NPCID_POLAR_POWER
+            || NPC[B].Type == NPCID_CYCLONE_POWER || NPC[B].Type == NPCID_SHELL_POWER)
         {
             Player[A].Hearts += 1;
 
@@ -436,7 +438,9 @@ void TouchBonus(int A, int B)
     // logic combined across all powerup NPCs
     else if(NPC[B].Type == NPCID_FIRE_POWER_S3 || NPC[B].Type == NPCID_FIRE_POWER_S1 || NPC[B].Type == NPCID_FIRE_POWER_S4
         || NPC[B].Type == NPCID_ICE_POWER_S3 || NPC[B].Type == NPCID_ICE_POWER_S4
-        || NPC[B].Type == NPCID_LEAF_POWER || NPC[B].Type == NPCID_STATUE_POWER || NPC[B].Type == NPCID_HEAVY_POWER)
+        || NPC[B].Type == NPCID_LEAF_POWER || NPC[B].Type == NPCID_STATUE_POWER || NPC[B].Type == NPCID_HEAVY_POWER
+        || NPC[B].Type == NPCID_AQUATIC_POWER || NPC[B].Type == NPCID_POLAR_POWER
+        || NPC[B].Type == NPCID_CYCLONE_POWER || NPC[B].Type == NPCID_SHELL_POWER)
     {
         int target_state = PLR_STATE_BIG;
         PlayerEffect target_effect = PLREFF_TURN_TO_STATE;
@@ -457,12 +461,25 @@ void TouchBonus(int A, int B)
             reset_effect2 = false;
             use_sfx = sfx_grow_item;
         }
+        else if(NPC[B].Type == NPCID_CYCLONE_POWER)
+        {
+            target_state = PLR_STATE_CYCLONE;
+            target_effect = PLREFF_GROW_TO_STATE;
+            reset_effect2 = false;
+            use_sfx = sfx_grow_item;
+        }
         else if(NPC[B].Type == NPCID_LEAF_POWER)
             target_state = PLR_STATE_LEAF;
         else if(NPC[B].Type == NPCID_STATUE_POWER)
             target_state = PLR_STATE_STATUE;
         else if(NPC[B].Type == NPCID_HEAVY_POWER)
             target_state = PLR_STATE_HEAVY;
+        else if(NPC[B].Type == NPCID_AQUATIC_POWER)
+            target_state = PLR_STATE_AQUATIC;
+        else if(NPC[B].Type == NPCID_POLAR_POWER)
+            target_state = PLR_STATE_POLAR;
+        else if(NPC[B].Type == NPCID_SHELL_POWER)
+            target_state = PLR_STATE_SHELL;
 
         UpdatePlayerBonus(A, NPC[B].Type);
         Player[A].StateNPC = NPC[B].Type;

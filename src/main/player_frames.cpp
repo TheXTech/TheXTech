@@ -66,7 +66,7 @@ void SetupPlayerFrames()
     LinkFrameX[93] = -36;
     LinkFrameX[92] = -36;
 
-    For(A, 51, 649)
+    For(A, 51, maxPlayerFrames - 101) // 649
     {
         LinkFrameX[A + 100] = LinkFrameX[A];
         LinkFrameY[A + 100] = LinkFrameY[A];
@@ -1195,7 +1195,7 @@ void SetupPlayerFrames()
     LuigiFrameY[307] = -6;
     LuigiFrameY[293] = -6;
 
-    For(A, 650, maxPlayerFrames)
+    For(A, 650, maxPlayerFrames) // this just fills 750 and above with arbitrary frames, which is fine for now
     {
         MarioFrameX[A] = MarioFrameX[A - 400];
         MarioFrameY[A] = MarioFrameY[A - 400];

@@ -1466,6 +1466,13 @@ void SetupVars()
     NPCTraits[NPCID_INVINCIBILITY_POWER].IsABonus = true;
     NPCTraits[NPCID_INVINCIBILITY_POWER].TFrames = 4;
     NPCTraits[NPCID_INVINCIBILITY_POWER].FrameSpeed = 4;
+    NPCTraits[NPCID_AQUATIC_POWER].IsABonus = true;
+    NPCTraits[NPCID_POLAR_POWER].IsABonus = true;
+    NPCTraits[NPCID_CYCLONE_POWER].IsABonus = true;
+    NPCTraits[NPCID_CYCLONE_POWER].TFrames = 4;
+    NPCTraits[NPCID_CYCLONE_POWER].FrameSpeed = 4;
+    NPCTraits[NPCID_CYCLONE_POWER].THeight = 42;
+    NPCTraits[NPCID_SHELL_POWER].IsABonus = true;
     NPCTraits[NPCID_COIN_S3].IsACoin = true;
     NPCTraits[NPCID_COIN_S4].IsACoin = true;
     NPCTraits[NPCID_COIN_5].IsACoin = true;

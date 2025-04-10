@@ -522,7 +522,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             {
                 // never replace if cloned player, in battle mode, or the player that hit the block should get the full powerup
             }
-            else if(C == NPCID_FIRE_POWER_S3 || C == NPCID_LEAF_POWER || C == NPCID_ICE_POWER_S3 || C == NPCID_ICE_POWER_S4)
+            else if(C == NPCID_FIRE_POWER_S3 || C == NPCID_LEAF_POWER || C == NPCID_ICE_POWER_S3 || C == NPCID_ICE_POWER_S4 || C == NPCID_CYCLONE_POWER || C == NPCID_AQUATIC_POWER)
                 replacement = NPCID_POWER_S3;
             else if(C == NPCID_FIRE_POWER_S4)
                 replacement = NPCID_POWER_S4;
@@ -672,6 +672,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                nn.Type == NPCID_FIRE_POWER_S3 || nn.Type == NPCID_CANNONITEM ||
                nn.Type == NPCID_LIFE_S3 || nn.Type == NPCID_POISON ||
                nn.Type == NPCID_STATUE_POWER || nn.Type == NPCID_HEAVY_POWER ||
+               nn.Type == NPCID_AQUATIC_POWER || nn.Type == NPCID_POLAR_POWER ||
+               nn.Type == NPCID_CYCLONE_POWER || nn.Type == NPCID_SHELL_POWER ||
                nn.Type == NPCID_FIRE_POWER_S1 || nn.Type == NPCID_FIRE_POWER_S4 ||
                nn.Type == NPCID_POWER_S1 || nn.Type == NPCID_POWER_S4 ||
                nn.Type == NPCID_LIFE_S1 || nn.Type == NPCID_LIFE_S4 ||

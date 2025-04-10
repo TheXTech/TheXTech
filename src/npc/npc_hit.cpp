@@ -2150,7 +2150,8 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_SWAP_POWER || NPC[A].Type == NPCID_FIRE_POWER_S3 ||
                NPC[A].Type == NPCID_LIFE_S3 || NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_STATUE_POWER ||
-               (NPC[A].Type >= NPCID_FIRE_POWER_S1 && NPC[A].Type <= NPCID_3_LIFE) || NPC[A].Type == NPCID_HEAVY_POWER)
+               (NPC[A].Type >= NPCID_FIRE_POWER_S1 && NPC[A].Type <= NPCID_3_LIFE) || NPC[A].Type == NPCID_HEAVY_POWER
+               || NPC[A].Type == NPCID_AQUATIC_POWER || NPC[A].Type == NPCID_POLAR_POWER || NPC[A].Type == NPCID_SHELL_POWER)
             {
                 NPC[A].Direction = Player[C].Direction;
                 NPC[A].Location.SpeedX = num_t::abs(NPC[A].Location.SpeedX) * NPC[A].Direction;

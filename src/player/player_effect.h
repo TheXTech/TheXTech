@@ -34,6 +34,10 @@ enum PlayerState : vbint_t
     PLR_STATE_STATUE = 5,
     PLR_STATE_HEAVY = 6,
     PLR_STATE_ICE = 7,
+    PLR_STATE_AQUATIC = 8,
+    PLR_STATE_POLAR = 9,
+    PLR_STATE_CYCLONE = 10,
+    PLR_STATE_SHELL = 11,
 };
 
 enum PlayerEffect : vbint_t

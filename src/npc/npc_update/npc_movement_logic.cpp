@@ -122,7 +122,8 @@ void NPCMovementLogic(int A, tempf_t& speedVar)
             NPC[A].Type == NPCID_STAR_EXIT || NPC[A].Type == NPCID_STAR_COLLECT || NPC[A].Type == NPCID_FIRE_POWER_S1 || NPC[A].Type == NPCID_TIMER_S2 ||
             NPC[A].Type == NPCID_EARTHQUAKE_BLOCK || NPC[A].Type == NPCID_POWER_S2 || NPC[A].Type == NPCID_POWER_S5 || NPC[A].Type == NPCID_FLY_POWER ||
             NPC[A].Type == NPCID_LOCK_DOOR || NPC[A].Type == NPCID_FLY_BLOCK || NPC[A].Type == NPCID_FLY_CANNON || NPC[A].Type == NPCID_ICE_POWER_S4 ||
-            NPC[A].Type == NPCID_ICE_POWER_S3 || NPC[A].Type == NPCID_DOOR_MAKER || NPC[A].Type == NPCID_QUAD_SPITTER)
+            NPC[A].Type == NPCID_ICE_POWER_S3 || NPC[A].Type == NPCID_DOOR_MAKER || NPC[A].Type == NPCID_QUAD_SPITTER || NPC[A].Type == NPCID_AQUATIC_POWER ||
+            NPC[A].Type == NPCID_POLAR_POWER || NPC[A].Type == NPCID_SHELL_POWER)
     {
         if(NPC[A].Location.SpeedX > 0)
             NPC[A].Location.SpeedX -= 0.05_n;
