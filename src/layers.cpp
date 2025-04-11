@@ -1517,12 +1517,17 @@ bool UpdateEvents()
         int A;
         for(A = 1; A <= newEventNum_old; A++)
         {
+            bool event_triggered;
+            event_triggered = newEventDelay[A] < 0;
+
             // count down the event if the events are active
             if(newEventDelay[A] > 0 && events_active)
                 newEventDelay[A]--;
             // trigger event if it's ready, or if the event was directly Triggered
-            else if(events_active || newEventDelay[A] < 0)
+            else if(events_active || event_triggered)
             {
+                int prevEventNum;
+                prevEventNum = newEventNum;
                 eventindex_t resume_index;
                 resume_index = ProcEvent_Safe(false, NewEvent[A], newEventPlayer[A]);
                 while(resume_index != EVENT_NONE)
@@ -1530,6 +1535,7 @@ bool UpdateEvents()
                     g_gameLoopInterrupt.A = A;
                     g_gameLoopInterrupt.B = newEventNum_old;
                     g_gameLoopInterrupt.C = resume_index;
+                    g_gameLoopInterrupt.D = prevEventNum;
                     g_gameLoopInterrupt.bool1 = events_active;
 
                     g_gameLoopInterrupt.site = GameLoopInterrupt::UpdateEvents;
@@ -1539,6 +1545,7 @@ resume:
                     A = g_gameLoopInterrupt.A;
                     newEventNum_old = g_gameLoopInterrupt.B;
                     resume_index = g_gameLoopInterrupt.C;
+                    prevEventNum = g_gameLoopInterrupt.D;
                     events_active = g_gameLoopInterrupt.bool1;
 
                     g_gameLoopInterrupt.site = GameLoopInterrupt::None;
@@ -1546,17 +1553,22 @@ resume:
                     resume_index = ProcEvent_Safe(true, resume_index, newEventPlayer[A]);
                 }
 
+                event_triggered = newEventDelay[A] < 0;
                 newEventDelay[A] = newEventDelay[newEventNum];
                 newEventPlayer[A] = newEventPlayer[newEventNum];
                 NewEvent[A] = NewEvent[newEventNum];
                 newEventNum--;
 
-                if(g_config.fix_event_swap_bug)
+                // if the event was triggered, countdown its successor event
+                if(event_triggered && newEventNum == prevEventNum)
+                    A--;
+                else if(g_config.fix_event_swap_bug)
                 {
-                    // if A was not replaced by a new event, then we should check the event A was replaced by
-                    if(newEventNum < newEventNum_old && newEventDelay[A] <= 0)
+                    // if A was not replaced by a new event, then we should check the event A was replaced by (instead of duplicating it!)
+                    if(newEventNum < newEventNum_old)
                     {
-                        A--;
+                        if(newEventDelay[A] <= 0)
+                            A--;
                         newEventNum_old--;
                     }
                 }
