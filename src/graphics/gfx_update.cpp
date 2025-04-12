@@ -2452,6 +2452,9 @@ void UpdateGraphicsScreen(Screen_t& screen)
                                                   pfrY(tx, p) + src_y,
                                                   plr_shade);
                         }
+
+                        if(p.State == PLR_STATE_CYCLONE)
+                            DrawCycloneAccessory(Z, p, camX + pX + pW / 2, camY + pY, plr_shade);
                     }
                 }
             }
@@ -2840,6 +2843,9 @@ void UpdateGraphicsScreen(Screen_t& screen)
                         0,
                         128 * Player[A].MountFrame,
                         plr_shade);
+
+                if(p.State == PLR_STATE_CYCLONE)
+                    DrawCycloneAccessory(Z, p, sX + 64, sY + Player[A].MountOffsetY - Y, plr_shade);
             }
         }
 
@@ -2896,7 +2902,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
             Player_t& p = Player[A];
             bool player_door_scroll = (p.Effect == PLREFF_WARP_DOOR && p.Effect2 >= 128);
 
-            if(!p.Dead && p.TimeToLive == 0 && p.CurMazeZone == 0 && !(p.Effect == PLREFF_WARP_PIPE || p.Effect == (PLREFF_TURN_TO_STATE + PLR_STATE_LEAF) || p.Effect == PLREFF_WAITING || p.Effect == PLREFF_PET_INSIDE || player_door_scroll))
+            if(!p.Dead && p.TimeToLive == 0 && p.CurMazeZone == 0 && !(p.Effect == PLREFF_WARP_PIPE || p.Effect == (PLREFF_TURN_TO_STATE + PLR_STATE_LEAF) || p.Effect == PLREFF_WAITING || p.Effect == PLREFF_PET_INSIDE || player_door_scroll) && p.Mount != 2)
                 DrawPlayer(p, Z);
         }
         //'normal player end

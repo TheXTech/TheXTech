@@ -622,7 +622,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     nn.Location.Height = 32;
                     nn.Location.Y = b.Location.Y - 32;
                 }
-                else if(nn.Type == NPCID_LEAF_POWER || nn.Type == NPCID_INVINCIBILITY_POWER)
+                else if(nn.Type == NPCID_LEAF_POWER || nn.Type == NPCID_INVINCIBILITY_POWER || nn.Type == NPCID_CYCLONE_POWER)
                 {
                     nn.Effect = NPCEFF_NORMAL;
                     nn.Location.Y = b.Location.Y - 32;

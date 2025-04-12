@@ -190,6 +190,182 @@ int pfrOffY(const StdPicture& tx, const Player_t& p)
     return offY;
 }
 
+void DrawCycloneAccessory(int Z, const Player_t& p, int cX, int tY, XTColor c)
+{
+    int acc_frame = (CommonFrame / 4) % 4;
+    if(acc_frame == 3)
+        acc_frame = 1;
+
+    // calculate offset for accessory
+    int offsetX = -16;
+    int offsetY = -32;
+
+    int extra_offX = 0;
+    int extra_offY = 0;
+
+    if(p.Character == 5)
+    {
+        offsetX += 1;
+
+        if(p.Frame == 1 || p.Frame == 2 || p.Frame == 3)
+        {
+            extra_offX = -4;
+            extra_offY = -6;
+        }
+        else if(p.Frame == 4)
+        {
+            extra_offX = -2;
+            extra_offY = -4;
+        }
+        else if(p.Frame == 5)
+        {
+            extra_offY = -6;
+        }
+        else if(p.Frame == 6)
+        {
+            extra_offX = -12;
+            extra_offY = -4;
+        }
+        else if(p.Frame == 7)
+        {
+            extra_offX = 10;
+            extra_offY = -2;
+        }
+        else if(p.Frame == 8)
+        {
+            extra_offX = 12;
+            extra_offY = -4;
+        }
+        else if(p.Frame == 9)
+        {
+            extra_offX = 0;
+            extra_offY = 0;
+        }
+        else if(p.Frame == 10)
+        {
+            extra_offX = -8;
+            extra_offY = -4;
+        }
+        else if(p.Frame == 11)
+        {
+            extra_offX = 2;
+            extra_offY = 0;
+        }
+    }
+    else if(p.Frame == 30)
+    {
+        extra_offX = (p.Character == 2) ? -10 : -8;
+        int offY = (p.Character == 2) ? -4 : 0;
+
+        extra_offY = p.MountOffsetY + offY;
+    }
+    else if(p.Frame == 31)
+    {
+        extra_offX = -4;
+        extra_offY = (p.Character == 2) ? -28 : -26;
+    }
+    else if(p.Frame == 7 || p.Frame == 27)
+    {
+        if(p.Character == 4)
+            extra_offY = 2;
+        else if(p.Character == 1)
+            extra_offY = -4;
+        else if(p.Character == 2)
+            extra_offY = -6;
+        else
+            extra_offY = -2;
+    }
+    else if(p.Frame == 13)
+    {
+        if(p.Character == 3)
+            extra_offY = 4;
+    }
+    else if(p.Frame == 15)
+    {
+        if(p.Character == 3)
+            extra_offY = -2;
+    }
+    else if(p.Frame >= 40)
+    {
+        if(p.Character == 2)
+            extra_offX = -2;
+    }
+    else if(p.Frame == 24)
+    {
+        extra_offX = -2;
+        extra_offY = 2;
+    }
+    else if(p.Frame == 25 || p.Frame == 26)
+    {
+        acc_frame = 3 + (CommonFrame / 8) % 4;
+        offsetY = -2;
+
+        if(p.Character == 4)
+            offsetY = -6;
+        else if(p.Character == 3)
+        {
+            offsetY = -4;
+            offsetX += 4;
+        }
+    }
+    else if(p.Frame == 22 || p.Frame == 23)
+    {
+        if(p.Frame == 23)
+            offsetY += 2;
+
+        extra_offX = -2;
+
+        if(p.Character == 4)
+            extra_offY = -12;
+        else if(p.Character == 3)
+        {
+            extra_offY = -22;
+            extra_offX = 0;
+
+            if(p.Direction == 1)
+                offsetX += 8;
+        }
+        else
+            extra_offY = -18;
+    }
+    else if(p.Frame == 16 || p.Frame == 17 || p.Frame == 18)
+    {
+        if(p.Character == 3)
+            extra_offY = 2;
+        else if(p.Character != 4)
+            extra_offY = -2;
+    }
+    else if(p.Frame <= 10)
+    {
+        if(p.Character == 1 || p.Character == 2)
+        {
+            if(p.Frame == 4 || p.Frame == 5)
+                extra_offY = -2;
+
+            if(p.Frame == 6)
+                extra_offX = 2;
+            else if(!p.SpinJump)
+                extra_offX = -2;
+        }
+    }
+
+    if(p.Character == 2 && !(p.Mount == 1 && p.Duck))
+        offsetY -= 2;
+
+    offsetX += extra_offX * p.Direction;
+    offsetY += extra_offY;
+
+    RenderTexturePlayer(Z,
+        cX + offsetX,
+        tY + offsetY,
+        32,
+        32,
+        GFX.CycloneAcc,
+        0,
+        32 * acc_frame,
+        c);
+}
+
 using plr_pic_arr = RangeArr<StdPicture, 1, numStates>;
 static constexpr std::array<plr_pic_arr*, 5> s_char_tex = {&GFXMario, &GFXLuigi, &GFXPeach, &GFXToad, &GFXLink};
 
@@ -390,6 +566,9 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                                           pfrY(tx, p),
                                           s);
                 }
+
+                if(p.State == PLR_STATE_CYCLONE)
+                    DrawCycloneAccessory(Z, p, sX + w / 2, sY, s);
             }
 
         // peach/toad held npcs

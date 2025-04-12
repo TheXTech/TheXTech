@@ -243,6 +243,10 @@ void DrawPlayerRaw(int X, int Y, int Character, int State, int Frame, int Direct
 // Public Sub DrawPlayer(A As Integer, Z As Integer)
 void DrawPlayer(const int A, const int Z, XTColor color = XTColor());
 void DrawPlayer(Player_t &p, const int Z, XTColor color = XTColor());
+
+// NEW: cX and tY are in screen coordinates
+void DrawCycloneAccessory(int Z, const Player_t& p, int cX, int tY, XTColor c);
+
 // Public Sub ScreenShot()
 void ScreenShot();
 // Public Sub DrawFrozenNPC(Z As Integer, A As Integer)

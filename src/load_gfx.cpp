@@ -1284,13 +1284,17 @@ static void loadCustomUIAssets()
                  fmt::format_ne("Tongue{0}", i),
                  nullptr, nullptr, &GFX.isCustom(ci++), GFX.Tongue[i], false, true);
 
-    loadCGFX(uiRoot + "Warp.png",
-             "Warp",
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.Warp, false, true);
+    // loadCGFX(uiRoot + "Warp.png",
+    //          "Warp",
+    //          nullptr, nullptr, &GFX.isCustom(ci++), GFX.Warp, false, true);
 
     loadCGFX(uiRoot + "YoshiWings.png",
              "YoshiWings",
              nullptr, nullptr, &GFX.isCustom(ci++), GFX.YoshiWings, false, true);
+
+    loadCGFX(uiRoot + "CycloneAcc.png",
+             "CycloneAcc",
+             nullptr, nullptr, &GFX.isCustom(ci++), GFX.CycloneAcc, false, true);
 
     loadCGFX(uiRoot + "EditorIcons.png",
              "EditorIcons",

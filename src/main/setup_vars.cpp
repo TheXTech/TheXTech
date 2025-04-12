@@ -1470,8 +1470,11 @@ void SetupVars()
     NPCTraits[NPCID_POLAR_POWER].IsABonus = true;
     NPCTraits[NPCID_CYCLONE_POWER].IsABonus = true;
     NPCTraits[NPCID_CYCLONE_POWER].TFrames = 4;
-    NPCTraits[NPCID_CYCLONE_POWER].FrameSpeed = 4;
-    NPCTraits[NPCID_CYCLONE_POWER].THeight = 42;
+    NPCTraits[NPCID_CYCLONE_POWER].FrameSpeed = 6;
+    NPCTraits[NPCID_CYCLONE_POWER].WidthGFX = 32;
+    NPCTraits[NPCID_CYCLONE_POWER].HeightGFX = 42;
+    NPCTraits[NPCID_CYCLONE_POWER].NoGravity = true;
+    NPCTraits[NPCID_CYCLONE_POWER].NoClipping = true;
     NPCTraits[NPCID_SHELL_POWER].IsABonus = true;
     NPCTraits[NPCID_COIN_S3].IsACoin = true;
     NPCTraits[NPCID_COIN_S4].IsACoin = true;

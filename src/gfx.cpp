@@ -169,7 +169,7 @@ bool GFX_t::load()
     For(i, 1, 2)
         loadImage(Tongue[i], uiPath + fmt::format_ne("Tongue{0}", i));
 
-    loadImage(Warp, uiPath + "Warp");
+    // loadImage(Warp, uiPath + "Warp");
 
     loadImage(YoshiWings, uiPath + "YoshiWings");
 
@@ -185,6 +185,8 @@ bool GFX_t::load()
         m_loadErrors = 0;
         return false;
     }
+
+    loadImage(CycloneAcc, uiPath + "CycloneAcc");
 
     loadImage(EIcons, uiPath + "EditorIcons");
 

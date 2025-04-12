@@ -82,10 +82,11 @@ public:
     RangeArr<StdPicture, 0, 7> nCursor;
     StdPicture TextBox;
     RangeArr<StdPicture, 1, 2> Tongue;
-    StdPicture Warp;
+    // StdPicture Warp;
     StdPicture YoshiWings;
 
     // new graphics for TheXTech
+    StdPicture CycloneAcc;
     StdPicture EIcons;
     StdPicture PCursor;
     StdPicture Medals;

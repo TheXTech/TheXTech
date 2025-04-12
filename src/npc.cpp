@@ -3203,6 +3203,52 @@ void NPCSpecial(int A)
         npc.Location.SpeedX = 0;
         npc.Location.SpeedY = 0;
     }
+    else if(npc.Type == NPCID_CYCLONE_POWER)
+    {
+        npc.Special += 1;
+
+        if(npc.Special == 96 || npc.Special >= 256)
+            npc.Special = 128;
+
+        npc.Location.SpeedX /= 2;
+
+        // accelerate upwards for 80 frames
+        if(npc.Special < 80)
+        {
+            if(npc.Special < 32)
+                npc.Special2 += (32 - npc.Special);
+            else if(npc.Special >= 62)
+                npc.Special2 -= (84 - npc.Special) * 2;
+
+            npc.Location.SpeedY = -0.004_n * npc.Special2;
+            npc.Location.SpeedX = 0.003_n * (npc.Special2 * npc.Direction);
+        }
+        // pause for a few frames
+        else if(npc.Special < 88)
+        {
+            npc.Location.SpeedX = 0;
+
+            if(npc.Location.SpeedY < 0_n)
+                npc.Location.SpeedY += 0.05_n;
+        }
+        // ease into movement
+        else if(npc.Special < 96)
+        {
+            npc.Location.SpeedX = Physics.NPCMushroomSpeed * npc.Direction * (npc.Special - 80) / 32;
+            npc.Location.SpeedY += 0.05_n;
+        }
+        // bob movement pattern
+        else if(npc.Special < 192)
+        {
+            if(npc.Location.SpeedY < 1.5_n)
+                npc.Location.SpeedY += 0.1_n;
+        }
+        else
+        {
+            if(npc.Location.SpeedY > -1.5_n)
+                npc.Location.SpeedY -= 0.1_n;
+        }
+    }
     else if(npc.Type == NPCID_RAFT) // Skull raft
     {
         if(!AllPlayersNormal())

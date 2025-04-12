@@ -1195,7 +1195,7 @@ void SetupPlayerFrames()
     LuigiFrameY[307] = -6;
     LuigiFrameY[293] = -6;
 
-    For(A, 650, maxPlayerFrames) // this just fills 750 and above with arbitrary frames, which is fine for now
+    For(A, 650, 749)
     {
         MarioFrameX[A] = MarioFrameX[A - 400];
         MarioFrameY[A] = MarioFrameY[A - 400];
@@ -1785,4 +1785,75 @@ void SetupPlayerFrames()
 
     ToadFrameX[500] = -6;
     ToadFrameY[500] = -6;
+
+    int base = 150;
+    int offset_x = 0;
+    int offset_y = 0;
+    for(int A = 750; A <= 1150; A++) // this just fills 750 and above with frames matching big power
+    {
+        // special case: cyclone power has big sprites
+        if(A == 950)
+        {
+            offset_x = -2;
+            offset_y = -2;
+        }
+        else if(A == 850 || A == 950 || A == 1050)
+        {
+            base = 150;
+            offset_x = 0;
+            offset_y = 0;
+        }
+
+        MarioFrameX[A] = MarioFrameX[base] + offset_x;
+        MarioFrameY[A] = MarioFrameY[base] + offset_y * 2;
+        LuigiFrameX[A] = LuigiFrameX[base] + offset_x;
+        LuigiFrameY[A] = LuigiFrameY[base] + offset_y;
+        PeachFrameX[A] = PeachFrameX[base] + offset_x;
+        PeachFrameY[A] = PeachFrameY[base];
+        ToadFrameX[A] = ToadFrameX[base] + offset_x;
+        ToadFrameY[A] = ToadFrameY[base];
+        LinkFrameX[A] = LinkFrameX[base];
+        LinkFrameY[A] = LinkFrameY[base];
+
+        base++;
+    }
+
+    // special cyclone power corrections for chars 2 and 3 (tall)
+    for(int D = -1; D <= 1; D += 2)
+    {
+        LuigiFrameY[1000 + D * 3] -= 2;
+        LuigiFrameY[1000 + D * 4] -= 2;
+        LuigiFrameY[1000 + D * 5] -= 2;
+        LuigiFrameY[1000 + D * 7] -= 2;
+        LuigiFrameY[1000 + D * 10] -= 2;
+        LuigiFrameY[1000 + D * 24] -= 2;
+        LuigiFrameY[1000 + D * 30] -= 2;
+        LuigiFrameY[1000 + D * 31] -= 2;
+        LuigiFrameY[1000 + D * 41] -= 2;
+        LuigiFrameY[1000 + D * 44] -= 2;
+
+        LuigiFrameY[1000 + D * 6] += 2;
+        LuigiFrameY[1000 + D * 23] += 2;
+
+        PeachFrameY[1000 + D * 7] -= 4;
+        PeachFrameY[1000 + D * 27] -= 4;
+
+        MarioFrameY[1000 + D * 23] += 2;
+
+        MarioFrameX[1000 + D * 16] = -12;
+        MarioFrameX[1000 + D * 17] = -12;
+        MarioFrameX[1000 + D * 18] = -12;
+
+        LuigiFrameX[1000 + D * 16] = -12;
+        LuigiFrameX[1000 + D * 17] = -12;
+        LuigiFrameX[1000 + D * 18] = -12;
+
+        PeachFrameX[1000 + D * 16] = -12;
+        PeachFrameX[1000 + D * 17] = -12;
+        PeachFrameX[1000 + D * 18] = -12;
+
+        ToadFrameX[1000 + D * 16] = -12;
+        ToadFrameX[1000 + D * 17] = -12;
+        ToadFrameX[1000 + D * 18] = -12;
+    }
 }
