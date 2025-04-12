@@ -1898,8 +1898,36 @@ void PlayerFrame(Player_t &p)
 
     p.MountOffsetY = 0;
 
+    if(p.SpinJump && p.State == PLR_STATE_CYCLONE)
+    {
+        if(p.Location.SpeedY > 0)
+            p.SpinFrame += 1;
+        else
+            p.SpinFrame += 2;
+
+        p.SpinFrame = unsigned(p.SpinFrame) % 32;
+
+        if(p.SpinFrame < 16)
+            p.Direction = 1;
+        else
+            p.Direction = -1;
+
+        p.Frame = 16 + p.SpinFrame / 8;
+        if(p.Character == 4)
+        {
+            if(p.Frame == 17)
+                p.Frame = 18;
+            else if(p.Frame == 19)
+                p.Frame = 16;
+        }
+        else
+        {
+            if(p.Frame == 19)
+                p.Frame = 17;
+        }
+    }
 // for the spinjump/shellsurf
-    if((p.SpinJump || p.ShellSurf) && p.Mount == 0)
+    else if((p.SpinJump || p.ShellSurf) && p.Mount == 0)
     {
         if(p.SpinFrame < 4 || p.SpinFrame >= 9)
             p.Direction = -1;

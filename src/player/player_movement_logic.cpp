@@ -601,15 +601,34 @@ void PlayerMovementY(int A)
     if(Player[A].Jump > 0)
         Player[A].Slope = 0;
 
-    if(Player[A].SpinJump || (Player[A].State != 4 && Player[A].State != 5) || Player[A].StandingOnNPC > 0 || Player[A].Slope > 0 || Player[A].Location.SpeedY == 0)
+    bool is_grounded = (Player[A].StandingOnNPC > 0 || Player[A].Slope > 0 || Player[A].Location.SpeedY == 0);
+    // cyclone: allow double jump as save after falling off cliff
+    if(Player[A].State == PLR_STATE_CYCLONE && !Player[A].SpinJump)
+    {
+        if(is_grounded)
+            Player[A].DoubleJump = true;
+    }
+    else if(Player[A].SpinJump || (Player[A].State != 4 && Player[A].State != 5) || is_grounded)
         Player[A].DoubleJump = false;
 
     // double jump code
-    if(Player[A].DoubleJump && Player[A].Jump == 0 && Player[A].Location.SpeedY != 0 && Player[A].Slope == 0 &&
-       Player[A].StandingOnNPC == 0 && Player[A].Wet == 0 && Player[A].Vine == 0 &&
-       !Player[A].WetFrame && !Player[A].Fairy && !Player[A].CanFly2)
+    if(Player[A].DoubleJump && Player[A].Jump == 0 && !is_grounded && Player[A].Wet == 0 && Player[A].Vine == 0 &&
+       !Player[A].WetFrame && !Player[A].Fairy && !Player[A].CanFly2 && Player[A].JumpRelease)
     {
-        if(Player[A].Controls.Jump && Player[A].JumpRelease)
+        if(Player[A].State == PLR_STATE_CYCLONE && (Player[A].Controls.Jump || Player[A].Controls.AltJump))
+        {
+            if(!Player[A].Mount)
+            {
+                PlaySoundSpatial(SFX_Whip, Player[A].Location);
+                Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
+                Player[A].Jump = 16;
+                Player[A].DoubleJump = false;
+
+                if(Player[A].Character != 5)
+                    Player[A].SpinJump = true;
+            }
+        }
+        else if(Player[A].Controls.Jump)
         {
             PlaySoundSpatial(SFX_Jump, Player[A].Location);
             Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
@@ -841,23 +860,22 @@ void PlayerMovementY(int A)
             else
                 Player[A].Location.SpeedY += Physics.PlayerGravity;
 
-            if(Player[A].HoldingNPC > 0)
-            {
-                if(NPC[Player[A].HoldingNPC].Type == NPCID_FLY_BLOCK || NPC[Player[A].HoldingNPC].Type == NPCID_FLY_CANNON)
-                {
-                    if(Player[A].Controls.Jump || Player[A].Controls.AltJump)
-                    {
-                        if(Player[A].Character == 2)
-                            Player[A].Location.SpeedY += -Physics.PlayerGravity * 0.72_r;
-                        else
-                            Player[A].Location.SpeedY += -Physics.PlayerGravity * 0.8_r;
+            bool has_fly_block = (Player[A].HoldingNPC > 0) && (NPC[Player[A].HoldingNPC].Type == NPCID_FLY_BLOCK || NPC[Player[A].HoldingNPC].Type == NPCID_FLY_CANNON);
 
-                        if(Player[A].Location.SpeedY > Physics.PlayerGravity * 3)
-                            Player[A].Location.SpeedY = Physics.PlayerGravity * 3;
-                    }
+            if(has_fly_block || (Player[A].State == PLR_STATE_CYCLONE && !Player[A].DoubleJump))
+            {
+                if(Player[A].Controls.Jump || Player[A].Controls.AltJump)
+                {
+                    if(Player[A].Character == 2)
+                        Player[A].Location.SpeedY += -Physics.PlayerGravity * 0.72_r;
                     else
-                        NPC[Player[A].HoldingNPC].Special = 0;
+                        Player[A].Location.SpeedY += -Physics.PlayerGravity * 0.8_r;
+
+                    if(Player[A].Location.SpeedY > Physics.PlayerGravity * 3)
+                        Player[A].Location.SpeedY = Physics.PlayerGravity * 3;
                 }
+                else if(has_fly_block)
+                    NPC[Player[A].HoldingNPC].Special = 0;
             }
 
             if(Player[A].Location.SpeedY > Physics.PlayerTerminalVelocity)
@@ -935,7 +953,7 @@ void PlayerMovementY(int A)
 
 
     // glide ' Racoon Mario
-    if((Player[A].State == 4 || Player[A].State == 5) || Player[A].YoshiBlue || (Player[A].Mount == 1 && Player[A].MountType == 3))
+    if((Player[A].State == PLR_STATE_LEAF || Player[A].State == PLR_STATE_STATUE) || Player[A].YoshiBlue || (Player[A].Mount == 1 && Player[A].MountType == 3))
     {
         if((Player[A].Controls.Jump || Player[A].Controls.AltJump) &&
           ((Player[A].Location.SpeedY > Physics.PlayerGravity * 5 && Player[A].Character != 3 && Player[A].Character != 4) ||
