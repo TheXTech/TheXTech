@@ -467,20 +467,21 @@ static void needA1Up()
         Player[B].HeldBonus = NPCID_LIFE_S3;
 }
 
-static void needATanookiSuit()
+static void grantPowerup(NPCID npcid, PlayerState state)
 {
     PlaySound(SFX_GotItem);
+
     for(int B = 1; B <= numPlayers; B++)
     {
-        Player[B].HeldBonus = NPCID_STATUE_POWER;
+        Player[B].HeldBonus = npcid;
 
-        if(Player[B].Character >= 3 && Player[B].State != 5)
+        if(Player[B].Character >= 3 && Player[B].State != state)
         {
             PlaySound(SFX_Transform);
             Player[B].Immune = 30;
             Player[B].Effect = PLREFF_WAITING;
             Player[B].Effect2 = 4;
-            Player[B].State = 5;
+            Player[B].State = state;
             SizeCheck(Player[B]);
             NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
         }
@@ -490,28 +491,14 @@ static void needATanookiSuit()
     }
 }
 
+static void needATanookiSuit()
+{
+    grantPowerup(NPCID_STATUE_POWER, PLR_STATE_STATUE);
+}
+
 static void needAHammerSuit()
 {
-    PlaySound(SFX_GotItem);
-
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        Player[B].HeldBonus = NPCID_HEAVY_POWER;
-
-        if(Player[B].Character >= 3 && Player[B].State != 6)
-        {
-            PlaySound(SFX_Transform);
-            Player[B].Immune = 30;
-            Player[B].Effect = PLREFF_WAITING;
-            Player[B].Effect2 = 4;
-            Player[B].State = 6;
-            SizeCheck(Player[B]);
-            NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
-        }
-
-        if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-            Player[B].Hearts += 1;
-    }
+    grantPowerup(NPCID_HEAVY_POWER, PLR_STATE_HEAVY);
 }
 
 static void needAMushroom()
@@ -540,136 +527,69 @@ static void needAMushroom()
 
 static void needAFlower()
 {
-    PlaySound(SFX_GotItem);
-
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        Player[B].HeldBonus = NPCID_FIRE_POWER_S3;
-
-        if(Player[B].Character >= 3 && Player[B].State != 3)
-        {
-            PlaySound(SFX_Transform);
-            Player[B].Immune = 30;
-            Player[B].Effect = PLREFF_WAITING;
-            Player[B].Effect2 = 4;
-            Player[B].State = 3;
-            SizeCheck(Player[B]);
-            NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
-        }
-
-        if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-            Player[B].Hearts += 1;
-    }
+    grantPowerup(NPCID_FIRE_POWER_S3, PLR_STATE_FIRE);
 }
 
 static void needAnIceFlower()
 {
-    PlaySound(SFX_GotItem);
-
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        Player[B].HeldBonus = NPCID_ICE_POWER_S3;
-
-        if(Player[B].Character >= 3 && Player[B].State != 7)
-        {
-            PlaySound(SFX_Transform);
-            Player[B].Immune = 30;
-            Player[B].Effect = PLREFF_WAITING;
-            Player[B].Effect2 = 4;
-            Player[B].State = 7;
-            SizeCheck(Player[B]);
-            NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
-        }
-
-        if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-            Player[B].Hearts += 1;
-    }
+    grantPowerup(NPCID_ICE_POWER_S3, PLR_STATE_ICE);
 }
 
 static void needALeaf()
 {
+    grantPowerup(NPCID_LEAF_POWER, PLR_STATE_LEAF);
+}
+
+static void grantItemBox(NPCID npcid)
+{
     PlaySound(SFX_GotItem);
     for(int B = 1; B <= numPlayers; B++)
-    {
-        Player[B].HeldBonus = NPCID_LEAF_POWER;
-
-        if(Player[B].Character >= 3 && Player[B].State != 4)
-        {
-            PlaySound(SFX_Transform);
-            Player[B].Immune = 30;
-            Player[B].Effect = PLREFF_WAITING;
-            Player[B].Effect2 = 4;
-            Player[B].State = 4;
-            SizeCheck(Player[B]);
-            NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
-        }
-
-        if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-            Player[B].Hearts += 1;
-    }
+        Player[B].HeldBonus = npcid;
 }
 
 static void needANegg()
 {
-    PlaySound(SFX_GotItem);
-    for(int B = 1; B <= numPlayers; B++)
-        Player[B].HeldBonus = NPCID_ITEM_POD;
+    grantItemBox(NPCID_ITEM_POD);
 }
 
 static void needAPlant()
 {
-    PlaySound(SFX_GotItem);
-    for(int B = 1; B <= numPlayers; B++)
-        Player[B].HeldBonus = NPCID_TOOTHYPIPE;
+    grantItemBox(NPCID_TOOTHYPIPE);
 }
 
 static void needAGun()
 {
-    PlaySound(SFX_GotItem);
-    for(int B = 1; B <= numPlayers; B++)
-        Player[B].HeldBonus = NPCID_CANNONITEM;
+    grantItemBox(NPCID_CANNONITEM);
 }
 
 static void needASwitch()
 {
-    PlaySound(SFX_GotItem);
-    for(int B = 1; B <= numPlayers; B++)
-        Player[B].HeldBonus = NPCID_COIN_SWITCH;
+    grantItemBox(NPCID_COIN_SWITCH);
 }
 
 static void needAClock()
 {
-    PlaySound(SFX_GotItem);
-    for(int B = 1; B <= numPlayers; B++)
-        Player[B].HeldBonus = NPCID_TIMER_S3;
+    grantItemBox(NPCID_TIMER_S3);
 }
 
 static void needABomb()
 {
-    PlaySound(SFX_GotItem);
-    for(int B = 1; B <= numPlayers; B++)
-        Player[B].HeldBonus = NPCID_WALK_BOMB_S2;
+    grantItemBox(NPCID_WALK_BOMB_S2);
 }
 
 static void needAShoe()
 {
-    PlaySound(SFX_GotItem);
-    for(int B = 1; B <= numPlayers; B++)
-        Player[B].HeldBonus = NPCID_GRN_BOOT;
+    grantItemBox(NPCID_GRN_BOOT);
 }
 
 static void redShoe()
 {
-    PlaySound(SFX_GotItem);
-    for(int B = 1; B <= numPlayers; B++)
-        Player[B].HeldBonus = NPCID_RED_BOOT;
+    grantItemBox(NPCID_RED_BOOT);
 }
 
 static void blueShoe()
 {
-    PlaySound(SFX_GotItem);
-    for(int B = 1; B <= numPlayers; B++)
-        Player[B].HeldBonus = NPCID_BLU_BOOT;
+    grantItemBox(NPCID_BLU_BOOT);
 }
 
 static void shadowStar()
@@ -703,13 +623,13 @@ static void s_heightFix(Player_t& p)
     }
 }
 
-static void becomeAsPeach()
+static void changeCharCheat(int new_char)
 {
     PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
-        Player[B].Character = 3;
+        Player[B].Character = new_char;
         Player[B].Immune = 50;
 
         s_heightFix(Player[B]);
@@ -718,74 +638,31 @@ static void becomeAsPeach()
     }
 
     UpdateYoshiMusic();
+}
+
+static void becomeAsPeach()
+{
+    changeCharCheat(3);
 }
 
 static void becomeAsToad()
 {
-    PlaySound(SFX_Transform);
-
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        Player[B].Character = 4;
-        Player[B].Immune = 50;
-
-        s_heightFix(Player[B]);
-
-        NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
-    }
-
-    UpdateYoshiMusic();
+    changeCharCheat(4);
 }
 
 static void becomeAsLink()
 {
-    PlaySound(SFX_Transform);
-
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        Player[B].Character = 5;
-        Player[B].Immune = 50;
-
-        s_heightFix(Player[B]);
-
-        NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
-    }
-
-    UpdateYoshiMusic();
+    changeCharCheat(5);
 }
 
 static void becomeAsMario()
 {
-    PlaySound(SFX_Transform);
-
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        Player[B].Character = 1;
-        Player[B].Immune = 50;
-
-        s_heightFix(Player[B]);
-
-        NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
-    }
-
-    UpdateYoshiMusic();
+    changeCharCheat(1);
 }
 
 static void becomeAsLuigi()
 {
-    PlaySound(SFX_Transform);
-
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        Player[B].Character = 2;
-        Player[B].Immune = 50;
-
-        s_heightFix(Player[B]);
-
-        NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
-    }
-
-    UpdateYoshiMusic();
+    changeCharCheat(2);
 }
 
 static int findLivingForCheat()
@@ -1235,7 +1112,7 @@ static void warioTime()
     }
 }
 
-static void carKeys()
+static void grantItemHeld(NPCID npcid, NPCEffect eff = NPCEFF_NORMAL, int special = 0)
 {
     for(int B = 1; B <= numPlayers; B++)
     {
@@ -1243,11 +1120,20 @@ static void carKeys()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPCID_KEY;
+            NPC[numNPCs].Type = npcid;
             NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
             NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+            NPC[numNPCs].Location.X = Player[B].Location.X;
+            NPC[numNPCs].Location.Y = Player[B].Location.Y;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
+            NPC[numNPCs].Effect = eff;
+            NPC[numNPCs].Special = special;
+
+            // for the pods
+            if(special)
+                NPCFrames(numNPCs);
+
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
@@ -1260,451 +1146,91 @@ static void carKeys()
             PlaySound(SFX_Grab);
         }
     }
+}
+
+static void carKeys()
+{
+    grantItemHeld(NPCID_KEY);
 }
 
 static void boingyBoing()
 {
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
-        {
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPCID_SPRING;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 200;
-            NPC[numNPCs].HoldingPlayer = B;
-
-            syncLayers_NPC(numNPCs);
-            CheckSectionNPC(numNPCs);
-            Player[B].HoldingNPC = numNPCs;
-            Player[B].ForceHold = 60;
-            PlaySound(SFX_Grab);
-        }
-    }
+    grantItemHeld(NPCID_SPRING);
 }
 
 static void bombsAway()
 {
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
-        {
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPCID_BOMB;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-            NPC[numNPCs].Location.X = Player[B].Location.X;
-            NPC[numNPCs].Location.Y = Player[B].Location.Y;
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 200;
-            NPC[numNPCs].HoldingPlayer = B;
-
-            syncLayers_NPC(numNPCs);
-            CheckSectionNPC(numNPCs);
-            Player[B].HoldingNPC = numNPCs;
-            Player[B].ForceHold = 60;
-            PlaySound(SFX_Grab);
-        }
-    }
+    grantItemHeld(NPCID_BOMB);
 }
 
 static void fireMissiles()
 {
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        if(Player[B].Mount == 0 && !Player[B].Dead &&
-           Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
-        {
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPCID_BULLET;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 200;
-            NPC[numNPCs].HoldingPlayer = B;
-
-            syncLayers_NPC(numNPCs);
-            CheckSectionNPC(numNPCs);
-            Player[B].HoldingNPC = numNPCs;
-            Player[B].ForceHold = 60;
-            PlaySound(SFX_Grab);
-        }
-    }
+    grantItemHeld(NPCID_BULLET);
 }
 
 static void hellFire()
 {
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
-        {
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPCID_FLY_CANNON;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 200;
-            NPC[numNPCs].HoldingPlayer = B;
-            NPC[numNPCs].Location.X = Player[B].Location.X;
-            NPC[numNPCs].Location.Y = Player[B].Location.Y;
-            NPC[numNPCs].Section = Player[B].Section;
-            syncLayers_NPC(numNPCs);
-
-            Player[B].HoldingNPC = numNPCs;
-            Player[B].ForceHold = 60;
-            PlaySound(SFX_Grab);
-        }
-    }
+    grantItemHeld(NPCID_FLY_CANNON);
 }
 
 static void upAndOut()
 {
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
-        {
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPCID_FLY_BLOCK;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 200;
-            NPC[numNPCs].HoldingPlayer = B;
-            NPC[numNPCs].Location.X = Player[B].Location.X;
-            NPC[numNPCs].Location.Y = Player[B].Location.Y;
-            NPC[numNPCs].Section = Player[B].Section;
-            syncLayers_NPC(numNPCs);
-
-            Player[B].HoldingNPC = numNPCs;
-            Player[B].ForceHold = 60;
-            PlaySound(SFX_Grab);
-        }
-    }
+    grantItemHeld(NPCID_FLY_BLOCK);
 }
 
 static void powHammer()
 {
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
-        {
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPCID_EARTHQUAKE_BLOCK;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 200;
-            NPC[numNPCs].HoldingPlayer = B;
-            NPC[numNPCs].Location.X = Player[B].Location.X;
-            NPC[numNPCs].Location.Y = Player[B].Location.Y;
-            NPC[numNPCs].Section = Player[B].Section;
-            syncLayers_NPC(numNPCs);
-
-            Player[B].HoldingNPC = numNPCs;
-            Player[B].ForceHold = 60;
-            PlaySound(SFX_Grab);
-        }
-    }
+    grantItemHeld(NPCID_EARTHQUAKE_BLOCK);
 }
 
 static void hammerInMyPants()
 {
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        if(Player[B].Mount == 0 && !Player[B].Dead &&
-           Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
-        {
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPCID_HEAVY_THROWER;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 200;
-            NPC[numNPCs].HoldingPlayer = B;
-            NPC[numNPCs].Location.X = Player[B].Location.X;
-            NPC[numNPCs].Location.Y = Player[B].Location.Y;
-            NPC[numNPCs].Section = Player[B].Section;
-            syncLayers_NPC(numNPCs);
-
-            Player[B].HoldingNPC = numNPCs;
-            Player[B].ForceHold = 60;
-            PlaySound(SFX_Grab);
-        }
-    }
+    grantItemHeld(NPCID_HEAVY_THROWER);
 }
 
 static void rainbowRider()
 {
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        if(Player[B].Mount == 0 && !Player[B].Dead &&
-           Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
-        {
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPCID_FLIPPED_RAINBOW_SHELL;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 200;
-            NPC[numNPCs].HoldingPlayer = B;
-            syncLayers_NPC(numNPCs);
-
-            Player[B].HoldingNPC = numNPCs;
-            Player[B].ForceHold = 60;
-            PlaySound(SFX_Grab);
-        }
-    }
+    grantItemHeld(NPCID_FLIPPED_RAINBOW_SHELL, NPCEFF_DROP_ITEM);
 }
 
 static void greenEgg()
 {
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
-        {
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPCID_ITEM_POD;
-            NPC[numNPCs].Special = 95;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 200;
-            NPC[numNPCs].HoldingPlayer = B;
-            syncLayers_NPC(numNPCs);
-
-            Player[B].HoldingNPC = numNPCs;
-            Player[B].ForceHold = 60;
-            PlaySound(SFX_Grab);
-        }
-    }
+    grantItemHeld(NPCID_ITEM_POD, NPCEFF_DROP_ITEM, NPCID_PET_GREEN);
 }
 
 static void blueEgg()
 {
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
-        {
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPCID_ITEM_POD;
-            NPC[numNPCs].Frame = 1;
-            NPC[numNPCs].Special = 98;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 200;
-            NPC[numNPCs].HoldingPlayer = B;
-            syncLayers_NPC(numNPCs);
-
-            Player[B].HoldingNPC = numNPCs;
-            Player[B].ForceHold = 60;
-            PlaySound(SFX_Grab);
-        }
-    }
+    grantItemHeld(NPCID_ITEM_POD, NPCEFF_DROP_ITEM, NPCID_PET_BLUE);
 }
 
 static void yellowEgg()
 {
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
-        {
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPCID_ITEM_POD;
-            NPC[numNPCs].Special = 99;
-            NPC[numNPCs].Frame = 2;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 200;
-            NPC[numNPCs].HoldingPlayer = B;
-            syncLayers_NPC(numNPCs);
-
-            Player[B].HoldingNPC = numNPCs;
-            Player[B].ForceHold = 60;
-            PlaySound(SFX_Grab);
-        }
-    }
+    grantItemHeld(NPCID_ITEM_POD, NPCEFF_DROP_ITEM, NPCID_PET_YELLOW);
 }
 
 static void redEgg()
 {
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
-        {
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPCID_ITEM_POD;
-            NPC[numNPCs].Special = 100;
-            NPC[numNPCs].Frame = 3;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 200;
-            NPC[numNPCs].HoldingPlayer = B;
-            syncLayers_NPC(numNPCs);
-
-            Player[B].HoldingNPC = numNPCs;
-            Player[B].ForceHold = 60;
-            PlaySound(SFX_Grab);
-        }
-    }
+    grantItemHeld(NPCID_ITEM_POD, NPCEFF_DROP_ITEM, NPCID_PET_RED);
 }
 
 static void blackEgg()
 {
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        if(Player[B].Mount == 0 && !Player[B].Dead &&
-           Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
-        {
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPCID_ITEM_POD;
-            NPC[numNPCs].Special = 148;
-            NPC[numNPCs].Frame = 4;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 200;
-            NPC[numNPCs].HoldingPlayer = B;
-            syncLayers_NPC(numNPCs);
-
-            Player[B].HoldingNPC = numNPCs;
-            Player[B].ForceHold = 60;
-            PlaySound(SFX_Grab);
-        }
-    }
+    grantItemHeld(NPCID_ITEM_POD, NPCEFF_DROP_ITEM, NPCID_PET_BLACK);
 }
 
 static void purpleEgg()
 {
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
-        {
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPCID_ITEM_POD;
-            NPC[numNPCs].Special = 149;
-            NPC[numNPCs].Frame = 5;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 200;
-            NPC[numNPCs].HoldingPlayer = B;
-            syncLayers_NPC(numNPCs);
-
-            Player[B].HoldingNPC = numNPCs;
-            Player[B].ForceHold = 60;
-            PlaySound(SFX_Grab);
-        }
-    }
+    grantItemHeld(NPCID_ITEM_POD, NPCEFF_DROP_ITEM, NPCID_PET_PURPLE);
 }
 
 static void pinkEgg()
 {
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
-        {
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPCID_ITEM_POD;
-            NPC[numNPCs].Special = 150;
-            NPC[numNPCs].Frame = 6;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 200;
-            NPC[numNPCs].HoldingPlayer = B;
-            syncLayers_NPC(numNPCs);
-
-            Player[B].HoldingNPC = numNPCs;
-            Player[B].ForceHold = 60;
-            PlaySound(SFX_Grab);
-        }
-    }
+    grantItemHeld(NPCID_ITEM_POD, NPCEFF_DROP_ITEM, NPCID_PET_PINK);
 }
 
 static void coldEgg()
 {
-    for(int B = 1; B <= numPlayers; B++)
-    {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
-        {
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPCID_ITEM_POD;
-            NPC[numNPCs].Special = 228;
-            NPC[numNPCs].Frame = 6;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 200;
-            NPC[numNPCs].HoldingPlayer = B;
-            syncLayers_NPC(numNPCs);
-
-            Player[B].HoldingNPC = numNPCs;
-            Player[B].ForceHold = 60;
-            PlaySound(SFX_Grab);
-        }
-    }
+    grantItemHeld(NPCID_ITEM_POD, NPCEFF_DROP_ITEM, NPCID_PET_CYAN);
 }
 
 static void stopHittingMe()
