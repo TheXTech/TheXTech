@@ -31,6 +31,8 @@
 
 void PlayerMovementX(int A, tempf_t& cursed_value_C)
 {
+    bool is_grounded = (Player[A].Location.SpeedY == 0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0);
+
     // Modify player's speed if he is running up/down hill
     tempf_t speedVar = 1; // Speed var is a percentage of the player's speed
     if(Player[A].Slope > 0)
@@ -56,7 +58,7 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
     // modify speedvar to slow the player down under water
     if(Player[A].Wet > 0)
     {
-        if(Player[A].Location.SpeedY == 0 || Player[A].Slope > 0 || Player[A].StandingOnNPC != 0)
+        if(is_grounded)
             speedVar /= 4; // if walking go really slow
         else
             speedVar /= 2; // if swimming go slower faster the walking
@@ -66,20 +68,19 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
     // ducking for link
     if(Player[A].Duck && Player[A].WetFrame)
     {
-        if(Player[A].Location.SpeedY != 0 && Player[A].Slope == 0 && Player[A].StandingOnNPC == 0)
+        if(!is_grounded)
             UnDuck(Player[A]);
     }
 
     // the following code controls the players ability to duck
-    if(!(Player[A].Character == 5 && ((Player[A].Location.SpeedY != 0 && Player[A].Slope == 0 && Player[A].StandingOnNPC == 0) || Player[A].FireBallCD != 0))) // Link can't duck/unduck in air
+    if(!(Player[A].Character == 5 && (!is_grounded || Player[A].FireBallCD != 0))) // Link can't duck/unduck in air
     {
         if(Player[A].Controls.Down && !Player[A].SpinJump &&
            !Player[A].Stoned && Player[A].Vine == 0 && !Player[A].Slide &&
            (Player[A].Slope == 0 || Player[A].Mount > 0 || Player[A].WetFrame ||
             Player[A].Character >= 3 || Player[A].GrabTime > 0) &&
            ((!Player[A].WetFrame || Player[A].Character >= 3) ||
-            Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 ||
-            Player[A].Slope != 0 || Player[A].Mount == 1) &&
+            is_grounded || Player[A].Mount == 1) &&
            !Player[A].Fairy && !Player[A].ShellSurf && !Player[A].Driving)
         {
             Player[A].Bumped = false;
@@ -144,7 +145,7 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
     if((Player[A].Controls.Left || Player[A].Controls.Right) &&
        !Player[A].JumpOffWall &&
        ((!Player[A].Duck && Player[A].GrabTime == 0) ||
-        (Player[A].Location.SpeedY != 0 && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0) ||
+        !is_grounded ||
         Player[A].Mount == 1)
     )
     {
@@ -203,7 +204,7 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
     }
     else
     {
-        if(Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0 || Player[A].WetFrame) // Only lose speed when not in the air
+        if(is_grounded || Player[A].WetFrame) // Only lose speed when not in the air
         {
             if(Player[A].Location.SpeedX > 0)
                 Player[A].Location.SpeedX -= (num_t)speedVar * 0.07_r;
@@ -305,10 +306,8 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
         bool is_running = (num_t::abs(Player[A].Location.SpeedX) >= Physics.PlayerRunSpeed ||
             (Player[A].Character == 3 && num_t::abs(Player[A].Location.SpeedX) >= 5.579_n)); // Rounding error of SpeedX makes an evil here (FIXME: does this match VB6?)
 
-        if( (Player[A].Location.SpeedY == 0 ||
-             Player[A].CanFly2 ||
-             Player[A].StandingOnNPC != 0 ||
-             Player[A].Slope > 0) &&
+        if( (Player[A].CanFly2 ||
+             is_grounded) &&
             is_running)
         {
             Player[A].RunCount += 10;
@@ -351,7 +350,7 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
         }
     }
 
-    if(Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0)
+    if(is_grounded)
         Player[A].FlyCount = 1;
 
     if(Player[A].FlyCount > 1)
