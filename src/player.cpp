@@ -1898,7 +1898,7 @@ void PlayerFrame(Player_t &p)
 
     p.MountOffsetY = 0;
 
-    if(p.SpinJump && p.State == PLR_STATE_CYCLONE)
+    if(p.SpinJump && p.State == PLR_STATE_CYCLONE && !p.HoldingNPC)
     {
         if(p.Location.SpeedY > 0)
             p.SpinFrame += 1;

@@ -466,7 +466,7 @@ void PlayerMovementY(int A)
             PlayerDismount(A);
     }
 
-    if((Player[A].Location.SpeedY == 0 || (Player[A].Jump > 0 && !Player[A].JumpOffWall) || Player[A].Vine > 0) && Player[A].FloatTime == 0) // princess float
+    if((Player[A].Location.SpeedY == 0 || (Player[A].Jump > 0 && !Player[A].JumpOffWall) || Player[A].Vine > 0) && Player[A].FloatTime == 0 && !(Player[A].State == PLR_STATE_CYCLONE && Player[A].SpinJump)) // princess float
         Player[A].CanFloat = true;
 
     if(Player[A].Wet > 0 || Player[A].WetFrame)
@@ -603,7 +603,7 @@ void PlayerMovementY(int A)
 
     bool is_grounded = (Player[A].StandingOnNPC > 0 || Player[A].Slope > 0 || Player[A].Location.SpeedY == 0);
     // cyclone: allow double jump as save after falling off cliff
-    if(Player[A].State == PLR_STATE_CYCLONE && !Player[A].SpinJump)
+    if(Player[A].State == PLR_STATE_CYCLONE && (!Player[A].SpinJump/* || Player[A].HoldingNPC */)) // uncomment to ban cycloning with NPC
     {
         if(is_grounded)
             Player[A].DoubleJump = true;
@@ -617,7 +617,7 @@ void PlayerMovementY(int A)
     {
         if(Player[A].State == PLR_STATE_CYCLONE && (Player[A].Controls.Jump || Player[A].Controls.AltJump))
         {
-            if(!Player[A].Mount)
+            if(!Player[A].Mount /* && !Player[A].HoldingNPC */) // uncomment to ban cycloning with NPC
             {
                 PlaySoundSpatial(SFX_Whip, Player[A].Location);
                 Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
