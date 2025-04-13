@@ -29,6 +29,8 @@
 #include "player/player_update_priv.h"
 #include "npc/npc_cockpit_bits.h"
 
+void s_playerSlopeMomentum(int A);
+
 void PlayerMovementX(int A, tempf_t& cursed_value_C)
 {
     bool is_grounded = (Player[A].Location.SpeedY == 0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0);
@@ -64,6 +66,51 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
             speedVar /= 2; // if swimming go slower faster the walking
     }
 
+    // special logic for shell: just keep going!
+    if(Player[A].State == PLR_STATE_SHELL && Player[A].Controls.Run && !Player[A].HoldingNPC && !Player[A].Mount && !Player[A].Wet)
+    {
+        // 7.1 is the NPC shellspeed
+        num_t shell_speed = speedVar * 7.1_r;
+
+        if(shell_speed >= 7.5_n)
+            shell_speed = 7.5_n;
+
+        bool can_begin = is_grounded;
+        if(Player[A].Slope && BlockSlope[Block[Player[A].Slope].Type] != Player[A].Direction)
+            can_begin = false;
+
+        // start rolling
+        if(can_begin && num_t::abs(Player[A].Location.SpeedX) >= shell_speed)
+            Player[A].Rolling = true;
+
+        // keep rolling
+        if(Player[A].Rolling && num_t::abs(Player[A].Location.SpeedX) >= 0.5_n)
+        {
+            Player[A].Direction = (Player[A].Location.SpeedX > 0) ? 1 : -1;
+
+            if(!Player[A].Duck)
+            {
+                Player[A].Duck = true;
+                Player[A].Location.set_height_floor(Physics.PlayerDuckHeight[Player[A].Character][Player[A].State]);
+            }
+
+            if(Player[A].Slope)
+                s_playerSlopeMomentum(A);
+            else
+                Player[A].Location.SpeedX = (Player[A].Location.SpeedX * 127 + Player[A].Direction * shell_speed) / 128;
+
+            return;
+        }
+
+        // stop rolling
+        // allow the player to go faster if they aren't a shell yet
+        speedVar = speedVar * 5 / 4;
+    }
+
+    if(Player[A].Rolling)
+        Player[A].Slide = false;
+
+    Player[A].Rolling = false;
 
     // ducking for link
     if(Player[A].Duck && Player[A].WetFrame)
@@ -362,21 +409,26 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
     }
 }
 
+void s_playerSlopeMomentum(int A)
+{
+    // Angle = 1 / (Block[Player[A].Slope].Location.Width / Block[Player[A].Slope].Location.Height);
+    num_t Angle = Block[Player[A].Slope].Location.Height / (int_ok)Block[Player[A].Slope].Location.Width;
+    num_t slideSpeed = Angle * BlockSlope[Block[Player[A].Slope].Type] / 10;
+
+    num_t add_uphill = (Player[A].Rolling) ? slideSpeed : slideSpeed * 2;
+
+    if(slideSpeed > 0 && Player[A].Location.SpeedX < 0)
+        Player[A].Location.SpeedX += add_uphill;
+    else if(slideSpeed < 0 && Player[A].Location.SpeedX > 0)
+        Player[A].Location.SpeedX += add_uphill;
+    else
+        Player[A].Location.SpeedX += slideSpeed;
+}
+
 void PlayerSlideMovementX(int A)
 {
     if(Player[A].Slope > 0)
-    {
-        // Angle = 1 / (Block[Player[A].Slope].Location.Width / Block[Player[A].Slope].Location.Height);
-        num_t Angle = Block[Player[A].Slope].Location.Height / (int_ok)Block[Player[A].Slope].Location.Width;
-        num_t slideSpeed = Angle * BlockSlope[Block[Player[A].Slope].Type] / 10;
-
-        if(slideSpeed > 0 && Player[A].Location.SpeedX < 0)
-            Player[A].Location.SpeedX += slideSpeed * 2;
-        else if(slideSpeed < 0 && Player[A].Location.SpeedX > 0)
-            Player[A].Location.SpeedX += slideSpeed * 2;
-        else
-            Player[A].Location.SpeedX += slideSpeed;
-    }
+        s_playerSlopeMomentum(A);
     else if(Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0)
     {
         if(Player[A].Location.SpeedX > 0.2_n)
@@ -475,7 +527,7 @@ void PlayerMovementY(int A)
 
     // handles the regular jump
     if(Player[A].Controls.Jump || (Player[A].Controls.AltJump &&
-       ((Player[A].Character > 2 && Player[A].Character != 4) || Player[A].Quicksand > 0 || g_config.disable_spin_jump) &&
+       ((Player[A].Character > 2 && Player[A].Character != 4) || Player[A].Quicksand > 0 || Player[A].Rolling || g_config.disable_spin_jump) &&
        Player[A].CanAltJump))
     {
         num_t tempSpeed;
@@ -1125,7 +1177,7 @@ void PlayerMazeZoneMovement(int A)
         Player[A].Duck = true;
         SizeCheck(Player[A]);
     }
-    else
+    else if(!Player[A].Rolling)
     {
         UnDuck(Player[A]);
         Player[A].WetFrame = true;

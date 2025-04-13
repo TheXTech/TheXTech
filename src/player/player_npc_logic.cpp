@@ -572,6 +572,19 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                             {
                                 if(NPC[B]->IsABonus) // Bonus
                                     TouchBonus(A, B);
+                                else if(Player[A].Rolling)
+                                {
+                                    if(NPC[B].Type == NPCID_SPRING)
+                                    {
+                                        tempSpring = true;
+                                        tempHit = B;
+                                        tempLocation.Y = NPC[B].Location.Y - Player[A].Location.Height;
+                                    }
+                                    else if(NPC[B].CantHurtPlayer != A)
+                                        NPCHit(B, 3, B);
+
+                                    continue;
+                                }
                                 else if(NPC[B]->IsAShell && NPC[B].Location.SpeedX == 0 && Player[A].HoldingNPC == 0 && Player[A].Controls.Run && !g_config.no_shell_grab_top)
                                 {
                                     // grab turtle shells
@@ -672,7 +685,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                  (NPC[B]->IsAShell && FreezeNPCs)
                             ) // GRAB EVERYTHING
                             {
-                                if(Player[A].Controls.Run)
+                                if(Player[A].Controls.Run && !Player[A].Rolling)
                                 {
                                     if((HitSpot == 2 && Player[A].Direction == -1) ||
                                        (HitSpot == 4 && Player[A].Direction == 1) ||
@@ -707,7 +720,9 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
 
                             if(NPC[B]->IsAShell || (NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Special == 1)) // Turtle shell
                             {
-                                if(NPC[B].Location.SpeedX == 0 && NPC[B].Location.SpeedY >= 0) // Shell is not moving
+                                if(Player[A].Rolling && NPC[B].HoldingPlayer == 0 && NPC[B].CantHurtPlayer != A) // Kill the shell!
+                                    NPCHit(B, 3, B);
+                                else if(NPC[B].Location.SpeedX == 0 && NPC[B].Location.SpeedY >= 0) // Shell is not moving
                                 {
                                     if(((Player[A].Controls.Run && Player[A].HoldingNPC == 0) || Player[A].HoldingNPC == B) && NPC[B].CantHurtPlayer != A) // Grab the shell
                                     {
@@ -778,7 +793,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         {
                                             if(NPC[B].Effect != NPCEFF_DROP_ITEM)
                                             {
-                                                if(InvincibilityTime || (Player[A].SlideKill && !NPC[B]->JumpHurt))
+                                                if(InvincibilityTime || (Player[A].SlideKill && !NPC[B]->JumpHurt) || Player[A].Rolling)
                                                     NPCHit(B, 3, B);
 
                                                 if(NPC[B].Killed == 0)
@@ -861,7 +876,14 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                                 tempBool = true;
                                         }
 
-                                        if(!tempBool && NPC[B].Type != NPCID_BULLY)
+                                        if(Player[A].Rolling)
+                                        {
+                                            PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
+                                            if((Player[A].Location.SpeedX > 0) == (Player[A].Direction > 0))
+                                                Player[A].Location.SpeedX = -Player[A].Location.SpeedX;
+                                            tempHit2 = false;
+                                        }
+                                        else if(!tempBool && NPC[B].Type != NPCID_BULLY)
                                             Player[A].Location.SpeedX = 0.2_n * Player[A].Direction;
 
                                         // reset player run count

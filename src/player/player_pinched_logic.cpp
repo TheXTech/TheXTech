@@ -58,6 +58,14 @@ void PlayerPinchedDeathCheck(int A)
     bool vcrush = pi.Bottom1 && pi.Top3;
     bool hcrush = pi.Left2 && pi.Right4;
 
+    // something strange happened to rolling player and they would have been killed -- force them into normal state instead
+    if(pi.MovingLR && hcrush && Player[A].Rolling)
+    {
+        Player[A].Location.SpeedX = 0;
+        Player[A].Immune = 5;
+        hcrush = false;
+    }
+
     // When the player is pushed through the floor or stops ducking while being crushed, they get left+right hits but no bottom hit
     bool vcrush_plus = vcrush || (hcrush && (pi.Bottom1 || pi.Top3));
 

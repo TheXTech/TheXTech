@@ -198,7 +198,9 @@ bool UpdatePlayer()
                 if(Player[A].GrabTime > 0)
                     Player[A].Slide = false;
 
-                if(Player[A].Slope > 0 && Player[A].Controls.Down &&
+                if(Player[A].Rolling)
+                    Player[A].Slide = true;
+                else if(Player[A].Slope > 0 && Player[A].Controls.Down &&
                    Player[A].Mount == 0 && Player[A].HoldingNPC == 0 &&
                    !(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5) &&
                    Player[A].GrabTime == 0)
@@ -242,7 +244,7 @@ bool UpdatePlayer()
                     // Player's X movement. ---------------------------
 
                     // Code used to move the player while sliding down a slope
-                    if(Player[A].Slide)
+                    if(Player[A].Slide && !Player[A].Rolling)
                         PlayerSlideMovementX(A);
                     // TODO: mount-dependent logic
                     // if not sliding and in the clown car
@@ -363,7 +365,7 @@ bool UpdatePlayer()
                         UpdateYoshiMusic();
                     }
 
-                    if(Player[A].Slide)
+                    if(Player[A].Slide && !Player[A].Rolling)
                         Player[A].Slide = false;
 
                     // If .Stoned = True Then .Stoned = False

@@ -116,7 +116,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                             {
                                 if(Player[A].Mount == 2 ||
                                    (
-                                       (HitSpot == 1 && Player[A].Mount != 0) &&
+                                       (HitSpot == 1 && (Player[A].Mount || Player[A].Rolling)) &&
                                        Block[B].Type != 598
                                    )
                                  )
@@ -752,6 +752,23 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
             if(C > 0)
                 Player[A].Location.SpeedY = (num_t)C;
         }
+    }
+
+    if(hitWall && Player[A].Rolling)
+    {
+        int slope = BlockSlope[Block[wallBlock].Type];
+
+        // don't crash on slopes you should be going up!
+        if(slope != -Player[A].Direction)
+        {
+            BlockHit(wallBlock, false, A);
+            BlockHitHard(wallBlock);
+            PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
+            if((Player[A].Location.SpeedX > 0) == (Player[A].Direction > 0))
+                Player[A].Location.SpeedX = -Player[A].Location.SpeedX;
+        }
+
+        hitWall = false;
     }
 
     if(floorBlock > 0) // For walking

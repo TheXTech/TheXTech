@@ -743,6 +743,7 @@ void SetupPlayers()
         Player[A].Bombs = 0;
         Player[A].Wet = 0;
         Player[A].ShellSurf = false;
+        Player[A].Rolling = false;
         Player[A].WetFrame = false;
         Player[A].Slide = false;
         Player[A].Vine = 0;
@@ -931,6 +932,7 @@ void PlayerHurt(const int A)
     p.CanFly2 = false;
     p.FlyCount = 0;
     p.RunCount = 0;
+    p.Rolling = false;
 
     if(p.Fairy)
     {
@@ -1581,6 +1583,12 @@ void EveryonesDead()
 
 void UnDuck(Player_t &p)
 {
+    if(p.Rolling)
+    {
+        p.Rolling = false;
+        p.Slide = false;
+    }
+
     if(p.Duck && p.GrabTime == 0) // Player stands up
     {
         if(p.Location.SpeedY != 0) // Fixes a block collision bug
@@ -1790,6 +1798,17 @@ void PlayerFrame(Player_t &p)
         return;
     }
 
+    // Rolling frames
+    if(p.Rolling)
+    {
+        if(p.Character == 5)
+            return;
+
+        p.FrameCount = (p.FrameCount + 1) & 15;
+        p.Frame = 16 + p.FrameCount / 4;
+        return;
+    }
+
 // statue frames
     if(p.Stoned)
     {
@@ -1898,6 +1917,7 @@ void PlayerFrame(Player_t &p)
 
     p.MountOffsetY = 0;
 
+    // cyclone frames
     if(p.SpinJump && p.State == PLR_STATE_CYCLONE && !p.HoldingNPC)
     {
         if(p.Location.SpeedY > 0)
@@ -5386,6 +5406,12 @@ void LinkFrame(Player_t &p)
         return;
     }
 
+    if(p.Rolling)
+    {
+        p.Frame = 12;
+        return;
+    }
+
     if(!LevelSelect && p.Effect == PLREFF_NORMAL && p.FireBallCD == 0)
     {
         if(p.Controls.Left)
@@ -6608,7 +6634,7 @@ void AddPlayer(int Character, Screen_t& screen)
     p.Frame = 1;
     if(p.Character == 3)
         p.CanFloat = true;
-    p.Direction = 1.;
+    p.Direction = 1;
 
     SizeCheck(Player[numPlayers]);
 

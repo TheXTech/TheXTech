@@ -1794,10 +1794,17 @@ void SetupPlayerFrames()
         // special case: cyclone power has big sprites
         if(A == 950)
         {
+            base = 150;
             offset_x = -2;
             offset_y = -2;
         }
-        else if(A == 850 || A == 950 || A == 1050)
+        else if(A == 1050)
+        {
+            base = 150;
+            offset_x = -6;
+            offset_y = 0;
+        }
+        else if(A == 850 || A == 950)
         {
             base = 150;
             offset_x = 0;

@@ -570,6 +570,8 @@ struct Player_t
     // int NoShellKick = 0;
 //    ShellSurf As Boolean 'true if surfing a shell
     bool ShellSurf = false;
+    // is currently a rolling shell/ball
+    bool Rolling = false;
 //    StateNPC As Integer
     NPCID StateNPC = NPCID(0);
 //    Slope As Integer 'the block that the player is standing on when on a slope

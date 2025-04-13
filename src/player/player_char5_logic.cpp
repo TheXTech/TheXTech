@@ -146,7 +146,7 @@ void PlayerChar5Logic(int A)
         }
     }
 
-    if(Player[A].FireBallCD == 0 && Player[A].Wet == 0 && !Player[A].Fairy && Player[A].Mount == 0)
+    if(Player[A].FireBallCD == 0 && Player[A].Wet == 0 && !Player[A].Fairy && Player[A].Mount == 0 && !Player[A].Rolling)
     {
         // Link ducks when jumping
         // Holding Up cancels this and allows upwards stab
