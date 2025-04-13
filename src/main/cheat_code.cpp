@@ -540,6 +540,16 @@ static void needALeaf()
     grantPowerup(NPCID_LEAF_POWER, PLR_STATE_LEAF);
 }
 
+static void needACyclone()
+{
+    grantPowerup(NPCID_CYCLONE_POWER, PLR_STATE_CYCLONE);
+}
+
+static void goodTimesRoll()
+{
+    grantPowerup(NPCID_SHELL_POWER, PLR_STATE_SHELL);
+}
+
 static void grantItemBox(NPCID npcid)
 {
     PlaySound(SFX_GotItem);
@@ -1193,6 +1203,11 @@ static void rainbowRider()
     grantItemHeld(NPCID_FLIPPED_RAINBOW_SHELL, NPCEFF_DROP_ITEM);
 }
 
+static void cantTouchThis()
+{
+    grantItemHeld(NPCID_INVINCIBILITY_POWER);
+}
+
 static void greenEgg()
 {
     grantItemHeld(NPCID_ITEM_POD, NPCEFF_DROP_ITEM, NPCID_PET_GREEN);
@@ -1740,6 +1755,9 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"getmeouttahere", getMeOuttaHere, true},
     {"newleaf", newLeaf, true},
     {"borntoclimb", bornToClimb, true},
+    {"needacyclone", needACyclone, true},
+    {"goodtimesroll", goodTimesRoll, true},
+    {"canttouchthis", cantTouchThis, true},
 
     {"holytrinity", holyTrinity, true}, {"passerby", holyTrinity, true},
     {"essentials", essentials, true}, {"holyfour", essentials, true},
