@@ -1801,9 +1801,6 @@ void PlayerFrame(Player_t &p)
     // Rolling frames
     if(p.Rolling)
     {
-        if(p.Character == 5)
-            return;
-
         p.FrameCount = (p.FrameCount + 1) & 15;
         p.Frame = 16 + p.FrameCount / 4;
         return;
@@ -5408,7 +5405,8 @@ void LinkFrame(Player_t &p)
 
     if(p.Rolling)
     {
-        p.Frame = 12;
+        p.FrameCount = (p.FrameCount + 1) & 15;
+        p.Frame = 12 + p.FrameCount / 4;
         return;
     }
 
