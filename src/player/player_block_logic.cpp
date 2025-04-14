@@ -497,6 +497,15 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                 if(Player[A].Location.Y - Player[A].Location.SpeedY < Block[B].Location.Y + Block[B].Location.Height)
                                     HitSpot = 3;
                             }
+                            // don't stop rolling when you clip into a block -- just bounce on it
+                            // (if there are multiple blocks, eventually the player will get pinched and leave rolling state)
+                            else if(HitSpot == 5 && Player[A].Rolling)
+                            {
+                                if(Block[B].Location.to_right_of(Player[A].Location))
+                                    HitSpot = 4;
+                                else
+                                    HitSpot = 2;
+                            }
 
                             if(HitSpot == 1) // landed on the block from the top V
                             {
@@ -739,7 +748,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
         }
     }
 
-    if(Player[A].Character == 5 && Player[A].Duck)
+    if(Player[A].Character == 5 && Player[A].Duck && !Player[A].Rolling)
         Player[A].Location.set_height_floor(Physics.PlayerDuckHeight[Player[A].Character][Player[A].State]);
 
 
@@ -764,8 +773,18 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
             BlockHit(wallBlock, false, A);
             BlockHitHard(wallBlock);
             PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
-            if((Player[A].Location.SpeedX > 0) == (Player[A].Direction > 0))
+            if((Player[A].Location.SpeedX > 0) == (Player[A].Direction > 0) && !hitCeiling)
+            {
                 Player[A].Location.SpeedX = -Player[A].Location.SpeedX;
+
+                // help player go over 1-block gaps here
+                if(!floorBlock && !Player[A].StandingOnNPC && !Player[A].Slope)
+                {
+                    Player[A].Location.Y -= 4;
+                    Player[A].StandUp = true;
+                    Player[A].ForceHitSpot3 = true; // sets standup the next frame
+                }
+            }
         }
 
         hitWall = false;
@@ -1003,16 +1022,10 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
         Player[A].Location.Y = Block[ceilingBlock].Location.Y + Block[ceilingBlock].Location.Height + 0.01_n;
         Player[A].Location.SpeedY = -0.01_n + Block[ceilingBlock].Location.SpeedY;
 
-        if(Player[A].Fairy)
-            Player[A].Location.SpeedY = 2;
-
         if(Player[A].Vine > 0)
             Player[A].Location.Y += 0.1_n;
 
-        if(Player[A].Mount == 2)
-            Player[A].Location.SpeedY = 2;
-
-        if(Player[A].CanFly2)
+        if(Player[A].Fairy || Player[A].Mount == 2 || Player[A].CanFly2)
             Player[A].Location.SpeedY = 2;
 
         if(Player[A].Mount != 2) // Tell the block it was hit
@@ -1021,7 +1034,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
         if(Block[ceilingBlock].Type == 55) // If it is a bouncy block the knock the player down
             Player[A].Location.SpeedY = 3;
 
-        if(Player[A].State > 1 && Player[A].Character != 5) // If the player was big ask the block nicely to die
+        if(Player[A].State > 1 && (Player[A].Character != 5 || Player[A].Rolling)) // If the player was big ask the block nicely to die
         {
             if(Player[A].Mount != 2 && Block[ceilingBlock].Type != 293)
                 BlockHitHard(ceilingBlock);

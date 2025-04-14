@@ -1825,9 +1825,10 @@ void SetupPlayerFrames()
         base++;
     }
 
-    // special cyclone power corrections for chars 2 and 3 (tall)
+    // special power corrections
     for(int D = -1; D <= 1; D += 2)
     {
+        // cyclone power
         LuigiFrameY[1000 + D * 3] -= 2;
         LuigiFrameY[1000 + D * 4] -= 2;
         LuigiFrameY[1000 + D * 5] -= 2;
@@ -1862,5 +1863,11 @@ void SetupPlayerFrames()
         ToadFrameX[1000 + D * 16] = -12;
         ToadFrameX[1000 + D * 17] = -12;
         ToadFrameX[1000 + D * 18] = -12;
+
+        // rolling power
+        LinkFrameY[1100 + D * 12] = -12;
+        LinkFrameY[1100 + D * 13] = -12;
+        LinkFrameY[1100 + D * 14] = -12;
+        LinkFrameY[1100 + D * 15] = -12;
     }
 }

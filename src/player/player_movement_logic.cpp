@@ -91,7 +91,7 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
             if(!Player[A].Duck)
             {
                 Player[A].Duck = true;
-                Player[A].Location.set_height_floor(Physics.PlayerDuckHeight[Player[A].Character][Player[A].State]);
+                SizeCheck(Player[A]);
             }
 
             if(Player[A].Slope)

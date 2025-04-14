@@ -3686,6 +3686,12 @@ void SizeCheck(Player_t &p)
     if(p.Character == 0)
         p.Character = 1;
 
+    if(p.Character == 5 && p.Rolling)
+    {
+        p.Location.set_height_floor(30);
+        return;
+    }
+
     if(p.Fairy)
     {
         if(p.Duck)
