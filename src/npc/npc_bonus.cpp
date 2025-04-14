@@ -467,6 +467,10 @@ void TouchBonus(int A, int B)
             target_effect = PLREFF_GROW_TO_STATE;
             reset_effect2 = false;
             use_sfx = sfx_grow_item;
+
+            // award a double-jump!
+            if(Player[A].State != PLR_STATE_CYCLONE)
+                Player[A].DoubleJump = true;
         }
         else if(NPC[B].Type == NPCID_LEAF_POWER)
             target_state = PLR_STATE_LEAF;
