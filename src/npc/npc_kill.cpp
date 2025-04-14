@@ -316,9 +316,9 @@ resume_TriggerLast:
     if(B != 9)
     {
         NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
-        if(NPC[A].Type == NPCID_SQUID_S1 || NPC[A].Type == NPCID_SQUID_S3 || NPC[A].Type == NPCID_FODDER_S3 || NPC[A].Type == NPCID_FODDER_S5 || NPC[A].Type == NPCID_FLY_FODDER_S5 || NPC[A].Type == NPCID_FLY_FODDER_S3 || NPC[A].Type == NPCID_BRUTE || NPC[A].Type == NPCID_BRUTE_SQUISHED || NPC[A].Type == NPCID_BIG_MOLE || NPC[A].Type == NPCID_CARRY_FODDER || NPC[A].Type == NPCID_HIT_CARRY_FODDER || NPC[A].Type == NPCID_FLY_CARRY_FODDER || NPC[A].Type == NPCID_GRN_FISH_S3 || NPC[A].Type == NPCID_FISH_S4 || NPC[A].Type == NPCID_RED_FISH_S3 || NPC[A].Type == NPCID_GOGGLE_FISH || NPC[A].Type == NPCID_GRN_FISH_S1 || NPC[A].Type == NPCID_BONE_FISH || NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_ICE_CUBE) // Goomba / Rex
+        if(NPC[A].Type == NPCID_SQUID_S1 || NPC[A].Type == NPCID_SQUID_S3 || NPC[A].Type == NPCID_FODDER_S3 || NPC[A].Type == NPCID_FODDER_S5 || NPC[A].Type == NPCID_FLY_FODDER_S5 || NPC[A].Type == NPCID_FLY_FODDER_S3 || NPC[A].Type == NPCID_BRUTE || NPC[A].Type == NPCID_BRUTE_SQUISHED || NPC[A].Type == NPCID_BIG_GUY || NPC[A].Type == NPCID_CARRY_FODDER || NPC[A].Type == NPCID_HIT_CARRY_FODDER || NPC[A].Type == NPCID_FLY_CARRY_FODDER || NPC[A].Type == NPCID_GRN_FISH_S3 || NPC[A].Type == NPCID_YEL_FISH_S4 || NPC[A].Type == NPCID_RED_FISH_S3 || NPC[A].Type == NPCID_GRN_FISH_S4 || NPC[A].Type == NPCID_GRN_FISH_S1 || NPC[A].Type == NPCID_BONE_FISH || NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_ICE_CUBE) // Goomba / Rex
         {
-            if(B == 1 && NPC[A].Type != NPCID_GRN_FISH_S3 && NPC[A].Type != NPCID_FISH_S4 && NPC[A].Type != NPCID_RED_FISH_S3 && NPC[A].Type != NPCID_GOGGLE_FISH && NPC[A].Type != NPCID_GRN_FISH_S1 && NPC[A].Type != NPCID_BONE_FISH)
+            if(B == 1 && NPC[A].Type != NPCID_GRN_FISH_S3 && NPC[A].Type != NPCID_YEL_FISH_S4 && NPC[A].Type != NPCID_RED_FISH_S3 && NPC[A].Type != NPCID_GRN_FISH_S4 && NPC[A].Type != NPCID_GRN_FISH_S1 && NPC[A].Type != NPCID_BONE_FISH)
             {
                 if(NPC[A].Type == NPCID_FODDER_S3)
                     NewEffect(EFFID_FODDER_S3_SQUISH, NPC[A].Location);
@@ -371,8 +371,8 @@ resume_TriggerLast:
                     NewEffect(EFFID_SQUID_S1_DIE, NPC[A].Location);
                 else if(NPC[A].Type == NPCID_BRUTE)
                     NewEffect(EFFID_BRUTE_DIE, NPC[A].Location, NPC[A].Direction);
-                else if(NPC[A].Type == NPCID_BIG_MOLE)
-                    NewEffect(EFFID_BIG_MOLE_DIE, NPC[A].Location, NPC[A].Direction);
+                else if(NPC[A].Type == NPCID_BIG_GUY)
+                    NewEffect(EFFID_BIG_GUY_DIE, NPC[A].Location, NPC[A].Direction);
                 else if(NPC[A].Type == NPCID_BRUTE_SQUISHED)
                     NewEffect(EFFID_BRUTE_SQUISHED_DIE, NPC[A].Location, NPC[A].Direction);
                 else if(NPC[A].Type == NPCID_GRN_FISH_S3)
@@ -382,12 +382,12 @@ resume_TriggerLast:
                         NPC[A].Location.SpeedY = -2;
                     NewEffect(EFFID_GRN_FISH_S3_DIE, NPC[A].Location, NPC[A].Direction);
                 }
-                else if(NPC[A].Type == NPCID_FISH_S4)
+                else if(NPC[A].Type == NPCID_YEL_FISH_S4)
                 {
                     NPC[A].Location.SpeedY = -11;
                     if(B == 1)
                         NPC[A].Location.SpeedY = -2;
-                    NewEffect(EFFID_FISH_S4_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_YEL_FISH_S4_DIE, NPC[A].Location, NPC[A].Direction);
                 }
                 else if(NPC[A].Type == NPCID_RED_FISH_S3)
                 {
@@ -396,12 +396,12 @@ resume_TriggerLast:
                         NPC[A].Location.SpeedY = -2;
                     NewEffect(EFFID_RED_FISH_S3_DIE, NPC[A].Location, NPC[A].Direction);
                 }
-                else if(NPC[A].Type == NPCID_GOGGLE_FISH)
+                else if(NPC[A].Type == NPCID_GRN_FISH_S4)
                 {
                     NPC[A].Location.SpeedY = -11;
                     if(B == 1)
                         NPC[A].Location.SpeedY = -2;
-                    NewEffect(EFFID_GOGGLE_FISH_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_GRN_FISH_S4_DIE, NPC[A].Location, NPC[A].Direction);
                 }
                 else if(NPC[A].Type == NPCID_GRN_FISH_S1)
                 {
@@ -463,7 +463,7 @@ resume_TriggerLast:
             else
                 NewEffect(EFFID_BIG_GHOST_DIE, NPC[A].Location, NPC[A].Direction);
         }
-        else if(NPC[A].Type == NPCID_BULLY) // bully
+        else if(NPC[A].Type == NPCID_CHASER) // bully
         {
             NPC[A].Location.SpeedY = -8;
             if(B == 6)
@@ -485,7 +485,7 @@ resume_TriggerLast:
             else
             {
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
-                NewEffect(EFFID_BULLY_DIE, NPC[A].Location, NPC[A].Direction);
+                NewEffect(EFFID_CHASER_DIE, NPC[A].Location, NPC[A].Direction);
             }
 
         }
@@ -1406,7 +1406,7 @@ resume_TriggerLast:
                     NewEffect(EFFID_BIG_BULLET_DIE, NPC[A].Location, NPC[A].Direction);
             }
         }
-        else if(NPC[A].Type == NPCID_STACKER || NPC[A].Type == NPCID_BLU_GUY || NPC[A].Type == NPCID_RED_GUY || NPC[A].Type == NPCID_JUMPER_S3 || NPC[A].Type == NPCID_RED_FISH_S1 || NPC[A].Type == NPCID_HEAVY_THROWER || NPC[A].Type == NPCID_SPIKY_THROWER || NPC[A].Type == NPCID_ITEM_THROWER || NPC[A].Type == NPCID_SPIKY_BALL_S3 || NPC[A].Type == NPCID_JUMPER_S4 || NPC[A].Type == NPCID_BAT || (NPC[A].Type >= NPCID_BIRD && NPC[A].Type <= NPCID_GRY_SPIT_GUY) || NPC[A].Type == NPCID_SATURN || NPC[A].Type == NPCID_WALK_PLANT || NPC[A].Type == NPCID_VINE_BUG) // Misc Things
+        else if(NPC[A].Type == NPCID_STACKER || NPC[A].Type == NPCID_BLU_GUY || NPC[A].Type == NPCID_RED_GUY || NPC[A].Type == NPCID_JUMPER_S3 || NPC[A].Type == NPCID_RED_FISH_S1 || NPC[A].Type == NPCID_HEAVY_THROWER || NPC[A].Type == NPCID_SPIKY_THROWER || NPC[A].Type == NPCID_ITEM_THROWER || NPC[A].Type == NPCID_SPIKY_BALL_S3 || NPC[A].Type == NPCID_JUMPER_S4 || NPC[A].Type == NPCID_BAT || (NPC[A].Type >= NPCID_BIRD && NPC[A].Type <= NPCID_GRY_SPIT_GUY) || NPC[A].Type == NPCID_CARRY_BUDDY || NPC[A].Type == NPCID_WALK_PLANT || NPC[A].Type == NPCID_VINE_BUG) // Misc Things
         {
             if(B == 6)
             {
@@ -1440,8 +1440,8 @@ resume_TriggerLast:
                         NPC[A].Location.SpeedY = 0;
                     NewEffect(EFFID_RED_FISH_S1_DIE, NPC[A].Location, NPC[A].Direction);
                 }
-                else if(NPC[A].Type == NPCID_SATURN)
-                    NewEffect(EFFID_SATURN_DIE, NPC[A].Location, NPC[A].Direction);
+                else if(NPC[A].Type == NPCID_CARRY_BUDDY)
+                    NewEffect(EFFID_CARRY_BUDDY_DIE, NPC[A].Location, NPC[A].Direction);
                 else if(NPC[A].Type == NPCID_STACKER)
                     NewEffect(EFFID_STACKER_DIE, NPC[A].Location);
                 else if(NPC[A].Type == NPCID_VINE_BUG)

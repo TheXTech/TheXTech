@@ -1016,7 +1016,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                                                 NPC[A].Projectile = false;
                                                         }
                                                     }
-                                                    else if(NPC[A].Type == NPCID_BULLY)
+                                                    else if(NPC[A].Type == NPCID_CHASER)
                                                     {
                                                         if(NPC[A].Location.SpeedX > -0.1_n && NPC[A].Location.SpeedX < 0.1_n)
                                                             NPC[A].Projectile = false;
@@ -1115,7 +1115,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                            // Duplicated segment [PVS Studio]
                                            // NPC[A].Type != NPCID_RED_BOOT &&
                                            NPC[A].Type != NPCID_BLU_BOOT && NPC[A].Type != NPCID_TOOTHYPIPE &&
-                                           NPC[A].Type != NPCID_BOMB && NPC[A].Type != NPCID_SATURN && NPC[A].Type != NPCID_FLIPPED_RAINBOW_SHELL && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK &&
+                                           NPC[A].Type != NPCID_BOMB && NPC[A].Type != NPCID_CARRY_BUDDY && NPC[A].Type != NPCID_FLIPPED_RAINBOW_SHELL && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK &&
                                            !((NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D))) // walldeath stuff
                                         {
                                             NPC[A].Location.SpeedX = Physics.NPCShellSpeed / 2 * NPC[A].Direction;

@@ -151,8 +151,8 @@ static void s_draw_shoe_block(int x, int y)
     StdPicture& plant = GFXNPC[NPCID_FIRE_PLANT];
     XRender::renderTextureBasic(x + 96 - 4 - 32, y + 96 - 8 - NPCTraits[NPCID_FIRE_PLANT].THeight, 32, NPCTraits[NPCID_FIRE_PLANT].THeight, plant, 0, 0);
 
-    StdPicture& fire = GFXNPC[NPCID_PLANT_FIRE];
-    XRender::renderTextureBasic(x + 96 - 56, y + 96 - 56, 32, NPCTraits[NPCID_PLANT_FIRE].THeight, fire, 0, 0);
+    StdPicture& fire = GFXNPC[NPCID_PLANT_FIREBALL];
+    XRender::renderTextureBasic(x + 96 - 56, y + 96 - 56, 32, NPCTraits[NPCID_PLANT_FIREBALL].THeight, fire, 0, 0);
 
     DrawPlayerRaw(x + 8 + 4, y + 96 - 8 - 32 - 22, 3, 1, 1, 1);
 
@@ -165,8 +165,8 @@ static void s_draw_heavy_duck(int x, int y)
     StdPicture& plant = GFXNPC[NPCID_FIRE_PLANT];
     XRender::renderTextureBasic(x + 96 - 4 - 32, y + 96 - 8 - NPCTraits[NPCID_FIRE_PLANT].THeight, 32, NPCTraits[NPCID_FIRE_PLANT].THeight, plant, 0, 0);
 
-    StdPicture& fire = GFXNPC[NPCID_PLANT_FIRE];
-    XRender::renderTextureBasic(x + 96 - 56, y + 96 - 56, 32, NPCTraits[NPCID_PLANT_FIRE].THeight, fire, 0, 0);
+    StdPicture& fire = GFXNPC[NPCID_PLANT_FIREBALL];
+    XRender::renderTextureBasic(x + 96 - 56, y + 96 - 56, 32, NPCTraits[NPCID_PLANT_FIREBALL].THeight, fire, 0, 0);
 
     DrawPlayerRaw(x + 8, y + 96 - 56, 1, 6, 7, 1);
 }

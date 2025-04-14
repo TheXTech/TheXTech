@@ -1199,7 +1199,7 @@ void NPCFrames(int A)
         if(NPC[A].Direction == 1)
             NPC[A].Frame = 0;
     }
-    else if(NPC[A].Type == NPCID_BULLY) // Bully
+    else if(NPC[A].Type == NPCID_CHASER) // Bully
     {
         NPC[A].Frame = 0;
         if(NPC[A].Direction == 1)
@@ -1447,7 +1447,7 @@ void NPCFrames(int A)
                 NPC[A].Frame = 0;
         }
     }
-    else if(NPC[A].Type == NPCID_GRN_TURTLE_S3 || NPC[A].Type == NPCID_RED_TURTLE_S3 || NPC[A].Type == NPCID_GLASS_TURTLE || NPC[A].Type == NPCID_SPIKY_S3 || NPC[A].Type == NPCID_SPIKY_S4 || NPC[A].Type == NPCID_GHOST_FAST || NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Type == NPCID_BIG_TURTLE || (NPC[A].Type >= NPCID_GRN_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_TURTLE_S4) || (NPC[A].Type >= NPCID_GRN_FLY_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_FLY_TURTLE_S4) || NPC[A].Type == NPCID_WALK_BOMB_S3 || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_BRUTE || NPC[A].Type == NPCID_BRUTE_SQUISHED || NPC[A].Type == NPCID_BIG_MOLE || NPC[A].Type == NPCID_CARRY_FODDER || NPC[A].Type == NPCID_HIT_CARRY_FODDER || NPC[A].Type == NPCID_GRN_TURTLE_S1 || NPC[A].Type == NPCID_RED_TURTLE_S1 || NPC[A].Type == NPCID_GRN_FLY_TURTLE_S1 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S1 || NPC[A].Type == NPCID_LAVA_MONSTER || NPC[A].Type == NPCID_GRN_FISH_S3 || NPC[A].Type == NPCID_FISH_S4 || NPC[A].Type == NPCID_RED_FISH_S3 || NPC[A].Type == NPCID_GOGGLE_FISH || NPC[A].Type == NPCID_GRN_FISH_S1) // Walking koopa troopa / hard thing / spiney
+    else if(NPC[A].Type == NPCID_GRN_TURTLE_S3 || NPC[A].Type == NPCID_RED_TURTLE_S3 || NPC[A].Type == NPCID_GLASS_TURTLE || NPC[A].Type == NPCID_SPIKY_S3 || NPC[A].Type == NPCID_SPIKY_S4 || NPC[A].Type == NPCID_GHOST_FAST || NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Type == NPCID_BIG_TURTLE || (NPC[A].Type >= NPCID_GRN_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_TURTLE_S4) || (NPC[A].Type >= NPCID_GRN_FLY_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_FLY_TURTLE_S4) || NPC[A].Type == NPCID_WALK_BOMB_S3 || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_BRUTE || NPC[A].Type == NPCID_BRUTE_SQUISHED || NPC[A].Type == NPCID_BIG_GUY || NPC[A].Type == NPCID_CARRY_FODDER || NPC[A].Type == NPCID_HIT_CARRY_FODDER || NPC[A].Type == NPCID_GRN_TURTLE_S1 || NPC[A].Type == NPCID_RED_TURTLE_S1 || NPC[A].Type == NPCID_GRN_FLY_TURTLE_S1 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S1 || NPC[A].Type == NPCID_LAVA_MONSTER || NPC[A].Type == NPCID_GRN_FISH_S3 || NPC[A].Type == NPCID_YEL_FISH_S4 || NPC[A].Type == NPCID_RED_FISH_S3 || NPC[A].Type == NPCID_GRN_FISH_S4 || NPC[A].Type == NPCID_GRN_FISH_S1) // Walking koopa troopa / hard thing / spiney
     {
         NPC[A].FrameCount += 1;
         if(NPC[A].Type == NPCID_HIT_CARRY_FODDER && NPC[A].Special > 360)
@@ -1633,7 +1633,7 @@ void NPCFrames(int A)
             }
         }
     }
-    else if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_HEAVY_THROWN || NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPCID_PLR_ICEBALL) // Frame finder for Fireball / Hammer
+    else if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_HEAVY_THROWN || NPC[A].Type == NPCID_PLANT_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) // Frame finder for Fireball / Hammer
     {
         if((NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) && NPC[A].Quicksand == 0)
         {
@@ -1809,7 +1809,7 @@ void NPCFrames(int A)
         else
             NPC[A].Frame = 0;
     }
-    else if(NPC[A].Type == NPCID_BLU_GUY || NPC[A].Type == NPCID_RED_GUY || NPC[A].Type == NPCID_RED_FISH_S1 || (NPC[A].Type >= NPCID_BIRD && NPC[A].Type <= NPCID_GRY_SPIT_GUY) || NPC[A].Type == NPCID_WALK_BOMB_S2 || NPC[A].Type == NPCID_SATURN) // Shy guys / Jumping Fish
+    else if(NPC[A].Type == NPCID_BLU_GUY || NPC[A].Type == NPCID_RED_GUY || NPC[A].Type == NPCID_RED_FISH_S1 || (NPC[A].Type >= NPCID_BIRD && NPC[A].Type <= NPCID_GRY_SPIT_GUY) || NPC[A].Type == NPCID_WALK_BOMB_S2 || NPC[A].Type == NPCID_CARRY_BUDDY) // Shy guys / Jumping Fish
     {
         if(NPC[A].Type == NPCID_WALK_BOMB_S2 && NPC[A].Special2 == 1)
         {

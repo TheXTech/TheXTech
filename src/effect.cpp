@@ -652,7 +652,7 @@ void UpdateEffects()
             else if(e.FrameCount > 5)
                 e.Frame = 1;
         }
-        else if(e.Type == EFFID_BULLET_DIE || e.Type == EFFID_BIG_BULLET_DIE || e.Type == EFFID_HEAVY_THROWER_DIE || e.Type == EFFID_POWER_S3_DIE || e.Type == EFFID_JUMPER_S4_DIE || e.Type == EFFID_VILLAIN_S3_DIE || e.Type == EFFID_SPIT_GUY_BALL_DIE || e.Type == EFFID_WALK_BOMB_S3_DIE || e.Type == EFFID_BULLY_DIE || e.Type == EFFID_STONE_S3_DIE || e.Type == EFFID_BIG_GHOST_DIE || e.Type == EFFID_GHOST_S4_DIE || e.Type == EFFID_GHOST_FAST_DIE || e.Type == EFFID_GHOST_S3_DIE || e.Type == EFFID_STONE_S4_DIE || e.Type == EFFID_SAW_DIE || e.Type == EFFID_VILLAIN_S1_DIE || e.Type == EFFID_BOMBER_BOSS_DIE || e.Type == EFFID_SICK_BOSS_DIE || e.Type == EFFID_BAT_DIE) // Bullet Bill / Hammer Bro
+        else if(e.Type == EFFID_BULLET_DIE || e.Type == EFFID_BIG_BULLET_DIE || e.Type == EFFID_HEAVY_THROWER_DIE || e.Type == EFFID_POWER_S3_DIE || e.Type == EFFID_JUMPER_S4_DIE || e.Type == EFFID_VILLAIN_S3_DIE || e.Type == EFFID_SPIT_GUY_BALL_DIE || e.Type == EFFID_WALK_BOMB_S3_DIE || e.Type == EFFID_CHASER_DIE || e.Type == EFFID_STONE_S3_DIE || e.Type == EFFID_BIG_GHOST_DIE || e.Type == EFFID_GHOST_S4_DIE || e.Type == EFFID_GHOST_FAST_DIE || e.Type == EFFID_GHOST_S3_DIE || e.Type == EFFID_STONE_S4_DIE || e.Type == EFFID_SAW_DIE || e.Type == EFFID_VILLAIN_S1_DIE || e.Type == EFFID_BOMBER_BOSS_DIE || e.Type == EFFID_SICK_BOSS_DIE || e.Type == EFFID_BAT_DIE) // Bullet Bill / Hammer Bro
         {
             e.Location.SpeedY += 0.5_n;
             if(e.Location.SpeedY >= 10)
@@ -673,7 +673,7 @@ void UpdateEffects()
             else if(e.FrameCount > 8)
                 e.Frame = 4;
         }
-        else if(e.Type == EFFID_RED_GUY_DIE || e.Type == EFFID_BLU_GUY_DIE || e.Type == EFFID_JUMPER_S3_DIE || e.Type == EFFID_RED_FISH_S1_DIE || (e.Type >= EFFID_BIRD_DIE && e.Type <= EFFID_GRY_SPIT_GUY_DIE) || e.Type == EFFID_SATURN_DIE) // Shy guy free falling
+        else if(e.Type == EFFID_RED_GUY_DIE || e.Type == EFFID_BLU_GUY_DIE || e.Type == EFFID_JUMPER_S3_DIE || e.Type == EFFID_RED_FISH_S1_DIE || (e.Type >= EFFID_BIRD_DIE && e.Type <= EFFID_GRY_SPIT_GUY_DIE) || e.Type == EFFID_CARRY_BUDDY_DIE) // Shy guy free falling
         {
             e.Location.SpeedY += 0.5_n;
             if(e.Location.SpeedY >= 10)
@@ -692,7 +692,7 @@ void UpdateEffects()
                     e.Frame = 6;
             }
         }
-        else if(e.Type == EFFID_BRUTE_SQUISHED_DIE || e.Type == EFFID_BRUTE_DIE || e.Type == EFFID_BIG_MOLE_DIE || e.Type == EFFID_CARRY_FODDER_DIE || e.Type == EFFID_SKELETON_DIE || e.Type == EFFID_GRN_FISH_S3_DIE || e.Type == EFFID_FISH_S4_DIE || e.Type == EFFID_RED_FISH_S3_DIE || e.Type == EFFID_GOGGLE_FISH_DIE || e.Type == EFFID_GRN_FISH_S1_DIE || e.Type == EFFID_BONE_FISH_DIE || e.Type == EFFID_SQUID_S1_DIE || e.Type == EFFID_WALK_PLANT_DIE) // Rex / mega mole / smw goomba free falling
+        else if(e.Type == EFFID_BRUTE_SQUISHED_DIE || e.Type == EFFID_BRUTE_DIE || e.Type == EFFID_BIG_GUY_DIE || e.Type == EFFID_CARRY_FODDER_DIE || e.Type == EFFID_SKELETON_DIE || e.Type == EFFID_GRN_FISH_S3_DIE || e.Type == EFFID_YEL_FISH_S4_DIE || e.Type == EFFID_RED_FISH_S3_DIE || e.Type == EFFID_GRN_FISH_S4_DIE || e.Type == EFFID_GRN_FISH_S1_DIE || e.Type == EFFID_BONE_FISH_DIE || e.Type == EFFID_SQUID_S1_DIE || e.Type == EFFID_WALK_PLANT_DIE) // Rex / mega mole / smw goomba free falling
         {
             e.Location.SpeedY += 0.5_n;
             if(e.Location.SpeedY >= 10)

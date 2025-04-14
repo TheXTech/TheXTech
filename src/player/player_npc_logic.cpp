@@ -215,7 +215,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                         // ' Fireball immune for ducking in the hammer suit
                         if((Player[A].State == 6 && Player[A].Duck && Player[A].Mount == 0 && Player[A].Character != 5) || (Player[A].Mount == 1 && Player[A].MountType == 2))
                         {
-                            if(NPC[B].Type == NPCID_STATUE_FIRE || NPC[B].Type == NPCID_VILLAIN_FIRE || NPC[B].Type == NPCID_PLANT_FIRE || NPC[B].Type == NPCID_QUAD_BALL)
+                            if(NPC[B].Type == NPCID_STATUE_FIRE || NPC[B].Type == NPCID_VILLAIN_FIRE || NPC[B].Type == NPCID_PLANT_FIREBALL || NPC[B].Type == NPCID_QUAD_BALL)
                             {
                                 PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
                                 HitSpot = 0;
@@ -883,7 +883,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                                 Player[A].Location.SpeedX = -Player[A].Location.SpeedX;
                                             tempHit2 = false;
                                         }
-                                        else if(!tempBool && NPC[B].Type != NPCID_BULLY)
+                                        else if(!tempBool && NPC[B].Type != NPCID_CHASER)
                                             Player[A].Location.SpeedX = 0.2_n * Player[A].Direction;
 
                                         // reset player run count

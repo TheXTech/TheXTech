@@ -362,10 +362,10 @@ void SetupVars()
     NPCTraits[NPCID_RED_FISH_S1].IsFish = true;
     NPCTraits[NPCID_GRN_FISH_S3].IsFish = true;
     NPCTraits[NPCID_RED_FISH_S3].IsFish = true;
-    NPCTraits[NPCID_GOGGLE_FISH].IsFish = true;
+    NPCTraits[NPCID_GRN_FISH_S4].IsFish = true;
     NPCTraits[NPCID_GRN_FISH_S1].IsFish = true;
     NPCTraits[NPCID_BONE_FISH].IsFish = true;
-    NPCTraits[NPCID_FISH_S4].IsFish = true;
+    NPCTraits[NPCID_YEL_FISH_S4].IsFish = true;
 
 
     NPCTraits[NPCID_MAGIC_DOOR].NoClipping = true;
@@ -426,11 +426,11 @@ void SetupVars()
 
     NPCTraits[NPCID_JUMP_PLANT].NoClipping = true;
 
-    NPCTraits[NPCID_PLANT_FIRE].JumpHurt = true;
-    NPCTraits[NPCID_PLANT_FIRE].NoClipping = true;
-    NPCTraits[NPCID_PLANT_FIRE].NoYoshi = true;
-    NPCTraits[NPCID_PLANT_FIRE].TWidth = 16;
-    NPCTraits[NPCID_PLANT_FIRE].THeight = 16;
+    NPCTraits[NPCID_PLANT_FIREBALL].JumpHurt = true;
+    NPCTraits[NPCID_PLANT_FIREBALL].NoClipping = true;
+    NPCTraits[NPCID_PLANT_FIREBALL].NoYoshi = true;
+    NPCTraits[NPCID_PLANT_FIREBALL].TWidth = 16;
+    NPCTraits[NPCID_PLANT_FIREBALL].THeight = 16;
 
     NPCTraits[NPCID_GEM_1].TWidth = 18; // TLOZ Rupee
     NPCTraits[NPCID_GEM_1].THeight = 32;
@@ -1172,10 +1172,10 @@ void SetupVars()
     NPCTraits[NPCID_CARRY_BLOCK_C].THeight = 32;
     NPCTraits[NPCID_CARRY_BLOCK_D].TWidth = 32; // SMB2 Mushroom Block
     NPCTraits[NPCID_CARRY_BLOCK_D].THeight = 32;
-    NPCTraits[NPCID_SATURN].TWidth = 32; // Mr Saturn
-    NPCTraits[NPCID_SATURN].THeight = 42;
-    NPCTraits[NPCID_SATURN].FrameOffsetY = 2;
-    NPCTraits[NPCID_SATURN].JumpHurt = true;
+    NPCTraits[NPCID_CARRY_BUDDY].TWidth = 32; // Mr Saturn
+    NPCTraits[NPCID_CARRY_BUDDY].THeight = 42;
+    NPCTraits[NPCID_CARRY_BUDDY].FrameOffsetY = 2;
+    NPCTraits[NPCID_CARRY_BUDDY].JumpHurt = true;
     NPCTraits[NPCID_LIFT_SAND].TWidth = 32; // Diggable Dirt
     NPCTraits[NPCID_LIFT_SAND].THeight = 32;
     NPCTraits[NPCID_ROCKET_WOOD].TWidth = 128; // Airship Rocket
@@ -1195,11 +1195,11 @@ void SetupVars()
     NPCTraits[NPCID_BRUTE_SQUISHED].WidthGFX = 32;
     NPCTraits[NPCID_BRUTE_SQUISHED].HeightGFX = 32;
     NPCTraits[NPCID_BRUTE_SQUISHED].FrameOffsetY = 2;
-    NPCTraits[NPCID_BIG_MOLE].TWidth = 58; // SMW Mega Mole
-    NPCTraits[NPCID_BIG_MOLE].THeight = 58;
-    NPCTraits[NPCID_BIG_MOLE].WidthGFX = 64;
-    NPCTraits[NPCID_BIG_MOLE].HeightGFX = 64;
-    NPCTraits[NPCID_BIG_MOLE].FrameOffsetY = 2;
+    NPCTraits[NPCID_BIG_GUY].TWidth = 58; // SMW Mega Mole
+    NPCTraits[NPCID_BIG_GUY].THeight = 58;
+    NPCTraits[NPCID_BIG_GUY].WidthGFX = 64;
+    NPCTraits[NPCID_BIG_GUY].HeightGFX = 64;
+    NPCTraits[NPCID_BIG_GUY].FrameOffsetY = 2;
     NPCTraits[NPCID_CARRY_FODDER].TWidth = 32; // SMW Goomba
     NPCTraits[NPCID_CARRY_FODDER].THeight = 32;
     NPCTraits[NPCID_CARRY_FODDER].FrameOffsetY = 2;
@@ -1211,11 +1211,11 @@ void SetupVars()
     NPCTraits[NPCID_FLY_CARRY_FODDER].WidthGFX = 66;
     NPCTraits[NPCID_FLY_CARRY_FODDER].HeightGFX = 50;
     NPCTraits[NPCID_FLY_CARRY_FODDER].FrameOffsetY = 2;
-    NPCTraits[NPCID_BULLY].TWidth = 26; // Bully
-    NPCTraits[NPCID_BULLY].THeight = 30;
-    NPCTraits[NPCID_BULLY].WidthGFX = 26;
-    NPCTraits[NPCID_BULLY].HeightGFX = 46;
-    NPCTraits[NPCID_BULLY].FrameOffsetY = 2;
+    NPCTraits[NPCID_CHASER].TWidth = 26; // Bully
+    NPCTraits[NPCID_CHASER].THeight = 30;
+    NPCTraits[NPCID_CHASER].WidthGFX = 26;
+    NPCTraits[NPCID_CHASER].HeightGFX = 46;
+    NPCTraits[NPCID_CHASER].FrameOffsetY = 2;
     NPCTraits[NPCID_STATUE_POWER].TWidth = 32; // Tanooki Suit
     NPCTraits[NPCID_STATUE_POWER].THeight = 32;
     NPCTraits[NPCID_STATUE_POWER].FrameOffsetY = 2;
@@ -1376,11 +1376,11 @@ void SetupVars()
     // NPCDefaultMovement(NPCID_RED_TURTLE_S1) = true;
     // NPCDefaultMovement(NPCID_BRUTE) = true;
     // 'NPCDefaultMovement(NPCID_BRUTE_SQUISHED) = true;
-    // 'NPCDefaultMovement(NPCID_BIG_MOLE) = true;
+    // 'NPCDefaultMovement(NPCID_BIG_GUY) = true;
     // NPCDefaultMovement(NPCID_CARRY_FODDER) = true;
     // NPCDefaultMovement(NPCID_FLY_CARRY_FODDER) = true;
-    NPCTraits[NPCID_BIG_MOLE].CanWalkOn = true;
-    NPCTraits[NPCID_BIG_MOLE].IsAHit1Block = true;
+    NPCTraits[NPCID_BIG_GUY].CanWalkOn = true;
+    NPCTraits[NPCID_BIG_GUY].IsAHit1Block = true;
     NPCTraits[NPCID_ROCKET_WOOD].WontHurt = true;
     NPCTraits[NPCID_HIT_CARRY_FODDER].WontHurt = true;
     NPCTraits[NPCID_ROCKET_WOOD].CanWalkOn = true;
@@ -1599,7 +1599,7 @@ void SetupVars()
     NPCTraits[NPCID_GRNSWITCH_FODDER].TurnsAtCliffs = true;
     NPCTraits[NPCID_REDSWITCH_FODDER].TurnsAtCliffs = true;
     NPCTraits[NPCID_PINK_CIVILIAN].TurnsAtCliffs = true;
-    NPCTraits[NPCID_SATURN].TurnsAtCliffs = true;
+    NPCTraits[NPCID_CARRY_BUDDY].TurnsAtCliffs = true;
     NPCTraits[NPCID_CANNONENEMY].MovesPlayer = true;
     NPCTraits[NPCID_KEY].MovesPlayer = true;
     NPCTraits[NPCID_COIN_SWITCH].MovesPlayer = true;
@@ -1670,7 +1670,7 @@ void SetupVars()
     NPCTraits[NPCID_PET_PURPLE].WontHurt = true;
     NPCTraits[NPCID_PET_PINK].WontHurt = true;
     NPCTraits[NPCID_PET_CYAN].WontHurt = true;
-    NPCTraits[NPCID_SATURN].WontHurt = true;
+    NPCTraits[NPCID_CARRY_BUDDY].WontHurt = true;
     NPCTraits[NPCID_CANNONITEM].IsGrabbable = true;
     NPCTraits[NPCID_SPRING].IsGrabbable = true;
     NPCTraits[NPCID_KEY].IsGrabbable = true;
@@ -1683,7 +1683,7 @@ void SetupVars()
     NPCTraits[NPCID_TOOTHYPIPE].IsGrabbable = true;
     NPCTraits[NPCID_VEGGIE_1].IsGrabbable = true;
     NPCTraits[NPCID_ITEM_POD].IsGrabbable = true;
-    NPCTraits[NPCID_SATURN].IsGrabbable = true;
+    NPCTraits[NPCID_CARRY_BUDDY].IsGrabbable = true;
     NPCTraits[NPCID_CANNONENEMY].IsABlock = true;
     NPCTraits[NPCID_KEY].IsABlock = true;
     NPCTraits[NPCID_COIN_SWITCH].IsABlock = true;
@@ -1968,7 +1968,7 @@ void SetupVars()
     NPCTraits[NPCID_TIME_SWITCH].NoIceBall = true;
     NPCTraits[NPCID_TNT].NoIceBall = true;
     NPCTraits[NPCID_EARTHQUAKE_BLOCK].NoIceBall = true;
-    NPCTraits[NPCID_PLANT_FIRE].NoIceBall = true;
+    NPCTraits[NPCID_PLANT_FIREBALL].NoIceBall = true;
     NPCTraits[NPCID_FLY_POWER].NoIceBall = true;
     NPCTraits[NPCID_LOCK_DOOR].NoIceBall = true;
     NPCTraits[NPCID_LONG_PLANT_UP].NoIceBall = true;
@@ -1997,7 +1997,7 @@ void SetupVars()
     NPCTraits[NPCID_STACKER].WidthGFX = 32;
 
 
-    // NPCDefaultMovement(NPCID_SATURN) = true;
+    // NPCDefaultMovement(NPCID_CARRY_BUDDY) = true;
 
 
     NPCTraits[NPCID_MAGIC_BOSS].WidthGFX = 84;

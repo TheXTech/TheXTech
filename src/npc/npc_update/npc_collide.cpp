@@ -57,7 +57,7 @@ void NPCCollide(int A)
     // if(!(!NPC[A]->IsACoin && NPC[A].Type != NPCID_TIMER_S2 && NPC[A].Type != NPCID_FALL_BLOCK_BROWN &&
     //     NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_WALL_SPARK && NPC[A].Type != NPCID_WALL_TURTLE && NPC[A].Type != NPCID_RED_BOOT &&
     //     NPC[A].Type != NPCID_BLU_BOOT && !(NPC[A]->IsFish && NPC[A].Special == 2) &&
-    //    !NPC[A].Generator && NPC[A].Type != NPCID_PLANT_FIRE && NPC[A].Type != NPCID_FIRE_CHAIN &&
+    //    !NPC[A].Generator && NPC[A].Type != NPCID_PLANT_FIREBALL && NPC[A].Type != NPCID_FIRE_CHAIN &&
     //     NPC[A].Type != NPCID_QUAD_BALL && NPC[A].Type != NPCID_FLY_BLOCK && NPC[A].Type != NPCID_FLY_CANNON &&
     //     NPC[A].Type != NPCID_FIRE_BOSS_FIRE && NPC[A].Type != NPCID_DOOR_MAKER && NPC[A].Type != NPCID_MAGIC_DOOR))
     // {
@@ -65,7 +65,7 @@ void NPCCollide(int A)
     // }
 
     // These NPC types prevent all physics updates and make it so that NPCCollide can never be called. They are removed now.
-    // NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPCID_FIRE_CHAIN
+    // NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_PLANT_FIREBALL || NPC[A].Type == NPCID_FIRE_CHAIN
 
     // NPC properties that block collision query
     if(NPC[A].Inert || NPC[A].Generator)
@@ -163,7 +163,7 @@ void NPCCollide(int A)
         //    NPC[B].Type != NPCID_STATUE_S3 && NPC[B].Type != NPCID_STATUE_FIRE && !(NPC[B].Type == NPCID_BULLET &&
         //    NPC[B].CantHurt > 0) && NPC[B].Type != NPCID_ITEM_BURIED && !(NPC[A].CantHurtPlayer == NPC[B].CantHurtPlayer &&
         //    NPC[A].CantHurtPlayer > 0) && !(NPC[B].Type == NPCID_ITEM_POD && !NPC[B].Projectile) &&
-        //    NPC[B].Type != NPCID_PET_FIRE && NPC[B].Type != NPCID_PLANT_FIRE && NPC[B].Type != NPCID_QUAD_BALL &&
+        //    NPC[B].Type != NPCID_PET_FIRE && NPC[B].Type != NPCID_PLANT_FIREBALL && NPC[B].Type != NPCID_QUAD_BALL &&
         //    NPC[B].Type != NPCID_FIRE_BOSS_FIRE && NPC[B].Type != NPCID_RED_VINE_TOP_S3 && NPC[B].Type != NPCID_GRN_VINE_TOP_S3 && NPC[B].Type != NPCID_GRN_VINE_TOP_S4))
         // {
         //     continue;
@@ -198,7 +198,7 @@ void NPCCollide(int A)
             NPC[B].Type == NPCID_HPIPE_SHORT || NPC[B].Type == NPCID_YEL_PLATFORM || NPC[B].Type == NPCID_BLU_PLATFORM ||
             NPC[B].Type == NPCID_GRN_PLATFORM || NPC[B].Type == NPCID_RED_PLATFORM || NPC[B].Type == NPCID_HPIPE_LONG ||
             NPC[B].Type == NPCID_VPIPE_SHORT || NPC[B].Type == NPCID_VPIPE_LONG || NPC[B].Type == NPCID_CONVEYOR || (NPC[B].Type >= NPCID_TANK_TREADS && NPC[B].Type <= NPCID_SLANT_WOOD_M) ||
-            NPC[B].Type == NPCID_STATUE_S3 || NPC[B].Type == NPCID_STATUE_FIRE || NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPCID_PET_FIRE || NPC[B].Type == NPCID_PLANT_FIRE || NPC[B].Type == NPCID_QUAD_BALL ||
+            NPC[B].Type == NPCID_STATUE_S3 || NPC[B].Type == NPCID_STATUE_FIRE || NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPCID_PET_FIRE || NPC[B].Type == NPCID_PLANT_FIREBALL || NPC[B].Type == NPCID_QUAD_BALL ||
             NPC[B].Type == NPCID_FIRE_BOSS_FIRE || NPC[B].Type == NPCID_RED_VINE_TOP_S3 || NPC[B].Type == NPCID_GRN_VINE_TOP_S3 || NPC[B].Type == NPCID_GRN_VINE_TOP_S4 || NPCIsYoshi(NPC[B].Type) || NPCIsToad(NPC[B].Type))
         {
             continue;

@@ -3322,7 +3322,7 @@ void SpecialNPC(int A)
     // NPC_t tempNPC;
 
     if(NPC[A].Type == NPCID_VILLAIN_FIRE || NPC[A].Type == NPCID_QUAD_BALL || NPC[A].Type == NPCID_STATUE_FIRE ||
-       NPC[A].Type == NPCID_SPIT_GUY_BALL || NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPCID_HEAVY_THROWN ||
+       NPC[A].Type == NPCID_SPIT_GUY_BALL || NPC[A].Type == NPCID_PLANT_FIREBALL || NPC[A].Type == NPCID_HEAVY_THROWN ||
        NPC[A].Type == NPCID_SICK_BOSS_BALL || NPC[A].Type == NPCID_HOMING_BALL ||
        NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_PLR_ICEBALL) // Link shield block
     {
@@ -3696,7 +3696,7 @@ void SpecialNPC(int A)
                     NPC[numNPCs].TimeLeft = 100;
                     NPC[numNPCs].Direction = NPC[A].Direction;
                     NPC[numNPCs].Section = NPC[A].Section;
-                    NPC[numNPCs].Type = NPCID_PLANT_FIRE;
+                    NPC[numNPCs].Type = NPCID_PLANT_FIREBALL;
                     NPC[numNPCs].Frame = 1;
                     NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
                     NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;

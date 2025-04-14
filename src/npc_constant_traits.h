@@ -311,7 +311,7 @@ constexpr bool NPCDefaultMovement(int Type)
         Type == NPCID_FODDER_S1 ||
         Type == NPCID_ITEM_BURIED ||
         Type == NPCID_PINK_CIVILIAN ||
-        Type == NPCID_SATURN
+        Type == NPCID_CARRY_BUDDY
     );
 }
 

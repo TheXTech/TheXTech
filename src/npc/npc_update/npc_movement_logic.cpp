@@ -167,7 +167,7 @@ void NPCMovementLogic(int A, tempf_t& speedVar)
     else if(NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_SWAP_POWER || NPC[A].Type == NPCID_LIFE_S3 ||
             NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 ||
             NPC[A].Type == NPCID_LIFE_S1 || NPC[A].Type == NPCID_LIFE_S4 || NPC[A].Type == NPCID_BRUTE_SQUISHED ||
-            NPC[A].Type == NPCID_BIG_MOLE || NPC[A].Type == NPCID_INVINCIBILITY_POWER || NPC[A].Type == NPCID_CYCLONE_POWER)
+            NPC[A].Type == NPCID_BIG_GUY || NPC[A].Type == NPCID_INVINCIBILITY_POWER || NPC[A].Type == NPCID_CYCLONE_POWER)
     {
         if(NPC[A].Direction == 0) // Move toward the closest player
         {
@@ -210,7 +210,7 @@ void NPCMovementLogic(int A, tempf_t& speedVar)
             NPC[A].Location.SpeedX = 5 * NPC[A].Direction;
     }
     // bully
-    else if(NPC[A].Type == NPCID_BULLY)
+    else if(NPC[A].Type == NPCID_CHASER)
     {
         if(!NPC[A].Projectile && NPC[A].Special2 == 0)
         {
@@ -442,7 +442,7 @@ void NPCMovementLogic(int A, tempf_t& speedVar)
         else if(NPC[A].Type != NPCID_RED_VINE_TOP_S3 && NPC[A].Type != NPCID_GRN_VINE_TOP_S3 && NPC[A].Type != NPCID_GRN_VINE_TOP_S4 &&
                 !(NPC[A]->IsFish && NPC[A].Special == 2) && NPC[A].Type != NPCID_HOMING_BALL &&
                 NPC[A].Type != NPCID_HOMING_BALL_GEN && NPC[A].Type != NPCID_SPIT_GUY_BALL && NPC[A].Type != NPCID_STAR_EXIT && NPC[A].Type != NPCID_STAR_COLLECT &&
-                NPC[A].Type != NPCID_VILLAIN_FIRE && NPC[A].Type != NPCID_PLANT_S3 && NPC[A].Type != NPCID_FIRE_PLANT && NPC[A].Type != NPCID_PLANT_FIRE &&
+                NPC[A].Type != NPCID_VILLAIN_FIRE && NPC[A].Type != NPCID_PLANT_S3 && NPC[A].Type != NPCID_FIRE_PLANT && NPC[A].Type != NPCID_PLANT_FIREBALL &&
                 NPC[A].Type != NPCID_PLANT_S1 && NPC[A].Type != NPCID_BIG_PLANT && NPC[A].Type != NPCID_LONG_PLANT_UP && NPC[A].Type != NPCID_LONG_PLANT_DOWN &&
                 !NPCIsAParaTroopa(NPC[A]) && NPC[A].Type != NPCID_BOTTOM_PLANT && NPC[A].Type != NPCID_SIDE_PLANT &&
                 NPC[A].Type != NPCID_LEAF_POWER && NPC[A].Type != NPCID_STONE_S3 && NPC[A].Type != NPCID_STONE_S4 && NPC[A].Type != NPCID_GHOST_S3 &&
