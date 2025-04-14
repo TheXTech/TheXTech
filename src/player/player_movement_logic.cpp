@@ -70,7 +70,7 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
     if(Player[A].State == PLR_STATE_SHELL && Player[A].Controls.Run && !Player[A].HoldingNPC && !Player[A].Mount && !Player[A].Wet)
     {
         // 7.1 is the NPC shellspeed
-        num_t shell_speed = speedVar * 7.1_r;
+        num_t shell_speed = (num_t)speedVar * 7.1_r;
 
         if(shell_speed >= 7.5_n)
             shell_speed = 7.5_n;
