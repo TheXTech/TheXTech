@@ -116,7 +116,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                             {
                                 if(Player[A].Mount == 2 ||
                                    (
-                                       (HitSpot == 1 && (Player[A].Mount || Player[A].Rolling)) &&
+                                       (HitSpot == 1 && Player[A].Mount) &&
                                        Block[B].Type != 598
                                    )
                                  )
