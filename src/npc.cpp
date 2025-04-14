@@ -3212,8 +3212,12 @@ void NPCSpecial(int A)
 
         npc.Location.SpeedX /= 2;
 
+        if(npc.Stuck)
+        {
+            // do nothing!
+        }
         // accelerate upwards for 80 frames
-        if(npc.Special < 80)
+        else if(npc.Special < 80)
         {
             if(npc.Special < 32)
                 npc.Special2 += (32 - npc.Special);
