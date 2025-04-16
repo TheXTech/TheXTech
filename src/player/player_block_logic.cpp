@@ -499,7 +499,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                             }
                             // don't stop rolling when you clip into a block -- just bounce on it
                             // (if there are multiple blocks, eventually the player will get pinched and leave rolling state)
-                            else if(HitSpot == 5 && Player[A].Rolling)
+                            else if(HitSpot == 5 && Player[A].Rolling && Player[A].State == PLR_STATE_SHELL)
                             {
                                 if(Block[B].Location.to_right_of(Player[A].Location))
                                     HitSpot = 4;
@@ -773,7 +773,8 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
             BlockHit(wallBlock, false, A);
             BlockHitHard(wallBlock);
             PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
-            if((Player[A].Location.SpeedX > 0) == (Player[A].Direction > 0) && !hitCeiling)
+
+            if((Player[A].Location.SpeedX > 0) == (Player[A].Direction > 0) && !hitCeiling && Player[A].State == PLR_STATE_SHELL)
             {
                 Player[A].Location.SpeedX = -Player[A].Location.SpeedX;
 
@@ -788,6 +789,13 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
         }
 
         hitWall = false;
+
+        // in polar, if the block can't be destroyed, do stop!
+        if(Player[A].State == PLR_STATE_POLAR)
+        {
+            if(!BlockIsBreakable(Block[wallBlock]))
+                hitWall = true;
+        }
     }
 
     if(floorBlock > 0) // For walking

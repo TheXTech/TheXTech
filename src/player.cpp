@@ -1738,10 +1738,21 @@ static void s_makeDust(Player_t& p, int dir_offset, Location_t& tempLocation)
 {
     if(p.SlideCounter <= 0)
     {
-        p.SlideCounter = 2 + iRand_round(2);
         tempLocation.Y = p.Location.Y + p.Location.Height - 5;
         tempLocation.X = p.Location.X + p.Location.Width / 2 - 4 + dir_offset * p.Direction;
-        NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
+
+        int add_slide = 2;
+        EFFID effid = EFFID_SKID_DUST;
+        if(p.State == PLR_STATE_POLAR && (p.Slippy || p.SlippyWall) && !p.Mount)
+        {
+            effid = EFFID_SPARKLE;
+            add_slide = 12;
+            tempLocation.Y -= 4;
+        }
+
+        NewEffect(effid, tempLocation, 1, 0, ShadowMode);
+
+        p.SlideCounter = 2 + iRand_round(add_slide);
     }
 }
 
@@ -1775,6 +1786,9 @@ void PlayerFrame(Player_t &p)
             p.Immune2 = false;
     }
 
+    if(p.State == PLR_STATE_POLAR && !p.Mount && p.Slippy && p.Location.SpeedX)
+        s_makeDust(p, 0, tempLocation);
+
 // find frames for link
     if(p.Character == 5)
     {
@@ -1801,8 +1815,15 @@ void PlayerFrame(Player_t &p)
     // Rolling frames
     if(p.Rolling)
     {
-        p.FrameCount = (p.FrameCount + 1) & 15;
-        p.Frame = 16 + p.FrameCount / 4;
+        if(p.State == PLR_STATE_SHELL)
+        {
+            p.FrameCount = (p.FrameCount + 1) & 15;
+            p.Frame = 16 + p.FrameCount / 4;
+        }
+        else if(p.State == PLR_STATE_POLAR)
+        {
+            p.Frame = 14;
+        }
         return;
     }
 
@@ -2075,7 +2096,7 @@ void PlayerFrame(Player_t &p)
                         }
                         else
                         {
-                            if(p.Location.SpeedX != 0 && !(p.Slippy && !p.Controls.Left && !p.Controls.Right))
+                            if(p.Location.SpeedX != 0 && !(p.Slippy && !p.Controls.Left && !p.Controls.Right && p.State != PLR_STATE_POLAR))
                             {
                                 p.FrameCount += 1;
 
@@ -2107,7 +2128,7 @@ void PlayerFrame(Player_t &p)
                             }
                         }
                     }
-                    else if(CanWallJump && (p.Pinched.Left2 == 2 || p.Pinched.Right4 == 2) && p.Mount == 0 && !p.SpinJump && !p.Duck && !p.SlippyWall)
+                    else if(CanWallJump && (p.Pinched.Left2 == 2 || p.Pinched.Right4 == 2) && p.Mount == 0 && !p.SpinJump && !p.Duck && (!p.SlippyWall || p.State == PLR_STATE_POLAR))
                     {
                         s_makeDust(p, 8, tempLocation);
                         p.Frame = -4;
@@ -2155,7 +2176,7 @@ void PlayerFrame(Player_t &p)
             }
         }
         // TODO: state-dependent moment
-        else if(p.FrameCount >= 100 && p.FrameCount <= 118 && (p.State == 3 || p.State == 6 || p.State == 7)) // Fire Mario and Luigi
+        else if(p.FrameCount >= 100 && p.FrameCount <= 118 && (p.State == 3 || p.State == 6 || p.State == 7 || p.State == PLR_STATE_POLAR)) // Fire Mario and Luigi
         {
             if(p.Duck)
             {
@@ -2292,7 +2313,7 @@ void PlayerFrame(Player_t &p)
                         }
                         else
                         {
-                            if(p.Location.SpeedX != 0 && !(p.Slippy && !p.Controls.Left && !p.Controls.Right))
+                            if(p.Location.SpeedX != 0 && !(p.Slippy && !p.Controls.Left && !p.Controls.Right && p.State != PLR_STATE_POLAR))
                             {
                                 p.FrameCount += 1;
 
@@ -2339,7 +2360,7 @@ void PlayerFrame(Player_t &p)
                             }
                         }
                     }
-                    else if(CanWallJump && (p.Pinched.Left2 == 2 || p.Pinched.Right4 == 2) && p.Mount == 0 && !p.SpinJump && !p.Duck && !p.SlippyWall)
+                    else if(CanWallJump && (p.Pinched.Left2 == 2 || p.Pinched.Right4 == 2) && p.Mount == 0 && !p.SpinJump && !p.Duck && (!p.SlippyWall || p.State == PLR_STATE_POLAR))
                     {
                         s_makeDust(p, 8, tempLocation);
                         p.Frame = -6;
@@ -4540,7 +4561,7 @@ void WaterCheck(const int A)
                     if(p.Location.SpeedY < -1.5_n)
                         p.Location.SpeedY = -1.5_n;
 
-                    if(!p.WetFrame)
+                    if(!p.WetFrame && !p.Rolling)
                     {
                         if(p.Location.SpeedX > 0.5_n)
                             p.Location.SpeedX = 0.5_n;
@@ -5413,6 +5434,10 @@ void LinkFrame(Player_t &p)
     {
         p.FrameCount = (p.FrameCount + 1) & 15;
         p.Frame = 12 + p.FrameCount / 4;
+
+        if(p.State == PLR_STATE_POLAR)
+            p.Frame = 11;
+
         return;
     }
 
@@ -5478,7 +5503,7 @@ void LinkFrame(Player_t &p)
     }
     else if(p.Location.SpeedY != 0 && p.StandingOnNPC == 0 && p.Slope == 0 && !(p.Quicksand > 0 && p.Location.SpeedY > 0)) // Jumping/falling
     {
-        if(CanWallJump && (p.Pinched.Left2 == 2 || p.Pinched.Right4 == 2) && !p.SlippyWall)
+        if(CanWallJump && (p.Pinched.Left2 == 2 || p.Pinched.Right4 == 2) && (!p.SlippyWall || p.State == PLR_STATE_POLAR))
         {
             s_makeDust(p, 8, tempLocation);
             p.Frame = 11;

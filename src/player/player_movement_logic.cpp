@@ -67,7 +67,7 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
     }
 
     // special logic for shell: just keep going!
-    if(Player[A].State == PLR_STATE_SHELL && Player[A].Controls.Run && !Player[A].HoldingNPC && !Player[A].Mount && !Player[A].Wet)
+    if(((Player[A].State == PLR_STATE_SHELL && !Player[A].Wet) || Player[A].State == PLR_STATE_POLAR) && Player[A].Controls.Run && !Player[A].HoldingNPC && !Player[A].Mount)
     {
         // 7.1 is the NPC shellspeed
         num_t shell_speed = (num_t)speedVar * 7.1_r;
@@ -79,12 +79,39 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
         if(Player[A].Slope && BlockSlope[Block[Player[A].Slope].Type] != Player[A].Direction)
             can_begin = false;
 
+        num_t stop_speed = 0.5_n;
+        if(Player[A].Slope)
+        {
+            // allow turning around on slopes
+            stop_speed = 0.0_n;
+        }
+
+        num_t start_speed = shell_speed;
+
+        if(Player[A].State == PLR_STATE_POLAR)
+        {
+            shell_speed -= 0.75_n;
+            if(Player[A].Slippy)
+                shell_speed += 3;
+
+            // allow starting quickly
+            start_speed -= 2;
+
+            // or extremely quickly on a slope or ice
+            if(Player[A].Slope || Player[A].Slippy)
+                start_speed = 0.5_n;
+
+            // require holding down to start
+            if(!Player[A].Controls.Down)
+                start_speed = 128;
+        }
+
         // start rolling
-        if(can_begin && num_t::abs(Player[A].Location.SpeedX) >= shell_speed)
+        if(can_begin && num_t::abs(Player[A].Location.SpeedX) >= start_speed)
             Player[A].Rolling = true;
 
         // keep rolling
-        if(Player[A].Rolling && num_t::abs(Player[A].Location.SpeedX) >= 0.5_n)
+        if(Player[A].Rolling && num_t::abs(Player[A].Location.SpeedX) > stop_speed)
         {
             Player[A].Direction = (Player[A].Location.SpeedX > 0) ? 1 : -1;
 
@@ -104,7 +131,8 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
 
         // stop rolling
         // allow the player to go faster if they aren't a shell yet
-        speedVar = speedVar * 5 / 4;
+        if(Player[A].State == PLR_STATE_SHELL)
+            speedVar = speedVar * 5 / 4;
     }
 
     if(Player[A].Rolling)
@@ -523,7 +551,7 @@ void PlayerMovementY(int A)
     if(Player[A].Wet > 0 || Player[A].WetFrame)
         Player[A].CanFloat = false;
 
-    bool has_wall_traction = CanWallJump && (Player[A].Pinched.Left2 == 2 || Player[A].Pinched.Right4 == 2) && !Player[A].SpinJump && !Player[A].SlippyWall && Player[A].HoldingNPC == 0 && Player[A].Mount == 0 && !Player[A].Duck;
+    bool has_wall_traction = CanWallJump && (Player[A].Pinched.Left2 == 2 || Player[A].Pinched.Right4 == 2) && !Player[A].SpinJump && (!Player[A].SlippyWall || Player[A].State == PLR_STATE_POLAR) && Player[A].HoldingNPC == 0 && Player[A].Mount == 0 && !Player[A].Duck;
 
     // handles the regular jump
     if(Player[A].Controls.Jump || (Player[A].Controls.AltJump &&

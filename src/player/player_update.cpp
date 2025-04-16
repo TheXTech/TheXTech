@@ -205,9 +205,13 @@ bool UpdatePlayer()
                    !(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5) &&
                    Player[A].GrabTime == 0)
                 {
-                    if(Player[A].Duck)
-                        UnDuck(Player[A]);
-                    Player[A].Slide = true;
+                    // prioritize rolling for Polar power
+                    if(!(Player[A].State == PLR_STATE_POLAR && num_t::abs(Player[A].Location.SpeedX) > 1 && BlockSlope[Block[Player[A].Slope].Type] == Player[A].Direction))
+                    {
+                        if(Player[A].Duck)
+                            UnDuck(Player[A]);
+                        Player[A].Slide = true;
+                    }
                 }
                 else if(Player[A].Location.SpeedX == 0)
                     Player[A].Slide = false;
@@ -301,7 +305,7 @@ bool UpdatePlayer()
 
 
                     // slippy code
-                    if(Player[A].Slippy && (!Player[A].Slide || Player[A].Slope == 0))
+                    if(Player[A].Slippy && (!Player[A].Slide || Player[A].Slope == 0) && (Player[A].State != PLR_STATE_POLAR || Player[A].Mount))
                     {
                         if(Player[A].Slope > 0)
                         {

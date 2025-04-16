@@ -1789,6 +1789,7 @@ void SetupPlayerFrames()
     int base = 150;
     int offset_x = 0;
     int offset_y = 0;
+    int char1_offset_y = 0;
     for(int A = 750; A <= 1150; A++) // this just fills 750 and above with frames matching big power
     {
         // special case: cyclone power has big sprites
@@ -1797,22 +1798,25 @@ void SetupPlayerFrames()
             base = 150;
             offset_x = -2;
             offset_y = -2;
+            char1_offset_y = -4;
         }
         else if(A == 1050)
         {
             base = 150;
             offset_x = -6;
             offset_y = 0;
+            char1_offset_y = 0;
         }
-        else if(A == 850 || A == 950)
+        else if(A == 850)
         {
-            base = 150;
-            offset_x = 0;
-            offset_y = 0;
+            // polar power uses fire sprites as base
+            offset_x = -4;
+            offset_y = -4;
+            char1_offset_y = -6;
         }
 
         MarioFrameX[A] = MarioFrameX[base] + offset_x;
-        MarioFrameY[A] = MarioFrameY[base] + offset_y * 2;
+        MarioFrameY[A] = MarioFrameY[base] + char1_offset_y;
         LuigiFrameX[A] = LuigiFrameX[base] + offset_x;
         LuigiFrameY[A] = LuigiFrameY[base] + offset_y;
         PeachFrameX[A] = PeachFrameX[base] + offset_x;
@@ -1869,5 +1873,14 @@ void SetupPlayerFrames()
         LinkFrameY[1100 + D * 13] = -12;
         LinkFrameY[1100 + D * 14] = -12;
         LinkFrameY[1100 + D * 15] = -12;
+
+        // polar frame corrections
+        MarioFrameY[900 + D * 23] += 4;
+        LuigiFrameY[900 + D * 23] += 4;
+        LuigiFrameY[900 + D * 6] += 2;
+
+        // polar slide
+        PeachFrameX[900 + D * 14] = ToadFrameX[900 + D * 14] = LuigiFrameX[900 + D * 14] = MarioFrameX[900 + D * 14] = -12 - 8 * D;
+        PeachFrameY[900 + D * 14] = ToadFrameY[900 + D * 14] = LuigiFrameY[900 + D * 14] = MarioFrameY[900 + D * 14] = -10;
     }
 }

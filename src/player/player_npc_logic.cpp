@@ -572,7 +572,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                             {
                                 if(NPC[B]->IsABonus) // Bonus
                                     TouchBonus(A, B);
-                                else if(Player[A].Rolling)
+                                else if(Player[A].Rolling && Player[A].State == PLR_STATE_SHELL)
                                 {
                                     if(NPC[B].Type == NPCID_SPRING)
                                     {
@@ -891,7 +891,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                             PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
                                             if((Player[A].Location.SpeedX > 0) == (Player[A].Direction > 0))
                                                 Player[A].Location.SpeedX = -Player[A].Location.SpeedX;
-                                            tempHit2 = false;
+                                            if(Player[A].State != PLR_STATE_POLAR)
+                                                tempHit2 = false;
                                         }
                                         else if(!tempBool && NPC[B].Type != NPCID_CHASER)
                                             Player[A].Location.SpeedX = 0.2_n * Player[A].Direction;

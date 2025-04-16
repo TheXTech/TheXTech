@@ -120,7 +120,7 @@ void PlayerChar5Logic(int A)
             PlaySoundSpatial(SFX_HeroStab, Player[A].Location);
 
             // TODO: State-dependent moment
-            if((Player[A].State == 3 || Player[A].State == 7 || Player[A].State == 6) && Player[A].FireBallCD2 == 0)
+            if((Player[A].State == 3 || Player[A].State == 7 || Player[A].State == 6 || Player[A].State == PLR_STATE_POLAR) && Player[A].FireBallCD2 == 0)
                 PlayerShootChar5Beam(A);
         }
         else

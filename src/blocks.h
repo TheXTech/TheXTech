@@ -22,6 +22,21 @@
 #ifndef BLOCKS_H
 #define BLOCKS_H
 
+#include "globals.h"
+
+inline bool BlockTypeBreakable(int Type)
+{
+    return (Type == 4 || Type == 60 ||
+       Type == 90 || Type == 188 ||
+       Type == 226 || Type == 293 ||
+       Type == 526);
+}
+
+inline bool BlockIsBreakable(const Block_t& block)
+{
+    return BlockTypeBreakable(block.Type) && block.Special <= 0;
+}
+
 // Check is this a player filter block that matches a character and must be ignored in checks
 bool BlockCheckPlayerFilter(int blockIdx, int playerIdx);
 

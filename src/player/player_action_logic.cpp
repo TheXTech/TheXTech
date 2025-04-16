@@ -152,7 +152,7 @@ void PlayerShootChar5Beam(int A)
 
     if(Player[A].State == 6)
         PlaySoundSpatial(SFX_HeroSwordBeam, Player[A].Location);
-    else if(Player[A].State == 7)
+    else if(Player[A].State == 7 || Player[A].State == PLR_STATE_POLAR)
         PlaySoundSpatial(SFX_HeroIce, Player[A].Location);
     else
         PlaySoundSpatial(SFX_HeroFireRod, Player[A].Location);
@@ -165,7 +165,7 @@ void PlayerShootChar5Beam(int A)
 
     NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
 
-    if(Player[A].State == 7)
+    if(Player[A].State == 7 || Player[A].State == PLR_STATE_POLAR)
         NPC[numNPCs].Type = NPCID_PLR_ICEBALL;
 
     if(Player[A].State == 6)
@@ -409,7 +409,9 @@ void PlayerThrowBall(const int A)
     NPC[numNPCs] = NPC_t();
     NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
 
-    if(p.State == 7)
+    bool throw_ice = (p.State == PLR_STATE_ICE || p.State == PLR_STATE_POLAR);
+
+    if(throw_ice)
         NPC[numNPCs].Type = NPCID_PLR_ICEBALL;
 
     if(ShadowMode)
@@ -426,7 +428,7 @@ void PlayerThrowBall(const int A)
     NPC[numNPCs].CantHurtPlayer = A;
     NPC[numNPCs].Special = p.Character;
 
-    if(p.State == 7)
+    if(throw_ice)
         NPC[numNPCs].Special = 1;
 
     if((p.Character == 3 || p.Character == 4) && p.Mount == 0 && p.Controls.AltRun) // peach holds fireballs
@@ -452,7 +454,7 @@ void PlayerThrowBall(const int A)
 
     NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX) / 3.5_ri;
 
-    if(p.State == 7)
+    if(throw_ice)
     {
         PlaySoundSpatial(SFX_Iceball, p.Location);
 
@@ -528,7 +530,8 @@ void PowerUps(const int A)
             }
         }
         // Fire Mario / Luigi code ---- FIRE FLOWER ACTION BALLS OF DOOM
-        else if(p.State == 3 || p.State == 7)
+        // State-dependent moment!
+        else if(p.State == 3 || p.State == 7 || p.State == PLR_STATE_POLAR)
         {
             if(p.FireBallCD <= 0)
             {

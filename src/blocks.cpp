@@ -1506,12 +1506,7 @@ resume_TriggerHit:
             bool just_kill_it, is_breakable;
             {
                 just_kill_it = (ib.Kill == 9);
-                bool is_breakable_type = (ib.Type == 4 || ib.Type == 60 ||
-                   ib.Type == 90 || ib.Type == 188 ||
-                   ib.Type == 226 || ib.Type == 293 ||
-                   ib.Type == 526); // Check to see if it is breakable
-                bool is_empty = (ib.Special <= 0);
-                is_breakable = (is_breakable_type && is_empty);
+                is_breakable = BlockIsBreakable(ib);
             }
 
             ib.Kill = false;
