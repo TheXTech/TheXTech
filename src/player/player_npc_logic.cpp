@@ -793,8 +793,18 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         {
                                             if(NPC[B].Effect != NPCEFF_DROP_ITEM)
                                             {
-                                                if(InvincibilityTime || (Player[A].SlideKill && !NPC[B]->JumpHurt) || Player[A].Rolling)
-                                                    NPCHit(B, 3, B);
+                                                if(InvincibilityTime || (Player[A].SlideKill && !NPC[B]->JumpHurt) || (Player[A].Rolling && Player[A].State == PLR_STATE_SHELL))
+                                                {
+                                                    // DO cause damage to VILLAIN_S3 even though it's meant to be immune to this kind of damage.
+                                                    if(InvincibilityTime && NPC[B].Type == NPCID_VILLAIN_S3)
+                                                    {
+                                                        // But use fireball -- this will take ~6 rounds of invincibility power to kill the boss
+                                                        NPC[numNPCs + 1].Type = NPCID_PLR_FIREBALL;
+                                                        NPCHit(B, 3, numNPCs + 1);
+                                                    }
+                                                    else
+                                                        NPCHit(B, 3, B);
+                                                }
 
                                                 if(NPC[B].Killed == 0)
                                                 {

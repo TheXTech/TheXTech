@@ -1494,11 +1494,16 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.SpeedY = -13;
             NPC[A].Location.SpeedX = 4 * NPC[C].Direction;
             NPC[A].Killed = B;
+
             if(NPC[A].Legacy)
             {
                 bgMusic[NPC[A].Section] = 0;
                 StopMusic();
             }
+
+            // cancel MoreScore for invincibility-triggered kill
+            if(B == 3 && C > numNPCs)
+                C = A;
         }
     }
     // SMW Rainbow Shell
