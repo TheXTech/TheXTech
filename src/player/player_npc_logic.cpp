@@ -265,7 +265,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         Player[A].FairyTime = 20;
                                 }
                             }
-                            else if(!Player[A].Fairy && !Player[A].Stoned)
+                            else if(!Player[A].Fairy && !Player[A].Stoned && !Player[A].AquaticSwim)
                             {
                                 if(Player[A].Mount == 0 && Player[A].HoldingNPC <= 0)
                                 {

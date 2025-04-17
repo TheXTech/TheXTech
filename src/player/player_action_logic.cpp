@@ -402,7 +402,7 @@ void PlayerThrowBall(const int A)
     if(numNPCs >= maxNPCs - 100)
         return;
 
-    if(!p.SpinJump)
+    if(!p.SpinJump && !p.AquaticSwim)
         p.FrameCount = 110;
 
     numNPCs++;
@@ -515,7 +515,7 @@ void PowerUps(const int A)
     //     BoomOut = PlayerChar4HeavyOut(A);
 
     // Run-triggered actions; many of the conditions were combined here, so please search for the distinctive comments to find the corresponding code in legacy source
-    if(!p.Slide && p.Vine == 0 && p.Character != 5 && !p.Duck && p.Mount <= 1 && p.HoldingNPC <= 0)
+    if(!p.Slide && p.Vine == 0 && p.Character != 5 && (!p.Duck || p.AquaticSwim) && p.Mount <= 1 && p.HoldingNPC <= 0)
     {
         // Hammer Throw Code
         if(p.State == 6)

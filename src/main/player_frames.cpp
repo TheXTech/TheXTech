@@ -1882,5 +1882,27 @@ void SetupPlayerFrames()
         // polar slide
         PeachFrameX[900 + D * 14] = ToadFrameX[900 + D * 14] = LuigiFrameX[900 + D * 14] = MarioFrameX[900 + D * 14] = -12 - 8 * D;
         PeachFrameY[900 + D * 14] = ToadFrameY[900 + D * 14] = LuigiFrameY[900 + D * 14] = MarioFrameY[900 + D * 14] = -10;
+
+        // polar swim
+        PeachFrameX[900 + D * 16] = ToadFrameX[900 + D * 16] = LuigiFrameX[900 + D * 16] = MarioFrameX[900 + D * 16] = -12 - 8 * D;
+        PeachFrameX[900 + D * 17] = ToadFrameX[900 + D * 17] = LuigiFrameX[900 + D * 17] = MarioFrameX[900 + D * 17] = -12 - 8 * D;
+        PeachFrameX[900 + D * 18] = ToadFrameX[900 + D * 18] = LuigiFrameX[900 + D * 18] = MarioFrameX[900 + D * 18] = -12 - 8 * D;
+        PeachFrameY[900 + D * 16] = ToadFrameY[900 + D * 16] = LuigiFrameY[900 + D * 16] = MarioFrameY[900 + D * 16] = -10;
+        PeachFrameY[900 + D * 17] = ToadFrameY[900 + D * 17] = LuigiFrameY[900 + D * 17] = MarioFrameY[900 + D * 17] = -10;
+        PeachFrameY[900 + D * 18] = ToadFrameY[900 + D * 18] = LuigiFrameY[900 + D * 18] = MarioFrameY[900 + D * 18] = -10;
+
+        PeachFrameX[900 + D * 19] = ToadFrameX[900 + D * 19] = LuigiFrameX[900 + D * 19] = MarioFrameX[900 + D * 19] = -4;
+        PeachFrameX[900 + D * 20] = ToadFrameX[900 + D * 20] = LuigiFrameX[900 + D * 20] = MarioFrameX[900 + D * 20] = -4;
+        PeachFrameX[900 + D * 21] = ToadFrameX[900 + D * 21] = LuigiFrameX[900 + D * 21] = MarioFrameX[900 + D * 21] = -4;
+        PeachFrameY[900 + D * 19] = ToadFrameY[900 + D * 19] = LuigiFrameY[900 + D * 19] = MarioFrameY[900 + D * 19] = -24;
+        PeachFrameY[900 + D * 20] = ToadFrameY[900 + D * 20] = LuigiFrameY[900 + D * 20] = MarioFrameY[900 + D * 20] = -24;
+        PeachFrameY[900 + D * 21] = ToadFrameY[900 + D * 21] = LuigiFrameY[900 + D * 21] = MarioFrameY[900 + D * 21] = -24;
+
+        PeachFrameX[900 + D * 40] = ToadFrameX[900 + D * 40] = LuigiFrameX[900 + D * 40] = MarioFrameX[900 + D * 40] = -4;
+        PeachFrameX[900 + D * 41] = ToadFrameX[900 + D * 41] = LuigiFrameX[900 + D * 41] = MarioFrameX[900 + D * 41] = -4;
+        PeachFrameX[900 + D * 42] = ToadFrameX[900 + D * 42] = LuigiFrameX[900 + D * 42] = MarioFrameX[900 + D * 42] = -4;
+        PeachFrameY[900 + D * 40] = ToadFrameY[900 + D * 40] = LuigiFrameY[900 + D * 40] = MarioFrameY[900 + D * 40] = -8;
+        PeachFrameY[900 + D * 41] = ToadFrameY[900 + D * 41] = LuigiFrameY[900 + D * 41] = MarioFrameY[900 + D * 41] = -8;
+        PeachFrameY[900 + D * 42] = ToadFrameY[900 + D * 42] = LuigiFrameY[900 + D * 42] = MarioFrameY[900 + D * 42] = -8;
     }
 }

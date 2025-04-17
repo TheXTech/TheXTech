@@ -77,7 +77,7 @@ void PlayerVineLogic(int A)
 
                     break;
                 }
-                else if(!Player[A].Fairy && !Player[A].Stoned)
+                else if(!Player[A].Fairy && !Player[A].Stoned && !Player[A].AquaticSwim)
                 {
                     if(Player[A].Mount == 0 && Player[A].HoldingNPC <= 0)
                     {

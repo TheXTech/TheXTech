@@ -744,6 +744,7 @@ void SetupPlayers()
         Player[A].Wet = 0;
         Player[A].ShellSurf = false;
         Player[A].Rolling = false;
+        Player[A].AquaticSwim = false;
         Player[A].WetFrame = false;
         Player[A].Slide = false;
         Player[A].Vine = 0;
@@ -1583,6 +1584,9 @@ void EveryonesDead()
 
 void UnDuck(Player_t &p)
 {
+    if(p.AquaticSwim)
+        return;
+
     if(p.Rolling)
     {
         p.Rolling = false;
@@ -1824,6 +1828,51 @@ void PlayerFrame(Player_t &p)
         {
             p.Frame = 14;
         }
+        return;
+    }
+
+    // Aquatic frames
+    if(p.AquaticSwim)
+    {
+        if(p.SwimCount)
+        {
+            p.FrameCount = (p.SwimCount & 15) * 4;
+
+            if(p.FrameCount == 60)
+            {
+                if(p.SwimCount / 16 == MAZE_DIR_UP)
+                    p.Frame = 40;
+                else if(p.SwimCount / 16 == MAZE_DIR_DOWN)
+                    p.Frame = 19;
+                else
+                    p.Frame = 16;
+            }
+        }
+        else
+        {
+            p.FrameCount -= (p.Controls.Run) ? 2 : 1;
+
+            if(p.FrameCount < 0)
+            {
+                p.FrameCount = 0;
+
+                if(p.Controls.Left || p.Controls.Right || p.Controls.Up || p.Controls.Down)
+                {
+                    p.FrameCount = 60;
+
+                    if(p.Controls.Up)
+                        p.Frame = 40;
+                    else if(p.Controls.Down)
+                        p.Frame = 19;
+                    else
+                        p.Frame = 16;
+                }
+            }
+        }
+
+        if(p.FrameCount == 32 || p.FrameCount == 48)
+            p.Frame += 1;
+
         return;
     }
 
@@ -2231,7 +2280,15 @@ void PlayerFrame(Player_t &p)
                 if(p.WetFrame && !grounded && !p.Duck && p.Quicksand == 0)
                 {
                     if(p.CurMazeZone)
-                        p.Frame = 40;
+                    {
+                        if(p.State == PLR_STATE_POLAR || p.State == PLR_STATE_AQUATIC)
+                        {
+                            // no normal swim frames for those states
+                            p.Frame = 5;
+                        }
+                        else
+                            p.Frame = 40;
+                    }
                     else if(p.Location.SpeedY < 0 || p.Frame == 43 || p.Frame == 44)
                     {
                         if(p.Character <= 2)
@@ -4517,11 +4574,17 @@ void WaterCheck(const int A)
 
     bool already_in_maze = p.CurMazeZone;
 
-    for(int B : treeWaterQuery(p.Location, SORTMODE_NONE))
+    Location_t query_loc = p.Location;
+
+    // check the hitbox the player will get when leaving water if in aquatic swim state
+    if(p.AquaticSwim)
+        query_loc.set_height_floor(Physics.PlayerHeight[p.Character][p.State]);
+
+    for(int B : treeWaterQuery(query_loc, SORTMODE_NONE))
     {
         if(!Water[B].Hidden)
         {
-            if(CheckCollision(p.Location, Water[B].Location))
+            if(CheckCollision(query_loc, Water[B].Location))
             {
                 if(Water[B].Type == PHYSID_MAZE)
                 {

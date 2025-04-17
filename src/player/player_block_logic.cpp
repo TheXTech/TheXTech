@@ -1036,6 +1036,12 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
         if(Player[A].Fairy || Player[A].Mount == 2 || Player[A].CanFly2)
             Player[A].Location.SpeedY = 2;
 
+        if(Player[A].AquaticSwim)
+        {
+            Player[A].SwimCount = 0;
+            Player[A].Location.SpeedY = 0.5_n;
+        }
+
         if(Player[A].Mount != 2) // Tell the block it was hit
             BlockHit(ceilingBlock, false, A);
 

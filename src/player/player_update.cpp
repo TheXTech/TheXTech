@@ -236,6 +236,24 @@ bool UpdatePlayer()
                         Player[A].Slippy = true;
                 }
 
+                if((Player[A].State == PLR_STATE_AQUATIC || Player[A].State == PLR_STATE_POLAR) && !Player[A].Mount && !Player[A].HoldingNPC && !Player[A].Vine && Player[A].WetFrame && !Player[A].Quicksand)
+                {
+                    if(!Player[A].AquaticSwim)
+                    {
+                        Player[A].SwimCount = 0;
+                        Player[A].FrameCount = 0;
+
+                        // face up!
+                        if(Player[A].Location.SpeedY < 0)
+                            Player[A].Frame = 42;
+                        else
+                            Player[A].Frame = 18;
+                    }
+                    Player[A].AquaticSwim = true;
+                }
+                else
+                    Player[A].AquaticSwim = false;
+
                 if(Player[A].CurMazeZone)
                     PlayerMazeZoneMovement(A);
                 // normal player movement
@@ -264,6 +282,8 @@ bool UpdatePlayer()
                     // if the player is climbing a vine
                     else if(Player[A].Vine > 0)
                         PlayerVineMovement(A);
+                    else if(Player[A].AquaticSwim)
+                        PlayerAquaticSwimMovement(A);
                     // if none of the above apply then the player controls like normal. remeber this is for the players X movement
                     else
                         PlayerMovementX(A, cursed_value_C);
@@ -340,7 +360,11 @@ bool UpdatePlayer()
                     if(Block[Player[A].Slope].Location.SpeedY != 0 && Player[A].Slope != 0)
                         Player[A].Location.Y += Block[Player[A].Slope].Location.SpeedY;
 
-                    if(Player[A].Fairy) // the player is a fairy
+                    if(Player[A].AquaticSwim && Player[A].Wet)
+                    {
+                        // Aquatic swim handles both X and Y movement
+                    }
+                    else if(Player[A].Fairy) // the player is a fairy
                         PlayerFairyMovementY(A);
                     // TODO: state-dependent logic
                     else if(Player[A].Wet > 0 && Player[A].Quicksand == 0) // the player is swimming

@@ -1198,6 +1198,176 @@ void PlayerSwimMovementY(int A)
     }
 }
 
+void PlayerAquaticSwimMovement(int A)
+{
+    Player[A].Rolling = false;
+
+    if(!Player[A].Duck)
+    {
+        Player[A].Duck = true;
+        SizeCheck(Player[A]);
+    }
+
+    if(!Player[A].Wet)
+    {
+        if(Player[A].Pinched.Bottom1)
+            Player[A].WetFrame = false;
+
+        tempf_t C = 0;
+
+        PlayerMovementX(A, C);
+        return;
+    }
+
+    int current_swim_dir = -1;
+    if(Player[A].SwimCount > 0)
+    {
+        current_swim_dir = Player[A].SwimCount / 16;
+
+        Player[A].SwimCount -= 1;
+
+        if((Player[A].SwimCount & 15) == 0)
+            Player[A].SwimCount = 0;
+    }
+
+    num_t base_speed = (Player[A].State == PLR_STATE_POLAR) ? 1_n : 2.5_n;
+
+    num_t target_speed = base_speed;
+    int rate = 16; // out of 256
+
+    if(Player[A].Controls.Run)
+        target_speed += 1;
+
+    if(Player[A].Character == 2)
+    {
+        target_speed *= 0.9_r;
+        rate = rate / 2;
+    }
+    else if(Player[A].Character == 3)
+        target_speed *= 0.85_r;
+    else if(Player[A].Character == 4)
+        target_speed *= 1.1_r;
+    else if(Player[A].Character == 5)
+    {
+        target_speed *= 0.95_r;
+        rate = rate * 3 / 4;
+    }
+
+    num_t target_speed_x = 0;
+    num_t target_speed_y = 0;
+    int rate_x = rate / 2;
+    int rate_y = rate / 2;
+
+    int new_swim_dir = (Player[A].Direction > 0) ? MAZE_DIR_RIGHT : MAZE_DIR_LEFT;
+
+    // keep old direction if present
+    if(Player[A].Frame == 19 || Player[A].Frame == 20 || Player[A].Frame == 21)
+        new_swim_dir = MAZE_DIR_DOWN;
+    else if(Player[A].Frame == 40 || Player[A].Frame == 41 || Player[A].Frame == 42)
+        new_swim_dir = MAZE_DIR_UP;
+
+    if((Player[A].Controls.Left && current_swim_dir != MAZE_DIR_RIGHT) || current_swim_dir == MAZE_DIR_LEFT)
+    {
+        new_swim_dir = MAZE_DIR_LEFT;
+        target_speed_x = -target_speed;
+
+        if(Player[A].Location.SpeedX < 0)
+            rate_x = rate;
+        else
+            rate_x = rate * 2;
+
+        if(current_swim_dir == MAZE_DIR_LEFT)
+        {
+            target_speed_x -= base_speed;
+            rate_x *= 2;
+        }
+
+        Player[A].Direction = -1;
+    }
+    else if(Player[A].Controls.Right || current_swim_dir == MAZE_DIR_RIGHT)
+    {
+        new_swim_dir = MAZE_DIR_RIGHT;
+        target_speed_x = target_speed;
+
+        if(Player[A].Location.SpeedX > 0)
+            rate_x = rate;
+        else
+            rate_x = rate * 2;
+
+        if(current_swim_dir == MAZE_DIR_RIGHT)
+        {
+            target_speed_x += base_speed;
+            rate_x *= 2;
+        }
+
+        Player[A].Direction = 1;
+    }
+
+    if((Player[A].Controls.Up && current_swim_dir != MAZE_DIR_DOWN) || current_swim_dir == MAZE_DIR_UP)
+    {
+        new_swim_dir = MAZE_DIR_UP;
+        target_speed_y = -target_speed;
+
+        if(Player[A].Location.SpeedY < 0)
+            rate_y = rate;
+        else
+            rate_y = rate * 2;
+
+        if(current_swim_dir == MAZE_DIR_UP)
+        {
+            target_speed_y -= base_speed;
+            rate_y *= 2;
+        }
+    }
+    else if(Player[A].Controls.Down || current_swim_dir == MAZE_DIR_DOWN)
+    {
+        new_swim_dir = MAZE_DIR_DOWN;
+        target_speed_y = target_speed;
+
+        if(Player[A].Location.SpeedY > 0)
+            rate_y = rate;
+        else
+            rate_y = rate * 2;
+
+        if(current_swim_dir == MAZE_DIR_DOWN)
+        {
+            target_speed_y += base_speed;
+            rate_y *= 2;
+        }
+    }
+
+    // go a bit slower vertically
+    target_speed_y = target_speed_y * 3 / 4;
+
+    Player[A].Location.SpeedX = (target_speed_x * rate_x + Player[A].Location.SpeedX * (256 - rate_x)) / 256;
+    Player[A].Location.SpeedY = (target_speed_y * rate_y + Player[A].Location.SpeedY * (256 - rate_y)) / 256;
+
+    // stop (X)
+    if(num_t::abs(Player[A].Location.SpeedX) < 0.03125_n)
+        Player[A].Location.SpeedX = 0;
+
+    // stop (Y)
+    if(num_t::abs(Player[A].Location.SpeedY) < 0.03125_n)
+        Player[A].Location.SpeedY = 0;
+
+    // apply gravity if about to stop being wet -- this keeps us in the water
+    if(Player[A].Wet == 1)
+        Player[A].Location.SpeedY += Physics.PlayerGravity;
+
+    if(Player[A].SwimCount == 0)
+    {
+        if((Player[A].Controls.Jump && Player[A].CanJump) ||
+           (Player[A].Controls.AltJump && Player[A].CanAltJump))
+        {
+            Player[A].SwimCount = 16 * new_swim_dir + 15;
+            PlaySoundSpatial(SFX_Swim, Player[A].Location);
+        }
+    }
+
+    Player[A].CanJump = !Player[A].Controls.Jump;
+    Player[A].CanAltJump = !Player[A].Controls.AltJump;
+}
+
 void PlayerMazeZoneMovement(int A)
 {
     if(Player[A].Mount == 3)
@@ -1205,7 +1375,7 @@ void PlayerMazeZoneMovement(int A)
         Player[A].Duck = true;
         SizeCheck(Player[A]);
     }
-    else if(!Player[A].Rolling)
+    else if(!Player[A].Rolling && !Player[A].AquaticSwim)
     {
         UnDuck(Player[A]);
         Player[A].WetFrame = true;

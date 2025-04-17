@@ -52,6 +52,7 @@ void PlayerSlideMovementX(int A);
 void PlayerCockpitMovementX(int A);
 void PlayerMovementY(int A);
 void PlayerSwimMovementY(int A);
+void PlayerAquaticSwimMovement(int A);
 
 void PlayerPoundLogic(int A);
 void PlayerShootChar5Beam(int A);

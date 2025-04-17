@@ -578,6 +578,8 @@ struct Player_t
     vbint_t Slope = 0;
 //    Stoned As Boolean 'true of a statue form (tanooki suit)
     bool Stoned = false;
+    // is currently swimming with aquatic/polar power
+    bool AquaticSwim = false;
 //    StonedCD As Integer 'delay before going back in to stone form
     vbint_t StonedCD = 0;
 //    StonedTime As Integer 'how long the player can remain as a statue
