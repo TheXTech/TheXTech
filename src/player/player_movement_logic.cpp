@@ -652,19 +652,19 @@ void PlayerMovementY(int A)
     if(Player[A].Jump > 0)
         Player[A].Slope = 0;
 
-    bool is_grounded = (Player[A].StandingOnNPC > 0 || Player[A].Slope > 0 || Player[A].Location.SpeedY == 0);
+    bool is_supported = (Player[A].StandingOnNPC != 0 || Player[A].Slope != 0 || Player[A].Location.SpeedY == 0 || Player[A].Wet || Player[A].Vine || Player[A].WetFrame);
     // cyclone: allow double jump as save after falling off cliff
     if(Player[A].State == PLR_STATE_CYCLONE && (!Player[A].SpinJump || Player[A].HoldingNPC))
     {
-        if(is_grounded)
+        if(is_supported)
             Player[A].DoubleJump = true;
     }
-    else if(Player[A].SpinJump || (Player[A].State != 4 && Player[A].State != 5) || is_grounded)
+    // this is the old condition which subtly differs from the supported condition tested above and below
+    else if(Player[A].SpinJump || (Player[A].State != 4 && Player[A].State != 5) || Player[A].StandingOnNPC > 0 || Player[A].Slope > 0 || Player[A].Location.SpeedY == 0)
         Player[A].DoubleJump = false;
 
     // double jump code
-    if(Player[A].DoubleJump && Player[A].Jump == 0 && !is_grounded && Player[A].Wet == 0 && Player[A].Vine == 0 &&
-       !Player[A].WetFrame && !Player[A].Fairy && !Player[A].CanFly2 && Player[A].JumpRelease)
+    if(Player[A].DoubleJump && Player[A].Jump == 0 && !is_supported && !Player[A].Fairy && !Player[A].CanFly2 && Player[A].JumpRelease)
     {
         if(Player[A].State == PLR_STATE_CYCLONE && (Player[A].Controls.Jump || Player[A].Controls.AltJump))
         {
