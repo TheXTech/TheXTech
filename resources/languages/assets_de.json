@@ -29,6 +29,9 @@
             "fam-set3": {
                 "bg2-13": "Wolken",
                 "bg2-14": "Wüste"
+            },
+            "auto": {
+                "bg2-0": "Keine"
             }
         }
     }
