@@ -132,7 +132,7 @@
             "fam-house3": "小屋",
             "fam-hurts3": "傷害",
             "fam-lava4": "岩漿",
-            "fam-mansion4": "大廈",
+            "fam-mansion4": "幽靈屋",
             "fam-metal5-1": "金屬",
             "fam-metal5-3": "其他",
             "fam-misc1": "其他",
@@ -256,7 +256,7 @@
             "fam-world": {
                 "header": "世界",
                 "music10": "地面",
-                "music17": "大廈",
+                "music17": "幽靈屋",
                 "music28": "天空",
                 "music29": "洞窟",
                 "music41": "城堡",
