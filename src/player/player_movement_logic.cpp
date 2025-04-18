@@ -704,7 +704,10 @@ void PlayerMovementY(int A)
                 Player[A].DoubleJump = false;
 
                 if(Player[A].Character != 5)
+                {
                     Player[A].SpinJump = true;
+                    UnDuck(Player[A]);
+                }
             }
         }
         else if(Player[A].Controls.Jump)
