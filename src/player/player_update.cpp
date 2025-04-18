@@ -238,7 +238,11 @@ bool UpdatePlayer()
 
                 if((Player[A].State == PLR_STATE_AQUATIC || Player[A].State == PLR_STATE_POLAR) && !Player[A].Mount && !Player[A].HoldingNPC && !Player[A].Vine && Player[A].WetFrame && !Player[A].Quicksand)
                 {
-                    if(!Player[A].AquaticSwim)
+                    if(Player[A].CurMazeZone)
+                    {
+                        // just keep things as they are
+                    }
+                    else if(!Player[A].AquaticSwim)
                     {
                         Player[A].SwimCount = 0;
                         Player[A].FrameCount = 0;
@@ -248,8 +252,9 @@ bool UpdatePlayer()
                             Player[A].Frame = 42;
                         else
                             Player[A].Frame = 18;
+
+                        Player[A].AquaticSwim = true;
                     }
-                    Player[A].AquaticSwim = true;
                 }
                 else
                     Player[A].AquaticSwim = false;
