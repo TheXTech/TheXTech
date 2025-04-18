@@ -116,7 +116,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                             {
                                 if(Player[A].Mount == 2 ||
                                    (
-                                       (HitSpot == 1 && Player[A].Mount) &&
+                                       ((HitSpot == 1 && Player[A].Mount) || (Player[A].Rolling && Player[A].State == PLR_STATE_SHELL)) &&
                                        Block[B].Type != 598
                                    )
                                  )
@@ -215,7 +215,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
                                 if(Player[A].Location.Y <= Block[B].Location.Y + Block[B].Location.Height - ((int_ok)Block[B].Location.Height * Slope))
                                 {
-                                    if(BlockKills[Block[B].Type])
+                                    if(BlockKills[Block[B].Type] && !(Player[A].Rolling && Player[A].Character == 5 && Player[A].State == PLR_STATE_SHELL))
                                     {
                                         if(!GodMode)
                                             PlayerDead(A);
@@ -416,25 +416,29 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                             }
 
 
-                            // this is a fix to help the player deal with lava blocks a bit easier
-                            // it moves the blocks hitbox down a few pixels
-                            if(BlockKills[Block[B].Type] && BlockSlope[Block[B].Type] == 0 && !GodMode && !(Player[A].Mount == 1 && Player[A].MountType == 2))
+                            if(BlockKills[Block[B].Type] && !GodMode)
                             {
-                                if(Player[A].Location.Y + Player[A].Location.Height < Block[B].Location.Y + 6)
-                                    HitSpot = 0;
-                            }
+                                bool hot_boot = (Player[A].Mount == 1 && Player[A].MountType == 2);
+                                bool lava_roller = (Player[A].Rolling && Player[A].Character == 5 && Player[A].State == PLR_STATE_SHELL);
+                                hot_boot |= lava_roller;
 
-                            // kill the player if touching a lava block
-                            if(BlockKills[Block[B].Type] && (HitSpot > 0 || Player[A].Slope == B))
-                            {
-                                if(!GodMode)
+                                // this is a fix to help the player deal with lava blocks a bit easier
+                                // it moves the blocks hitbox down a few pixels
+                                if(BlockSlope[Block[B].Type] == 0 && !hot_boot)
                                 {
-                                    if(!(Player[A].Mount == 1 && Player[A].MountType == 2))
+                                    if(Player[A].Location.Y + Player[A].Location.Height < Block[B].Location.Y + 6)
+                                        HitSpot = 0;
+                                }
+
+                                // kill the player if touching a lava block
+                                if(HitSpot > 0 || Player[A].Slope == B)
+                                {
+                                    if(!hot_boot)
                                     {
                                         PlayerDead(A);
                                         break;
                                     }
-                                    else if(HitSpot != 1 && BlockSlope[Block[B].Type] == 0)
+                                    else if(HitSpot != 1 && BlockSlope[Block[B].Type] == 0 && !lava_roller)
                                     {
                                         PlayerDead(A);
                                         break;
