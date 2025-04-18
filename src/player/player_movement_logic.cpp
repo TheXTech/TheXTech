@@ -1387,16 +1387,18 @@ void PlayerMazeZoneMovement(int A)
 
     Player[A].Bumped = 0;
     Player[A].Bumped2 = 0;
+    Player[A].Jump = 0;
+    Player[A].SpinJump = false;
 
     if(Player[A].MazeZoneStatus & MAZE_PLAYER_FLIP)
         Player[A].MazeZoneStatus = (Player[A].MazeZoneStatus & 3) ^ MAZE_DIR_FLIP_BIT;
-
-    Player[A].SpinJump = false;
 
     PhysEnv_Maze(Player[A].Location, Player[A].CurMazeZone, Player[A].MazeZoneStatus, 0, A, Player[A].Rolling ? 6 : (Player[A].Quicksand ? 1 : (Player[A].Wet && !Player[A].AquaticSwim ? 2 : 4)), {Player[A].Controls.Left, Player[A].Controls.Up, Player[A].Controls.Right, Player[A].Controls.Down});
 
     if(!Player[A].CurMazeZone)
     {
+        Player[A].WetFrame = Player[A].Wet && !Player[A].Quicksand;
+
         // prevent unexpected block clipping
         if(Player[A].MazeZoneStatus % 4 == MAZE_DIR_DOWN)
         {
@@ -1411,7 +1413,8 @@ void PlayerMazeZoneMovement(int A)
         // don't allow jumping
         else
         {
-            Player[A].Location.SpeedY = 0.01_n;
+            Player[A].CanJump = false;
+            Player[A].CanAltJump = false;
         }
 
         PlaySoundSpatial(SFX_HeroDash, Player[A].Location);
