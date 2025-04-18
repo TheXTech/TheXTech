@@ -778,9 +778,11 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
             BlockHitHard(wallBlock);
             PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
 
-            if((Player[A].Location.SpeedX > 0) == (Player[A].Direction > 0) && !hitCeiling && Player[A].State == PLR_STATE_SHELL)
+            num_t rel_speed = Player[A].Location.SpeedX - Block[wallBlock].Location.SpeedX;
+
+            if((rel_speed > 0) == (Player[A].Direction > 0) && !hitCeiling && Player[A].State == PLR_STATE_SHELL)
             {
-                Player[A].Location.SpeedX = -Player[A].Location.SpeedX;
+                Player[A].Location.SpeedX = Block[wallBlock].Location.SpeedX - rel_speed;
 
                 // help player go over 1-block gaps here
                 if(!floorBlock && !Player[A].StandingOnNPC && !Player[A].Slope)

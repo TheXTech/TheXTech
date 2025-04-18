@@ -854,8 +854,10 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         if(Player[A].Rolling)
                                         {
                                             PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
-                                            if((Player[A].Location.SpeedX > 0) == (Player[A].Direction > 0))
-                                                Player[A].Location.SpeedX = -Player[A].Location.SpeedX;
+
+                                            num_t rel_speed = Player[A].Location.SpeedX - wallNpcSpeed;
+                                            if((rel_speed > 0) == (Player[A].Direction > 0))
+                                                Player[A].Location.SpeedX = wallNpcSpeed - rel_speed;
                                             if(Player[A].State != PLR_STATE_POLAR)
                                                 hitWall = false;
                                         }
