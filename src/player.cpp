@@ -6106,7 +6106,8 @@ void PlayerEffects(const int A)
         if(target_state != PLR_STATE_LEAF)
             p.Immune2 = true;
 
-        p.Frame = 1;
+        if(!p.AquaticSwim && !p.Rolling)
+            p.Frame = 1;
 
         if(p.Effect2 == 0)
         {

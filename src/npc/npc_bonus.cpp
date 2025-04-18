@@ -501,14 +501,24 @@ void TouchBonus(int A, int B)
                 Player[A].GrabTime = BackupGrabTime;
             }
 
-            Player[A].Frame = 1;
+            if(!Player[A].AquaticSwim && !Player[A].Rolling)
+                Player[A].Frame = 1;
+
             Player[A].Effect = (PlayerEffect)(target_effect + target_state);
 
             if(reset_effect2)
                 Player[A].Effect2 = 0;
 
-            if(Player[A].Mount > 0)
+            if(Player[A].Mount > 0 || (Player[A].AquaticSwim && target_state != PLR_STATE_AQUATIC && target_state != PLR_STATE_POLAR) || (Player[A].Rolling && target_state != PLR_STATE_SHELL && target_state != PLR_STATE_POLAR))
+            {
+                Player[A].AquaticSwim = false;
+                Player[A].Rolling = false;
+
                 UnDuck(Player[A]);
+
+                if(Player[A].Mount == 0)
+                    PlayerFrame(A);
+            }
 
             PlaySoundSpatial(use_sfx, NPC[B].Location);
         }
