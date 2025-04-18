@@ -1381,7 +1381,8 @@ void PlayerMazeZoneMovement(int A)
     else if(!Player[A].Rolling && !Player[A].AquaticSwim)
     {
         UnDuck(Player[A]);
-        Player[A].WetFrame = true;
+        if(Player[A].State != PLR_STATE_POLAR && Player[A].State != PLR_STATE_AQUATIC)
+            Player[A].WetFrame = true;
     }
 
     Player[A].Bumped = 0;
