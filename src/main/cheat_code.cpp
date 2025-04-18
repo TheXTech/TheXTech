@@ -550,6 +550,16 @@ static void goodTimesRoll()
     grantPowerup(NPCID_SHELL_POWER, PLR_STATE_SHELL);
 }
 
+static void wayPastCool()
+{
+    grantPowerup(NPCID_POLAR_POWER, PLR_STATE_POLAR);
+}
+
+static void sushiTime()
+{
+    grantPowerup(NPCID_AQUATIC_POWER, PLR_STATE_AQUATIC);
+}
+
 static void grantItemBox(NPCID npcid)
 {
     PlaySound(SFX_GotItem);
@@ -1758,6 +1768,8 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"needacyclone", needACyclone, true},
     {"goodtimesroll", goodTimesRoll, true},
     {"canttouchthis", cantTouchThis, true},
+    {"waypastcool", wayPastCool, true},
+    {"sushitime", sushiTime, true},
 
     {"holytrinity", holyTrinity, true}, {"passerby", holyTrinity, true},
     {"essentials", essentials, true}, {"holyfour", essentials, true},
