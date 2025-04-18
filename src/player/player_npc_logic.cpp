@@ -721,7 +721,10 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 TouchBonus(A, B);
                             else // Everything else
                             {
-                                if((NPC[B].Type == NPCID_LIT_BOMB_S3 || NPC[B].Type == NPCID_HIT_CARRY_FODDER) && NPC[B].HoldingPlayer != A) // kick the bob-om
+                                // player-npc hurt routine:
+
+                                // kick the bob-om
+                                if((NPC[B].Type == NPCID_LIT_BOMB_S3 || NPC[B].Type == NPCID_HIT_CARRY_FODDER) && NPC[B].HoldingPlayer != A)
                                 {
                                     if(NPC[B].TailCD == 0)
                                     {
@@ -731,44 +734,47 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         NPCHit(B, 1, A);
                                     }
                                 }
-                                else if(NPC[B].CantHurtPlayer != A && !NPC[B]->WontHurt)
+                                // don't hurt own thrown items
+                                else if(NPC[B].CantHurtPlayer == A) {}
+                                // don't hurt NPC of friendly type
+                                else if(NPC[B]->WontHurt) {}
+                                // also cancel hurt for player-shot bullet
+                                else if(NPC[B].Type == NPCID_BULLET && NPC[B].Projectile != 0) {}
+                                // special routine for hit turtles that haven't stood up yet
+                                else if(NPC[B].Type >= NPCID_GRN_HIT_TURTLE_S4 && NPC[B].Type <= NPCID_YEL_HIT_TURTLE_S4 && NPC[B].Projectile != 0)
+                                    NPCHit(B, 3, B);
+                                // cancel hurt for dropped items
+                                else if(NPC[B].Effect == NPCEFF_DROP_ITEM) {}
+                                // someone's going to get hurt...
+                                else
                                 {
-                                    if(!(NPC[B].Type == NPCID_BULLET && NPC[B].Projectile != 0))
+                                    if(InvincibilityTime || (Player[A].SlideKill && !NPC[B]->JumpHurt) || (Player[A].Rolling && Player[A].State == PLR_STATE_SHELL))
                                     {
-                                        if(NPC[B].Type >= NPCID_GRN_HIT_TURTLE_S4 && NPC[B].Type <= NPCID_YEL_HIT_TURTLE_S4 && NPC[B].Projectile != 0)
-                                            NPCHit(B, 3, B);
-                                        else
+                                        // DO cause damage to VILLAIN_S3 even though it's meant to be immune to this kind of damage.
+                                        if(InvincibilityTime && NPC[B].Type == NPCID_VILLAIN_S3)
                                         {
-                                            if(NPC[B].Effect != NPCEFF_DROP_ITEM)
-                                            {
-                                                if(InvincibilityTime || (Player[A].SlideKill && !NPC[B]->JumpHurt) || (Player[A].Rolling && Player[A].State == PLR_STATE_SHELL))
-                                                {
-                                                    // DO cause damage to VILLAIN_S3 even though it's meant to be immune to this kind of damage.
-                                                    if(InvincibilityTime && NPC[B].Type == NPCID_VILLAIN_S3)
-                                                    {
-                                                        // But use fireball -- this will take ~6 rounds of invincibility power to kill the boss
-                                                        NPC[numNPCs + 1].Type = NPCID_PLR_FIREBALL;
-                                                        NPCHit(B, 3, numNPCs + 1);
-                                                    }
-                                                    else
-                                                        NPCHit(B, 3, B);
-                                                }
+                                            // But use fireball -- this will take ~6 rounds of invincibility power to kill the boss
+                                            NPC[numNPCs + 1].Type = NPCID_PLR_FIREBALL;
+                                            NPCHit(B, 3, numNPCs + 1);
+                                        }
+                                        else
+                                            NPCHit(B, 3, B);
+                                    }
 
-                                                if(NPC[B].Killed == 0)
-                                                {
-                                                    if(n00bCollision(Player[A].Location, NPC[B].Location))
-                                                    {
-                                                        if(BattleMode && NPC[B].HoldingPlayer != A && NPC[B].HoldingPlayer > 0 && Player[A].Immune == 0)
-                                                            NPCHit(B, 5, B);
-                                                        PlayerHurt(A);
-                                                    }
-                                                }
-                                                else
-                                                    MoreScore(NPC[B]->Score, NPC[B].Location, Player[A].Multiplier);
-                                            }
+                                    if(NPC[B].Killed == 0)
+                                    {
+                                        if(n00bCollision(Player[A].Location, NPC[B].Location))
+                                        {
+                                            if(BattleMode && NPC[B].HoldingPlayer != A && NPC[B].HoldingPlayer > 0 && Player[A].Immune == 0)
+                                                NPCHit(B, 5, B);
+                                            PlayerHurt(A);
                                         }
                                     }
+                                    else
+                                        MoreScore(NPC[B]->Score, NPC[B].Location, Player[A].Multiplier);
                                 }
+
+                                // npc block routine
 
                                 // this is for NPC that physically push the player
                                 if(NPC[B]->MovesPlayer && NPC[B].Projectile == 0 && Player[A].HoldingNPC != B &&
