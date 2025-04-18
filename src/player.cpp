@@ -1960,7 +1960,14 @@ void PlayerFrame(Player_t &p)
 // this finds the players direction
     if(!LevelSelect && p.Effect != PLREFF_WARP_PIPE)
     {
-        if(!(p.Mount == 3 && p.MountSpecial > 0))
+        if(p.JumpOffWall)
+        {
+            if(p.Location.SpeedX > 0)
+                p.Direction = 1;
+            else
+                p.Direction = -1;
+        }
+        else if(!(p.Mount == 3 && p.MountSpecial > 0))
         {
             if(p.Controls.Left)
                 p.Direction = -1;
