@@ -35,6 +35,8 @@
 #include "config.h"
 #include "phys_env.h"
 
+#include "player/player_update_priv.h"
+
 #include "main/trees.h"
 
 void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, const bool movingBlock, const int floorBlock, const tempf_t oldSpeedY)
@@ -241,71 +243,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
 
 
                         if(NPC[B]->IsAVine) // if the player collided with a vine then see if he should climb it
-                        {
-                            if(Player[A].Character == 5)
-                            {
-                                bool hasNoMonts = (g_config.fix_char5_vehicle_climb && Player[A].Mount <= 0) ||
-                                                   !g_config.fix_char5_vehicle_climb;
-                                if(hasNoMonts && Player[A].Immune == 0 && Player[A].Controls.Up)
-                                {
-                                    Player[A].FairyCD = 0;
-
-                                    if(!Player[A].Fairy)
-                                    {
-                                        Player[A].Fairy = true;
-                                        SizeCheck(Player[A]);
-                                        PlaySoundSpatial(SFX_HeroFairy, Player[A].Location);
-                                        Player[A].Immune = 10;
-                                        Player[A].Effect = PLREFF_WAITING;
-                                        Player[A].Effect2 = 4;
-                                        NewEffect(EFFID_SMOKE_S5, Player[A].Location);
-                                    }
-
-                                    if(Player[A].FairyTime != -1 && Player[A].FairyTime < 20)
-                                        Player[A].FairyTime = 20;
-                                }
-                            }
-                            else if(!Player[A].Fairy && !Player[A].Stoned && !Player[A].AquaticSwim)
-                            {
-                                if(Player[A].Mount == 0 && Player[A].HoldingNPC <= 0)
-                                {
-                                    if(Player[A].Vine > 0)
-                                    {
-                                        if(Player[A].Duck)
-                                            UnDuck(Player[A]);
-
-                                        if(Player[A].Location.Y >= NPC[B].Location.Y - 20 && Player[A].Vine < 2)
-                                            Player[A].Vine = 2;
-
-                                        if(Player[A].Location.Y >= NPC[B].Location.Y - 18)
-                                            Player[A].Vine = 3;
-                                    }
-                                    else if((Player[A].Controls.Up ||
-                                             (Player[A].Controls.Down &&
-                                              !num_t::fEqual_d(Player[A].Location.SpeedY, 0) && // Not .Location.SpeedY = 0
-                                              Player[A].StandingOnNPC == 0 && // Not .StandingOnNPC <> 0
-                                              Player[A].Slope <= 0) // Not .Slope > 0
-                                            ) && Player[A].Jump == 0)
-                                    {
-                                        if(Player[A].Duck)
-                                            UnDuck(Player[A]);
-
-                                        if(Player[A].Location.Y >= NPC[B].Location.Y - 20 && Player[A].Vine < 2)
-                                            Player[A].Vine = 2;
-
-                                        if(Player[A].Location.Y >= NPC[B].Location.Y - 18)
-                                            Player[A].Vine = 3;
-                                    }
-
-                                    if(Player[A].Vine > 0)
-                                    {
-                                        Player[A].VineNPC = B;
-                                        if(g_config.fix_climb_bgo_speed_adding)
-                                            Player[A].VineBGO = 0;
-                                    }
-                                }
-                            }
-                        }
+                            p_PlayerTouchVine(Player[A], NPC[B].Location.Y, B, 0);
 
                         // subcon warps
                         if(NPC[B].Type == NPCID_MAGIC_DOOR && HitSpot > 0 && Player[A].Controls.Up)

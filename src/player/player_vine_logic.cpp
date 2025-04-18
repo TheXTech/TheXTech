@@ -30,6 +30,80 @@
 
 #include "main/trees.h"
 
+bool p_PlayerTouchVine(Player_t& p, num_t vine_top, int VineNPC, int VineBGO)
+{
+    if(p.Character == 5)
+    {
+        bool hasNoMonts = (g_config.fix_char5_vehicle_climb && p.Mount <= 0) ||
+                           !g_config.fix_char5_vehicle_climb;
+        if(hasNoMonts && p.Immune == 0 && p.Controls.Up)
+        {
+            p.FairyCD = 0;
+
+            if(!p.Fairy)
+            {
+                p.Fairy = true;
+                SizeCheck(p);
+                PlaySoundSpatial(SFX_HeroFairy, p.Location);
+                p.Immune = 10;
+                p.Effect = PLREFF_WAITING;
+                p.Effect2 = 4;
+                NewEffect(EFFID_SMOKE_S5, p.Location);
+            }
+
+            if(p.FairyTime != -1 && p.FairyTime < 20)
+                p.FairyTime = 20;
+        }
+
+        return true;
+    }
+    else if(!p.Fairy && !p.Stoned && !p.AquaticSwim)
+    {
+        if(p.Mount == 0 && p.HoldingNPC <= 0)
+        {
+            if(p.Vine > 0)
+            {
+                if(p.Duck)
+                    UnDuck(p);
+
+                if(p.Location.Y >= vine_top - 20 && p.Vine < 2)
+                    p.Vine = 2;
+
+                if(p.Location.Y >= vine_top - 18)
+                    p.Vine = 3;
+            }
+            else if((p.Controls.Up ||
+                     (p.Controls.Down &&
+                      !num_t::fEqual_d(p.Location.SpeedY, 0) && // Not .Location.SpeedY = 0
+                      p.StandingOnNPC == 0 && // Not .StandingOnNPC <> 0
+                      p.Slope <= 0) // Not .Slope > 0
+                    ) && p.Jump == 0)
+            {
+                if(p.Duck)
+                    UnDuck(p);
+
+                if(p.Location.Y >= vine_top - 20 && p.Vine < 2)
+                    p.Vine = 2;
+
+                if(p.Location.Y >= vine_top - 18)
+                    p.Vine = 3;
+            }
+
+            if(p.Vine > 0)
+            {
+                p.VineNPC = VineNPC;
+                if(g_config.fix_climb_bgo_speed_adding)
+                    p.VineBGO = VineBGO;
+            }
+
+            if(p.Vine == 3)
+                return true;
+        }
+    }
+
+    return false;
+}
+
 void PlayerVineLogic(int A)
 {
     if(Player[A].Vine > 0)
@@ -52,72 +126,8 @@ void PlayerVineLogic(int A)
 
             if(CheckCollision(Player[A].Location, tempLocation))
             {
-                if(Player[A].Character == 5)
-                {
-                    bool hasNoMonts = (g_config.fix_char5_vehicle_climb && Player[A].Mount <= 0) ||
-                                       !g_config.fix_char5_vehicle_climb;
-                    if(hasNoMonts && Player[A].Immune == 0 && Player[A].Controls.Up)
-                    {
-                        Player[A].FairyCD = 0;
-
-                        if(!Player[A].Fairy)
-                        {
-                            Player[A].Fairy = true;
-                            SizeCheck(Player[A]);
-                            PlaySoundSpatial(SFX_HeroFairy, Player[A].Location);
-                            Player[A].Immune = 10;
-                            Player[A].Effect = PLREFF_WAITING;
-                            Player[A].Effect2 = 4;
-                            NewEffect(EFFID_SMOKE_S5, Player[A].Location);
-                        }
-
-                        if(Player[A].FairyTime != -1 && Player[A].FairyTime < 20)
-                            Player[A].FairyTime = 20;
-                    }
-
+                if(p_PlayerTouchVine(Player[A], Background[B].Location.Y, -1, B))
                     break;
-                }
-                else if(!Player[A].Fairy && !Player[A].Stoned && !Player[A].AquaticSwim)
-                {
-                    if(Player[A].Mount == 0 && Player[A].HoldingNPC <= 0)
-                    {
-                        if(Player[A].Vine > 0)
-                        {
-                            if(Player[A].Duck)
-                                UnDuck(Player[A]);
-
-                            if(Player[A].Location.Y >= Background[B].Location.Y - 20 && Player[A].Vine < 2)
-                                Player[A].Vine = 2;
-
-                            if(Player[A].Location.Y >= Background[B].Location.Y - 18)
-                                Player[A].Vine = 3;
-                        }
-                        else if((Player[A].Controls.Up || (Player[A].Controls.Down &&
-                                                           Player[A].Location.SpeedY != 0 &&
-                                                           Player[A].StandingOnNPC == 0 &&
-                                                           Player[A].Slope <= 0)) && Player[A].Jump == 0)
-                        {
-                            if(Player[A].Duck)
-                                UnDuck(Player[A]);
-
-                            if(Player[A].Location.Y >= Background[B].Location.Y - 20 && Player[A].Vine < 2)
-                                Player[A].Vine = 2;
-
-                            if(Player[A].Location.Y >= Background[B].Location.Y - 18)
-                                Player[A].Vine = 3;
-                        }
-
-                        if(Player[A].Vine > 0)
-                        {
-                            Player[A].VineNPC = -1;
-                            if(g_config.fix_climb_bgo_speed_adding)
-                                Player[A].VineBGO = B;
-                        }
-
-                        if(Player[A].Vine == 3)
-                            break;
-                    }
-                } // !Fairy & !Stoned
             } // Collide player and temp location
             // }// Collide player and BGO
         } // Is BGO climbable and visible?

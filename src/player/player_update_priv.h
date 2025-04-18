@@ -25,6 +25,9 @@
 
 #include "numeric_types.h"
 
+struct Location_t;
+struct Player_t;
+
 void p_PlayerMakeFlySparkle(const Location_t& loc, int Frame = 1);
 
 // most of these routines were originally part of UpdatePlayer
@@ -32,6 +35,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
 
 void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontResetGrabTime, tempf_t cursed_value_C);
 
+bool p_PlayerTouchVine(Player_t& p, num_t vine_top, int VineNPC, int VineBGO);
 void PlayerVineLogic(int A);
 bool PlayerFairyOnVine(int A);
 void PlayerVineMovement(int A);
