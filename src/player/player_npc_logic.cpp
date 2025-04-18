@@ -43,15 +43,16 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
 {
     int floorNpc1 = 0;
     int floorNpc2 = 0;
-    // was previously a float
-    num_t tempHitSpeed = 0;
+    // previously tempHitSpeed. was previously a float, converted through numf_t at all assignments
+    num_t wallNpcSpeed = 0;
     bool spinKill = false;
 
     // cleanup variables for NPC collisions
 
-    int tempHit = 0; // Used for JUMP detection -- new: it's the ID of the last NPC that was jumped on
-    bool tempHit2 = false;
-    Location_t tempLocation;
+    int bounceNpc = 0; // previously tempHit. Used for JUMP detection -- new: it's the ID of the last NPC that was jumped on
+    bool hitWall = false; // previously tempHit2
+    num_t bouncePlrY = 0; // previously shared with tempLocation.Y
+    // Location_t tempLocation;
 
     for(int B : treeNPCQuery(Player[A].Location, SORTMODE_ID))
     {
@@ -257,7 +258,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 Player[A].Warp = numWarps + 1;
                                 Player[A].WarpBackward = false;
                                 Warp[numWarps + 1].Entrance = static_cast<SpeedlessLocation_t>(NPC[B].Location);
-                                tempLocation = NPC[B].Location;
+
+                                Location_t tempLocation = NPC[B].Location;
                                 tempLocation.X = NPC[B].Location.X - level[Player[A].Section].X + level[NPC[B].Special2].X;
                                 tempLocation.Y = NPC[B].Location.Y - level[Player[A].Section].Y + level[NPC[B].Special2].Y;
                                 Warp[numWarps + 1].Exit = static_cast<SpeedlessLocation_t>(tempLocation);
@@ -279,6 +281,9 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 tempLocation.Y -= 32;
                                 tempLocation.Height = 64;
                                 NewEffect(EFFID_DOOR_S2_OPEN, tempLocation);
+
+                                // this is a bug that came from re-using tempLocation.Y in the original code
+                                bouncePlrY = tempLocation.Y;
                             }
                         }
 
@@ -385,15 +390,15 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     Player[A].ForceHitSpot3 = true;
                                     if(/*HitSpot == 1 && */ !(Player[A].GroundPound && NPC[B].Killed == 8))
                                     {
-                                        tempHit = B;
-                                        tempLocation.Y = NPC[B].Location.Y - Player[A].Location.Height;
+                                        bounceNpc = B;
+                                        bouncePlrY = NPC[B].Location.Y - Player[A].Location.Height;
 
                                         if(NPC[B].Killed == 0)
                                             PlaySoundSpatial(SFX_Stomp, Player[A].Location);
                                         else if(Player[A].SpinJump)
                                         {
                                             if(Player[A].Controls.Down)
-                                                tempHit = 0;
+                                                bounceNpc = 0;
                                             else
                                                 spinKill = true;
                                         }
@@ -515,8 +520,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     if(NPC[B].Type == NPCID_SPRING)
                                     {
                                         tempSpring = true;
-                                        tempHit = B;
-                                        tempLocation.Y = NPC[B].Location.Y - Player[A].Location.Height;
+                                        bounceNpc = B;
+                                        bouncePlrY = NPC[B].Location.Y - Player[A].Location.Height;
                                     }
                                     else if(NPC[B].CantHurtPlayer != A)
                                         NPCHit(B, 3, B);
@@ -556,8 +561,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     {
                                         if(NPC[B].Special != 0)
                                             PlaySoundSpatial(SFX_Stomp, Player[A].Location);
-                                        tempHit = B;
-                                        tempLocation.Y = NPC[B].Location.Y - Player[A].Location.Height;
+                                        bounceNpc = B;
+                                        bouncePlrY = NPC[B].Location.Y - Player[A].Location.Height;
                                     }
                                     else if(NPC[B].Special != 4)
                                     {
@@ -575,12 +580,12 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     if(NPC[B]->IsAShell && NPC[B].Location.SpeedX == 0 && NPC[B].Location.SpeedY == 0)
                                         tempShell = true;
 
-                                    tempHit = B;
-                                    tempLocation.Y = NPC[B].Location.Y - Player[A].Location.Height;
+                                    bounceNpc = B;
+                                    bouncePlrY = NPC[B].Location.Y - Player[A].Location.Height;
 
                                     if(NPC[B].Type == NPCID_COIN_SWITCH || NPC[B].Type == NPCID_TIME_SWITCH || NPC[B].Type == NPCID_TNT)
                                     {
-                                        tempHit = 0;
+                                        bounceNpc = 0;
                                         Player[A].Jump = false;
                                         Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
                                         Player[A].Location.SpeedY = -Physics.PlayerGravity;
@@ -680,21 +685,26 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         {
                                             if(NPC[B].Type != NPCID_FLIPPED_RAINBOW_SHELL)
                                             {
-                                                tempLocation.Y = Player[A].Location.Y;
-                                                tempHit = B;
+                                                bouncePlrY = Player[A].Location.Y;
+                                                bounceNpc = B;
                                                 NPCHit(B, 8, A);
                                             }
                                         }
                                         else
                                         {
+                                            Location_t tempLocation;
                                             tempLocation.Height = 0;
                                             tempLocation.Width = 0;
                                             tempLocation.Y = (Player[A].Location.Y + NPC[B].Location.Y * 4) / 5;
                                             tempLocation.X = (Player[A].Location.X + NPC[B].Location.X * 4) / 5;
                                             NewEffect(EFFID_STOMP_INIT, tempLocation);
+
                                             NPC[B].CantHurt = 0;
                                             NPC[B].CantHurtPlayer = 0;
                                             NPCHit(B, 1, A);
+
+                                            // this is a bug that came from re-using tempLocation.Y in the original code
+                                            bouncePlrY = tempLocation.Y;
                                         }
                                     }
                                 }
@@ -779,7 +789,12 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     {
                                         if(NPC[B].Type == NPCID_ICE_CUBE && Player[A].Character != 5 && Player[A].State > 1)
                                             NPCHit(B, 3, B);
-                                        tempLocation = Player[A].Location;
+
+                                        Location_t tempLocation = Player[A].Location;
+
+                                        // this is a bug that came from re-using tempLocation.Y in the original code
+                                        bouncePlrY = tempLocation.Y;
+
                                         Player[A].Location.SpeedY = 0.1_n + NPC[B].Location.SpeedY;
                                         Player[A].Location.Y = NPC[B].Location.Y + NPC[B].Location.Height + 0.1_n;
 
@@ -812,9 +827,9 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     // player gets pushed left/right by NPC
                                     else
                                     {
-                                        tempHit2 = true;
+                                        hitWall = true;
                                         // this variable was previously a numf_t
-                                        tempHitSpeed = (num_t)(tempf_t)(NPC[B].Location.SpeedX + (num_t)NPC[B].BeltSpeed);
+                                        wallNpcSpeed = (num_t)(tempf_t)(NPC[B].Location.SpeedX + (num_t)NPC[B].BeltSpeed);
 
                                         // reset player speed if not on conveyor belt
                                         bool tempBool = false;
@@ -830,7 +845,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                             if((Player[A].Location.SpeedX > 0) == (Player[A].Direction > 0))
                                                 Player[A].Location.SpeedX = -Player[A].Location.SpeedX;
                                             if(Player[A].State != PLR_STATE_POLAR)
-                                                tempHit2 = false;
+                                                hitWall = false;
                                         }
                                         else if(!tempBool && NPC[B].Type != NPCID_CHASER)
                                             Player[A].Location.SpeedX = 0.2_n * Player[A].Direction;
@@ -936,12 +951,12 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
     }
 
     // if the player collided on the left or right of some npcs then stop his movement
-    if(tempHit2)
+    if(hitWall)
     {
-        if(Player[A].Location.SpeedX + NPC[Player[A].StandingOnNPC].Location.SpeedX + tempHitSpeed > 0 && Player[A].Controls.Right)
-            Player[A].Location.SpeedX = 0.2_n * Player[A].Direction + tempHitSpeed;
-        else if(Player[A].Location.SpeedX + NPC[Player[A].StandingOnNPC].Location.SpeedX + tempHitSpeed < 0 && Player[A].Controls.Left)
-            Player[A].Location.SpeedX = 0.2_n * Player[A].Direction + tempHitSpeed;
+        if(Player[A].Location.SpeedX + NPC[Player[A].StandingOnNPC].Location.SpeedX + wallNpcSpeed > 0 && Player[A].Controls.Right)
+            Player[A].Location.SpeedX = 0.2_n * Player[A].Direction + wallNpcSpeed;
+        else if(Player[A].Location.SpeedX + NPC[Player[A].StandingOnNPC].Location.SpeedX + wallNpcSpeed < 0 && Player[A].Controls.Left)
+            Player[A].Location.SpeedX = 0.2_n * Player[A].Direction + wallNpcSpeed;
         else
         {
             if(Player[A].Controls.Right || Player[A].Controls.Left)
@@ -951,18 +966,18 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
         }
     }
 
-    if(tempHit && Player[A].CurMazeZone)
+    if(bounceNpc && Player[A].CurMazeZone)
     {
-        if(NPC[tempHit].Effect == NPCEFF_MAZE && NPC[tempHit].Effect3 != MAZE_DIR_DOWN)
-            NPC[tempHit].TurnAround = true;
+        if(NPC[bounceNpc].Effect == NPCEFF_MAZE && NPC[bounceNpc].Effect3 != MAZE_DIR_DOWN)
+            NPC[bounceNpc].TurnAround = true;
 
-        Player[A].Location.Y = tempLocation.Y;
+        Player[A].Location.Y = bouncePlrY;
         Player[A].Location.SpeedY += Physics.PlayerJumpVelocity / 2;
 
         if(Player[A].MazeZoneStatus == MAZE_DIR_DOWN)
             Player[A].MazeZoneStatus |= MAZE_PLAYER_FLIP;
     }
-    else if(tempHit) // For multiple NPC hits
+    else if(bounceNpc) // For multiple NPC hits
     {
         // enable another double-jump when Char4 bounces on an NPC
         if(Player[A].Character == 4 && (Player[A].State == 4 || Player[A].State == 5) && !Player[A].SpinJump)
@@ -990,8 +1005,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
         if(Player[A].Wet > 0)
             Player[A].Location.SpeedY *= 0.3_r;
 
-        // this is very likely but not certain to be the y value stored when tempHit was set
-        Player[A].Location.Y = tempLocation.Y;
+        // this is very likely but not certain to be the y value stored when bounceNpc was set
+        Player[A].Location.Y = bouncePlrY;
 
         if(tempShell)
             NewEffect(EFFID_STOMP_INIT, newLoc(Player[A].Location.X + Player[A].Location.Width / 2 - EffectWidth[EFFID_STOMP_INIT] * 0.5_n, Player[A].Location.Y + Player[A].Location.Height - EffectHeight[EFFID_STOMP_INIT] * 0.5_n));
