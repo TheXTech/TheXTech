@@ -34,6 +34,7 @@ void s_playerSlopeMomentum(int A);
 void PlayerMovementX(int A, tempf_t& cursed_value_C)
 {
     bool is_grounded = (Player[A].Location.SpeedY == 0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0);
+    bool aquatic_jumps = (Player[A].State == PLR_STATE_AQUATIC && Player[A].Character != 5 && !Player[A].Mount && !Player[A].HoldingNPC && (is_grounded || (Player[A].Duck && !Player[A].Jump)));
 
     // Modify player's speed if he is running up/down hill
     tempf_t speedVar = 1; // Speed var is a percentage of the player's speed
@@ -56,6 +57,9 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
 
     if(Player[A].Character == 4)
         speedVar = (tempf_t)((num_t)speedVar * 1.07_r);
+
+    if(Player[A].State == PLR_STATE_AQUATIC)
+        speedVar = (tempf_t)((num_t)speedVar * 0.87_r);
 
     // modify speedvar to slow the player down under water
     if(Player[A].Wet > 0)
@@ -219,6 +223,7 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
     // deduplicated (was previously separate sections for holding Left and Right)
     if((Player[A].Controls.Left || Player[A].Controls.Right) &&
        !Player[A].JumpOffWall &&
+       !aquatic_jumps &&
        ((!Player[A].Duck && Player[A].GrabTime == 0) ||
         !is_grounded ||
         Player[A].Mount == 1)
@@ -281,18 +286,23 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
     {
         if(is_grounded || Player[A].WetFrame) // Only lose speed when not in the air
         {
+            // direct slowdown -- add extra friction during aquatic jumps
+            auto slowdown = (num_t)speedVar * ((aquatic_jumps) ? 0.14_r : 0.07_r);
             if(Player[A].Location.SpeedX > 0)
-                Player[A].Location.SpeedX -= (num_t)speedVar * 0.07_r;
+                Player[A].Location.SpeedX -= slowdown;
             if(Player[A].Location.SpeedX < 0)
-                Player[A].Location.SpeedX += (num_t)speedVar * 0.07_r;
+                Player[A].Location.SpeedX += slowdown;
+
+            // ratio-based slowdown
             if(Player[A].Character == 2) // LUIGI
-                Player[A].Location.SpeedX = Player[A].Location.SpeedX * 1.003_r;
-            if(Player[A].Character == 3) // PEACH
-                Player[A].Location.SpeedX = Player[A].Location.SpeedX * 1.0015_r;
-            if(Player[A].Character == 4) // toad
-                Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.9985_r;
-            if(SuperSpeed)
-                Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.95_r;
+                Player[A].Location.SpeedX *= 1.003_r;
+            else if(Player[A].Character == 3) // PEACH
+                Player[A].Location.SpeedX *= 1.0015_r;
+            else if(Player[A].Character == 4) // toad
+                Player[A].Location.SpeedX *= 0.9985_r;
+
+            if(SuperSpeed || (aquatic_jumps && Player[A].Controls.Run))
+                Player[A].Location.SpeedX *= 0.95_r;
         }
 
         if(Player[A].Location.SpeedX > -0.18_n && Player[A].Location.SpeedX < 0.18_n)
@@ -506,19 +516,42 @@ void PlayerCockpitMovementX(int A)
 
 void PlayerMovementY(int A)
 {
-    if(Player[A].Mount == 1) // this gives the player the bounce when in the kurbio's shoe
+    bool aquatic_jumps = (Player[A].State == PLR_STATE_AQUATIC && Player[A].Character != 5 && !Player[A].Mount && !Player[A].HoldingNPC);
+
+    // this gives the player the bounce when in the kurbio's shoe, or newly when in aquatic hopping state
+    if(Player[A].Mount == 1 || (aquatic_jumps && !Player[A].Duck && !Player[A].Slide))
     {
-        if(Player[A].Controls.Left || Player[A].Controls.Right)
+        num_t floor_speed = NPC[Player[A].StandingOnNPC].Location.SpeedX + (num_t)NPC[Player[A].StandingOnNPC].BeltSpeed;
+
+        if((Player[A].Controls.Left || Player[A].Controls.Right) && (!aquatic_jumps || Player[A].CanAltJump))
         {
             if(Player[A].Location.SpeedY == 0 || Player[A].Slope > 0 || (Player[A].StandingOnNPC != 0 && Player[A].Location.Y + Player[A].Location.Height >= NPC[Player[A].StandingOnNPC].Location.Y - NPC[Player[A].StandingOnNPC].Location.SpeedY))
             {
-                if(Player[A].Controls.Left && Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX - (num_t)NPC[Player[A].StandingOnNPC].BeltSpeed <= 0)
+                num_t rel_speed = Player[A].Location.SpeedX - floor_speed;
+                if(aquatic_jumps && !SuperSpeed && num_t::abs(rel_speed) > 0.18_n)
+                {
+                    // wait for player to get some friction
+                }
+                else if((Player[A].Controls.Left && rel_speed <= 0) || (Player[A].Controls.Right && rel_speed >= 0))
+                {
                     Player[A].Location.SpeedY = -4.1_n + NPC[Player[A].StandingOnNPC].Location.SpeedY;
-                else if(Player[A].Controls.Right && Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX - (num_t)NPC[Player[A].StandingOnNPC].BeltSpeed >= 0)
-                    Player[A].Location.SpeedY = -4.1_n + NPC[Player[A].StandingOnNPC].Location.SpeedY;
+
+                    if(aquatic_jumps)
+                    {
+                        Player[A].StandingOnNPC = 0;
+                        Player[A].Direction = (Player[A].Controls.Left) ? -1 : 1;
+                        Player[A].Location.SpeedX = Player[A].Direction * ((Player[A].Controls.Run) ? 3 : 1.5_n) + floor_speed;
+
+                        if(SuperSpeed)
+                            Player[A].Location.SpeedX *= 2;
+                    }
+                }
                 else
                     PlaySoundSpatial(SFX_Skid, Player[A].Location);
-                Player[A].MountSpecial = 1;
+
+                // allow jump during hop
+                if(!aquatic_jumps || (Player[A].CanJump && Player[A].CanAltJump))
+                    Player[A].MountSpecial = 1;
             }
         }
 
@@ -530,9 +563,15 @@ void PlayerMovementY(int A)
         if(Player[A].Controls.Jump && Player[A].MountSpecial == 1 && Player[A].CanJump)
         {
             Player[A].Location.SpeedY = 0;
-            Player[A].StandUp = true;
+
+            if(!aquatic_jumps)
+                Player[A].StandUp = true;
+            else
+                Player[A].MountSpecial = 0;
         }
     }
+    else if(Player[A].State == PLR_STATE_AQUATIC && !Player[A].Mount)
+        Player[A].MountSpecial = 0;
 
     if(Player[A].Mount == 1)
     {
@@ -555,7 +594,7 @@ void PlayerMovementY(int A)
 
     // handles the regular jump
     if(Player[A].Controls.Jump || (Player[A].Controls.AltJump &&
-       ((Player[A].Character > 2 && Player[A].Character != 4) || Player[A].Quicksand > 0 || Player[A].Rolling || g_config.disable_spin_jump) &&
+       ((Player[A].Character > 2 && Player[A].Character != 4) || Player[A].Quicksand > 0 || Player[A].Rolling || aquatic_jumps || g_config.disable_spin_jump) &&
        Player[A].CanAltJump))
     {
         num_t tempSpeed;
@@ -596,6 +635,16 @@ void PlayerMovementY(int A)
 
                 if(Player[A].SpinJump)
                     Player[A].Jump -= 6;
+
+                if(aquatic_jumps)
+                {
+                    Player[A].Jump += 10;
+                    Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
+                    Player[A].Location.SpeedX /= 4;
+                    Player[A].MountSpecial = 0;
+                }
+                else if(Player[A].State == PLR_STATE_AQUATIC)
+                    Player[A].Jump += 4;
 
                 if(Player[A].StandingOnNPC > 0 && !FreezeNPCs)
                 {
@@ -672,7 +721,9 @@ void PlayerMovementY(int A)
                 }
             }
         }
-        Player[A].CanJump = false;
+
+        if(!(aquatic_jumps && Player[A].MountSpecial))
+            Player[A].CanJump = false;
     }
     else
         Player[A].CanJump = true;
@@ -795,7 +846,7 @@ void PlayerMovementY(int A)
 
         if((Player[A].Vine > 0 || Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0 || MultiHop) && Player[A].CanAltJump) // Player Jumped
         {
-            if(!Player[A].Duck)
+            if(!Player[A].Duck && !aquatic_jumps)
             {
                 Player[A].Slope = 0;
                 Player[A].SpinFireDir = Player[A].Direction;
@@ -851,7 +902,7 @@ void PlayerMovementY(int A)
                 }
             }
         }
-        else if(has_wall_traction && Player[A].CanAltJump)
+        else if(has_wall_traction && Player[A].CanAltJump && !Player[A].JumpOffWall)
         {
             NewEffect(EFFID_WHACK, newLoc(Player[A].Location.X + Player[A].Location.Width / 2 - 16, Player[A].Location.Y + Player[A].Location.Height - 16));
             PlaySoundSpatial(SFX_Whip, Player[A].Location); // Jump sound
@@ -879,8 +930,9 @@ void PlayerMovementY(int A)
             }
         }
         // End If
-        Player[A].CanAltJump = false;
 
+        if(!(aquatic_jumps && Player[A].MountSpecial))
+            Player[A].CanAltJump = false;
     }
     else
         Player[A].CanAltJump = true;
@@ -895,7 +947,7 @@ void PlayerMovementY(int A)
         Player[A].TailCount = 0;
     }
 
-    if(Player[A].Mount > 0)
+    if(Player[A].Mount > 0 || aquatic_jumps)
         Player[A].SpinJump = false;
 
     if(!Player[A].Controls.AltJump && !Player[A].Controls.Jump)
@@ -969,7 +1021,7 @@ void PlayerMovementY(int A)
     }
 
     // princess float
-    if(Player[A].Character == 3 && Player[A].Wet == 0 && !Player[A].WetFrame)
+    if(Player[A].Character == 3 && Player[A].Wet == 0 && !Player[A].WetFrame && (!aquatic_jumps || !Player[A].MountSpecial))
     {
         if(Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC > 0 || Player[A].Slope > 0 || Player[A].CanFly2)
             Player[A].CanFloat = true;

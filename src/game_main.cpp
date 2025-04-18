@@ -1867,6 +1867,10 @@ void UpdateMacro()
                 c.Start = false;
                 c.AltJump = false;
                 c.AltRun = false;
+
+                if(p.State == PLR_STATE_AQUATIC && !p.Mount && !p.HoldingNPC)
+                    c.Run = true;
+
                 if(p.Wet > 0 && p.CanJump)
                 {
                     if(p.Location.SpeedY > 1)
@@ -2107,6 +2111,9 @@ void UpdateMacro()
                 c.Start = false;
                 c.AltJump = false;
                 c.AltRun = false;
+
+                if(p.State == PLR_STATE_AQUATIC && !p.Mount && !p.HoldingNPC)
+                    c.Run = true;
             }
             else
             {

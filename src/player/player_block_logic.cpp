@@ -1000,6 +1000,10 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
         if(Player[A].Mount == 2)
             Player[A].Location.SpeedX = 0;
+
+        // disable mid-hop jumps (fixes a clipping bug)
+        if(Player[A].State == PLR_STATE_AQUATIC && !Player[A].Mount && Player[A].MountSpecial)
+            Player[A].MountSpecial = 2;
     }
 
     int ceilingBlock = 0; // was called B

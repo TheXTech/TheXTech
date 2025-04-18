@@ -978,6 +978,10 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
             else
                 Player[A].Location.SpeedX = 0;
         }
+
+        // disable mid-hop jumps (fixes a clipping bug)
+        if(Player[A].State == PLR_STATE_AQUATIC && !Player[A].Mount && Player[A].MountSpecial)
+            Player[A].MountSpecial = 2;
     }
 
     if(bounceNpc && Player[A].CurMazeZone)
@@ -1015,6 +1019,9 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
 
         if(Player[A].SpinJump)
             Player[A].Jump -= 6;
+
+        if(Player[A].State == PLR_STATE_AQUATIC)
+            Player[A].Jump += 3;
 
         if(Player[A].Wet > 0)
             Player[A].Location.SpeedY *= 0.3_r;

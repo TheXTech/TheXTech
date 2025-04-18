@@ -1967,6 +1967,10 @@ void PlayerFrame(Player_t &p)
             else
                 p.Direction = -1;
         }
+        else if(p.State == PLR_STATE_AQUATIC && !p.Mount && p.MountSpecial)
+        {
+            // in the middle of a hop, don't change direction
+        }
         else if(!(p.Mount == 3 && p.MountSpecial > 0))
         {
             if(p.Controls.Left)
@@ -2349,7 +2353,12 @@ void PlayerFrame(Player_t &p)
                 {
                     if(grounded || (p.Quicksand > 0 && p.Location.SpeedY > 0))
                     {
-                        if(p.Location.SpeedX > 0 && (p.Controls.Left || (p.Direction == -1 && p.Bumped)) &&
+                        if(p.State == PLR_STATE_AQUATIC && !p.Bumped)
+                        {
+                            p.Frame = 1;
+                            p.FrameCount = 0;
+                        }
+                        else if(p.Location.SpeedX > 0 && (p.Controls.Left || (p.Direction == -1 && p.Bumped)) &&
                            p.Effect == PLREFF_NORMAL && !p.Duck && p.Quicksand == 0)
                         {
                             if(!LevelSelect)
@@ -2377,7 +2386,7 @@ void PlayerFrame(Player_t &p)
                         }
                         else
                         {
-                            if(p.Location.SpeedX != 0 && !(p.Slippy && !p.Controls.Left && !p.Controls.Right && p.State != PLR_STATE_POLAR))
+                            if(p.Location.SpeedX != 0 && !(p.Slippy && !p.Controls.Left && !p.Controls.Right && p.State != PLR_STATE_POLAR) && p.State != PLR_STATE_AQUATIC)
                             {
                                 p.FrameCount += 1;
 
@@ -2543,6 +2552,9 @@ void PlayerFrame(Player_t &p)
                 p.MountFrame = 0 + SpecialFrame[1];
 
             p.Frame = 1;
+
+            if(p.State == PLR_STATE_AQUATIC)
+                p.Frame = 8;
         }
         else if(p.Mount == 2) // Koopa Clown Car
         {
@@ -4670,6 +4682,9 @@ void WaterCheck(const int A)
         {
             p.Jump = 12;
             p.Location.SpeedY = Physics.PlayerJumpVelocity;
+
+            if(p.State == PLR_STATE_AQUATIC && p.AquaticSwim)
+                p.Jump += 8;
         }
     }
     else if(p.Wet == 2 && p.Quicksand == 0)

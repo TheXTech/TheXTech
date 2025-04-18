@@ -248,7 +248,7 @@ bool UpdatePlayer()
                         Player[A].FrameCount = 0;
 
                         // face up!
-                        if(Player[A].Location.SpeedY < 0 && !Player[A].Immune)
+                        if(Player[A].Location.SpeedY < 0 && !Player[A].Immune && Player[A].State == PLR_STATE_POLAR)
                             Player[A].Frame = 42;
                         else
                             Player[A].Frame = 18;

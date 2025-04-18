@@ -1787,9 +1787,9 @@ void SetupPlayerFrames()
     ToadFrameY[500] = -6;
 
     int base = 150;
-    int offset_x = 0;
-    int offset_y = 0;
-    int char1_offset_y = 0;
+    int offset_x = -8;
+    int offset_y = -2;
+    int char1_offset_y = -8;
     for(int A = 750; A <= 1150; A++) // this just fills 750 and above with frames matching big power
     {
         // special case: cyclone power has big sprites
@@ -1874,6 +1874,27 @@ void SetupPlayerFrames()
         LinkFrameY[1100 + D * 14] = -12;
         LinkFrameY[1100 + D * 15] = -12;
 
+        // aquatic frame corrections
+        MarioFrameY[800 + D * 4] += 6;
+        MarioFrameY[800 + D * 5] += 6;
+        MarioFrameY[800 + D * 7] -= 2;
+        MarioFrameY[800 + D * 23] += 6;
+
+        LuigiFrameY[800 + D * 4] += 8;
+        LuigiFrameY[800 + D * 5] += 8;
+        LuigiFrameY[800 + D * 7] -= 8;
+        LuigiFrameY[800 + D * 23] += 2;
+
+        PeachFrameY[800 + D * 5] += 4;
+        PeachFrameY[800 + D * 7] -= 14;
+        PeachFrameY[800 + D * 27] -= 14;
+
+        ToadFrameY[800 + D * 7] -= 12;
+        ToadFrameY[800 + D * 8] -= 4;
+        ToadFrameY[800 + D * 9] -= 4;
+        ToadFrameY[800 + D * 10] -= 4;
+        ToadFrameY[800 + D * 27] -= 12;
+
         // polar frame corrections
         MarioFrameY[900 + D * 23] += 4;
         LuigiFrameY[900 + D * 23] += 4;
@@ -1883,26 +1904,29 @@ void SetupPlayerFrames()
         PeachFrameX[900 + D * 14] = ToadFrameX[900 + D * 14] = LuigiFrameX[900 + D * 14] = MarioFrameX[900 + D * 14] = -12 - 8 * D;
         PeachFrameY[900 + D * 14] = ToadFrameY[900 + D * 14] = LuigiFrameY[900 + D * 14] = MarioFrameY[900 + D * 14] = -10;
 
-        // polar swim
-        PeachFrameX[900 + D * 16] = ToadFrameX[900 + D * 16] = LuigiFrameX[900 + D * 16] = MarioFrameX[900 + D * 16] = -12 - 8 * D;
-        PeachFrameX[900 + D * 17] = ToadFrameX[900 + D * 17] = LuigiFrameX[900 + D * 17] = MarioFrameX[900 + D * 17] = -12 - 8 * D;
-        PeachFrameX[900 + D * 18] = ToadFrameX[900 + D * 18] = LuigiFrameX[900 + D * 18] = MarioFrameX[900 + D * 18] = -12 - 8 * D;
-        PeachFrameY[900 + D * 16] = ToadFrameY[900 + D * 16] = LuigiFrameY[900 + D * 16] = MarioFrameY[900 + D * 16] = -10;
-        PeachFrameY[900 + D * 17] = ToadFrameY[900 + D * 17] = LuigiFrameY[900 + D * 17] = MarioFrameY[900 + D * 17] = -10;
-        PeachFrameY[900 + D * 18] = ToadFrameY[900 + D * 18] = LuigiFrameY[900 + D * 18] = MarioFrameY[900 + D * 18] = -10;
+        // aquatic swim
+        for(int C = 800; C <= 900; C += 100)
+        {
+            PeachFrameX[C + D * 16] = ToadFrameX[C + D * 16] = LuigiFrameX[C + D * 16] = MarioFrameX[C + D * 16] = -12 - 8 * D;
+            PeachFrameX[C + D * 17] = ToadFrameX[C + D * 17] = LuigiFrameX[C + D * 17] = MarioFrameX[C + D * 17] = -12 - 8 * D;
+            PeachFrameX[C + D * 18] = ToadFrameX[C + D * 18] = LuigiFrameX[C + D * 18] = MarioFrameX[C + D * 18] = -12 - 8 * D;
+            PeachFrameY[C + D * 16] = ToadFrameY[C + D * 16] = LuigiFrameY[C + D * 16] = MarioFrameY[C + D * 16] = -10;
+            PeachFrameY[C + D * 17] = ToadFrameY[C + D * 17] = LuigiFrameY[C + D * 17] = MarioFrameY[C + D * 17] = -10;
+            PeachFrameY[C + D * 18] = ToadFrameY[C + D * 18] = LuigiFrameY[C + D * 18] = MarioFrameY[C + D * 18] = -10;
 
-        PeachFrameX[900 + D * 19] = ToadFrameX[900 + D * 19] = LuigiFrameX[900 + D * 19] = MarioFrameX[900 + D * 19] = -4;
-        PeachFrameX[900 + D * 20] = ToadFrameX[900 + D * 20] = LuigiFrameX[900 + D * 20] = MarioFrameX[900 + D * 20] = -4;
-        PeachFrameX[900 + D * 21] = ToadFrameX[900 + D * 21] = LuigiFrameX[900 + D * 21] = MarioFrameX[900 + D * 21] = -4;
-        PeachFrameY[900 + D * 19] = ToadFrameY[900 + D * 19] = LuigiFrameY[900 + D * 19] = MarioFrameY[900 + D * 19] = -24;
-        PeachFrameY[900 + D * 20] = ToadFrameY[900 + D * 20] = LuigiFrameY[900 + D * 20] = MarioFrameY[900 + D * 20] = -24;
-        PeachFrameY[900 + D * 21] = ToadFrameY[900 + D * 21] = LuigiFrameY[900 + D * 21] = MarioFrameY[900 + D * 21] = -24;
+            PeachFrameX[C + D * 19] = ToadFrameX[C + D * 19] = LuigiFrameX[C + D * 19] = MarioFrameX[C + D * 19] = -4;
+            PeachFrameX[C + D * 20] = ToadFrameX[C + D * 20] = LuigiFrameX[C + D * 20] = MarioFrameX[C + D * 20] = -4;
+            PeachFrameX[C + D * 21] = ToadFrameX[C + D * 21] = LuigiFrameX[C + D * 21] = MarioFrameX[C + D * 21] = -4;
+            PeachFrameY[C + D * 19] = ToadFrameY[C + D * 19] = LuigiFrameY[C + D * 19] = MarioFrameY[C + D * 19] = -24;
+            PeachFrameY[C + D * 20] = ToadFrameY[C + D * 20] = LuigiFrameY[C + D * 20] = MarioFrameY[C + D * 20] = -24;
+            PeachFrameY[C + D * 21] = ToadFrameY[C + D * 21] = LuigiFrameY[C + D * 21] = MarioFrameY[C + D * 21] = -24;
 
-        PeachFrameX[900 + D * 40] = ToadFrameX[900 + D * 40] = LuigiFrameX[900 + D * 40] = MarioFrameX[900 + D * 40] = -4;
-        PeachFrameX[900 + D * 41] = ToadFrameX[900 + D * 41] = LuigiFrameX[900 + D * 41] = MarioFrameX[900 + D * 41] = -4;
-        PeachFrameX[900 + D * 42] = ToadFrameX[900 + D * 42] = LuigiFrameX[900 + D * 42] = MarioFrameX[900 + D * 42] = -4;
-        PeachFrameY[900 + D * 40] = ToadFrameY[900 + D * 40] = LuigiFrameY[900 + D * 40] = MarioFrameY[900 + D * 40] = -8;
-        PeachFrameY[900 + D * 41] = ToadFrameY[900 + D * 41] = LuigiFrameY[900 + D * 41] = MarioFrameY[900 + D * 41] = -8;
-        PeachFrameY[900 + D * 42] = ToadFrameY[900 + D * 42] = LuigiFrameY[900 + D * 42] = MarioFrameY[900 + D * 42] = -8;
+            PeachFrameX[C + D * 40] = ToadFrameX[C + D * 40] = LuigiFrameX[C + D * 40] = MarioFrameX[C + D * 40] = -4;
+            PeachFrameX[C + D * 41] = ToadFrameX[C + D * 41] = LuigiFrameX[C + D * 41] = MarioFrameX[C + D * 41] = -4;
+            PeachFrameX[C + D * 42] = ToadFrameX[C + D * 42] = LuigiFrameX[C + D * 42] = MarioFrameX[C + D * 42] = -4;
+            PeachFrameY[C + D * 40] = ToadFrameY[C + D * 40] = LuigiFrameY[C + D * 40] = MarioFrameY[C + D * 40] = -8;
+            PeachFrameY[C + D * 41] = ToadFrameY[C + D * 41] = LuigiFrameY[C + D * 41] = MarioFrameY[C + D * 41] = -8;
+            PeachFrameY[C + D * 42] = ToadFrameY[C + D * 42] = LuigiFrameY[C + D * 42] = MarioFrameY[C + D * 42] = -8;
+        }
     }
 }
