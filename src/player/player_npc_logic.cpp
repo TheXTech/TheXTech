@@ -737,7 +737,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 // don't hurt own thrown items
                                 else if(NPC[B].CantHurtPlayer == A) {}
                                 // don't hurt NPC of friendly type
-                                else if(NPC[B]->WontHurt) {}
+                                else if(NPC[B]->WontHurt && !(Player[A].Rolling && NPC[B].Type == NPCID_BOSS_CASE)) {}
                                 // also cancel hurt for player-shot bullet
                                 else if(NPC[B].Type == NPCID_BULLET && NPC[B].Projectile != 0) {}
                                 // special routine for hit turtles that haven't stood up yet
@@ -750,8 +750,12 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 {
                                     if(InvincibilityTime || (Player[A].SlideKill && !NPC[B]->JumpHurt) || (Player[A].Rolling && Player[A].State == PLR_STATE_SHELL))
                                     {
+                                        if(Player[A].Rolling && (NPC[B].Type == NPCID_FIRE_BOSS_SHELL || NPC[B].Type == NPCID_MAGIC_BOSS_SHELL || NPC[B].Type == NPCID_HEAVY_THROWN || NPC[B].Type == NPCID_HOMING_BALL))
+                                        {
+                                            // be vulnerable to these NPCs while rolling
+                                        }
                                         // DO cause damage to VILLAIN_S3 even though it's meant to be immune to this kind of damage.
-                                        if(InvincibilityTime && NPC[B].Type == NPCID_VILLAIN_S3)
+                                        else if(InvincibilityTime && NPC[B].Type == NPCID_VILLAIN_S3)
                                         {
                                             // But use fireball -- this will take ~6 rounds of invincibility power to kill the boss
                                             NPC[numNPCs + 1].Type = NPCID_PLR_FIREBALL;
@@ -763,7 +767,9 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
 
                                     if(NPC[B].Killed == 0)
                                     {
-                                        if(n00bCollision(Player[A].Location, NPC[B].Location))
+                                        // don't hurt player by just-hurt boss
+                                        if(Player[A].Rolling && (NPC[B].Immune != 0 || (NPC[B].Type == NPCID_SPIT_BOSS && NPC[B].Special < 0))) {}
+                                        else if(n00bCollision(Player[A].Location, NPC[B].Location))
                                         {
                                             if(BattleMode && NPC[B].HoldingPlayer != A && NPC[B].HoldingPlayer > 0 && Player[A].Immune == 0)
                                                 NPCHit(B, 5, B);
