@@ -54,7 +54,7 @@ jobs:
         # Was made in 2009 by Andrew Spinks "Redigit", and supported up to 2011 by it's original author.
         - {
             name: "Super Mario Bros. X",
-            os: ubuntu-20.04,
+            os: ubuntu-24.04,
 
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=smbx \
             -DTHEXTECH_GAME_NAME_TITLE=\"Super Mario Bros. X - Web Edition\" \
