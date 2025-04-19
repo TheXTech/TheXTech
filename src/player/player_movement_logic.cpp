@@ -61,6 +61,9 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
     if(Player[A].State == PLR_STATE_AQUATIC)
         speedVar = (tempf_t)((num_t)speedVar * 0.87_r);
 
+    if(Player[A].State == PLR_STATE_POLAR && Player[A].Slippy)
+        speedVar += (tempf_t)0.05_n;
+
     // modify speedvar to slow the player down under water
     if(Player[A].Wet > 0)
     {
