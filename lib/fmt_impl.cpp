@@ -83,9 +83,9 @@ std::string sprintf_ne(const char *fstr, ...)
 
     if(len > (int)ret.size())
     {
-        ret.resize(len + 1);
+        ret.resize(len);
         va_start(arg, fstr);
-        SDL_vsnprintf(&ret[0], ret.size(), fstr, arg);
+        SDL_vsnprintf(&ret[0], ret.size() + 1, fstr, arg);
         va_end(arg);
     }
     else
