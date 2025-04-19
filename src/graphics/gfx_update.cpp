@@ -2389,7 +2389,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                                 ? 0
                                 : (p.State == 1)
                                   ?  6
-                                  : -4;
+                                  : (g_config.fix_visual_bugs ? 0 : -4);
 
                             IntegerLocation_t drawLoc;
 
