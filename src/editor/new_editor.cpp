@@ -149,6 +149,11 @@ void DisableCursorNew()
     e_CursorY = -50;
 }
 
+static numf_t s_divide_by_ten(int n)
+{
+    return numf_t(n) / 10;
+}
+
 static void s_fix_mouse_pos()
 {
     MouseMove((int)SharedCursor.X, (int)SharedCursor.Y);
@@ -1536,16 +1541,16 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         layer_line --;
 
         if(UpdateButton(mode, e_ScreenW - 160 + 4, 40 + (20 * layer_line) + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
-            Events[m_current_event].SpeedY = 0.1_nf * (sy+1);
+            Events[m_current_event].SpeedY = s_divide_by_ten(sy + 1);
 
         if(UpdateButton(mode, e_ScreenW - 120 + 4, 40 + (20 * layer_line) + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
-            Events[m_current_event].SpeedY = 0.1_nf * (sy-1);
+            Events[m_current_event].SpeedY = s_divide_by_ten(sy - 1);
 
         if(UpdateButton(mode, e_ScreenW - 80 + 4, 40 + (20 * layer_line) + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
-            Events[m_current_event].SpeedX = 0.1_nf * (sx-1);
+            Events[m_current_event].SpeedX = s_divide_by_ten(sx - 1);
 
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 40 + (20 * layer_line) + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
-            Events[m_current_event].SpeedX = 0.1_nf * (sx+1);
+            Events[m_current_event].SpeedX = s_divide_by_ten(sx + 1);
 
         layer_line ++;
     }
@@ -1977,25 +1982,25 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
 
         if(UpdateButton(mode, 240 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
         {
-            Events[0].AutoY = 0.1_nf * (sy-1);
+            Events[0].AutoY = s_divide_by_ten(sy - 1);
             UpdateStartLevelEventBounds();
         }
 
         if(UpdateButton(mode, 280 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
         {
-            Events[0].AutoY = 0.1_nf * (sy+1);
+            Events[0].AutoY = s_divide_by_ten(sy + 1);
             UpdateStartLevelEventBounds();
         }
 
         if(UpdateButton(mode, 320 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         {
-            Events[0].AutoX = 0.1_nf * (sx-1);
+            Events[0].AutoX = s_divide_by_ten(sx - 1);
             UpdateStartLevelEventBounds();
         }
 
         if(UpdateButton(mode, 360 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         {
-            Events[0].AutoX = 0.1_nf * (sx+1);
+            Events[0].AutoX = s_divide_by_ten(sx + 1);
             UpdateStartLevelEventBounds();
         }
     }
