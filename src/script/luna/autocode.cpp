@@ -19,7 +19,6 @@
  */
 
 #include <list>
-#include <sstream>
 #include <unordered_map>
 
 #include <Logger/logger.h>
@@ -1478,13 +1477,9 @@ void Autocode::HeartSystem() const
         else if(sheath->Hearts == 0)
             gAutoMan.m_Hearts = 0;
 
-        std::stringstream gAutoMan_m_Hearts;
-        gAutoMan_m_Hearts << (long long)gAutoMan.m_Hearts;
         // Display life stuff on screen
-        Renderer::Get().AddOp(new RenderStringOp(std::string(
-                                  std::string("HP: ") + std::string(gAutoMan_m_Hearts.str())
-                              )
-                              , 3, s_round2int(Target), s_round2int(Param1)));
+        Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("HP: {}", gAutoMan.m_Hearts),
+                                                 3, s_round2int(Target), s_round2int(Param1)));
     }//if heartuser
 }
 
