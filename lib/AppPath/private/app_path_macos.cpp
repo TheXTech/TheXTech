@@ -19,7 +19,7 @@
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreServices/CoreServices.h>
-#include <PGE_File_Formats/pge_file_lib_private.h> // For URL-Decode.
+#include <PGE_File_Formats/pge_file_lib_globs.h> // For URL-Decode.
 
 #include <SDL2/SDL_stdinc.h>
 
