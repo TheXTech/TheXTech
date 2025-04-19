@@ -32,6 +32,19 @@ public:
 
     void Draw(Renderer *renderer) override;
 
+    inline void* operator new(size_t size)
+    {
+        // Note: If you creating any chunks with a size bigger than current size, please increase it
+        SDL_assert_release(size < c_rAllocChunkSize);
+        auto *ret = g_rAlloc.Allocate(c_rAllocChunkSize);
+        return ret;
+    }
+
+    inline void operator delete(void* memory)
+    {
+        g_rAlloc.Free(memory);
+    }
+
     double x1;
     double y1;
     double x2;

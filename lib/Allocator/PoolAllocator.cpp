@@ -77,11 +77,28 @@ void* PoolAllocator::Allocate(const std::size_t allocationSize, const std::size_
 
 void PoolAllocator::Free(void* ptr)
 {
+    if(reinterpret_cast<uintptr_t>(ptr) == 0)
+        return;
+
     --m_count;
     m_used -= m_chunkSizeH;
 
     Node *n = reinterpret_cast<Node*>(reinterpret_cast<uintptr_t>(ptr) + m_chunkSize);
-    n->data = reinterpret_cast<uintptr_t>(ptr);
+    if(n->data != reinterpret_cast<uintptr_t>(ptr))
+    {
+        // Fatal error
+        XMsgBox::errorMsgBox("Fatal error",
+            fmt::sprintf_ne("Attempt to free wrong memory block at the pool allocator:\n"
+            "- Desired address: %0x08llX\n"
+            "- Reported in the node address: %0x08llX\n"
+            "\n"
+            "Game will be closed. Please check logs for details.",
+            reinterpret_cast<unsigned long long>(ptr),
+            n->data)
+        );
+        abort();
+    }
+
     n->next = nullptr;
 
     m_freeList.push(n);
