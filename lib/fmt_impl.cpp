@@ -67,7 +67,7 @@ std::string sprintf_ne(const char *fstr, ...)
         {
             ++b;
             if(*b == 's')
-                argLen += 1000; // Reserve ~1000 for every string
+                argLen += 128; // Reserve ~1000 for every string
             else if(*b == '%')
                 continue; // Not an arg!
             else
@@ -81,7 +81,15 @@ std::string sprintf_ne(const char *fstr, ...)
     len = SDL_vsnprintf(&ret[0], ret.size(), fstr, arg);
     va_end(arg);
 
-    ret.resize(len);
+    if(len > (int)ret.size())
+    {
+        ret.resize(len + 1);
+        va_start(arg, fstr);
+        SDL_vsnprintf(&ret[0], ret.size(), fstr, arg);
+        va_end(arg);
+    }
+    else
+        ret.resize(len);
 
     return ret;
 }
