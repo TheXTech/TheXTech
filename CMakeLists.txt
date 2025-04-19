@@ -678,7 +678,8 @@ if(NOT USE_SYSTEM_SDL2 AND NOT THEXTECH_NO_SDL_BUILD)
 endif()
 target_link_libraries(A2XT_Int INTERFACE mbediso)
 target_compile_definitions(A2XT_Int INTERFACE
-    -DPGE_USE_ARCHIVES  # DirMan should use the archives library
+    -DPGE_USE_ARCHIVES   # DirMan should use the archives library
+    -DPGE_FILES_PRESENT  # DirMan should use the Files checkSuffix routine
 )
 
 if(ANDROID)

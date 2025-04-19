@@ -2,42 +2,9 @@
 #include "strings.h"
 #include "dir_list_ci.h"
 
-#include <locale>
 #include <cstring>
 #include <algorithm>
 #include <utility>
-
-
-static bool matchSuffixFilters(const std::string &name, const std::vector<std::string> &suffixFilters)
-{
-    std::locale loc;
-
-    if(suffixFilters.empty())
-        return true;//If no filter, grand everything
-
-    for(const std::string &suffix : suffixFilters)
-    {
-        if(suffix.size() > name.size())
-            continue;
-
-        const char* name_compare = &name[name.size() - suffix.size()];
-
-        bool match = true;
-        for(size_t i = 0; i < suffix.size(); ++i)
-        {
-            if(std::tolower(name_compare[i], loc) != suffix[i])
-            {
-                match = false;
-                break;
-            }
-        }
-
-        if(match)
-            return true;
-    }
-
-    return false;
-}
 
 
 DirListCI::DirListCI(std::string curDir) noexcept
@@ -210,7 +177,7 @@ std::vector<std::string> DirListCI::getFilesList(const std::string& subDir,
 
     for(auto &f : m_fileMap)
     {
-        if(matchSuffixFilters(f.second, suffix_filters))
+        if(DirMan::matchSuffixFilters(f.second, suffix_filters))
             ret.push_back(f.second);
     }
 

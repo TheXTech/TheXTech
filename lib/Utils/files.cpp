@@ -26,7 +26,7 @@
 #include "Logger/logger.h"
 #include "Archives/archives.h"
 #include <stdio.h>
-#include <locale>
+#include <sdl_proxy/sdl_stdinc.h>
 #include <SDL2/SDL_rwops.h>
 
 #ifdef _WIN32
@@ -436,11 +436,7 @@ bool Files::hasSuffix(const std::string &path, const std::string &suffix)
     if(suffix.size() > path.size())
         return false;
 
-    std::locale loc;
-    std::string f = path.substr(path.size() - suffix.size(), suffix.size());
-    for(char &c : f)
-        c = std::tolower(c, loc);
-    return (f.compare(suffix) == 0);
+    return (SDL_strncasecmp(path.c_str() + path.size() - suffix.size(), suffix.c_str(), suffix.size()) == 0);
 }
 
 

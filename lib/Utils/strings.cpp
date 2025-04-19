@@ -27,7 +27,6 @@
 #include <string>
 #include <cstring>
 #include <cctype>
-#include <locale>
 
 
 bool Strings::startsWith(const std::string &str, char what)

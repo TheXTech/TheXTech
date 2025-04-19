@@ -27,6 +27,7 @@
 #include "sdl_proxy/sdl_stdinc.h"
 #include <Integrator/integrator.h>
 #include <fontman/font_manager.h>
+#include "Utils/files.h"
 
 #include "core/render.h"
 
@@ -4857,16 +4858,8 @@ void EditorScreen::ValidateExt(std::string& cur_file)
 
     for(const std::string& ext : m_target_exts)
     {
-        if(cur_file.size() >= ext.size())
-        {
-            std::string possible_ext;
-            possible_ext.reserve(ext.size());
-            for(const char &c : cur_file.substr(cur_file.size() - ext.size()))
-                possible_ext.push_back(std::tolower(c));
-
-            if(possible_ext.compare(0, ext.size(), ext) == 0)
-                return;
-        }
+        if(Files::hasSuffix(cur_file, ext))
+            return;
     }
 
     cur_file += m_target_exts[0];
