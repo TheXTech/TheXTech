@@ -9,9 +9,7 @@ void StackLinkedList<T>::push(Node* newNode)
 {
     newNode->next = head;
     head = newNode;
-    ++m_counter;
-    if(m_counter > m_maximum)
-        m_maximum = m_counter;
+    --m_counter;
 }
 
 template <class T>
@@ -23,7 +21,9 @@ typename StackLinkedList<T>::Node* StackLinkedList<T>::pop()
     Node* top = head;
     head = head->next;
 
-    --m_counter;
+    ++m_counter;
+    if(m_counter > m_maximum)
+        m_maximum = m_counter;
 
     return top;
 }
