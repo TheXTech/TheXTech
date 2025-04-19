@@ -644,6 +644,7 @@ target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
 set(LIB_SRC
     lib/util.cpp
     lib/fader.cpp
+    lib/fmt_impl.cpp
     lib/Graphics/image_size.cpp
     lib/Graphics/size.cpp
     ${APPPATH_SRCS}

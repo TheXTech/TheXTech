@@ -42,6 +42,8 @@
 
 #define XTECH_sscanf sscanf
 
+#define SDL_vsnprintf  vsnprintf
+
 #ifdef SDL_min
 #   undef SDL_min
 #endif
