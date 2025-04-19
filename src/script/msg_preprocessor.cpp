@@ -45,6 +45,13 @@ static void s_splitString(std::vector<std::string>& out, const std::string& str,
     while(end < str.size() - 1);
 }
 
+#ifdef PGE_MIN_PORT
+void preProcessMessage(std::string&, int)
+{
+    // FIXME: rewrite logic to not require regex
+    return;
+}
+#else
 void preProcessMessage(std::string& text, int playerWho)
 {
     std::regex cond_if = std::regex("^#if *(\\w+\\(.*\\))$");
@@ -140,3 +147,4 @@ void preProcessMessage(std::string& text, int playerWho)
 
     text = ret;
 }
+#endif
