@@ -811,7 +811,7 @@ static std::string shoot_getTimedString(const std::string &path, const char *ext
     if(!prevSecCounter)
     {
         return fmt::sprintf_ne("%sScr_%04d-%02d-%02d_%02d-%02d-%02d.%s",
-                               path,
+                               path.c_str(),
                                (1900 + t.tm_year), (1 + t.tm_mon), t.tm_mday,
                                t.tm_hour, t.tm_min, t.tm_sec,
                                ext);
@@ -819,7 +819,7 @@ static std::string shoot_getTimedString(const std::string &path, const char *ext
     else
     {
         return fmt::sprintf_ne("%sScr_%04d-%02d-%02d_%02d-%02d-%02d_(%d).%s",
-                               path,
+                               path.c_str(),
                                (1900 + t.tm_year), (1 + t.tm_mon), t.tm_mday,
                                t.tm_hour, t.tm_min, t.tm_sec,
                                prevSecCounter,
