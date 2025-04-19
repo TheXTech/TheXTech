@@ -17,6 +17,7 @@ public:
     Node* front = nullptr;
     Node* back = nullptr;
     size_t m_counter = 0;
+    size_t m_taken = 0;
     size_t m_maximum = 0;
 
 public:
