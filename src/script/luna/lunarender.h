@@ -25,7 +25,6 @@
 #include "numeric_types.h"
 
 #include <unordered_map>
-#include <memory>
 #include <vector>
 #include <string>
 #include <list>

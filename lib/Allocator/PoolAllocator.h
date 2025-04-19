@@ -1,3 +1,7 @@
+#pragma once
+#ifndef POOL_ALLOCATOR_H
+#define POOL_ALLOCATOR_H
+
 #include "Allocator.h"
 #include "StackLinkedList.h"
 
@@ -12,6 +16,11 @@ private:
 
     void* m_start_ptr = nullptr;
     std::size_t m_chunkSize;
+    std::size_t m_capacity;
+
+    size_t m_count = 0;
+    size_t m_maximum = 0;
+    size_t m_maximumPrev = 0;
 public:
     PoolAllocator(const std::size_t totalSize, const std::size_t chunkSize);
 
@@ -24,7 +33,12 @@ public:
     virtual void Init() override;
 
     virtual void Reset();
+
+    size_t maximum() const;
+    size_t prevMaximum() const;
 private:
     PoolAllocator(PoolAllocator& poolAllocator);
 
 };
+
+#endif // POOL_ALLOCATOR_H
