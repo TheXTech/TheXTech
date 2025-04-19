@@ -26,9 +26,12 @@
 
 namespace fmt
 {
+
 /*
     Exception-less fmt::format version. Instead of exception, the error message will be logged into file
 */
+std::string sprintf_ne(const char *fstr, ...);
+
 template <typename... Args>
 std::string format_ne(CStringRef format_str, const Args & ... args)
 {
@@ -51,32 +54,6 @@ std::string format_ne(CStringRef format_str, const Args & ... args)
     catch(...)
     {
         pLogWarning("fmt::format error: Thrown unknown exception on attempt to process string [%s]", format_str.c_str());
-        return "<ERROR OF " + std::string(format_str.c_str()) + ">";
-    }
-}
-
-template <typename... Args>
-std::string sprintf_ne(CStringRef format_str, const Args & ... args)
-{
-    try
-    {
-        return sprintf(format_str, std::forward<const Args&>(args)...);
-    }
-    catch(const FormatError &e)
-    {
-        std::string out;
-        pLogWarning("fmt::sprintf error: Thrown exception [%s] on attempt to process string [%s]",
-                    e.what(),
-                    format_str.c_str());
-        out.append(e.what());
-        out.append(" [");
-        out.append(format_str.c_str());
-        out.push_back(']');
-        return out;
-    }
-    catch(...)
-    {
-        pLogWarning("fmt::sprintf error: Thrown unknown exception on attempt to process string [%s]", format_str.c_str());
         return "<ERROR OF " + std::string(format_str.c_str()) + ">";
     }
 }
