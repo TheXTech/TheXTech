@@ -22,7 +22,6 @@
 #include "autocode_manager.h"
 #include "renderop.h"
 #include "globals.h"
-#include "graphics.h"
 #include "config.h"
 #include "lunamisc.h"
 #include "renderop_string.h"

@@ -1213,6 +1213,7 @@ void Autocode::Do(bool init)
 
             Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("STRINGS: {0}", StringsBankSize()), 3, 50, 460));
             Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("STRINGS-Unused: {0}", StringsUnusedEntries()), 3, 50, 480));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("Allocator-Max: {0}, prev {1}", g_rAlloc.maximum(), g_rAlloc.prevMaximum()), 3, 50, 500));
             break;
         }
 
