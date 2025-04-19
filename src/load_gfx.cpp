@@ -832,11 +832,11 @@ void LoadGFX()
     LoaderUpdateDebugString("Characters");
     for(int c = 0; c < numCharacters; ++c)
     {
-        LoaderUpdateDebugString(fmt::format_ne("Character {0}", c));
+        LoaderUpdateDebugString(fmt::sprintf_ne("Character %d", c));
         CurDir.setCurDir(getGfxDir() + GFXPlayerNames[c]);
         For(A, 1, 10)
         {
-            s_find_image(p, CurDir, fmt::format_ne("{1}-{0}", A, GFXPlayerNames[c]));
+            s_find_image(p, CurDir, fmt::sprintf_ne("%s-%d", GFXPlayerNames[c], A));
             if(!p.empty())
             {
                 XRender::lazyLoadPicture((*GFXCharacterBMP[c])[A], p);
@@ -852,8 +852,8 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "block/");
     for(int A = 1; A <= maxBlockType; ++A)
     {
-        LoaderUpdateDebugString(fmt::format_ne("Block {0}", A));
-        s_find_image(p, CurDir, fmt::format_ne("block-{0}", A));
+        LoaderUpdateDebugString(fmt::sprintf_ne("Block %d", A));
+        s_find_image(p, CurDir, fmt::sprintf_ne("block-%d", A));
 
         if(!p.empty())
             XRender::lazyLoadPicture(GFXBlockBMP[A], p);
@@ -870,8 +870,8 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "background2/");
     for(int A = 1; A <= numBackground2; ++A)
     {
-        LoaderUpdateDebugString(fmt::format_ne("Background {0}", A));
-        s_find_image(p, CurDir, fmt::format_ne("background2-{0}", A));
+        LoaderUpdateDebugString(fmt::sprintf_ne("Background %d", A));
+        s_find_image(p, CurDir, fmt::sprintf_ne("background2-%d", A));
 
         if(!p.empty())
         {
@@ -896,8 +896,8 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "npc/");
     for(int A = 1; A <= maxNPCType; ++A)
     {
-        LoaderUpdateDebugString(fmt::format_ne("NPC {0}", A));
-        s_find_image(p, CurDir, fmt::format_ne("npc-{0}", A));
+        LoaderUpdateDebugString(fmt::sprintf_ne("NPC %d", A));
+        s_find_image(p, CurDir, fmt::sprintf_ne("npc-%d", A));
 
         if(!p.empty())
         {
@@ -921,8 +921,8 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "effect/");
     for(int A = 1; A <= maxEffectType; ++A)
     {
-        LoaderUpdateDebugString(fmt::format_ne("Effect {0}", A));
-        s_find_image(p, CurDir, fmt::format_ne("effect-{0}", A));
+        LoaderUpdateDebugString(fmt::sprintf_ne("Effect %d", A));
+        s_find_image(p, CurDir, fmt::sprintf_ne("effect-%d", A));
 
         if(!p.empty())
         {
@@ -940,8 +940,8 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "yoshi/");
     for(int A = 1; A <= maxYoshiGfx; ++A)
     {
-        LoaderUpdateDebugString(fmt::format_ne("Mount B {0}", A));
-        s_find_image(p, CurDir, fmt::format_ne("yoshib-{0}", A));
+        LoaderUpdateDebugString(fmt::sprintf_ne("Mount B %d", A));
+        s_find_image(p, CurDir, fmt::sprintf_ne("yoshib-%d", A));
 
         if(!p.empty())
         {
@@ -958,8 +958,8 @@ void LoadGFX()
 
     for(int A = 1; A <= maxYoshiGfx; ++A)
     {
-        LoaderUpdateDebugString(fmt::format_ne("Mount T {0}", A));
-        s_find_image(p, CurDir, fmt::format_ne("yoshit-{0}", A));
+        LoaderUpdateDebugString(fmt::sprintf_ne("Mount T %d", A));
+        s_find_image(p, CurDir, fmt::sprintf_ne("yoshit-%d", A));
 
         if(!p.empty())
         {
@@ -979,8 +979,8 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "background/");
     for(int A = 1; A <= maxBackgroundType; ++A)
     {
-        LoaderUpdateDebugString(fmt::format_ne("BGO {0}", A));
-        s_find_image(p, CurDir, fmt::format_ne("background-{0}", A));
+        LoaderUpdateDebugString(fmt::sprintf_ne("BGO %d", A));
+        s_find_image(p, CurDir, fmt::sprintf_ne("background-%d", A));
 
         if(!p.empty())
         {
@@ -1007,8 +1007,8 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "tile/");
     for(int A = 1; A <= maxTileType; ++A)
     {
-        LoaderUpdateDebugString(fmt::format_ne("Terrain {0}", A));
-        s_find_image(p, CurDir, fmt::format_ne("tile-{0}", A));
+        LoaderUpdateDebugString(fmt::sprintf_ne("Terrain %d", A));
+        s_find_image(p, CurDir, fmt::sprintf_ne("tile-%d", A));
         if(!p.empty())
         {
             XRender::lazyLoadPicture(GFXTileBMP[A], p);
@@ -1029,8 +1029,8 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "level/");
     for(int A = 0; A <= maxLevelType; ++A)
     {
-        LoaderUpdateDebugString(fmt::format_ne("Level {0}", A));
-        s_find_image(p, CurDir, fmt::format_ne("level-{0}", A));
+        LoaderUpdateDebugString(fmt::sprintf_ne("Level %d", A));
+        s_find_image(p, CurDir, fmt::sprintf_ne("level-%d", A));
         if(!p.empty())
         {
             XRender::lazyLoadPicture(GFXLevelBMP[A], p);
@@ -1051,8 +1051,8 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "scene/");
     for(int A = 1; A <= maxSceneType; ++A)
     {
-        LoaderUpdateDebugString(fmt::format_ne("Scenery {0}", A));
-        s_find_image(p, CurDir, fmt::format_ne("scene-{0}", A));
+        LoaderUpdateDebugString(fmt::sprintf_ne("Scenery %d", A));
+        s_find_image(p, CurDir, fmt::sprintf_ne("scene-%d", A));
         if(!p.empty())
         {
             XRender::lazyLoadPicture(GFXSceneBMP[A], p);
@@ -1073,8 +1073,8 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "player/");
     for(int A = 1; A <= numCharacters; ++A)
     {
-        LoaderUpdateDebugString(fmt::format_ne("World character {0}", A));
-        s_find_image(p, CurDir, fmt::format_ne("player-{0}", A));
+        LoaderUpdateDebugString(fmt::sprintf_ne("World character %d", A));
+        s_find_image(p, CurDir, fmt::sprintf_ne("player-%d", A));
         if(!p.empty())
         {
             XRender::lazyLoadPicture(GFXPlayerBMP[A], p);
@@ -1095,8 +1095,8 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "path/");
     for(int A = 1; A <= maxPathType; ++A)
     {
-        LoaderUpdateDebugString(fmt::format_ne("Path cell {0}", A));
-        s_find_image(p, CurDir, fmt::format_ne("path-{0}", A));
+        LoaderUpdateDebugString(fmt::sprintf_ne("Path cell %d", A));
+        s_find_image(p, CurDir, fmt::sprintf_ne("path-%d", A));
         if(!p.empty())
         {
             XRender::lazyLoadPicture(GFXPathBMP[A], p);
@@ -1189,13 +1189,13 @@ static void loadCustomUIAssets()
              nullptr, nullptr, GFX.isCustom(ci++), GFX.BMWin, false, true);
 
     For(i, 1, 3)
-        loadCGFX(uiRoot + fmt::format_ne("Boot{0}.png", i),
-                 fmt::format_ne("Boot{0}", i),
+        loadCGFX(uiRoot + fmt::sprintf_ne("Boot%d.png", i),
+                 fmt::sprintf_ne("Boot%d", i),
                  nullptr, nullptr, GFX.isCustom(ci++), GFX.Boot[i], false, true);
 
     For(i, 1, 5)
-        loadCGFX(uiRoot + fmt::format_ne("CharacterName{0}.png", i),
-                 fmt::format_ne("CharacterName{0}", i),
+        loadCGFX(uiRoot + fmt::sprintf_ne("CharacterName%d.png", i),
+                 fmt::sprintf_ne("CharacterName%d", i),
                  nullptr, nullptr, GFX.isCustom(ci++), GFX.CharacterName[i], false, true);
 
     loadCGFX(uiRoot + "Chat.png",
@@ -1203,23 +1203,23 @@ static void loadCustomUIAssets()
              nullptr, nullptr, GFX.isCustom(ci++), GFX.Chat, false, true);
 
     For(i, 0, 2)
-        loadCGFX(uiRoot + fmt::format_ne("Container{0}.png", i),
-                 fmt::format_ne("Container{0}", i),
+        loadCGFX(uiRoot + fmt::sprintf_ne("Container%d.png", i),
+                 fmt::sprintf_ne("Container%d", i),
                  nullptr, nullptr, GFX.isCustom(ci++), GFX.Container[i], false, true);
 
     For(i, 1, 3)
-        loadCGFX(uiRoot + fmt::format_ne("ECursor{0}.png", i),
-                 fmt::format_ne("ECursor{0}", i),
+        loadCGFX(uiRoot + fmt::sprintf_ne("ECursor%d.png", i),
+                 fmt::sprintf_ne("ECursor%d", i),
                  nullptr, nullptr, GFX.isCustom(ci++), GFX.ECursor[i], false, true);
 
     For(i, 0, 9)
-        loadCGFX(uiRoot + fmt::format_ne("Font1_{0}.png", i),
-                 fmt::format_ne("Font1_{0}", i),
+        loadCGFX(uiRoot + fmt::sprintf_ne("Font1_%d.png", i),
+                 fmt::sprintf_ne("Font1_%d", i),
                  nullptr, nullptr, GFX.isCustom(ci++), GFX.Font1[i], false, true);
 
     For(i, 1, 3)
-        loadCGFX(uiRoot + fmt::format_ne("Font2_{0}.png", i),
-                 fmt::format_ne("Font2_{0}", i),
+        loadCGFX(uiRoot + fmt::sprintf_ne("Font2_%d.png", i),
+                 fmt::sprintf_ne("Font2_%d", i),
                  nullptr, nullptr, GFX.isCustom(ci++), GFX.Font2[i], false, true);
 
     loadCGFX(uiRoot + "Font2S.png",
@@ -1227,13 +1227,13 @@ static void loadCustomUIAssets()
              nullptr, nullptr, GFX.isCustom(ci++), GFX.Font2S, false, true);
 
     For(i, 1, 2)
-        loadCGFX(uiRoot + fmt::format_ne("Heart{0}.png", i),
-                 fmt::format_ne("Heart{0}", i),
+        loadCGFX(uiRoot + fmt::sprintf_ne("Heart%d.png", i),
+                 fmt::sprintf_ne("Heart%d", i),
                  nullptr, nullptr, GFX.isCustom(ci++), GFX.Heart[i], false, true);
 
     For(i, 0, 8)
-        loadCGFX(uiRoot + fmt::format_ne("Interface{0}.png", i),
-                 fmt::format_ne("Interface{0}", i),
+        loadCGFX(uiRoot + fmt::sprintf_ne("Interface%d.png", i),
+                 fmt::sprintf_ne("Interface%d", i),
                  nullptr, nullptr, GFX.isCustom(ci++), GFX.Interface[i], false, true);
 
     loadCGFX(uiRoot + "LoadCoin.png",
@@ -1245,13 +1245,13 @@ static void loadCustomUIAssets()
              nullptr, nullptr, GFX.isCustom(ci++), GFX.Loader, false, true);
 
     For(i, 0, 3)
-        loadCGFX(uiRoot + fmt::format_ne("MCursor{0}.png", i),
-                 fmt::format_ne("MCursor{0}", i),
+        loadCGFX(uiRoot + fmt::sprintf_ne("MCursor%d.png", i),
+                 fmt::sprintf_ne("MCursor%d", i),
                  nullptr, nullptr, GFX.isCustom(ci++), GFX.MCursor[i], false, true);
 
     For(i, 1, 4)
-        loadCGFX(uiRoot + fmt::format_ne("MenuGFX{0}.png", i),
-                 fmt::format_ne("MenuGFX{0}", i),
+        loadCGFX(uiRoot + fmt::sprintf_ne("MenuGFX%d.png", i),
+                 fmt::sprintf_ne("MenuGFX%d", i),
                  nullptr, nullptr, GFX.isCustom(ci++), GFX.MenuGFX[i], false, true);
 
     loadCGFX(uiRoot + "Mount.png",
@@ -1259,8 +1259,8 @@ static void loadCustomUIAssets()
              nullptr, nullptr, GFX.isCustom(ci++), GFX.Mount[2], false, true);
 
     For(i, 0, 7)
-        loadCGFX(uiRoot + fmt::format_ne("nCursor{0}.png", i),
-                 fmt::format_ne("nCursor{0}", i),
+        loadCGFX(uiRoot + fmt::sprintf_ne("nCursor%d.png", i),
+                 fmt::sprintf_ne("nCursor%d", i),
                  nullptr, nullptr, GFX.isCustom(ci++), GFX.nCursor[i], false, true);
 
     loadCGFX(uiRoot + "TextBox.png",
@@ -1268,8 +1268,8 @@ static void loadCustomUIAssets()
              nullptr, nullptr, GFX.isCustom(ci++), GFX.TextBox, false, true);
 
     For(i, 1, 2)
-        loadCGFX(uiRoot + fmt::format_ne("Tongue{0}.png", i),
-                 fmt::format_ne("Tongue{0}", i),
+        loadCGFX(uiRoot + fmt::sprintf_ne("Tongue%d.png", i),
+                 fmt::sprintf_ne("Tongue%d", i),
                  nullptr, nullptr, GFX.isCustom(ci++), GFX.Tongue[i], false, true);
 
     loadCGFX(uiRoot + "Warp.png",
@@ -1373,15 +1373,15 @@ void LoadCustomGFX(bool include_world, const char* preview_players_from)
 
     for(int A = 1; A <= maxYoshiGfx; ++A)
     {
-        loadCGFX(GfxRoot + fmt::format_ne("yoshi/yoshib-{0}.png", A),
-                 fmt::format_ne("yoshib-{0}", A),
+        loadCGFX(GfxRoot + fmt::sprintf_ne("yoshi/yoshib-%d.png", A),
+                 fmt::sprintf_ne("yoshib-%d", A),
                  nullptr, nullptr, GFXYoshiBCustom[A], GFXYoshiBBMP[A]);
     }
 
     for(int A = 1; A <= maxYoshiGfx; ++A)
     {
-        loadCGFX(GfxRoot + fmt::format_ne("yoshi/yoshit-{0}.png", A),
-                 fmt::format_ne("yoshit-{0}", A),
+        loadCGFX(GfxRoot + fmt::sprintf_ne("yoshi/yoshit-%d.png", A),
+                 fmt::sprintf_ne("yoshit-%d", A),
                  nullptr, nullptr, GFXYoshiTCustom[A], GFXYoshiTBMP[A]);
     }
 
@@ -1389,7 +1389,7 @@ void LoadCustomGFX(bool include_world, const char* preview_players_from)
     {
         for(int A = 1; A <= numStates; ++A)
         {
-            loadCGFX(GfxRoot + fmt::format_ne("{1}/{1}-{0}.png", A, GFXPlayerNames[c]),
+            loadCGFX(GfxRoot + fmt::sprintf_ne("{1}/{1}-{0}.png", A, GFXPlayerNames[c]),
                      fmt::format_ne("{1}-{0}", A, GFXPlayerNames[c]),
                      &(*GFXCharacterWidth[c])[A], &(*GFXCharacterHeight[c])[A],
                      (*GFXCharacterCustom[c])[A], (*GFXCharacterBMP[c])[A]);

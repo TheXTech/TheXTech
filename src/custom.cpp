@@ -95,7 +95,7 @@ void SavePlayerDefaults()
         for(int S = 1; S <= numStates; ++S)
         {
             // Global override of player setup
-            PlayerPathRes = PlayerDir.resolveFileCaseExistsAbs(fmt::format_ne("{0}-{1}.ini", s_playerFileName[C], S));
+            PlayerPathRes = PlayerDir.resolveFileCaseExistsAbs(fmt::sprintf_ne("%s-%d.ini", s_playerFileName[C], S));
             if(!PlayerPathRes.empty())
                 LoadCustomPlayer(C, S, PlayerPathRes);
         }
@@ -182,7 +182,7 @@ void SaveNPCDefaults()
         NPCTraits[A].FrameStyle = 0;
 
         // Global override of NPC setup
-        npcPathRes = NPCDir.resolveFileCaseExistsAbs(fmt::format_ne("npc-{0}.txt", A));
+        npcPathRes = NPCDir.resolveFileCaseExistsAbs(fmt::sprintf_ne("npc-%d.txt", A));
 
         if(!npcPathRes.empty())
             LoadCustomNPC(A, npcPathRes);
@@ -218,12 +218,13 @@ void FindCustomPlayers(const char* preview_players_from)
     {
         for(int S = 1; S <= numStates; ++S)
         {
+            const auto pFile = fmt::sprintf_ne("%s-%d.ini", s_playerFileName[C], S);
             // Episode-wide custom player setup
-            playerPath = g_dirEpisode.resolveFileCaseExistsAbs(fmt::format_ne("{1}-{0}.ini", S, s_playerFileName[C]));
+            playerPath = g_dirEpisode.resolveFileCaseExistsAbs(pFile);
 
             // Level-wide custom player setup
             if(!preview_players_from)
-                playerPathC = g_dirCustom.resolveFileCaseExistsAbs(fmt::format_ne("{1}-{0}.ini", S, s_playerFileName[C]));
+                playerPathC = g_dirCustom.resolveFileCaseExistsAbs(pFile);
 
             if(!playerPath.empty())
                 LoadCustomPlayer(C, S, playerPath);
@@ -340,10 +341,11 @@ void FindCustomNPCs(/*std::string cFilePath*/)
 
     for(int A = 1; A < maxNPCType; ++A)
     {
+        const auto nFile = fmt::sprintf_ne("npc-%d.txt", A);
         // Episode-wide custom NPC setup
-        npcPath = g_dirEpisode.resolveFileCaseExistsAbs(fmt::format_ne("npc-{0}.txt", A));
+        npcPath = g_dirEpisode.resolveFileCaseExistsAbs(nFile);
         // Level-wide custom NPC setup
-        npcPathC = g_dirCustom.resolveFileCaseExistsAbs(fmt::format_ne("npc-{0}.txt", A));
+        npcPathC = g_dirCustom.resolveFileCaseExistsAbs(nFile);
 
         if(!npcPath.empty())
             LoadCustomNPC(A, npcPath);

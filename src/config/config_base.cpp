@@ -72,10 +72,10 @@ void BaseConfigOption_t<false>::make_translation(XTechTranslate& translate, cons
     if((m_scope & Options_t::Scope::MakeTranslation) == 0)
         return;
 
-    translate.m_engineMap.insert({fmt::format_ne("menu.options.{0}.{1}", cur_section_id, m_internal_name), &m_display_name});
+    translate.m_engineMap.insert({fmt::sprintf_ne("menu.options.%s.%s", cur_section_id, m_internal_name), &m_display_name});
 
     if(!m_display_tooltip.empty())
-        translate.m_engineMap.insert({fmt::format_ne("menu.options.{0}.{1}-tip", cur_section_id, m_internal_name), &m_display_tooltip});
+        translate.m_engineMap.insert({fmt::sprintf_ne("menu.options.%s.%s-tip", cur_section_id, m_internal_name), &m_display_tooltip});
 }
 
 BaseConfigOption_t<true>::BaseConfigOption_t(_Config_t<true>* parent) : m_index(parent->m_options.size())
@@ -127,8 +127,8 @@ void ConfigSection_t<false>::make_translation(XTechTranslate& translate, const c
     if(this != &g_options.compat && (m_scope & Options_t::Scope::MakeTranslation) == 0)
         return;
 
-    translate.m_engineMap.insert({fmt::format_ne("menu.options.{0}._header", cur_section_id), &m_display_name});
+    translate.m_engineMap.insert({fmt::sprintf_ne("menu.options.%s._header", cur_section_id), &m_display_name});
 
     if(!m_display_tooltip.empty())
-        translate.m_engineMap.insert({fmt::format_ne("menu.options.{0}._tooltip", cur_section_id), &m_display_tooltip});
+        translate.m_engineMap.insert({fmt::sprintf_ne("menu.options.%s._tooltip", cur_section_id), &m_display_tooltip});
 }

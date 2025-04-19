@@ -107,38 +107,38 @@ bool GFX_t::load()
     loadImage(BMVs, uiPath + "BMVs");
     loadImage(BMWin, uiPath + "BMWin");
     For(i, 1, 3)
-        loadImage(Boot[i], uiPath + fmt::format_ne("Boot{0}", i));
+        loadImage(Boot[i], uiPath + fmt::sprintf_ne("Boot%d", i));
 
     For(i, 1, 5)
-        loadImage(CharacterName[i], uiPath + fmt::format_ne("CharacterName{0}", i));
+        loadImage(CharacterName[i], uiPath + fmt::sprintf_ne("CharacterName%d", i));
 
     loadImage(Chat, uiPath + "Chat");
 
     For(i, 0, 2)
-        loadImage(Container[i], uiPath + fmt::format_ne("Container{0}", i));
+        loadImage(Container[i], uiPath + fmt::sprintf_ne("Container%d", i));
 
     For(i, 1, 3)
-        loadImage(ECursor[i], uiPath + fmt::format_ne("ECursor{0}", i));
+        loadImage(ECursor[i], uiPath + fmt::sprintf_ne("ECursor%d", i));
 
     For(i, 0, 9)
-        loadImage(Font1[i], uiPath + fmt::format_ne("Font1_{0}", i));
+        loadImage(Font1[i], uiPath + fmt::sprintf_ne("Font1_%d", i));
 
     For(i, 1, 3)
-        loadImage(Font2[i], uiPath + fmt::format_ne("Font2_{0}", i));
+        loadImage(Font2[i], uiPath + fmt::sprintf_ne("Font2_%d", i));
 
     loadImage(Font2S, uiPath + "Font2S");
 
     For(i, 1, 2)
-        loadImage(Heart[i], uiPath + fmt::format_ne("Heart{0}", i));
+        loadImage(Heart[i], uiPath + fmt::sprintf_ne("Heart%d", i));
 
     For(i, 0, 8)
-        loadImage(Interface[i], uiPath + fmt::format_ne("Interface{0}", i));
+        loadImage(Interface[i], uiPath + fmt::sprintf_ne("Interface%d", i));
 
     loadImage(LoadCoin, uiPath + "LoadCoin");
     loadImage(Loader, uiPath + "Loader");
 
     For(i, 0, 3)
-        loadImage(MCursor[i], uiPath + fmt::format_ne("MCursor{0}", i));
+        loadImage(MCursor[i], uiPath + fmt::sprintf_ne("MCursor%d", i));
 
     For(i, 1, 4)
     {
@@ -156,18 +156,18 @@ bool GFX_t::load()
 
         pLogWarning("File %s%s doesn't exist, trying to load generic one...", n.c_str(), UI_IMG_EXT);
 #endif
-        loadImage(MenuGFX[i], uiPath + fmt::format_ne("MenuGFX{0}", i));
+        loadImage(MenuGFX[i], uiPath + fmt::sprintf_ne("MenuGFX%d", i));
     }
 
     loadImage(Mount[2], uiPath + "Mount");
 
     For(i, 0, 7)
-        loadImage(nCursor[i], uiPath + fmt::format_ne("nCursor{0}", i));
+        loadImage(nCursor[i], uiPath + fmt::sprintf_ne("nCursor%d", i));
 
     loadImage(TextBox, uiPath + "TextBox");
 
     For(i, 1, 2)
-        loadImage(Tongue[i], uiPath + fmt::format_ne("Tongue{0}", i));
+        loadImage(Tongue[i], uiPath + fmt::sprintf_ne("Tongue%d", i));
 
     loadImage(Warp, uiPath + "Warp");
 

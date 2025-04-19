@@ -875,8 +875,8 @@ void DrawEditorWorld()
                 double at_X = lvl.Location.X + lvl.Location.Width / 2 + camX;
                 double at_Y = lvl.Location.Y + camY - 40;
                 XRender::renderRect(at_X - 80, at_Y - 4, 160, 44, {0, 0, 0, 127}, true);
-                SuperPrintCenter(fmt::format_ne("{0}: {1}", g_editorStrings.letterCoordX, static_cast<int>(lvl.Location.X)), 3, at_X, at_Y);
-                SuperPrintCenter(fmt::format_ne("{0}: {1}", g_editorStrings.letterCoordY, static_cast<int>(lvl.Location.Y)), 3, at_X, at_Y + 20);
+                SuperPrintCenter(fmt::sprintf_ne("%s: %d", g_editorStrings.letterCoordX.c_str(), static_cast<int>(lvl.Location.X)), 3, at_X, at_Y);
+                SuperPrintCenter(fmt::sprintf_ne("%s: %d", g_editorStrings.letterCoordY.c_str(), static_cast<int>(lvl.Location.Y)), 3, at_X, at_Y + 20);
             }
         }
     }

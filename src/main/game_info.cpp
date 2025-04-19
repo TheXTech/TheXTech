@@ -60,7 +60,7 @@ const std::string GameInfo::titleWindow() const
     return "Super Mario Bros. X - Version 1.3 - www.SuperMarioBrothers.org";
 #else
     const char* ver_string = "TheXTech v" V_LATEST_STABLE ", #" V_BUILD_VER;
-    return fmt::format_ne("{0} - ({1})", this->title, ver_string);
+    return fmt::sprintf_ne("%s - (%s)", this->title.c_str(), ver_string);
 #endif
 }
 
@@ -175,7 +175,7 @@ void GameInfo::LoadGameInfo()
         {
             for(int i = 1; i <= numCharacters; ++i)
             {
-                std::string name = fmt::format_ne("name{0}", i);
+                std::string name = fmt::sprintf_ne("name%d", i);
                 config.read(name.c_str(),
                             characterName[i],
                             characterName[i]);
@@ -218,7 +218,7 @@ void GameInfo::LoadGameInfo()
                 // Old format
                 for(int cr = 1; ; cr++)
                 {
-                    std::string key = fmt::format_ne("game-credit-{0}", cr);
+                    std::string key = fmt::sprintf_ne("game-credit-%d", cr);
                     if(!config.hasKey(key))
                         break;
                     config.read(key.c_str(), value, value);

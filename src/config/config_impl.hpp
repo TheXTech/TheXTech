@@ -267,7 +267,7 @@ const std::string& ConfigOption_t<true, std::string>::get_display_value(std::str
 template<>
 const std::string& ConfigOption_t<true, std::pair<int, int>>::get_display_value(std::string& out) const
 {
-    out = fmt::format_ne("{0}x{1}", m_value.first, m_value.second);
+    out = fmt::sprintf_ne("%dx%d", m_value.first, m_value.second);
     return out;
 }
 
@@ -308,7 +308,7 @@ void ConfigOption_t<true, std::pair<int, int>>::save_to_ini(IniProcessing* ini)
 
     if(is_set())
     {
-        std::string out = fmt::format_ne("{0}x{1}", m_value.first, m_value.second);
+        std::string out = fmt::sprintf_ne("%dx%d", m_value.first, m_value.second);
         ini->setValue(m_base->m_internal_name, out);
     }
     else
@@ -319,7 +319,7 @@ void ConfigOption_t<true, std::pair<int, int>>::save_to_ini(IniProcessing* ini)
 template<>
 const std::string& ConfigOption_t<true, std::array<uint8_t, 3>>::get_display_value(std::string& out) const
 {
-    out = fmt::format_ne("{0},{1},{2}", m_value[0], m_value[1], m_value[2]);
+    out = fmt::sprintf_ne("%u,%u,%u", m_value[0], m_value[1], m_value[2]);
     return out;
 }
 
@@ -392,11 +392,11 @@ void ConfigEnumOption_t<false, value_t>::make_translation(XTechTranslate& transl
     if((ConfigOption_t<false, value_t>::m_scope & Options_t::Scope::MakeTranslation) == 0)
         return;
 
-    translate.m_engineMap.insert({fmt::format_ne("menu.options.{0}.{1}._name", cur_section_id, m_internal_name), &m_display_name});
+    translate.m_engineMap.insert({fmt::sprintf_ne("menu.options.%s.%s._name", cur_section_id, m_internal_name), &m_display_name});
 
     // some obscure behavior of the GCC version in Ubuntu 16.04 necessitates qualifying m_display_tooltip with the base class scope
     if(!BaseConfigOption_t<false>::m_display_tooltip.empty())
-        translate.m_engineMap.insert({fmt::format_ne("menu.options.{0}.{1}._tooltip", cur_section_id, m_internal_name), &m_display_tooltip});
+        translate.m_engineMap.insert({fmt::sprintf_ne("menu.options.%s.%s._tooltip", cur_section_id, m_internal_name), &m_display_tooltip});
 
     for(auto& value : m_enum_values)
     {
@@ -404,10 +404,10 @@ void ConfigEnumOption_t<false, value_t>::make_translation(XTechTranslate& transl
             continue;
 
         if(!value.m_display_name.empty())
-            translate.m_engineMap.insert({fmt::format_ne("menu.options.{0}.{1}.{2}", cur_section_id, m_internal_name, value.m_internal_name), &value.m_display_name});
+            translate.m_engineMap.insert({fmt::sprintf_ne("menu.options.%s.%s.%s", cur_section_id, m_internal_name, value.m_internal_name), &value.m_display_name});
 
         if(!value.m_display_tooltip.empty())
-            translate.m_engineMap.insert({fmt::format_ne("menu.options.{0}.{1}.{2}-tip", cur_section_id, m_internal_name, value.m_internal_name), &value.m_display_tooltip});
+            translate.m_engineMap.insert({fmt::sprintf_ne("menu.options.%s.%s.%s-tip", cur_section_id, m_internal_name, value.m_internal_name), &value.m_display_tooltip});
     }
 }
 

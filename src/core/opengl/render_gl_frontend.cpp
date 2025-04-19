@@ -309,7 +309,7 @@ bool RenderGL::initRender(SDL_Window *window)
         return false;
     }
 
-    std::string init_string = fmt::format_ne("Initialized OpenGL {0}.{1}-{2}", m_gl_majver, m_gl_minver, get_profile_letter(m_gl_profile));
+    std::string init_string = fmt::sprintf_ne("Initialized OpenGL %d.%d-%d", m_gl_majver, m_gl_minver, get_profile_letter(m_gl_profile));
 
     init_string += " with draw features: ";
     if(m_use_logicop)
