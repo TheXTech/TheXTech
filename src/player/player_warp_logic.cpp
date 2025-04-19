@@ -1488,6 +1488,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
     }
 
     // execute the warp!
+    plr.AquaticSwim = false;
     UnDuck(Player[A]);
     plr.YoshiTongueLength = 0;
     plr.MountSpecial = 0;
