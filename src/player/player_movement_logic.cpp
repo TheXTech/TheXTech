@@ -1288,7 +1288,7 @@ void PlayerAquaticSwimMovement(int A)
             Player[A].SwimCount = 0;
     }
 
-    num_t base_speed = (Player[A].State == PLR_STATE_POLAR) ? 1.5_n : 2.5_n;
+    num_t base_speed = (Player[A].State == PLR_STATE_POLAR) ? 2_n : 2.5_n;
 
     num_t target_speed = base_speed;
     int rate = 16; // out of 256
