@@ -1196,21 +1196,21 @@ void Autocode::Do(bool init)
         // DEBUG
         case AT_DebugPrint:
         {
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("LunaScript (TheXTech) VERSION-{0}", LUNA_VERSION), 3, 50, 250));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::sprintf_ne("LunaScript (TheXTech) VERSION-%d", LUNA_VERSION), 3, 50, 250));
             //Renderer::Get().SafePrint(, 3, 340, 250);
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("Globl: {0}", gAutoMan.m_GlobalCodes.size()), 3, 50, 280));
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("Init:  {0}", gAutoMan.m_InitAutocodes.size()), 3, 50, 300));
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("Codes: {0}", gAutoMan.m_Autocodes.size()), 3, 50, 320));
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("Queue: {0}", gAutoMan.m_CustomCodes.size()), 3, 50, 340));
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("Sprites: {0}", gSpriteMan.CountSprites()), 3, 50, 360));
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("BlueePrints: {0}", gSpriteMan.CountBlueprints()), 3, 50, 380));
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("Components: {0}", gSpriteMan.m_ComponentList.size()), 3, 50, 400));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::sprintf_ne("Globl: %zu", gAutoMan.m_GlobalCodes.size()), 3, 50, 280));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::sprintf_ne("Init:  %zu", gAutoMan.m_InitAutocodes.size()), 3, 50, 300));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::sprintf_ne("Codes: %zu", gAutoMan.m_Autocodes.size()), 3, 50, 320));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::sprintf_ne("Queue: %zu", gAutoMan.m_CustomCodes.size()), 3, 50, 340));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::sprintf_ne("Sprites: %zu", gSpriteMan.CountSprites()), 3, 50, 360));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::sprintf_ne("BlueePrints: %zu", gSpriteMan.CountBlueprints()), 3, 50, 380));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::sprintf_ne("Components: %zu", gSpriteMan.m_ComponentList.size()), 3, 50, 400));
 
             // some stats of lunacell were printed here
 
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("STRINGS: {0}", StringsBankSize()), 3, 50, 460));
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("STRINGS-Unused: {0}", StringsUnusedEntries()), 3, 50, 480));
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("Allocator-Max: {0}, prev {1}", g_rAlloc.maximum(), g_rAlloc.prevMaximum()), 3, 50, 500));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::sprintf_ne("STRINGS: %zu", StringsBankSize()), 3, 50, 460));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::sprintf_ne("STRINGS-Unused: %zu", StringsUnusedEntries()), 3, 50, 480));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::sprintf_ne("Allocator-Max: %zu, prev %zu", g_rAlloc.maximum(), g_rAlloc.prevMaximum()), 3, 50, 500));
             break;
         }
 

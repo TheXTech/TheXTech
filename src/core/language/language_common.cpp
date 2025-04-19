@@ -69,8 +69,8 @@ static bool detectSetup()
 
     if(!CurrentLangDialect.empty())
     {
-        langEngineFile = AppPathManager::languagesDir() + fmt::format_ne("thextech_{0}-{1}.json", CurrentLanguage.c_str(), CurrentLangDialect.c_str());
-        langAssetsFile = AppPathManager::languagesDir() + fmt::format_ne("assets_{0}-{1}.json", CurrentLanguage.c_str(), CurrentLangDialect.c_str());
+        langEngineFile = AppPathManager::languagesDir() + fmt::sprintf_ne("thextech_%s-%s.json", CurrentLanguage.c_str(), CurrentLangDialect.c_str());
+        langAssetsFile = AppPathManager::languagesDir() + fmt::sprintf_ne("assets_%s-%s.json", CurrentLanguage.c_str(), CurrentLangDialect.c_str());
         if(!Files::fileExists(langEngineFile))
             langEngineFile.clear();
         if(!Files::fileExists(langAssetsFile))
@@ -78,9 +78,9 @@ static bool detectSetup()
     }
 
     if(langEngineFile.empty())
-        langEngineFile = AppPathManager::languagesDir() + fmt::format_ne("thextech_{0}.json", CurrentLanguage.c_str());
+        langEngineFile = AppPathManager::languagesDir() + fmt::sprintf_ne("thextech_%s.json", CurrentLanguage.c_str());
     if(langAssetsFile.empty())
-        langAssetsFile = AppPathManager::languagesDir() + fmt::format_ne("assets_{0}.json", CurrentLanguage.c_str());
+        langAssetsFile = AppPathManager::languagesDir() + fmt::sprintf_ne("assets_%s.json", CurrentLanguage.c_str());
 
     if(!Files::fileExists(langEngineFile))
         langEngineFile.clear();
@@ -259,7 +259,7 @@ void XLanguage::rotateLanguage(std::string& nextLanguage, int step)
     }
 
     // find current filename
-    std::string seek_fn = fmt::format_ne("thextech_{0}.json", (const std::string&) g_config.language);
+    std::string seek_fn = fmt::format_ne("thextech_{0}.json", (const std::string&)g_config.language);
 
     auto curr_lang_fn = std::find(s_languages.cbegin(), s_languages.cend(), seek_fn);
 

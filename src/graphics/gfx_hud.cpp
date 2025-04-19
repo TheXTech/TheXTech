@@ -484,9 +484,9 @@ void DrawMedals(int X, int Y, bool warp, uint8_t max, uint8_t prev, uint8_t ckpt
     int total_len = 0;
 
     if(g_config.medals_show_policy == Config_t::MEDALS_SHOW_COUNTS)
-        label = fmt::format_ne("{0}/{1}", got_count, max);
+        label = fmt::sprintf_ne("%d/%u", got_count, max);
     else
-        label = fmt::format_ne("{0}", got_count);
+        label = fmt::sprintf_ne("%d", got_count);
 
     total_len += coin_width + 8 + GFX.Interface[1].w + 4;
     total_len += SuperTextPixLen(label, 3);

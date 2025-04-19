@@ -45,10 +45,10 @@ void* PoolAllocator::Allocate(const std::size_t allocationSize, const std::size_
     {
         // Fatal error
         XMsgBox::errorMsgBox("Fatal error",
-            fmt::format_ne("The pool allocator is full:\n"
-            "- Total capacity: {0}\n"
-            "- Current size of free list: {1}\n"
-            "- Maximum size of free list: {2}\n"
+            fmt::sprintf_ne("The pool allocator is full:\n"
+            "- Total capacity: %zu\n"
+            "- Current size of free list: %zu\n"
+            "- Maximum size of free list: %zu\n"
             "\n"
             "Game will be closed. Please check logs for details.",
             m_capacity,

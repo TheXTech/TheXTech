@@ -101,7 +101,7 @@ EditorPipe::~EditorPipe()
 
 void EditorPipe::sendStarsNumber(int numStars)
 {
-    sendMessage(fmt::format_ne("CMD:NUM_STARS {0}", numStars));
+    sendMessage(fmt::sprintf_ne("CMD:NUM_STARS %d", numStars));
 }
 
 void EditorPipe::sendTakenBlock(const LevelBlock &block)
@@ -147,12 +147,12 @@ void EditorPipe::sendCloseProperties()
 
 void EditorPipe::sendPlayerSettings(int playerId, int character, int state, int vehicleID, int vehicleState)
 {
-    sendMessage(fmt::format_ne("CMD:PLAYER_SETUP_UPDATE {0} {1} {2} {3} {4}", playerId, character, state, vehicleID, vehicleState));
+    sendMessage(fmt::sprintf_ne("CMD:PLAYER_SETUP_UPDATE %d %d %d %d %d", playerId, character, state, vehicleID, vehicleState));
 }
 
 void EditorPipe::sendPlayerSettings2(int playerId, int health, int reservedItem)
 {
-    sendMessage(fmt::format_ne("CMD:PLAYER_SETUP_UPDATE2 {0} {1} {2}", playerId, health, reservedItem));
+    sendMessage(fmt::sprintf_ne("CMD:PLAYER_SETUP_UPDATE2 %d %d %d", playerId, health, reservedItem));
 }
 
 void EditorPipe::shut()
@@ -216,7 +216,7 @@ void EditorPipe::icomingData(const std::string &in)
         m_doParseLevelData = true;
         m_doAcceptLevelDataParts = false;
         m_acceptedLevel.open(&m_acceptedRawData, m_accepted_lvl_path);
-        IntProc::setState(fmt::format_ne("LVLX is valid: 1"));
+        IntProc::setState("LVLX is valid: 1");
 
         m_levelAccepted_lock.lock();
         m_levelAccepted = true;
