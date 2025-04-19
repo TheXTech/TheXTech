@@ -7,6 +7,5 @@ list(APPEND FMT_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/fmt_format.cpp
     ${CMAKE_CURRENT_LIST_DIR}/fmt_ostream.cpp
     ${CMAKE_CURRENT_LIST_DIR}/fmt_posix.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/fmt_printf.cpp
 )
 
