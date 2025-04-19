@@ -515,6 +515,10 @@ if(THEXTECH_ENABLE_LUA)
     list(APPEND A2XT_INCS script/include)
 endif()
 
+target_compile_definitions(A2XT_Int INTERFACE
+    -DINI_PROCESSING_USE_MDX_PARSER  # IniProcessor should use the MDX tokenizer for lists
+)
+
 include(cmake/library_glew.cmake)
 include(cmake/library_syslibs.cmake)
 
