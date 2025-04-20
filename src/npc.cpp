@@ -5352,7 +5352,9 @@ void SpecialNPC(int A)
                 StartMusicIfOnscreen(NPC[A].Section);
             }
         }
-        if(NPC[A].Special >= 0)
+
+        // previously Special, changed to Special5 when it became a container
+        if(NPC[A].Special5 >= 0)
         {
             NPCFaceNearestPlayer(NPC[A]);
 
@@ -5390,14 +5392,14 @@ void SpecialNPC(int A)
                     PlaySoundSpatial(SFX_SpitBossSpit, NPC[A].Location);
                     syncLayers_NPC(numNPCs);
                 }
-                NPC[A].Special = 1;
+                NPC[A].Special5 = 1;
                 if(NPC[A].Special2 > 280)
                 {
                     NPC[A].Special2 = 0;
-                    NPC[A].Special = 0;
+                    NPC[A].Special5 = 0;
                 }
             }
-            if(NPC[A].Special == 0 && NPC[A].Location.SpeedY == Physics.NPCGravity)
+            if(NPC[A].Special5 == 0 && NPC[A].Location.SpeedY == Physics.NPCGravity)
             {
                 NPC[A].Special3 += 1;
                 if(NPC[A].Special3 <= 200)
@@ -5414,13 +5416,12 @@ void SpecialNPC(int A)
         }
         else
         {
-            NPC[A].Special += 1;
+            NPC[A].Special5 += 1;
             NPC[A].Location.SpeedX = 0;
         }
+
         if(NPC[A].Stuck)
             NPC[A].Location.SpeedX = 0;
-
-
     }
     else if(NPC[A].Type == NPCID_EXT_TURTLE)
     {

@@ -405,6 +405,11 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                             Special2_from = 'Y';
                                             NPC_A_Special2 = NPC[A].SpecialY;
                                         }
+                                        else if(NPC[A].Type == NPCID_SPIT_BOSS)
+                                        {
+                                            Special_from = '5';
+                                            NPC_A_Special = NPC[A].Special5;
+                                        }
 
                                         if(HitSpot == 5)
                                         {
@@ -504,6 +509,8 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                             NPC[A].SpecialX = NPC_A_Special;
                                         else if(Special_from == 'Y')
                                             NPC[A].SpecialY = NPC_A_Special;
+                                        else if(Special_from == '5')
+                                            NPC[A].Special5 = (vbint_t)NPC_A_Special;
                                         else
                                             NPC[A].Special = (vbint_t)NPC_A_Special;
                                     }

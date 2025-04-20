@@ -768,7 +768,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     if(NPC[B].Killed == 0)
                                     {
                                         // don't hurt player by just-hurt boss
-                                        if(Player[A].Rolling && (NPC[B].Immune != 0 || (NPC[B].Type == NPCID_SPIT_BOSS && NPC[B].Special < 0))) {}
+                                        if(Player[A].Rolling && (NPC[B].Immune != 0 || (NPC[B].Type == NPCID_SPIT_BOSS && NPC[B].Special5 < 0))) {}
                                         else if(n00bCollision(Player[A].Location, NPC[B].Location))
                                         {
                                             if(BattleMode && NPC[B].HoldingPlayer != A && NPC[B].HoldingPlayer > 0 && Player[A].Immune == 0)

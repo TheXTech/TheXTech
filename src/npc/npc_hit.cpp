@@ -1825,13 +1825,14 @@ void NPCHit(int A, int B, int C)
     // Birdo
     else if(NPC[A].Type == NPCID_SPIT_BOSS)
     {
-        if(NPC[A].Special >= 0)
+        // changed from Special when it became a container
+        if(NPC[A].Special5 >= 0)
         {
             if(B == 3)
             {
                 if(NPC[C].Type != NPCID_PLR_FIREBALL)
                 {
-                    NPC[A].Special = -30;
+                    NPC[A].Special5 = -30;
                     NPC[A].Damage += 1;
                     NPC[A].Direction = -NPC[A].Direction;
                     PlaySoundSpatial(SFX_SpitBossHit, NPC[A].Location);
@@ -1841,7 +1842,7 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Damage = 3;
             else if(B == 10)
             {
-                NPC[A].Special = -30;
+                NPC[A].Special5 = -30;
                 NPC[A].Damage += 1;
                 NPC[A].Direction = -NPC[A].Direction;
                 PlaySoundSpatial(SFX_SpitBossHit, NPC[A].Location);

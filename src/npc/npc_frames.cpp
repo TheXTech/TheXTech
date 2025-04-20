@@ -2019,7 +2019,9 @@ void NPCFrames(int A)
         NPC[A].Frame = 0;
         if(NPC[A].Direction == 1)
             NPC[A].Frame = 5;
-        if(NPC[A].Special == 0)
+
+        // changed from Special when it became a container
+        if(NPC[A].Special5 == 0)
         {
             if(NPC[A].Location.SpeedX != 0)
             {
@@ -2030,7 +2032,7 @@ void NPCFrames(int A)
                     NPC[A].Frame += 1;
             }
         }
-        else if(NPC[A].Special < 0)
+        else if(NPC[A].Special5 < 0)
         {
             NPC[A].Frame += 3;
             NPC[A].FrameCount += 1;
