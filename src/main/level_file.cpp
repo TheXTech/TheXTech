@@ -788,6 +788,12 @@ bool OpenLevel_Block(void* userdata, LevelBlock& b)
         block.Type = int(b.id);
         block.DefaultType = block.Type;
 
+        if(b.npc_id > maxNPCType)
+        {
+            pLogWarning("Block contents %d is out of range (max NPC type %d), reset to 1 coin", (int)b.npc_id, maxNPCType);
+            b.npc_id = -1;
+        }
+
         block.Special = int(b.npc_id > 0 ? b.npc_id + 1000 : -1 * b.npc_id);
 
         switch(block.Special) // Replace some legacy NPC codes with new
@@ -900,10 +906,16 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
         if(n.id > maxNPCType) // Drop ID to 1 for NPCs of out of range IDs
         {
             pLogWarning("NPC-%d ID is out of range (max types %d), reset to NPC-1", (int)n.id, maxNPCType);
-            npc.Type = NPCID(1);
+            n.id = 1;
         }
-        else
-            npc.Type = NPCID(n.id);
+
+        if(n.contents > maxNPCType) // Drop contents to 0 for NPCs of out of range contents
+        {
+            pLogWarning("NPC contents %d is out of range (max types %d), reset to 0", (int)n.contents, maxNPCType);
+            n.contents = 0;
+        }
+
+        npc.Type = NPCID(n.id);
 
         if(npc.Type == NPCID_ITEM_BURIED || npc.Type == NPCID_ITEM_POD ||
            npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_THROWER ||
