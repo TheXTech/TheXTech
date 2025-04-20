@@ -112,10 +112,23 @@ void DrawInterface(int Z, int numScreens)
 
             if(plr.HeldBonus > 0)
             {
-                XRender::renderTextureBasic(plr_center - GFX.Container[1].w / 2 + 12,
-                                        ScreenTop + 16 + 12,
-                                        NPCWidth(plr.HeldBonus), NPCHeight(plr.HeldBonus),
-                                        GFXNPC[plr.HeldBonus], 0, 0);
+                int x = plr_center - GFX.Container[1].w / 2 + 12;
+                int y = ScreenTop + 16 + 12;
+                int w = NPCWidth(plr.HeldBonus);
+                int h = NPCHeight(plr.HeldBonus);
+
+                if(g_config.fix_visual_bugs)
+                {
+                    if(NPCWidthGFX(plr.HeldBonus))
+                    {
+                        w = NPCWidthGFX(plr.HeldBonus);
+                        h = NPCHeightGFX(plr.HeldBonus);
+                    }
+                    x += 16 - w / 2;
+                    y += 16 - h / 2;
+                }
+
+                XRender::renderTextureBasic(x, y, w, h, GFXNPC[plr.HeldBonus], 0, 0);
             }
         }
 
