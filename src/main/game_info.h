@@ -78,6 +78,8 @@ struct GameInfo
 
     bool outroDeadMode = true;
 
+    unsigned int contentFeatureLevel = 0;
+
     typedef std::pair<std::string, std::string> CheatAlias;
 
     std::vector<CheatAlias> cheatsGlobalAliases;

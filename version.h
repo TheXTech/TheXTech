@@ -61,6 +61,8 @@
 #   define V_VF4 0
 #endif
 
+#define V_FEATURE_LEVEL (((V_VF1 * 100 + V_VF2) * 100 + V_VF3) * 100 + V_VF4)
+
 #ifdef THEXTECH_VERSION_REL
 #   define V_FILE_RELEASE STR_VALUE(THEXTECH_VERSION_REL)
 #else

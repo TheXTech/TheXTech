@@ -21,6 +21,7 @@
 #include "globals.h"
 #include "sound.h"
 #include "write_common.h"
+#include "main/game_info.h"
 #include <PGE_File_Formats/file_formats.h>
 #include <AppPath/app_path.h>
 #include "Logger/logger.h"
@@ -36,6 +37,9 @@ void SaveWorld(const std::string& FilePath, int format, int version)   // Saves 
     WorldAreaRect area;
 
     FileFormats::CreateWorldData(out);
+
+    out.meta.configPackId = "TheXTech";
+    out.meta.engineFeatureLevel = g_gameInfo.contentFeatureLevel;
 
     out.EpisodeTitle = WorldName;
     out.IntroLevel_file = StartLevel;

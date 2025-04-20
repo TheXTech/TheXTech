@@ -106,6 +106,7 @@ void GameInfo::InitGameInfo()
     disableBattleMode = false;
 
     activity_settings_in_compat = false;
+    contentFeatureLevel = 0;
 
     ResetIntroActivitySettings();
     ResetOutroActivitySettings();
@@ -150,6 +151,14 @@ void GameInfo::LoadGameInfo()
             config.read("disable-two-player", disableTwoPlayer, false);
             config.read("disable-battle-mode", disableBattleMode, false);
             config.read("status-icon-name", statusIconName, std::string());
+            config.read("feature-level-supported", contentFeatureLevel, 0);
+
+            constexpr unsigned int engineFeatureLevel = V_FEATURE_LEVEL;
+            if(contentFeatureLevel > engineFeatureLevel)
+            {
+                pLogDebug("Limiting asset pack to feature level %u (supports %u)", engineFeatureLevel, contentFeatureLevel);
+                contentFeatureLevel = engineFeatureLevel;
+            }
         }
         config.endGroup();
 

@@ -36,11 +36,13 @@
 #include "../main/trees.h"
 #include "level_file.h"
 #include "world_file.h"
+#include "main/game_info.h"
 #include "main/level_save_info.h"
 #include "main/screen_progress.h"
 #include "main/game_strings.h"
 #include "translate_episode.h"
 #include "fontman/font_manager.h"
+#include "../version.h"
 
 #include <Utils/strings.h>
 #include <Utils/files.h>
@@ -59,6 +61,7 @@ struct WorldLoad
 };
 
 bool OpenWorld_Unpack(WorldLoad& load, WorldData& wld);
+using callback_error = std::runtime_error;
 
 bool OpenWorld_Post(const WorldLoad& load);
 
@@ -134,9 +137,17 @@ bool OpenWorld_Head(void* userdata, WorldData& wld)
 {
     WorldLoad& load = *static_cast<WorldLoad*>(userdata);
 
+    constexpr unsigned int engineFeatureLevel = V_FEATURE_LEVEL;
+
     FileFormat = wld.meta.RecentFormat;
+    unsigned int reqFeatureLevel = wld.meta.engineFeatureLevel;
     if(wld.meta.RecentFormat == LevelData::SMBX64)
         load.FileRelease = int(wld.meta.RecentFormatVersion);
+
+    if(reqFeatureLevel > engineFeatureLevel)
+        throw callback_error("Content cannot be loaded. Please update TheXTech.");
+    else if(reqFeatureLevel > g_gameInfo.contentFeatureLevel)
+        throw callback_error("Content cannot be loaded. Please update your game assets.");
 
     WorldName = wld.EpisodeTitle;
 
@@ -451,7 +462,20 @@ bool OpenWorld_AreaRect(void*, WorldAreaRect& m)
 
 bool OpenWorld_Unpack(WorldLoad& load, WorldData& wld)
 {
-    OpenWorld_Head(&load, wld);
+    try
+    {
+        OpenWorld_Head(&load, wld);
+    }
+    catch(const callback_error& e)
+    {
+        pLogWarning("Error of level \"%s\" file loading: %s.",
+                    wld.meta.filename.c_str(),
+                    e.what());
+
+        MessageText = e.what();
+
+        return false;
+    }
 
     for(auto &t : wld.tiles)
     {

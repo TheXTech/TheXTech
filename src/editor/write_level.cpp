@@ -22,6 +22,7 @@
 #include "sorting.h"
 #include "layers.h"
 #include "write_common.h"
+#include "main/game_info.h"
 #include "sound.h"
 #include "npc_id.h"
 #include "npc_traits.h"
@@ -106,6 +107,8 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
 
     // Level-wide settings
     out.LevelName = LevelName;
+    out.meta.configPackId = "TheXTech";
+    out.meta.engineFeatureLevel = g_gameInfo.contentFeatureLevel;
 
     // sections
     for(int i = 0; i < numSections; ++i)
