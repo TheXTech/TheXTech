@@ -116,7 +116,7 @@ const int maxBackgroundType = 200;
 //Public Const maxSceneType As Integer = 100 'Maximum number of scenetypes
 const int maxSceneType = 100;
 //Public Const maxNPCType As Integer = 300 'Maximum number of NPC types
-const int maxNPCType = 305;
+const int maxNPCType = 306;
 //Public Const maxEffectType As Integer = 200 'Maximum number of effect types
 const int maxEffectType = 200;
 

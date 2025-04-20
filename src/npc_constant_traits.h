@@ -161,7 +161,8 @@ constexpr bool NPCIsAnExit(int Type)
         Type == NPCID_GOALORB_S3 ||
         Type == NPCID_GOALORB_S2 ||
         Type == NPCID_STAR_EXIT ||
-        Type == NPCID_STAR_COLLECT
+        Type == NPCID_STAR_COLLECT ||
+        Type == NPCID_FLAG_EXIT
     );
 }
 

@@ -383,6 +383,11 @@ void TouchBonus(int A, int B)
     {
         // go straight to code to kill NPC
     }
+    else if(NPC[B].Type == NPCID_FLAG_EXIT)
+    {
+        // do nothing, we just want the other traits of bonus
+        return;
+    }
     else if(NPC[B].Type == NPCID_POISON) // Bonus is a POISON mushroom
     {
         PlayerHurt(A);

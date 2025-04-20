@@ -1443,6 +1443,9 @@ void SetupVars()
     NPCTraits[NPCID_SWAP_POWER].IsABonus = true;
     NPCTraits[NPCID_COIN_S3].IsABonus = true;
     NPCTraits[NPCID_ITEMGOAL].IsABonus = true;
+    NPCTraits[NPCID_FLAG_EXIT].IsABonus = true;
+    NPCTraits[NPCID_FLAG_EXIT].TFrames = 3;
+    NPCTraits[NPCID_FLAG_EXIT].FrameSpeed = 8;
     NPCTraits[NPCID_FIRE_POWER_S3].IsABonus = true;
     NPCTraits[NPCID_ICE_POWER_S3].IsABonus = true;
     NPCTraits[NPCID_ICE_POWER_S4].IsABonus = true;
@@ -2066,6 +2069,7 @@ void SetupVars()
     NPCTraits[NPCID_STONE_S4].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
     NPCTraits[NPCID_HOMING_BALL_GEN].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
     NPCTraits[NPCID_ITEMGOAL].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_FLAG_EXIT].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
     NPCTraits[NPCID_CANNONENEMY].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
     NPCTraits[NPCID_STATUE_S3].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
     NPCTraits[NPCID_STATUE_S4].InactiveRender = NPCTraits_t::SHOW_ALWAYS;

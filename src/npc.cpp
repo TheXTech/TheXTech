@@ -2937,12 +2937,24 @@ void NPCSpecial(int A)
             }
         }
     }
-    else if(npc.Type == NPCID_GOALTAPE) // SMW Exit
+    else if(npc.Type == NPCID_GOALTAPE || npc.Type == NPCID_FLAG_EXIT) // SMW Exit
     {
         // Special is whether the tape is going up or down
         // SpecialY is the Y coordinate of the ground below the tape (was previously Special2)
 
-        if(npc.Special == 0)
+        if(npc.Type == NPCID_FLAG_EXIT)
+        {
+            if(LevelMacro == LEVELMACRO_FLAG_EXIT)
+            {
+                if(npc.Special)
+                    npc.Location.SpeedY = 0;
+                else
+                    npc.Location.SpeedY = 2;
+
+                return;
+            }
+        }
+        else if(npc.Special == 0)
             npc.Location.SpeedY = 2;
         else
             npc.Location.SpeedY = -2;
@@ -2972,18 +2984,42 @@ void NPCSpecial(int A)
                 npc.SpecialY = Block[C].Location.Y + 4;
         }
 
+        num_t left_boundary = npc.Location.X;
+        if(npc.Type == NPCID_GOALTAPE)
+            left_boundary += npc.Location.Width - 8;
+
         for(int i = 1; i <= numPlayers; i++)
         {
             auto &p = Player[i];
+
             if(p.Section == npc.Section)
             {
                 if(p.Location.Y + npc.Location.Height <= npc.SpecialY)
                 {
-                    if(p.Location.X + p.Location.Width >= npc.Location.X + npc.Location.Width - 8)
+                    if(p.Location.X + p.Location.Width >= left_boundary)
                     {
                         if(p.Location.X <= npc.Location.X + 80)
                         {
-                            if(CheckCollision(p.Location, npc.Location))
+                            if(npc.Type == NPCID_FLAG_EXIT)
+                            {
+                                // have some stricter checks for this exit
+                                if(p.Dead || p.TimeToLive || p.Effect != PLREFF_NORMAL || p.CurMazeZone)
+                                    continue;
+
+                                // give tapes for flag exit
+                                int score = 10;
+
+                                int gap = num_t::floor(p.Location.Y) - num_t::floor(npc.Location.Y);
+                                if(gap > 0)
+                                    score -= (gap + 31) / 32;
+
+                                if(score < 1)
+                                    score = 1;
+
+                                MoreScore(score, npc.Location);
+                            }
+                            // give points for goal tape if touched
+                            else if(CheckCollision(p.Location, npc.Location))
                             {
                                 MoreScore(num_t::vb6round((1 - (npc.Location.Y - npc.DefaultLocationY).divided_by(npc.SpecialY - npc.DefaultLocationY)) * 10) + 1, npc.Location);
                                 npc.Killed = 9;
@@ -2996,8 +3032,6 @@ void NPCSpecial(int A)
 
                             if(g_ClonedPlayerMode)
                                 Player[1] = Player[A];
-
-                            LevelMacro = LEVELMACRO_GOAL_TAPE_EXIT;
 
                             for(int j = 1; j <= numPlayers; j++)
                             {
@@ -3014,8 +3048,23 @@ void NPCSpecial(int A)
                             }
 
                             StopMusic();
+
+                            if(npc.Type == NPCID_FLAG_EXIT)
+                            {
+                                LevelMacro = LEVELMACRO_FLAG_EXIT;
+                                // go towards the ground
+                                npc.Location.Y += 2;
+                                // wait for player to reach ground
+                                LevelMacroWhich = -1;
+                                PlaySound(SFX_FlagExit);
+                            }
+                            else
+                            {
+                                LevelMacro = LEVELMACRO_GOAL_TAPE_EXIT;
+                                PlaySound(SFX_TapeExit);
+                            }
+
                             // XEvents::doEvents();
-                            PlaySound(SFX_TapeExit);
                             break;
                         }
                     }

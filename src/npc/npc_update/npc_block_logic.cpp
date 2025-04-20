@@ -831,7 +831,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                         }
                                         else if(NPC[A].Type == NPCID_SPIKY_BALL_S4)
                                             NPC[A].Special = 1;
-                                        else if(NPC[A].Type == NPCID_GOALTAPE)
+                                        else if(NPC[A].Type == NPCID_GOALTAPE || NPC[A].Type == NPCID_FLAG_EXIT)
                                             NPC[A].Special = 1;
                                         else if(NPC[A].Type == NPCID_SQUID_S3 || NPC[A].Type == NPCID_SQUID_S1)
                                             NPC[A].Special4 = 1;

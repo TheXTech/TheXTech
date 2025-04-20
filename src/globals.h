@@ -1863,6 +1863,7 @@ enum LevelMacro_t
     LEVELMACRO_GAME_COMPLETE_EXIT = 5,
     LEVELMACRO_STAR_EXIT = 6,
     LEVELMACRO_GOAL_TAPE_EXIT = 7,
+    LEVELMACRO_FLAG_EXIT = 8,
 };
 //Public LevelMacro As Integer 'Shows a level outro when beat
 extern int LevelMacro;

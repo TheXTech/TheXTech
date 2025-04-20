@@ -217,7 +217,7 @@ void FillGraph(Graph& graph)
 
     for(int i = 1; i <= numNPCs; i++)
     {
-        if(NPC[i].Type == NPCID_GOALTAPE || NPC[i].Type == NPCID_STAR_EXIT
+        if(NPC[i].Type == NPCID_GOALTAPE || NPC[i].Type == NPCID_STAR_EXIT || NPC[i].Type == NPCID_FLAG_EXIT
             || NPC[i].Type == NPCID_ITEMGOAL || NPC[i].Type == NPCID_GOALORB_S3 || NPC[i].Type == NPCID_GOALORB_S2)
         {
             graph.level.exits.push_back(o(ObjectGraph::Object::Exit,
