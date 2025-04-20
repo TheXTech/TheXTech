@@ -48,7 +48,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         char temporaryCString[PATH_MAX];
         bzero(temporaryCString, PATH_MAX);
         CFStringGetCString(filePathRef, temporaryCString, PATH_MAX, kCFStringEncodingUTF8);
-        s_applicationPath = PGE_URLDEC(std::string(temporaryCString));
+        s_applicationPath = PGE_FileFormats_misc::url_decode(std::string(temporaryCString));
         {
             s_bundleName.clear();
 
@@ -85,7 +85,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         char temporaryCString[PATH_MAX];
         bzero(temporaryCString, PATH_MAX);
         CFStringGetCString(filePathRef, temporaryCString, PATH_MAX, kCFStringEncodingUTF8);
-        std::string path = PGE_URLDEC(std::string(temporaryCString));
+        std::string path = PGE_FileFormats_misc::url_decode(std::string(temporaryCString));
         if(path.compare(0, 7, "file://") == 0)
             path.erase(0, 7);
         s_assetsRoot = path;
