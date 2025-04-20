@@ -541,7 +541,7 @@ bool OpenWorld_Unpack(WorldLoad& load, WorldData& wld)
     catch(const callback_error& e)
     {
         pLogWarning("Error of level \"%s\" file loading: %s.",
-                    lvl.meta.filename.c_str(),
+                    wld.meta.filename.c_str(),
                     e.what());
 
         MessageText = e.what();
