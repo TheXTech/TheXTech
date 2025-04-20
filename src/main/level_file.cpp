@@ -906,7 +906,8 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
             npc.Type = NPCID(n.id);
 
         if(npc.Type == NPCID_ITEM_BURIED || npc.Type == NPCID_ITEM_POD ||
-           npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_THROWER)
+           npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_THROWER ||
+           (NPCNewContainerType(npc.Type) && FileFormat == FileFormats::LVL_PGEX))
         {
             npc.Special = (vbint_t)n.contents;
             npc.DefaultSpecial = npc.Special;
@@ -1238,8 +1239,7 @@ void OpenLevel_FixLayersEvents(const LevelLoad& load)
                     npc.Killed = 9;
             }
         }
-        else if((npc.Type == NPCID_ITEM_BURIED || npc.Type == NPCID_ITEM_POD ||
-                  npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_THROWER) &&
+        else if(NPCIsContainer(npc) &&
                 (NPCID(npc.Special) == NPCID_STAR_EXIT || NPCID(npc.Special) == NPCID_STAR_COLLECT)) // Is a container that has a star inside
         {
             bool starFound = false;

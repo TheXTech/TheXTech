@@ -1746,12 +1746,13 @@ void UpdateInterprocess()
             if(n.id > maxNPCType) // Avoid out of range crash
                 EditorCursor.NPC.Type = NPCID(1);
 
-            if(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD || EditorCursor.NPC.Type == NPCID_ITEM_THROWER || EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE)
+            if(NPCIsContainer(EditorCursor.NPC))
             {
                 EditorCursor.NPC.Special = (vbint_t)n.contents;
                 EditorCursor.NPC.DefaultSpecial = EditorCursor.NPC.Special;
             }
-            if(EditorCursor.NPC.Type == 288 || EditorCursor.NPC.Type == 289 || (EditorCursor.NPC.Type == NPCID_ITEM_BURIED && int(EditorCursor.NPC.Special) == 288))
+
+            if(EditorCursor.NPC.Type == NPCID_DOOR_MAKER || EditorCursor.NPC.Type == NPCID_MAGIC_DOOR || (EditorCursor.NPC.Type == NPCID_ITEM_BURIED && EditorCursor.NPC.Special == NPCID_DOOR_MAKER))
             {
                 EditorCursor.NPC.Special2 = (vbint_t)n.special_data;
                 EditorCursor.NPC.DefaultSpecial2 = EditorCursor.NPC.Special2;
@@ -2196,14 +2197,17 @@ void SetCursor()
     else if(EditorCursor.Mode == OptCursor_t::LVL_NPCS) // NPCs
     {
         int t = EditorCursor.NPC.Type;
+
         // Container NPCs are handled elsewhere in new editor
         if(MagicHand)
         {
-            if(t != NPCID_ITEM_BURIED && t != 96 && t != 283 && t != 284 && !NPCTraits[t].IsFish && !NPCIsAParaTroopa(t) && t != NPCID_FIRE_CHAIN)
+            if(!NPCIsContainer(EditorCursor.NPC) && !NPCTraits[t].IsFish && !NPCIsAParaTroopa(t) && t != NPCID_FIRE_CHAIN)
                 EditorCursor.NPC.Special = 0;
-            if(t != 288 && t != 289 && t != NPCID_ITEM_BURIED && t != 260)
+
+            if(t != NPCID_DOOR_MAKER && t != NPCID_MAGIC_DOOR && t != NPCID_ITEM_BURIED && t != NPCID_FIRE_CHAIN)
                 EditorCursor.NPC.Special2 = 0;
         }
+
         EditorCursor.NPC.Special3 = 0;
         EditorCursor.NPC.Special4 = 0;
         EditorCursor.NPC.Special5 = 0;

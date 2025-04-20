@@ -30,6 +30,7 @@
 #include "sdl_proxy/sdl_stdinc.h"
 
 #include "npc_id.h"
+#include "npc.h"
 
 #include "globals.h"
 
@@ -210,7 +211,8 @@ void SaveInfoInit::check_npc(const LevelNPC& npc)
         return;
 
     bool is_container = (npc.id == NPCID_ITEM_BURIED || npc.id == NPCID_ITEM_POD ||
-                         npc.id == NPCID_ITEM_BUBBLE || npc.id == NPCID_ITEM_THROWER);
+                         npc.id == NPCID_ITEM_BUBBLE || npc.id == NPCID_ITEM_THROWER ||
+                         NPCNewContainerType(npc.id));
 
     bool contains_medal = is_container && npc.contents == NPCID_MEDAL;
 

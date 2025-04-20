@@ -5743,3 +5743,16 @@ bool npcHasFloor(const struct NPC_t &npc)
 
     return hasFloor;
 }
+
+bool NPCNewContainerType(int Type)
+{
+    (void)Type;
+    return false;
+}
+
+bool NPCIsContainer(const NPC_t& npc)
+{
+    return npc.Type == NPCID_ITEM_BURIED || npc.Type == NPCID_ITEM_POD
+        || npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_THROWER
+        || (NPCNewContainerType(npc.Type) && npc.Special != 0);
+}

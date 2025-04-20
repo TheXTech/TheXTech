@@ -23,6 +23,7 @@
 #include "layers.h"
 #include "write_common.h"
 #include "sound.h"
+#include "npc.h"
 #include "npc_id.h"
 #include "npc_traits.h"
 #include "npc_special_data.h"
@@ -227,8 +228,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         npc.y = (int32_t)n.Location.Y;
         npc.direct = n.Direction;
 
-        if(n.Type == NPCID_ITEM_BURIED || n.Type == NPCID_ITEM_POD ||
-           n.Type == NPCID_ITEM_BUBBLE || n.Type == NPCID_ITEM_THROWER)
+        if(NPCIsContainer(n))
         {
             npc.contents = n.Special;
             npc.special_data = n.Variant;

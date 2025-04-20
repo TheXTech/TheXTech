@@ -43,6 +43,7 @@
 #include "main/world_globals.h"
 
 #include "config.h"
+#include "npc.h"
 #include "npc_id.h"
 #include "npc_traits.h"
 #include "npc_special_data.h"
@@ -252,13 +253,12 @@ bool AllowBubble()
 {
     int type;
 
-    if(EditorCursor.NPC.Type == 91 || EditorCursor.NPC.Type == 96 ||
-       EditorCursor.NPC.Type == 283 || EditorCursor.NPC.Type == 284)
+    if(NPCIsContainer(EditorCursor.NPC))
         type = EditorCursor.NPC.Special;
     else
         type = EditorCursor.NPC.Type;
 
-    if(type == 134)
+    if(type == NPCID_BOMB)
         return true;
 
     if(NPCHeight(type) > 36 || NPCWidth(type) > 36
@@ -286,8 +286,7 @@ void SetEditorNPCType(NPCID type)
 {
     NPCID prev_type;
 
-    if(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD
-        || EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE || EditorCursor.NPC.Type == NPCID_ITEM_THROWER)
+    if(NPCIsContainer(EditorCursor.NPC))
     {
         prev_type = NPCID(EditorCursor.NPC.Special);
         EditorCursor.NPC.Special = type;
@@ -395,8 +394,7 @@ void EditorScreen::FocusNPC()
     int type;
     if(m_special_page == SPECIAL_PAGE_BLOCK_CONTENTS)
         type = EditorCursor.Block.Special - 1000;
-    else if(EditorCursor.NPC.Type == 91 || EditorCursor.NPC.Type == 96
-        || EditorCursor.NPC.Type == 283 || EditorCursor.NPC.Type == 284)
+    else if(NPCIsContainer(EditorCursor.NPC))
         type = EditorCursor.NPC.Special;
     else
         type = EditorCursor.NPC.Type;
@@ -544,9 +542,7 @@ void EditorScreen::UpdateNPC(CallMode mode, int x, int y, NPCID type)
     if(m_special_page != SPECIAL_PAGE_BLOCK_CONTENTS)
     {
         bool sel = (EditorCursor.NPC.Type == type ||
-            (EditorCursor.NPC.Special == type &&
-                (EditorCursor.NPC.Type == 91 || EditorCursor.NPC.Type == 96
-                    || EditorCursor.NPC.Type == 283 || EditorCursor.NPC.Type == 284)));
+            (EditorCursor.NPC.Special == type && NPCIsContainer(EditorCursor.NPC)));
 
         if(UpdateNPCButton(mode, x, y, type, sel) && !sel)
             SetEditorNPCType(type);
@@ -636,8 +632,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Type = NPCID(EditorCursor.NPC.Special);
                 EditorCursor.NPC.Special = 0;
             }
-            else if(!(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD
-                || EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE || EditorCursor.NPC.Type == NPCID_ITEM_THROWER))
+            else if(!NPCIsContainer(EditorCursor.NPC))
             {
                 EditorCursor.NPC.Special = EditorCursor.NPC.Type;
                 EditorCursor.NPC.Type = NPCID_ITEM_BURIED;
@@ -655,8 +650,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Type = NPCID(EditorCursor.NPC.Special);
                 EditorCursor.NPC.Special = 0;
             }
-            else if(!(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD
-                || EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE || EditorCursor.NPC.Type == NPCID_ITEM_THROWER))
+            else if(!NPCIsContainer(EditorCursor.NPC))
             {
                 EditorCursor.NPC.Special = EditorCursor.NPC.Type;
                 EditorCursor.NPC.Type = NPCID_ITEM_POD;
@@ -674,8 +668,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Type = NPCID(EditorCursor.NPC.Special);
                 EditorCursor.NPC.Special = 0;
             }
-            else if(!(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD
-                || EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE || EditorCursor.NPC.Type == NPCID_ITEM_THROWER))
+            else if(!NPCIsContainer(EditorCursor.NPC))
             {
                 EditorCursor.NPC.Special = EditorCursor.NPC.Type;
                 EditorCursor.NPC.Type = NPCID_ITEM_THROWER;
@@ -695,8 +688,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                     EditorCursor.NPC.Type = NPCID(EditorCursor.NPC.Special);
                     EditorCursor.NPC.Special = 0;
                 }
-                else if(!(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD
-                    || EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE || EditorCursor.NPC.Type == NPCID_ITEM_THROWER))
+                else if(!NPCIsContainer(EditorCursor.NPC))
                 {
                     EditorCursor.NPC.Special = EditorCursor.NPC.Type;
                     EditorCursor.NPC.Type = NPCID_ITEM_BUBBLE;
@@ -710,8 +702,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
         // Various properties that depend on type, get the real one here:
         int type;
-        if(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD
-            || EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE || EditorCursor.NPC.Type == NPCID_ITEM_THROWER)
+        if(NPCIsContainer(EditorCursor.NPC))
         {
             type = EditorCursor.NPC.Special;
         }

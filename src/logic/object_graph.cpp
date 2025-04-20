@@ -180,8 +180,7 @@ void FillGraph(Graph& graph)
     {
         NPC_t& n = NPC[i];
 
-        bool is_container = (n.Type == NPCID_ITEM_BURIED || n.Type == NPCID_ITEM_POD ||
-                             n.Type == NPCID_ITEM_BUBBLE || n.Type == NPCID_ITEM_THROWER);
+        bool is_container = NPCIsContainer(n);
 
         bool contains_door = is_container && (n.Special == NPCID_DOOR_MAKER || n.Special == NPCID_MAGIC_DOOR);
         bool is_door = (n.Type == NPCID_DOOR_MAKER || n.Type == NPCID_MAGIC_DOOR);

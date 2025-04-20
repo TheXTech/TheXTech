@@ -102,8 +102,7 @@ void s_drawBlockExtra(int Z, int camX, int camY, const Block_t& b)
 
 void s_drawNpcExtra(int Z, int camX, int camY, const NPC_t& n)
 {
-    if(!n.Hidden && (n.Type == NPCID_ITEM_BURIED || n.Type == NPCID_ITEM_POD)
-        && (n.Special > 0))
+    if(!n.Hidden && NPCIsContainer(n) && n.Type != NPCID_ITEM_BUBBLE && (n.Special > 0))
     {
         if(vScreenCollision(Z, n.Location))
         {

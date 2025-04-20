@@ -84,6 +84,10 @@ NPCID RandomBonus();
 // totally new function, used in the Raft logic
 bool npcHasFloor(const struct NPC_t &npc);
 
+// totally new function, used in editor and medals-tracking logic
+bool NPCIsContainer(const NPC_t& npc);
+bool NPCNewContainerType(int Type);
+
 // totally new function, used for compatibility (in compat mode, horizontal distance; in modern mode, squared Euclidean distance)
 num_t NPCPlayerTargetDist(const NPC_t& npc, const Player_t& player);
 

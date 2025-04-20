@@ -27,6 +27,7 @@
 #include <Logger/logger.h>
 
 #include "npc_id.h"
+#include "npc.h"
 
 #include "main/level_medals.h"
 #include "main/level_save_info.h"
@@ -236,8 +237,7 @@ void OrderMedals()
     {
         NPC_t& n = NPC[i];
 
-        bool is_container = (n.Type == NPCID_ITEM_BURIED || n.Type == NPCID_ITEM_POD ||
-                             n.Type == NPCID_ITEM_BUBBLE || n.Type == NPCID_ITEM_THROWER);
+        bool is_container = NPCIsContainer(n);
 
         bool contains_medal = is_container && n.Special == NPCID_MEDAL;
 
