@@ -569,7 +569,7 @@ static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName
 
         bool is_wldx = (head.meta.RecentFormat == WorldData::PGEX);
         bool is_wld38a = (head.meta.RecentFormat == WorldData::SMBX38A);
-        if(is_wldx && head.meta.configPackId == "SMBX2")
+        if(is_wldx && (head.meta.configPackId == "SMBX2" || head.meta.engineFeatureLevel > g_gameInfo.contentFeatureLevel))
             w.probably_incompatible = true;
         else if(is_wld38a)
             w.probably_incompatible = true;

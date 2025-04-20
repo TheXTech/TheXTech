@@ -49,6 +49,7 @@
 #include "main/level_medals.h"
 #include "main/screen_progress.h"
 #include "main/game_strings.h"
+#include "main/game_info.h"
 #include "trees.h"
 #include "npc_traits.h"
 #include "npc_special_data.h"
@@ -74,6 +75,7 @@
 
 #include "npc/section_overlap.h"
 
+#include "../version.h"
 
 #ifdef THEXTECH_BUILD_GL_MODERN
 #    include "core/opengl/gl_program_bank.h"
@@ -382,11 +384,20 @@ bool OpenLevel_Head(void* userdata, LevelData& head)
     // maxStars = head.stars;
     LevelName = head.LevelName;
 
+    constexpr unsigned int engineFeatureLevel = V_FEATURE_LEVEL;
+
 #ifdef PGEFL_CALLBACK_API
     FileFormat = head.RecentFormat;
+    unsigned int reqFeatureLevel = head.engineFeatureLevel;
 #else
     FileFormat = head.meta.RecentFormat;
+    unsigned int reqFeatureLevel = head.meta.engineFeatureLevel;
 #endif
+
+    if(reqFeatureLevel > engineFeatureLevel)
+        throw callback_error("Content cannot be loaded. Please update TheXTech.");
+    else if(reqFeatureLevel > g_gameInfo.contentFeatureLevel)
+        throw callback_error("Content cannot be loaded. Please update your game assets.");
 
     // Level-wide extra settings
     if(!head.custom_params.empty())
@@ -1408,6 +1419,8 @@ bool OpenLevel_Unpack(LevelLoad& load, LevelData& lvl)
         pLogWarning("Error of level \"%s\" file loading: %s.",
                     lvl.meta.filename.c_str(),
                     e.what());
+
+        MessageText = e.what();
 
         return false;
     }
