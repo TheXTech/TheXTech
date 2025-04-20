@@ -1016,6 +1016,17 @@ void PlayerEffectWarpDoor(int A)
     if(p.Character == 5)
         p.Frame = 1;
 
+    // just stay in the door after entering it during a flag exit
+    if(LevelMacro == LEVELMACRO_FLAG_EXIT)
+    {
+        if(p.Effect2 == 15)
+        {
+            p.Effect = PLREFF_WAITING;
+            p.Effect2 = -A;
+        }
+        return;
+    }
+
     // trigger warp fader when p.Effect2 is 5 (for normal animations) or 20 (for none/scroll animations)
     s_WarpFaderLogic(false, A, warp.transitEffect, warp_enter, p.Effect2 == 5, !is_level_quit && !same_section && (p.Effect2 == 20));
 

@@ -65,7 +65,7 @@ ItemList_t music_list;
 ItemList_t wmusic_list;
 ItemList_t bg2_list;
 
-std::vector<std::string> list_level_exit_names(10);
+std::vector<std::string> list_level_exit_names(11);
 
 static constexpr uint8_t LOADED_ALL = 7;
 uint8_t loaded = 0;

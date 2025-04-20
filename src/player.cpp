@@ -5942,6 +5942,18 @@ void PlayerEffects(const int A)
 
             if(Player[-p.Effect2].Dead)
                 p.Dead = true;
+
+            // a player has entered a door, make some fireworks!
+            if(LevelMacro == LEVELMACRO_FLAG_EXIT && -p.Effect2 == A)
+            {
+                if(((LevelMacroCounter & 63) == 0) && iRand(2))
+                {
+                    Location_t target = newLoc(p.Location.X + (16 - 128 + iRand(256)),
+                                               p.Location.Y - 256 + iRand(192));
+                    PlaySoundSpatial(SFX_Fireworks, target);
+                    NewEffect(EFFID_BOSS_FRAGILE_EXPLODE, target);
+                }
+            }
         }
         // temporary immunity and invisibility
         else if(p.Effect2 <= 30)

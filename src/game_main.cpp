@@ -2092,7 +2092,7 @@ void UpdateMacro()
             EndLevel = true;
         }
     }
-    else if(LevelMacro == LEVELMACRO_GOAL_TAPE_EXIT) // SMW Exit
+    else if(LevelMacro == LEVELMACRO_GOAL_TAPE_EXIT || LevelMacro == LEVELMACRO_FLAG_EXIT) // SMW Exit
     {
         for(A = 1; A <= numPlayers; A++)
         {
@@ -2107,7 +2107,7 @@ void UpdateMacro()
                 c.Left = false;
                 c.Right = true;
                 c.Run = false;
-                c.Up = false;
+                c.Up = (LevelMacro == LEVELMACRO_FLAG_EXIT);
                 c.Start = false;
                 c.AltJump = false;
                 c.AltRun = false;
@@ -2152,7 +2152,9 @@ void UpdateMacro()
 
         if(LevelMacroCounter >= 630)
         {
-            LevelBeatCode = 8;
+            // LEVELMACRO_GOAL_TAPE_EXIT = 7 -> 8
+            // LEVELMACRO_FLAG_EXIT = 8 -> 9
+            LevelBeatCode = (LevelMacro + 1);
             LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
             EndLevel = true;

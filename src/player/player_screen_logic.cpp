@@ -553,7 +553,7 @@ void PlayerLevelBoundsLogic(int A)
         hBoundsHandled = true;
     }
 
-    if(LevelMacro == LEVELMACRO_CARD_ROULETTE_EXIT || LevelMacro == LEVELMACRO_GOAL_TAPE_EXIT || GameMenu)
+    if(LevelMacro == LEVELMACRO_CARD_ROULETTE_EXIT || LevelMacro == LEVELMACRO_GOAL_TAPE_EXIT || LevelMacro == LEVELMACRO_FLAG_EXIT || GameMenu)
         hBoundsHandled = true;
 
     PlayerLevelEdgeCheck(A, !hBoundsHandled);

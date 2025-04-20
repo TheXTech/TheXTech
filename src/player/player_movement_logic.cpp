@@ -1475,3 +1475,17 @@ void PlayerMazeZoneMovement(int A)
         PlaySoundSpatial(SFX_HeroDash, Player[A].Location);
     }
 }
+
+void PlayerFlagSlideMovement(int A)
+{
+    // have we hit the ground yet?
+    if(Player[A].Location.SpeedY == 0)
+    {
+        LevelMacroWhich = 0;
+    }
+    else
+    {
+        Player[A].Location.SpeedY = 2;
+        Player[A].Location.Y += Player[A].Location.SpeedY;
+    }
+}

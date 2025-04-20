@@ -259,8 +259,12 @@ bool UpdatePlayer()
                 else
                     Player[A].AquaticSwim = false;
 
+                // maze zone movement fully bypasses normal movement routines
                 if(Player[A].CurMazeZone)
                     PlayerMazeZoneMovement(A);
+                // first stage of flag exit
+                else if(LevelMacro == LEVELMACRO_FLAG_EXIT && LevelMacroWhich < 0)
+                    PlayerFlagSlideMovement(A);
                 // normal player movement
                 else
                 {
