@@ -928,6 +928,7 @@ void make_pages(std::vector<ItemFamily*>& families, std::vector<ItemPage_t>& pag
         new_page.category = (**unplaced).category;
         new_page.icon = 0;
 
+        // find icon if one of the families has a custom icon
         for(auto f = new_page.begin; f != new_page.end; f++)
         {
             if((**f).icon)
@@ -937,11 +938,19 @@ void make_pages(std::vector<ItemFamily*>& families, std::vector<ItemPage_t>& pag
             }
         }
 
-        if(!new_page.icon)
-            new_page.icon = (**unplaced).types[0].type;
+        for(auto f = new_page.begin; f != new_page.end; ++f)
+        {
+            // find icon if none of the families has a custom icon
+            if(!new_page.icon && !(**f).types.empty())
+                new_page.icon = (**f).types[0].type;
 
-        for(auto it = new_page.begin; it != new_page.end; ++it)
-            (**it).page = (int8_t)pages.size();
+            // add reference to page
+            (**f).page = (int8_t)pages.size();
+        }
+
+        // don't generate fully empty page
+        if(!new_page.icon)
+            pages.pop_back();
 
         unplaced = unplaced_new;
     }
