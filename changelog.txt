@@ -17,6 +17,7 @@ Changelog for 1.3.8-dev
 -Add experimental cheat "borntoclimb" (@ds-sloth)
 -Added an experimental port to the Nintendo DSi port (@ds-sloth)
 -Fix SMBX 1.3 visual peculiarity where a large held item was drawn at the wrong offset and size, guarded by compat flag "fix-visual-bugs" [Modern Mode] (@ds-sloth)
+-Battle mode: allow eaten player to escape by repeatedly hitting Jump (@ds-sloth)
 
 Changelog for 1.3.7.1-dev
 -Add GameCube controller support for Wii (@ds-sloth)

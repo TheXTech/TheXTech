@@ -6431,6 +6431,33 @@ void PlayerEffects(const int A)
             p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
         }
+
+        // new logic: allow escape!
+        if(BattleMode && g_config.multiplayer_pause_controls)
+        {
+            if(p.Effect == PLREFF_NORMAL)
+            {
+                p.Immune = 0;
+                p.CanJump = false;
+            }
+            else if(p.Immune > 0)
+                p.Immune--;
+
+            if(p.Controls.Jump || p.Controls.AltJump)
+            {
+                if(p.Immune == 0 && p.CanJump && p.Effect2)
+                {
+                    p.Immune = 15;
+                    p.CanJump = false;
+
+                    // this gives a median carry time of 10 seconds (22 taps)
+                    if(iRand(32) == 0)
+                        YoshiSpit(p.Effect2);
+                }
+            }
+            else
+                p.CanJump = true;
+        }
     }
     else if(p.Effect == PLREFF_RESPAWN) // player stole a heldbonus
     {
