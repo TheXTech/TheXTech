@@ -690,6 +690,48 @@ void SkullRide(int A, bool reEnable, const Location_t *alignAt)
     }
 }
 
+static void s_NPCSpawnCustomThrown(NPC_t& thrower, NPC_t& new_npc)
+{
+    new_npc.Location.Width = new_npc->TWidth;
+    new_npc.Location.Height = new_npc->THeight;
+    new_npc.Variant = thrower.Variant;
+
+    num_t floor_y = thrower.Location.Y + thrower.Location.Height - new_npc.Location.Height;
+    if(new_npc.Location.Y > floor_y)
+        new_npc.Location.Y = floor_y;
+
+    new_npc.Immune = 12;
+
+    if(new_npc->IsACoin || new_npc.Type == NPCID_SLIDE_BLOCK)
+    {
+        if(NPC[numNPCs]->IsACoin)
+            NPC[numNPCs].Location.SpeedX /= 2;
+
+        new_npc.Special = 1;
+    }
+    else if(new_npc.Type == NPCID_HOMING_BALL)
+        new_npc.Special2 = 95;
+
+    if(new_npc->IsABlock)
+    {
+        if(new_npc.Direction > 0)
+            new_npc.Location.X = thrower.Location.X + thrower.Location.Width;
+        else
+            new_npc.Location.X = thrower.Location.X - new_npc.Location.Width;
+    }
+
+    if(new_npc.Type != NPCID_BULLET && new_npc.Type != NPCID_BOMB && new_npc.Type != NPCID_HOMING_BALL
+        && new_npc.Type != NPCID_HOMING_BALL_GEN && new_npc.Type != NPCID_STACKER && new_npc.Type != NPCID_WALK_PLANT
+        && new_npc.Type != NPCID_VINE_BUG && new_npc.Type != NPCID_BOSS_CASE && new_npc.Type != NPCID_FLY
+        && !new_npc->IsACoin)
+    {
+        new_npc.Projectile = true;
+    }
+
+    if(thrower.Inert && !(new_npc->IsACoin || new_npc->IsABonus || new_npc->WontHurt))
+        new_npc.Inert = true;
+}
+
 void NPCSpecial(int A)
 {
     // double C = 0;
@@ -5363,7 +5405,8 @@ void SpecialNPC(int A)
             {
                 NPC[A].Location.Y -= 1;
                 NPC[A].Location.SpeedY = -5;
-                if(NPC[A].Inert)
+                // previously never shot anything, now it shoots if contents are configured
+                if(NPC[A].Inert && !NPC[A].Special)
                     NPC[A].Special2 = 0;
                 // deferring tree update to end of the NPC physics update
             }
@@ -5375,7 +5418,7 @@ void SpecialNPC(int A)
                     NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].Direction = NPC[A].Direction;
-                    NPC[numNPCs].Type = NPCID_SPIT_BOSS_BALL;
+                    NPC[numNPCs].Type = (NPC[A].Special) ? (NPCID)NPC[A].Special : NPCID_SPIT_BOSS_BALL;
 
                     NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
                     NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
@@ -5389,6 +5432,15 @@ void SpecialNPC(int A)
                     NPC[numNPCs].TimeLeft = 100;
                     NPC[numNPCs].Section = NPC[A].Section;
                     NPC[numNPCs].Location.SpeedX = 4 * NPC[numNPCs].Direction;
+
+                    if(NPC[A].Special)
+                    {
+                        s_NPCSpawnCustomThrown(NPC[A], NPC[numNPCs]);
+
+                        if(NPC[numNPCs].Type == NPCID_SLIDE_BLOCK || NPC[numNPCs]->IsAShell)
+                            NPC[numNPCs].Location.SpeedX = Physics.NPCShellSpeed * NPC[numNPCs].Direction;
+                    }
+
                     PlaySoundSpatial(SFX_SpitBossSpit, NPC[A].Location);
                     syncLayers_NPC(numNPCs);
                 }
@@ -5747,8 +5799,7 @@ bool npcHasFloor(const struct NPC_t &npc)
 
 bool NPCNewContainerType(int Type)
 {
-    (void)Type;
-    return false;
+    return Type == NPCID_SPIT_BOSS;
 }
 
 bool NPCIsContainer(const NPC_t& npc)

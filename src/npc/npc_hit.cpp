@@ -1830,7 +1830,11 @@ void NPCHit(int A, int B, int C)
         {
             if(B == 3)
             {
-                if(NPC[C].Type != NPCID_PLR_FIREBALL)
+                if(NPC[C].Type == NPC[A].Special && NPC[C].Immune)
+                {
+                    // new logic: don't get hurt by a just-shot item
+                }
+                else if(NPC[C].Type != NPCID_PLR_FIREBALL)
                 {
                     NPC[A].Special5 = -30;
                     NPC[A].Damage += 1;

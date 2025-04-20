@@ -679,9 +679,27 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             }
         }
 
+        if(FileFormat == FileFormats::LVL_PGEX && UpdateButton(mode, e_ScreenW - 40 + 4, 180 + 4, GFXNPC[NPCID_SPIT_BOSS], (EditorCursor.NPC.Type == NPCID_SPIT_BOSS && EditorCursor.NPC.Special), 0, 0, NPCWidthGFX(NPCID_SPIT_BOSS), NPCHeightGFX(NPCID_SPIT_BOSS)))
+        {
+            if(EditorCursor.NPC.Type == NPCID_SPIT_BOSS && EditorCursor.NPC.Special)
+            {
+                EditorCursor.NPC.Type = NPCID(EditorCursor.NPC.Special);
+                EditorCursor.NPC.Special = 0;
+            }
+            else if(!NPCIsContainer(EditorCursor.NPC))
+            {
+                EditorCursor.NPC.Special = EditorCursor.NPC.Type;
+                EditorCursor.NPC.Type = NPCID_SPIT_BOSS;
+            }
+            else
+            {
+                EditorCursor.NPC.Type = NPCID_SPIT_BOSS;
+            }
+        }
+
         if(AllowBubble())
         {
-            if(UpdateButton(mode, e_ScreenW - 40 + 4, 180 + 4, GFXNPC[NPCID_ITEM_BUBBLE], EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE, 0, 0, NPCWidthGFX(NPCID_ITEM_BUBBLE), NPCHeightGFX(NPCID_ITEM_BUBBLE)))
+            if(UpdateButton(mode, e_ScreenW - 40 + 4, ((FileFormat == FileFormats::LVL_PGEX) ? 220 : 180) + 4, GFXNPC[NPCID_ITEM_BUBBLE], EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE, 0, 0, NPCWidthGFX(NPCID_ITEM_BUBBLE), NPCHeightGFX(NPCID_ITEM_BUBBLE)))
             {
                 if(EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE)
                 {
