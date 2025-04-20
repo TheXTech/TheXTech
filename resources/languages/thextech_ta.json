@@ -1,14 +1,14 @@
 {
     "editor": {
         "block": {
-            "canBreak": "உடைக்க முடியும்",
+            "canBreak": "உடையும்",
             "letterHeight": "ம",
             "letterWidth": "W",
             "canBreakTooltip": "மரபு: அடிக்கும்போது உடைகிறது",
             "inside": "உள்ளே:",
             "invis": "இன்விச்",
             "pickContents": "தொகுதி உள்ளடக்கங்களைத் தேர்ந்தெடுங்கள்",
-            "slick": "மென்மையாய்"
+            "slick": "மென்மை"
         },
         "events": {
             "bounds": {
@@ -91,7 +91,7 @@
             "commandOpen": "திறந்த ...",
             "commandSaveAs": "சேமி ...",
             "confirmConfirmAction": "நீங்கள் நிச்சயமாக {0} செய்ய விரும்புகிறீர்களா?",
-            "confirmConvertFormatTo": "வடிவத்தை {0 க்கு ஆக மாற்றவா?",
+            "confirmConvertFormatTo": "வடிவத்தை {0} ஆக மாற்றவா?",
             "formatLegacy": "மரபு",
             "optionActionWithoutSave": "{0} சேமிக்காமல்",
             "optionYesSaveThenAction": "ஆம்: சேமி {0}",
@@ -179,8 +179,8 @@
         "select": {
             "pathBlankUnlock": "பாதை {0} திறக்கவும்",
             "worldMusic": "உலக இசை",
-            "allSectPropBlankForEventN": "{1 க்கு க்கு அனைத்து பிரிவு {0}",
-            "sectBlankPropBlankForEventN": "{2 க்கு க்கு பிரிவு {0} {1}",
+            "allSectPropBlankForEventN": "{1} க்கு அனைத்து தேர்வு {0}",
+            "sectBlankPropBlankForEventN": "{2} க்கு தேர்வு {0} {1}",
             "sectionBlankPropBlank": "பிரிவு {0} {1}",
             "soundForEventN": "நிகழ்வுக்கான ஒலி {0}",
             "warpTransitEffect": "வார்ப் மாற்றம் விளைவு"
@@ -269,18 +269,18 @@
         "letterDown": "டி",
         "level": {
             "startPos": "POS ஐத் தொடங்குங்கள்",
-            "alwaysVis": "எப்போதும் பார்வையிடவும்",
-            "bigBG": "பெரிய பி.சி.",
-            "gameStart": "விளையாட்டு தொடக்க",
+            "alwaysVis": "எப்போதும் காண்",
+            "bigBG": "பெரிய பின்னணி",
+            "gameStart": "விளையாடத் தொடக்கு",
             "levelName": "நிலை பெயர்",
-            "pathBG": "பாதை பி.சி.",
+            "pathBG": "பாதை பின்னணி",
             "pathUnlocks": "பாதை திறத்தல்"
         },
         "mapPos": "வரைபடம் போச்:",
         "letterLeft": "எல்",
         "letterRight": "R",
         "letterUp": "உ",
-        "pageBlankOfBlank": "{1 of இன் பக்கம் {0}",
+        "pageBlankOfBlank": "{1} இன் பக்கம் {0}",
         "phraseAreYouSure": "நீங்கள் உறுதியாக இருக்கிறீர்களா?",
         "phraseCountMore": "{0} மேலும்",
         "phraseDelayIsMs": "தாமதம்: {0} எம்.எச்",
@@ -479,7 +479,7 @@
                     "buttonZ": "சட்",
                     "prefixN": "N"
                 },
-                "typeNunchuck": "Nunchuck",
+                "typeNunchuck": "சங்கிலித் தண்டுகள்",
                 "typeWiimote": "Wiimote",
                 "typeGamecube": "கேம்க்யூப்"
             },
@@ -581,7 +581,7 @@
                     "info": "தகவல்",
                     "none": "எதுவுமில்லை"
                 },
-                "record-gameplay-data": "விளையாட்டு விளையாட்டு",
+                "record-gameplay-data": "விளையாட்டுப் பதிவு",
                 "render": {
                     "hw": "தானி",
                     "opengl": "Opengl 3+",
