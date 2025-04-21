@@ -299,17 +299,20 @@ bool UpdateNPCs()
     {
         int A = *(it++);
 
-        if(NPC[A].RespawnDelay > 0)
+        if(NPC[A].RespawnDelay && !NPC[A].Active && NPC[A].Effect2 > 0)
         {
             NPC[A].Reset[1] = false;
             NPC[A].Reset[2] = false;
-            NPC[A].RespawnDelay -= 1;
+            NPC[A].Effect2 -= 1;
 
             NPCQueues::NoReset.push_back(A);
         }
-
-        if(NPC[A].RespawnDelay == 0)
+        else
+        {
+            // don't reset Effect2 in case the NPC is somehow using it now
+            NPC[A].RespawnDelay = false;
             NPCQueues::RespawnDelay.erase(A);
+        }
     }
 
     for(int A = maxNPCs - 100 + 1; A <= numNPCs; A++)

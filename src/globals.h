@@ -430,9 +430,6 @@ struct NPC_t
 //    CantHurt As Integer 'Won't hurt the player
     // timer for how long the NPC will be harmless to a certain player, set to values up to 10000
     vbint_t CantHurt = 0;
-//    RespawnDelay As Integeri
-    // used to respawn an NPC in Battle Mode, set to 65 * 30 (30s) on deactivation and decremented each frame
-    vbint_t RespawnDelay = 0;
 //    WallDeath As Integer
     // tracks whether the NPC was activated in a wall (or is not in water, for fish). set to values between 0 and 10, used as a counter bounded at these values, sometimes very briefly 11.
     uint8_t WallDeath = 0;
@@ -457,6 +454,10 @@ struct NPC_t
     bool Bouce : 1;
 //    DefaultStuck As Boolean
     bool DefaultStuck : 1;
+//    RespawnDelay As Integeri
+    // Used to respawn an NPC in Battle Mode but no longer a counter.
+    // Effect2 is set to 65 * 30 (30s) on deactivation and decremented each frame while this flag is set.
+    bool RespawnDelay : 1;
     // EXTRA (private to npc_activation.cpp): stores whether the NPC needs to use an event logic screen for activation
     bool _priv_force_canonical : 1;
     // EXTRA (private to npc_activation.cpp): stores whether the NPC has an activation event to hide self
@@ -504,7 +505,8 @@ struct NPC_t
 
     NPC_t() : TurnAround(false), TurnBackWipe(false), GeneratorActive(false),
         playerTemp(false), Legacy(false), Chat(false), NoLavaSplash(false),
-        Bouce(false), DefaultStuck(false), _priv_force_canonical(false),
+        Bouce(false), DefaultStuck(false), RespawnDelay(false),
+        _priv_force_canonical(false),
         _priv_self_hide_event(false),
         DefaultLocationHeight_Force32(false) {}
 

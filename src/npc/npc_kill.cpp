@@ -1569,10 +1569,7 @@ resume_TriggerLast:
     }
 
     if(BattleMode)
-    {
-        NPC[A].RespawnDelay = 65 * 30;
-        NPCQueues::RespawnDelay.insert(A);
-    }
+        NPC[A].RespawnDelay = true;
 
     // note: this is the "defective" version of SetLayerSpeed, which (in classic mode) only sets the speed to 0, and does nothing else
     if(NPC[A].AttLayer != LAYER_NONE && NPC[A].AttLayer != LAYER_DEFAULT)

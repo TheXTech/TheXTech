@@ -1838,21 +1838,7 @@ public:
 
         // insert(0x00000000, &NPC_t::AttLayer);
         insert(0x00000004, &NPC_t::Quicksand);
-        insert(0x00000006, // RespawnDelay
-            [](const NPC_t& n, FIELDTYPE ftype)->num_t
-            {
-                return valueToMem(n.RespawnDelay, ftype);
-            },
-            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
-            {
-                memToValue(n.RespawnDelay, in, ftype);
-
-                if(n.RespawnDelay)
-                    NPCQueues::RespawnDelay.insert(n);
-                else
-                    NPCQueues::RespawnDelay.erase(n);
-            }
-        );
+        // insert(0x00000006, &NPC_t::RespawnDelay); // only usable in Battle Mode
         insert(0x00000008, // Bouce
             [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {

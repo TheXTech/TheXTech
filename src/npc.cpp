@@ -243,7 +243,13 @@ void Deactivate(int A)
             NPC[A].TimeLeft = 0;
             NPC[A].Projectile = false;
             NPC[A].Effect = NPCEFF_NORMAL;
-            NPC[A].Effect2 = 0;
+
+            // counter to respawn
+            if(NPC[A].RespawnDelay)
+                NPC[A].Effect2 = 65 * 30;
+            else
+                NPC[A].Effect2 = 0;
+
             NPC[A].Effect3 = 0;
             NPC[A].BeltSpeed = 0;
             NPC[A].vehiclePlr = 0;
