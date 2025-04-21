@@ -1801,6 +1801,7 @@ void ClearLevel()
         // bgColor[A] = 0xF89868;    // unused since SMBX64, removed
         bgMusic[A] = 0;
         level[A] = BlankSpeedless;
+        LevelREAL[A] = IntegerLocation_t();
         LevelWrap[A] = false;
         LevelVWrap[A] = false;
         // LevelChop[A] = 0; // unused since SMBX64, removed
