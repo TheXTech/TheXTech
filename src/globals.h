@@ -375,7 +375,7 @@ struct NPC_t
 //    Slope As Integer 'the block that the NPC is on a slope with
     vbint_t Slope = 0;
 //    Multiplier As Integer 'for upping the points the player recieves
-    vbint_t Multiplier = 0;
+    uint8_t Multiplier = 0;
 //    standingOnPlayerY As Integer
     vbint_t vehicleYOffset = 0;
 //    standingOnPlayer As Integer 'If this NPC is standing on a player in the clown car
@@ -591,7 +591,7 @@ struct Player_t
 //    SpinFireDir As Integer 'for shooting fireballs while spin jumping
     vbint_t SpinFireDir = 0;
 //    Multiplier As Integer 'for score increase for multiple hops
-    vbint_t Multiplier = 0;
+    uint8_t Multiplier = 0;
 //    SlideCounter As Integer 'for creating the dust effect when sliding
     vbint_t SlideCounter = 0;
 //    ShowWarp As Integer

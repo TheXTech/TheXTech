@@ -49,7 +49,7 @@ void SnowbordinCode()
     if(!shell_npc)
         return;
 
-    vbint_t &shell_kills = shell_npc->Multiplier;
+    uint8_t &shell_kills = shell_npc->Multiplier;
 
     if(shell_kills >= 9)
     {

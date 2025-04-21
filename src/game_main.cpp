@@ -2273,11 +2273,11 @@ Location_t newLoc(num_t X, num_t Y, num_t Width, num_t Height)
 
 void MoreScore(int addScore, const Location_t &Loc)
 {
-    vbint_t mult = 0; // dummy
+    uint8_t mult = 0; // dummy
     MoreScore(addScore, Loc, mult);
 }
 
-void MoreScore(int addScore, const Location_t &Loc, vbint_t &Multiplier)
+void MoreScore(int addScore, const Location_t &Loc, uint8_t &Multiplier)
 {
     //int oldM = 0;
     int A = 0;
