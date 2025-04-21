@@ -145,6 +145,10 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
     for(int i = 1; i <= 2; ++i)
     {
         const auto &p = PlayerStart[i];
+
+        if(p.isNull())
+            continue;
+
         player.id = i;
         player.x = p.X;
         player.y = p.Y;
