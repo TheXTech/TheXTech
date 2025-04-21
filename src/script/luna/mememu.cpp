@@ -2148,18 +2148,7 @@ public:
         );
         insert(0x0000014e, &NPC_t::coinSwitchBlockType);
         insert(0x00000150, &NPC_t::tempBlock);
-        insert(0x00000152, // onWall
-            [](const NPC_t& n, FIELDTYPE ftype)->num_t
-            {
-                return valueToMem(n.onWall, ftype);
-            },
-            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
-            {
-                bool temp = n.onWall;
-                memToValue(temp, in, ftype);
-                n.onWall = temp;
-            }
-        );
+        // insert(0x00000152, &NPC_t::onWall); // removed temporary variable
         insert(0x00000154, // TurnBackWipe
             [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {

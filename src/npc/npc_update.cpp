@@ -1702,7 +1702,8 @@ interrupt_Activation:
                     if(NPC[A].Pinched.Moving > 0)
                         NPC[A].Pinched.Moving -= 1;
 
-                    NPC[A].onWall = false;
+                    // removed, only ever read in NPCBlockLogic
+                    // NPC[A].onWall = false;
                     if(NPC[A].Location.X < -(FLBlocks - 1) * 32)
                         NPC[A].Location.X = -(FLBlocks - 1) * 32;
                     if(NPC[A].Location.X + NPC[A].Location.Width > (FLBlocks + 1) * 32)

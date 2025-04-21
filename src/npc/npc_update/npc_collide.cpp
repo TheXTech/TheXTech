@@ -527,8 +527,6 @@ void NPCCollide(int A)
                 }
                 else if(NPC[A].Effect == NPCEFF_MAZE && NPC[B].Effect == NPCEFF_MAZE && HitSpot != 5)
                 {
-                    NPC[A].onWall = true;
-
                     if(!NPC[B].TurnAround)
                         NPC[A].TurnAround = true;
 
@@ -537,7 +535,9 @@ void NPCCollide(int A)
                 }
                 else if((HitSpot == 2 || HitSpot == 4) && NPC[A].Type != NPCID_SAW && NPC[B].Type != NPCID_SAW)
                 {
-                    NPC[A].onWall = true;
+                    // set in SMBX 1.3 but reset to false before it got read
+                    // NPC[A].onWall = true;
+
                     if(NPC[A].Direction == NPC[B].Direction)
                     {
                         if(NPC[A].Location.SpeedX * NPC[A].Direction > NPC[B].Location.SpeedX * NPC[B].Direction)

@@ -36,6 +36,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
 {
     bool resetBeltSpeed = false;
     bool beltClear = false; // "stops belt movement when on a wall" (Redigit)
+    bool onWall = false; // temporary variable, moved from NPC_t struct
     tempf_t beltCount = 0;
     tempf_t addBelt = 0;
 
@@ -1112,7 +1113,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                         if(NPC[A].Type == NPCID_VILLAIN_S3)
                                             NPC[A].Location.SpeedX = 0;
 
-                                        NPC[A].onWall = true;
+                                        onWall = true;
 
                                         // item was thrown into a wall this frame (or is a fish that just re-entered water)
                                         if(NPC[A].WallDeath >= 5 && !NPC[A]->IsABonus && NPC[A].Type != NPCID_FLY_BLOCK &&
@@ -1415,7 +1416,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                     NPC[C].TimeLeft = NPC[A].TimeLeft - 1;
                                 else if(NPC[A].TimeLeft < NPC[C].TimeLeft - 1)
                                     NPC[A].TimeLeft = NPC[C].TimeLeft - 1;
-                                NPC[A].onWall = true;
+                                onWall = true;
                                 if((NPC[A].Location.SpeedX > 0 && NPC[C].Location.X > NPC[A].Location.X) || (NPC[A].Location.SpeedX < 0 && NPC[C].Location.X < NPC[A].Location.X))
                                     NPC[A].TurnAround = true;
                                 if((NPC[C].Location.SpeedX > 0 && NPC[A].Location.X > NPC[C].Location.X) || (NPC[C].Location.SpeedX < 0 && NPC[A].Location.X < NPC[C].Location.X))
@@ -1437,7 +1438,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
         }
     }
 
-    if(!NPC[A].onWall)
+    if(!onWall)
         beltSpeed += addBelt;
 
     NPC[A].oldAddBelt = (numf_t)addBelt;

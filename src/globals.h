@@ -441,8 +441,6 @@ struct NPC_t
     // rarely used bools turned into bitfields
 //    TurnAround As Boolean 'if the NPC needs to turn around
     bool TurnAround : 1;
-//    onWall As Boolean
-    bool onWall : 1;
 //    TurnBackWipe As Boolean
     bool TurnBackWipe : 1;
 //    GeneratorActive As Boolean
@@ -453,6 +451,7 @@ struct NPC_t
     bool Legacy : 1;
 //    Chat As Boolean 'for talking to the NPC
     bool Chat : 1;
+    // (only set by NPCHit and used by KillNPC. Killed == 6 is never checked. Could certainly migrate to a KillCode modifier if a bit is needed.)
 //    NoLavaSplash As Boolean 'true for no lava splash
     bool NoLavaSplash : 1;
 //    Bouce As Boolean
@@ -491,6 +490,9 @@ struct NPC_t
     // int NetTimeout = 0;    // unused since SMBX64, removed
 //    Settings As Integer
     // int Settings = 0;    // unused since SMBX64, removed
+    // was previously a persistent variable, but was set to a constant value at the start of UpdateNPCs and never read outside of that routine
+//    onWall As Boolean
+    // bool onWall : 1;
 
 //End Type
 
@@ -498,7 +500,7 @@ struct NPC_t
     void ResetLocation();
     const NPCTraits_t* operator->() const;
 
-    NPC_t() : TurnAround(false), onWall(false), TurnBackWipe(false), GeneratorActive(false),
+    NPC_t() : TurnAround(false), TurnBackWipe(false), GeneratorActive(false),
         playerTemp(false), Legacy(false), Chat(false), NoLavaSplash(false),
         Bouce(false), DefaultStuck(false), _priv_force_canonical(false),
         _priv_self_hide_event(false),
