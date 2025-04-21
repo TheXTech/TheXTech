@@ -1487,6 +1487,7 @@ void OpenLevelDataPost()
                 const NPC_t& n_in = NPC[A];
 
                 if(n_in.Type == NPCID_CONVEYOR &&
+                   !n_in.Generator &&
                    !n_in.Inert &&
                    numBlock < maxBlocks &&
                    n_in.AttLayer == LAYER_NONE)
