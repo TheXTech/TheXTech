@@ -776,11 +776,13 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
             BlockHitHard(wallBlock);
             PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
 
-            num_t rel_speed = Player[A].Location.SpeedX - Block[wallBlock].Location.SpeedX;
+            // uses layer's speed to fix a bug where the sides of conveyor belts changed the player's speed
+            num_t block_speed = (num_t)Layer[Block[wallBlock].Layer].ApplySpeedX;
+            num_t rel_speed = Player[A].Location.SpeedX - block_speed;
 
             if((rel_speed > 0) == (Player[A].Direction > 0) && !hitCeiling && Player[A].State == PLR_STATE_SHELL)
             {
-                Player[A].Location.SpeedX = Block[wallBlock].Location.SpeedX - rel_speed;
+                Player[A].Location.SpeedX = block_speed - rel_speed;
 
                 // help player go over 1-block gaps here
                 if(!floorBlock && !Player[A].StandingOnNPC && !Player[A].Slope)

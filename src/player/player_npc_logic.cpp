@@ -855,9 +855,16 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         {
                                             PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
 
-                                            num_t rel_speed = Player[A].Location.SpeedX - wallNpcSpeed;
+                                            // handle conveyor belts (which move with their layer, not their own SpeedX) correctly
+                                            num_t npc_speed = wallNpcSpeed;
+                                            if(NPC[B].Type == NPCID_CONVEYOR)
+                                                npc_speed = (num_t)Layer[NPC[B].Layer].ApplySpeedX;
+
+                                            // bounce player!
+                                            num_t rel_speed = Player[A].Location.SpeedX - npc_speed;
                                             if((rel_speed > 0) == (Player[A].Direction > 0))
-                                                Player[A].Location.SpeedX = wallNpcSpeed - rel_speed;
+                                                Player[A].Location.SpeedX = npc_speed - rel_speed;
+
                                             if(Player[A].State != PLR_STATE_POLAR)
                                                 hitWall = false;
                                         }
