@@ -334,11 +334,14 @@ void NPCHit(int A, int B, int C)
 
         NPC[A].Direction = Player[C].Direction;
 
+#if 0
+        / NOT a generator, this was tested above
         if(NPC[A].Generator)
         {
             NPC[A].Generator = false;
             NPCQueues::update(A);
         }
+#endif
 
         NPC[A].Frame = 0;
         NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
