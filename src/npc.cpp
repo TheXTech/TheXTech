@@ -254,6 +254,7 @@ void Deactivate(int A)
             NPC[A].oldAddBelt = 0;
             NPC[A].Reset[1] = false;
             NPC[A].Reset[2] = false;
+            // DefaultSpecial
             NPC[A].Special = NPC[A].DefaultSpecial;
             NPC[A].Special2 = NPC[A].DefaultSpecial2;
             NPC[A].Special3 = 0;
@@ -262,7 +263,8 @@ void Deactivate(int A)
             // NPC[A].Special6 = 0;
             NPC[A].SpecialX = 0;
             NPC[A].SpecialY = 0;
-            NPC[A].Damage = 0;
+            if(!NPC[A]->IsACoin)
+                NPC[A].Damage = 0;
             NPC[A].HoldingPlayer = 0;
 
             // NPC[A].Pinched1 = 0;

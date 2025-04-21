@@ -31,6 +31,7 @@
 #include "collision.h"
 #include "eff_id.h"
 #include "blk_id.h"
+#include "npc_traits.h"
 #include "config.h"
 
 #include "main/trees.h"
@@ -172,11 +173,8 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                             // ' fixes a bug with holding an npc that is really a block
                             if(Player[A].HoldingNPC > 0)
                             {
-                                if(NPC[Player[A].HoldingNPC].coinSwitchBlockType > 0)
-                                {
-                                    if(NPC[Player[A].HoldingNPC].coinSwitchBlockType == B)
-                                        HitSpot = 0;
-                                }
+                                if(NPC[Player[A].HoldingNPC].coinSwitchBlockType() == B)
+                                    HitSpot = 0;
                             }
 
                             // destroy some blocks if the player is touching it as a statue

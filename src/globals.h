@@ -409,6 +409,7 @@ struct NPC_t
     vbint_t FrameCount = 0;
 //    Damage As Single
     // never set to a non-integer value, likely used a float for saturation arithemtic
+    // (note: for NPCs whose DefaultType is a coin, this now stores the block type of a coin created by a coin switch)
     vbint_t Damage = 0;
 
     // Player reference variables
@@ -432,8 +433,6 @@ struct NPC_t
 //    RespawnDelay As Integeri
     // used to respawn an NPC in Battle Mode, set to 65 * 30 (30s) on deactivation and decremented each frame
     vbint_t RespawnDelay = 0;
-//    Block As Integer 'Used when a P-Switch turns a block into a coint
-    vbint_t coinSwitchBlockType = 0;
 //    WallDeath As Integer
     // tracks whether the NPC was activated in a wall (or is not in water, for fish). set to values between 0 and 10, used as a counter bounded at these values, sometimes very briefly 11.
     uint8_t WallDeath = 0;
@@ -493,6 +492,9 @@ struct NPC_t
     // was previously a persistent variable, but was set to a constant value at the start of UpdateNPCs and never read outside of that routine
 //    onWall As Boolean
     // bool onWall : 1;
+//    Block As Integer 'Used when a P-Switch turns a block into a coint
+    // Now stored in Damage which is unused for coins
+    inline vbint_t coinSwitchBlockType() const;
 
 //End Type
 

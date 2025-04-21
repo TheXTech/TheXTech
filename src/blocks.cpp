@@ -719,7 +719,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         nn.Active = true;
         nn.TimeLeft = 1;
         nn.Type = NPCID_COIN_S4;
-        nn.coinSwitchBlockType = 89;
+        // nn.coinSwitchBlockType = 89;
+        // this value has been moved to Damage for coins
+        nn.Damage = 89;
         nn.Location = b.Location;
         nn.Location.Width = nn->TWidth;
         nn.Location.Height = nn->THeight;
@@ -1627,7 +1629,7 @@ bool PSwitch(bool enabled)
     {
         for(A = 1; A <= numNPCs; A++)
         {
-            bool transform = NPC[A]->IsACoin && NPC[A].coinSwitchBlockType == 0 && !NPC[A].Hidden && NPC[A].Special == 0;
+            bool transform = NPC[A]->IsACoin && NPC[A].coinSwitchBlockType() == 0 && !NPC[A].Hidden && NPC[A].Special == 0;
 
             if(NPC[A].Type == NPCID_MEDAL && g_config.fix_special_coin_switch)
                 transform = false;
@@ -1716,7 +1718,9 @@ bool PSwitch(bool enabled)
                     nn.Layer = Block[A].Layer;
                     nn.TriggerDeath = Block[A].TriggerDeath;
                     nn.TriggerLast = Block[A].TriggerLast;
-                    nn.coinSwitchBlockType = Block[A].Type;
+                    // nn.coinSwitchBlockType = Block[A].Type;
+                    // this value has been moved to Damage for coins
+                    nn.Damage = Block[A].Type;
                     nn.Hidden = false;
                     nn.Location = Block[A].Location;
                     nn.Location.SpeedX = 0;
@@ -1764,7 +1768,7 @@ bool PSwitch(bool enabled)
     {
         for(A = 1; A <= numNPCs; A++)
         {
-            if(NPC[A].coinSwitchBlockType > 0)
+            if(NPC[A].coinSwitchBlockType() > 0)
             {
                 if(numBlock < maxBlocks)
                 {
@@ -1775,7 +1779,7 @@ bool PSwitch(bool enabled)
                     nb.TriggerLast = NPC[A].TriggerLast;
                     nb.Hidden = NPC[A].Hidden;
                     nb.Invis = false;
-                    nb.Type = NPC[A].coinSwitchBlockType;
+                    nb.Type = NPC[A].coinSwitchBlockType();
                     nb.Location = NPC[A].Location;
                     nb.Location.SpeedX = 0;
                     nb.Location.SpeedY = 0;

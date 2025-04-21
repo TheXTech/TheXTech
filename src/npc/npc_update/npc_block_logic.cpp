@@ -100,7 +100,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
 
 
                                 // the coinSwitchBlockType != B check is an SMBX 1.3 bug, probably because the field was called "Block"
-                                if(NPC[A].coinSwitchBlockType != B && NPC[A].tempBlock != B &&
+                                if(NPC[A].coinSwitchBlockType() != B && NPC[A].tempBlock != B &&
                                    !(NPC[A].Projectile && Block[B].tempBlockNoProjClipping()) &&
                                    !BlockNoClipping[Block[B].Type] && !Block[B].Hidden)
                                 {
@@ -765,13 +765,17 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                                 if(HitSpot > 1)
                                                     HitSpot = 0;
 
-                                                NPC[A].Damage += 10000;
+                                                // for coins, Damage was overloaded to store coinSwitchBlockType. don't clobber it here!
+                                                if(!NPCTraits[NPC[A].DefaultType].IsACoin)
+                                                {
+                                                    NPC[A].Damage += 10000;
 
-                                                // NEW bounds check
-                                                // this reduces the risk of a signed integer overflow, and SMBX 1.3 includes no comparisons to values above 20000
-                                                // SMBX 1.3 uses a float for Damage, which effectively saturates at such high values
-                                                if(NPC[A].Damage > 16000)
-                                                    NPC[A].Damage = 16000;
+                                                    // NEW bounds check
+                                                    // this reduces the risk of a signed integer overflow, and SMBX 1.3 includes no comparisons to values above 20000
+                                                    // SMBX 1.3 uses a float for Damage, which effectively saturates at such high values
+                                                    if(NPC[A].Damage > 16000)
+                                                        NPC[A].Damage = 16000;
+                                                }
 
                                                 NPC[A].Immune = 0;
                                                 NPC[0].Multiplier = 0;

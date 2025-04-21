@@ -2146,7 +2146,7 @@ public:
                     NPCQueues::Active.erase(n);
             }
         );
-        insert(0x0000014e, &NPC_t::coinSwitchBlockType);
+        // insert(0x0000014e, &NPC_t::coinSwitchBlockType); // never-used for non-coins, now shares storage with Damage (never-used for coins)
         insert(0x00000150, &NPC_t::tempBlock);
         // insert(0x00000152, &NPC_t::onWall); // removed temporary variable
         insert(0x00000154, // TurnBackWipe

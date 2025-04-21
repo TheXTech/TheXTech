@@ -172,4 +172,12 @@ inline bool Block_t::tempBlockNoProjClipping() const
     return (npc_tr.CanWalkOn && !npc_tr.IsAHit1Block && !npc_tr.IsABlock);
 }
 
+inline vbint_t NPC_t::coinSwitchBlockType() const
+{
+    if(NPCTraits[this->DefaultType].IsACoin)
+        return this->Damage;
+
+    return 0;
+}
+
 #endif // #ifndef NPC_TRAITS_H
