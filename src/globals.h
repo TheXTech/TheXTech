@@ -473,8 +473,6 @@ struct NPC_t
     NPCID DefaultType = NPCID(0);
 //    DefaultSpecial As Integer
     vbint_t DefaultSpecial = 0;
-//    DefaultSpecial2 As Integer
-    vbint_t DefaultSpecial2 = 0;
 //    DefaultLocation As Location
     num_t DefaultLocationX = 0_n;
     num_t DefaultLocationY = 0_n;
@@ -493,6 +491,10 @@ struct NPC_t
     // was previously a persistent variable, but was set to a constant value at the start of UpdateNPCs and never read outside of that routine
 //    onWall As Boolean
     // bool onWall : 1;
+//    DefaultSpecial2 As Integer
+    // was only used by NPCID_MAGIC_DOOR and friends, which now use Variant
+    // vbint_t DefaultSpecial2 = 0;
+
 //    Block As Integer 'Used when a P-Switch turns a block into a coint
     // Now stored in Damage which is unused for coins
     inline vbint_t coinSwitchBlockType() const;

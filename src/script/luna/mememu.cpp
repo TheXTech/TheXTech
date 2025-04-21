@@ -2029,7 +2029,7 @@ public:
         static_assert(sizeof(NPC_t::DefaultType) == sizeof(vbint_t), "underlying type of NPC_t::DefaultType must be vbint_t");
         insert(0x000000dc, reinterpret_cast<vbint_t NPC_t::*>(&NPC_t::DefaultType));
         insert(0x000000de, &NPC_t::DefaultSpecial);
-        insert(0x000000e0, &NPC_t::DefaultSpecial2);
+        // insert(0x000000e0, &NPC_t::DefaultSpecial2); // removed, was unused except by NPCID_MAGIC_DOOR and friends
         insert(0x000000e2, // Type
             [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {

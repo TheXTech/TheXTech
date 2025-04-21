@@ -241,7 +241,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         if(n.Type == NPCID_DOOR_MAKER || n.Type == NPCID_MAGIC_DOOR ||
           (n.Type == NPCID_ITEM_BURIED && n.Special == NPCID_DOOR_MAKER))
         {
-            npc.special_data = n.Special2;
+            npc.special_data = n.Variant;
         }
         // AI / firebar length
         else if(n.Type == NPCID_FIRE_CHAIN || NPCIsAParaTroopa(n) || n->IsFish)

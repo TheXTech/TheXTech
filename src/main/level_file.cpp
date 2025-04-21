@@ -928,6 +928,8 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
 
         npc.Type = NPCID(n.id);
 
+        bool force_variant = false;
+
         if(npc.Type == NPCID_ITEM_BURIED || npc.Type == NPCID_ITEM_POD ||
            npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_THROWER ||
            (NPCNewContainerType(npc.Type) && FileFormat == FileFormats::LVL_PGEX))
@@ -936,13 +938,21 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
             npc.DefaultSpecial = npc.Special;
             npc.Variant = n.special_data;
             variantHandled = true;
-        }
 
-        if(npc.Type == NPCID_DOOR_MAKER || npc.Type == NPCID_MAGIC_DOOR ||
-          (npc.Type == NPCID_ITEM_BURIED && n.contents == NPCID_DOOR_MAKER))
+            // this use of special_data was enabled in SMBX64
+            if(npc.Type == NPCID_ITEM_BURIED && npc.Special == NPCID_DOOR_MAKER)
+                force_variant = true;
+        }
+        else if(npc.Type == NPCID_DOOR_MAKER || npc.Type == NPCID_MAGIC_DOOR)
         {
-            npc.Special2 = (vbint_t)n.special_data;
-            npc.DefaultSpecial2 = npc.Special2;
+            if(n.special_data < 0)
+                npc.Variant = 255;
+            else
+                npc.Variant = n.special_data;
+
+            // this use of special_data was enabled in SMBX64
+            force_variant = true;
+            variantHandled = true;
         }
 
         if(NPCIsAParaTroopa(npc))
@@ -970,7 +980,7 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
         }
 
         // don't load anything for SMBX64 files
-        if(FileFormat == FileFormats::LVL_SMBX64)
+        if(FileFormat == FileFormats::LVL_SMBX64 && !force_variant)
         {
             npc.Variant = 0;
         }
@@ -978,7 +988,7 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
         else if(find_Variant_Data(npc.Type))
         {
             if((n.special_data < 0) || (n.special_data >= 256))
-                pLogWarning("Attempted to load npc Type %d with out-of-range variant index %f", npc.Type, n.special_data);
+                pLogWarning("Attempted to load npc Type %d with out-of-range variant index %d", (int)npc.Type, (int)n.special_data);
             else
                 npc.Variant = (uint8_t)n.special_data;
         }

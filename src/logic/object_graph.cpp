@@ -185,7 +185,7 @@ void FillGraph(Graph& graph)
         bool contains_door = is_container && (n.Special == NPCID_DOOR_MAKER || n.Special == NPCID_MAGIC_DOOR);
         bool is_door = (n.Type == NPCID_DOOR_MAKER || n.Type == NPCID_MAGIC_DOOR);
 
-        bool has_target_section = n.Special2 >= 0;
+        bool has_target_section = n.Variant <= maxSections;
 
         // allow doors only
         if(!is_door && !contains_door)
@@ -206,8 +206,8 @@ void FillGraph(Graph& graph)
 
         Loc npc_center = get_center(n.Location);
 
-        int targetX = npc_center.x - LevelREAL[cur_section].X + LevelREAL[n.Special2].X;
-        int targetY = npc_center.y - LevelREAL[cur_section].Y + LevelREAL[n.Special2].Y;
+        int targetX = npc_center.x - LevelREAL[cur_section].X + LevelREAL[n.Variant].X;
+        int targetY = npc_center.y - LevelREAL[cur_section].Y + LevelREAL[n.Variant].Y;
 
         graph.level.warps.push_back(o(ObjectGraph::Object::Warp,
             npc_center,

@@ -309,13 +309,6 @@ void SetEditorNPCType(NPCID type)
             EditorCursor.NPC.Special = 0;
     }
 
-    // reset Special2 for NPCs that don't allow it
-    if(!(EditorCursor.NPC.Type == NPCID_MAGIC_DOOR || EditorCursor.NPC.Type == NPCID_DOOR_MAKER
-        || (EditorCursor.NPC.Type == NPCID_ITEM_BURIED && EditorCursor.NPC.Special == NPCID_DOOR_MAKER)))
-    {
-        EditorCursor.NPC.Special2 = 0;
-    }
-
     // reset legacy for the NPCs that don't allow it
     if(!(type == NPCID_MINIBOSS || type == NPCID_SPIT_BOSS || type == NPCID_VILLAIN_S3))
         EditorCursor.NPC.Legacy = false;
@@ -330,7 +323,7 @@ void SetEditorNPCType(NPCID type)
     }
 
     // reset Variant data for NPCs that don't support it
-    if(find_Variant_Data(type) == nullptr && !(type == NPCID_STAR_COLLECT || type == NPCID_STAR_EXIT || type == NPCID_MEDAL))
+    if(find_Variant_Data(type) == nullptr && !(type == NPCID_STAR_COLLECT || type == NPCID_STAR_EXIT || type == NPCID_MEDAL || type == NPCID_MAGIC_DOOR || type == NPCID_DOOR_MAKER))
         EditorCursor.NPC.Variant = 0;
 
     // turn into new type if can't be in bubble anymore
@@ -915,24 +908,24 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Special ++;
         }
 
-        if(EditorCursor.NPC.Type == NPCID_MAGIC_DOOR || EditorCursor.NPC.Type == NPCID_DOOR_MAKER
-            || (EditorCursor.NPC.Type == NPCID_ITEM_BURIED && EditorCursor.NPC.Special == NPCID_DOOR_MAKER))
+        bool is_magic_door = (EditorCursor.NPC.Type == NPCID_MAGIC_DOOR || EditorCursor.NPC.Type == NPCID_DOOR_MAKER
+            || (EditorCursor.NPC.Type == NPCID_ITEM_BURIED && EditorCursor.NPC.Special == NPCID_DOOR_MAKER));
+
+        bool is_multistar = ((type == NPCID_STAR_COLLECT || type == NPCID_STAR_EXIT || type == NPCID_MEDAL) && FileFormat == FileFormats::LVL_PGEX);
+
+        // multistars and magic door destination
+        if(is_magic_door || is_multistar)
         {
-            std::string&& dest_section = fmt::format_ne(g_editorStrings.phraseSectionIndex, EditorCursor.NPC.Special2 + 1);
-            SuperPrintR(mode, dest_section, 3, e_ScreenW - 200, 220);
-
-            if(EditorCursor.NPC.Special2 > 0 && UpdateButton(mode, e_ScreenW - 160 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
-                EditorCursor.NPC.Special2--;
-
-            if(EditorCursor.NPC.Special2 < 20 && UpdateButton(mode, e_ScreenW - 120 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
-                EditorCursor.NPC.Special2++;
-        }
-
-        // multistars
-        if((type == NPCID_STAR_COLLECT || type == NPCID_STAR_EXIT || type == NPCID_MEDAL) && FileFormat == FileFormats::LVL_PGEX)
-        {
-            std::string&& star_index = EditorCursor.NPC.Variant ? fmt::format_ne(g_editorStrings.phraseGenericIndex, (int)(EditorCursor.NPC.Variant)) : g_editorStrings.fileFormatLegacy;
-            SuperPrintCenterR(mode, star_index, 3, e_ScreenW - 120, 220);
+            if(is_magic_door)
+            {
+                std::string&& dest_section = fmt::format_ne(g_editorStrings.phraseSectionIndex, EditorCursor.NPC.Variant + 1);
+                SuperPrintR(mode, dest_section, 3, e_ScreenW - 200, 220);
+            }
+            else
+            {
+                std::string&& star_index = EditorCursor.NPC.Variant ? fmt::format_ne(g_editorStrings.phraseGenericIndex, (int)(EditorCursor.NPC.Variant)) : g_editorStrings.fileFormatLegacy;
+                SuperPrintCenterR(mode, star_index, 3, e_ScreenW - 120, 220);
+            }
 
             uint8_t max_index = (type == NPCID_MEDAL) ? 8 : 20;
 

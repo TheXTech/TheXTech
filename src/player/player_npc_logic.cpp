@@ -249,7 +249,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                         // subcon warps
                         if(NPC[B].Type == NPCID_MAGIC_DOOR && HitSpot > 0 && Player[A].Controls.Up)
                         {
-                            if(NPC[B].Special2 >= 0)
+                            if(NPC[B].Variant <= maxSections)
                             {
                                 NPC[B].Killed = 9;
                                 NPCQueues::Killed.push_back(B);
@@ -260,8 +260,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 Warp[numWarps + 1].Entrance = static_cast<SpeedlessLocation_t>(NPC[B].Location);
 
                                 Location_t tempLocation = NPC[B].Location;
-                                tempLocation.X = NPC[B].Location.X - level[Player[A].Section].X + level[NPC[B].Special2].X;
-                                tempLocation.Y = NPC[B].Location.Y - level[Player[A].Section].Y + level[NPC[B].Special2].Y;
+                                tempLocation.X = NPC[B].Location.X - level[Player[A].Section].X + level[NPC[B].Variant].X;
+                                tempLocation.Y = NPC[B].Location.Y - level[Player[A].Section].Y + level[NPC[B].Variant].Y;
                                 Warp[numWarps + 1].Exit = static_cast<SpeedlessLocation_t>(tempLocation);
                                 Warp[numWarps + 1].Hidden = false;
                                 Warp[numWarps + 1].NoYoshi = false;
