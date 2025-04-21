@@ -615,7 +615,7 @@ resume_Activation_Generator:
         // process chain activations
         if(NPC[A].JustActivated != 0)
         {
-            static std::array<int, maxNPCs> newAct;
+            static std::array<vbint_t, maxNPCs> newAct;
             int numAct;
             numAct = 0;
 
