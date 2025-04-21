@@ -518,7 +518,9 @@ void UpdateNPCs()
                 }
             }
 
-            continue;
+            // skip the rest of this logic unless NPC is a force-active type (in which case the result will be buggy)
+            if(!NPCQueues::check_active_type(NPC[A]))
+                continue;
         }
 
         // Force-active NPCs, part 1
