@@ -1470,7 +1470,12 @@ void UpdateGraphics(bool skipRepaint)
 
     // we've now done all the logic that UpdateGraphics can do.
     if(Do_FrameSkip)
+    {
+        // Proceed Luna Render's queue
+        lunaRenderStart();
+        lunaRenderEnd();
         return;
+    }
 
     g_microStats.start_task(MicroStats::Graphics);
 
