@@ -47,7 +47,7 @@ class RenderSDL final : public AbstractRender_t
     bool m_pow2 = false;
 
     // queue of render ops
-    RenderQueue m_render_queue;
+    XRenderQueue m_render_queue;
 
     // current draw plane
     uint8_t m_recent_draw_plane = 0;
@@ -209,7 +209,7 @@ public:
     /*!
      * \brief Immediately executes a single render operation
      */
-    void execute(const RenderOp& op);
+    void execute(const XRenderOp& op);
 
     // Draw primitives
 

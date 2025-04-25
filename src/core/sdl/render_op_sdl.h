@@ -33,11 +33,7 @@
 #include "rand.h"
 
 
-// define these in namespace to prevent undefined behavior collision with Luna RenderOp
-namespace XRenderSDL
-{
-
-struct RenderOp
+struct XRenderOp
 {
     enum class Type : uint8_t
     {
@@ -83,9 +79,9 @@ struct RenderOp
     StdPicture* texture;
 };
 
-struct RenderQueue
+struct XRenderQueue
 {
-    std::vector<RenderOp> ops;
+    std::vector<XRenderOp> ops;
     std::vector<int32_t> indices;
     uint16_t size = 0;
 
@@ -96,11 +92,11 @@ struct RenderQueue
         size = 0;
     }
 
-    inline RenderOp& push(uint8_t plane)
+    inline XRenderOp& push(uint8_t plane)
     {
         if(size == UINT16_MAX)
         {
-            SDL_assert_release(false); // render queue overflow
+            SDL_assert_release(false && "SDL Render queue got overflown (65535 entries)");
             return ops[size - 1];
         }
 
@@ -114,11 +110,5 @@ struct RenderQueue
         std::sort(indices.begin(), indices.end());
     }
 };
-
-} // namespace XRenderSDL
-
-// allow any C++ file including this (implementation of RenderSDL) to access these names in the global namespace
-using XRenderSDL::RenderOp;
-using XRenderSDL::RenderQueue;
 
 #endif // #ifndef RENDER_OP_SDL_H

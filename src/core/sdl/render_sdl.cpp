@@ -667,7 +667,7 @@ void RenderSDL::flushRenderQueue()
     m_render_queue.clear();
 }
 
-void RenderSDL::execute(const RenderOp& op)
+void RenderSDL::execute(const XRenderOp& op)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -675,12 +675,12 @@ void RenderSDL::execute(const RenderOp& op)
 
     switch(op.type)
     {
-    case RenderOp::Type::rect:
+    case XRenderOp::Type::rect:
     {
         SDL_Rect aRect = {op.xDst, op.yDst, op.wDst, op.hDst};
         SDL_SetRenderDrawColor(m_gRenderer, op.color.r, op.color.g, op.color.b, op.color.a);
 
-        if(op.traits & RenderOp::Traits::filled)
+        if(op.traits & XRenderOp::Traits::filled)
             SDL_RenderFillRect(m_gRenderer, &aRect);
         else
             SDL_RenderDrawRect(m_gRenderer, &aRect);
@@ -688,7 +688,7 @@ void RenderSDL::execute(const RenderOp& op)
         break;
     }
 
-    case RenderOp::Type::circle:
+    case XRenderOp::Type::circle:
     {
         int radius = op.radius();
 
@@ -719,7 +719,7 @@ void RenderSDL::execute(const RenderOp& op)
         break;
     }
 
-    case RenderOp::Type::circle_hole:
+    case XRenderOp::Type::circle_hole:
     {
         int radius = op.radius();
 
@@ -765,7 +765,7 @@ void RenderSDL::execute(const RenderOp& op)
     }
 
 
-    case RenderOp::Type::texture:
+    case XRenderOp::Type::texture:
     {
         if(!op.texture || !op.texture->inited)
             break;
@@ -785,7 +785,7 @@ void RenderSDL::execute(const RenderOp& op)
         SDL_Rect sourceRect;
         SDL_Rect* sourceRectPtr = nullptr;
 
-        if(op.traits & RenderOp::Traits::src_rect)
+        if(op.traits & XRenderOp::Traits::src_rect)
         {
             sourceRect = {op.xSrc, op.ySrc, op.wSrc, op.hSrc};
             sourceRectPtr = &sourceRect;
@@ -793,11 +793,11 @@ void RenderSDL::execute(const RenderOp& op)
 
         txColorMod(tx.d, op.color);
 
-        if(op.traits & RenderOp::Traits::rotoflip)
+        if(op.traits & XRenderOp::Traits::rotoflip)
         {
             const SDL_RendererFlip flip = (SDL_RendererFlip)(op.traits & 3);
 
-            double angle = (op.traits & RenderOp::Traits::rotation)
+            double angle = (op.traits & XRenderOp::Traits::rotation)
                 ? double(op.angle) * (360.0 / 65536.0)
                 : 0.;
 
@@ -820,9 +820,9 @@ void RenderSDL::execute(const RenderOp& op)
 
 void RenderSDL::renderRect(int x, int y, int w, int h, XTColor color, bool filled)
 {
-    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
+    XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
-    op.type = RenderOp::Type::rect;
+    op.type = XRenderOp::Type::rect;
     op.xDst = x + m_viewport_offset_x;
     op.yDst = y + m_viewport_offset_y;
     op.wDst = w;
@@ -831,16 +831,16 @@ void RenderSDL::renderRect(int x, int y, int w, int h, XTColor color, bool fille
     op.color = color;
 
     if(filled)
-        op.traits = RenderOp::Traits::filled;
+        op.traits = XRenderOp::Traits::filled;
     else
         op.traits = 0;
 }
 
 void RenderSDL::renderRectBR(int _left, int _top, int _right, int _bottom, XTColor color)
 {
-    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
+    XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
-    op.type = RenderOp::Type::rect;
+    op.type = XRenderOp::Type::rect;
     op.xDst = _left + m_viewport_offset_x;
     op.yDst = _top + m_viewport_offset_y;
     op.wDst = _right - _left;
@@ -848,7 +848,7 @@ void RenderSDL::renderRectBR(int _left, int _top, int _right, int _bottom, XTCol
 
     op.color = color;
 
-    op.traits = RenderOp::Traits::filled;
+    op.traits = XRenderOp::Traits::filled;
 }
 
 void RenderSDL::renderCircle(int cx, int cy, int radius, XTColor color, bool filled)
@@ -856,9 +856,9 @@ void RenderSDL::renderCircle(int cx, int cy, int radius, XTColor color, bool fil
     if(radius <= 0)
         return; // Nothing to draw
 
-    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
+    XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
-    op.type = RenderOp::Type::circle;
+    op.type = XRenderOp::Type::circle;
     op.xDst = cx + m_viewport_offset_x;
     op.yDst = cy + m_viewport_offset_y;
     op.radius() = radius;
@@ -866,7 +866,7 @@ void RenderSDL::renderCircle(int cx, int cy, int radius, XTColor color, bool fil
     op.color = color;
 
     if(filled)
-        op.traits = RenderOp::Traits::filled;
+        op.traits = XRenderOp::Traits::filled;
     else
         op.traits = 0;
 }
@@ -876,9 +876,9 @@ void RenderSDL::renderCircleHole(int cx, int cy, int radius, XTColor color)
     if(radius <= 0)
         return; // Nothing to draw
 
-    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
+    XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
-    op.type = RenderOp::Type::circle_hole;
+    op.type = XRenderOp::Type::circle_hole;
     op.xDst = cx + m_viewport_offset_x;
     op.yDst = cy + m_viewport_offset_y;
     op.radius() = radius;
@@ -941,9 +941,9 @@ void RenderSDL::renderTextureScaleEx(int xDst, int yDst, int wDst, int hDst,
     }
 
 
-    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
+    XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
-    op.type = RenderOp::Type::texture;
+    op.type = XRenderOp::Type::texture;
     op.texture = &tx;
 
     op.xDst = xDst + m_viewport_offset_x;
@@ -958,12 +958,12 @@ void RenderSDL::renderTextureScaleEx(int xDst, int yDst, int wDst, int hDst,
 
     op.color = color;
 
-    op.traits = (flip & 3) | RenderOp::Traits::src_rect;
+    op.traits = (flip & 3) | XRenderOp::Traits::src_rect;
     op.angle = 0;
 
     if(rotateAngle != 0)
     {
-        op.traits |= RenderOp::Traits::rotation;
+        op.traits |= XRenderOp::Traits::rotation;
         op.angle = (uint16_t)(((int)rotateAngle % 360) * 65536 / 360);
 
         // calculate new offset now
@@ -1002,10 +1002,10 @@ void RenderSDL::renderTextureScale(int xDst, int yDst, int wDst, int hDst,
         return;
     }
 
-    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
+    XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
-    op.type = RenderOp::Type::texture;
-    op.traits = m_pow2 ? RenderOp::Traits::src_rect : 0;
+    op.type = XRenderOp::Type::texture;
+    op.traits = m_pow2 ? XRenderOp::Traits::src_rect : 0;
 
     op.texture = &tx;
 
@@ -1058,10 +1058,10 @@ void RenderSDL::renderTexture(int xDst, int yDst, int wDst, int hDst,
     }
 
 
-    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
+    XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
-    op.type = RenderOp::Type::texture;
-    op.traits = RenderOp::Traits::src_rect;
+    op.type = XRenderOp::Type::texture;
+    op.traits = XRenderOp::Traits::src_rect;
 
     op.texture = &tx;
 
@@ -1112,10 +1112,10 @@ void RenderSDL::renderTexture(int xDst, int yDst,
         return;
     }
 
-    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
+    XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
-    op.type = RenderOp::Type::texture;
-    op.traits = m_pow2 ? RenderOp::Traits::src_rect : 0;
+    op.type = XRenderOp::Type::texture;
+    op.traits = m_pow2 ? XRenderOp::Traits::src_rect : 0;
 
     op.texture = &tx;
 
