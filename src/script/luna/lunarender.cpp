@@ -263,9 +263,6 @@ void Renderer::StoreCameraPosition(int idx)
 
 void Renderer::StartRenderLogic()
 {
-    if(GamePaused != PauseCode::None)
-        return;
-
     // Decrement life time counters
     for(auto &m_currentRenderOp : m_queueState.m_currentRenderOps)
         m_currentRenderOp->m_FramesLeft--;
@@ -273,9 +270,6 @@ void Renderer::StartRenderLogic()
 
 void Renderer::EndRenderLogic()
 {
-    if(GamePaused != PauseCode::None)
-        return;
-
     // Remove cleared operations
     std::vector<RenderOp *> nonExpiredOps;
     for(auto &m_currentRenderOp : m_queueState.m_currentRenderOps)
