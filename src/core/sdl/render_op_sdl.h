@@ -33,6 +33,10 @@
 #include "rand.h"
 
 
+// define these in namespace to prevent undefined behavior collision with Luna RenderOp
+namespace XRenderSDL
+{
+
 struct RenderOp
 {
     enum class Type : uint8_t
@@ -110,5 +114,11 @@ struct RenderQueue
         std::sort(indices.begin(), indices.end());
     }
 };
+
+} // namespace XRenderSDL
+
+// allow any C++ file including this (implementation of RenderSDL) to access these names in the global namespace
+using XRenderSDL::RenderOp;
+using XRenderSDL::RenderQueue;
 
 #endif // #ifndef RENDER_OP_SDL_H
