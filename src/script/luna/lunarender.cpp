@@ -261,45 +261,51 @@ void Renderer::StoreCameraPosition(int idx)
     //    }
 }
 
+void Renderer::StartRenderLogic()
+{
+    if(GamePaused != PauseCode::None)
+        return;
+
+    // Decrement life time counters
+    for(auto &m_currentRenderOp : m_queueState.m_currentRenderOps)
+        m_currentRenderOp->m_FramesLeft--;
+}
+
+void Renderer::EndRenderLogic()
+{
+    if(GamePaused != PauseCode::None)
+        return;
+
+    // Remove cleared operations
+    std::vector<RenderOp *> nonExpiredOps;
+    for(auto &m_currentRenderOp : m_queueState.m_currentRenderOps)
+    {
+        RenderOp *pOp = m_currentRenderOp;
+        if(pOp->m_FramesLeft <= 0)
+        {
+            m_currentRenderOp = nullptr;
+            delete pOp;
+        }
+        else
+            nonExpiredOps.push_back(pOp);
+    }
+
+    m_queueState.m_currentRenderOps.swap(nonExpiredOps);
+}
+
 void Renderer::StartFrameRender()
 {
     m_queueState.m_curCamIdx = 0;
     m_queueState.m_InFrameRender = true;
-
-    // Remove cleared operations
-    if(GamePaused == PauseCode::None)
-    {
-        std::vector<RenderOp *> nonExpiredOps;
-        for(auto &m_currentRenderOp : m_queueState.m_currentRenderOps)
-        {
-            RenderOp *pOp = m_currentRenderOp;
-            if(pOp->m_FramesLeft <= 0)
-            {
-                m_currentRenderOp = nullptr;
-                delete pOp;
-            }
-            else
-                nonExpiredOps.push_back(pOp);
-        }
-
-        m_queueState.m_currentRenderOps.swap(nonExpiredOps);
-        m_queueState.m_renderOpsSortedCount = m_queueState.m_currentRenderOps.size();
-    }
+    m_queueState.m_renderOpsSortedCount = m_queueState.m_currentRenderOps.size();
 }
 
 void Renderer::EndFrameRender()
 {
-    if(!m_queueState.m_InFrameRender) return;
+    if(!m_queueState.m_InFrameRender)
+        return;
 
     m_queueState.m_curCamIdx = 0;
-
-    // Remove cleared operations
-    if(GamePaused == PauseCode::None)
-    {
-        for(auto &m_currentRenderOp : m_queueState.m_currentRenderOps)
-            m_currentRenderOp->m_FramesLeft--;
-    }
-
     m_queueState.m_renderOpsProcessedCount = 0;
     m_queueState.m_InFrameRender = false;
 }

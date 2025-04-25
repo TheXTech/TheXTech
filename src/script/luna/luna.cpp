@@ -120,6 +120,8 @@ void lunaLoop()
 #endif
 //        g_EventHandler.hookLevelLoop();
 
+        Renderer::Get().StartRenderLogic();
+
         // Run autocode
         gAutoMan.DoEvents(false);
 
@@ -131,6 +133,8 @@ void lunaLoop()
 //        TestFrameCode();
         if(g_config.luna_allow_level_codes)
             lunaLevelsDo();
+
+        Renderer::Get().EndRenderLogic();
     }
 }
 

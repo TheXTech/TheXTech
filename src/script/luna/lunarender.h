@@ -71,6 +71,12 @@ struct Renderer
     // Calls from hooks
     void StartCameraRender(int idx);
     void StoreCameraPosition(int idx);
+
+    // Render logic
+    void StartRenderLogic();
+    void EndRenderLogic();
+
+    // Render begin/end
     void StartFrameRender();
     void EndFrameRender();
 
