@@ -49,6 +49,7 @@ Changelog for 1.3.7.1-dev
 -Refine Magic Block handling of lava next to slopes (@ds-sloth, thanks to @ChristianSilvermoon for the report)
 -Fix TheXTech v1.3.7 change to the timing of events triggered by warp enter/exit events (@ds-sloth, thanks to @ChristianSilvermoon for the report)
 -Fix TheXTech v1.3.6.1 inaccuracy where generator NPCs with IDs 57, 60, 62, 64, and 66 could not be walked on in their generator state (@ds-sloth)
+-Resolved the pool allocator memory overflow crash problem (Caused by LunaScript's render operations with frame skipping enabled on slow devices) (@Wohlstand)
 
 Changelog for 1.3.7
 -Fix vanilla peculiarity where medals were sometimes not collected when killed, guarded by "fix-medal-kill" [Modern Mode] (@ds-sloth, thanks to @Superbloxen for the report)
