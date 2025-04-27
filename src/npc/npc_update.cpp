@@ -833,7 +833,36 @@ interrupt_Activation:
         {
             if(NPC[A].Active)
             {
-                if(NPC[A].Type == NPCID_GOALTAPE)
+                if((NPC[A]->IsFish && NPC[A].Special == 2) || NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || NPC[A].Type == NPCID_GHOST_FAST) // Special Start for Jumping Fish and Bullet Bills
+                {
+                    if(NPC[A].TimeLeft <= 1)
+                    {
+                        NPC[A].Active = false;
+                        NPC[A].TimeLeft = 0;
+                    }
+                    else if(NPC[A].Direction == -1 && NPC[A].Location.X < Player[NPC[A].JustActivated].Location.X)
+                    {
+                        NPC[A].Active = false;
+                        NPC[A].TimeLeft = 0;
+                    }
+                    else if(NPC[A].Direction == 1 && NPC[A].Location.X > Player[NPC[A].JustActivated].Location.X)
+                    {
+                        NPC[A].Active = false;
+                        NPC[A].TimeLeft = 0;
+                    }
+                    else if(NPC[A]->IsFish && NPC[A].Special == 2)
+                    {
+                        NPC[A].Location.Y = level[Player[NPC[A].JustActivated].Section].Height - 0.1_n;
+                        NPC[A].Location.SpeedX = (1 + (NPC[A].Location.Y - NPC[A].DefaultLocationY) / 200) * NPC[A].Direction;
+                        NPC[A].Special5 = 1;
+                        treeNPCUpdate(A);
+                        if(NPC[A].tempBlock > 0)
+                            treeNPCSplitTempBlock(A);
+                    }
+                    else if(NPC[A].Type != NPCID_GHOST_FAST)
+                        PlaySoundSpatial(SFX_Bullet, NPC[A].Location);
+                }
+                else if(NPC[A].Type == NPCID_GOALTAPE)
                 {
                     Location_t tempLocation = NPC[A].Location;
                     tempLocation.Height = 8000;
@@ -870,35 +899,6 @@ interrupt_Activation:
                     treeNPCUpdate(A);
                     if(NPC[A].tempBlock > 0)
                         treeNPCSplitTempBlock(A);
-                }
-                else if(NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || (NPC[A]->IsFish && NPC[A].Special == 2) || NPC[A].Type == NPCID_GHOST_FAST) // Special Start for Jumping Fish and Bullet Bills
-                {
-                    if(NPC[A].TimeLeft <= 1)
-                    {
-                        NPC[A].Active = false;
-                        NPC[A].TimeLeft = 0;
-                    }
-                    else if(NPC[A].Direction == -1 && NPC[A].Location.X < Player[NPC[A].JustActivated].Location.X)
-                    {
-                        NPC[A].Active = false;
-                        NPC[A].TimeLeft = 0;
-                    }
-                    else if(NPC[A].Direction == 1 && NPC[A].Location.X > Player[NPC[A].JustActivated].Location.X)
-                    {
-                        NPC[A].Active = false;
-                        NPC[A].TimeLeft = 0;
-                    }
-                    else if(NPC[A]->IsFish && NPC[A].Special == 2)
-                    {
-                        NPC[A].Location.Y = level[Player[NPC[A].JustActivated].Section].Height - 0.1_n;
-                        NPC[A].Location.SpeedX = (1 + (NPC[A].Location.Y - NPC[A].DefaultLocationY) / 200) * NPC[A].Direction;
-                        NPC[A].Special5 = 1;
-                        treeNPCUpdate(A);
-                        if(NPC[A].tempBlock > 0)
-                            treeNPCSplitTempBlock(A);
-                    }
-                    else if(NPC[A].Type != NPCID_GHOST_FAST)
-                        PlaySoundSpatial(SFX_Bullet, NPC[A].Location);
                 }
                 else if(NPC[A].Type == NPCID_CANNONENEMY)
                 {
