@@ -176,6 +176,11 @@ bool UpdatePlayer()
 
             if(Player[A].Effect == PLREFF_NORMAL)
             {
+                // NEW: used for compat flag "fix-player-clip-wall-at-npc"
+                // this variable does not persist over the interrupt/resume routine
+                int oldStandingOnNpc;
+                oldStandingOnNpc = Player[A].StandingOnNPC;
+
                 // for the pound pet mount logic
                 PlayerPoundLogic(A);
 
@@ -499,7 +504,7 @@ bool UpdatePlayer()
                     if(!Player[A].CurMazeZone)
                     {
                         // Block collisions.
-                        PlayerBlockLogic(A, floorBlock, movingBlock, DontResetGrabTime, cursed_value_C);
+                        PlayerBlockLogic(A, floorBlock, movingBlock, DontResetGrabTime, cursed_value_C, oldStandingOnNpc);
 
                         // Vine collisions.
                         PlayerVineLogic(A);
