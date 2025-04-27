@@ -567,6 +567,7 @@ resume_Activation:
                         NPC[numNPCs].GeneratorTime() = 0;
                         NPC[numNPCs].GeneratorTimeMax() = 0;
                         CheckSectionNPC(numNPCs);
+                        syncLayers_NPC(numNPCs);
 
                         if(NPC[numNPCs].TriggerActivate != EVENT_NONE)
                         {
@@ -588,9 +589,6 @@ resume_Activation_Generator:
 
                         if(NPC[numNPCs].Type == NPCID_RANDOM_POWER)
                             NPC[numNPCs].Type = RandomBonus();
-
-                        syncLayers_NPC(numNPCs);
-                        CheckNPCWidth(NPC[numNPCs]);
                     }
                 }
             }
