@@ -133,7 +133,7 @@ static inline void NPCEffectLogic_Encased(int A)
 {
     bool still_encased = false;
 
-    // Note: since SMBX64, this logic doesn't check for Hidden or Active, so an encased NPC will not escape encased mode properly in Battle Mode
+    // Note: since SMBX64, this logic doesn't check for Hidden or Active, so an encased NPC will not escape encased mode properly in Battle Mode (where killed NPCs just become inactive)
     // Note 2: NPCID_BOSS_FRAGILE does not use the encased logic, it has its own specific logic to check for nearby NPCID_BOSS_CASE
     for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_NONE))
     {
