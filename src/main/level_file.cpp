@@ -1001,9 +1001,13 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
         npc.Generator = n.generator;
         if(npc.Generator)
         {
-            npc.GeneratorDirection = n.generator_direct;
-            npc.GeneratorEffect = n.generator_type;
-            npc.GeneratorTimeMax = n.generator_period;
+            npc.Special3 = ((uint16_t)(uint8_t)n.generator_direct << 8) + (uint8_t)n.generator_type;
+            npc.GeneratorTime() = 0;
+            npc.GeneratorTimeMax() = n.generator_period;
+
+            // npc.GeneratorDirection = n.generator_direct;
+            // npc.GeneratorEffect = n.generator_type;
+            // npc.GeneratorTimeMax = n.generator_period;
         }
 
         if(!n.msg.empty())

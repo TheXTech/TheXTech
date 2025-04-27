@@ -1055,14 +1055,14 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         if(UpdateCheckBox(mode, 280 + 4, 100 + 4, EditorCursor.NPC.Generator))
         {
             EditorCursor.NPC.Generator = true;
-            if(!EditorCursor.NPC.GeneratorDirection)
-                EditorCursor.NPC.GeneratorDirection = 1;
 
-            if(!EditorCursor.NPC.GeneratorEffect)
-                EditorCursor.NPC.GeneratorEffect = 1;
+            // Set GeneratorDirection and GeneratorEffect both to 1
+            if(!EditorCursor.NPC.Special3)
+                EditorCursor.NPC.Special3 = 0x0101;
 
-            if(EditorCursor.NPC.GeneratorTimeMax < 1)
-                EditorCursor.NPC.GeneratorTimeMax = 1;
+            // GeneratorTimeMax
+            if(EditorCursor.NPC.GeneratorTimeMax() < 1)
+                EditorCursor.NPC.GeneratorTimeMax() = 1;
         }
 
         if(UpdateButton(mode, 320 + 4, 100 + 4, GFX.EIcons, !EditorCursor.NPC.Generator, 0, 32*Icon::x, 32, 32))
@@ -1071,41 +1071,47 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         if(EditorCursor.NPC.Generator)
         {
             // direction change
+            uint8_t GeneratorDirection = EditorCursor.NPC.GeneratorDirection();
             SuperPrintR(mode, g_editorStrings.npcGenDirection, 3, 50, 150);
 
-            if(UpdateButton(mode, 280 + 4, 140 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorDirection == 1, 0, 32*Icon::up, 32, 32))
-                EditorCursor.NPC.GeneratorDirection = 1;
+            if(UpdateButton(mode, 280 + 4, 140 + 4, GFX.EIcons, GeneratorDirection == 1, 0, 32*Icon::up, 32, 32))
+                GeneratorDirection = 1;
 
-            if(UpdateButton(mode, 320 + 4, 140 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorDirection == 3, 0, 32*Icon::down, 32, 32))
-                EditorCursor.NPC.GeneratorDirection = 3;
+            if(UpdateButton(mode, 320 + 4, 140 + 4, GFX.EIcons, GeneratorDirection == 3, 0, 32*Icon::down, 32, 32))
+                GeneratorDirection = 3;
 
-            if(UpdateButton(mode, 360 + 4, 140 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorDirection == 2, 0, 32*Icon::left, 32, 32))
-                EditorCursor.NPC.GeneratorDirection = 2;
+            if(UpdateButton(mode, 360 + 4, 140 + 4, GFX.EIcons, GeneratorDirection == 2, 0, 32*Icon::left, 32, 32))
+                GeneratorDirection = 2;
 
-            if(UpdateButton(mode, 400 + 4, 140 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorDirection == 4, 0, 32*Icon::right, 32, 32))
-                EditorCursor.NPC.GeneratorDirection = 4;
+            if(UpdateButton(mode, 400 + 4, 140 + 4, GFX.EIcons, GeneratorDirection == 4, 0, 32*Icon::right, 32, 32))
+                GeneratorDirection = 4;
 
             // effect change
+            uint8_t GeneratorEffect = EditorCursor.NPC.GeneratorEffect();
             const std::string& effect =
-                   (EditorCursor.NPC.GeneratorEffect == 1) ? g_editorStrings.npcGenEffectWarp
-                : ((EditorCursor.NPC.GeneratorEffect == 2) ? g_editorStrings.npcGenEffectShoot
+                   (GeneratorEffect == 1) ? g_editorStrings.npcGenEffectWarp
+                : ((GeneratorEffect == 2) ? g_editorStrings.npcGenEffectShoot
                 : g_mainMenu.caseNone);
             SuperPrintR(mode, fmt::format_ne(g_editorStrings.npcGenEffectIs, effect), 3, 50, 190);
 
-            if(UpdateButton(mode, 280 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorEffect == 1, 0, 32*Icon::bottom, 32, 32))
-                EditorCursor.NPC.GeneratorEffect = 1;
+            if(UpdateButton(mode, 280 + 4, 180 + 4, GFX.EIcons, GeneratorEffect == 1, 0, 32*Icon::bottom, 32, 32))
+                GeneratorEffect = 1;
 
-            if(UpdateButton(mode, 320 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorEffect == 2, 0, 32*Icon::up, 32, 32))
-                EditorCursor.NPC.GeneratorEffect = 2;
+            if(UpdateButton(mode, 320 + 4, 180 + 4, GFX.EIcons, GeneratorEffect == 2, 0, 32*Icon::up, 32, 32))
+                GeneratorEffect = 2;
+
+            // assign back to updated internal representation in Special3
+            EditorCursor.NPC.Special3 = ((uint16_t)GeneratorDirection << 8) + (uint8_t)GeneratorEffect;
 
             // delay change
-            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseDelayIsMs, EditorCursor.NPC.GeneratorTimeMax * 100), 3, 50, 230);
+            auto& GeneratorTimeMax = EditorCursor.NPC.GeneratorTimeMax();
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseDelayIsMs, GeneratorTimeMax * 100), 3, 50, 230);
 
-            if(EditorCursor.NPC.GeneratorTimeMax > 1 && UpdateButton(mode, 280 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
-                EditorCursor.NPC.GeneratorTimeMax --;
+            if(GeneratorTimeMax > 1 && UpdateButton(mode, 280 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+                GeneratorTimeMax --;
 
             if(UpdateButton(mode, 320 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
-                EditorCursor.NPC.GeneratorTimeMax ++;
+                GeneratorTimeMax ++;
         }
     }
 

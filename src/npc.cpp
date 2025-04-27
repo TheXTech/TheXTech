@@ -263,9 +263,15 @@ void Deactivate(int A)
             // DefaultSpecial
             NPC[A].Special = NPC[A].DefaultSpecial;
             NPC[A].Special2 = 0; // NPC[A].DefaultSpecial2; // moved to Variant for the one type (NPCID_MAGIC_DOOR) that used it
-            NPC[A].Special3 = 0;
-            NPC[A].Special4 = 0;
-            NPC[A].Special5 = 0;
+
+            // for generators, these store critical variables
+            if(!NPC[A].Generator)
+            {
+                NPC[A].Special3 = 0;
+                NPC[A].Special4 = 0;
+                NPC[A].Special5 = 0;
+            }
+
             // NPC[A].Special6 = 0;
             NPC[A].SpecialX = 0;
             NPC[A].SpecialY = 0;

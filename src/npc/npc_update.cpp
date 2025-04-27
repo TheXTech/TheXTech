@@ -381,19 +381,19 @@ resume_Activation:
                 // Old timer logic
                 // this did not achieve anything other than keeping the value from growing large, but was likely the reason Redigit thought floats were necessary
 #if 0
-                NPC[A].GeneratorTime += 1;
+                NPC[A].GeneratorTime() += 1;
 
-                if(NPC[A].GeneratorTime >= NPC[A].GeneratorTimeMax * 6.5f)
-                    NPC[A].GeneratorTime = NPC[A].GeneratorTimeMax * 6.5f;
+                if(NPC[A].GeneratorTime() >= NPC[A].GeneratorTimeMax() * 6.5f)
+                    NPC[A].GeneratorTime() = NPC[A].GeneratorTimeMax() * 6.5f;
 #endif
 
-                if(NPC[A].GeneratorTime * 10 < NPC[A].GeneratorTimeMax * 65)
-                    NPC[A].GeneratorTime += 1;
+                if(NPC[A].GeneratorTime() * 10 < NPC[A].GeneratorTimeMax() * 65)
+                    NPC[A].GeneratorTime() += 1;
 
                 if(NPC[A].GeneratorActive)
                 {
                     NPC[A].GeneratorActive = false;
-                    if(NPC[A].GeneratorTime * 10 >= NPC[A].GeneratorTimeMax * 65)
+                    if(NPC[A].GeneratorTime() * 10 >= NPC[A].GeneratorTimeMax() * 65)
                     {
                         // this is not touched after the resumption below
                         bool tempBool;
@@ -450,23 +450,23 @@ resume_Activation:
                         }
 
                         if(tempBool)
-                            NPC[A].GeneratorTime = NPC[A].GeneratorTimeMax;
+                            NPC[A].GeneratorTime() = NPC[A].GeneratorTimeMax();
                         else
                         {
-                            NPC[A].GeneratorTime = 0;
+                            NPC[A].GeneratorTime() = 0;
                             numNPCs++;
                             NPC[numNPCs] = NPC[A];
 
-                            if(NPC[A].GeneratorEffect == 1) // Warp NPC
+                            if(NPC[A].GeneratorEffect() == 1) // Warp NPC
                             {
                                 // NOTE: this code previously used Effect2 to store the destination position, and now it uses SpecialX/Y
                                 NPC[numNPCs].Layer = NPC[A].Layer;
-                                NPC[numNPCs].Effect3 = NPC[A].GeneratorDirection;
+                                NPC[numNPCs].Effect3 = NPC[A].GeneratorDirection();
                                 NPC[numNPCs].Effect2 = 0;
                                 NPC[numNPCs].Effect = NPCEFF_WARP;
                                 NPC[numNPCs].Location.SpeedX = 0;
                                 NPC[numNPCs].TimeLeft = 100;
-                                if(NPC[A].GeneratorDirection == 1)
+                                if(NPC[A].GeneratorDirection() == 1)
                                 {
                                     if(NPC[A]->HeightGFX > NPC[A].Location.Height)
                                     {
@@ -479,7 +479,7 @@ resume_Activation:
                                         NPC[numNPCs].SpecialY = NPC[numNPCs].Location.Y;
                                     }
                                 }
-                                else if(NPC[A].GeneratorDirection == 3)
+                                else if(NPC[A].GeneratorDirection() == 3)
                                 {
                                     if(NPC[A]->HeightGFX > NPC[A].Location.Height)
                                     {
@@ -492,20 +492,20 @@ resume_Activation:
                                         NPC[numNPCs].SpecialY = NPC[numNPCs].Location.Y + NPC[A].Location.Height;
                                     }
                                 }
-                                else if(NPC[A].GeneratorDirection == 2)
+                                else if(NPC[A].GeneratorDirection() == 2)
                                 {
                                     NPC[numNPCs].Location.Y -= 4;
                                     NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width;
                                     NPC[numNPCs].SpecialX = NPC[numNPCs].Location.X;
                                 }
-                                else if(NPC[A].GeneratorDirection == 4)
+                                else if(NPC[A].GeneratorDirection() == 4)
                                 {
                                     NPC[numNPCs].Location.Y -= 4;
                                     NPC[numNPCs].Location.X = NPC[A].Location.X - NPC[A].Location.Width;
                                     NPC[numNPCs].SpecialX = NPC[numNPCs].Location.X + NPC[A].Location.Width;
                                 }
                             }
-                            else if(NPC[A].GeneratorEffect == 2) // projectile
+                            else if(NPC[A].GeneratorEffect() == 2) // projectile
                             {
                                 NPC[numNPCs].Layer = LAYER_SPAWNED_NPCS;
                                 PlaySoundSpatial(SFX_Bullet, NPC[A].Location);
@@ -515,7 +515,8 @@ resume_Activation:
 
                                 if(NPC[numNPCs].Type == NPCID_SLIDE_BLOCK)
                                     NPC[numNPCs].Special = 1;
-                                if(NPC[A].GeneratorDirection == 1)
+
+                                if(NPC[A].GeneratorDirection() == 1)
                                 {
                                     NPC[numNPCs].Location.SpeedY = -10;
                                     NPC[numNPCs].Location.SpeedX = 0;
@@ -524,12 +525,12 @@ resume_Activation:
                                         NPC[numNPCs].Location.SpeedX = dRand() * 2 - 1;
                                     // NPC(numNPCs).Location.SpeedY = -1
                                 }
-                                else if(NPC[A].GeneratorDirection == 2)
+                                else if(NPC[A].GeneratorDirection() == 2)
                                 {
                                     NPC[numNPCs].Location.SpeedX = -Physics.NPCShellSpeed;
                                     NewEffect(EFFID_SMOKE_S3, newLoc(NPC[A].Location.X + 16, NPC[A].Location.Y, 32, 32));
                                 }
-                                else if(NPC[A].GeneratorDirection == 3)
+                                else if(NPC[A].GeneratorDirection() == 3)
                                 {
                                     NPC[numNPCs].Location.SpeedY = 8;
                                     NPC[numNPCs].Location.SpeedX = 0;
@@ -554,6 +555,10 @@ resume_Activation:
                             NPC[numNPCs].TriggerDeath = NPC[A].TriggerDeath;
                             NPC[numNPCs].TriggerLast = NPC[A].TriggerLast;
                             NPC[numNPCs].TriggerTalk = NPC[A].TriggerTalk;
+                            // new because generator variables now share memory with Special3/4/5
+                            NPC[numNPCs].Special3 = 0;
+                            NPC[numNPCs].GeneratorTime() = 0;
+                            NPC[numNPCs].GeneratorTimeMax() = 0;
                             CheckSectionNPC(numNPCs);
 
                             if(NPC[numNPCs].TriggerActivate != EVENT_NONE)

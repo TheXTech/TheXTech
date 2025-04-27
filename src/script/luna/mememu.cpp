@@ -1976,10 +1976,11 @@ public:
                     NPCQueues::Active.erase(n);
             }
         );
-        insert(0x00000068, &NPC_t::GeneratorTimeMax);
-        insert(0x0000006c, &NPC_t::GeneratorTime);
-        insert(0x00000070, &NPC_t::GeneratorDirection);
-        insert(0x00000072, &NPC_t::GeneratorEffect);
+        // all removed
+        // insert(0x00000068, &NPC_t::GeneratorTimeMax);
+        // insert(0x0000006c, &NPC_t::GeneratorTime);
+        // insert(0x00000070, &NPC_t::GeneratorDirection);
+        // insert(0x00000072, &NPC_t::GeneratorEffect);
         insert(0x00000074, // GeneratorActive
             [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {

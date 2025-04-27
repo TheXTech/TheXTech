@@ -462,9 +462,9 @@ void UpdateEditor()
                         n.generator = EditorCursor.NPC.Generator;
                         if(n.generator)
                         {
-                            n.generator_direct = EditorCursor.NPC.GeneratorDirection;
-                            n.generator_type = EditorCursor.NPC.GeneratorEffect;
-                            n.generator_period = EditorCursor.NPC.GeneratorTimeMax;
+                            n.generator_direct = EditorCursor.NPC.GeneratorDirection();
+                            n.generator_type = EditorCursor.NPC.GeneratorEffect();
+                            n.generator_period = EditorCursor.NPC.GeneratorTimeMax();
                         }
 
                         if(n.id == NPCID_ITEM_BURIED || n.id == 96 || n.id == 283 || n.id == 284)
@@ -1784,9 +1784,10 @@ void UpdateInterprocess()
             EditorCursor.NPC.Generator = n.generator;
             if(EditorCursor.NPC.Generator)
             {
-                EditorCursor.NPC.GeneratorDirection = n.generator_direct;
-                EditorCursor.NPC.GeneratorEffect = n.generator_type;
-                EditorCursor.NPC.GeneratorTimeMax = n.generator_period;
+                // EditorCursor.NPC.GeneratorDirection = n.generator_direct;
+                // EditorCursor.NPC.GeneratorEffect = n.generator_type;
+                EditorCursor.NPC.Special3 = ((uint16_t)(uint8_t)n.generator_direct << 8) + (uint8_t)n.generator_type;
+                EditorCursor.NPC.GeneratorTimeMax() = n.generator_period;
             }
 
             if(!n.msg.empty())
@@ -2203,9 +2204,14 @@ void SetCursor()
         }
 
         EditorCursor.NPC.Special2 = 0;
-        EditorCursor.NPC.Special3 = 0;
         EditorCursor.NPC.Special4 = 0;
-        EditorCursor.NPC.Special5 = 0;
+
+        if(!EditorCursor.NPC.Generator)
+        {
+            EditorCursor.NPC.Special3 = 0;
+            EditorCursor.NPC.Special5 = 0;
+        }
+
         // EditorCursor.NPC.Special6 = 0;
         EditorCursor.NPC.SpecialX = 0;
         EditorCursor.NPC.SpecialY = 0;

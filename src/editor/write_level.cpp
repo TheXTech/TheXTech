@@ -264,9 +264,9 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         }
 
         npc.generator = n.Generator;
-        npc.generator_direct = n.GeneratorDirection;
-        npc.generator_period = n.GeneratorTimeMax;
-        npc.generator_type = n.GeneratorEffect;
+        npc.generator_direct = n.GeneratorDirection();
+        npc.generator_period = n.GeneratorTimeMax();
+        npc.generator_type = n.GeneratorEffect();
         npc.attach_layer = GetL(n.AttLayer);
 
         npc.msg = GetS(n.Text);

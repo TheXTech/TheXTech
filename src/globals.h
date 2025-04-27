@@ -386,16 +386,25 @@ struct NPC_t
     bool Generator = false;
 //    GeneratorDirection As Integer
     // valid values: 0, 1, 2, 3, 4
-    uint8_t GeneratorDirection = 0;
+    // MOVED: now stored in the upper byte of Special3 for Generators
+    // uint8_t GeneratorDirection = 0;
+    inline uint8_t GeneratorDirection() const { return (uint8_t)(Special3 >> 8); }
 //    GeneratorEffect As Integer
     // valid values: 0, 1, 2
-    uint8_t GeneratorEffect = 0;
+    // MOVED: now stored in the lower byte of Special3 for Generators
+    // uint8_t GeneratorEffect = 0;
+    inline uint8_t GeneratorEffect() const { return (uint8_t)Special3; }
 //    GeneratorTimeMax As Single
     // surprisingly, never stores any floating point variables. expressed in deci-seconds.
-    vbint_t GeneratorTimeMax = 0;
+    // MOVED: now stored in Special4 for Generators
+    // vbint_t GeneratorTimeMax = 0;
+    inline vbint_t& GeneratorTimeMax() { return Special4; }
+    inline const vbint_t& GeneratorTimeMax() const { return Special4; }
 //    GeneratorTime As Single
     // surprisingly, only stores its own limit as a floating point variables. expressed in ticks.
-    vbint_t GeneratorTime = 0;
+    // MOVED: now stored in Special5 for Generators
+    // vbint_t GeneratorTime = 0;
+    inline vbint_t& GeneratorTime() { return Special5; }
 
     // Misc floating-point variables
 //    RealSpeedX As Single 'the real speed of the NPC
