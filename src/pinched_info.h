@@ -22,19 +22,21 @@
 #ifndef PINCHED_INFO_H
 #define PINCHED_INFO_H
 
+#include <stdint.h>
+
 // structure used to store information about whether a player / NPC is being crushed by blocks
 struct PinchedInfo_t
 {
-    unsigned Bottom1   : 2;
-    unsigned Left2     : 2;
-    unsigned Top3      : 2;
-    unsigned Right4    : 2;
-    unsigned Moving    : 2;
+    uint16_t Bottom1   : 2;
+    uint16_t Left2     : 2;
+    uint16_t Top3      : 2;
+    uint16_t Right4    : 2;
+    uint16_t Moving    : 2;
     bool     MovingLR  : 1;
     bool     MovingUD  : 1;
 
     // players only: frame counter to use classic (strict) pinched death condition
-    unsigned Strict    : 4;
+    uint16_t Strict    : 4;
 
     inline PinchedInfo_t()
     {
