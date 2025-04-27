@@ -289,7 +289,7 @@ void Deactivate(int A)
             NPC[A].Pinched = PinchedInfo_t();
 
             // new-added logic: if CURRENTLY offscreen for all vScreens, allow it to reset
-            if(g_config.fix_frame_perfect_despawn && !FreezeNPCs)
+            if(g_config.fix_frame_perfect_despawn && (g_config.fix_timestop_respawn || !FreezeNPCs))
             {
                 bool hit = false;
 

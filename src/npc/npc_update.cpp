@@ -245,15 +245,32 @@ bool UpdateNPCs()
             if(NPC[A].TimeLeft == 0)
             {
                 Deactivate(A);
-                if(g_config.fix_FreezeNPCs_no_reset)
+
+                if(g_config.fix_timestop_respawn)
                 {
-                    // eventually: do something to reset the NPC's state using a routine shared with the main UpdateNPCs logic
+                    // NPCMovementLogic gets called here to reset the NPC's position -- important for plants
+                    if(!NPC[A].Generator)
+                    {
+                        tempf_t speedVar = 1;
+                        NPCMovementLogic(A, speedVar);
+                    }
+
+                    // don't keep deactivating the NPC every frame
                     NPC[A].TimeLeft = -1;
                 }
             }
 
             if(NPC[A].JustActivated)
             {
+                // update the NPC's position -- important for bullets and jumping fish
+                if(g_config.fix_timestop_respawn && !NPC[A].Generator)
+                {
+                    NPCActivationLogic(A);
+
+                    if(NPC[A].TriggerActivate != EVENT_NONE)
+                        TriggerEvent(NPC[A].TriggerActivate, 0);
+                }
+
                 NPC[A].JustActivated = 0;
                 NPCQueues::update(A);
             }

@@ -884,9 +884,6 @@ public:
     // 1.3.5.2
     opt<bool> fix_bat_start_while_inactive{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-bat-start-while-inactive", "Bat start", "Don't activate the bats until they are onscreen"};
-    // opt<bool> fix_FreezeNPCs_no_reset{this, defaults(false), {VER_THEXTECH137, CompatClass::standard_update, false}, Scope::None,
-    //     "fix-FreezeNPCs-no-reset", "'Fix' FreezeNPCs", "There is a bug that results in NPCs vanishing after getting a freeze clock, but this 'fix' introduces other bugs"};
-    static constexpr bool fix_FreezeNPCs_no_reset = false;
     // 1.3.5.3
     opt<bool> fix_npc_activation_event_loop_bug{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-npc-activation-event-loop-bug", "NPC activation loop", "Fixes softlock bug that results when NPCs activate each other in a loop"};
@@ -966,6 +963,8 @@ public:
         "new-conveyor-belts", "New conveyor belts", "Update belts to faster and more stable logic"};
     opt<bool> optimize_coins{this, defaults(true), {CompatClass::critical_update, false}, Scope::Creator,
         "optimize-coins", "Optimize coins", "Speed up the game when many coins are onscreen"};
+    opt<bool> fix_timestop_respawn{this, defaults(true), {CompatClass::standard_update, false}, Scope::Creator,
+        "fix-timestop-respawn", "Fix timestop respawn", "Allow NPCs to respawn during timestop"};
 
     /* ---- Compatibility - Speedrun ----*/
 

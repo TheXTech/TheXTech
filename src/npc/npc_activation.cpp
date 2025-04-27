@@ -200,7 +200,7 @@ void NPCActivationLogic(int A)
                 if(NPC[A].tempBlock > 0)
                     treeNPCSplitTempBlock(A);
             }
-            else if(NPC[A].Type != NPCID_GHOST_FAST)
+            else if(NPC[A].Type != NPCID_GHOST_FAST && !FreezeNPCs)
                 PlaySoundSpatial(SFX_Bullet, NPC[A].Location);
         }
         else if(NPC[A].Type == NPCID_GOALTAPE)
