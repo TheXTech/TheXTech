@@ -871,26 +871,20 @@ interrupt_Activation:
                     if(NPC[A].tempBlock > 0)
                         treeNPCSplitTempBlock(A);
                 }
-
-
-
                 else if(NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || (NPC[A]->IsFish && NPC[A].Special == 2) || NPC[A].Type == NPCID_GHOST_FAST) // Special Start for Jumping Fish and Bullet Bills
                 {
                     if(NPC[A].TimeLeft <= 1)
                     {
-                        NPCQueues::Active.erase(A);
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
                     else if(NPC[A].Direction == -1 && NPC[A].Location.X < Player[NPC[A].JustActivated].Location.X)
                     {
-                        NPCQueues::Active.erase(A);
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
                     else if(NPC[A].Direction == 1 && NPC[A].Location.X > Player[NPC[A].JustActivated].Location.X)
                     {
-                        NPCQueues::Active.erase(A);
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
@@ -907,27 +901,28 @@ interrupt_Activation:
                         PlaySoundSpatial(SFX_Bullet, NPC[A].Location);
                 }
                 else if(NPC[A].Type == NPCID_CANNONENEMY)
+                {
                     NPC[A].Special = 100;
+                    NPC[A].Projectile = false; // moved from below
+                }
+                // NOTE: these were previously not guarded by the Active check above,
+                // but the only way this code should be called for NPCs without Active is if they are Hidden,
+                // in which case these variables will get reset by Deactivate
+                else if(NPC[A].Type == NPCID_STATUE_S3 || NPC[A].Type == NPCID_STATUE_S4)
+                    NPC[A].Special = iRand(200);
+                else if(NPC[A].Type == NPCID_CANNONITEM)
+                    NPC[A].Projectile = false;
             }
-            else if(!NPC[A].Generator && !NPCQueues::check_active(NPC[A]))
-                NPCQueues::Active.erase(A);
-
-            if(NPC[A].Type == NPCID_STATUE_S3 || NPC[A].Type == NPCID_STATUE_S4)
-                NPC[A].Special = iRand(200);
 
             NPC[A].JustActivated = 0;
             NPC[A].CantHurt = 0;
             NPC[A].CantHurtPlayer = 0;
 
-            if(NPC[A].Type == NPCID_CANNONENEMY)
-                NPC[A].Projectile = false;
-
-            if(NPC[A].Type == NPCID_CANNONITEM)
-                NPC[A].Projectile = false;
-
-            // this allows us to exclude Vines from the set of active NPCs (without checking their status every frame if they do need to be active)
-            if(NPC[A]->IsAVine)
-                NPCQueues::update(NPC[A]);
+            // in addition to removing cancelled NPCs from the Active list,
+            // this also allows us to exclude Vines from the set of active NPCs
+            // (without checking their status every frame if they do need to be active)
+            if(!NPCQueues::check_active(NPC[A]))
+                NPCQueues::Active.erase(A);
         }
         // check for active NPCs that are falling off
         else if(NPC[A].Location.Y > level[NPC[A].Section].Height && NPC[A].Location.Y > level[NPC[A].Section].Height + 16)
