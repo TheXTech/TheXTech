@@ -34,12 +34,10 @@
 
 #include "main/trees.h"
 
-void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontResetGrabTime, float cursed_value_C)
+void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontResetGrabTime, float cursed_value_C, const int oldStandingOnNpc)
 {
     int oldSlope = Player[A].Slope;
     Player[A].Slope = 0;
-
-    int oldStandingOnNpc = Player[A].StandingOnNPC;
 
     int blockPushX = 0;
     bool tempHit = false;

@@ -167,6 +167,7 @@ void UpdatePlayer()
                 }
 
                 double SlippySpeedX = Player[A].Location.SpeedX;
+                int oldStandingOnNpc = Player[A].StandingOnNPC;
 
 
                 // Player's X movement. ---------------------------
@@ -386,7 +387,7 @@ void UpdatePlayer()
 
                 Player[A].Slippy = false;
 
-                PlayerBlockLogic(A, floorBlock, movingBlock, DontResetGrabTime, cursed_value_C);
+                PlayerBlockLogic(A, floorBlock, movingBlock, DontResetGrabTime, cursed_value_C, oldStandingOnNpc);
 
                 // Vine collisions.
                 PlayerVineLogic(A);
