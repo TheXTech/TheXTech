@@ -239,6 +239,16 @@ extern bool ShowOnScreenHUD;
 
 struct NPCTraits_t;
 
+enum WingBehaviors : uint8_t
+{
+    WING_NONE = 0,
+    WING_PARA_CHASE = 0,
+    WING_JUMP = 1,
+    WING_LEFTRIGHT = 2,
+    WING_UPDOWN = 3,
+    WING_CHASE = 4,
+};
+
 //Public Type NPC 'The NPC Type
 struct NPC_t
 {
@@ -427,6 +437,10 @@ struct NPC_t
 //    WallDeath As Integer
     // tracks whether the NPC was activated in a wall (or is not in water, for fish). set to values between 0 and 10, used as a counter bounded at these values, sometimes very briefly 11.
     uint8_t WallDeath = 0;
+//  NEW: which GFX expansion slot should the NPC use? Reserved for now
+    uint8_t GFXSlot = 0;
+//  NEW: what type of wing behavior should the NPC have?
+    WingBehaviors WingBehavior = WING_NONE;
 
     // rarely used bools turned into bitfields
 //    TurnAround As Boolean 'if the NPC needs to turn around
@@ -475,6 +489,8 @@ struct NPC_t
 //    Quicksand As Integer
     // counter for whether NPC is in quicksand, set to 2 when detected, decremented otherwise
     uint8_t Quicksand : 2;
+//  NEW: does the NPC currently have Wings?
+    bool Wings : 1;
 
 //'the default values are used when De-Activating an NPC when it goes on screen
 //    DefaultDirection As Single
@@ -526,7 +542,8 @@ struct NPC_t
         tempBlockInTree(false),
         Stuck(false),
         Shadow(false),
-        Quicksand(0) {}
+        Quicksand(0),
+        Wings(false) {}
 
 };
 
