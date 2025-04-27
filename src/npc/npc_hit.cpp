@@ -145,6 +145,7 @@ void NPCHit(int A, int B, int C)
 
             if(NPC[A].Effect == NPCEFF_MAZE)
             {
+                // disable no-gravity for an item frozen within a maze
                 NPC[A].Special3 = 0;
                 NPC[A].Projectile = true;
 
@@ -153,6 +154,7 @@ void NPCHit(int A, int B, int C)
             }
             else
             {
+                // this freezes the item in mid-air until it's grabbed
                 NPC[A].Special3 = 1;
                 NPC[A].Location.SpeedY = 0;
                 NPC[A].Location.SpeedX = 0;
