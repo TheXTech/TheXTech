@@ -471,7 +471,7 @@ void UpdateEditor()
                             n.contents = (long)EditorCursor.NPC.Special;
 
                         if(n.id == 288 || n.id == 289 || (n.id == NPCID_ITEM_BURIED && int(EditorCursor.NPC.Special) == 288))
-                            n.special_data = EditorCursor.NPC.Special2;
+                            n.special_data = EditorCursor.NPC.Variant;
 
                         if(NPCIsAParaTroopa(n.id) || NPCTraits[n.id].IsFish || n.id == 260)
                             n.special_data = (long)EditorCursor.NPC.Special;
