@@ -467,17 +467,17 @@ void UpdateEditor()
                             n.generator_period = EditorCursor.NPC.GeneratorTimeMax();
                         }
 
-                        if(n.id == NPCID_ITEM_BURIED || n.id == 96 || n.id == 283 || n.id == 284)
-                            n.contents = (long)EditorCursor.NPC.Special;
+                        if(n.id == NPCID_ITEM_BURIED || n.id == NPCID_ITEM_POD || n.id == NPCID_ITEM_BUBBLE || n.id == NPCID_ITEM_THROWER)
+                            n.contents = EditorCursor.NPC.Special;
 
-                        if(n.id == 288 || n.id == 289 || (n.id == NPCID_ITEM_BURIED && int(EditorCursor.NPC.Special) == 288))
+                        if(n.id == NPCID_DOOR_MAKER || n.id == NPCID_MAGIC_DOOR || (n.id == NPCID_ITEM_BURIED && EditorCursor.NPC.Special == NPCID_DOOR_MAKER))
                             n.special_data = EditorCursor.NPC.Variant;
 
-                        if(NPCIsAParaTroopa(n.id) || NPCTraits[n.id].IsFish || n.id == 260)
-                            n.special_data = (long)EditorCursor.NPC.Special;
+                        if(NPCIsAParaTroopa(n.id) || NPCTraits[n.id].IsFish || n.id == NPCID_FIRE_CHAIN)
+                            n.special_data = EditorCursor.NPC.Special;
 
-                        if(n.id == 86)
-                            n.special_data = (long)EditorCursor.NPC.Variant;
+                        if(n.id == NPCID_VILLAIN_S3)
+                            n.special_data = EditorCursor.NPC.Variant;
 
                         n.msg = GetS(EditorCursor.NPC.Text);
                         n.friendly = EditorCursor.NPC.Inert;
@@ -1767,13 +1767,13 @@ void UpdateInterprocess()
                 EditorCursor.NPC.DefaultSpecial = EditorCursor.NPC.Special;
             }
 
-            if(EditorCursor.NPC.Type == 260)
+            if(EditorCursor.NPC.Type == NPCID_FIRE_CHAIN)
             {
                 EditorCursor.NPC.Special = (vbint_t)n.special_data;
                 EditorCursor.NPC.DefaultSpecial = EditorCursor.NPC.Special;
             }
 
-            if(EditorCursor.NPC.Type == 86)
+            if(EditorCursor.NPC.Type == NPCID_VILLAIN_S3)
             {
                 if(n.special_data >= 0 && n.special_data < 256)
                     EditorCursor.NPC.Variant = (uint8_t)n.special_data;
@@ -1794,7 +1794,7 @@ void UpdateInterprocess()
                 SetS(EditorCursor.NPC.Text, n.msg);
 
             EditorCursor.NPC.Inert = n.friendly;
-            if(EditorCursor.NPC.Type == 151)
+            if(EditorCursor.NPC.Type == NPCID_SIGN)
                 EditorCursor.NPC.Inert = true;
             EditorCursor.NPC.Stuck = n.nomove;
             EditorCursor.NPC.DefaultStuck = EditorCursor.NPC.Stuck;
