@@ -259,18 +259,6 @@ struct NPC_t
     bool Hidden = false;
 //    Inert As Boolean 'the friendly toggle. makes the NPC not do anything
     bool Inert = false;
-//    Stuck As Boolean 'the 'don't move' toggle. forces the NPC not to move
-    bool Stuck = false;
-//    Shadow As Boolean 'if true turn the NPC black and allow it to pass through walls.  only used for a cheat code
-    bool Shadow = false;
-//    EXTRA: does the tempBlock have its own tree entry?
-    // To explain further: when an NPC is at the same location as its tempBlock,
-    //   its temp block is *not* added to the temp block quadtree
-    //   (saves time by only keeping one tree).
-    // Whenever the NPC is moved and temp block isn't, they split and the temp block needs to be added to the tree if it has not already been added. (treeNPCSplitTempBlock)
-    // Whenever the temp block is moved and the NPC isn't, they split and the temp block needs to be updated even if it is already added. (treeNPCUpdateTempBlock)
-    // Whenever the temp block is moved *to* the NPC's position, they re-join, and the temp block is removed if it was added.
-    bool tempBlockInTree = false;
 
 //    Reset(1 To 2) As Boolean 'If it can display the NPC
     // IMPORTANT: in SMBX64 and compat mode, Reset[1] is whether the NPC was NOT on vScreen 1 during the last draw
@@ -279,6 +267,11 @@ struct NPC_t
     //         NO screens during the last draw. Reset[1] is the only externally usable flag, and Reset[2] is used
     //         internally during the NPC screen logic to mark whether Reset[1] was set prior to the screen logic.
     RangeArrI<bool, 1, 2, false> Reset;
+
+//    JustActivated As Integer 'The player that activated the NPC
+    uint8_t JustActivated = 0;
+//    TimeLeft As Integer 'Time left before reset when not on screen
+    vbint_t TimeLeft = 0;
 
 //    Location As Location 'collsion detection information
     Location_t Location;
@@ -321,16 +314,9 @@ struct NPC_t
 //    Wet As Integer ' greater then 0 of the NPC is in water
     // counter for whether NPC is in water, set to 2 when detected, decremented otherwise
     uint8_t Wet = 0;
-//    Quicksand As Integer
-    // counter for whether NPC is in quicksand, set to 2 when detected, decremented otherwise
-    uint8_t Quicksand = 0;
 //    TailCD As Integer 'if greater then 0 the player can't hit with it's tail
     // set to values up to 12 when whipped / kicked, decremented otherwise
     uint8_t TailCD = 0;
-//    JustActivated As Integer 'The player that activated the NPC
-    uint8_t JustActivated = 0;
-//    TimeLeft As Integer 'Time left before reset when not on screen
-    vbint_t TimeLeft = 0;
 
 //    Direction As Single 'The direction the NPC is walking
     // we have confirmed that this is never assigned a value other than 0, -1, or 1
@@ -376,14 +362,12 @@ struct NPC_t
     vbint_t Slope = 0;
 //    Multiplier As Integer 'for upping the points the player recieves
     uint8_t Multiplier = 0;
-//    standingOnPlayerY As Integer
-    vbint_t vehicleYOffset = 0;
 //    standingOnPlayer As Integer 'If this NPC is standing on a player in the clown car
     uint8_t vehiclePlr = 0;
+//    standingOnPlayerY As Integer
+    vbint_t vehicleYOffset = 0;
 
-    // Information about Generator state (GeneratorActive in bitfield at the bottom of the struct)
-//    Generator As Boolean 'for spawning new NPCs
-    bool Generator = false;
+    // Information about Generator state (Generator and GeneratorActive in bitfield at the bottom of the struct)
 //    GeneratorDirection As Integer
     // valid values: 0, 1, 2, 3, 4
     // MOVED: now stored in the upper byte of Special3 for Generators
@@ -406,6 +390,10 @@ struct NPC_t
     // vbint_t GeneratorTime = 0;
     inline vbint_t& GeneratorTime() { return Special5; }
 
+//    FrameCount As Single 'The counter for incrementing the frames
+    // was previously a float but this didn't accomplish anything
+    vbint_t FrameCount = 0;
+
     // Misc floating-point variables
 //    RealSpeedX As Single 'the real speed of the NPC
     numf_t RealSpeedX = 0;
@@ -413,9 +401,6 @@ struct NPC_t
     numf_t BeltSpeed = 0;
 //    oldAddBelt As Single
     numf_t oldAddBelt = 0;
-//    FrameCount As Single 'The counter for incrementing the frames
-    // was previously a float but this didn't accomplish anything
-    vbint_t FrameCount = 0;
 //    Damage As Single
     // never set to a non-integer value, likely used a float for saturation arithemtic
     // (note: for NPCs whose DefaultType is a coin, this now stores the block type of a coin created by a coin switch)
@@ -448,6 +433,8 @@ struct NPC_t
     bool TurnAround : 1;
 //    TurnBackWipe As Boolean
     bool TurnBackWipe : 1;
+//    Generator As Boolean 'for spawning new NPCs
+    bool Generator : 1;
 //    GeneratorActive As Boolean
     bool GeneratorActive : 1;
 //    playerTemp As Boolean
@@ -473,6 +460,21 @@ struct NPC_t
     bool _priv_self_hide_event : 1;
     // EXTRA: used only for vines spawned by vine head
     bool DefaultLocationHeight_Force32 : 1;
+//    EXTRA: does the tempBlock have its own tree entry?
+    // To explain further: when an NPC is at the same location as its tempBlock,
+    //   its temp block is *not* added to the temp block quadtree
+    //   (saves time by only keeping one tree).
+    // Whenever the NPC is moved and temp block isn't, they split and the temp block needs to be added to the tree if it has not already been added. (treeNPCSplitTempBlock)
+    // Whenever the temp block is moved and the NPC isn't, they split and the temp block needs to be updated even if it is already added. (treeNPCUpdateTempBlock)
+    // Whenever the temp block is moved *to* the NPC's position, they re-join, and the temp block is removed if it was added.
+    bool tempBlockInTree : 1;
+//    Stuck As Boolean 'the 'don't move' toggle. forces the NPC not to move
+    bool Stuck : 1;
+//    Shadow As Boolean 'if true turn the NPC black and allow it to pass through walls.  only used for a cheat code
+    bool Shadow : 1;
+//    Quicksand As Integer
+    // counter for whether NPC is in quicksand, set to 2 when detected, decremented otherwise
+    uint8_t Quicksand : 2;
 
 //'the default values are used when De-Activating an NPC when it goes on screen
 //    DefaultDirection As Single
@@ -514,12 +516,17 @@ struct NPC_t
     void ResetLocation();
     const NPCTraits_t* operator->() const;
 
-    NPC_t() : TurnAround(false), TurnBackWipe(false), GeneratorActive(false),
+    NPC_t() : TurnAround(false), TurnBackWipe(false),
+        Generator(false), GeneratorActive(false),
         playerTemp(false), Legacy(false), Chat(false), NoLavaSplash(false),
         Bouce(false), DefaultStuck(false), RespawnDelay(false),
         _priv_force_canonical(false),
         _priv_self_hide_event(false),
-        DefaultLocationHeight_Force32(false) {}
+        DefaultLocationHeight_Force32(false),
+        tempBlockInTree(false),
+        Stuck(false),
+        Shadow(false),
+        Quicksand(0) {}
 
 };
 

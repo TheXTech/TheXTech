@@ -1837,7 +1837,7 @@ public:
         // (mememu does not support setting strings yet)
 
         // insert(0x00000000, &NPC_t::AttLayer);
-        insert(0x00000004, &NPC_t::Quicksand);
+        // insert(0x00000004, &NPC_t::Quicksand); // turned into bitfield, unused in Analogue Funk
         // insert(0x00000006, &NPC_t::RespawnDelay); // only usable in Battle Mode
         insert(0x00000008, // Bouce
             [](const NPC_t& n, FIELDTYPE ftype)->num_t
@@ -1908,7 +1908,7 @@ public:
                 NPCQueues::Unchecked.push_back(n);
             }
         );
-        insert(0x00000028, &NPC_t::Shadow);
+        // insert(0x00000028, &NPC_t::Shadow); // turned into bitfield, unused in Analogue Funk
         // insert(0x0000002c, &NPC_t::TriggerActivate);
         // insert(0x00000030, &NPC_t::TriggerDeath);
         // insert(0x00000034, &NPC_t::TriggerTalk);
@@ -1940,19 +1940,8 @@ public:
             }
         );
         insert(0x00000046, &NPC_t::Inert);
-        insert(0x00000048, &NPC_t::Stuck);
-        insert(0x0000004a, // DefaultStuck
-            [](const NPC_t& n, FIELDTYPE ftype)->num_t
-            {
-                return valueToMem(n.DefaultStuck, ftype);
-            },
-            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
-            {
-                bool temp = n.DefaultStuck;
-                memToValue(temp, in, ftype);
-                n.DefaultStuck = temp;
-            }
-        );
+        // insert(0x00000048, &NPC_t::Stuck); // turned into bitfield, unused in Analogue Funk
+        // insert(0x0000004a, &NPC_t::DefaultStuck); // turned into bitfield, unused in Analogue Funk
         // insert(0x0000004c, &NPC_t::Text);
         insert(0x00000050, &NPC_t::oldAddBelt);
         // insert(0x00000054, &NPC_t::PinchCount); // unused since SMBX64, now removed
@@ -1961,38 +1950,27 @@ public:
         insert(0x0000005c, &NPC_t::BeltSpeed);
         insert(0x00000060, &NPC_t::vehiclePlr);
         insert(0x00000062, &NPC_t::vehicleYOffset);
-        insert(0x00000064, // Generator
-            [](const NPC_t& n, FIELDTYPE ftype)->num_t
-            {
-                return valueToMem(n.Generator, ftype);
-            },
-            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
-            {
-                memToValue(n.Generator, in, ftype);
+        // insert(0x00000064, // Generator // turned into bitfield, unused in Analogue Funk
+        //     [](const NPC_t& n, FIELDTYPE ftype)->num_t
+        //     {
+        //         return valueToMem(n.Generator, ftype);
+        //     },
+        //     [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
+        //     {
+        //         memToValue(n.Generator, in, ftype);
 
-                if(n.Generator)
-                    NPCQueues::Active.insert(n);
-                else if(!NPCQueues::check_active(n))
-                    NPCQueues::Active.erase(n);
-            }
-        );
+        //         if(n.Generator)
+        //             NPCQueues::Active.insert(n);
+        //         else if(!NPCQueues::check_active(n))
+        //             NPCQueues::Active.erase(n);
+        //     }
+        // );
         // all removed
         // insert(0x00000068, &NPC_t::GeneratorTimeMax);
         // insert(0x0000006c, &NPC_t::GeneratorTime);
         // insert(0x00000070, &NPC_t::GeneratorDirection);
         // insert(0x00000072, &NPC_t::GeneratorEffect);
-        insert(0x00000074, // GeneratorActive
-            [](const NPC_t& n, FIELDTYPE ftype)->num_t
-            {
-                return valueToMem(n.GeneratorActive, ftype);
-            },
-            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
-            {
-                bool temp = n.GeneratorActive;
-                memToValue(temp, in, ftype);
-                n.GeneratorActive = temp;
-            }
-        );
+        // insert(0x00000074, &NPC_t::GeneratorActive); // turned into bitfield, unused in Analogue Funk
         insert(0x00000076, // playerTemp
             [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
@@ -2136,18 +2114,7 @@ public:
         // insert(0x0000014e, &NPC_t::coinSwitchBlockType); // never-used for non-coins, now shares storage with Damage (never-used for coins)
         insert(0x00000150, &NPC_t::tempBlock);
         // insert(0x00000152, &NPC_t::onWall); // removed temporary variable
-        insert(0x00000154, // TurnBackWipe
-            [](const NPC_t& n, FIELDTYPE ftype)->num_t
-            {
-                return valueToMem(n.TurnBackWipe, ftype);
-            },
-            [](NPC_t& n, num_t in, FIELDTYPE ftype)->void
-            {
-                bool temp = n.TurnBackWipe;
-                memToValue(temp, in, ftype);
-                n.TurnBackWipe = temp;
-            }
-        );
+        // insert(0x00000154, &NPC_t::TurnBackWipe); // turned into bitfield, unused in Analogue Funk
         insert(0x00000156, // Immune
             [](const NPC_t& n, FIELDTYPE ftype)->num_t
             {
