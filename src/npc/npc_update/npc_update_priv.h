@@ -44,6 +44,8 @@ void NPCEffects(int A);
 
 void NPCSpecialMaybeHeld(int A);
 
+void NPCActivationLogic(int A);
+
 // returns true if an NPC should be generated
 bool NPCGeneratorLogic(int A);
 // does NOT call the activation event (because that requires safe ProcEvent handling)

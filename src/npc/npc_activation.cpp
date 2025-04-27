@@ -28,6 +28,7 @@
 
 #include "npc_id.h"
 #include "npc_traits.h"
+#include "npc_queues.h"
 
 #include "main/trees.h"
 
@@ -167,4 +168,100 @@ void NPC_ConstructCanonicalSet()
             }
         }
     }
+}
+
+void NPCActivationLogic(int A)
+{
+    if(NPC[A].Active)
+    {
+        if((NPC[A]->IsFish && NPC[A].Special == 2) || NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || NPC[A].Type == NPCID_GHOST_FAST) // Special Start for Jumping Fish and Bullet Bills
+        {
+            if(NPC[A].TimeLeft <= 1)
+            {
+                NPC[A].Active = false;
+                NPC[A].TimeLeft = 0;
+            }
+            else if(NPC[A].Direction == -1 && NPC[A].Location.X < Player[NPC[A].JustActivated].Location.X)
+            {
+                NPC[A].Active = false;
+                NPC[A].TimeLeft = 0;
+            }
+            else if(NPC[A].Direction == 1 && NPC[A].Location.X > Player[NPC[A].JustActivated].Location.X)
+            {
+                NPC[A].Active = false;
+                NPC[A].TimeLeft = 0;
+            }
+            else if(NPC[A]->IsFish && NPC[A].Special == 2)
+            {
+                NPC[A].Location.Y = level[Player[NPC[A].JustActivated].Section].Height - 0.1_n;
+                NPC[A].Location.SpeedX = (1 + (NPC[A].Location.Y - NPC[A].DefaultLocationY) / 200) * NPC[A].Direction;
+                NPC[A].Special5 = 1;
+                treeNPCUpdate(A);
+                if(NPC[A].tempBlock > 0)
+                    treeNPCSplitTempBlock(A);
+            }
+            else if(NPC[A].Type != NPCID_GHOST_FAST)
+                PlaySoundSpatial(SFX_Bullet, NPC[A].Location);
+        }
+        else if(NPC[A].Type == NPCID_GOALTAPE)
+        {
+            Location_t tempLocation = NPC[A].Location;
+            tempLocation.Height = 8000;
+            int C = 0;
+            for(int B : treeBlockQuery(tempLocation, SORTMODE_COMPAT))
+            {
+                if(CheckCollision(tempLocation, Block[B].Location))
+                {
+                    if(C == 0)
+                        C = B;
+                    else
+                    {
+                        if(Block[B].Location.Y < Block[C].Location.Y)
+                            C = B;
+                    }
+                }
+            }
+
+            if(C > 0)
+            {
+                // save location of ground below goal tape (was previously Special2)
+                NPC[A].SpecialY = Block[C].Location.Y + 4;
+                NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height;
+                NPC[A].Special = 1;
+
+                treeNPCUpdate(A);
+                if(NPC[A].tempBlock > 0)
+                    treeNPCSplitTempBlock(A);
+            }
+        }
+        else if(NPC[A].Type == NPCID_LAVA_MONSTER) // blaarg
+        {
+            NPC[A].Location.Y = NPC[A].DefaultLocationY + NPC[A].Location.Height + 36;
+            treeNPCUpdate(A);
+            if(NPC[A].tempBlock > 0)
+                treeNPCSplitTempBlock(A);
+        }
+        else if(NPC[A].Type == NPCID_CANNONENEMY)
+        {
+            NPC[A].Special = 100;
+            NPC[A].Projectile = false; // moved from below
+        }
+        // NOTE: these were previously not guarded by the Active check above,
+        // but the only way this code should be called for NPCs without Active is if they are Hidden,
+        // in which case these variables will get reset by Deactivate
+        else if(NPC[A].Type == NPCID_STATUE_S3 || NPC[A].Type == NPCID_STATUE_S4)
+            NPC[A].Special = iRand(200);
+        else if(NPC[A].Type == NPCID_CANNONITEM)
+            NPC[A].Projectile = false;
+    }
+
+    NPC[A].JustActivated = 0;
+    NPC[A].CantHurt = 0;
+    NPC[A].CantHurtPlayer = 0;
+
+    // in addition to removing cancelled NPCs from the Active list,
+    // this also allows us to exclude Vines from the set of active NPCs
+    // (without checking their status every frame if they do need to be active)
+    if(!NPCQueues::check_active(NPC[A]))
+        NPCQueues::Active.erase(A);
 }
