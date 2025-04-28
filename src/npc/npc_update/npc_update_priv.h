@@ -30,6 +30,8 @@ struct NPC_t;
 // most of these routines were originally part of UpdateNPCs
 void NPCMovementLogic(int A, tempf_t& speedVar);
 
+void NPCMovementLogic_Wings(int A, const num_t speedVar);
+
 void NPCSectionWrap(NPC_t& npc);
 
 void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA, const int numTempBlock, const tempf_t speedVar);

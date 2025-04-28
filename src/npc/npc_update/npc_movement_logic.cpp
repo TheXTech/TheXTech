@@ -25,6 +25,8 @@
 #include "config.h"
 #include "collision.h"
 
+#include "npc/npc_update/npc_update_priv.h"
+
 #include "main/trees.h"
 
 static inline bool s_use_default_movement(int A)
@@ -632,4 +634,163 @@ void NPCSectionWrap(NPC_t& npc)
                 npc.Location.Y = level[npc.Section].Y - npc.Location.Height + 1;
         }
     }
+}
+
+void NPCMovementLogic_Wings(int A, const num_t speedVar)
+{
+    if(NPC[A].Special == 0) // chase
+    {
+        if(NPC[A].CantHurt > 0)
+            NPC[A].CantHurt = 100;
+
+        NPC[A].Projectile = false;
+
+        int target_plr = 0;
+        num_t min_dist = 0;
+        for(int B = 1; B <= numPlayers; B++)
+        {
+            if(!Player[B].Dead && Player[B].Section == NPC[A].Section && Player[B].TimeToLive == 0 && NPC[A].CantHurtPlayer != B)
+            {
+                num_t dist = NPCPlayerTargetDist(NPC[A], Player[B]);
+                if(min_dist == 0 || dist < min_dist)
+                {
+                    min_dist = dist;
+                    target_plr = B;
+                }
+            }
+        }
+
+        if(target_plr > 0)
+        {
+            int D;
+            if(NPC[A].Location.to_right_of(Player[target_plr].Location))
+                D = -1;
+            else
+                D = 1;
+
+            NPC[A].Direction = D;
+            int E = 0; // X
+            int F_div = -1; // Y
+
+            if(NPC[A].Location.Y > Player[target_plr].Location.Y)
+                F_div = -1;
+            else if(NPC[A].Location.Y < Player[target_plr].Location.Y - 128)
+                F_div = 1;
+
+            if(NPC[A].Location.X > Player[target_plr].Location.X + Player[target_plr].Location.Width + 64)
+                E = -1;
+            else if(NPC[A].Location.X + NPC[A].Location.Width + 64 < Player[target_plr].Location.X)
+                E = 1;
+
+            if(NPC[A].Location.X + NPC[A].Location.Width + 150 > Player[target_plr].Location.X && NPC[A].Location.X - 150 < Player[target_plr].Location.X + Player[target_plr].Location.Width)
+            {
+                if(NPC[A].Location.Y > Player[target_plr].Location.Y + Player[target_plr].Location.Height)
+                {
+
+                    // If Player(C).Location.SpeedX + NPC(Player(C).StandingOnNPC).Location.SpeedX > 0 And .Location.X + .Location.Width / 2 > Player(C).Location.X + Player(C).Location.Width / 2 Then
+                        // E = -D
+                    // ElseIf Player(C).Location.SpeedX + NPC(Player(C).StandingOnNPC).Location.SpeedX <= 0 And .Location.X + .Location.Width / 2 < Player(C).Location.X + Player(C).Location.Width / 2 Then
+                        E = -D;
+                    // End If
+                    if(NPC[A].Location.Y < Player[target_plr].Location.Y + Player[target_plr].Location.Height + 160)
+                    {
+                        if(NPC[A].Location.X + NPC[A].Location.Width + 100 > Player[target_plr].Location.X && NPC[A].Location.X - 100 < Player[target_plr].Location.X + Player[target_plr].Location.Width)
+                            F_div = 5;
+                    }
+                }
+                else
+                {
+                    E = D;
+                    F_div = 1;
+                }
+            }
+
+            if(NPC[A].Wet == 2)
+            {
+                NPC[A].Location.SpeedX += 0.025_n * E;
+                NPC[A].Location.SpeedY += 0.025_n / F_div;
+            }
+            else
+            {
+                NPC[A].Location.SpeedX += 0.05_n * E;
+                NPC[A].Location.SpeedY += 0.05_n / F_div;
+            }
+
+            if(NPC[A].Location.SpeedX > 4)
+                NPC[A].Location.SpeedX = 4;
+            else if(NPC[A].Location.SpeedX < -4)
+                NPC[A].Location.SpeedX = -4;
+
+            if(NPC[A].Location.SpeedY > 3)
+                NPC[A].Location.SpeedY = 3;
+            else if(NPC[A].Location.SpeedY < -3)
+                NPC[A].Location.SpeedY = -3;
+        }
+    }
+    else if(NPC[A].Special == 1)
+    {
+        NPC[A].Location.SpeedY += Physics.NPCGravity;
+        NPC[A].Location.SpeedX = Physics.NPCWalkingSpeed * NPC[A].Direction;
+    }
+    else if(NPC[A].Special == 2)
+    {
+        if(NPC[A].Special3 == 0)
+        {
+            NPC[A].Location.SpeedY += 0.05_n;
+            if(NPC[A].Location.SpeedY > 1)
+                NPC[A].Special3 = 1;
+        }
+        else
+        {
+            NPC[A].Location.SpeedY -= 0.05_n;
+            if(NPC[A].Location.SpeedY < -1)
+                NPC[A].Special3 = 0;
+        }
+
+        if(NPC[A].Location.X == NPC[A].DefaultLocationX && NPC[A].Location.SpeedX == 0)
+            NPC[A].Location.SpeedX = 2 * NPC[A].Direction;
+        if(NPC[A].Location.X < NPC[A].DefaultLocationX - 64)
+            NPC[A].Location.SpeedX += 0.02_n;
+        else if(NPC[A].Location.X > NPC[A].DefaultLocationX + 64)
+            NPC[A].Location.SpeedX -= 0.02_n;
+        else if(NPC[A].Direction == -1)
+            NPC[A].Location.SpeedX -= 0.02_n;
+        else if(NPC[A].Direction == 1)
+            NPC[A].Location.SpeedX += 0.02_n;
+
+        if(NPC[A].Location.SpeedX > 2)
+            NPC[A].Location.SpeedX = 2;
+        if(NPC[A].Location.SpeedX < -2)
+            NPC[A].Location.SpeedX = -2;
+    }
+    else if(NPC[A].Special == 3)
+    {
+        NPC[A].Location.SpeedX = 0;
+
+        if(NPC[A].Location.Y == NPC[A].DefaultLocationY && NPC[A].Location.SpeedY == 0)
+            NPC[A].Location.SpeedY = 2 * NPC[A].Direction;
+        if(NPC[A].Location.Y < NPC[A].DefaultLocationY - 64)
+            NPC[A].Location.SpeedY += 0.02_n;
+        else if(NPC[A].Location.Y > NPC[A].DefaultLocationY + 64)
+            NPC[A].Location.SpeedY -= 0.02_n;
+        else if(NPC[A].Location.SpeedY < 0)
+            NPC[A].Location.SpeedY -= 0.02_n;
+        else
+            NPC[A].Location.SpeedY += 0.02_n;
+
+        if(NPC[A].Location.SpeedY > 2)
+            NPC[A].Location.SpeedY = 2;
+        if(NPC[A].Location.SpeedY < -2)
+            NPC[A].Location.SpeedY = -2;
+
+        NPCFaceNearestPlayer(NPC[A], true);
+    }
+
+    if(NPC[A].Stuck && !NPC[A].Projectile)
+        NPC[A].Location.SpeedX = 0;
+
+    // apply speed
+    NPC[A].Location.X += NPC[A].Location.SpeedX.times(speedVar);
+    NPC[A].Location.Y += NPC[A].Location.SpeedY;
+    // deferring tree update to end of the NPC physics update
 }
