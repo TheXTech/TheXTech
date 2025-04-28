@@ -1774,6 +1774,9 @@ void NPCHit(int A, int B, int C)
                 NPC[A].SpecialY = 0;
                 NPC[A].Location.SpeedX = 0;
                 NPC[A].Location.SpeedY = 0;
+
+                // temporarily remove wings if present
+                NPC[A].Wings = false;
             }
             else if(B == 3)
             {
@@ -2319,6 +2322,18 @@ void NPCHit(int A, int B, int C)
     {
         if(BlockKills2[Block[C].Type])
             NPC[A].NoLavaSplash = true;
+    }
+
+    // lose wings and get an extra hit if not a boss
+    if(B == 1 && NPC[A].Wings && NPC[A].Damage == 0)
+    {
+        if(NPC[A].Location.SpeedY < 0)
+            NPC[A].Location.SpeedY = 0;
+
+        PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
+        NPC[A].Killed = 0;
+        NPC[A].Immune = 4;
+        NPC[A].Wings = false;
     }
 
     if(NPC[A].Killed == 0 && NPC[A].Location.SpeedX == 0 && oldNPC.Location.SpeedX != 0)

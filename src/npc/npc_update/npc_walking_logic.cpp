@@ -339,9 +339,11 @@ void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, tempf_t
     }
     else // Walking code for everything else
     {
-        if(NPCIsAParaTroopa(NPC[A]))
+        if(NPCIsAParaTroopa(NPC[A]) || NPC[A].Wings)
         {
-            if(NPC[A].Special == 1)
+            WingBehaviors behavior = (NPC[A].Wings) ? NPC[A].WingBehavior : (WingBehaviors)NPC[A].Special;
+
+            if(behavior == WING_JUMP)
                 NPC[A].Location.SpeedY = -9;
             else
             {

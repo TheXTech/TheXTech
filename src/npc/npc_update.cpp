@@ -860,7 +860,7 @@ interrupt_Activation:
         // Normal operations start here
 
 
-        if(NPC[A]->IsACoin && NPC[A].Special == 0 && NPC[A].HoldingPlayer == 0 && !NPC[A].Inert && NPC[A].Effect == NPCEFF_NORMAL && g_config.optimize_coins)
+        if(NPC[A]->IsACoin && NPC[A].Special == 0 && NPC[A].HoldingPlayer == 0 && !NPC[A].Inert && !NPC[A].Wings && NPC[A].Effect == NPCEFF_NORMAL && g_config.optimize_coins)
         {
             if(NPC[A].Active && NPC[A].Killed == 0 && !NPC[A].Generator)
             {
@@ -1409,11 +1409,18 @@ interrupt_Activation:
                         if(NPC[A].Type == NPCID_SAW)
                             NPC[A].SpecialX = -NPC[A].SpecialX;
 
-                        if(!NPC[A]->IsAShell && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_TANK_TREADS &&
+                        // Don't turn around if a shell or a fireball
+                        bool can_turn_around = !NPC[A]->IsAShell && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_TANK_TREADS &&
                            NPC[A].Type != NPCID_BULLET && NPC[A].Type != NPCID_VILLAIN_S3 && !NPCIsABot(NPC[A]) &&
                            NPC[A].Type != NPCID_SPIT_BOSS_BALL && NPC[A].Type != NPCID_SPIT_GUY_BALL && !NPCIsVeggie(NPC[A]) &&
                            NPC[A].Type != NPCID_ROCKET_WOOD && NPC[A].Type != NPCID_WALL_SPARK && NPC[A].Type != NPCID_WALL_BUG &&
-                           NPC[A].Type != NPCID_WALL_TURTLE && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != NPCID_SWORDBEAM)  // Don't turn around if a shell or a fireball
+                           NPC[A].Type != NPCID_WALL_TURTLE && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != NPCID_SWORDBEAM;
+
+                        // wings override their parents' behavior
+                        if(NPC[A].Wings)
+                            can_turn_around = true;
+
+                        if(can_turn_around)
                         {
                             NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
                             if(NPC[A].tempBlock > 0)
@@ -1452,12 +1459,18 @@ interrupt_Activation:
                     if(NPC[A].Location.X + NPC[A].Location.Width > (FLBlocks + 1) * 32)
                         NPC[A].Location.X = (FLBlocks + 1) * 32 - NPC[A].Location.Width;
 
-                    if(!(NPC[A]->IsACoin && NPC[A].Special == 0) && !(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0) &&
+                    bool can_do_blocks = !(NPC[A]->IsACoin && NPC[A].Special == 0) && !(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0) &&
                        NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_STATUE_FIRE && NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_STAR_EXIT &&
                        NPC[A].Type != NPCID_STAR_COLLECT && !(NPC[A].Type >= NPCID_PLATFORM_S3 && NPC[A].Type <= NPCID_PLATFORM_S1) &&
                        NPC[A].Type != NPCID_LIFT_SAND && NPC[A].Type != NPCID_CHECKPOINT && NPC[A].Type != NPCID_SICK_BOSS_BALL &&
                        !(NPC[A].Type == NPCID_PLANT_FIREBALL || NPC[A].Type == NPCID_LOCK_DOOR || NPC[A].Type == NPCID_FIRE_DISK || NPC[A].Type == NPCID_FIRE_CHAIN) &&
-                       !(NPCIsAnExit(NPC[A]) && ((NPC[A].DefaultLocationX == NPC[A].Location.X && NPC[A].DefaultLocationY == NPC[A].Location.Y) || NPC[A].Inert)))
+                       !(NPCIsAnExit(NPC[A]) && ((NPC[A].DefaultLocationX == NPC[A].Location.X && NPC[A].DefaultLocationY == NPC[A].Location.Y) || NPC[A].Inert));
+
+                    // wings override their parents' behavior
+                    if(NPC[A].Wings)
+                        can_do_blocks = true;
+
+                    if(can_do_blocks)
                     {
                         // only the top half of the saw collides with blocks (gets restored after block collisions)
                         if(NPC[A].Type == NPCID_SAW)

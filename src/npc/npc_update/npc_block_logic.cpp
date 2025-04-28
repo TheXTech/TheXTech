@@ -55,7 +55,9 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
     // NPC[A].BeltSpeed = 0;
     tempf_t beltSpeed = 0;
 
-    if((!NPC[A]->NoClipping || NPC[A].Projectile) &&
+    bool is_winged = (NPCIsAParaTroopa(NPC[A]) || (NPC[A].Wings && NPC[A].WingBehavior != WING_JUMP));
+
+    if((!NPC[A]->NoClipping || NPC[A].Projectile || NPC[A].Wings) &&
        !(NPC[A].Type == NPCID_SPIT_BOSS_BALL && NPC[A].Projectile) && NPC[A].Type != NPCID_TOOTHY &&
         NPC[A].vehiclePlr == 0 && !(NPCIsVeggie(NPC[A]) && NPC[A].Projectile) &&
        NPC[A].Type != NPCID_HEAVY_THROWN && NPC[A].Type != NPCID_BIG_BULLET && NPC[A].Type != NPCID_PET_FIRE &&
@@ -179,7 +181,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
 
                                     if(BlockIsSizable[Block[B].Type] || BlockOnlyHitspot1[Block[B].Type])
                                     {
-                                        if(HitSpot != 1 || (NPCIsAParaTroopa(NPC[A]) && NPC[A].Special != 1))
+                                        if(HitSpot != 1 || (NPCIsAParaTroopa(NPC[A]) && NPC[A].Special != WING_JUMP) || (NPC[A].Wings && NPC[A].WingBehavior != WING_JUMP))
                                             HitSpot = 0;
                                     }
 
@@ -493,7 +495,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                                 if(NPC[A].Location.SpeedY < -0.01_n)
                                                     NPC[A].Location.SpeedY = -0.01_n + Block[B].Location.SpeedY;
 
-                                                if(NPCIsAParaTroopa(NPC[A]))
+                                                if(is_winged)
                                                     NPC[A].Location.SpeedY += 2;
                                             }
                                         }
@@ -1082,7 +1084,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
 
                                             if(!(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_TANK_TREADS || NPC[A].Type == NPCID_BULLET))
                                                 NPC[A].TurnAround = true;
-                                            if(NPCIsAParaTroopa(NPC[A]))
+                                            if(is_winged)
                                                 NPC[A].Location.SpeedX += -Block[B].Location.SpeedX * 1.2_r;
                                             if(NPC[A]->IsAShell)
                                                 NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
@@ -1101,7 +1103,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                         else
                                             tempBlockHit2 = B;
 
-                                        if(NPCIsAParaTroopa(NPC[A]))
+                                        if(is_winged)
                                         {
                                             NPC[A].Location.SpeedY = 2 + Block[B].Location.SpeedY;
                                             NPC[A].Location.Y = Block[B].Location.Y + Block[B].Location.Height + 0.1_n;
@@ -1259,7 +1261,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
             }
         }
 
-        if(!NPCIsAParaTroopa(NPC[A]))
+        if(!is_winged)
         {
             NPC[A].Location.Y = Block[winningBlock].Location.Y + Block[winningBlock].Location.Height + 0.01_n;
 

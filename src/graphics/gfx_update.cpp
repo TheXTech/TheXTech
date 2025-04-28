@@ -603,6 +603,34 @@ void DrawWarningNPC(int Z, int camX, int camY, int A)
         {255, 0, 0, cn.a});
 }
 
+// draw wings for an NPC
+void DrawNPCWings(const NPC_t& n, int sX, int sY, XTColor cn)
+{
+    int w = (int)(n->TWidth);
+    int h = (int)(n->THeight);
+    int npcY = (int)(n.Location.Y);
+
+    int draw_frame = ((npcY + CommonFrame) >> 6) & 1;
+
+    bool one_direction = (w <= 64);
+
+    for(int direction = 0; direction < 2; direction++)
+    {
+        if(one_direction)
+            direction = n.Direction;
+
+        if(direction == 1)
+            draw_frame += 2;
+
+        XRender::renderTextureBasic((direction == 1) ? (sX - 16) : (sX + w + 16 - 32),
+                              sY + h - 40,
+                              32, 32, GFX.YoshiWings, 0, 0 + 32 * draw_frame, cn);
+
+        if(one_direction)
+            break;
+    }
+}
+
 // code to facilitate cached values for the onscreen blocks and BGOs
 // intentionally only initialize the vectors for the first 2 screens since >2P mode is rare
 
@@ -2165,8 +2193,10 @@ void UpdateGraphicsScreen(Screen_t& screen)
             XTColor cn;
             s_get_NPC_tint(A, cn);
 
-            int drawX = camX + s_round2int(NPC[A].Location.X) + NPC[A]->FrameOffsetX;
-            int drawY = camY + s_round2int(NPC[A].Location.Y) + NPC[A]->FrameOffsetY;
+            int sX = camX + s_round2int(NPC[A].Location.X);
+            int sY = camY + s_round2int(NPC[A].Location.Y);
+            int drawX = sX + NPC[A]->FrameOffsetX;
+            int drawY = sY + NPC[A]->FrameOffsetY;
             int w = s_round2int(NPC[A].Location.Width);
             int h = s_round2int(NPC[A].Location.Height);
 
@@ -2228,6 +2258,9 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     0, NPC[A].Frame * NPC[A]->HeightGFX,
                     cn);
             }
+
+            if(NPC[A].Wings)
+                DrawNPCWings(NPC[A], sX, sY, cn);
         }
 
 
@@ -2546,7 +2579,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 cn.a /= 2;
 
             int drawX_no_offset = camX + s_round2int(NPC[A].Location.X);
-            int drawY = camY + s_round2int(NPC[A].Location.Y) + NPC[A]->FrameOffsetY;
+            int sY = camY + s_round2int(NPC[A].Location.Y);
+            int drawY = sY + NPC[A]->FrameOffsetY;
             int w = s_round2int(NPC[A].Location.Width);
             int h = s_round2int(NPC[A].Location.Height);
 
@@ -2567,6 +2601,9 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     0, NPC[A].Frame * NPC[A]->HeightGFX,
                     cn);
             }
+
+            if(NPC[A].Wings)
+                DrawNPCWings(NPC[A], drawX_no_offset, sY, cn);
         }
 
 
@@ -2751,6 +2788,9 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 // Yoshi's Head
                 XRender::renderTextureBasic(sX + YoshiTX, sY + YoshiTY, 32, 32, GFXYoshiT[B], 0, 32 * YoshiTFrame, cn);
             }
+
+            if(NPC[A].Wings)
+                DrawNPCWings(NPC[A], sX, sY, cn);
         }
 
         // npc chat bubble
@@ -2890,6 +2930,9 @@ void UpdateGraphicsScreen(Screen_t& screen)
                         0, NPC[A].Frame * NPC[A]->HeightGFX,
                         cn);
                 }
+
+                if(NPC[A].Wings)
+                    DrawNPCWings(NPC[A], sX, sY, cn);
             }
         }
 
@@ -2970,21 +3013,28 @@ void UpdateGraphicsScreen(Screen_t& screen)
             XTColor cn;
             s_get_NPC_tint(A, cn);
 
+            int sX = camX + s_round2int(NPC[A].Location.X);
+            int sY = camY + s_round2int(NPC[A].Location.Y);
+
             if(NPC[A]->WidthGFX == 0)
             {
-                XRender::renderTextureBasic(camX + s_round2int(NPC[A].Location.X) + NPC[A]->FrameOffsetX,
-                    camY + s_round2int(NPC[A].Location.Y) + NPC[A]->FrameOffsetY,
+                XRender::renderTextureBasic(sX + NPC[A]->FrameOffsetX,
+                    sY + NPC[A]->FrameOffsetY,
                     s_round2int(NPC[A].Location.Width),
                     s_round2int(NPC[A].Location.Height),
                     GFXNPC[NPC[A].Type], 0, NPC[A].Frame * s_round2int(NPC[A].Location.Height), cn);
             }
             else
             {
-                XRender::renderTextureBasic(camX + s_round2int(NPC[A].Location.X + NPC[A].Location.Width / 2) + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2, camY + s_round2int(NPC[A].Location.Y + NPC[A].Location.Height) + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX,
+                XRender::renderTextureBasic(camX + s_round2int(NPC[A].Location.X + NPC[A].Location.Width / 2) + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2,
+                    camY + s_round2int(NPC[A].Location.Y + NPC[A].Location.Height) + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX,
                     NPC[A]->WidthGFX,
                     NPC[A]->HeightGFX,
                     GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->HeightGFX, cn);
             }
+
+            if(NPC[A].Wings)
+                DrawNPCWings(NPC[A], sX, sY, cn);
         }
 
         XRender::setDrawPlane(PLANE_LVL_BLK_HURTS);

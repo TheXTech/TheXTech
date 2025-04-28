@@ -297,7 +297,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == NPCID_FIRE_BOSS) // ludwig koopa
     {
-        if(NPC[A].Location.SpeedY != 0)
+        if(NPC[A].Location.SpeedY != 0 && !NPC[A].Wings)
         {
             NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount < 4)

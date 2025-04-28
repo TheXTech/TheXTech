@@ -479,6 +479,9 @@ void UpdateEditor()
                         if(n.id == NPCID_VILLAIN_S3)
                             n.special_data = EditorCursor.NPC.Variant;
 
+                        if(EditorCursor.NPC.Wings)
+                            n.wings_type = (int)EditorCursor.NPC.WingBehavior;
+
                         n.msg = GetS(EditorCursor.NPC.Text);
                         n.friendly = EditorCursor.NPC.Inert;
                         n.nomove = EditorCursor.NPC.Stuck;
@@ -1798,6 +1801,9 @@ void UpdateInterprocess()
                 EditorCursor.NPC.Inert = true;
             EditorCursor.NPC.Stuck = n.nomove;
             EditorCursor.NPC.DefaultStuck = EditorCursor.NPC.Stuck;
+
+            EditorCursor.NPC.WingBehavior = (WingBehaviors)n.wings_type;
+            EditorCursor.NPC.Wings = (EditorCursor.NPC.WingBehavior != WING_NONE);
 
             EditorCursor.NPC.Legacy = n.is_boss;
 

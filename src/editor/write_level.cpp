@@ -273,6 +273,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         npc.friendly = n.Inert;
         npc.nomove = n.Stuck;
         npc.is_boss = n.Legacy;
+        npc.wings_type = (int)n.WingBehavior;
 
         npc.layer = GetL(n.Layer);
 

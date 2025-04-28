@@ -36,6 +36,9 @@ static inline bool s_use_default_movement(int A)
 
 void NPCMovementLogic(int A, tempf_t& speedVar)
 {
+    num_t Wings_SpeedX = NPC[A].Location.SpeedX;
+    num_t Wings_SpeedY = NPC[A].Location.SpeedY;
+
     // POSSIBLE SUBROUTINE: setSpeed
 
     // Default Movement Code
@@ -582,7 +585,11 @@ void NPCMovementLogic(int A, tempf_t& speedVar)
     }
 
     // Actual Movement (SpeedX / SpeedY application code)
-    if((!NPCIsAnExit(NPC[A]) || NPC[A].Type == NPCID_STAR_EXIT || NPC[A].Type == NPCID_STAR_COLLECT) &&
+    if(NPC[A].Wings)
+    {
+        // don't do anything here, the movement will be applied after SpecialNPC
+    }
+    else if((!NPCIsAnExit(NPC[A]) || NPC[A].Type == NPCID_STAR_EXIT || NPC[A].Type == NPCID_STAR_COLLECT) &&
         NPC[A].Type != NPCID_FIRE_POWER_S3 && NPC[A].Type != NPCID_CONVEYOR)
     {
         // ParaTroopa speed application happens in SpecialNPC, buried item can't move at all
@@ -612,6 +619,17 @@ void NPCMovementLogic(int A, tempf_t& speedVar)
 
     // Special NPCs code
     SpecialNPC(A);
+
+    // Wings movement code
+    if(NPC[A].Wings)
+    {
+        // reset speed to its old value
+        NPC[A].Location.SpeedX = Wings_SpeedX;
+        NPC[A].Location.SpeedY = Wings_SpeedY;
+
+        // do wings movement!
+        NPCMovementLogic_Wings(A, (num_t)speedVar);
+    }
 }
 
 void NPCSectionWrap(NPC_t& npc)
@@ -638,7 +656,12 @@ void NPCSectionWrap(NPC_t& npc)
 
 void NPCMovementLogic_Wings(int A, const num_t speedVar)
 {
-    if(NPC[A].Special == 0) // chase
+    WingBehaviors behavior = (NPC[A].Wings) ? NPC[A].WingBehavior : (WingBehaviors)NPC[A].Special;
+
+    if(NPC[A].Wings)
+        NPC[A].Projectile = false;
+
+    if(behavior == WING_CHASE || behavior == WING_PARA_CHASE) // chase
     {
         if(NPC[A].CantHurt > 0)
             NPC[A].CantHurt = 100;
@@ -727,24 +750,42 @@ void NPCMovementLogic_Wings(int A, const num_t speedVar)
                 NPC[A].Location.SpeedY = -3;
         }
     }
-    else if(NPC[A].Special == 1)
+    else if(behavior == WING_JUMP)
     {
         NPC[A].Location.SpeedY += Physics.NPCGravity;
         NPC[A].Location.SpeedX = Physics.NPCWalkingSpeed * NPC[A].Direction;
     }
-    else if(NPC[A].Special == 2)
+    else if(behavior == WING_LEFTRIGHT)
     {
-        if(NPC[A].Special3 == 0)
+        if(NPC[A].Wings)
         {
-            NPC[A].Location.SpeedY += 0.05_n;
-            if(NPC[A].Location.SpeedY > 1)
-                NPC[A].Special3 = 1;
+            if(NPC[A].Location.Y == NPC[A].DefaultLocationY && NPC[A].Location.SpeedY == 0)
+                NPC[A].Location.SpeedY = 1;
+
+            if(NPC[A].Location.Y > NPC[A].DefaultLocationY)
+                NPC[A].Location.SpeedY -= 0.02_n;
+            else if(NPC[A].Location.Y < NPC[A].DefaultLocationY)
+                NPC[A].Location.SpeedY += 0.02_n;
+
+            if(NPC[A].Location.SpeedY < -2)
+                NPC[A].Location.SpeedY += Physics.NPCGravity;
+            else if(num_t::abs(NPC[A].Location.SpeedY) >= 1)
+                NPC[A].Location.SpeedY *= 0.9921875_rb;
         }
         else
         {
-            NPC[A].Location.SpeedY -= 0.05_n;
-            if(NPC[A].Location.SpeedY < -1)
-                NPC[A].Special3 = 0;
+            if(NPC[A].Special3 == 0)
+            {
+                NPC[A].Location.SpeedY += 0.05_n;
+                if(NPC[A].Location.SpeedY > 1)
+                    NPC[A].Special3 = 1;
+            }
+            else
+            {
+                NPC[A].Location.SpeedY -= 0.05_n;
+                if(NPC[A].Location.SpeedY < -1)
+                    NPC[A].Special3 = 0;
+            }
         }
 
         if(NPC[A].Location.X == NPC[A].DefaultLocationX && NPC[A].Location.SpeedX == 0)
@@ -763,7 +804,7 @@ void NPCMovementLogic_Wings(int A, const num_t speedVar)
         if(NPC[A].Location.SpeedX < -2)
             NPC[A].Location.SpeedX = -2;
     }
-    else if(NPC[A].Special == 3)
+    else if(behavior == WING_UPDOWN)
     {
         NPC[A].Location.SpeedX = 0;
 

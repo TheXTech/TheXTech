@@ -241,6 +241,7 @@ void Deactivate(int A)
             NPC[A].ResetLocation();
             NPC[A].Direction = NPC[A].DefaultDirection;
             NPC[A].Stuck = NPC[A].DefaultStuck;
+            NPC[A].Wings = (NPC[A].WingBehavior != WING_NONE);
             NPC[A].TimeLeft = 0;
             NPC[A].Projectile = false;
             NPC[A].Effect = NPCEFF_NORMAL;
@@ -1300,6 +1301,9 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_MAGIC_BOSS_SHELL || npc.Type == NPCID_FIRE_BOSS_SHELL) // larry/ludwig shell
     {
+        // temporarily remove any wings if present
+        npc.Wings = false;
+
         if(npc.Special5 == 0) // Target a Random Player
         {
             int C = 0;
@@ -1411,6 +1415,9 @@ void NPCSpecial(int A)
                 npc.Location.set_width_center(npc->TWidth);
                 npc.Location.set_height_floor(npc->THeight);
 
+                // restore wings if lost
+                npc.Wings = (npc.WingBehavior != WING_NONE);
+
                 NPCQueues::Unchecked.push_back(A);
                 // deferring tree update to end of the NPC physics update
             }
@@ -1487,7 +1494,7 @@ void NPCSpecial(int A)
 
             // attack timer
             npc.Special4 += 1;
-            if(npc.Special4 > 100 + iRand(100) && num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity))
+            if(npc.Special4 > 100 + iRand(100) && (num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity) || npc.Wings))
             {
                 npc.Special = 1;
                 npc.Special5 = 0;
@@ -1632,7 +1639,8 @@ void NPCSpecial(int A)
             }
 
             // attack timer
-            if(num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity))
+            bool can_advance = (num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity) || npc.Wings);
+            if(can_advance)
                 npc.SpecialX += 1;
 
             if(npc.SpecialX == 20 || npc.SpecialX == 40 || npc.SpecialX == 60 || (npc.Damage >= 5 && npc.SpecialX == 80) || (npc.Damage >= 10 && npc.SpecialX == 100))
@@ -1646,12 +1654,14 @@ void NPCSpecial(int A)
             if(npc.Damage >= 10 && npc.Special == 0 && npc.SpecialX >= 100)
                 npc.SpecialX = 200;
 
-            if(npc.SpecialX >= 160 && num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity))
+            if(npc.SpecialX >= 160 && can_advance)
             {
                 npc.SpecialX = 0;
                 npc.Special = 3;
                 PlaySoundSpatial(SFX_Spring, npc.Location);
                 npc.Location.SpeedY = -7 - dRand() * 2;
+                // clip wings if present
+                npc.Wings = false;
             }
         }
         else if(npc.Special == 3)
@@ -4432,6 +4442,9 @@ void SpecialNPC(int A)
             {
                 NPC[A].Location.Y += NPC[A].Location.Height - 54;
                 NPC[A].Location.Height = 54;
+
+                // restore wings if lost
+                NPC[A].Wings = (NPC[A].WingBehavior != WING_NONE);
             }
 
             NPC[A].SpecialY += dRand() * 2;
@@ -4493,7 +4506,9 @@ void SpecialNPC(int A)
     }
     else if(NPCIsAParaTroopa(NPC[A])) // para-troopas
     {
-        NPCMovementLogic_Wings(A, 1);
+        // do wings logic if it won't be handled elsewhere
+        if(!NPC[A].Wings)
+            NPCMovementLogic_Wings(A, 1);
     }
     // Jumpy bee thing
     else if(NPC[A].Type == NPCID_FLY)

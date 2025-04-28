@@ -488,17 +488,21 @@ void NPCCollide(int A)
             if(NPCIsToad(NPC[A]) && NPC[A].Killed > 0)
                 HitSpot = 0;
 
-            if(NPCIsAParaTroopa(NPC[A]) && NPCIsAParaTroopa(NPC[B]))
+            if((NPCIsAParaTroopa(NPC[A]) || NPC[A].Wings) && (NPCIsAParaTroopa(NPC[B]) || NPC[B].Wings))
             {
-                if(NPC[A].Location.to_right_of(NPC[B].Location))
-                    NPC[A].Location.SpeedX += 0.05_n;
-                else
-                    NPC[A].Location.SpeedX -= 0.05_n;
+                // don't do these special movement routines for winged NPCs if one of the NPCs is a block
+                if(!NPC[A].Wings || !(NPC[A]->IsABlock || (HitSpot == 3 && (NPC[A]->IsAHit1Block || NPC[A]->CanWalkOn)) || NPC[B]->IsABlock || (HitSpot == 1 && (NPC[B]->IsAHit1Block || NPC[B]->CanWalkOn))))
+                {
+                    if(NPC[A].Location.to_right_of(NPC[B].Location))
+                        NPC[A].Location.SpeedX += 0.05_n;
+                    else
+                        NPC[A].Location.SpeedX -= 0.05_n;
 
-                if(NPC[A].Location.Y + NPC[A].Location.Height / 2 > NPC[B].Location.Y + NPC[B].Location.Height / 2)
-                    NPC[A].Location.SpeedY += 0.05_n;
-                else
-                    NPC[A].Location.SpeedY -= 0.05_n;
+                    if(NPC[A].Location.Y + NPC[A].Location.Height / 2 > NPC[B].Location.Y + NPC[B].Location.Height / 2)
+                        NPC[A].Location.SpeedY += 0.05_n;
+                    else
+                        NPC[A].Location.SpeedY -= 0.05_n;
+                }
 
                 HitSpot = 0;
             }
