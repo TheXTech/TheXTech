@@ -25,11 +25,13 @@
 // most functions here have been deprecated by the corresponding quadtree functions, but should be preserved for historical comparison
 
 // Public Sub qSortBlocksY(min As Integer, max As Integer) 'quicksort the blocks Y
-// quicksort the blocks Y
+// quicksort the blocks Y (kept for compatibility with coin switch logic)
 void qSortBlocksY(int min, int max);
 // Public Sub qSortBlocksX(min As Integer, max As Integer) 'quicksort the blocks X
-// quicksort the blocks X
+// quicksort the blocks X (kept for compatibility with coin switch and tempBlock logic)
 void qSortBlocksX(int min, int max);
+// NEW: just sort them all at once, stably (used at save to prevent altering order as much as possible)
+void qSortBlocks(int min, int max);
 // Public Sub qSortBackgrounds(min As Integer, max As Integer) 'quicksort the backgrounds
 // quicksort the backgrounds
 void qSortBackgrounds(int min, int max, bool use_x = true);

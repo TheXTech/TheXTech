@@ -765,7 +765,7 @@ interrupt_Activation:
         }
     }
 
-    // need to sort the temp blocks in strict compatibility mode, to fully emulate the specific way that switched block clipping works in X64
+    // need to sort the temp blocks in strict compatibility mode, to fully emulate the specific way that switched block clipping works in X64 (#739)
     if(g_config.emulate_classic_block_order)
     {
         if(numTempBlock > 1)

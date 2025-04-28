@@ -118,6 +118,20 @@ void qSortBlocksX(int min, int max)
     qSortBlocksX(lo + 1, max);
 }
 
+void qSortBlocks(int min, int max)
+{
+    if(min >= max)
+        return;
+
+    std::stable_sort(&Block[min], (&Block[max]) + 1,
+    [](const Block_t& a, const Block_t& b)
+    {
+        return (a.Location.X <= b.Location.X
+            && (a.Location.X < b.Location.X
+                || a.Location.Y < b.Location.Y));
+    });
+}
+
 void qSortBackgrounds(int min, int max, bool use_x)
 {
     if(min >= max)

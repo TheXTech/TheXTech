@@ -1533,21 +1533,7 @@ void OpenLevelDataPost()
     // TODO: disable this if the file indicates that it is already sorted
     if(g_config.emulate_classic_block_order && (FileFormat == FileFormats::LVL_PGEX || used_new_belts))
     {
-        qSortBlocksX(1, numBlock);
-
-        int col_start = 1;
-        int col_end = 2;
-        for(; col_end <= numBlock; col_end++)
-        {
-            if(Block[col_end].Location.X > Block[col_start].Location.X)
-            {
-                qSortBlocksY(col_start, col_end - 1);
-                col_start = col_end;
-            }
-        }
-
-        // col_end = numBlock + 1
-        qSortBlocksY(col_start, col_end - 1);
+        qSortBlocks(1, numBlock);
         qSortBackgrounds(1, numBackground);
     }
     else
