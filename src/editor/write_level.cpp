@@ -73,19 +73,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
 
     qSortNPCsY(1, C);
     qSortNPCsY(C + 1, numNPCs);
-    qSortBlocksX(1, numBlock);
-
-    B = 1;
-    for(A = 2; A <= numBlock; A++)
-    {
-        if(Block[A].Location.X > Block[B].Location.X)
-        {
-            qSortBlocksY(B, A - 1);
-            B = A;
-        }
-    }
-
-    qSortBlocksY(B, A - 1);
+    qSortBlocks(1, numBlock);
     qSortBackgrounds(1, numBackground);
     // FindSBlocks();
 
