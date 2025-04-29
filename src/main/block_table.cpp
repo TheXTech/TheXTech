@@ -19,6 +19,7 @@
  */
 
 #include <algorithm>
+#include <sorting/pdqsort.h>
 
 #include "layers.h"
 #include "config.h"
@@ -190,11 +191,11 @@ struct TableInterface
         }
 
         if(sort_mode == SORTMODE_LOC)
-            std::sort(out.begin(), out.end(), Comparisons::Loc<ItemRef_t>);
+            pdqsort(out.begin(), out.end(), Comparisons::Loc<ItemRef_t>);
         else if(sort_mode == SORTMODE_ID)
-            std::sort(out.begin(), out.end(), Comparisons::ID<ItemRef_t>);
+            trees_sort_by_index(out);
         else if(sort_mode == SORTMODE_Z)
-            std::sort(out.begin(), out.end(), Comparisons::Z<ItemRef_t>);
+            pdqsort(out.begin(), out.end(), Comparisons::Z<ItemRef_t>);
     }
 
     void query(std::vector<BaseRef_t>& out, num_t Left, num_t Top, num_t Right, num_t Bottom,
@@ -409,11 +410,11 @@ void treeTempBlockQuery(std::vector<BaseRef_t>& out,
     }
 
     if(sort_mode == SORTMODE_LOC)
-        std::sort(out.begin(), out.end(), Comparisons::Loc<BlockRef_t>);
+        pdqsort(out.begin(), out.end(), Comparisons::Loc<BlockRef_t>);
     else if(sort_mode == SORTMODE_ID)
-        std::sort(out.begin(), out.end(), Comparisons::ID<BlockRef_t>);
+        trees_sort_by_index(out);
     else if(sort_mode == SORTMODE_Z)
-        std::sort(out.begin(), out.end(), Comparisons::Z<BlockRef_t>);
+        pdqsort(out.begin(), out.end(), Comparisons::Z<BlockRef_t>);
 }
 
 TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &_loc,
@@ -510,11 +511,11 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &_loc,
     }
 
     if(sort_mode == SORTMODE_LOC)
-        std::sort(result.i_vec->begin(), result.i_vec->end(), Comparisons::Loc<BlockRef_t>);
+        pdqsort(result.i_vec->begin(), result.i_vec->end(), Comparisons::Loc<BlockRef_t>);
     else if(sort_mode == SORTMODE_ID)
-        std::sort(result.i_vec->begin(), result.i_vec->end(), Comparisons::ID<BlockRef_t>);
+        trees_sort_by_index(*result.i_vec);
     else if(sort_mode == SORTMODE_Z)
-        std::sort(result.i_vec->begin(), result.i_vec->end(), Comparisons::Z<BlockRef_t>);
+        pdqsort(result.i_vec->begin(), result.i_vec->end(), Comparisons::Z<BlockRef_t>);
 
     return result;
 }
@@ -652,11 +653,11 @@ void treeNPCQuery(std::vector<BaseRef_t>& out, const Location_t &_loc, int sort_
         sort_mode = SORTMODE_ID;
 
     if(sort_mode == SORTMODE_LOC)
-        std::sort(out.begin(), out.end(), Comparisons::Loc<NPCRef_t>);
+        pdqsort(out.begin(), out.end(), Comparisons::Loc<NPCRef_t>);
     else if(sort_mode == SORTMODE_ID)
-        std::sort(out.begin(), out.end(), Comparisons::ID<NPCRef_t>);
+        trees_sort_by_index(out);
     else if(sort_mode == SORTMODE_Z)
-        std::sort(out.begin(), out.end(), Comparisons::Z<NPCRef_t>);
+        pdqsort(out.begin(), out.end(), Comparisons::Z<NPCRef_t>);
 }
 
 TreeResult_Sentinel<NPCRef_t> treeNPCQuery(const Location_t &_loc,

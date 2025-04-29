@@ -18,8 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <algorithm>
-
 #include <Logger/logger.h>
 
 #include "../globals.h"
@@ -654,12 +652,7 @@ void CleanupVehicleNPCs()
     // int C = 0;
 
     // kill the player temp NPCs, from last to first
-    std::sort(NPCQueues::PlayerTemp.begin(), NPCQueues::PlayerTemp.end(),
-    [](NPCRef_t a, NPCRef_t b)
-    {
-        return a > b;
-    });
-
+    NPCQueues::reverse_sort(NPCQueues::PlayerTemp);
 
     // for(A = numNPCs; A >= 1; A--)
     int last_NPC = numNPCs + 1;

@@ -21,7 +21,7 @@
 #include "screen.h"
 #include "sdl_proxy/sdl_stdinc.h"
 
-#include <algorithm>
+#include <sorting/pdqsort.h>
 #include <array>
 #include <bitset>
 
@@ -408,15 +408,15 @@ public:
     // sort each queue properly
     void sort()
     {
-        std::sort(&BG[0], &BG[BG_n]);
-        std::sort(&Low[0], &Low[Low_n]);
-        std::sort(&Iced[0], &Iced[Iced_n]);
-        std::sort(&Normal[0], &Normal[Normal_n]);
-        std::sort(&Chat[0], &Chat[Chat_n]);
-        std::sort(&Held[0], &Held[Held_n]);
-        std::sort(&FG[0], &FG[FG_n]);
-        std::sort(&Dropped[0], &Dropped[Dropped_n]);
-        std::sort(&Warning[0], &Warning[Warning_n]);
+        pdqsort(&BG[0], &BG[BG_n]);
+        pdqsort(&Low[0], &Low[Low_n]);
+        pdqsort(&Iced[0], &Iced[Iced_n]);
+        pdqsort(&Normal[0], &Normal[Normal_n]);
+        pdqsort(&Chat[0], &Chat[Chat_n]);
+        pdqsort(&Held[0], &Held[Held_n]);
+        pdqsort(&FG[0], &FG[FG_n]);
+        pdqsort(&Dropped[0], &Dropped[Dropped_n]);
+        pdqsort(&Warning[0], &Warning[Warning_n]);
     }
 };
 

@@ -23,7 +23,7 @@
 #define RENDER_OP_SDL_H
 
 #include <cstdint>
-#include <algorithm>
+#include <sorting/pdqsort.h>
 #include <vector>
 
 #include <SDL2/SDL_assert.h>
@@ -107,7 +107,7 @@ struct XRenderQueue
 
     inline void sort()
     {
-        std::sort(indices.begin(), indices.end());
+        pdqsort(indices.begin(), indices.end());
     }
 };
 

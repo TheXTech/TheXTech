@@ -18,8 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <algorithm>
-
 #include "sdl_proxy/sdl_stdinc.h"
 #include "globals.h"
 #include "npc.h"
@@ -698,11 +696,10 @@ void SkullRide(int A, bool reEnable, const Location_t *alignAt)
         }
 
         // reverse sort the frontier of the stack because this is a depth-first approach
-        std::sort(vec.begin() + current_frontier_size, vec.end(),
-        [](BaseRef_t a, BaseRef_t b)
-        {
-            return a.index > b.index;
-        });
+        NPCQueues::reverse_sort(
+            reinterpret_cast<int16_t*>(vec.data() + current_frontier_size),
+            reinterpret_cast<int16_t*>(vec.data() + vec.size())
+        );
     }
 }
 

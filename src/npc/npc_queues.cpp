@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sorting/pdqsort.h>
 
 #include <vector>
 #include <set>
@@ -83,6 +84,16 @@ void update(NPCRef_t npc)
 
     if(npc->Killed)
         Killed.push_back(npc);
+}
+
+void reverse_sort(int16_t* start, int16_t* end)
+{
+    pdqsort(start, end,
+        [](int16_t a, int16_t b)
+        {
+            return a > b;
+        }
+    );
 }
 
 } // namespace NPCQueues

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <algorithm>
+#include <sorting/pdqsort.h>
 
 #include "core/opengl/gl_inc.h"
 
@@ -677,7 +677,7 @@ void RenderGL::coalesceLights()
     auto lights_end_it   = lights_begin_it + m_light_count;
 
     // sort by light type
-    std::sort(lights_begin_it, lights_end_it);
+    pdqsort(lights_begin_it, lights_end_it);
 
     if(debug_coalesce)
         pLogDebug("Lights %d:%d", int(lights_begin_it - lights_begin_it), (lights_end_it - lights_begin_it));
@@ -705,7 +705,7 @@ void RenderGL::coalesceLights()
             };
 
             // coalesce horizontally, then vertically
-            std::sort(type_begin_it, type_end_it, y_compare);
+            pdqsort(type_begin_it, type_end_it, y_compare);
 
             // treat each row separately
             auto row_begin_it = type_begin_it;
@@ -717,7 +717,7 @@ void RenderGL::coalesceLights()
                     pLogDebug("Row %d:%d", int(row_begin_it - lights_begin_it), (row_end_it - lights_begin_it));
 
                 // sort row horizontally
-                std::sort(row_begin_it, row_end_it, x_compare);
+                pdqsort(row_begin_it, row_end_it, x_compare);
 
                 // for each item in row, try to coalesce
                 auto item_it = row_begin_it;
@@ -762,7 +762,7 @@ void RenderGL::coalesceLights()
             }
 
             // now coalesce vertically
-            std::sort(type_begin_it, type_end_it, x_compare);
+            pdqsort(type_begin_it, type_end_it, x_compare);
 
             // treat each column separately
             auto col_begin_it = type_begin_it;
@@ -774,7 +774,7 @@ void RenderGL::coalesceLights()
                     pLogDebug("Col %d:%d", int(col_begin_it - lights_begin_it), (col_end_it - lights_begin_it));
 
                 // sort col vertically
-                std::sort(col_begin_it, col_end_it, y_compare);
+                pdqsort(col_begin_it, col_end_it, y_compare);
 
                 // for each item in col, try to coalesce
                 auto item_it = col_begin_it;

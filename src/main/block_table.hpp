@@ -721,4 +721,12 @@ struct table_t : public base_table_t
     }
 };
 
+inline void trees_sort_by_index(std::vector<BaseRef_t>& i_vec)
+{
+    pdqsort(i_vec.begin(), i_vec.end(),
+        [](BaseRef_t a, BaseRef_t b) {
+            return a < b;
+        });
+}
+
 #endif // #ifndef BLOCK_TABLE_IMPL_HPP

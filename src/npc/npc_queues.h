@@ -112,6 +112,16 @@ void clear();
 
 void update(NPCRef_t npc);
 
+/* utility function to help with multiple NPC-related routines */
+void reverse_sort(int16_t* start, int16_t* end);
+
+template<class T>
+void reverse_sort(std::vector<T>& vec)
+{
+    static_assert(sizeof(*vec.data()) == sizeof(int16_t), "reverse_sort can only be called on BaseRef_t and its children");
+    reverse_sort(reinterpret_cast<int16_t*>(vec.data()), reinterpret_cast<int16_t*>(vec.data() + vec.size()));
+}
+
 } // namespace NPCQueues
 
 #endif // #ifndef NPC_QUEUES_H

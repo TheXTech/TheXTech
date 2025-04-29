@@ -19,7 +19,7 @@
  */
 
 #include <memory>
-#include <algorithm>
+#include <sorting/pdqsort.h>
 
 #include "layers.h"
 #include "config.h"
@@ -102,27 +102,15 @@ TreeResult_Sentinel<ItemRef_t> treeWorldQuery(std::unique_ptr<table_t<ItemRef_t>
                                   s_floor_div_64(Top),
                                   s_floor_div_64(Bottom + 63)));
 
-    if(sort_mode == SORTMODE_ID)
-    {
-        std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](BaseRef_t a, BaseRef_t b) {
-                return a < b;
-            });
-    }
+    if(sort_mode == SORTMODE_ID || sort_mode == SORTMODE_Z)
+        trees_sort_by_index(*result.i_vec);
     else if(sort_mode == SORTMODE_LOC)
     {
-        std::sort(result.i_vec->begin(), result.i_vec->end(),
+        pdqsort(result.i_vec->begin(), result.i_vec->end(),
             [](BaseRef_t a, BaseRef_t b) {
                 return (((ItemRef_t)a)->Location.X < ((ItemRef_t)b)->Location.X
                     || (((ItemRef_t)a)->Location.X == ((ItemRef_t)b)->Location.X
                         && ((ItemRef_t)a)->Location.Y < ((ItemRef_t)b)->Location.Y));
-            });
-    }
-    else if(sort_mode == SORTMODE_Z)
-    {
-        std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](BaseRef_t a, BaseRef_t b) {
-                return a < b;
             });
     }
 
@@ -425,9 +413,9 @@ void UpdatableQuery<BlockRef_t>::update(const Location_t& loc, const UpdatableQu
 
     // sort all of the blocks after the current step (manually separating cases to maximize chances of successful inlining)
     if(sort_mode_use == SORTMODE_Z)
-        std::sort(sent.i_vec->begin() + start_sort, sent.i_vec->end(), Comparisons::Z<BlockRef_t>);
+        pdqsort(sent.i_vec->begin() + start_sort, sent.i_vec->end(), Comparisons::Z<BlockRef_t>);
     else if(sort_mode_use == SORTMODE_LOC)
-        std::sort(sent.i_vec->begin() + start_sort, sent.i_vec->end(), Comparisons::Loc<BlockRef_t>);
+        pdqsort(sent.i_vec->begin() + start_sort, sent.i_vec->end(), Comparisons::Loc<BlockRef_t>);
     else
-        std::sort(sent.i_vec->begin() + start_sort, sent.i_vec->end(), Comparisons::ID<BlockRef_t>);
+        trees_sort_by_index(*sent.i_vec);
 }

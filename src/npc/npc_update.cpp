@@ -1691,11 +1691,7 @@ interrupt_Activation:
 kill_NPCs_and_CharStuff:
 
     // kill the NPCs, from last to first
-    std::sort(NPCQueues::Killed.begin(), NPCQueues::Killed.end(),
-    [](NPCRef_t a, NPCRef_t b)
-    {
-        return a > b;
-    });
+    NPCQueues::reverse_sort(NPCQueues::Killed);
 
     // all of these are preserved by the interrupt / resume routine
     int last_NPC;
@@ -1802,11 +1798,10 @@ resume_KillNPC:
                     pLogDebug("Found %d indexes lower than %d. Sorting to check this frame.", (int)(first_bigger_it - NPCQueues::Killed.begin()) - (int)old_check, A);
 
                     // re-sort the range to check this frame
-                    std::sort(NPCQueues::Killed.begin() + i + 1, NPCQueues::Killed.begin() + KilledQueue_check,
-                    [](NPCRef_t a, NPCRef_t b)
-                    {
-                        return a > b;
-                    });
+                    NPCQueues::reverse_sort(
+                        reinterpret_cast<int16_t*>(NPCQueues::Killed.data() + i + 1),
+                        reinterpret_cast<int16_t*>(NPCQueues::Killed.data() + KilledQueue_check)
+                    );
                 }
             }
         }
