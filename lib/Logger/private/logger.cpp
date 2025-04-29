@@ -26,6 +26,7 @@
 #   include <ctime>   // localtime
 #   include <DirManager/dirman.h>
 #   include <Utils/files.h>
+#   include <sorting/tinysort.h>
 #endif
 
 #include <fmt_format_ne.h>
@@ -108,7 +109,7 @@ static void cleanUpLogs(const std::string &logsPath, int maxLogs)
         return;
 
     // Sort array
-    std::sort(files.begin(), files.end());
+    tinysort(files.begin(), files.end());
 
     // Keep these files (remove from a deletion list)
     files.erase(files.end() - (maxLogs - 1), files.end());

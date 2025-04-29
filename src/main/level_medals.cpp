@@ -22,6 +22,7 @@
 #include <array>
 #include <algorithm>
 
+#include <sorting/tinysort.h>
 #include <PGE_File_Formats/file_formats.h>
 
 #include <Logger/logger.h>
@@ -294,7 +295,7 @@ void OrderMedals()
         }
 
         // sort by distance
-        std::sort(auto_medals.begin(), auto_medals.begin() + auto_medal_count);
+        tinysort(auto_medals.begin(), auto_medals.begin() + auto_medal_count);
     }
 
     // auto-assign indexes to unspecified medals

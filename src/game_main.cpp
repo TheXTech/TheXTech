@@ -44,6 +44,7 @@
 #endif
 #include <pge_delay.h>
 #include <fmt_format_ne.h>
+#include <sorting/tinysort.h>
 
 #ifdef ENABLE_XTECH_LUA
 #include "xtech_lua_main.h"
@@ -204,7 +205,7 @@ static bool choiceFromIntroset(std::string &out, const std::string &dir, const s
         }
     }
 
-    std::sort(intros.begin(), intros.end());
+    tinysort(intros.begin(), intros.end());
 
     for(auto &i : intros)
     {

@@ -36,6 +36,7 @@
 #include <Utils/files_ini.h>
 #include <DirManager/dirman.h>
 #include <IniProcessor/ini_processing.h>
+#include <sorting/tinysort.h>
 #include <fmt_format_ne.h>
 
 #include "global_constants.h"
@@ -263,7 +264,7 @@ static bool s_loadFontsFromDir(DirListCI &fonts_root,
         return false; // Fonts manager is unavailable when directory is not exists
 
     std::vector<std::string> files = fonts_root.getFilesList(subdir, {".font.ini"});
-    std::sort(files.begin(), files.end());
+    tinysort(files.begin(), files.end());
 
     std::string sSubDir = subdir + (subdir.empty() ? "" : "/");
 

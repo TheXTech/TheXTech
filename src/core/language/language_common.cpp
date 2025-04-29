@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <algorithm>
+#include <sorting/tinysort.h>
 #include <Utils/strings.h>
 #include <Utils/files.h>
 #include <util.h>
@@ -138,7 +138,7 @@ void XLanguage::findLanguages()
     }
 
     // sort filenames
-    std::sort(list.begin(), list.end());
+    tinysort(list.begin(), list.end());
 
     const auto langs_begin = std::lower_bound(list.cbegin(), list.cend(), "thextech_");
     const auto langs_end   = std::upper_bound(list.cbegin(), list.cend(), "thextech`");

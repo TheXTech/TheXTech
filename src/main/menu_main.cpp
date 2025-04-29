@@ -32,6 +32,7 @@
 
 #include <fmt_format_ne.h>
 #include <array>
+#include <sorting/tinysort.h>
 
 #include <AppPath/app_path.h>
 #include <DirManager/dirman.h>
@@ -735,13 +736,13 @@ static void s_FinishFindWorlds()
     }
 
     // Sort all worlds by alphabetical order
-    std::sort(SelectWorld.begin(), SelectWorld.end(),
+    tinysort(SelectWorld.begin(), SelectWorld.end(),
               [](const SelectWorld_t& a, const SelectWorld_t& b)
     {
         return a.WorldName < b.WorldName;
     });
 
-    std::sort(SelectWorldEditable.begin(), SelectWorldEditable.end(),
+    tinysort(SelectWorldEditable.begin(), SelectWorldEditable.end(),
               [](const SelectWorld_t& a, const SelectWorld_t& b)
     {
         return a.WorldName < b.WorldName;

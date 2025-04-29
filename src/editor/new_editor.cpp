@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <algorithm>
+#include <sorting/tinysort.h>
 
 #include <PGE_File_Formats/file_formats.h>
 #include <Logger/logger.h>
@@ -4833,8 +4833,8 @@ void EditorScreen::SyncPath()
     m_dirman.setPath(m_root_path+m_cur_path);
     m_dirman.getListOfFiles(m_cur_path_files, m_target_exts);
     m_dirman.getListOfFolders(m_cur_path_dirs);
-    std::sort(m_cur_path_files.begin(), m_cur_path_files.end());
-    std::sort(m_cur_path_dirs.begin(), m_cur_path_dirs.end());
+    tinysort(m_cur_path_files.begin(), m_cur_path_files.end());
+    tinysort(m_cur_path_dirs.begin(), m_cur_path_dirs.end());
     m_path_synced = true;
 }
 

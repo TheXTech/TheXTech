@@ -24,6 +24,8 @@
 
 #include <fmt_format_ne.h>
 
+#include <sorting/tinysort.h>
+
 #include "sdl_proxy/sdl_stdinc.h"
 #include "sdl_proxy/sdl_assert.h"
 
@@ -400,7 +402,7 @@ void ItemFamily::make_layout_pods()
     trash_pod.cols = (int)trash_pod.types.size();
 
     // order the pods by size
-    std::sort(temp_layout_pods.begin(), temp_layout_pods.end(),
+    tinysort(temp_layout_pods.begin(), temp_layout_pods.end(),
     [](const LayoutPod_t& a, const LayoutPod_t& b)
     {
         return a.rows > b.rows || (a.rows == b.rows && a.cols > b.cols);
@@ -565,7 +567,7 @@ void ItemList_t::make_translation(XTechTranslate& translate, const char* group, 
 std::vector<ItemFamily*>::iterator make_page(std::vector<ItemFamily*>::iterator begin, std::vector<ItemFamily*>::iterator end,
     int width, int height)
 {
-    std::sort(begin, end,
+    tinysort(begin, end,
     [](const ItemFamily* a, const ItemFamily* b)
     {
         return a->category < b->category
@@ -777,7 +779,7 @@ std::vector<ItemFamily*>::iterator make_page(std::vector<ItemFamily*>::iterator 
     }
 
     // grow any combined margins
-    std::sort(lost_margins.begin(), lost_margins.end(),
+    tinysort(lost_margins.begin(), lost_margins.end(),
     [](const std::array<int, 4>& a, const std::array<int, 4>& b)
     {
         return a[2] < b[2];
@@ -795,7 +797,7 @@ std::vector<ItemFamily*>::iterator make_page(std::vector<ItemFamily*>::iterator 
         }
     }
 
-    std::sort(lost_margins.begin(), lost_margins.end(),
+    tinysort(lost_margins.begin(), lost_margins.end(),
     [](const std::array<int, 4>& a, const std::array<int, 4>& b)
     {
         return a[0] < b[0];
@@ -827,7 +829,7 @@ std::vector<ItemFamily*>::iterator make_page(std::vector<ItemFamily*>::iterator 
     // do it!
     end = orig_end;
 
-    std::sort(unplaced, end,
+    tinysort(unplaced, end,
     [](const ItemFamily* a, const ItemFamily* b)
     {
         return a->category < b->category
@@ -845,7 +847,7 @@ std::vector<ItemFamily*>::iterator make_page(std::vector<ItemFamily*>::iterator 
 
         bool placed = false;
 
-        std::sort(lost_margins.begin(), lost_margins.end(),
+        tinysort(lost_margins.begin(), lost_margins.end(),
         [](const std::array<int, 4>& a, const std::array<int, 4>& b)
         {
             return ((a[1] - a[0]) * (a[3] - a[2])) < ((b[1] - b[0]) * (b[3] - b[2]));
@@ -1690,7 +1692,7 @@ void Load(XTechTranslate* translate)
     {
         loaded++;
 
-        std::sort(bg2_families.begin(), bg2_families.end(),
+        tinysort(bg2_families.begin(), bg2_families.end(),
         [](const std::pair<ListItemFamily_t, std::string>& a, const std::pair<ListItemFamily_t, std::string>& b)
         {
             return a.first.sort_index < b.first.sort_index;
@@ -1736,7 +1738,7 @@ void Load(XTechTranslate* translate)
     {
         loaded++;
 
-        std::sort(music_families.begin(), music_families.end(),
+        tinysort(music_families.begin(), music_families.end(),
         [](const std::pair<ListItemFamily_t, std::string>& a, const std::pair<ListItemFamily_t, std::string>& b)
         {
             return a.first.sort_index < b.first.sort_index;
@@ -1782,7 +1784,7 @@ void Load(XTechTranslate* translate)
     // process world music
     if(!wmusic_families.empty())
     {
-        std::sort(wmusic_families.begin(), wmusic_families.end(),
+        tinysort(wmusic_families.begin(), wmusic_families.end(),
         [](const std::pair<ListItemFamily_t, std::string>& a, const std::pair<ListItemFamily_t, std::string>& b)
         {
             return a.first.sort_index < b.first.sort_index;
@@ -1827,7 +1829,7 @@ void Load(XTechTranslate* translate)
     {
         loaded++;
 
-        std::sort(sound_families.begin(), sound_families.end(),
+        tinysort(sound_families.begin(), sound_families.end(),
         [](const std::pair<ListItemFamily_t, std::string>& a, const std::pair<ListItemFamily_t, std::string>& b)
         {
             return a.first.sort_index < b.first.sort_index;
