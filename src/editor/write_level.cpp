@@ -223,6 +223,9 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         npc.y = (int32_t)n.Location.Y;
         npc.direct = n.Direction;
 
+        npc.contents = 0;
+        npc.special_data = 0;
+
         if(NPCIsContainer(n))
         {
             npc.contents = n.Special;
