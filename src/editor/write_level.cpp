@@ -222,6 +222,9 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         npc.y = n.Location.Y;
         npc.direct = n.Direction;
 
+        npc.contents = 0;
+        npc.special_data = 0;
+
         if(n.Type == NPCID_ITEM_BURIED || n.Type == NPCID_ITEM_POD ||
            n.Type == NPCID_ITEM_BUBBLE || n.Type == NPCID_ITEM_THROWER)
         {
