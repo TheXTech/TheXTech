@@ -2027,6 +2027,7 @@ void PowBlock()
         {
             if(NPC[A]->IsACoin)
             {
+                NPC[A].Wings = WING_NONE;
                 NPC[A].Special = 1;
                 NPC[A].Location.SpeedX = dRand() - 0.5_n;
             }
