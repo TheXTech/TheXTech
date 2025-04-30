@@ -615,6 +615,15 @@ void DrawNPCWings(const NPC_t& n, int sX, int sY, XTColor cn)
 
     bool one_direction = (w <= 64);
 
+    if(n.Type == NPCID_MINIBOSS || n.Type == NPCID_QUAD_SPITTER)
+    {
+        one_direction = false;
+        sX += 8;
+        w -= 16;
+    }
+    else if(n.Type == NPCID_SPRING && !LevelEditor)
+        sY -= 16;
+
     for(int direction = 0; direction < 2; direction++)
     {
         if(one_direction)
