@@ -86,6 +86,7 @@ void NPCSpecialMaybeHeld(int A)
                 NPC[A].Special2 = 0;
                 NPC[A].Inert = false;
                 NPC[A].Stuck = false;
+                NPC[A].Wings = NPC[A].DefaultWings;
             }
             else if(NPC[A].Special2 >= 300)
             {
