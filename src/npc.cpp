@@ -1806,7 +1806,7 @@ void NPCSpecial(int A)
             npc.Location.SpeedX = 0;
         else if(npc.Special == 0)
         {
-            if(num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity))
+            if(num_t::fEqual_f(npc.Location.SpeedY, Physics.NPCGravity) || npc.Wings)
             {
                 if(npc.Special2 == 0)
                     npc.Special2 = npc.Direction;
@@ -2484,7 +2484,8 @@ void NPCSpecial(int A)
         if(npc.TimeLeft > 1)
             npc.TimeLeft = 100;
 
-        npc.Direction = npc.DefaultDirection;
+        if(!npc.Wings)
+            npc.Direction = npc.DefaultDirection;
 
         if(npc.Immune > 0 && npc.Special != 3)
             npc.Special = 2;
@@ -3764,6 +3765,7 @@ void SpecialNPC(int A)
             NPC[A].Effect2 = 16;
             NPC[A].Projectile = false;
             NPC[A].Type = NPCID_MAGIC_DOOR;
+            NPC[A].Wings = WING_NONE;
             PlaySoundSpatial(SFX_SpitBossBeat, NPC[A].Location);
         }
     }
@@ -4407,23 +4409,42 @@ void SpecialNPC(int A)
             {
                 NPC[A].Special3 += 1;
                 NPC[A].Special2 = 0;
-                NPC[A].Location.X += NPC[A].Direction * 2;
-                if(NPC[A].Location.X >= NPC[A].DefaultLocationX + 2)
-                    NPC[A].Direction = -1;
-                if(NPC[A].Location.X <= NPC[A].DefaultLocationX - 2)
-                    NPC[A].Direction = 1;
+
+                // new shake logic because wings allow this object to move horizontally
+                if(NPC[A].Wings)
+                {
+                    NPC[A].Special4 = (NPC[A].Special4 + 1) & 3;
+                    NPC[A].Location.X += (NPC[A].Special4 >= 2) ? 2 : -2;
+                }
+                else
+                {
+                    NPC[A].Location.X += NPC[A].Direction * 2;
+                    if(NPC[A].Location.X >= NPC[A].DefaultLocationX + 2)
+                        NPC[A].Direction = -1;
+                    if(NPC[A].Location.X <= NPC[A].DefaultLocationX - 2)
+                        NPC[A].Direction = 1;
+                }
             }
             else
             {
                 if(NPC[A].Special3 > 0)
                     NPC[A].Special3 -= 1;
-                NPC[A].Location.X = NPC[A].DefaultLocationX;
+
+                // new shake logic because wings allow this object to move horizontally
+                if(NPC[A].Wings)
+                    NPC[A].Special4 = 0;
+                else
+                    NPC[A].Location.X = NPC[A].DefaultLocationX;
             }
 
             if((NPC[A].Special3 >= 5 && NPC[A].Type == NPCID_FALL_BLOCK_RED) || (NPC[A].Special3 >= 30 && NPC[A].Type == NPCID_FALL_BLOCK_BROWN))
             {
                 NPC[A].Special = 1;
-                NPC[A].Location.X = NPC[A].DefaultLocationX;
+
+                if(NPC[A].Wings)
+                    NPC[A].Wings = WING_NONE;
+                else
+                    NPC[A].Location.X = NPC[A].DefaultLocationX;
             }
             // deferring tree update to end of the NPC physics update
         }
@@ -5221,6 +5242,10 @@ void SpecialNPC(int A)
             // hide
             if((D <= E && p.Direction == -1) || (D >= E && p.Direction == 1) || p.SpinJump)
             {
+                // set wings to override to use normal ghost speed logic
+                if(NPC[A].Wings)
+                    NPC[A].Wings = WING_OVERRIDE;
+
                 NPC[A].Special = 0;
 
                 if(NPC[A].Type == NPCID_GHOST_S3)
@@ -5248,6 +5273,9 @@ void SpecialNPC(int A)
             // chase
             else
             {
+                // restore wings to their default value
+                NPC[A].Wings = NPC[A].DefaultWings;
+
                 NPC[A].Special = 1;
                 NPC[A].Direction = p.Direction;
 
