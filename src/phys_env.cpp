@@ -176,7 +176,7 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
             {
                 const NPC_t& n = NPC[N];
 
-                if(n.Active && !n.Generator && n->IsABlock)
+                if(n.Active && !n.Generator && n->IsABlock && (!plr_A || N != Player[plr_A].HoldingNPC))
                 {
                     if(CheckCollision(edgeLoc, n.Location))
                     {
