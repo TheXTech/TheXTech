@@ -1092,6 +1092,10 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                     }
                                     else if(HitSpot == 3) // Hitspot 3
                                     {
+                                        // ignore the hit if it is an NPC that a Winged Block NPC will be supporting
+                                        if(NPC[A].Wings && NPC[A].tempBlock && Block[B].tempBlockNpcIdx && !blk_npc_tr.NoGravity)
+                                            continue;
+
                                         if(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1)
                                             NPCHit(A, 4, A);
 
