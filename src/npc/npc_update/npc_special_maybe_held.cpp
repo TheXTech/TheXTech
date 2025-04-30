@@ -124,6 +124,7 @@ void NPCSpecialMaybeHeld(int A)
 
         if(NPC[A].Special4 == 0)
         {
+            NPC[A].Wings = NPC[A].DefaultWings;
             NPC[A].Special3 = 0; // reset counter when done
             if(NPC[A].Direction < 0)
                 NPC[A].Frame = 0;
@@ -156,7 +157,8 @@ void NPCSpecialMaybeHeld(int A)
         }
 
         // see if facing the player
-        bool tempBool = false;
+        // new: don't wait to face player if using wings movement
+        bool tempBool = NPC[A].Wings;
         if(NPC[A].Special5 > 0)
         {
             if(NPC[A].Location.to_right_of(Player[NPC[A].Special5].Location))
@@ -287,7 +289,13 @@ void NPCSpecialMaybeHeld(int A)
         }
         else if(NPC[A].Special4 == 2) // hops
         {
-            if(NPC[A].Location.SpeedY == 0 || NPC[A].Slope > 0)
+            if(NPC[A].Wings)
+            {
+                NPC[A].Special3 += 1;
+                if(NPC[A].Special3 >= 10)
+                    NPC[A].Special4 = 0;
+            }
+            else if(NPC[A].Location.SpeedY == 0 || NPC[A].Slope > 0)
             {
                 if(NPC[A].Special3 < 5)
                 {
@@ -321,7 +329,13 @@ void NPCSpecialMaybeHeld(int A)
         }
         else if(NPC[A].Special4 == 3) // jump on player
         {
-            if(NPC[A].Special3 < -1)
+            if(NPC[A].Wings)
+            {
+                // -9 is jump speed, this means that the NPC is currently in its walking routine
+                if(NPC[A].Wings != WING_JUMP || NPC[A].Location.SpeedY == -9)
+                    NPC[A].Wings = WING_NONE;
+            }
+            else if(NPC[A].Special3 < -1)
             {
                 if(NPC[A].Special > 1)
                     NPC[A].Special -= 1;
@@ -357,6 +371,11 @@ void NPCSpecialMaybeHeld(int A)
                     sx = -15;
                 NPC[A].Special3 = -50;
                 NPC[A].Special = 10;
+
+                // reset direction if NPC normally has wings
+                if(NPC[A].DefaultWings != WING_NONE)
+                    NPC[A].Direction = (sx > 0) ? 1 : -1;
+
                 if(NPC[A].Direction < 0)
                     NPC[A].Frame = 0;
                 else

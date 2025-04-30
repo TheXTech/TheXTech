@@ -1051,7 +1051,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                         else
                                         {
                                             beltClear = true;
-                                            if(NPC[A].Type == NPCID_VILLAIN_S3)
+                                            if(NPC[A].Type == NPCID_VILLAIN_S3 && !NPC[A].Wings)
                                                 NPC[A].Location.SpeedX = 0;
 
                                             resetBeltSpeed = true;
