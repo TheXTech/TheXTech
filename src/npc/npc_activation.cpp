@@ -242,18 +242,15 @@ void NPCActivationLogic(int A)
                 treeNPCSplitTempBlock(A);
         }
         else if(NPC[A].Type == NPCID_CANNONENEMY)
-        {
             NPC[A].Special = 100;
-            NPC[A].Projectile = false; // moved from below
-        }
-        // NOTE: these were previously not guarded by the Active check above,
-        // but the only way this code should be called for NPCs without Active is if they are Hidden,
-        // in which case these variables will get reset by Deactivate
-        else if(NPC[A].Type == NPCID_STATUE_S3 || NPC[A].Type == NPCID_STATUE_S4)
-            NPC[A].Special = iRand(200);
-        else if(NPC[A].Type == NPCID_CANNONITEM)
-            NPC[A].Projectile = false;
     }
+
+    // NOTE: these were not guarded by the Active check above in SMBX 1.3
+    // they can't be safely moved into it because the iRand call has side effects
+    if(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM)
+        NPC[A].Projectile = false;
+    else if(NPC[A].Type == NPCID_STATUE_S3 || NPC[A].Type == NPCID_STATUE_S4)
+        NPC[A].Special = iRand(200);
 
     NPC[A].JustActivated = 0;
     NPC[A].CantHurt = 0;
