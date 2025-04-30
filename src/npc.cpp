@@ -5099,7 +5099,8 @@ void SpecialNPC(int A)
             if(NPC[A].Special == 0)
             {
                 NPC[A].Location.SpeedY = 0;
-                NPC[A].Location.Y = NPC[A].DefaultLocationY;
+                if(!NPC[A].Wings)
+                    NPC[A].Location.Y = NPC[A].DefaultLocationY;
                 for(int B = 1; B <= numPlayers; B++)
                 {
                     bool playerLower = Player[B].Location.Y >= NPC[A].Location.Y;
@@ -5113,10 +5114,20 @@ void SpecialNPC(int A)
                 }
             }
             else if(NPC[A].Special == 1)
+            {
                 NPC[A].Location.SpeedY = 6;
+
+                if(NPC[A].Wings)
+                {
+                    // remember current Y coordinate when rising back up
+                    NPC[A].SpecialY = NPC[A].Location.Y;
+                    NPC[A].Location.SpeedX = 0;
+                    NPC[A].Wings = WING_NONE;
+                }
+            }
             else if(NPC[A].Special == 2)
             {
-                if(NPC[A].Special2 == 0)
+                if(NPC[A].Special2 == 0 && !NPC[A].Wings)
                 {
                     PlaySoundSpatial(SFX_Stone, NPC[A].Location);
                     if(g_config.extra_screen_shake)
@@ -5149,12 +5160,17 @@ void SpecialNPC(int A)
             else if(NPC[A].Special == 3)
             {
                 NPC[A].Location.SpeedY = -2;
-                if(NPC[A].Location.Y <= NPC[A].DefaultLocationY + 1)
+
+                num_t target_y = (NPC[A].DefaultWings) ? NPC[A].SpecialY : NPC[A].DefaultLocationY;
+                if(NPC[A].Location.Y <= target_y + 1)
                 {
-                    NPC[A].Location.Y = NPC[A].DefaultLocationY;
+                    if(!NPC[A].Wings)
+                        NPC[A].Location.Y = target_y;
+
                     NPC[A].Location.SpeedY = 0;
                     NPC[A].Special = 0;
                     NPC[A].Special2 = 0;
+                    NPC[A].Wings = NPC[A].DefaultWings;
                 }
             }
         // End If
