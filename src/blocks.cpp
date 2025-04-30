@@ -1629,7 +1629,7 @@ bool PSwitch(bool enabled)
     {
         for(A = 1; A <= numNPCs; A++)
         {
-            bool transform = NPC[A]->IsACoin && NPC[A].coinSwitchBlockType() == 0 && !NPC[A].Hidden && NPC[A].Special == 0;
+            bool transform = NPC[A]->IsACoin && NPC[A].coinSwitchBlockType() == 0 && !NPC[A].Hidden && NPC[A].Special == 0 && !NPC[A].Wings;
 
             if(NPC[A].Type == NPCID_MEDAL && g_config.fix_special_coin_switch)
                 transform = false;
