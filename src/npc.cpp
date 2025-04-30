@@ -235,11 +235,18 @@ void Deactivate(int A)
             NPC[A].Quicksand = 0;
             NPC[A].NoLavaSplash = false;
             NPC[A].Active = false;
+
+            // reset variables
             NPC[A].Type = NPC[A].DefaultType;
             NPC[A].ResetLocation();
             NPC[A].Direction = NPC[A].DefaultDirection;
             NPC[A].Stuck = NPC[A].DefaultStuck;
-            NPC[A].Wings = (NPC[A].WingBehavior != WING_NONE);
+
+            // NEW: reset wings (unless the NPC is a container that bans wings)
+            NPC[A].Wings = NPC[A].DefaultWings;
+            if(NPC[A].Type == NPCID_ITEM_BURIED || NPC[A].Type == NPCID_ITEM_BUBBLE)
+                NPC[A].Wings = WING_NONE;
+
             NPC[A].TimeLeft = 0;
             NPC[A].Projectile = false;
             NPC[A].Effect = NPCEFF_NORMAL;
@@ -1299,7 +1306,7 @@ void NPCSpecial(int A)
     else if(npc.Type == NPCID_MAGIC_BOSS_SHELL || npc.Type == NPCID_FIRE_BOSS_SHELL) // larry/ludwig shell
     {
         // temporarily remove any wings if present
-        npc.Wings = false;
+        npc.Wings = WING_NONE;
 
         if(npc.Special5 == 0) // Target a Random Player
         {
@@ -1413,7 +1420,7 @@ void NPCSpecial(int A)
                 npc.Location.set_height_floor(npc->THeight);
 
                 // restore wings if lost
-                npc.Wings = (npc.WingBehavior != WING_NONE);
+                npc.Wings = npc.DefaultWings;
 
                 NPCQueues::Unchecked.push_back(A);
                 // deferring tree update to end of the NPC physics update
@@ -1658,7 +1665,7 @@ void NPCSpecial(int A)
                 PlaySoundSpatial(SFX_Spring, npc.Location);
                 npc.Location.SpeedY = -7 - dRand() * 2;
                 // clip wings if present
-                npc.Wings = false;
+                npc.Wings = WING_NONE;
             }
         }
         else if(npc.Special == 3)
@@ -4441,7 +4448,7 @@ void SpecialNPC(int A)
                 NPC[A].Location.Height = 54;
 
                 // restore wings if lost
-                NPC[A].Wings = (NPC[A].WingBehavior != WING_NONE);
+                NPC[A].Wings = NPC[A].DefaultWings;
             }
 
             NPC[A].SpecialY += dRand() * 2;

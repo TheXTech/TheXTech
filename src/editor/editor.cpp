@@ -480,7 +480,7 @@ void UpdateEditor()
                             n.special_data = EditorCursor.NPC.Variant;
 
                         if(EditorCursor.NPC.Wings)
-                            n.wings_type = (int)EditorCursor.NPC.WingBehavior;
+                            n.wings_type = (int)EditorCursor.NPC.DefaultWings;
 
                         n.msg = GetS(EditorCursor.NPC.Text);
                         n.friendly = EditorCursor.NPC.Inert;
@@ -1802,8 +1802,8 @@ void UpdateInterprocess()
             EditorCursor.NPC.Stuck = n.nomove;
             EditorCursor.NPC.DefaultStuck = EditorCursor.NPC.Stuck;
 
-            EditorCursor.NPC.WingBehavior = (WingBehaviors)n.wings_type;
-            EditorCursor.NPC.Wings = (EditorCursor.NPC.WingBehavior != WING_NONE);
+            EditorCursor.NPC.DefaultWings = (WingBehaviors)n.wings_type;
+            EditorCursor.NPC.Wings = EditorCursor.NPC.DefaultWings;
 
             EditorCursor.NPC.Legacy = n.is_boss;
 

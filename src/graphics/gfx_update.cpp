@@ -608,9 +608,10 @@ void DrawNPCWings(const NPC_t& n, int sX, int sY, XTColor cn)
 {
     int w = (int)(n->TWidth);
     int h = (int)(n->THeight);
+    int h_gfx = (n->HeightGFX) ? n->HeightGFX : h;
     int npcY = (int)(n.Location.Y);
 
-    int draw_frame = ((npcY + CommonFrame) >> 6) & 1;
+    int draw_frame = ((npcY - CommonFrame_NotFrozen) >> 5) & 1;
 
     bool one_direction = (w <= 64);
 
@@ -622,8 +623,8 @@ void DrawNPCWings(const NPC_t& n, int sX, int sY, XTColor cn)
         if(direction == 1)
             draw_frame += 2;
 
-        XRender::renderTextureBasic((direction == 1) ? (sX - 16) : (sX + w + 16 - 32),
-                              sY + h - 40,
+        XRender::renderTextureBasic((direction == 1) ? (sX - 20) : (sX + w + 20 - 32),
+                              sY + h - h_gfx / 4 - 32,
                               32, 32, GFX.YoshiWings, 0, 0 + 32 * draw_frame, cn);
 
         if(one_direction)

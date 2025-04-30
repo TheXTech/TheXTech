@@ -1776,7 +1776,7 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Location.SpeedY = 0;
 
                 // temporarily remove wings if present
-                NPC[A].Wings = false;
+                NPC[A].Wings = WING_NONE;
             }
             else if(B == 3)
             {
@@ -2333,7 +2333,7 @@ void NPCHit(int A, int B, int C)
         PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
         NPC[A].Killed = 0;
         NPC[A].Immune = 4;
-        NPC[A].Wings = false;
+        NPC[A].Wings = WING_NONE;
     }
 
     if(NPC[A].Killed == 0 && NPC[A].Location.SpeedX == 0 && oldNPC.Location.SpeedX != 0)

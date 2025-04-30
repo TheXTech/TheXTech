@@ -55,7 +55,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
     // NPC[A].BeltSpeed = 0;
     tempf_t beltSpeed = 0;
 
-    bool is_winged = (NPCIsAParaTroopa(NPC[A]) || (NPC[A].Wings && NPC[A].WingBehavior != WING_JUMP));
+    bool is_winged = (NPCIsAParaTroopa(NPC[A]) || (NPC[A].Wings && NPC[A].Wings != WING_JUMP));
 
     if((!NPC[A]->NoClipping || NPC[A].Projectile || NPC[A].Wings) &&
        !(NPC[A].Type == NPCID_SPIT_BOSS_BALL && NPC[A].Projectile) && NPC[A].Type != NPCID_TOOTHY &&
@@ -181,7 +181,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
 
                                     if(BlockIsSizable[Block[B].Type] || BlockOnlyHitspot1[Block[B].Type])
                                     {
-                                        if(HitSpot != 1 || (NPCIsAParaTroopa(NPC[A]) && NPC[A].Special != WING_JUMP) || (NPC[A].Wings && NPC[A].WingBehavior != WING_JUMP))
+                                        if(HitSpot != 1 || (NPCIsAParaTroopa(NPC[A]) && NPC[A].Special != WING_JUMP) || (NPC[A].Wings && NPC[A].Wings != WING_JUMP))
                                             HitSpot = 0;
                                     }
 

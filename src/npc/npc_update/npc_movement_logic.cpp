@@ -585,7 +585,7 @@ void NPCMovementLogic(int A, tempf_t& speedVar)
     }
 
     // Actual Movement (SpeedX / SpeedY application code)
-    if(NPC[A].Wings)
+    if(NPC[A].Wings && !NPC[A].Projectile)
     {
         // don't do anything here, the movement will be applied after SpecialNPC
     }
@@ -621,11 +621,14 @@ void NPCMovementLogic(int A, tempf_t& speedVar)
     SpecialNPC(A);
 
     // Wings movement code
-    if(NPC[A].Wings)
+    if(NPC[A].Wings && !NPC[A].Projectile)
     {
         // reset speed to its old value
-        NPC[A].Location.SpeedX = Wings_SpeedX;
-        NPC[A].Location.SpeedY = Wings_SpeedY;
+        if(NPC[A].Wings != WING_OVERRIDE)
+        {
+            NPC[A].Location.SpeedX = Wings_SpeedX;
+            NPC[A].Location.SpeedY = Wings_SpeedY;
+        }
 
         // do wings movement!
         NPCMovementLogic_Wings(A, (num_t)speedVar);
@@ -656,10 +659,7 @@ void NPCSectionWrap(NPC_t& npc)
 
 void NPCMovementLogic_Wings(int A, const num_t speedVar)
 {
-    WingBehaviors behavior = (NPC[A].Wings) ? NPC[A].WingBehavior : (WingBehaviors)NPC[A].Special;
-
-    if(NPC[A].Wings)
-        NPC[A].Projectile = false;
+    WingBehaviors behavior = (NPC[A].Wings) ? NPC[A].Wings : (WingBehaviors)NPC[A].Special;
 
     if(behavior == WING_CHASE || behavior == WING_PARA_CHASE) // chase
     {
@@ -753,7 +753,16 @@ void NPCMovementLogic_Wings(int A, const num_t speedVar)
     else if(behavior == WING_JUMP)
     {
         NPC[A].Location.SpeedY += Physics.NPCGravity;
-        NPC[A].Location.SpeedX = Physics.NPCWalkingSpeed * NPC[A].Direction;
+
+        if(NPC[A].Wings && NPC[A].Location.SpeedX)
+        {
+            if(NPC[A].Location.SpeedX < 0)
+                NPC[A].Location.SpeedX = -Physics.NPCWalkingSpeed;
+            else
+                NPC[A].Location.SpeedX = Physics.NPCWalkingSpeed;
+        }
+        else
+            NPC[A].Location.SpeedX = Physics.NPCWalkingSpeed * NPC[A].Direction;
     }
     else if(behavior == WING_LEFTRIGHT)
     {

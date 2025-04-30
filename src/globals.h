@@ -247,6 +247,16 @@ enum WingBehaviors : uint8_t
     WING_LEFTRIGHT = 2,
     WING_UPDOWN = 3,
     WING_CHASE = 4,
+    // reserved 38A values
+    WING_HOVER_FORWARD = 5,
+    WING_BUTTERFLY_AI = 6,
+    // reserved 38A values -- won't happen
+    WING_RSV_REMOTE_CONTROL = 7,
+    WING_RSV_RAILS = 8,
+    // reserved TheXTech values
+    WING_FLEE = 9,
+    // use normal NPC control for now
+    WING_OVERRIDE = 255,
 };
 
 //Public Type NPC 'The NPC Type
@@ -439,8 +449,8 @@ struct NPC_t
     uint8_t WallDeath = 0;
 //  NEW: which GFX expansion slot should the NPC use? Reserved for now
     uint8_t GFXSlot = 0;
-//  NEW: what type of wing behavior should the NPC have?
-    WingBehaviors WingBehavior = WING_NONE;
+//  NEW: what type of wings does the NPC currently have?
+    WingBehaviors Wings = WING_NONE;
 
     // rarely used bools turned into bitfields
 //    TurnAround As Boolean 'if the NPC needs to turn around
@@ -489,9 +499,9 @@ struct NPC_t
 //    Quicksand As Integer
     // counter for whether NPC is in quicksand, set to 2 when detected, decremented otherwise
     uint8_t Quicksand : 2;
-//  NEW: does the NPC currently have Wings?
-    bool Wings : 1;
 
+//  NEW: what type of wing behavior should the NPC normally have?
+    WingBehaviors DefaultWings = WING_NONE;
 //'the default values are used when De-Activating an NPC when it goes on screen
 //    DefaultDirection As Single
     // changed to int8_t, only ever holds values -1, 0, and 1
@@ -542,8 +552,7 @@ struct NPC_t
         tempBlockInTree(false),
         Stuck(false),
         Shadow(false),
-        Quicksand(0),
-        Wings(false) {}
+        Quicksand(0) {}
 
 };
 

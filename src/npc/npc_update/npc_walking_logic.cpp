@@ -37,7 +37,17 @@ void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, tempf_t
             tempSpeedA = 0;
     }
 
-    if(NPC[A].Type == NPCID_RED_FLY_FODDER) // Walking code for Flying Goomba
+    if(NPC[A].Wings)
+    {
+        if(NPC[A].Wings == WING_JUMP)
+            NPC[A].Location.SpeedY = -9;
+        else
+        {
+            if(NPC[A].Location.SpeedY > 0)
+                NPC[A].Location.SpeedY = -NPC[A].Location.SpeedY;
+        }
+    }
+    else if(NPC[A].Type == NPCID_RED_FLY_FODDER) // Walking code for Flying Goomba
     {
         if(NPC[A].Special <= 30)
         {
@@ -339,11 +349,9 @@ void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, tempf_t
     }
     else // Walking code for everything else
     {
-        if(NPCIsAParaTroopa(NPC[A]) || NPC[A].Wings)
+        if(NPCIsAParaTroopa(NPC[A]))
         {
-            WingBehaviors behavior = (NPC[A].Wings) ? NPC[A].WingBehavior : (WingBehaviors)NPC[A].Special;
-
-            if(behavior == WING_JUMP)
+            if(NPC[A].Special == WING_JUMP)
                 NPC[A].Location.SpeedY = -9;
             else
             {

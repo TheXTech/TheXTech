@@ -1019,8 +1019,8 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
         npc.Stuck = n.nomove;
         npc.DefaultStuck = npc.Stuck;
 
-        npc.WingBehavior = (WingBehaviors)n.wings_type;
-        npc.Wings = (npc.WingBehavior != WING_NONE);
+        npc.DefaultWings = (WingBehaviors)n.wings_type;
+        npc.Wings = npc.DefaultWings;
 
         npc.Legacy = n.is_boss;
 
