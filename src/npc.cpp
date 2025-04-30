@@ -1051,6 +1051,8 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_ITEM_BUBBLE) // bubble
     {
+        npc.Wings = WING_NONE;
+
         if(npc.Special == NPCID_RANDOM_POWER)
         {
             npc.Special = RandomBonus();
@@ -1088,6 +1090,7 @@ void NPCSpecial(int A)
             npc.Location.SpeedX = 0;
             npc.Location.SpeedY = 0;
             npc.Direction = npc.DefaultDirection;
+            npc.Wings = npc.DefaultWings;
 
             NPCQueues::update(A);
 

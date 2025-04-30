@@ -2671,6 +2671,9 @@ void UpdateGraphicsScreen(Screen_t& screen)
                             GFXNPC[NPC[A].Special],
                             0, B * contents_h,
                             cn);
+
+                        if(NPC[A].DefaultWings)
+                            DrawNPCWings(NPC[A], sX, sY, cn);
                     }
 
                     XRender::renderTextureBasic(sX + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2 + w / 2,
