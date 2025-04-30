@@ -4443,6 +4443,11 @@ void SpecialNPC(int A)
                 StartMusicIfOnscreen(NPC[A].Section);
             }
         }
+
+        // temporarily remove any wings if not in normal state
+        if(NPC[A].Special != 0)
+            NPC[A].Wings = WING_NONE;
+
         if(NPC[A].Special == 0)
         {
             if(NPC[A].Location.Height != 54)

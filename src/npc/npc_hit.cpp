@@ -1774,9 +1774,6 @@ void NPCHit(int A, int B, int C)
                 NPC[A].SpecialY = 0;
                 NPC[A].Location.SpeedX = 0;
                 NPC[A].Location.SpeedY = 0;
-
-                // temporarily remove wings if present
-                NPC[A].Wings = WING_NONE;
             }
             else if(B == 3)
             {
