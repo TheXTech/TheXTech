@@ -545,7 +545,7 @@ void NPCHit(int A, int B, int C)
     {
         if(B == 1)
         {
-            if(NPC[A].Type == NPCID_BRUTE)
+            if(NPC[A].Type == NPCID_BRUTE && !NPC[A].Wings)
             {
                 NPC[A].Location.set_height_floor(32);
                 NPC[A].Type = NPCID_BRUTE_SQUISHED;
@@ -1285,7 +1285,7 @@ void NPCHit(int A, int B, int C)
     // Things With Shells (Koopa Troopa, Buzzy Beetle, Etc.)
     else if(NPC[A].Type == NPCID_GRN_TURTLE_S3 || NPC[A].Type == NPCID_RED_TURTLE_S3 || NPC[A].Type == NPCID_GLASS_TURTLE || NPC[A].Type == NPCID_BIG_TURTLE || NPCIsAParaTroopa(NPC[A]) || (NPC[A].Type >= NPCID_GRN_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_TURTLE_S4) || NPC[A].Type == NPCID_GRN_TURTLE_S1 || NPC[A].Type == NPCID_RED_TURTLE_S1 || NPC[A].Type == NPCID_GRN_FLY_TURTLE_S1 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S1)
     {
-        if(B == 1)
+        if(B == 1 && !NPC[A].Wings)
         {
             PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
             NPC[A].Location.Y += NPC[A].Location.Height;
@@ -1913,11 +1913,18 @@ void NPCHit(int A, int B, int C)
         else
         {
             if(B == 1 && NPC[A].Type == NPCID_SPRING)
+            {
                 PlaySoundSpatial(SFX_Spring, NPC[A].Location);
+
+                // prevent wing loss
+                if(NPC[A].Wings)
+                    NPC[A].Damage = 1;
+            }
 
             if(B == 1 && (NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT))
             {
                 NPC[A].Killed = 1;
+                NPC[A].Wings = WING_NONE;
                 if(NPC[A].Type == NPCID_COIN_SWITCH)
                 {
                     PSwitchTime = Physics.NPCPSwitch;
