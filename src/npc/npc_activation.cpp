@@ -251,6 +251,9 @@ void NPCActivationLogic(int A)
         NPC[A].Projectile = false;
     else if(NPC[A].Type == NPCID_STATUE_S3 || NPC[A].Type == NPCID_STATUE_S4)
         NPC[A].Special = iRand(200);
+    // new, clip wings from buried items
+    else if(NPC[A].Type == NPCID_ITEM_BURIED)
+        NPC[A].Wings = WING_NONE;
 
     NPC[A].JustActivated = 0;
     NPC[A].CantHurt = 0;

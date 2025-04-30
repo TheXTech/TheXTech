@@ -318,10 +318,12 @@ void NPCHit(int A, int B, int C)
     // SMB2 Grass
     else if(B == 10 && (NPC[A].Type == NPCID_ITEM_BURIED || NPCIsVeggie(NPC[A])))
     {
+        // Unbury code (v2)
         if(NPC[A].Type == NPCID_ITEM_BURIED)
         {
             NPC[A].Location.Y += -NPC[A].Location.Height;
             NPC[A].Type = NPCID(NPC[A].Special);
+            NPC[A].Wings = NPC[A].DefaultWings;
         }
 
         PlaySoundSpatial(SFX_HeroGrass, NPC[A].Location);

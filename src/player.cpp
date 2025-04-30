@@ -4965,6 +4965,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     NPC[p.StandingOnNPC].Direction = p.Direction;
                     NPCFrames(p.StandingOnNPC);
 
+                    // Unbury code (v3)
                     if(NPC[p.StandingOnNPC].Type == NPCID_ITEM_BURIED)
                     {
                         p.Location.SpeedX += NPC[p.StandingOnNPC].Location.SpeedX;
@@ -4982,6 +4983,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
 
                         CharStuff(p.StandingOnNPC);
                         NPC[p.StandingOnNPC].Special = 0;
+                        NPC[p.StandingOnNPC].Wings = NPC[p.StandingOnNPC].DefaultWings;
 
                         if(NPCIsYoshi(NPC[p.StandingOnNPC]))
                         {

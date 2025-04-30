@@ -1220,6 +1220,7 @@ interrupt_Activation:
                             NPC[A].Type = NPCID_ITEM_POD;
                         }
 
+                        // Unbury code (v1)
                         if(NPC[A].Type == NPCID_ITEM_BURIED)
                         {
                             if(NPC[A].Special == 0)
@@ -1234,6 +1235,7 @@ interrupt_Activation:
                             NPC[A].Frame = 0;
                             NPC[A].Type = NPCID(NPC[A].Special);
                             NPC[A].Special = 0;
+                            NPC[A].Wings = NPC[A].DefaultWings;
 
                             if(NPCIsYoshi(NPC[A]))
                             {
