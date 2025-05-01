@@ -2210,12 +2210,12 @@ void SetCursor()
         }
 
         EditorCursor.NPC.Special2 = 0;
-        EditorCursor.NPC.Special4 = 0;
+        EditorCursor.NPC.Special5 = 0;
 
         if(!EditorCursor.NPC.Generator)
         {
             EditorCursor.NPC.Special3 = 0;
-            EditorCursor.NPC.Special5 = 0;
+            EditorCursor.NPC.Special4 = 0;
         }
 
         // EditorCursor.NPC.Special6 = 0;
