@@ -1084,9 +1084,14 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
 
                                             if(!(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_TANK_TREADS || NPC[A].Type == NPCID_BULLET))
                                                 NPC[A].TurnAround = true;
+
                                             if(is_winged)
                                                 NPC[A].Location.SpeedX += -Block[B].Location.SpeedX * 1.2_r;
-                                            if(NPC[A]->IsAShell)
+
+                                            // this also includes WING_JUMP AI
+                                            if(NPC[A].Wings)
+                                                NPC[A].TurnAround = true;
+                                            else if(NPC[A]->IsAShell)
                                                 NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
                                         }
                                     }
