@@ -161,8 +161,8 @@ enum
     SFX_FireBossKilled,
     SFX_HeroIce,
     SFX_HeroFireRod,
-    SFX_FlameThrower,
-    SFX_FlagExit,
+    // SFX_FlameThrower, (was previously 104)
+    SFX_FlagExit = 104,
 };
 
 int CustomWorldMusicId();
