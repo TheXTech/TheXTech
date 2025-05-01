@@ -371,6 +371,10 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                             if(HitSpot == 2 || HitSpot == 4)
                                                 HitSpot = 0;
                                         }
+
+                                        // hit a wall, cancel wings and switch routines
+                                        if(HitSpot)
+                                            NPC[A].Wings = WING_NONE;
                                     }
                                     else if(NPC[A].Type == NPCID_SAW)
                                     {
