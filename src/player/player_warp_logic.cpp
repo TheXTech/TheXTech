@@ -315,22 +315,25 @@ void PlayerEffectWarpPipe(int A)
 
     if(p.Effect2 == 0) // Entering pipe
     {
+        // how many *frames* left until the player crosses the boundary of the pipe and becomes invisible
         int leftToGoal = 0;
+        // how many *frames* to wait after the player crosses the boundary of the pipe and becomes invisible (set to -16 for left/right warps)
+        int leftToGoal_end = -8;
 
-        if(warp_dir_enter == 3)
+        if(warp_dir_enter == LevelDoor::ENTRANCE_DOWN || warp_dir_enter == LevelDoor::ENTRANCE_UP)
         {
-            p.Location.Y += 1;
-            p.Location.X = warp_enter.X + (warp_enter.Width - p.Location.Width) / 2;
-
-            leftToGoal = (int)(warp_enter.Y + warp_enter.Height - p.Location.Y + 0.5_n);
-
-            if(p.Location.Y > warp_enter.Y + warp_enter.Height + 8)
+            if(warp_dir_enter == LevelDoor::ENTRANCE_DOWN)
             {
-                if(do_scroll)
-                    s_InitWarpScroll(p, warp_enter, warp_exit);
-                else
-                    p.Effect2 = 1;
+                p.Location.Y += 1;
+                leftToGoal = num_t::floor(warp_enter.Y + warp_enter.Height - p.Location.Y);
             }
+            else
+            {
+                p.Location.Y -= 1;
+                leftToGoal = num_t::floor(p.Location.Y + p.Location.Height - warp_enter.Y);
+            }
+
+            p.Location.X = warp_enter.X + (warp_enter.Width - p.Location.Width) / 2;
 
             if(p.Mount == 0)
                 p.Frame = 15;
@@ -341,101 +344,61 @@ void PlayerEffectWarpPipe(int A)
                 NPC[p.HoldingNPC].Location.X = p.Location.X + (p.Location.Width - NPC[p.HoldingNPC].Location.Width) / 2;
             }
         }
-        else if(warp_dir_enter == 1)
+        else if(warp_dir_enter == LevelDoor::ENTRANCE_LEFT || warp_dir_enter == LevelDoor::ENTRANCE_RIGHT)
         {
-            p.Location.Y -= 1;
-            p.Location.X = warp_enter.X + (warp_enter.Width - p.Location.Width) / 2;
-
-            leftToGoal = (int)(p.Location.Y + p.Location.Height - warp_enter.Y + 0.5_n);
-
-            if(p.Location.Y + p.Location.Height + 8 < warp_enter.Y)
+            if(warp_dir_enter == LevelDoor::ENTRANCE_LEFT)
             {
-                if(do_scroll)
-                    s_InitWarpScroll(p, warp_enter, warp_exit);
-                else
-                    p.Effect2 = 1;
+                p.Location.X -= 0.5_n;
+                p.Location.SpeedX = -0.5_n;
+                leftToGoal = num_t::floor((p.Location.X + p.Location.Width - warp_enter.X) * 2);
+                p.Direction = -1; // makes (p.Direction > 0) always false
+            }
+            else
+            {
+                p.Location.X += 0.5_n;
+                p.Location.SpeedX = 0.5_n;
+                leftToGoal = num_t::floor((warp_enter.X + warp_enter.Width - p.Location.X) * 2);
+                p.Direction = 1; // Makes (p.Direction > 0) always true
             }
 
-            if(p.HoldingNPC > 0)
-            {
-                NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
-                NPC[p.HoldingNPC].Location.X = p.Location.X + (p.Location.Width - NPC[p.HoldingNPC].Location.Width) / 2;
-            }
-            if(p.Mount == 0)
-                p.Frame = 15;
-        }
-        else if(warp_dir_enter == 2)
-        {
             if(p.Mount == 3)
             {
                 p.Duck = true;
                 p.Location.Height = 30;
             }
 
-            p.Direction = -1; // makes (p.Direction > 0) always false
             p.Location.Y = warp_enter.Y + warp_enter.Height - p.Location.Height - 2;
-            p.Location.X -= 0.5_n;
-
-            leftToGoal = (int)((p.Location.X + p.Location.Width - warp_enter.X) * 2 + 0.5_n);
-
-            if(p.Location.X + p.Location.Width + 8 < warp_enter.X)
-            {
-                if(do_scroll)
-                    s_InitWarpScroll(p, warp_enter, warp_exit);
-                else
-                    p.Effect2 = 1;
-            }
 
             if(p.HoldingNPC > 0)
             {
                 NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
-//                    if(p.Direction > 0) // Always false
-//                        NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
-//                    else
-                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
+
+                if(warp_dir_enter == LevelDoor::ENTRANCE_LEFT)
+                    NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
+                else
+                    NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
             }
-            p.Location.SpeedX = -0.5_n;
+
             PlayerFrame(p);
             p.Location.SpeedX = 0;
+
+            // -8px as always, but leftToGoal is measured in frames (cross-ref * 2 above)
+            leftToGoal_end = -16;
         }
-        else if(warp_dir_enter == 4)
+
+        // checks whether the player is 8 *pixels* beyond the pipe boundary
+        if(leftToGoal < leftToGoal_end)
         {
-            if(p.Mount == 3)
-            {
-                p.Duck = true;
-                p.Location.Height = 30;
-            }
-            p.Direction = 1; // Makes (p.Direction > 0) always true
-            p.Location.Y = warp_enter.Y + warp_enter.Height - p.Location.Height - 2;
-            p.Location.X += 0.5_n;
-
-            leftToGoal = (int)((warp_enter.X + warp_enter.Width - p.Location.X) * 2 + 0.5_n);
-
-            if(p.Location.X > warp_enter.X + warp_enter.Width + 8)
-            {
-                if(do_scroll)
-                    s_InitWarpScroll(p, warp_enter, warp_exit);
-                else
-                    p.Effect2 = 1;
-            }
-
-            if(p.HoldingNPC > 0)
-            {
-                NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
-//                    if(p.Direction > 0) // always true
-                NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
-//                    else
-//                        NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
-            }
-            p.Location.SpeedX = 0.5_n;
-            PlayerFrame(p);
-            p.Location.SpeedX = 0;
+            if(do_scroll)
+                s_InitWarpScroll(p, warp_enter, warp_exit);
+            else
+                p.Effect2 = 1;
         }
 
         if(p.HoldingNPC > 0 && p.HoldingNPC <= numNPCs)
             treeNPCUpdate(p.HoldingNPC);
 
-        // teleport other players into the pipe warp
+        // teleport other players into the pipe warp 8 frames before player crosses boundary
         if(is_shared_screen && leftToGoal == 8)
         {
             int vscreen_A = vScreenIdxByPlayer(A);
@@ -486,7 +449,7 @@ void PlayerEffectWarpPipe(int A)
 
         // D_pLogDebug("Warping: %g (same section? %s!)", leftToGoal, SectionCollision(p.Section, warp_exit) ? "yes" : "no");
 
-        // trigger fader when there are 16 pixels left (for normal effects) or 0 pixels left (for none or scroll)
+        // trigger fader when there are 16 frames left (for normal effects) or 0 frames left (for none or scroll)
         s_WarpFaderLogic(false, A, warp.transitEffect, warp_enter, leftToGoal == 16, !is_level_quit && !same_section && leftToGoal == 0);
     }
     else if(p.Effect2 == 1)  // Exiting pipe (initialization)
