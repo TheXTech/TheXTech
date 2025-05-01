@@ -5789,3 +5789,47 @@ bool NPCIsContainer(const NPC_t& npc)
         || npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_THROWER
         || (NPCNewContainerType(npc.Type) && npc.Special != 0);
 }
+
+static bool s_TypeBansWings(NPCID Type)
+{
+    const auto& tr = NPCTraits[Type];
+    if(tr.IsAVine)
+        return true;
+
+    switch(Type)
+    {
+    // ban plants
+    case NPCID_JUMP_PLANT:
+    case NPCID_FIRE_PLANT:
+    case NPCID_PLANT_S3:
+    case NPCID_BIG_PLANT:
+    case NPCID_PLANT_S1:
+    case NPCID_LONG_PLANT_UP:
+    case NPCID_BOTTOM_PLANT:
+    case NPCID_LONG_PLANT_DOWN:
+    case NPCID_SIDE_PLANT:
+    // ban these types which set location to default location
+    case NPCID_LAVA_MONSTER:
+    case NPCID_LAVABUBBLE:
+    case NPCID_CONVEYOR:
+    case NPCID_BOSS_CASE:
+    case NPCID_BOSS_FRAGILE:
+        return true;
+    default:
+        return false;
+    }
+}
+
+bool NPCBansWings(const NPC_t& npc)
+{
+    if(s_TypeBansWings(npc.Type))
+        return true;
+
+    if(npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_BURIED)
+    {
+        if(s_TypeBansWings((NPCID)npc.Special))
+            return true;
+    }
+
+    return false;
+}

@@ -309,6 +309,12 @@ void SetEditorNPCType(NPCID type)
             EditorCursor.NPC.Special = 0;
     }
 
+    if(NPCBansWings(EditorCursor.NPC))
+    {
+        EditorCursor.NPC.Wings = WING_NONE;
+        EditorCursor.NPC.DefaultWings = WING_NONE;
+    }
+
     // reset legacy for the NPCs that don't allow it
     if(!(type == NPCID_MINIBOSS || type == NPCID_SPIT_BOSS || type == NPCID_VILLAIN_S3))
         EditorCursor.NPC.Legacy = false;
