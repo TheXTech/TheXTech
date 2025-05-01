@@ -762,12 +762,24 @@ void PlayerEffectWarpPipe(int A)
                 PlayerGrabCode(A);
             }
         }
-        else if(warp_dir_exit == LevelDoor::EXIT_DOWN)
+        else if(warp_dir_exit == LevelDoor::EXIT_DOWN || warp_dir_exit == LevelDoor::EXIT_UP)
         {
-            p.Location.Y += 1;
+            if(warp_dir_exit == LevelDoor::EXIT_DOWN)
+            {
+                p.Location.Y += 1;
+                if(p.Location.Y >= warp_exit.Y)
+                    p.Effect2 = 3;
+            }
+            else
+            {
+                p.Location.Y -= 1;
+                if(p.Location.Y + p.Location.Height <= warp_exit.Y + warp_exit.Height)
+                    p.Effect2 = 3;
 
-            if(p.Location.Y >= warp_exit.Y)
-                p.Effect2 = 3;
+                // make players less likely to collide chaotically out of UP exits
+                if(is_shared_screen || (numPlayers > 2 && !g_ClonedPlayerMode))
+                    p.StandUp2 = true;
+            }
 
             if(p.HoldingNPC > 0)
             {
@@ -778,50 +790,37 @@ void PlayerEffectWarpPipe(int A)
             if(p.Mount == 0)
                 p.Frame = 15;
         }
-        else if(warp_dir_exit == LevelDoor::EXIT_UP)
+        else if(warp_dir_exit == LevelDoor::EXIT_LEFT || warp_dir_exit == LevelDoor::EXIT_RIGHT)
         {
-            p.Location.Y -= 1;
-
-            if(p.Location.Y + p.Location.Height <= warp_exit.Y + warp_exit.Height)
-                p.Effect2 = 3;
-
-            if(p.HoldingNPC > 0)
+            if(warp_dir_exit == LevelDoor::EXIT_LEFT)
             {
-                NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
-                NPC[p.HoldingNPC].Location.X = p.Location.X + (p.Location.Width - NPC[p.HoldingNPC].Location.Width) / 2;
+                p.Location.X -= 0.5_n;
+                p.Direction = -1; // makes (p.Direction < 0) always true
+
+                if(p.Location.X + p.Location.Width <= warp_exit.X + warp_exit.Width)
+                    p.Effect2 = 3;
             }
+            else
+            {
+                p.Location.X += 0.5_n;
+                p.Direction = 1; // makes (p.Direction < 0) always false
 
-            if(p.Mount == 0)
-                p.Frame = 15;
-
-            // make players less likely to collide chaotically out of UP exits
-            if(is_shared_screen || (numPlayers > 2 && !g_ClonedPlayerMode))
-                p.StandUp2 = true;
-        }
-        else if(warp_dir_exit == LevelDoor::EXIT_LEFT)
-        {
-            p.Location.X -= 0.5_n;
-            p.Direction = -1; // makes (p.Direction < 0) always true
-
-            if(p.Location.X + p.Location.Width <= warp_exit.X + warp_exit.Width)
-                p.Effect2 = 3;
+                if(p.Location.X >= warp_exit.X)
+                    p.Effect2 = 3;
+            }
 
             if(p.HoldingNPC > 0)
             {
                 if(p.Character >= 3) // peach/toad leaving a pipe
                 {
+                    // VB6 bug: should have been -1 when going left
                     p.Location.SpeedX = 1;
                     PlayerFrame(p);
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
-
-//                        if(p.Direction < 0) // always true
-                    NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
-//                        else
-//                            NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
                 }
                 else
                 {
-                    p.Direction = 1; // makes (p.Direction > 0) always true
+                    p.Direction = -p.Direction;
 
                     if(p.State == 1)
                         p.Frame = 5;
@@ -829,60 +828,17 @@ void PlayerEffectWarpPipe(int A)
                         p.Frame = 8;
 
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
+                }
 
-//                        if(p.Direction > 0) // always true
+                // this logic was substantially simplified from VB6, which also appeared to depend on Direction (but actually didn't)
+                if(warp_dir_exit == LevelDoor::EXIT_LEFT)
                     NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
-//                        else
-//                            NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
-                }
-            }
-            else
-            {
-                p.Location.SpeedX = -0.5_n;
-                PlayerFrame(p);
-                p.Location.SpeedX = 0;
-            }
-        }
-        else if(warp_dir_exit == LevelDoor::EXIT_RIGHT)
-        {
-            p.Location.X += 0.5_n;
-            p.Direction = 1; // makes (p.Direction < 0) always false
-
-            if(p.Location.X >= warp_exit.X)
-                p.Effect2 = 3;
-
-            if(p.HoldingNPC > 0)
-            {
-                if(p.Character >= 3) // peach/toad leaving a pipe
-                {
-                    p.Location.SpeedX = 1;
-                    PlayerFrame(p);
-                    NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
-
-//                        if(p.Direction < 0) // always false
-//                            NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
-//                        else
-                    NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
-                }
                 else
-                {
-                    p.Direction = -1; // makes (p.Direction > 0) always false
-
-                    if(p.State == 1)
-                        p.Frame = 5;
-                    else
-                        p.Frame = 8;
-
-                    NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
-
-//                        if(p.Direction > 0) // always false
-//                            NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
-//                        else
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
-                }
             }
             else
             {
+                // VB6 bug: this should have been 0.5 when going right
                 p.Location.SpeedX = -0.5_n;
                 PlayerFrame(p);
                 p.Location.SpeedX = 0;
