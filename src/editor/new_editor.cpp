@@ -807,17 +807,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         // Wings
         if(FileFormat == FileFormats::LVL_PGEX && !NPCBansWings(EditorCursor.NPC))
         {
-            if(UpdateButton(mode, e_ScreenW - 200 + 4, 180 + 4, GFX.YoshiWings, EditorCursor.NPC.DefaultWings != WING_NONE, 0, 0, 32, 32))
-            {
-                if(EditorCursor.NPC.DefaultWings >= WING_CHASE)
-                    EditorCursor.NPC.DefaultWings = WING_NONE;
-                else
-                    EditorCursor.NPC.DefaultWings = (WingBehaviors)((int)EditorCursor.NPC.DefaultWings + 1);
-
-                EditorCursor.NPC.Wings = EditorCursor.NPC.DefaultWings;
-            }
-
-            int icon = 0;
+            int icon = 32;
 
             if(EditorCursor.NPC.Wings == WING_JUMP)
                 icon = Icon::hop;
@@ -828,8 +818,21 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             else if(EditorCursor.NPC.Wings == WING_CHASE)
                 icon = Icon::target;
 
-            if(icon && mode == CallMode::Render)
-                XRender::renderTextureBasic(e_ScreenW - 200 + 4, 180 + 4, 32, 32, GFX.EIcons, 0, 32 * icon, XTAlpha(127));
+            if(UpdateButton(mode, e_ScreenW - 200 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.DefaultWings != WING_NONE, 0, 32 * icon, 32, 32))
+            {
+                if(EditorCursor.NPC.DefaultWings >= WING_CHASE)
+                    EditorCursor.NPC.DefaultWings = WING_NONE;
+                else
+                    EditorCursor.NPC.DefaultWings = (WingBehaviors)((int)EditorCursor.NPC.DefaultWings + 1);
+
+                EditorCursor.NPC.Wings = EditorCursor.NPC.DefaultWings;
+            }
+
+            if(mode == CallMode::Render)
+            {
+                int sz = (icon == 32) ? 32 : 16;
+                XRender::renderTextureScaleEx(e_ScreenW - 200 + 4, 180 + 4, sz, sz, GFX.YoshiWings, 0, 0, 32, 32);
+            }
         }
 
         // Generator
