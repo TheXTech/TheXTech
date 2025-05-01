@@ -1272,7 +1272,10 @@ interrupt_Activation:
                         }
 
                         if(NPC[A].Type == NPCID_SLIDE_BLOCK)
+                        {
                             NPC[A].Special = 1;
+                            NPC[A].Wings = WING_NONE;
+                        }
 
                         if(NPC[A].Type == NPCID_SPIT_GUY_BALL)
                         {
