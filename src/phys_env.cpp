@@ -49,6 +49,7 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
 
     int direction = maze_state % 4;
     bool cleared_to_exit = maze_state & MAZE_CAN_EXIT;
+    bool do_cancel = false;
 
     num_t center_x = loc.X + loc.Width / 2;
     num_t center_y = loc.Y + loc.Height / 2;
@@ -85,7 +86,12 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
         exit_check_x = maze_center_x;
         target_speed_x = (maze_center_x - center_x) / 8;
 
-        if(num_t::abs(target_speed_x) < 0.25_n)
+        if(num_t::abs(target_speed_x) > 8_n)
+        {
+            do_cancel = true;
+            target_speed_x = 0;
+        }
+        else if(num_t::abs(target_speed_x) < 0.25_n)
         {
             loc.X = maze_center_x - loc.Width / 2;
             loc.SpeedX = 0;
@@ -118,7 +124,12 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
 
         target_speed_y = (maze_center_y - center_y) / 8;
 
-        if(num_t::abs(target_speed_y) < 0.25_n)
+        if(num_t::abs(target_speed_y) > 8_n)
+        {
+            do_cancel = true;
+            target_speed_y = 0;
+        }
+        else if(num_t::abs(target_speed_y) < 0.25_n)
         {
             loc.Y = maze_center_y - loc.Height / 2;
             loc.SpeedY = 0;
@@ -126,8 +137,7 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
         }
     }
 
-    bool do_cancel = false;
-    if(space_left > space_to_cancel + 128 || space_left < -128)
+    if(space_left > space_to_cancel + 128 || space_left < -128 || do_cancel)
     {
         do_cancel = true;
         exit_check_x = center_x;
