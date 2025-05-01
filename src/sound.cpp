@@ -188,11 +188,10 @@ struct SFX_t
     Mix_Music *music = nullptr;
     Mix_Chunk *chunkOrig = nullptr;
     Mix_Music *musicOrig = nullptr;
+    int8_t channel = -1;
     bool isCustom = false;
     bool isSilent = false;
     bool isSilentOrig = false;
-    int volume = 128;
-    int channel = -1;
 };
 
 static std::unordered_map<std::string, Music_t> music;
