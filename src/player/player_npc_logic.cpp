@@ -875,7 +875,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         Player[A].RunCount = 0;
 
                                         // mark moving pinched (if needed)
-                                        if(NPC[B].Type != NPCID_KEY && NPC[B].Type != NPCID_COIN_SWITCH && NPC[B].Type != NPCID_CONVEYOR && (NPC[B].Location.SpeedX != 0 || NPC[B].Location.SpeedY != 0 || NPC[B].BeltSpeed))
+                                        if(NPC[B].Type != NPCID_KEY && NPC[B].Type != NPCID_COIN_SWITCH && NPC[B].Type != NPCID_CONVEYOR && (NPC[B].Location.SpeedX != 0 || NPC[B].Location.SpeedY != 0 || NPC[B].BeltSpeed) && !(NPC[B].Wings && NPC[B].CantHurtPlayer == A))
                                         {
                                             Player[A].Pinched.Moving = 2;
 
