@@ -585,7 +585,7 @@ void NPCMovementLogic(int A, tempf_t& speedVar)
     }
 
     // Actual Movement (SpeedX / SpeedY application code)
-    if(NPC[A].Wings && !NPC[A].Projectile)
+    if(NPC[A].Wings)
     {
         // don't do anything here, the movement will be applied after SpecialNPC
     }
@@ -621,7 +621,7 @@ void NPCMovementLogic(int A, tempf_t& speedVar)
     SpecialNPC(A);
 
     // Wings movement code
-    if(NPC[A].Wings && !NPC[A].Projectile)
+    if(NPC[A].Wings)
     {
         // reset speed to its old value
         if(NPC[A].Wings != WING_OVERRIDE)
@@ -661,7 +661,14 @@ void NPCMovementLogic_Wings(int A, const num_t speedVar)
 {
     WingBehaviors behavior = (NPC[A].Wings) ? NPC[A].Wings : (WingBehaviors)NPC[A].Special;
 
-    if(behavior == WING_CHASE || behavior == WING_PARA_CHASE) // chase
+    if(NPC[A].Wings && NPC[A].Projectile && !NPC[A]->IsAShell)
+    {
+        NPC[A].Location.SpeedY += Physics.NPCGravity;
+
+        if(num_t::abs(NPC[A].Location.SpeedY) < 0.5_n)
+            NPC[A].Projectile = false;
+    }
+    else if(behavior == WING_CHASE || behavior == WING_PARA_CHASE) // chase
     {
         if(NPC[A].CantHurt > 0)
             NPC[A].CantHurt = 100;
@@ -682,6 +689,9 @@ void NPCMovementLogic_Wings(int A, const num_t speedVar)
                 }
             }
         }
+
+        if(NPC[A].Wings && target_plr == 0 && NPC[A].CantHurtPlayer)
+            target_plr = NPC[A].CantHurtPlayer;
 
         if(target_plr > 0)
         {
