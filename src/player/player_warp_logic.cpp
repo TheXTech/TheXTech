@@ -497,10 +497,14 @@ void PlayerEffectWarpPipe(int A)
             s_WarpStealMount(A);
         }
 
-        if(warp_dir_exit == 1)
+        if(warp_dir_exit == LevelDoor::EXIT_DOWN || warp_dir_exit == LevelDoor::EXIT_UP)
         {
+            if(warp_dir_exit == LevelDoor::EXIT_DOWN)
+                p.Location.Y = warp_exit.Y - p.Location.Height - 8;
+            else
+                p.Location.Y = warp_exit.Y + warp_exit.Height + 8;
+
             p.Location.X = warp_exit.X + (warp_exit.Width - p.Location.Width) / 2;
-            p.Location.Y = warp_exit.Y - p.Location.Height - 8;
 
             if(p.Mount == 0)
                 p.Frame = 15;
@@ -510,36 +514,33 @@ void PlayerEffectWarpPipe(int A)
                 NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
                 NPC[p.HoldingNPC].Location.X = p.Location.X + (p.Location.Width - NPC[p.HoldingNPC].Location.Width) / 2;
             }
+
+            if(p.Duck)
+                UnDuck(Player[A]);
         }
-        else if(warp_dir_exit == 3)
+        else if(warp_dir_exit == LevelDoor::EXIT_RIGHT || warp_dir_exit == LevelDoor::EXIT_LEFT)
         {
-            p.Location.X = warp_exit.X + (warp_exit.Width - p.Location.Width) / 2;
-            p.Location.Y = warp_exit.Y + warp_exit.Height + 8;
-
-            if(p.Mount == 0)
-                p.Frame = 15;
-
-            if(p.HoldingNPC > 0)
+            if(warp_dir_exit == LevelDoor::EXIT_RIGHT)
             {
-                NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
-                NPC[p.HoldingNPC].Location.X = p.Location.X + (p.Location.Width - NPC[p.HoldingNPC].Location.Width) / 2;
+                p.Location.X = warp_exit.X - p.Location.Width - 8;
+                p.Direction = 1;
             }
-        }
-        else if(warp_dir_exit == 2)
-        {
+            else
+            {
+                p.Location.X = warp_exit.X + warp_exit.Width + 8;
+                p.Direction = -1;
+            }
+
             if(p.Mount == 3)
             {
                 p.Duck = true;
                 p.Location.Height = 30;
             }
 
-            p.Location.X = warp_exit.X - p.Location.Width - 8;
             p.Location.Y = warp_exit.Y + warp_exit.Height - p.Location.Height - 2;
 
             if(p.Mount == 0)
                 p.Frame = 1;
-
-            p.Direction = 1;
 
             if(p.HoldingNPC > 0)
             {
@@ -549,41 +550,13 @@ void PlayerEffectWarpPipe(int A)
                     p.Frame = 8;
 
                 NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
-                p.Direction = -1; // Makes (p.Direction > 0) always false
-//                    if(p.Direction > 0) // always false
-//                        NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
-//                    else
-                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
-            }
-        }
-        else if(warp_dir_exit == 4)
-        {
-            if(p.Mount == 3)
-            {
-                p.Duck = true;
-                p.Location.Height = 30;
-            }
 
-            p.Location.X = warp_exit.X + warp_exit.Width + 8;
-            p.Location.Y = warp_exit.Y + warp_exit.Height - p.Location.Height - 2;
+                p.Direction = -p.Direction;
 
-            if(p.Mount == 0)
-                p.Frame = 1;
-
-            p.Direction = -1;
-            if(p.HoldingNPC > 0)
-            {
-                if(p.State == 1)
-                    p.Frame = 5;
+                if(warp_dir_exit == LevelDoor::EXIT_RIGHT)
+                    NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
                 else
-                    p.Frame = 8;
-
-                p.Direction = 1; // Makes always true
-                NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
-//                    if(p.Direction > 0) // always true
-                NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
-//                    else
-//                        NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
+                    NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
             }
         }
 
@@ -591,11 +564,6 @@ void PlayerEffectWarpPipe(int A)
             treeNPCUpdate(p.HoldingNPC);
 
         p.Effect2 = 100;
-        if(p.Duck)
-        {
-            if(warp_dir_exit == 1 || warp_dir_exit == 3)
-                UnDuck(Player[A]);
-        }
 
         CheckSection(A);
 
