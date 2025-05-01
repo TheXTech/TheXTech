@@ -1389,6 +1389,10 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
     if(warp.LevelEnt)
         return false;
 
+    // can't enter pipe/door warps from maze zone
+    if(plr.CurMazeZone && (warp.Effect == 1 || warp.Effect == 2))
+        return false;
+
     bool canWarp = false;
 
     if(warp.Effect == 3) // Portal
@@ -1531,10 +1535,22 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
             return true;
         }
 
-        plr.Location.X = exit.X + (exit.Width - plr.Location.Width) / 2;
-        plr.Location.Y = exit.Y + exit.Height - plr.Location.Height - 0.1_n;
-        CheckSection(A);
         plr.WarpCD = (warp.Effect == 3) ? 10 : 50;
+
+        num_t off_x = (exit.Width - plr.Location.Width) / 2;
+        num_t off_y = exit.Height - plr.Location.Height - 0.1_n;
+
+        // special logic to keep location correct in maze zones
+        if(plr.CurMazeZone)
+        {
+            off_x = plr.Location.X - entrance.X;
+            off_y = plr.Location.Y - entrance.Y;
+            plr.WarpCD = 80;
+        }
+
+        plr.Location.X = exit.X + off_x;
+        plr.Location.Y = exit.Y + off_y;
+        CheckSection(A);
 
         const Screen_t& screen = ScreenByPlayer(A);
         int vscreen_A = vScreenIdxByPlayer(A);
@@ -1565,6 +1581,16 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 
                     o_p.Location.X = exit.X + (exit.Width - o_p.Location.Width) / 2;
                     o_p.Location.Y = exit.Y + exit.Height - o_p.Location.Height - 0.1_n;
+
+                    // override if in maze zone
+                    if(plr.CurMazeZone)
+                    {
+                        o_p.CurMazeZone = plr.CurMazeZone;
+                        o_p.MazeZoneStatus = plr.MazeZoneStatus;
+                        o_p.Location.X = plr.Location.X;
+                        o_p.Location.Y = plr.Location.Y;
+                    }
+
                     CheckSection(o_A);
 
                     if(warp.Effect != 3) // Don't zero speed when passing a portal warp
