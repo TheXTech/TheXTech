@@ -849,6 +849,10 @@ void NPCMovementLogic_Wings(int A, const num_t speedVar)
     if(NPC[A].Stuck && !NPC[A].Projectile)
         NPC[A].Location.SpeedX = 0;
 
+    // slightly slower terminal falling velocity than normal (normal is 8)
+    if(NPC[A].Location.SpeedY >= 6)
+        NPC[A].Location.SpeedY = 6;
+
     // apply speed
     NPC[A].Location.X += NPC[A].Location.SpeedX.times(speedVar);
     NPC[A].Location.Y += NPC[A].Location.SpeedY;
