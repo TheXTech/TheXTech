@@ -478,12 +478,15 @@ void DrawEditorLevel(int Z)
             NPC[0] = e.NPC;
             NPCFrames(0);
             e.NPC = NPC[0];
-
             auto &n = e.NPC;
+
+            int sX = camX + s_round2int(n.Location.X);
+            int sY = camY + s_round2int(n.Location.Y);
+
             if(n->WidthGFX == 0)
             {
-                XRender::renderTextureBasic(camX + s_round2int(n.Location.X) + n->FrameOffsetX,
-                                      camY + s_round2int(n.Location.Y) + n->FrameOffsetY,
+                XRender::renderTextureBasic(sX + n->FrameOffsetX,
+                                      sY + n->FrameOffsetY,
                                       (int)n.Location.Width,
                                       (int)n.Location.Height,
                                       GFXNPC[n.Type], 0, n.Frame * (int)n.Location.Height);
@@ -504,12 +507,12 @@ void DrawEditorLevel(int Z)
                         dH = NPCHeightGFX(n.Special);
                     }
 
-                    int sX = s_round2int(n.Location.X + n.Location.Width / 2) - dW / 2;
-                    int sY = s_round2int(n.Location.Y + n.Location.Height / 2) - dH / 2;
+                    int cont_sX = camX + s_round2int(n.Location.X + n.Location.Width / 2) - dW / 2;
+                    int cont_sY = camY + s_round2int(n.Location.Y + n.Location.Height / 2) - dH / 2;
                     B = EditorNPCFrame(NPCID(n.Special), n.Direction);
 
-                    XRender::renderTextureBasic(camX + sX + n->FrameOffsetX,
-                                          camY + sY,
+                    XRender::renderTextureBasic(cont_sX + n->FrameOffsetX,
+                                          cont_sY,
                                           dW, dH,
                                           GFXNPC[n.Special], 0, B * dH);
                 }
@@ -519,6 +522,9 @@ void DrawEditorLevel(int Z)
                                       n->WidthGFX, n->HeightGFX, GFXNPC[n.Type],
                                       0, n.Frame * n->HeightGFX);
             }
+
+            if(e.NPC.Wings)
+                DrawNPCWings(e.NPC, sX, sY, XTColor());
 
             s_drawNpcExtra(Z, camX, camY, n);
         }
