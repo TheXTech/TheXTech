@@ -81,11 +81,6 @@ static unsigned int g_totalMusicWorld = 0;
 //! Total count of special music
 static unsigned int g_totalMusicSpecial = 0;
 
-//! Enable using the unique iceball SFX when available
-static bool s_useIceBallSfx = false;
-//! Enable using of the new ice SFX: NPC freeze and breaking of the frozen NPC
-static bool s_useNewIceSfx = false;
-
 static int s_loaderEffect = -1;
 
 static int s_curMusic = -1;
@@ -802,8 +797,6 @@ void InitSound()
     IniProcessing sounds = Files::load_ini(sfxIni);
     sounds.beginGroup("sound-main");
     sounds.read("total", g_totalSounds, 0);
-    sounds.read("use-iceball-sfx", s_useIceBallSfx, false);
-    sounds.read("use-new-ice-sfx", s_useNewIceSfx, false);
     bool playerUseNPCHammer;
     bool playerUseOwnHammer;
     sounds.read("player-use-npc-hammer-sfx", playerUseNPCHammer, false);
@@ -837,8 +830,6 @@ void InitSound()
         playerHammerSFX = SFX_Throw;
     else
         playerHammerSFX = SFX_Fireball;
-
-    UpdateLoad();
 }
 
 static int s_soundDelay(int A)
@@ -950,12 +941,6 @@ void PlaySoundInternal(int A, int loops, int volume, int l, int r)
 
     if(A < 1 || A - 1 > (int)s_sfxEffects.size() || s_sfxEffects[A - 1] == -1 || !g_config.sfx_modern) // Play fallback sound for the missing SFX
         A = getFallbackSfx(A);
-    else if(!s_useIceBallSfx && A == SFX_Iceball)
-        A = SFX_Fireball; // Fell back into fireball when iceball sound isn't preferred
-    else if(!s_useIceBallSfx && A == SFX_HeroIce)
-        A = SFX_HeroFire;
-    else if(!s_useNewIceSfx && (A == SFX_Freeze || A == SFX_Icebreak))
-        A = SFX_ShellHit; // Restore the old behavior
 
     if(g_ClonedPlayerMode && A == SFX_Skid)
         return;
