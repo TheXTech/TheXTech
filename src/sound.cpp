@@ -470,20 +470,20 @@ static void RestoreSfx(SFX_t &u)
 {
     if(u.isCustom)
     {
-        if((u.chunk || u.music || u.isSilent) && (u.chunkOrig || u.musicOrig || u.isSilentOrig))
-        {
-            if(u.chunk)
-                Mix_FreeChunk(u.chunk);
+        if(u.chunk)
+            Mix_FreeChunk(u.chunk);
 
-            if(u.music)
-                Mix_FreeMusic(u.music);
+        if(u.music)
+            Mix_FreeMusic(u.music);
 
-            u.chunk = u.chunkOrig;
-            u.music = u.musicOrig;
-            u.isSilent = u.isSilentOrig;
-            u.chunkOrig = nullptr;
-            u.musicOrig = nullptr;
-        }
+        u.chunk = u.chunkOrig;
+        u.music = u.musicOrig;
+        u.isSilent = u.isSilentOrig;
+
+        u.chunkOrig = nullptr;
+        u.musicOrig = nullptr;
+        u.isSilentOrig = false;
+
         u.isCustom = false;
     }
 }
@@ -756,12 +756,17 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
         pLogWarning("Unknown music alias '%s'", Alias.c_str());
 }
 
+static int getFallbackSfx(int A);
 void PlaySfx_Blocking(int Alias, int loops, int volume, uint8_t left, uint8_t right)
 {
     if(!g_mixerLoaded || (int)g_config.audio_sfx_volume == 0)
         return;
 
     auto sfx = sound.find(Alias);
+
+    if(sfx == sound.end() || (!sfx->second.chunk && !sfx->second.music && !sfx->second.isSilent))
+        sfx = sound.find(getFallbackSfx(Alias));
+
     if(sfx != sound.end())
     {
         auto &s = sfx->second;
