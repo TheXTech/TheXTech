@@ -1226,6 +1226,8 @@ interrupt_Activation:
                             if(NPC[A].Special == 0)
                                 NPC[A].Special = NPCID_VEGGIE_RANDOM;
 
+                            // START UNBURY ROUTINE
+
                             if(NPC[A].Generator)
                             {
                                 NPC[A].Generator = false;
@@ -1233,7 +1235,12 @@ interrupt_Activation:
                             }
 
                             NPC[A].Frame = 0;
+                            // NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
                             NPC[A].Type = NPCID(NPC[A].Special);
+
+                            // MISSING RANDOM_POWER
+
+                            // CharStuff(A);
                             NPC[A].Special = 0;
                             NPC[A].Wings = NPC[A].DefaultWings;
 
@@ -1243,14 +1250,21 @@ interrupt_Activation:
                                 NPC[A].Type = NPCID_ITEM_POD;
                             }
 
-                            if(!(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_KEY ||
-                                 NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT || NPC[A].Type == NPCID_BLU_BOOT ||
-                                 NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_GRN_BOOT ||
-                                 // Duplicated segment [PVS Studio]
-                                 // NPC[A].Type == NPCID_BLU_BOOT ||
-                                 NPC[A].Type == NPCID_TOOTHYPIPE || NPCIsAnExit(NPC[A])))
+                            if(!(NPC[A].Type == NPCID_CANNONENEMY
+                                || NPC[A].Type == NPCID_CANNONITEM
+                                || NPC[A].Type == NPCID_SPRING
+                                || NPC[A].Type == NPCID_KEY
+                                || NPC[A].Type == NPCID_COIN_SWITCH
+                                || NPC[A].Type == NPCID_TIME_SWITCH
+                                || NPC[A].Type == NPCID_TNT
+                                || NPC[A].Type == NPCID_GRN_BOOT
+                                || NPC[A].Type == NPCID_RED_BOOT
+                                || NPC[A].Type == NPCID_BLU_BOOT
+                                || NPC[A].Type == NPCID_TOOTHYPIPE
+                                || NPCIsAnExit(NPC[A])))
                             {
-                                NPC[A].DefaultType = NPCID_NULL;
+                                // if(!BattleMode)
+                                    NPC[A].DefaultType = NPCID_NULL;
                             }
 
                             NPC[A].Location.Height = NPC[A]->THeight;
@@ -1267,6 +1281,8 @@ interrupt_Activation:
                                 NPC[A].Location.set_width_center(NPC[A]->TWidth);
                                 NPC[A].Location.set_height_center(NPC[A]->THeight);
                             }
+
+                            // END UNBURY ROUTINE
 
                             NPCQueues::Unchecked.push_back(A);
                         }

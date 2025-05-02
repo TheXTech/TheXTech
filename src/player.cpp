@@ -4969,12 +4969,22 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     if(NPC[p.StandingOnNPC].Type == NPCID_ITEM_BURIED)
                     {
                         p.Location.SpeedX += NPC[p.StandingOnNPC].Location.SpeedX;
+
                         NPC[p.StandingOnNPC].Direction = p.Direction;
-                        NPC[p.StandingOnNPC].Generator = false;
+
+                        // START UNBURY ROUTINE
+
+                        if(NPC[p.StandingOnNPC].Generator)
+                        {
+                            NPC[p.StandingOnNPC].Generator = false;
+                            NPCQueues::update(p.StandingOnNPC);
+                        }
+
                         NPC[p.StandingOnNPC].Frame = 0;
                         NPC[p.StandingOnNPC].Frame = EditorNPCFrame(NPC[p.StandingOnNPC].Type, NPC[p.StandingOnNPC].Direction);
                         NPC[p.StandingOnNPC].Type = NPCID(NPC[p.StandingOnNPC].Special);
 
+                        // NOT in v2 or v1
                         if(NPC[p.StandingOnNPC].Type == NPCID_RANDOM_POWER)
                         {
                             NPC[p.StandingOnNPC].Type = RandomBonus();
@@ -4991,7 +5001,18 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                             NPC[p.StandingOnNPC].Type = NPCID_ITEM_POD;
                         }
 
-                        if(!(NPC[p.StandingOnNPC].Type == NPCID_CANNONENEMY || NPC[p.StandingOnNPC].Type == NPCID_CANNONITEM || NPC[p.StandingOnNPC].Type == NPCID_SPRING || NPC[p.StandingOnNPC].Type == NPCID_KEY || NPC[p.StandingOnNPC].Type == NPCID_COIN_SWITCH || NPC[p.StandingOnNPC].Type == NPCID_GRN_BOOT || NPC[p.StandingOnNPC].Type == NPCID_RED_BOOT || NPC[p.StandingOnNPC].Type == NPCID_BLU_BOOT || NPC[p.StandingOnNPC].Type == NPCID_TOOTHYPIPE || NPCIsAnExit(NPC[p.StandingOnNPC])))
+                        if(!(NPC[p.StandingOnNPC].Type == NPCID_CANNONENEMY
+                            || NPC[p.StandingOnNPC].Type == NPCID_CANNONITEM
+                            || NPC[p.StandingOnNPC].Type == NPCID_SPRING
+                            || NPC[p.StandingOnNPC].Type == NPCID_KEY
+                            || NPC[p.StandingOnNPC].Type == NPCID_COIN_SWITCH
+                            // || NPC[p.StandingOnNPC].Type == NPCID_TIME_SWITCH
+                            // || NPC[p.StandingOnNPC].Type == NPCID_TNT
+                            || NPC[p.StandingOnNPC].Type == NPCID_GRN_BOOT
+                            || NPC[p.StandingOnNPC].Type == NPCID_RED_BOOT
+                            || NPC[p.StandingOnNPC].Type == NPCID_BLU_BOOT
+                            || NPC[p.StandingOnNPC].Type == NPCID_TOOTHYPIPE
+                            || NPCIsAnExit(NPC[p.StandingOnNPC])))
                         {
                             if(!BattleMode)
                                 NPC[p.StandingOnNPC].DefaultType = NPCID_NULL;
@@ -5009,6 +5030,8 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                             NPC[p.StandingOnNPC].Location.set_width_center(NPC[p.StandingOnNPC]->TWidth);
                             NPC[p.StandingOnNPC].Location.set_height_center(NPC[p.StandingOnNPC]->THeight);
                         }
+
+                        // END UNBURY ROUTINE
 
                         NPCFrames(p.StandingOnNPC);
 
