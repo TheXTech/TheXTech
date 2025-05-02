@@ -5095,8 +5095,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         NPC[p.HoldingNPC].Special2 = 0;
                     }
 
-                    // at once point this was SFX_FlameThrower
-                    PlaySoundSpatial(SFX_HeroFire, p.Location);
+                        PlaySoundSpatial(SFX_FlameThrower, p.Location);
 
                     // For B = 1 To 3
                         numNPCs++;

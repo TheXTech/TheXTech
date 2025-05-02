@@ -1457,7 +1457,7 @@ static const std::unordered_map<int, int> s_soundFallback =
     {SFX_FireBossKilled, SFX_SickBossKilled},
     {SFX_HeroIce, SFX_HeroFire},
     {SFX_HeroFireRod, SFX_HeroFire},
-    // {SFX_FlameThrower, SFX_HeroFire}, // unused in asset packs, removed for now
+    {SFX_FlameThrower, SFX_HeroFire},
     {SFX_FlagExit, SFX_TapeExit},
     {SFX_PlayerHeavy, SFX_Fireball},
 };
