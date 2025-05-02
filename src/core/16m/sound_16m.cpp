@@ -866,6 +866,11 @@ static const std::unordered_map<int, int> s_soundFallback =
     {SFX_Icebreak, SFX_ShellHit},
     {SFX_SproutVine, SFX_ItemEmerge},
     {SFX_FireBossKilled, SFX_SickBossKilled},
+    {SFX_HeroIce, SFX_HeroFire},
+    {SFX_HeroFireRod, SFX_HeroFire},
+    {SFX_FlameThrower, SFX_HeroFire},
+    {SFX_FlagExit, SFX_TapeExit},
+    {SFX_PlayerHeavy, SFX_Fireball},
 };
 
 static int getFallbackSfx(int A)
@@ -917,7 +922,7 @@ void PlaySoundInternal(int A, int loops, int volume, int l, int r)
 
     UNUSED(loops);
 
-    if(A > (int)g_totalSounds || !g_config.sfx_modern) // Play fallback sound for the missing SFX
+    if(A - 1 > s_sfxEffects.size() || s_sfxEffects[A - 1] == -1 || !g_config.sfx_modern) // Play fallback sound for the missing SFX
         A = getFallbackSfx(A);
     else if(!s_useIceBallSfx && A == SFX_Iceball)
         A = SFX_Fireball; // Fell back into fireball when iceball sound isn't preferred
