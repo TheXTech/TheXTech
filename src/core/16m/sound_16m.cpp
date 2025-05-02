@@ -841,44 +841,70 @@ void InitSound()
     UpdateLoad();
 }
 
-static const std::unordered_map<int, int> s_soundDelays =
+static int s_soundDelay(int A)
 {
-    {2, 12}, {3, 12},  {4, 12},  {5, 30}, {8, 10},  {9, 4},
-    {10, 8}, {12, 10}, {17, 10}, {26, 8}, {31, 20}, {37, 10},
-    {42, 16},{50, 8},  {54, 8},  {71, 9}, {74, 8},  {81, 5},
-    {86, 8}, {SFX_Icebreak, 4}
-};
+    switch(A)
+    {
+    case SFX_Stomp:
+    case SFX_BlockHit:
+    case SFX_BlockSmashed:
+        return 12;
+    case SFX_PlayerShrink:
+        return 30;
+    case SFX_PlayerDied:
+    case SFX_GotItem:
+    case SFX_Warp:
+    case SFX_Stone:
+        return 10;
+    case SFX_Skid:
+    case SFX_Slide:
+    case SFX_PetTongue:
+    case SFX_PlayerDied2:
+    case SFX_Saw:
+    case SFX_HeroDash:
+        return 8;
+    case SFX_Key:
+        return 20;
+    case SFX_BigFireball:
+        return 16;
+    case SFX_Climbing:
+        return 9;
+    case SFX_HeroRupee:
+        return 5;
+    default:
+        return 4;
+    }
+}
 
 static void s_resetSoundDelay(int A)
 {
     // set the delay before a sound can be played again
-    auto i = s_soundDelays.find(A);
-    if(i == s_soundDelays.end())
-        SoundPause[A] = 4;
-    else
-        SoundPause[A] = i->second;
+    SoundPause[A] = s_soundDelay(A);
 }
-
-static const std::unordered_map<int, int> s_soundFallback =
-{
-    {SFX_Iceball, SFX_Fireball},
-    {SFX_Freeze, SFX_ShellHit},
-    {SFX_Icebreak, SFX_ShellHit},
-    {SFX_SproutVine, SFX_ItemEmerge},
-    {SFX_FireBossKilled, SFX_SickBossKilled},
-    {SFX_HeroIce, SFX_HeroFire},
-    {SFX_HeroFireRod, SFX_HeroFire},
-    {SFX_FlameThrower, SFX_HeroFire},
-    {SFX_FlagExit, SFX_TapeExit},
-    {SFX_PlayerHeavy, SFX_Fireball},
-};
 
 static int getFallbackSfx(int A)
 {
-    auto fb = s_soundFallback.find(A);
-    if(fb != s_soundFallback.end())
-        A = fb->second;
-    return A;
+    switch(A)
+    {
+    case SFX_Iceball:
+    case SFX_PlayerHeavy:
+        return SFX_Fireball;
+    case SFX_Freeze:
+    case SFX_Icebreak:
+        return SFX_ShellHit;
+    case SFX_SproutVine:
+        return SFX_ItemEmerge;
+    case SFX_FireBossKilled:
+        return SFX_SickBossKilled;
+    case SFX_HeroIce:
+    case SFX_HeroFireRod:
+    case SFX_FlameThrower:
+        return SFX_HeroFire;
+    case SFX_FlagExit:
+        return SFX_TapeExit;
+    default:
+        return A;
+    }
 }
 
 void PlaySoundInternal(int A, int loops, int volume, int l, int r);
@@ -922,7 +948,7 @@ void PlaySoundInternal(int A, int loops, int volume, int l, int r)
 
     UNUSED(loops);
 
-    if(A - 1 > s_sfxEffects.size() || s_sfxEffects[A - 1] == -1 || !g_config.sfx_modern) // Play fallback sound for the missing SFX
+    if(A < 1 || A - 1 > (int)s_sfxEffects.size() || s_sfxEffects[A - 1] == -1 || !g_config.sfx_modern) // Play fallback sound for the missing SFX
         A = getFallbackSfx(A);
     else if(!s_useIceBallSfx && A == SFX_Iceball)
         A = SFX_Fireball; // Fell back into fireball when iceball sound isn't preferred
