@@ -2130,11 +2130,7 @@ void NPCSpecial(int A)
     else if(npc.Type == NPCID_WALL_SPARK || npc.Type == NPCID_WALL_BUG || npc.Type == NPCID_WALL_TURTLE) // sparky
     {
         // was F
-        Location_t tempLocation;
         int speed_mult = (npc.Type == NPCID_WALL_SPARK) ? 2 : 1;
-
-        tempBool = false;
-        bool tempBool2 = false;
 
         // special stores wall attachment side, special2 stores current direction (1 is right, -1 is left)
 
@@ -2152,20 +2148,21 @@ void NPCSpecial(int A)
             npc.Special2 = npc.Direction;
         }
 
-        if(npc.Slope > 0)
+        // handle floor slopes
+        if(npc.Slope > 0 && (npc.Special == 2 || npc.Special == 4))
         {
+            // "right side of a wall" -> moving left
             if(npc.Special == 2)
-            {
                 npc.Special2 = 1;
-                npc.Special = 1;
-            }
+            // "left side of a wall" -> moving left
             else if(npc.Special == 4)
-            {
                 npc.Special2 = -1;
-                npc.Special = 1;
-            }
+
+            // you're on a floor!
+            npc.Special = 1;
         }
 
+        // timer for being unsupported while on floor
         npc.Special5 += 1;
         if(npc.Special5 >= 8 && npc.Special == 1)
         {
@@ -2180,6 +2177,8 @@ void NPCSpecial(int A)
         if(npc.Special < 1 || npc.Special > 4)
             return;
 
+        // set speed: push NPC into wall it is currently climbing
+        // FIXME: is Special2 ever anything other than -1 or 1 at this point? Would be nice to remove the abs calls.
         if(npc.Special == 1)
         {
             npc.Location.SpeedY = speed_mult * std::abs(npc.Special2);
@@ -2201,20 +2200,20 @@ void NPCSpecial(int A)
             npc.Location.SpeedX = -std::abs(npc.Special2);
         }
 
-        tempBool = false;
+        // check whether the NPC is about to turn an inner corner (eg, hit a wall when on ground)
+        bool inner_corner = false;
+        Location_t tempLocation;
         tempLocation.Width = 2;
         tempLocation.Height = 2;
         tempLocation.X = npc.Location.X + npc.Location.Width / 2 - 1;
         tempLocation.Y = npc.Location.Y + npc.Location.Height / 2 - 1;
 
+        // check the point 18px to the left/right of the NPC's center (horizontal climbing)
         if(npc.Special == 1 || npc.Special == 3)
             tempLocation.X += 18 * npc.Special2;
+        // check the point 18px to the top/bottom of the NPC's center (vertical climbing)
         else if(npc.Special == 2 || npc.Special == 4)
             tempLocation.Y += 18 * npc.Special2;
-
-        // fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
-        // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
-        // blockTileGet(tempLocation, fBlock, lBlock);
 
         for(Block_t& block : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
         {
@@ -2228,180 +2227,149 @@ void NPCSpecial(int A)
 
                 if(CheckCollision(tempLocation, block.Location))
                 {
-                    if(npc.Special == 1)
-                    {
-                        if(npc.Special2 == 1)
-                        {
-                            npc.Location.SpeedY = 0;
-                            npc.Special = 2;
-                            npc.Special2 = -1;
-                        }
-                        else
-                        {
-                            npc.Location.SpeedY = 0;
-                            npc.Special = 4;
-                            npc.Special2 = -1;
-                        }
-                    }
-                    else if(npc.Special == 2)
-                    {
-                        if(npc.Special2 == 1)
-                        {
-                            npc.Special = 1;
-                            npc.Special2 = -1;
-                        }
-                        else
-                        {
-                            npc.Special = 3;
-                            npc.Special2 = -1;
-                        }
-                    }
-                    else if(npc.Special == 3)
-                    {
-                        if(npc.Special2 == 1)
-                        {
-                            npc.Special = 2;
-                            npc.Special2 = 1;
-                        }
-                        else
-                        {
-                            npc.Special = 4;
-                            npc.Special2 = 1;
-                        }
-                    }
-                    else if(npc.Special == 4)
-                    {
-                        if(npc.Special2 == 1)
-                        {
-                            npc.Special = 1;
-                            npc.Special2 = 1;
-                        }
-                        else
-                        {
-                            npc.Special = 3;
-                            npc.Special2 = 1;
-                        }
-                    }
-                    tempBool = true;
+                    inner_corner = true;
                     break;
                 }
             }
         }
 
-        if(!tempBool)
+        // routine for turning an inner corner
+        if(inner_corner)
         {
-            if(npc.Special == 1)
-            {
-                tempLocation.Width = npc.Location.Width + 2;
-                tempLocation.Height = 8;
-                tempLocation.X = npc.Location.X;
-                tempLocation.Y = npc.Location.Y + npc.Location.Height;
-            }
-            else if(npc.Special == 2)
-            {
-                tempLocation.Width = 8;
-                tempLocation.Height = npc.Location.Height;
-                tempLocation.Y = npc.Location.Y;
-                tempLocation.X = npc.Location.X + npc.Location.Width;
-            }
-            else if(npc.Special == 3)
-            {
-                tempLocation.Width = npc.Location.Width;
-                tempLocation.Height = 8;
-                tempLocation.X = npc.Location.X;
-                tempLocation.Y = npc.Location.Y - 8;
-            }
-            else if(npc.Special == 4)
-            {
-                tempLocation.Width = 8;
-                tempLocation.Height = npc.Location.Height;
-                tempLocation.Y = npc.Location.Y;
-                tempLocation.X = npc.Location.X - 8;
-            }
-            // fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
-            // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
-            // blockTileGet(tempLocation, fBlock, lBlock);
+            int old_side = npc.Special;
 
-            for(BlockRef_t block_p : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
+            // on a ceiling / floor?
+            if(npc.Special == 1 || npc.Special == 3)
             {
-                Block_t& block = *block_p;
+                // going right -> hit left side of wall
+                if(npc.Special2 == 1)
+                    npc.Special = 2;
+                // hit right side of wall
+                else
+                    npc.Special = 4;
 
-                if(!block.Hidden && !BlockNoClipping[block.Type] && !BlockIsSizable[block.Type] && !BlockOnlyHitspot1[block.Type])
+                // was on floor -> now you're going up
+                if(old_side == 1)
                 {
-                    if(CheckCollision(tempLocation, block.Location))
-                    {
-                        if(npc.Special == 1)
-                            npc.Special3 = (vbint_t)block_p;
-                        else if(npc.Special == 3)
-                        {
-                            if(BlockSlope2[block.Type] != 0)
-                                npc.Location.SpeedY = npc.Location.SpeedY * speed_mult;
-                        }
-                        tempBool2 = true;
-                        break;
-                    }
+                    npc.Location.SpeedY = 0;
+                    npc.Special2 = -1;
                 }
+                // now you're going down
+                else
+                    npc.Special2 = 1;
+            }
+            // on a wall?
+            else if(npc.Special == 2 || npc.Special == 4)
+            {
+                // going down -> hit a floor
+                if(npc.Special2 == 1)
+                    npc.Special = 1;
+                // hit a ceiling
+                else
+                    npc.Special = 3;
+
+                // was on left side of wall -> now you're going left
+                if(old_side == 2)
+                    npc.Special2 = -1;
+                // now you're going right
+                else
+                    npc.Special2 = 1;
             }
 
-            if(!tempBool2)
+            return;
+        }
+
+        // check whether the wall the NPC is pressing into is gone -> it's on an outer corner
+        bool outer_corner = true;
+
+        // check the 8px below (case 1) / above (case 3) the NPC
+        if(npc.Special == 1 || npc.Special == 3)
+        {
+            tempLocation.Width = npc.Location.Width + ((npc.Special == 1) ? 2 : 0);
+            tempLocation.Height = 8;
+            tempLocation.X = npc.Location.X;
+            tempLocation.Y = npc.Location.Y + ((npc.Special == 1) ? npc.Location.Height : -8);
+        }
+        // check the 8px to the right (case 2) / left (case 4) of the NPC
+        else if(npc.Special == 2 || npc.Special == 4)
+        {
+            tempLocation.Width = 8;
+            tempLocation.Height = npc.Location.Height;
+            tempLocation.Y = npc.Location.Y;
+            tempLocation.X = npc.Location.X + ((npc.Special == 2) ? npc.Location.Width : -8);
+        }
+
+        for(BlockRef_t block_p : treeFLBlockQuery(tempLocation, SORTMODE_COMPAT))
+        {
+            Block_t& block = *block_p;
+
+            if(!block.Hidden && !BlockNoClipping[block.Type] && !BlockIsSizable[block.Type] && !BlockOnlyHitspot1[block.Type])
             {
-                if(npc.Special == 1)
+                if(CheckCollision(tempLocation, block.Location))
                 {
-                    if(npc.Special2 == 1)
+                    // this saves the last Block that the NPC was on top of
+                    if(npc.Special == 1)
+                        npc.Special3 = (vbint_t)block_p;
+                    // this makes the climbing work when on a ceiling slope, without slamming into ceilings otherwise
+                    else if(npc.Special == 3)
                     {
-                        if(npc.Special3 > 0)
-                        {
-                            npc.Location.X = Block[npc.Special3].Location.X + Block[npc.Special3].Location.Width + 2;
-                            npc.Location.Y += 2;
-                        }
-                        npc.Special = 4;
-                        npc.Special2 = 1;
+                        if(BlockSlope2[block.Type] != 0)
+                            npc.Location.SpeedY *= speed_mult;
                     }
-                    else
-                    {
-                        npc.Special = 2;
-                        npc.Special2 = 1;
-                    }
+
+                    outer_corner = false;
+                    break;
                 }
-                else if(npc.Special == 2)
+            }
+        }
+
+        // outer corner turning logic
+        if(outer_corner)
+        {
+            int old_side = npc.Special;
+
+            // moving on floor / ceiling
+            if(npc.Special == 1 || npc.Special == 3)
+            {
+                // was moving right -> now you're on right side of floor/ceiling block
+                if(npc.Special2 == 1)
                 {
-                    if(npc.Special2 == 1)
+                    // VB6 logic: turn right off of floor extra beautifully (but note that this could potentially cause the NPC to return to a location from long ago)
+                    if(npc.Special == 1 && npc.Special3 > 0)
                     {
-                        npc.Special = 3;
-                        npc.Special2 = 1;
+                        npc.Location.X = Block[npc.Special3].Location.X + Block[npc.Special3].Location.Width + 2;
+                        npc.Location.Y += 2;
                     }
-                    else
-                    {
-                        npc.Special = 1;
-                        npc.Special2 = 1;
-                    }
+
+                    npc.Special = 4;
                 }
-                else if(npc.Special == 3)
-                {
-                    if(npc.Special2 == 1)
-                    {
-                        npc.Special = 4;
-                        npc.Special2 = -1;
-                    }
-                    else
-                    {
-                        npc.Special = 2;
-                        npc.Special2 = -1;
-                    }
-                }
-                else if(npc.Special == 4)
-                {
-                    if(npc.Special2 == 1)
-                    {
-                        npc.Special = 3;
-                        npc.Special2 = -1;
-                    }
-                    else
-                    {
-                        npc.Special = 1;
-                        npc.Special2 = -1;
-                    }
-                }
+                // now you're on left side of floor/ceiling block
+                else
+                    npc.Special = 2;
+
+                // on floor -> moving down
+                if(old_side == 1)
+                    npc.Special2 = 1;
+                // on ceiling -> moving up
+                else
+                    npc.Special2 = -1;
+            }
+            // moving on wall
+            else if(npc.Special == 2 || npc.Special == 4)
+            {
+                // was moving down -> now you're on bottom of wall block
+                if(npc.Special2 == 1)
+                    npc.Special = 3;
+                // now you're on top of wall block
+                else
+                    npc.Special = 1;
+
+                // on left side of wall -> moving right
+                if(old_side == 2)
+                    npc.Special2 = 1;
+                // on right side of wall -> moving left
+                else
+                    npc.Special2 = -1;
             }
         }
     }
