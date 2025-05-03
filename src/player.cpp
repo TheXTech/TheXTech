@@ -4972,66 +4972,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
 
                         NPC[p.StandingOnNPC].Direction = p.Direction;
 
-                        // START UNBURY ROUTINE
-
-                        if(NPC[p.StandingOnNPC].Generator)
-                        {
-                            NPC[p.StandingOnNPC].Generator = false;
-                            NPCQueues::update(p.StandingOnNPC);
-                        }
-
-                        NPC[p.StandingOnNPC].Frame = 0;
-                        NPC[p.StandingOnNPC].Frame = EditorNPCFrame(NPC[p.StandingOnNPC].Type, NPC[p.StandingOnNPC].Direction);
-                        NPC[p.StandingOnNPC].Type = NPCID(NPC[p.StandingOnNPC].Special);
-
-                        // NOT in v2 or v1
-                        if(NPC[p.StandingOnNPC].Type == NPCID_RANDOM_POWER)
-                        {
-                            NPC[p.StandingOnNPC].Type = RandomBonus();
-                            NPC[p.StandingOnNPC].DefaultSpecial = NPC[p.StandingOnNPC].Type;
-                        }
-
-                        CharStuff(p.StandingOnNPC);
-                        NPC[p.StandingOnNPC].Special = 0;
-                        NPC[p.StandingOnNPC].Wings = NPC[p.StandingOnNPC].DefaultWings;
-
-                        if(NPCIsYoshi(NPC[p.StandingOnNPC]))
-                        {
-                            NPC[p.StandingOnNPC].Special = NPC[p.StandingOnNPC].Type;
-                            NPC[p.StandingOnNPC].Type = NPCID_ITEM_POD;
-                        }
-
-                        if(!(NPC[p.StandingOnNPC].Type == NPCID_CANNONENEMY
-                            || NPC[p.StandingOnNPC].Type == NPCID_CANNONITEM
-                            || NPC[p.StandingOnNPC].Type == NPCID_SPRING
-                            || NPC[p.StandingOnNPC].Type == NPCID_KEY
-                            || NPC[p.StandingOnNPC].Type == NPCID_COIN_SWITCH
-                            // || NPC[p.StandingOnNPC].Type == NPCID_TIME_SWITCH
-                            // || NPC[p.StandingOnNPC].Type == NPCID_TNT
-                            || NPC[p.StandingOnNPC].Type == NPCID_GRN_BOOT
-                            || NPC[p.StandingOnNPC].Type == NPCID_RED_BOOT
-                            || NPC[p.StandingOnNPC].Type == NPCID_BLU_BOOT
-                            || NPC[p.StandingOnNPC].Type == NPCID_TOOTHYPIPE
-                            || NPCIsAnExit(NPC[p.StandingOnNPC])))
-                        {
-                            if(!BattleMode)
-                                NPC[p.StandingOnNPC].DefaultType = NPCID_NULL;
-                        }
-
-                        NPC[p.StandingOnNPC].Location.Height = NPC[p.StandingOnNPC]->THeight;
-                        NPC[p.StandingOnNPC].Location.Width = NPC[p.StandingOnNPC]->TWidth;
-
-                        if(NPC[p.StandingOnNPC].Type == NPCID_VEGGIE_RANDOM)
-                        {
-                            B = iRand(9);
-                            NPC[p.StandingOnNPC].Type = NPCID(NPCID_VEGGIE_2 + B);
-                            if(NPC[p.StandingOnNPC].Type == NPCID_VEGGIE_RANDOM)
-                                NPC[p.StandingOnNPC].Type = NPCID_VEGGIE_1;
-                            NPC[p.StandingOnNPC].Location.set_width_center(NPC[p.StandingOnNPC]->TWidth);
-                            NPC[p.StandingOnNPC].Location.set_height_center(NPC[p.StandingOnNPC]->THeight);
-                        }
-
-                        // END UNBURY ROUTINE
+                        NPCUnbury(p.StandingOnNPC, 3);
 
                         NPCFrames(p.StandingOnNPC);
 

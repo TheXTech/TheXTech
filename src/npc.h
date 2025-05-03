@@ -88,6 +88,9 @@ bool npcHasFloor(const struct NPC_t &npc);
 bool NPCIsContainer(const NPC_t& npc);
 bool NPCNewContainerType(int Type);
 
+// NEW: release an NPC from burial -- only made because the call was duplicated in 3 places. If callsite is 0, the logic should be "correct".
+void NPCUnbury(int A, int Callsite);
+
 // totally new function, used in editor and level-loading
 bool NPCBansWings(const NPC_t& npc);
 

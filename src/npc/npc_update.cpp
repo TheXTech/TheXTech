@@ -1226,64 +1226,7 @@ interrupt_Activation:
                             if(NPC[A].Special == 0)
                                 NPC[A].Special = NPCID_VEGGIE_RANDOM;
 
-                            // START UNBURY ROUTINE
-
-                            if(NPC[A].Generator)
-                            {
-                                NPC[A].Generator = false;
-                                NPCQueues::update(A);
-                            }
-
-                            NPC[A].Frame = 0;
-                            // NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-                            NPC[A].Type = NPCID(NPC[A].Special);
-
-                            // MISSING RANDOM_POWER
-
-                            // CharStuff(A);
-                            NPC[A].Special = 0;
-                            NPC[A].Wings = NPC[A].DefaultWings;
-
-                            if(NPCIsYoshi(NPC[A]))
-                            {
-                                NPC[A].Special = NPC[A].Type;
-                                NPC[A].Type = NPCID_ITEM_POD;
-                            }
-
-                            if(!(NPC[A].Type == NPCID_CANNONENEMY
-                                || NPC[A].Type == NPCID_CANNONITEM
-                                || NPC[A].Type == NPCID_SPRING
-                                || NPC[A].Type == NPCID_KEY
-                                || NPC[A].Type == NPCID_COIN_SWITCH
-                                || NPC[A].Type == NPCID_TIME_SWITCH
-                                || NPC[A].Type == NPCID_TNT
-                                || NPC[A].Type == NPCID_GRN_BOOT
-                                || NPC[A].Type == NPCID_RED_BOOT
-                                || NPC[A].Type == NPCID_BLU_BOOT
-                                || NPC[A].Type == NPCID_TOOTHYPIPE
-                                || NPCIsAnExit(NPC[A])))
-                            {
-                                // if(!BattleMode)
-                                    NPC[A].DefaultType = NPCID_NULL;
-                            }
-
-                            NPC[A].Location.Height = NPC[A]->THeight;
-                            NPC[A].Location.Width = NPC[A]->TWidth;
-
-                            if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
-                            {
-                                int B = iRand(9);
-                                NPC[A].Type = NPCID(NPCID_VEGGIE_2 + B);
-
-                                if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
-                                    NPC[A].Type = NPCID_VEGGIE_1;
-
-                                NPC[A].Location.set_width_center(NPC[A]->TWidth);
-                                NPC[A].Location.set_height_center(NPC[A]->THeight);
-                            }
-
-                            // END UNBURY ROUTINE
-
+                            NPCUnbury(A, 1);
                             NPCQueues::Unchecked.push_back(A);
                         }
 

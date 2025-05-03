@@ -5790,6 +5790,79 @@ bool NPCIsContainer(const NPC_t& npc)
         || (NPCNewContainerType(npc.Type) && npc.Special != 0);
 }
 
+void NPCUnbury(int A, int Callsite)
+{
+    if(NPC[A].Generator)
+    {
+        NPC[A].Generator = false;
+        NPCQueues::update(A);
+    }
+
+    NPC[A].Frame = 0;
+
+    if(Callsite != 1)
+        NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
+
+    if(Callsite != 2)
+    {
+        NPC[A].Type = NPCID(NPC[A].Special);
+        NPC[A].Wings = NPC[A].DefaultWings;
+    }
+
+    if(Callsite != 1 && Callsite != 2 && NPC[A].Type == NPCID_RANDOM_POWER)
+    {
+        NPC[A].Type = RandomBonus();
+        NPC[A].DefaultSpecial = NPC[A].Type;
+    }
+
+    if(Callsite != 1)
+        CharStuff(A);
+
+    NPC[A].Special = 0;
+
+    if(NPCIsYoshi(NPC[A]))
+    {
+        NPC[A].Special = NPC[A].Type;
+        NPC[A].Type = NPCID_ITEM_POD;
+    }
+
+    if(Callsite != 2 && Callsite != 3 && (NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT))
+    {
+        // those types were in the below sequence of checks at Callsite 1
+    }
+    else if(!(NPC[A].Type == NPCID_CANNONENEMY
+        || NPC[A].Type == NPCID_CANNONITEM
+        || NPC[A].Type == NPCID_SPRING
+        || NPC[A].Type == NPCID_KEY
+        || NPC[A].Type == NPCID_COIN_SWITCH
+        // || NPC[A].Type == NPCID_TIME_SWITCH
+        // || NPC[A].Type == NPCID_TNT
+        || NPC[A].Type == NPCID_GRN_BOOT
+        || NPC[A].Type == NPCID_RED_BOOT
+        || NPC[A].Type == NPCID_BLU_BOOT
+        || NPC[A].Type == NPCID_TOOTHYPIPE
+        || NPCIsAnExit(NPC[A])))
+    {
+        if(Callsite == 1 || !BattleMode)
+            NPC[A].DefaultType = NPCID_NULL;
+    }
+
+    NPC[A].Location.Height = NPC[A]->THeight;
+    NPC[A].Location.Width = NPC[A]->TWidth;
+
+    if(Callsite != 2 && NPC[A].Type == NPCID_VEGGIE_RANDOM)
+    {
+        int B = iRand(9);
+        NPC[A].Type = NPCID(NPCID_VEGGIE_2 + B);
+
+        if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
+            NPC[A].Type = NPCID_VEGGIE_1;
+
+        NPC[A].Location.set_width_center(NPC[A]->TWidth);
+        NPC[A].Location.set_height_center(NPC[A]->THeight);
+    }
+}
+
 static bool s_TypeBansWings(NPCID Type)
 {
     const auto& tr = NPCTraits[Type];
