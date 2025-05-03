@@ -185,7 +185,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                             HitSpot = 0;
                                     }
 
-                                    // unified type-based cancellation / collision logic
+                                    // Unified type-based cancellation / collision logic -- prior to slope and lava checks. Deprecate this and don't allow users to define.
                                     if(NPC[A]->IsFish)
                                     {
                                         // fish ignore block collisions while out of water (eg, jumping)
@@ -372,6 +372,9 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                             if(HitSpot == 2 || HitSpot == 4)
                                                 HitSpot = 0;
                                         }
+
+                                        if(Block[B].tempBlockNpcType > 0)
+                                            HitSpot = 0;
 
                                         // hit a wall, cancel wings and switch routines
                                         if(HitSpot)
@@ -617,28 +620,8 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                         }
                                     }
 
-
-
-                                    if(NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPCID_WALL_TURTLE)
-                                    {
-                                        if(NPC[A].Special == 3 && (HitSpot == 2 || HitSpot == 4))
-                                        {
-                                            if(Block[B].Location.Y + Block[B].Location.Height <= NPC[A].Location.Y + 1)
-                                                HitSpot = 3;
-                                        }
-
-                                        if(Block[B].tempBlockNpcType > 0)
-                                            HitSpot = 0;
-                                    }
-
                                     if(BlockKills[Block[B].Type] && (HitSpot > 0 || NPC[A].Slope == B))
                                         NPCHit(A, 6, B);
-
-                                    if(NPC[A].Type == NPCID_ITEM_POD && HitSpot == 1)
-                                    {
-                                        if((NPC[A].Location.SpeedY > 2 && HitSpot == 1) || (NPC[A].Location.SpeedY < -2 && HitSpot == 3) || (NPC[A].Location.SpeedX > 2 && HitSpot == 4) || (NPC[A].Location.SpeedX < -2 && HitSpot == 2))
-                                            NPC[A].Special2 = 1;
-                                    }
 
                                     if(HitSpot == 5)
                                     {
@@ -649,10 +632,32 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                         }
                                     }
 
-                                    // beech koopa kicking an ice block
-                                    if(((g_config.fix_npc55_kick_ice_blocks && NPC[A].Type == NPCID_EXT_TURTLE) || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && Block[B].tempBlockNpcType == NPCID_SLIDE_BLOCK)
+                                    if(Block[B].tempBlockNpcType == NPCID_BOSS_CASE || Block[B].tempBlockNpcType == NPCID_BOSS_FRAGILE)
                                     {
-                                        if(HitSpot == 2 || HitSpot == 4)
+                                        if(NPC[A].Projectile)
+                                        {
+                                            NPCHit(Block[B].tempBlockNpcIdx, 3, A);
+                                            NPCHit(A, 4, Block[B].tempBlockNpcIdx);
+                                        }
+                                    }
+
+                                    // At this point, the hit is confirmed and the HitSpot will not change.
+
+                                    // Unified type-based logic on confirmed hit -- post slope and lava checks. Probably do allow users to define this for non-floor collisions
+                                    if(NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPCID_WALL_TURTLE)
+                                    {
+                                        if(NPC[A].Special == 3 && (HitSpot == 2 || HitSpot == 4))
+                                        {
+                                            if(Block[B].Location.Y + Block[B].Location.Height <= NPC[A].Location.Y + 1)
+                                                HitSpot = 3;
+                                        }
+                                    }
+                                    // beech koopa kicking an ice block
+                                    else if(NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4)
+                                    {
+                                        if(Block[B].tempBlockNpcType == NPCID_SLIDE_BLOCK
+                                            && (g_config.fix_npc55_kick_ice_blocks || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4)
+                                            && (HitSpot == 2 || HitSpot == 4))
                                         {
                                             if(NPC[A].Location.SpeedY == Physics.NPCGravity ||
                                                NPC[A].Location.SpeedY == 0 || NPC[A].Slope > 0 ||
@@ -667,37 +672,50 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                             }
                                         }
                                     }
-
-                                    if(Block[B].tempBlockNpcType == NPCID_BOSS_CASE || Block[B].tempBlockNpcType == NPCID_BOSS_FRAGILE)
+                                    // slightly rearranged -- note that these types ignore HitCode 4 and that ICE_CUBE is Killed by HitCode 3, so this is safe
+                                    else if(NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_ICE_CUBE)
                                     {
-                                        if(NPC[A].Projectile)
+                                        if(HitSpot == 2 || HitSpot == 4 || HitSpot == 5)
                                         {
-                                            NPCHit(Block[B].tempBlockNpcIdx, 3, A);
-                                            NPCHit(A, 4, Block[B].tempBlockNpcIdx);
+                                            if(Block[B].tempBlockNpcType == NPCID_ICE_CUBE)
+                                            {
+                                                NPCHit(Block[B].tempBlockNpcIdx, 3, Block[B].tempBlockNpcIdx);
+                                                NPC[Block[B].tempBlockNpcIdx].Location.SpeedX = -NPC[A].Location.SpeedX;
+                                                NPC[A].Multiplier += 1;
+                                            }
+
+                                            NPCHit(A, 3, A);
+                                        }
+                                        else if(NPC[A].Type == NPCID_ICE_CUBE && (HitSpot == 1 || HitSpot == 3 /* || HitSpot == 5*/))
+                                        {
+                                            if(NPC[A].Location.SpeedX > -Physics.NPCShellSpeed * 0.8_r && NPC[A].Location.SpeedX < Physics.NPCShellSpeed * 0.8_r)
+                                            {
+                                                if(NPC[A].Location.SpeedY > 5 || NPC[A].Location.SpeedY < -2)
+                                                    NPCHit(A, 3, A);
+                                            }
                                         }
                                     }
-
-
-
-                                    if((NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_ICE_CUBE) && (HitSpot == 2 || HitSpot == 4 || HitSpot == 5))
+                                    // quite rearranged. these came after the below pinch logic before.
+                                    // I confirmed that each of their NPCHit calls commute with being hit by NPC 0 with HitCode 3. -- ds-sloth
+                                    else if(NPC[A].Type == NPCID_PLR_ICEBALL)
                                     {
-                                        if(Block[B].tempBlockNpcType == NPCID_ICE_CUBE)
-                                        {
-                                            NPCHit(Block[B].tempBlockNpcIdx, 3, Block[B].tempBlockNpcIdx);
-                                            NPC[Block[B].tempBlockNpcIdx].Location.SpeedX = -NPC[A].Location.SpeedX;
-                                            NPC[A].Multiplier += 1;
-                                        }
-
-                                        NPCHit(A, 3, A);
+                                        if(HitSpot > 1 || (NPC[A].Special == 5 && HitSpot > 0))
+                                            NPCHit(A, 3, A);
                                     }
-
-                                    if(NPC[A].Type == NPCID_ICE_CUBE && (HitSpot == 1 || HitSpot == 3 || HitSpot == 5))
+                                    else if(NPC[A].Type == NPCID_ITEM_BUBBLE)
                                     {
-                                        if(NPC[A].Location.SpeedX > -Physics.NPCShellSpeed * 0.8_r && NPC[A].Location.SpeedX < Physics.NPCShellSpeed * 0.8_r)
-                                        {
-                                            if(NPC[A].Location.SpeedY > 5 || NPC[A].Location.SpeedY < -2)
-                                                NPCHit(A, 3, A);
-                                        }
+                                        if(!BlockIsSizable[Block[B].Type])
+                                            NPCHit(A, 3, A);
+                                    }
+                                    else if(NPC[A].Type == NPCID_CHAR3_HEAVY)
+                                    {
+                                        if(HitSpot > 0)
+                                            NPCHit(A, 3, A);
+                                    }
+                                    else if(NPC[A].Type == NPCID_PLR_FIREBALL)
+                                    {
+                                        if(NPC[A].Special == 5 && HitSpot > 0)
+                                            NPCHit(A, 3, A);
                                     }
 
                                     // dead code: this procedure isn't called for coins with NPC[A].Special == 0
@@ -793,18 +811,6 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                         }
                                     }
 
-                                    if((NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) && NPC[A].Special == 5 && HitSpot > 0)
-                                        NPCHit(A, 3, A);
-
-                                    if(NPC[A].Type == NPCID_PLR_ICEBALL && HitSpot > 1)
-                                        NPCHit(A, 3, A);
-
-                                    if(NPC[A].Type == NPCID_ITEM_BUBBLE && !BlockIsSizable[Block[B].Type])
-                                        NPCHit(A, 3, A);
-
-                                    if(NPC[A].Type == NPCID_CHAR3_HEAVY && HitSpot > 0)
-                                        NPCHit(A, 3, A);
-
                                     // safe to leave uninitialized, they're only read if g_config.fix_npc_downward_clip is set
                                     num_t tempHitOld;
                                     int tempHitOldBlock;
@@ -843,9 +849,13 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                                 NPC[A].Special2 = 0;
                                             }
                                         }
-                                        else if(NPC[A].Type == NPCID_SPIKY_BALL_S4)
-                                            NPC[A].Special = 1;
-                                        else if(NPC[A].Type == NPCID_GOALTAPE || NPC[A].Type == NPCID_FLAG_EXIT)
+                                        // item pod hatching (moved from above)
+                                        else if(NPC[A].Type == NPCID_ITEM_POD /* && HitSpot == 1 */)
+                                        {
+                                            if(NPC[A].Location.SpeedY > 2) /* && HitSpot == 1) || (NPC[A].Location.SpeedY < -2 && HitSpot == 3) || (NPC[A].Location.SpeedX > 2 && HitSpot == 4) || (NPC[A].Location.SpeedX < -2 && HitSpot == 2)) */
+                                                NPC[A].Special2 = 1;
+                                        }
+                                        else if(NPC[A].Type == NPCID_SPIKY_BALL_S4 || NPC[A].Type == NPCID_GOALTAPE || NPC[A].Type == NPCID_FLAG_EXIT)
                                             NPC[A].Special = 1;
                                         else if(NPC[A].Type == NPCID_SQUID_S3 || NPC[A].Type == NPCID_SQUID_S1)
                                             NPC[A].Special4 = 1;
@@ -1017,7 +1027,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                                     tempHit = 0;
                                                     tempHitOld = 0;
                                                 }
-                                                else if(NPC[A].Type != NPCID_TANK_TREADS && NPC[A].Type != NPCID_BULLET && NPC[A].Type != NPCID_PLR_FIREBALL)
+                                                else if(NPC[A].Type != NPCID_TANK_TREADS && NPC[A].Type != NPCID_BULLET /* && NPC[A].Type != NPCID_PLR_FIREBALL*/) // FIREBALL checked above
                                                 {
                                                     if(NPC[A]->MovesPlayer)
                                                     {
@@ -1199,7 +1209,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                                             tempHitIsSlope, &NPC[A]);
                                     }
 
-                                    if((NPC[A].Projectile && NPC[A].Type != NPCID_PLR_FIREBALL) != 0 && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != NPCID_METALBARREL && !(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG)) // Hit the block if the NPC is a projectile
+                                    if(NPC[A].Projectile && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != NPCID_METALBARREL && !(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG)) // Hit the block if the NPC is a projectile
                                     {
                                         if(HitSpot == 2 || HitSpot == 4 || HitSpot == 5)
                                         {
@@ -1257,7 +1267,6 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                 winningBlock = tempBlockHit2;
         }
 
-        // possible usually-nulled function pointer here: ceiling collision logic. Takes winningBlock. Returns true if we should set the NPC's speed / location by the ceiling, otherwise false.
         if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) // Kill the fireball
             NPCHit(A, 4);
         else if(NPC[A].Projectile || Block[winningBlock].Invis) // Hit the block hard if the NPC is a projectile
