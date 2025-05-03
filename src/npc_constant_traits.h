@@ -25,6 +25,14 @@
 
 #include "globals.h"
 
+// force-inline these definitions because they are often used in switch blocks depending only on NPC_t::Type
+// inlining allows the compiler to seek arithmetic patterns and to know that it is safe to reorder cases if desired
+// force-inlining should be used extremely sparingly but this only causes a 3kb codesize increase across the full application
+#if (defined(__GNUC__) || defined(__llvm__))
+#    define XT_FORCE_INLINE __attribute__((always_inline))
+#else
+#    define XT_FORCE_INLINE
+#endif
 
 // constant traits that determine NPC behavior based on Type
 // will be replaced with other mechanisms during the NPC function pointer update
@@ -154,7 +162,7 @@ constexpr bool NPCIsAVine(const NPC_t& n)
 
 // OKAY TO KEEP AS FUNCTION. Usages outside of NPC methods should be replaced with new usage-specific NPC traits.
 //'Flags the NPC type if it is a level exit
-constexpr bool NPCIsAnExit(NPCID Type)
+XT_FORCE_INLINE constexpr bool NPCIsAnExit(NPCID Type)
 {
     return (
         Type == NPCID_ITEMGOAL ||
@@ -166,14 +174,14 @@ constexpr bool NPCIsAnExit(NPCID Type)
     );
 }
 
-constexpr bool NPCIsAnExit(const NPC_t& n)
+XT_FORCE_INLINE constexpr bool NPCIsAnExit(const NPC_t& n)
 {
     return NPCIsAnExit(n.Type);
 }
 
 // OKAY TO KEEP AS FUNCTION. Usages in UpdatePlayer may become an OnPlayerCollide NPC method.
 //'Flags the NPC type as a para-troopa
-constexpr bool NPCIsAParaTroopa(NPCID Type)
+XT_FORCE_INLINE constexpr bool NPCIsAParaTroopa(NPCID Type)
 {
     return (
         Type == NPCID_FLY_FODDER_S3 ||
@@ -189,26 +197,26 @@ constexpr bool NPCIsAParaTroopa(NPCID Type)
     );
 }
 
-constexpr bool NPCIsAParaTroopa(const NPC_t& n)
+XT_FORCE_INLINE constexpr bool NPCIsAParaTroopa(const NPC_t& n)
 {
     return NPCIsAParaTroopa(n.Type);
 }
 
 // OKAY TO KEEP AS FUNCTION. Usages in UpdatePlayer may become an OnPlayerCollide NPC method, usages in Blocks should become a new flag.
 //'npc is a kurbo's shoe
-constexpr bool NPCIsBoot(NPCID Type)
+XT_FORCE_INLINE constexpr bool NPCIsBoot(NPCID Type)
 {
     return (Type == NPCID_GRN_BOOT || Type == NPCID_RED_BOOT || Type == NPCID_BLU_BOOT);
 }
 
-constexpr bool NPCIsBoot(const NPC_t& n)
+XT_FORCE_INLINE constexpr bool NPCIsBoot(const NPC_t& n)
 {
     return NPCIsBoot(n.Type);
 }
 
 // OKAY TO KEEP AS FUNCTION. Usages in UpdatePlayer may become an OnPlayerCollide NPC method, usages in Blocks should become a new flag.
 //'npc is a yoshi
-constexpr bool NPCIsYoshi(NPCID Type)
+XT_FORCE_INLINE constexpr bool NPCIsYoshi(NPCID Type)
 {
     return (
         Type == NPCID_PET_GREEN ||
@@ -222,14 +230,14 @@ constexpr bool NPCIsYoshi(NPCID Type)
     );
 }
 
-constexpr bool NPCIsYoshi(const NPC_t& n)
+XT_FORCE_INLINE constexpr bool NPCIsYoshi(const NPC_t& n)
 {
     return NPCIsYoshi(n.Type);
 }
 
 // OKAY TO KEEP AS FUNCTION. Usages outside of NPC methods should be replaced with new usage-specific NPC traits.
 //'npc is a toad
-constexpr bool NPCIsToad(NPCID Type)
+XT_FORCE_INLINE constexpr bool NPCIsToad(NPCID Type)
 {
     return (
         Type == NPCID_CIVILIAN_SCARED ||
@@ -241,26 +249,26 @@ constexpr bool NPCIsToad(NPCID Type)
     );
 }
 
-constexpr bool NPCIsToad(const NPC_t& n)
+XT_FORCE_INLINE constexpr bool NPCIsToad(const NPC_t& n)
 {
     return NPCIsToad(n.Type);
 }
 
 // OKAY TO KEEP AS FUNCTION. Usages outside of NPC methods should be replaced with new usage-specific NPC traits.
 //'Zelda 2 Bot monster
-constexpr bool NPCIsABot(NPCID Type)
+XT_FORCE_INLINE constexpr bool NPCIsABot(NPCID Type)
 {
     return (Type == NPCID_BLU_SLIME || Type == NPCID_CYAN_SLIME || Type == NPCID_RED_SLIME);
 }
 
-constexpr bool NPCIsABot(const NPC_t& n)
+XT_FORCE_INLINE constexpr bool NPCIsABot(const NPC_t& n)
 {
     return NPCIsABot(n.Type);
 }
 
 // OKAY TO KEEP AS FUNCTION. Unused outside of NPC methods.
 //'default NPC movement
-constexpr bool NPCDefaultMovement(NPCID Type)
+XT_FORCE_INLINE constexpr bool NPCDefaultMovement(NPCID Type)
 {
     return (
         Type == NPCID_FODDER_S5 ||
@@ -316,19 +324,19 @@ constexpr bool NPCDefaultMovement(NPCID Type)
     );
 }
 
-constexpr bool NPCDefaultMovement(const NPC_t& n)
+XT_FORCE_INLINE constexpr bool NPCDefaultMovement(const NPC_t& n)
 {
     return NPCDefaultMovement(n.Type);
 }
 
 // OKAY TO KEEP AS FUNCTION. Usages outside of NPC methods should be replaced with new usage-specific NPC traits.
 //'turnips
-constexpr bool NPCIsVeggie(NPCID Type)
+XT_FORCE_INLINE constexpr bool NPCIsVeggie(NPCID Type)
 {
     return Type == NPCID_VEGGIE_1 || (Type >= NPCID_VEGGIE_2 && Type <= NPCID_VEGGIE_RANDOM);
 }
 
-constexpr bool NPCIsVeggie(const NPC_t& n)
+XT_FORCE_INLINE constexpr bool NPCIsVeggie(const NPC_t& n)
 {
     return NPCIsVeggie(n.Type);
 }
