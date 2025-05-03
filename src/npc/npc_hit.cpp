@@ -2354,21 +2354,18 @@ void NPCHit(int A, int B, int C)
         NPC[A].Location.set_width_center(NPC[A]->TWidth);
     }
 
-    if(NPC[A].Location.Width != oldNPC.Location.Width)
-    {
-        treeNPCUpdate(A);
-        if(NPC[A].tempBlock > 0)
-            treeNPCSplitTempBlock(A);
-
-        NPCQueues::Unchecked.push_back(A);
-    }
-    else if(NPC[A].Location.Height != oldNPC.Location.Height
+    if(NPC[A].Location.Width != oldNPC.Location.Width
+        || NPC[A].Location.Height != oldNPC.Location.Height
         || NPC[A].Location.X != oldNPC.Location.X
         || NPC[A].Location.Y != oldNPC.Location.Y)
     {
-        treeNPCUpdate(A);
-        if(NPC[A].tempBlock > 0)
+        if(NPC[A].Location.Width != oldNPC.Location.Width)
+            NPCQueues::Unchecked.push_back(A);
+
+        bool changed = treeNPCUpdate(A);
+        if(changed && NPC[A].tempBlock > 0)
             treeNPCSplitTempBlock(A);
+
     }
 
     StopHit = 0;
