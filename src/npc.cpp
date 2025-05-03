@@ -762,7 +762,7 @@ void NPCSpecial(int A)
     // int64_t lBlock = 0;
     // bool straightLine = false; // SET BUT NOT USED
     bool tempBool = false;
-    bool tempBool2 = false;
+    // bool tempBool2 = false;
     // Location_t tempLocation;
     // NPC_t tempNPC;
     auto &npc = NPC[A];
@@ -2134,7 +2134,9 @@ void NPCSpecial(int A)
         int speed_mult = (npc.Type == NPCID_WALL_SPARK) ? 2 : 1;
 
         tempBool = false;
-        tempBool2 = false;
+        bool tempBool2 = false;
+
+        // special stores wall attachment side, special2 stores current direction (1 is right, -1 is left)
 
         if(npc.Special == 0)
         {
@@ -2225,13 +2227,12 @@ void NPCSpecial(int A)
                 for(BlockRef_t block_p : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
                 {
                     Block_t& block = *block_p;
-                    int i = (int)block_p;
 
                     if(!block.Hidden && !BlockNoClipping[block.Type] && !BlockIsSizable[block.Type] && !BlockOnlyHitspot1[block.Type])
                     {
                         if(CheckCollision(tempLocation, block.Location))
                         {
-                            npc.Special3 = i;
+                            npc.Special3 = (vbint_t)block_p;
                             tempBool2 = true;
                             break;
                         }
@@ -2273,11 +2274,11 @@ void NPCSpecial(int A)
             // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
             // blockTileGet(tempLocation, fBlock, lBlock);
 
-            for(int i : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
+            for(Block_t& block : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
             {
-                if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
+                if(!block.Hidden && !BlockNoClipping[block.Type] && !BlockIsSizable[block.Type] && !BlockOnlyHitspot1[block.Type])
                 {
-                    if(CheckCollision(tempLocation, Block[i].Location))
+                    if(CheckCollision(tempLocation, block.Location))
                     {
                         if(npc.Special2 == 1)
                         {
@@ -2305,11 +2306,13 @@ void NPCSpecial(int A)
                 // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                 // blockTileGet(tempLocation, fBlock, lBlock);
 
-                for(int i : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
+                for(BlockRef_t block_p : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
                 {
-                    if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
+                    Block_t& block = *block_p;
+
+                    if(!block.Hidden && !BlockNoClipping[block.Type] && !BlockIsSizable[block.Type] && !BlockOnlyHitspot1[block.Type])
                     {
-                        if(CheckCollision(tempLocation, Block[i].Location))
+                        if(CheckCollision(tempLocation, block.Location))
                         {
                             tempBool2 = true;
                             break;
@@ -2345,11 +2348,11 @@ void NPCSpecial(int A)
             // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
             // blockTileGet(tempLocation, fBlock, lBlock);
 
-            for(int i : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
+            for(Block_t& block : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
             {
-                if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
+                if(!block.Hidden && !BlockNoClipping[block.Type] && !BlockIsSizable[block.Type] && !BlockOnlyHitspot1[block.Type])
                 {
-                    if(CheckCollision(tempLocation, Block[i].Location) && BlockSlope2[Block[i].Type] == 0)
+                    if(CheckCollision(tempLocation, block.Location) && BlockSlope2[block.Type] == 0)
                     {
                         if(npc.Special2 == 1)
                         {
@@ -2377,14 +2380,16 @@ void NPCSpecial(int A)
                 // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                 // blockTileGet(tempLocation, fBlock, lBlock);
 
-                for(int i : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
+                for(BlockRef_t block_p : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
                 {
-                    if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
+                    Block_t& block = *block_p;
+
+                    if(!block.Hidden && !BlockNoClipping[block.Type] && !BlockIsSizable[block.Type] && !BlockOnlyHitspot1[block.Type])
                     {
-                        if(CheckCollision(tempLocation, Block[i].Location))
+                        if(CheckCollision(tempLocation, block.Location))
                         {
                             tempBool2 = true;
-                            if(BlockSlope2[Block[i].Type] != 0)
+                            if(BlockSlope2[block.Type] != 0)
                                 npc.Location.SpeedY = npc.Location.SpeedY * speed_mult;
                         }
                     }
@@ -2418,11 +2423,11 @@ void NPCSpecial(int A)
             // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
             // blockTileGet(tempLocation, fBlock, lBlock);
 
-            for(int i : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
+            for(Block_t& block : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
             {
-                if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
+                if(!block.Hidden && !BlockNoClipping[block.Type] && !BlockIsSizable[block.Type] && !BlockOnlyHitspot1[block.Type])
                 {
-                    if(CheckCollision(tempLocation, Block[i].Location) && BlockSlope2[Block[i].Type] == 0)
+                    if(CheckCollision(tempLocation, block.Location) && BlockSlope2[block.Type] == 0)
                     {
                         if(npc.Special2 == 1)
                         {
@@ -2450,11 +2455,13 @@ void NPCSpecial(int A)
                 // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                 // blockTileGet(tempLocation, fBlock, lBlock);
 
-                for(int i : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
+                for(BlockRef_t block_p : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
                 {
-                    if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
+                    Block_t& block = *block_p;
+
+                    if(!block.Hidden && !BlockNoClipping[block.Type] && !BlockIsSizable[block.Type] && !BlockOnlyHitspot1[block.Type])
                     {
-                        if(CheckCollision(tempLocation, Block[i].Location))
+                        if(CheckCollision(tempLocation, block.Location))
                         {
                             tempBool2 = true;
                             break;
