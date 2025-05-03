@@ -933,6 +933,14 @@ set(THEXTECH_SRC
     src/fontman/utf8_helpers.cpp
 )
 
+if(NOT CMAKE_BUILD_TYPE_LOWER STREQUAL "debug")
+    # some performance-critical files get special treatment, even though the executable overall is normally -Os
+    set_source_files_properties(
+        src/main/trees.cpp
+        src/main/block_table.cpp
+    PROPERTIES COMPILE_FLAGS -O2)
+endif()
+
 if(NOT THEXTECH_NO_SDL_BUILD)
     list(APPEND THEXTECH_SRC src/sound_thread.cpp)
 endif()
