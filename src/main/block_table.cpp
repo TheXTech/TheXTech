@@ -398,7 +398,9 @@ void treeTempBlockQuery(std::vector<BaseRef_t>& out,
 
     s_NPCsToTempBlocks(out);
 
-    s_temp_block_table.query(out, loc);
+    // this table is empty unless an NPC crossed a boundary during this frame
+    if(s_temp_block_table.member_rects.size() != 0)
+        s_temp_block_table.query(out, loc);
 
 
     if(sort_mode == SORTMODE_COMPAT)
