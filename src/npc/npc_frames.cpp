@@ -39,8 +39,6 @@ static void s_makeHeavySparkle(const NPC_t& n, int offY)
 
 void NPCFrames(int A)
 {
-    Location_t tempLocation;
-
     if(NPC[A]->TFrames > 0) // custom frames
     {
         NPC[A].FrameCount += 1;
@@ -124,7 +122,7 @@ void NPCFrames(int A)
     else if(NPC[A].Type == NPCID_SQUID_S3 || NPC[A].Type == NPCID_SQUID_S1 || NPC[A].Type == NPCID_SPIT_BOSS_BALL ||
             NPC[A].Type == NPCID_FALL_BLOCK_RED || NPC[A].Type == NPCID_FALL_BLOCK_BROWN ||
             NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT ||
-            NPC[A].Type == NPCID_VPIPE_LONG || NPC[A].Type == NPCID_BIG_SHELL || NPCIsVeggie(NPC[A]) || NPC[A].Type == NPCID_SHORT_WOOD ||
+            NPC[A].Type == NPCID_VPIPE_LONG || NPC[A].Type == NPCID_BIG_SHELL || NPCIsVeggie(NPC[A].Type) || NPC[A].Type == NPCID_SHORT_WOOD ||
             NPC[A].Type == NPCID_LONG_WOOD || NPC[A].Type == NPCID_SLANT_WOOD_R || NPC[A].Type == NPCID_SLANT_WOOD_M || NPC[A].Type == NPCID_PLATFORM_S3 ||
             NPC[A].Type == NPCID_CHECKER_PLATFORM || NPC[A].Type == NPCID_PLATFORM_S1 || NPC[A].Type == NPCID_SPIT_GUY_BALL || NPC[A].Type == NPCID_SIGN ||
             (NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_CHECKPOINT ||
@@ -875,7 +873,7 @@ void NPCFrames(int A)
 
         if(NPC[A].Frame == 0)
         {
-            tempLocation = NPC[A].Location;
+            Location_t tempLocation = NPC[A].Location;
             tempLocation.Width = NPC[A].Location.Width * 2;
             tempLocation.X = NPC[A].Location.X - NPC[A].Location.Width / 2;
 
@@ -1637,6 +1635,7 @@ void NPCFrames(int A)
     {
         if((NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) && NPC[A].Quicksand == 0)
         {
+            Location_t tempLocation;
             bool make_trail = true;
 
             if(NPC[A].Wet > 0)
@@ -1794,7 +1793,7 @@ void NPCFrames(int A)
     {
         // Bullet Bills / Key / ONLY DIRECTION FRAMES
     }
-    else if(NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_STATUE_S3 || NPC[A].Type == NPCID_CIVILIAN || NPC[A].Type == NPCID_CHAR3 || NPCIsYoshi(NPC[A]) || NPC[A].Type == NPCID_CHAR2 || NPC[A].Type == NPCID_CHAR5 || NPC[A].Type == NPCID_STATUE_S4)
+    else if(NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_STATUE_S3 || NPC[A].Type == NPCID_CIVILIAN || NPC[A].Type == NPCID_CHAR3 || NPCIsYoshi(NPC[A].Type) || NPC[A].Type == NPCID_CHAR2 || NPC[A].Type == NPCID_CHAR5 || NPC[A].Type == NPCID_STATUE_S4)
     {
         if(NPC[A].Direction == -1)
             NPC[A].Frame = 0;
@@ -1985,7 +1984,7 @@ void NPCFrames(int A)
             else
             {
                 int C = 0;
-                tempLocation = NPC[A].Location;
+                Location_t tempLocation = NPC[A].Location;
                 tempLocation.Height = 24;
                 tempLocation.Y -= 8;
                 for(int B = 1; B <= numPlayers; ++B)
