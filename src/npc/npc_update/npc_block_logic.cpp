@@ -967,28 +967,29 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
 
                                             if(NPC[A].Projectile)
                                             {
-                                                if(NPC[A].Type == NPCID_PLR_FIREBALL)
+                                                if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL)
                                                 {
-                                                    if(NPC[A].Special == 4)
+                                                    if(NPC[A].Type == NPCID_PLR_ICEBALL)
+                                                        NPC[A].Location.SpeedY = -7 + Block[B].Location.SpeedY;
+                                                    else if(NPC[A].Special == 4)
                                                         NPC[A].Location.SpeedY = -3 + Block[B].Location.SpeedY;
                                                     else
                                                         NPC[A].Location.SpeedY = -5 + Block[B].Location.SpeedY;
+
                                                     if(NPC[A].Slope == 0)
                                                         NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01_n;
+
                                                     tempHit = 0;
                                                     tempHitOld = 0;
-                                                }
-                                                else if(NPC[A].Type == NPCID_PLR_ICEBALL)
-                                                {
-                                                    NPC[A].Location.SpeedY = -7 + Block[B].Location.SpeedY;
-                                                    if(NPC[A].Slope == 0)
-                                                        NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01_n;
-                                                    tempHit = 0;
-                                                    tempHitOld = 0;
-                                                    if(!Block[B].Slippy)
-                                                        NPC[A].Special5 += 1;
-                                                    if(NPC[A].Special5 >= 3)
-                                                        NPCHit(A, 3, A);
+
+                                                    if(NPC[A].Type == NPCID_PLR_ICEBALL)
+                                                    {
+                                                        if(!Block[B].Slippy)
+                                                            NPC[A].Special5 += 1;
+
+                                                        if(NPC[A].Special5 >= 3)
+                                                            NPCHit(A, 3, A);
+                                                    }
                                                 }
                                                 else if(NPC[A].Type >= NPCID_GRN_HIT_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_HIT_TURTLE_S4)
                                                 {
