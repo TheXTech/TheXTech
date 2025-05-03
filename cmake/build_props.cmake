@@ -152,6 +152,16 @@ elseif(NOT MSVC)
         if(ANDROID)
             set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -funwind-tables")
             set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -funwind-tables")
+        elseif(THEXTECH_CLI_BUILD AND THEXTECH_NO_SDL_BUILD)
+            # use -Os by default for all build types
+            string(REGEX REPLACE "-O3" "-Os"
+                CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
+            string(REGEX REPLACE "-O3" "-Os"
+                CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+            string(REGEX REPLACE "-O2" "-Os"
+                CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO}")
+            string(REGEX REPLACE "-O2" "-Os"
+                CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
         elseif(NINTENDO_DS)
             # use -Os by default for all build types
             string(REGEX REPLACE "-O3" "-Os"
