@@ -1332,10 +1332,8 @@ eventindex_t ProcEvent_Safe(bool is_resume, eventindex_t index, int whichPlayer,
 
         if(Layer[B].SpeedX == 0 && Layer[B].SpeedY == 0)
         {
-            // eventually, only re-join tables the first time the event has been triggered in a level
-            treeBlockJoinLayer(B);
-            treeBackgroundJoinLayer(B);
-            treeWaterJoinLayer(B);
+            // join the layer back to the main spatial lookup tables if it doesn't start moving again for 255 frames (this can be tuned, 255 is the maximum possible for this uint8_t variable)
+            Layer[B].join_timer = 255;
         }
         else
         {
@@ -1690,7 +1688,21 @@ void UpdateLayers()
 
         // only consider non-empty, moving layers
         if(Layer[A].Name.empty() || (Layer[A].SpeedX == 0 && Layer[A].SpeedY == 0))
+        {
+            // join timer check for layers that were moving until recently
+            if(Layer[A].join_timer && !FreezeNPCs && !FreezeLayers)
+            {
+                Layer[A].join_timer--;
+                if(Layer[A].join_timer == 0)
+                {
+                    treeBlockJoinLayer(A);
+                    treeBackgroundJoinLayer(A);
+                    treeWaterJoinLayer(A);
+                }
+            }
+
             continue;
+        }
 
         // the layer does not move
         if(FreezeNPCs || (FreezeLayers && Layer[A].EffectStop))

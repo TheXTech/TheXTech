@@ -40,10 +40,12 @@ struct Layer_t
 {
 //    EffectStop As Boolean
     bool EffectStop = false;
-//    Name As String
-    std::string Name;
 //    Hidden As Boolean
     bool Hidden = false;
+    // NEW: time until layer rejoins the main table
+    uint8_t join_timer = 0;
+//    Name As String
+    std::string Name;
 //    SpeedX As Single
     numf_t SpeedX = 0;
 //    SpeedY As Single
