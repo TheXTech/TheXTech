@@ -5647,7 +5647,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
         {
             if(NPC[A].Type == NPCID_ITEM_POD && NPC[A].Special > 0 /* && CheckEggs*/) // Check Eggs
             {
-                if(NPCIsYoshi(NPC[A].Special)) // Yoshi into mushroom (Egg)
+                if(NPCIsYoshi((NPCID)NPC[A].Special)) // Yoshi into mushroom (Egg)
                 {
                     // NPC(A).Special = 249
                     NPC[A].Special = NPCID_GRN_BOOT; // Yoshi into boot
@@ -5706,7 +5706,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
         {
             if(NPC[A].Type == NPCID_ITEM_POD && NPC[A].Special > 0 /* && CheckEggs*/) // Check Eggs
             {
-                if(NPCIsYoshi(NPC[A].Special) || NPCIsBoot(NPC[A].Special)) // Yoshi / boot into mushroom (Egg)
+                if(NPCIsYoshi((NPCID)NPC[A].Special) || NPCIsBoot((NPCID)NPC[A].Special)) // Yoshi / boot into mushroom (Egg)
                     NPC[A].Special = NPCID_POWER_S5;
                 if(NPC[A].Special == NPCID_POWER_S3 || NPC[A].Special == NPCID_POWER_S1 || NPC[A].Special == NPCID_POWER_S4) // mushrooms into hearts (eggs)
                     NPC[A].Special = NPCID_POWER_S5;

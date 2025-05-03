@@ -3208,7 +3208,7 @@ void YoshiEat(const int A)
     {
         auto &n = NPC[B];
         if(((n->IsACoin && n.Special == 1) || !n->NoYoshi) &&
-           n.Active && ((!n->IsACoin || n.Special == 1) || n.Type == 103) &&
+           n.Active && ((!n->IsACoin || n.Special == 1) || n.Type == NPCID_RED_COIN) &&
            !NPCIsAnExit(n) && !n.Generator && !n.Inert && !NPCIsYoshi(n) &&
             n.Effect != NPCEFF_PET_TONGUE && n.Immune == 0 && n.Type != NPCID_ITEM_BURIED &&
             !(n.Projectile && n.Type == NPCID_BULLET) && n.HoldingPlayer == 0)

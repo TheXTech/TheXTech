@@ -473,7 +473,7 @@ void UpdateEditor()
                         if(n.id == NPCID_DOOR_MAKER || n.id == NPCID_MAGIC_DOOR || (n.id == NPCID_ITEM_BURIED && EditorCursor.NPC.Special == NPCID_DOOR_MAKER))
                             n.special_data = EditorCursor.NPC.Variant;
 
-                        if(NPCIsAParaTroopa(n.id) || NPCTraits[n.id].IsFish || n.id == NPCID_FIRE_CHAIN)
+                        if(NPCIsAParaTroopa((NPCID)n.id) || NPCTraits[n.id].IsFish || n.id == NPCID_FIRE_CHAIN)
                             n.special_data = EditorCursor.NPC.Special;
 
                         if(n.id == NPCID_VILLAIN_S3)
@@ -2200,7 +2200,7 @@ void SetCursor()
     }
     else if(EditorCursor.Mode == OptCursor_t::LVL_NPCS) // NPCs
     {
-        int t = EditorCursor.NPC.Type;
+        NPCID t = EditorCursor.NPC.Type;
 
         // Container NPCs are handled elsewhere in new editor
         if(MagicHand)

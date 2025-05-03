@@ -887,7 +887,7 @@ static std::vector<NPCRef_t> s_NoReset_NPCs_LastFrame;
 // shared between the NPC screen logic functions, always reset to 0 between frames
 static std::bitset<maxNPCs> s_NPC_present;
 
-static inline bool s_NPC_long_life(int Type)
+static inline bool s_NPC_long_life(NPCID Type)
 {
     return (NPCIsYoshi(Type) || NPCIsBoot(Type) || Type == NPCID_POWER_S3
         || Type == NPCID_FIRE_POWER_S3 || Type == NPCID_CANNONITEM || Type == NPCID_LIFE_S3

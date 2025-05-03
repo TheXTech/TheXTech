@@ -728,7 +728,7 @@ void UpdateEffects()
                 e.Life = 0;
                 if(!LevelEditor && e.NewNpc != NPCID_ITEM_POD)
                 {
-                    if(NPCIsYoshi(e.NewNpc))
+                    if(NPCIsYoshi((NPCID)e.NewNpc))
                         NewEffect(EFFID_PET_BIRTH, e.Location, 1, e.NewNpc);
                     else if(e.NewNpc > 0)
                     {
@@ -748,7 +748,7 @@ void UpdateEffects()
                         if(nn.Type == NPCID_LEAF_POWER)
                             nn.Location.SpeedY = -6;
 
-                        if(NPCTraits[e.NewNpc].IsFish || NPCIsAParaTroopa(e.NewNpc) || e.NewNpc == NPCID_FIRE_CHAIN)
+                        if(NPCTraits[e.NewNpc].IsFish || NPCIsAParaTroopa((NPCID)e.NewNpc) || e.NewNpc == NPCID_FIRE_CHAIN)
                         {
                             nn.Special = e.NewNpcSpecial;
                             nn.DefaultSpecial = e.NewNpcSpecial;

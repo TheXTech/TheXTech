@@ -718,10 +718,10 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         }
 
         // Various properties that depend on type, get the real one here:
-        int type;
+        NPCID type;
         if(NPCIsContainer(EditorCursor.NPC))
         {
-            type = EditorCursor.NPC.Special;
+            type = (NPCID)EditorCursor.NPC.Special;
         }
         else
         {
