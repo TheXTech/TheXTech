@@ -1678,9 +1678,9 @@ interrupt_Activation:
                 || NPC[A].Location.Width != prevW
                 || NPC[A].Location.Height != prevH)
             {
-                treeNPCUpdate(A);
+                bool changed = treeNPCUpdate(A);
 
-                if(NPC[A].tempBlock > 0)
+                if(changed && NPC[A].tempBlock > 0)
                     treeNPCSplitTempBlock(A);
             }
         }

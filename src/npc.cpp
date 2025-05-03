@@ -322,8 +322,8 @@ void Deactivate(int A)
 
             // NEW now that we have the new NPC Queues
             NPCQueues::update(A);
-            treeNPCUpdate(A);
-            if(NPC[A].tempBlock > 0)
+            bool changed = treeNPCUpdate(A);
+            if(changed && NPC[A].tempBlock > 0)
                 treeNPCSplitTempBlock(A);
         }
     }

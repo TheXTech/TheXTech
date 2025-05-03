@@ -262,7 +262,7 @@ extern TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(const Location_t
 extern void treeNPCClear();
 extern void treeNPCAdd(NPCRef_t obj);
 extern void treeNPCRemove(NPCRef_t obj);
-extern void treeNPCUpdate(NPCRef_t obj);
+extern bool treeNPCUpdate(NPCRef_t obj);
 extern void treeNPCSplitTempBlock(NPCRef_t obj);
 extern void treeNPCUpdateTempBlock(NPCRef_t obj);
 extern TreeResult_Sentinel<NPCRef_t> treeNPCQuery(num_t Left, num_t Top, num_t Right, num_t Bottom,

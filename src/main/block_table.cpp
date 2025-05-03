@@ -598,11 +598,11 @@ void treeNPCAdd(NPCRef_t obj)
     s_npc_table.insert(obj);
 }
 
-void treeNPCUpdate(NPCRef_t obj)
+bool treeNPCUpdate(NPCRef_t obj)
 {
     SDL_assert_release((int)obj > 0);
 
-    s_npc_table.update(obj);
+    return s_npc_table.update(obj);
 }
 
 void treeNPCSplitTempBlock(NPCRef_t obj)
