@@ -29,11 +29,6 @@
 
 #include "main/trees.h"
 
-static inline bool s_use_default_movement(int A)
-{
-    return (NPCDefaultMovement(NPC[A]) || (NPC[A]->IsFish && NPC[A].Special != 2)) && !((NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[A].Special > 0);
-}
-
 void NPCMovementLogic(int A, tempf_t& speedVar)
 {
     num_t Wings_SpeedX = NPC[A].Location.SpeedX;
@@ -41,8 +36,11 @@ void NPCMovementLogic(int A, tempf_t& speedVar)
 
     // POSSIBLE SUBROUTINE: setSpeed
 
+    // this condition was duplicated in two places in SMBX 1.3
+    bool use_default_movement = (NPCDefaultMovement(NPC[A].Type) || (NPC[A]->IsFish && NPC[A].Special != 2)) && !((NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[A].Special > 0);
+
     // Default Movement Code
-    if(s_use_default_movement(A) && NPC[A].Type != NPCID_ITEM_BURIED)
+    if(use_default_movement && NPC[A].Type != NPCID_ITEM_BURIED)
     {
         if(NPC[A].Direction == 0)
         {
@@ -116,12 +114,12 @@ void NPCMovementLogic(int A, tempf_t& speedVar)
             NPC[A].Type == NPCID_GRN_BOOT || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT ||
             (NPC[A].Type == NPCID_SPIT_BOSS_BALL && NPC[A].Projectile) || NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_METALBARREL ||
             NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG ||
-            (NPCIsVeggie(NPC[A]) && !NPC[A].Projectile) ||
+            (NPCIsVeggie(NPC[A].Type) && !NPC[A].Projectile) ||
             (NPC[A].Type == NPCID_HEAVY_THROWER && NPC[A].Projectile) ||
             /*(NPC[A].Projectile && (NPC[A].Type == NPCID_FLY && NPC[A].Type == NPCID_MINIBOSS)) ||*/ // FIXME: This segment is always false (type equal both 54 and 15, impossible!) [PVS Studio]
             NPC[A].Type == NPCID_CIVILIAN_SCARED || NPC[A].Type == NPCID_STATUE_S3 || NPC[A].Type == NPCID_STATUE_S4 || NPC[A].Type == NPCID_CIVILIAN ||
             NPC[A].Type == NPCID_CHAR3 || NPC[A].Type == NPCID_ITEM_POD || NPC[A].Type == NPCID_BOMB || NPC[A].Type == NPCID_LIT_BOMB_S3 ||
-            NPC[A].Type == NPCID_CHAR2 || NPC[A].Type == NPCID_CHAR5 || (NPCIsYoshi(NPC[A]) && NPC[A].Special == 0) ||
+            NPC[A].Type == NPCID_CHAR2 || NPC[A].Type == NPCID_CHAR5 || (NPCIsYoshi(NPC[A].Type) && NPC[A].Special == 0) ||
             (NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_HIT_CARRY_FODDER || (NPC[A].Type == NPCID_SPIT_BOSS && NPC[A].Projectile) ||
             NPC[A].Type == NPCID_HEAVY_POWER || NPC[A].Type == NPCID_STATUE_POWER || NPC[A].Type == NPCID_FIRE_POWER_S4 || NPC[A].Type == NPCID_3_LIFE ||
             NPC[A].Type == NPCID_STAR_EXIT || NPC[A].Type == NPCID_STAR_COLLECT || NPC[A].Type == NPCID_FIRE_POWER_S1 || NPC[A].Type == NPCID_TIMER_S2 ||
@@ -308,7 +306,7 @@ void NPCMovementLogic(int A, tempf_t& speedVar)
         NPC[A].Location.SpeedX = 2 * NPC[A].Direction;
 
     // yoshi
-    if(NPCIsYoshi(NPC[A]))
+    if(NPCIsYoshi(NPC[A].Type))
     {
         if(NPC[A].Special == 0)
         {
@@ -344,7 +342,7 @@ void NPCMovementLogic(int A, tempf_t& speedVar)
 
     // Reset Speed when no longer a projectile
     // If Not (NPCIsAShell(.Type) Or .Type = 8 Or .Type = 93 Or .Type = 74 Or .Type = 51 Or .Type = 52 Or .Type = 12 Or .Type = 14 Or .Type = 13 Or .Type = 15 Or NPCIsABonus(.Type) Or .Type = 17 Or .Type = 18 Or .Type = 21 Or .Type = 22 Or .Type = 25 Or .Type = 26 Or .Type = 29 Or .Type = 30 Or .Type = 31 Or .Type = 32 Or .Type = 35 Or .Type = 37 Or .Type = 38 Or .Type = 39 Or .Type = 40 Or .Type = 42 Or .Type = 43 Or .Type = 44 Or .Type = 45 Or .Type = 46 Or .Type = 47 Or .Type = 48 Or .Type = 76 Or .Type = 49 Or .Type = 54 Or .Type = 56 Or .Type = 57 Or .Type = 58 Or .Type = 60 Or .Type = 62 Or .Type = 64 Or .Type = 66 Or .Type = 67 Or .Type = 68 Or .Type = 69 Or .Type = 70 Or .Type = 78 Or .Type = 84 Or .Type = 85 Or .Type = 87 Or (.Type = 55 And .Special > 0) Or (.Type >= 79 And .Type <= 83) Or .Type = 86 Or .Type = 92 Or .Type = 94 Or NPCIsYoshi(.Type) Or .Type = 96 Or .Type = 101 Or .Type = 102) And .Projectile = False Then
-    if(s_use_default_movement(A) && !NPC[A].Projectile)
+    if(use_default_movement && !NPC[A].Projectile)
     {
         if(!NPC[A]->CanWalkOn)
         {
@@ -382,11 +380,11 @@ void NPCMovementLogic(int A, tempf_t& speedVar)
             if(NPC[A]->IsFish && NPC[A].Special == 1 && !NPC[A].Projectile)
                 NPC[A].Location.SpeedX = Physics.NPCWalkingOnSpeed * 2 * NPC[A].Direction;
         }
+
+        // moved into here from immediately below, use_def_mov is certainly true for NPCID_WALK_BOMB_S2 (cross-ref NPCDefaultMovement)
+        if(NPC[A].Type == NPCID_WALK_BOMB_S2 /* && !NPC[A].Projectile */ && NPC[A].Special2 == 1)
+            NPC[A].Location.SpeedX = 0;
     }
-
-    if(NPC[A].Type == NPCID_WALK_BOMB_S2 && !NPC[A].Projectile && NPC[A].Special2 == 1)
-        NPC[A].Location.SpeedX = 0;
-
 
 
     // NPC Gravity
@@ -449,7 +447,7 @@ void NPCMovementLogic(int A, tempf_t& speedVar)
                 NPC[A].Type != NPCID_HOMING_BALL_GEN && NPC[A].Type != NPCID_SPIT_GUY_BALL && NPC[A].Type != NPCID_STAR_EXIT && NPC[A].Type != NPCID_STAR_COLLECT &&
                 NPC[A].Type != NPCID_VILLAIN_FIRE && NPC[A].Type != NPCID_PLANT_S3 && NPC[A].Type != NPCID_FIRE_PLANT && NPC[A].Type != NPCID_PLANT_FIREBALL &&
                 NPC[A].Type != NPCID_PLANT_S1 && NPC[A].Type != NPCID_BIG_PLANT && NPC[A].Type != NPCID_LONG_PLANT_UP && NPC[A].Type != NPCID_LONG_PLANT_DOWN &&
-                !NPCIsAParaTroopa(NPC[A]) && NPC[A].Type != NPCID_BOTTOM_PLANT && NPC[A].Type != NPCID_SIDE_PLANT &&
+                !NPCIsAParaTroopa(NPC[A].Type) && NPC[A].Type != NPCID_BOTTOM_PLANT && NPC[A].Type != NPCID_SIDE_PLANT &&
                 NPC[A].Type != NPCID_LEAF_POWER && NPC[A].Type != NPCID_STONE_S3 && NPC[A].Type != NPCID_STONE_S4 && NPC[A].Type != NPCID_GHOST_S3 &&
                 NPC[A].Type != NPCID_GHOST_FAST && NPC[A].Type != NPCID_GHOST_S4 && NPC[A].Type != NPCID_BIG_GHOST && NPC[A].Type != NPCID_SPIKY_THROWER &&
                 NPC[A].Type != NPCID_VEHICLE && NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_YEL_PLATFORM &&
@@ -589,11 +587,12 @@ void NPCMovementLogic(int A, tempf_t& speedVar)
     {
         // don't do anything here, the movement will be applied after SpecialNPC
     }
-    else if((!NPCIsAnExit(NPC[A]) || NPC[A].Type == NPCID_STAR_EXIT || NPC[A].Type == NPCID_STAR_COLLECT) &&
+    else if(/*(!NPCIsAnExit(NPC[A]) || NPC[A].Type == NPCID_STAR_EXIT || NPC[A].Type == NPCID_STAR_COLLECT) */
+        NPC[A].Type != NPCID_ITEMGOAL && NPC[A].Type != NPCID_GOALORB_S3 && NPC[A].Type != NPCID_GOALORB_S2 && NPC[A].Type != NPCID_FLAG_EXIT &&
         NPC[A].Type != NPCID_FIRE_POWER_S3 && NPC[A].Type != NPCID_CONVEYOR)
     {
         // ParaTroopa speed application happens in SpecialNPC, buried item can't move at all
-        if(!NPCIsAParaTroopa(NPC[A]) && NPC[A].Type != NPCID_ITEM_BURIED)
+        if(!NPCIsAParaTroopa(NPC[A].Type) && NPC[A].Type != NPCID_ITEM_BURIED)
         {
             NPC[A].Location.X += NPC[A].Location.SpeedX.times((num_t)speedVar);
             NPC[A].Location.Y += NPC[A].Location.SpeedY;
