@@ -1089,15 +1089,12 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
 
                                             addBelt = (tempf_t)(NPC[A].Location.X - (num_t)addBelt);
 
-                                            if(!(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_TANK_TREADS || NPC[A].Type == NPCID_BULLET))
-                                                NPC[A].TurnAround = true;
+                                            // the only read-site in the entire SMBX 1.3 codebase checks for these types and ignores them
+                                            // if(!(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_TANK_TREADS || NPC[A].Type == NPCID_BULLET))
+                                            NPC[A].TurnAround = true;
 
                                             if(is_winged)
                                                 NPC[A].Location.SpeedX += -Block[B].Location.SpeedX * 1.2_r;
-
-                                            // this also includes WING_JUMP AI
-                                            if(NPC[A].Wings)
-                                                NPC[A].TurnAround = true;
                                             else if(NPC[A]->IsAShell)
                                                 NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
                                         }
@@ -1179,8 +1176,10 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                                 NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01_n;
                                             }
 
-                                            if(NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_TANK_TREADS && NPC[A].Type != NPCID_PLR_ICEBALL)
-                                                NPC[A].TurnAround = true;
+                                            // the only read-site in the entire SMBX 1.3 codebase checks for fireball and tank_treads and ignores them,
+                                            //   and kills iceball (which must have already been killed if this code was reached)
+                                            // if(NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_TANK_TREADS && NPC[A].Type != NPCID_PLR_ICEBALL)
+                                            NPC[A].TurnAround = true;
 
                                             if(NPC[A]->IsAShell)
                                             {
