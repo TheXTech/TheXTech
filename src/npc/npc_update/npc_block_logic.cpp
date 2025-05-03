@@ -325,6 +325,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                     }
                                     else if(NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_WALL_TURTLE)
                                     {
+                                        // tells the NPC that it's supported
                                         NPC[A].Special5 = 0;
 
                                         if(HitSpot == 1)
@@ -418,19 +419,17 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                             NPC_A_Special = NPC[A].Special5;
                                         }
 
-                                        if(HitSpot == 5)
+                                        // previously going down a wall? now turn around this outer corner
+                                        if(HitSpot == 5 && (NPC_A_Special == 2 || NPC_A_Special == 4) && NPC_A_Special2 == 1)
                                         {
-                                            if(NPC_A_Special == 2 && NPC_A_Special2 == 1)
-                                            {
+                                            // left side -> move right on ceiling slope
+                                            if(NPC_A_Special == 2)
                                                 NPC_A_Special2 = 1;
-                                                NPC_A_Special = 3;
-                                            }
-
-                                            if(NPC_A_Special == 4 && NPC_A_Special2 == 1)
-                                            {
+                                             // right side -> move left on ceiling slope
+                                            else
                                                 NPC_A_Special2 = -1;
-                                                NPC_A_Special = 3;
-                                            }
+
+                                            NPC_A_Special = 3;
                                         }
 
                                         HitSpot = 0;
@@ -461,12 +460,16 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
 
                                             if(num_t::fEqual_d(NPC[A].Location.SpeedY, Physics.NPCGravity) || NPC[A].Slope > 0 || oldSlope > 0)
                                             {
+                                                // previously going up a wall? now turn within this inner corner
                                                 if((NPC_A_Special == 2 || NPC_A_Special == 4) && NPC_A_Special2 == -1)
                                                 {
+                                                    // right side -> move right on ceiling slope
                                                     if(NPC_A_Special == 4)
                                                         NPC_A_Special2 = 1;
-                                                    if(NPC_A_Special == 2)
+                                                    // left side -> move left on ceiling slope
+                                                    else
                                                         NPC_A_Special2 = -1;
+
                                                     NPC_A_Special = 3;
                                                 }
 
