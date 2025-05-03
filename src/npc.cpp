@@ -763,7 +763,7 @@ void NPCSpecial(int A)
     // bool straightLine = false; // SET BUT NOT USED
     bool tempBool = false;
     bool tempBool2 = false;
-    Location_t tempLocation;
+    // Location_t tempLocation;
     // NPC_t tempNPC;
     auto &npc = NPC[A];
 
@@ -776,6 +776,7 @@ void NPCSpecial(int A)
     else if(npc.Type == NPCID_RED_VINE_TOP_S3 || npc.Type == NPCID_GRN_VINE_TOP_S3 || npc.Type == NPCID_GRN_VINE_TOP_S4) // Vine Maker
     {
         npc.Location.SpeedY = -2;
+        Location_t tempLocation;
         tempLocation.Height = 28;
         tempLocation.Width = 30;
         tempLocation.Y = npc.Location.Y + (npc.Location.Height - tempLocation.Height) / 2;
@@ -952,7 +953,7 @@ void NPCSpecial(int A)
             else
                 npc.Special = 1;
 
-            tempLocation = npc.Location;
+            Location_t tempLocation = npc.Location;
 
             if(npc.Special == -1)
                 tempLocation.Y -= 1;
@@ -1232,7 +1233,7 @@ void NPCSpecial(int A)
                     auto &p = Player[i];
                     if(p.Section == npc.Section && !p.Dead && p.TimeToLive == 0)
                     {
-                        tempLocation = npc.Location;
+                        Location_t tempLocation = npc.Location;
                         tempLocation.Width = 400;
                         tempLocation.Height = 800;
                         tempLocation.X -= tempLocation.Width / 2;
@@ -1763,6 +1764,7 @@ void NPCSpecial(int A)
             if((i < 5 && npc.Special == 40)
                 || (i == 5 && iRand(2) == 0))
             {
+                Location_t tempLocation;
                 tempLocation.Height = EffectHeight[EFFID_SPARKLE];
                 tempLocation.Width = EffectWidth[EFFID_SPARKLE];
                 tempLocation.SpeedX = 0;
@@ -1876,7 +1878,7 @@ void NPCSpecial(int A)
                 auto &p = Player[i];
                 if(!p.Dead && p.TimeToLive == 0 && p.Section == npc.Section)
                 {
-                    tempLocation = npc.Location;
+                    Location_t tempLocation = npc.Location;
                     tempLocation.Height = 256;
                     tempLocation.Y -= tempLocation.Height;
 
@@ -2128,6 +2130,7 @@ void NPCSpecial(int A)
     else if(npc.Type == NPCID_WALL_SPARK || npc.Type == NPCID_WALL_BUG || npc.Type == NPCID_WALL_TURTLE) // sparky
     {
         // was F
+        Location_t tempLocation;
         int speed_mult = (npc.Type == NPCID_WALL_SPARK) ? 2 : 1;
 
         tempBool = false;
@@ -2626,7 +2629,7 @@ void NPCSpecial(int A)
             // tempBool2 = false; // "value set, but never unused"
             bool centered = false;
 
-            tempLocation = npc.Location;
+            Location_t tempLocation = npc.Location;
 
             switch(railAlgo) // The hot spot (the rail attachment point)
             {
@@ -2997,7 +3000,7 @@ void NPCSpecial(int A)
 
         if(npc.SpecialY == 0)
         {
-            tempLocation = npc.Location;
+            Location_t tempLocation = npc.Location;
             tempLocation.Height = 8000;
             int C = 0;
             for(int i : treeBlockQuery(tempLocation, SORTMODE_COMPAT))
@@ -3123,7 +3126,7 @@ void NPCSpecial(int A)
     {
         if(npc.Special == 0)
         {
-            tempLocation = npc.Location;
+            Location_t tempLocation = npc.Location;
             tempLocation.Height = 400;
             tempLocation.Y -= tempLocation.Height;
             tempLocation.set_width_center(600);
@@ -3441,7 +3444,7 @@ void SpecialNPC(int A)
     // float E = 0;
     // float F = 0;
     // bool tempTurn = false;
-    Location_t tempLocation;
+    // Location_t tempLocation;
     // Location_t tempLocation2;
     // NPC_t tempNPC;
 
@@ -3466,6 +3469,7 @@ void SpecialNPC(int A)
                !(NPC[A].Type == NPCID_PLR_FIREBALL && NPC[A].CantHurtPlayer == B) &&
                !(NPC[A].Type == NPCID_PLR_HEAVY && NPC[A].CantHurtPlayer == B))
             {
+                Location_t tempLocation;
                 if(!Player[B].Duck)
                     tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height - 52;
                 else
@@ -3679,6 +3683,8 @@ void SpecialNPC(int A)
         // if(NPC[A].Type == NPCID_ICE_CUBE && NPC[A].Special == 3)
         //     NPC[A].BeltSpeed = 0;
 
+        Location_t tempLocation;
+
         // two chances to make a sparkle: 7 frames out of 100 when stationary, and 1 frame out of 5 when thrown
         if(iRand(100) >= 93)
             NewEffect_IceSparkle(NPC[A], tempLocation);
@@ -3753,7 +3759,7 @@ void SpecialNPC(int A)
     {
         if(NPC[A].Special3 == 1)
         {
-            tempLocation = NPC[A].Location;
+            Location_t tempLocation = NPC[A].Location;
             tempLocation.Y -= 32;
             NewEffect(EFFID_SMOKE_S2, NPC[A].Location);
             NewEffect(EFFID_SMOKE_S2, tempLocation);
@@ -4341,6 +4347,8 @@ void SpecialNPC(int A)
     // Fireball code (Podoboo)
     else if(NPC[A].Type == NPCID_LAVABUBBLE)
     {
+        Location_t tempLocation;
+
         if(NPC[A].Location.Y > NPC[A].DefaultLocationY + NPC[A].Location.Height + 16)
             NPC[A].Location.Y = NPC[A].DefaultLocationY + NPC[A]->THeight + 16;
 
@@ -4537,7 +4545,7 @@ void SpecialNPC(int A)
         }
         // deferring tree update to end of the NPC physics update
     }
-    else if(NPCIsAParaTroopa(NPC[A])) // para-troopas
+    else if(NPCIsAParaTroopa(NPC[A].Type)) // para-troopas
     {
         // do wings logic if it won't be handled elsewhere
         if(!NPC[A].Wings)
@@ -4988,7 +4996,7 @@ void SpecialNPC(int A)
         if(NPC[A].Special5 >= timer)
         {
             NPC[A].Special5 = timer;
-            tempLocation = NPC[A].Location;
+            Location_t tempLocation = NPC[A].Location;
             tempLocation.X -= 16;
             tempLocation.Y -= 16;
             tempLocation.Width += 32;
@@ -5153,6 +5161,7 @@ void SpecialNPC(int A)
                     PlaySoundSpatial(SFX_Stone, NPC[A].Location);
                     if(g_config.extra_screen_shake)
                         doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 5, 200, NPC[A].Location);
+                    Location_t tempLocation;
                     tempLocation.Width = 32;
                     tempLocation.Height = 32;
                     tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - 16;
@@ -5491,7 +5500,7 @@ void SpecialNPC(int A)
             {
                 if(num_t::fEqual_f(NPC[A].Location.SpeedY, Physics.NPCGravity))
                 {
-                    tempLocation = NPC[A].Location;
+                    Location_t tempLocation = NPC[A].Location;
                     tempLocation.Width += 32;
                     tempLocation.X -= 16;
 
