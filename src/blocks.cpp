@@ -47,6 +47,15 @@
 #include "main/trees.h"
 #include "main/game_loop_interrupt.h"
 
+void s_makeCoin(Block_t& b)
+{
+    Coins += 1;
+    if(Coins >= 100)
+        Got100Coins();
+
+    PlaySoundSpatial(SFX_Coin, b.Location);
+    NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
+}
 
 void BlockHit(int A, bool HitDown, int whatPlayer)
 {
@@ -243,15 +252,6 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     else // Everything else defaults to SMB3
         newBlock = 2;
 
-    // invincibility continuation block
-    if(b.Special == 110)
-    {
-        if(InvincibilityTime)
-            b.Special = 1000 + NPCID_INVINCIBILITY_POWER;
-        else
-            b.Special = 1;
-    }
-
     if(b.Special > 0 && b.Special < 100) // Block has coins
     {
         if(whatPlayer > 0 && Player[whatPlayer].Character == 4)
@@ -340,12 +340,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
             else
             {
-                Coins += 1;
-                if(Coins >= 100)
-                    Got100Coins();
-
-                PlaySoundSpatial(SFX_Coin, b.Location);
-                NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
+                s_makeCoin(b);
                 b.Special -= 1;
             }
         }
@@ -407,23 +402,13 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
             else
             {
-                Coins += 1;
-                if(Coins >= 100)
-                    Got100Coins();
-
-                PlaySoundSpatial(SFX_Coin, b.Location);
-                NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
+                s_makeCoin(b);
                 b.Special -= 1;
             }
         }
         else
         {
-            Coins += 1;
-            if(Coins >= 100)
-                Got100Coins();
-
-            PlaySoundSpatial(SFX_Coin, b.Location);
-            NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
+            s_makeCoin(b);
             b.Special -= 1;
         }
 
@@ -455,6 +440,13 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             C = NPCID_GRN_BOOT;
             is_ancient = true;
         }
+        else if(b.Special == 110)
+        {
+            if(InvincibilityTime)
+                C = NPCID_INVINCIBILITY_POWER;
+            else
+                C = NPCID_NULL;
+        }
         else // b.Special == 101
         {
             C = NPCID_FODDER_S3;
@@ -478,14 +470,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 b.Location.Width = BlockWidth[newBlock];
         }
 
-        // was duplicated for some reason in ancient code
-        if(is_ancient)
-        {
-            if(!HitDown)
-                BlockShakeUp(A);
-            else
-                BlockShakeDown(A);
-        }
+        // Shake code was duplicated for some reason in ancient code, but that had no effect
 
 #if 0 // Completely disable the DEAD the code that spawns the player
         if(NPCIsABonus(C) && C != 169 && C != 170) // check to see if it should spawn a dead player
@@ -503,6 +488,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         if(tempPlayer == 0) // Spawn the npc
 #endif
         // Spawn the npc
+        if(C < 1 || C > maxNPCType)
+            s_makeCoin(b);
+        else
         {
             numNPCs++; // create a new NPC
             auto &nn = NPC[numNPCs];
