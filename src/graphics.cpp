@@ -885,11 +885,8 @@ void ScreenShot()
     TakeScreen = false;
 }
 
-void DrawFrozenNPC(int Z, int A)
+void DrawFrozenNPC(int camX, int camY, int A)
 {
-    int camX = vScreen[Z].CameraAddX();
-    int camY = vScreen[Z].CameraAddY();
-
     auto &n = NPC[A];
 
     int sX = camX + s_round2int(NPC[A].Location.X);

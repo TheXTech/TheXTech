@@ -2242,7 +2242,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 }
             }
             else if(NPC[A].Type == NPCID_ICE_CUBE)
-                DrawFrozenNPC(Z, A);
+                DrawFrozenNPC(camX, camY, A);
             // fix a graphical SMBX64 bug where the draw width and frame stride were incorrect
             else if(NPC[A]->WidthGFX != 0 && NPC[A].Effect == NPCEFF_EMERGE_UP && g_config.fix_visual_bugs)
             {
@@ -2623,7 +2623,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         for(size_t i = 0; i < NPC_Draw_Queue_p.Iced_n; i++)
         {
             int A = NPC_Draw_Queue_p.Iced[i];
-            DrawFrozenNPC(Z, A);
+            DrawFrozenNPC(camX, camY, A);
         }
 
 
@@ -2913,7 +2913,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
             if(NPC[A].Type == NPCID_ICE_CUBE)
             {
-                DrawFrozenNPC(Z, A);
+                DrawFrozenNPC(camX, camY, A);
             }
             else if(!NPCIsYoshi(NPC[A]) && NPC[A].Type > 0)
             {

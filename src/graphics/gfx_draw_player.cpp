@@ -624,7 +624,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                 }
                 else
                 {
-                    DrawFrozenNPC(Z, p.HoldingNPC);
+                    DrawFrozenNPC(camX, camY, p.HoldingNPC);
                 }
             }
 
