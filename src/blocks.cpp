@@ -57,6 +57,48 @@ void s_makeCoin(Block_t& b)
     NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
 }
 
+static int s_findNearbyPlayer(const Location_t& loc)
+{
+    if(numPlayers == 1)
+        return 1;
+
+    int target_plr = 1;
+    num_t min_dist = 0;
+
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        const Player_t& player = Player[B];
+        if(!player.Dead)
+        {
+            num_t dx = loc.minus_center_x(player.Location);
+            num_t dy = loc.minus_center_y(player.Location);
+            num_t dist = num_t::dist2(dx, dy);
+            if(min_dist == 0 || dist < min_dist)
+            {
+                min_dist = dist;
+                target_plr = B;
+            }
+        }
+    }
+
+    return target_plr;
+}
+
+// initial value for ScreensLeft -- sets bit for each screen that has players
+static uint16_t s_InitScreensLeft()
+{
+    uint16_t ScreensLeft = 0;
+
+    uint16_t cur_bit = 1;
+    for(int i = 0; i < maxNetplayClients; i++, cur_bit <<= 1)
+    {
+        if(Screens[i].player_count)
+            ScreensLeft |= cur_bit;
+    }
+
+    return ScreensLeft;
+}
+
 void BlockHit(int A, bool HitDown, int whatPlayer)
 {
     // int tempPlayer = 0;
@@ -71,8 +113,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     auto &b = Block[A];
 
-    if(BattleMode && b.RespawnDelay == 0)
-        b.RespawnDelay = 1;
+    if(BattleMode && b.RespawnDelay_ScreensLeft == 0)
+        b.RespawnDelay_ScreensLeft = 1;
 
     // if(whatPlayer != 0)
     //     Controls::Rumble(whatPlayer, 10, .1);
@@ -453,21 +495,60 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             is_ancient = true;
         }
 
+        // NEW: logic to allow "important" NPCs to spawn multiple times, once per screen, in NetPlay
+        // Intentionally excludes keys and coin/timer switches because those could be used to defeat puzzles
+        if(!BattleMode && (NPCTraits[C].IsABonus || NPCLongLife(C) || C == NPCID_RANDOM_POWER || C == NPCID_NULL))
+        {
+            if(!b.RespawnDelay_ScreensLeft)
+                b.RespawnDelay_ScreensLeft = s_InitScreensLeft();
+
+            int use_player = whatPlayer;
+            if(use_player <= 0)
+            {
+                // find nearest player
+                use_player = s_findNearbyPlayer(b.Location);
+            }
+
+            // find player's screen index
+            uint16_t screen_index = ScreenIdxByPlayer(use_player);
+            uint16_t screen_index_bit = (1U << screen_index);
+
+            if(screen_index >= 16)
+            {
+                // invalid screen index, cancel the block for everyone
+                b.RespawnDelay_ScreensLeft = 0;
+            }
+            else if(b.RespawnDelay_ScreensLeft & screen_index_bit)
+            {
+                // cancel the block just for this player's screen
+                b.RespawnDelay_ScreensLeft &= ~screen_index_bit;
+            }
+            else
+            {
+                // screen has already hit block, don't make anything!
+                return;
+            }
+        }
+
         if(!HitDown)
             BlockShakeUp(A);
         else
             BlockShakeDown(A);
 
-        b.Special = 0;
-
-        if(b.Type != 55) // 55 is the bouncy note block
+        // cancel block, unless some other screen will get to hit it later
+        if(BattleMode || b.RespawnDelay_ScreensLeft == 0)
         {
-            b.Type = newBlock;
-            b.Location.Height = BlockHeight[newBlock];
+            b.Special = 0;
 
-            // Was always set in SMBX64. Doing this check here keeps the easy bonus pickup and prevents movement. -- ds-sloth
-            if(!g_config.fix_restored_block_move || !b.getShrinkResized())
-                b.Location.Width = BlockWidth[newBlock];
+            if(b.Type != 55) // 55 is the bouncy note block
+            {
+                b.Type = newBlock;
+                b.Location.Height = BlockHeight[newBlock];
+
+                // Was always set in SMBX64. Doing this check here keeps the easy bonus pickup and prevents movement. -- ds-sloth
+                if(!g_config.fix_restored_block_move || !b.getShrinkResized())
+                    b.Location.Width = BlockWidth[newBlock];
+            }
         }
 
         // Shake code was duplicated for some reason in ancient code, but that had no effect
@@ -849,8 +930,8 @@ bool KillBlock(int A, bool Splode)
     if(Block[A].Hidden)
         return false;
 
-    if(BattleMode && Block[A].RespawnDelay == 0)
-        Block[A].RespawnDelay = 1;
+    if(BattleMode && Block[A].RespawnDelay_ScreensLeft == 0)
+        Block[A].RespawnDelay_ScreensLeft = 1;
 
     if(Splode)
     {
@@ -1263,10 +1344,10 @@ bool UpdateBlocks()
         {
             auto &b = Block[A];
             // respawn
-            if(b.RespawnDelay > 0)
+            if(b.RespawnDelay_ScreensLeft > 0)
             {
-                b.RespawnDelay += 1;
-                if(b.RespawnDelay >= 65 * 60)
+                b.RespawnDelay_ScreensLeft += 1;
+                if(b.RespawnDelay_ScreensLeft >= 65 * 60)
                 {
                     if(b.DefaultType > 0 || b.DefaultSpecial > 0 || b.Layer == LAYER_DESTROYED_BLOCKS)
                     {
@@ -1304,13 +1385,13 @@ bool UpdateBlocks()
                                 b.Type = b.DefaultType;
                             }
 
-                            b.RespawnDelay = 0;
+                            b.RespawnDelay_ScreensLeft = 0;
                         }
                         else
-                            b.RespawnDelay = 65 * 30;
+                            b.RespawnDelay_ScreensLeft = 65 * 30;
                     }
                     else
-                        b.RespawnDelay = 0;
+                        b.RespawnDelay_ScreensLeft = 0;
                 }
             }
         }

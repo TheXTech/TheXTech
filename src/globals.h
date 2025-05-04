@@ -903,7 +903,8 @@ struct Block_t
 //    Slippy As Boolean
     bool Slippy = false;
 //    RespawnDelay As Integer
-    vbint_t RespawnDelay = 0;
+    // Newly re-used to represent which screens can still hit the block (outside of Battle Mode)
+    uint16_t RespawnDelay_ScreensLeft = 0;
 //    RapidHit As Integer
     vbint_t RapidHit = 0;
 //    DefaultType As Integer
