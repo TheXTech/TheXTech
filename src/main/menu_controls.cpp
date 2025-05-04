@@ -28,6 +28,7 @@
 #include "../sound.h"
 #include "../globals.h"
 #include "../graphics.h"
+#include "control/controls_methods.h" // to cancel keyboard's double-click fullscreen
 
 #include "../gfx.h"
 #include "../core/render.h"
@@ -56,6 +57,13 @@ static Controls::ControlsClass s_profileTab = Controls::ControlsClass::None;
 
 static std::array<MarqueeState, maxLocalPlayers> s_controller_type_marquee;
 static std::array<MarqueeState, maxLocalPlayers> s_controller_profile_marquee;
+
+static inline void s_cancelDoubleClick()
+{
+#ifdef KEYBOARD_H
+    Controls::g_cancelDoubleClick = true;
+#endif
+}
 
 // only partially refactored from the mouse and standard menu logic functions
 //   (which currently duplicate part of their logic)
@@ -214,6 +222,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
                 if(MenuMouseRelease && SharedCursor.Primary)
                 {
+                    s_cancelDoubleClick();
                     PlaySoundMenu(SFX_Slide);
                     s_deleteProfileSel = false;
                     MenuCursor = 1; // Delete Profile
@@ -234,6 +243,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
                 if(MenuMouseRelease && SharedCursor.Primary)
                 {
+                    s_cancelDoubleClick();
                     if(profile && type->DeleteProfile(profile, Controls::g_InputMethods))
                     {
                         PlaySoundMenu(SFX_VillainKilled);
@@ -330,6 +340,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
                 if(MenuMouseRelease && SharedCursor.Primary)
                 {
+                    s_cancelDoubleClick();
                     PlaySoundMenu(SFX_Do);
                     s_curType = MenuCursor;
                     MenuCursor = 0;
@@ -517,6 +528,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
                         if(MenuMouseRelease && SharedCursor.Primary)
                         {
+                            s_cancelDoubleClick();
                             if(MenuCursor != n_profiles)
                             {
                                 PlaySoundMenu(SFX_Do);
@@ -576,6 +588,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
                         if(MenuMouseRelease && SharedCursor.Primary)
                         {
+                            s_cancelDoubleClick();
                             if(type->OptionChange(i))
                                 PlaySoundMenu(SFX_Do);
                             else
@@ -612,6 +625,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
                         if(MenuMouseRelease && SharedCursor.Primary)
                         {
+                            s_cancelDoubleClick();
                             if(type->OptionChange(i))
                                 PlaySoundMenu(SFX_Do);
                             else
@@ -783,6 +797,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
                     if(MenuMouseRelease && SharedCursor.Primary)
                     {
+                        s_cancelDoubleClick();
                         MenuMouseRelease = false;
 
                         menuControls_Do();
@@ -833,6 +848,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
                         if(MenuMouseRelease && SharedCursor.Primary)
                         {
+                            s_cancelDoubleClick();
                             if(type->OptionChange(i))
                                 PlaySoundMenu(SFX_Do);
                             else
@@ -870,6 +886,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
                         if(MenuMouseRelease && SharedCursor.Primary)
                         {
+                            s_cancelDoubleClick();
                             if(profile->OptionChange(i))
                                 PlaySoundMenu(SFX_Do);
                             else
@@ -1085,6 +1102,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
                     if(MenuMouseRelease && SharedCursor.Primary)
                     {
+                        s_cancelDoubleClick();
                         PlaySoundMenu(SFX_PSwitch);
                         g_pollingInput = true;
                         MenuCursorCanMove = false;
@@ -1104,6 +1122,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
                     if(MenuMouseRelease && SharedCursor.Primary)
                     {
+                        s_cancelDoubleClick();
                         PlaySoundMenu(SFX_PSwitch);
                         g_pollingInput = true;
                         MenuCursorCanMove = false;

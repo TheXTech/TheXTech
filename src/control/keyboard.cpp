@@ -45,6 +45,8 @@
 namespace Controls
 {
 
+bool g_cancelDoubleClick = false;
+
 // helper functions
 
 
@@ -1413,12 +1415,14 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
             bool doubleClick = (this->m_lastMousePress + 300) >= SDL_GetTicks();
             this->m_lastMousePress = SDL_GetTicks();
 
-            if(doubleClick && !MagicHand && !LevelEditor)
+            if(doubleClick && !MagicHand && !LevelEditor && !g_cancelDoubleClick)
             {
                 this->m_lastMousePress = 0;
                 g_hotkeysPressed[Hotkeys::Buttons::Fullscreen] = 0;
                 return true;
             }
+
+            g_cancelDoubleClick = false;
         }
 #endif
 
