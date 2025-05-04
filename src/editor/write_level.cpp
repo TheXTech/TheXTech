@@ -214,6 +214,10 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         out.bgo.push_back(bgo);
     }
 
+    const auto generator_direct_default = npc.generator_direct;
+    const auto generator_period_default = npc.generator_period;
+    const auto generator_type_default = npc.generator_type;
+
     for(int i = 1; i <= numNPCs; ++i)
     {
         const auto &n = NPC[i];
@@ -255,9 +259,18 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         }
 
         npc.generator = n.Generator;
-        npc.generator_direct = n.GeneratorDirection();
-        npc.generator_period = n.GeneratorTimeMax();
-        npc.generator_type = n.GeneratorEffect();
+        if(npc.generator)
+        {
+            npc.generator_direct = n.GeneratorDirection();
+            npc.generator_period = n.GeneratorTimeMax();
+            npc.generator_type = n.GeneratorEffect();
+        }
+        else
+        {
+            npc.generator_direct = generator_direct_default;
+            npc.generator_period = generator_period_default;
+            npc.generator_type = generator_type_default;
+        }
         npc.attach_layer = GetL(n.AttLayer);
 
         npc.msg = GetS(n.Text);
