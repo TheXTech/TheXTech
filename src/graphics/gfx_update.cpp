@@ -887,17 +887,6 @@ static std::vector<NPCRef_t> s_NoReset_NPCs_LastFrame;
 // shared between the NPC screen logic functions, always reset to 0 between frames
 static std::bitset<maxNPCs> s_NPC_present;
 
-static inline bool s_NPC_long_life(NPCID Type)
-{
-    return (NPCIsYoshi(Type) || NPCIsBoot(Type) || Type == NPCID_POWER_S3
-        || Type == NPCID_FIRE_POWER_S3 || Type == NPCID_CANNONITEM || Type == NPCID_LIFE_S3
-        || Type == NPCID_POISON || Type == NPCID_STATUE_POWER || Type == NPCID_HEAVY_POWER || Type == NPCID_FIRE_POWER_S1
-        || Type == NPCID_FIRE_POWER_S4 || Type == NPCID_POWER_S1 || Type == NPCID_POWER_S4
-        || Type == NPCID_LIFE_S1 || Type == NPCID_LIFE_S4 || Type == NPCID_3_LIFE || Type == NPCID_FLIPPED_RAINBOW_SHELL
-        || Type == NPCID_PLATFORM_S3 || Type == NPCID_INVINCIBILITY_POWER || Type == NPCID_AQUATIC_POWER
-        || Type == NPCID_POLAR_POWER || Type == NPCID_CYCLONE_POWER || Type == NPCID_SHELL_POWER);
-}
-
 // does the classic ("onscreen") NPC activation / reset logic for vScreen Z, directly based on the many NPC loops of the original game
 void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw_Queue_t& NPC_Draw_Queue_p)
 {
@@ -1078,7 +1067,8 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
                     NPC[A].JustActivated = static_cast<uint8_t>(Z);
 
                 NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
-                if(check_long_life && s_NPC_long_life(NPC[A].Type))
+                // NPCID_PLATFORM_S3 was checked here but not in BlockHit, so it's not included in the global trait
+                if(check_long_life && (NPCLongLife(NPC[A].Type) || NPC[A].Type == NPCID_PLATFORM_S3))
                     NPC[A].TimeLeft = Physics.NPCTimeOffScreen * 20;
 
                 if(!NPC[A].Active)
@@ -1399,7 +1389,8 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
             // update TimeLeft (despawn timer) if active and in the no-reset zone
             if(NPC[A].Active)
             {
-                if(s_NPC_long_life(NPC[A].Type))
+                // NPCID_PLATFORM_S3 was checked here but not in BlockHit, so it's not included in the global trait
+                if(NPCLongLife(NPC[A].Type) || NPC[A].Type == NPCID_PLATFORM_S3)
                     NPC[A].TimeLeft = Physics.NPCTimeOffScreen * 20;
                 else
                     NPC[A].TimeLeft = Physics.NPCTimeOffScreen;

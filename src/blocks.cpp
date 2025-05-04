@@ -655,17 +655,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             {
                 // the logic is the next clause didn't exist in ancient cases
             }
-            else if(NPCIsYoshi(nn) ||
-               NPCIsBoot(nn) || nn.Type == NPCID_POWER_S3 ||
-               nn.Type == NPCID_FIRE_POWER_S3 || nn.Type == NPCID_CANNONITEM ||
-               nn.Type == NPCID_LIFE_S3 || nn.Type == NPCID_POISON ||
-               nn.Type == NPCID_STATUE_POWER || nn.Type == NPCID_HEAVY_POWER ||
-               nn.Type == NPCID_AQUATIC_POWER || nn.Type == NPCID_POLAR_POWER ||
-               nn.Type == NPCID_CYCLONE_POWER || nn.Type == NPCID_SHELL_POWER ||
-               nn.Type == NPCID_FIRE_POWER_S1 || nn.Type == NPCID_FIRE_POWER_S4 ||
-               nn.Type == NPCID_POWER_S1 || nn.Type == NPCID_POWER_S4 ||
-               nn.Type == NPCID_LIFE_S1 || nn.Type == NPCID_LIFE_S4 ||
-               nn.Type == NPCID_3_LIFE || nn.Type == NPCID_FLIPPED_RAINBOW_SHELL)
+            else if(NPCLongLife(nn.Type))
             {
                 nn.TimeLeft = Physics.NPCTimeOffScreen * 20;
             }

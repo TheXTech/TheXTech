@@ -341,4 +341,18 @@ XT_FORCE_INLINE constexpr bool NPCIsVeggie(const NPC_t& n)
     return NPCIsVeggie(n.Type);
 }
 
+// factored out of block hit / UpdateGraphics code
+constexpr inline bool NPCLongLife(NPCID Type)
+{
+    return (NPCIsYoshi(Type) || NPCIsBoot(Type) || Type == NPCID_POWER_S3
+        || Type == NPCID_FIRE_POWER_S3 || Type == NPCID_CANNONITEM || Type == NPCID_LIFE_S3
+        || Type == NPCID_POISON || Type == NPCID_STATUE_POWER || Type == NPCID_HEAVY_POWER || Type == NPCID_FIRE_POWER_S1
+        || Type == NPCID_FIRE_POWER_S4 || Type == NPCID_POWER_S1 || Type == NPCID_POWER_S4
+        || Type == NPCID_LIFE_S1 || Type == NPCID_LIFE_S4 || Type == NPCID_3_LIFE || Type == NPCID_FLIPPED_RAINBOW_SHELL
+        // || Type == NPCID_PLATFORM_S3 // exclusive to UpdateGraphics
+        // TheXTech-exclusive Types with long lives
+        || Type == NPCID_INVINCIBILITY_POWER || Type == NPCID_AQUATIC_POWER
+        || Type == NPCID_POLAR_POWER || Type == NPCID_CYCLONE_POWER || Type == NPCID_SHELL_POWER);
+}
+
 #endif // #ifndef NPC_CONSTANT_TRAITS_H
