@@ -486,6 +486,13 @@ bool MessageScreen_Logic(int plr)
     bool menuDoPress = SharedPause;
     bool menuBackPress = false;
 
+    if(GameMenu)
+    {
+        bool clicked = (SharedCursor.Primary || SharedCursor.Secondary);
+        menuDoPress |= clicked;
+        MenuMouseRelease = !clicked;
+    }
+
     // there was previously code to copy all players' controls from the main player, but this is no longer necessary (and actively harmful in the SingleCoop case)
 
     if(!g_config.multiplayer_pause_controls && plr == 0)
