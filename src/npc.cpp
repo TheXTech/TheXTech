@@ -2983,7 +2983,7 @@ void NPCSpecial(int A)
                                 // go towards the ground
                                 npc.Location.Y += 2;
                                 // wait for player to reach ground
-                                LevelMacroWhich = -1;
+                                LevelMacroWhich = -16;
                                 PlaySound(SFX_FlagExit);
                             }
                             else

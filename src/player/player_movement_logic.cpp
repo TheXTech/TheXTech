@@ -1478,10 +1478,13 @@ void PlayerMazeZoneMovement(int A)
 
 void PlayerFlagSlideMovement(int A)
 {
+    Player[A].Location.SpeedX = 0;
+
     // have we hit the ground yet?
-    if(Player[A].Location.SpeedY == 0)
+    if(Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC)
     {
-        LevelMacroWhich = 0;
+        // this results in waiting 16 frames after hitting the ground
+        LevelMacroWhich++;
     }
     else
     {
