@@ -43,6 +43,7 @@
 
 #include "npc_traits.h"
 
+#include "control/controls_methods.h" // to cancel keyboard's double-click fullscreen
 #include "main/trees.h"
 #include "script/luna/luna.h"
 
@@ -593,5 +594,11 @@ void MenuLoop()
 
     if(SharedCursor.Primary || SharedCursor.Secondary)
         MenuMouseRelease = false;
+
+#ifdef KEYBOARD_H
+    if(MenuMouseClick)
+        Controls::g_cancelDoubleClick = true;
+#endif
+
     MenuMouseClick = false;
 }

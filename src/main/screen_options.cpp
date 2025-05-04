@@ -44,6 +44,7 @@
 #include "graphics/gfx_marquee.h"
 #include "main/menu_controls.h"
 #include "controls.h"
+#include "control/controls_methods.h" // to cancel keyboard's double-click fullscreen
 
 namespace OptionsScreen
 {
@@ -642,6 +643,9 @@ bool Mouse_Render(bool mouse, bool render)
 
         if(SharedCursor.Primary && cur_mouse_item == (int)cur_item && MenuMouseRelease)
         {
+#ifdef KEYBOARD_H
+            Controls::g_cancelDoubleClick = true;
+#endif
             MenuMouseRelease = false;
             Do();
         }

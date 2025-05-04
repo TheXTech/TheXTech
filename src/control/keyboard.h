@@ -26,6 +26,8 @@
 namespace Controls
 {
 
+extern bool g_cancelDoubleClick;
+
 constexpr int null_key = -1;
 
 class InputMethod_Keyboard : public InputMethod

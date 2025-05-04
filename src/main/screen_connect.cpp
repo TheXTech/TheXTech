@@ -23,6 +23,15 @@
 #include "main/game_strings.h"
 #include "main/speedrunner.h"
 
+#include "control/controls_methods.h" // to cancel keyboard's double-click fullscreen
+
+static inline void s_cancelDoubleClick()
+{
+#ifdef KEYBOARD_H
+    Controls::g_cancelDoubleClick = true;
+#endif
+}
+
 namespace ConnectScreen
 {
 
@@ -1236,6 +1245,7 @@ bool PlayerBox::MouseItem(int i)
 
     if(MenuMouseRelease && SharedCursor.Primary)
     {
+        s_cancelDoubleClick();
         MenuMouseRelease = false;
         return Do();
     }
@@ -1709,6 +1719,7 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
 
             if(MenuMouseRelease && SharedCursor.Primary)
             {
+                s_cancelDoubleClick();
                 MenuMouseRelease = false;
                 return Do();
             }
