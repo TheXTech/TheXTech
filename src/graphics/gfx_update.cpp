@@ -2519,13 +2519,25 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(sX + bw >= 0 && sY + bh >= 0 /*&& !block.Hidden*/)
                 {
                     g_stats.renderedBlocks++;
+                    XTColor cb;
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+                    if(block.RespawnDelay_ScreensLeft && !BattleMode)
+                    {
+                        uint16_t screen_index = (&screen - &Screens[0]);
+                        if((block.RespawnDelay_ScreensLeft & (1U << screen_index)) == 0)
+                            cb = XTColor(127, 127, 127);
+                    }
+#endif
+
                     XRender::renderTextureBasic(sX,
                                           sY + block.ShakeOffset,
                                           bw,
                                           bh,
                                           GFXBlock[block.Type],
                                           0,
-                                          BlockFrame[block.Type] * bh);
+                                          BlockFrame[block.Type] * bh,
+                                          cb);
                     // BlockFrame * bh was previously BlockFrame * 32
                     // This change is needed for converted conveyor blocks
                     // It may be reverted in the future
