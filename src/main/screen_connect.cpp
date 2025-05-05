@@ -251,11 +251,18 @@ static void s_logRecentChars()
     // reset recent chars to 0
     s_recent_char = {};
 
-    // update
-    for(int i = 0; i < maxLocalPlayers; i++)
+    // update recent characters
+    for(size_t i = 0; i < maxLocalPlayers; i++)
     {
         if(s_players[i].m_state != PlayerState::Disconnected)
             s_recent_char[i] = l_screen->charSelect[i];
+    }
+
+    // mark input methods as used
+    for(Controls::InputMethod* method : Controls::g_InputMethods)
+    {
+        if(method)
+            method->used_for_player = true;
     }
 
     // if controls dirty, save them
