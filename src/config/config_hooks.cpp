@@ -72,14 +72,9 @@ void config_rendermode_set()
         return;
 
     bool res = g_frmMain.restartRenderer();
-    PlaySoundMenu(SFX_PSwitch);
 
-    if(!res)
-    {
-        g_MessageType = MESSAGE_TYPE_SYS_INFO;
-        MessageText = g_mainMenu.optionsRestartEngine;
-        PauseGame(PauseCode::Message);
-    }
+    if(res)
+        PlaySoundMenu(SFX_PSwitch);
 }
 
 void config_fullscreen_set()
