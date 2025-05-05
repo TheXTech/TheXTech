@@ -501,13 +501,13 @@ public:
 #ifndef RENDER_CUSTOM
     enum RenderMode_t
     {
-        RENDER_SOFTWARE = 0,
-        RENDER_ACCELERATED_AUTO,
+        RENDER_ACCELERATED_AUTO = 0,
         RENDER_ACCELERATED_SDL,
         RENDER_ACCELERATED_OPENGL,
         RENDER_ACCELERATED_OPENGL_ES,
         RENDER_ACCELERATED_OPENGL_LEGACY,
         RENDER_ACCELERATED_OPENGL_ES_LEGACY,
+        RENDER_SOFTWARE,
         RENDER_END
     };
     setup_enum_t render_mode{this,
