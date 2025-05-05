@@ -36,6 +36,7 @@ Changelog for 1.3.7.1-dev
 -Rapidly clicking on menu items no longer toggles fullscreen. (@ds-sloth, thanks to @Agatha for the suggestion)
 -The mouse can now be used to click through message boxes in the main menu. (@ds-sloth, thanks to @Agatha for the suggestion)
 -Advanced options are now applied only when hitting Select or returning to the previous screen. (@ds-sloth, thanks to @Wohlstand for the suggestion)
+-Fix TheXTech v1.3.7-beta visual bug in which the backdrop did not have proper borders in 4P split screen at 1440p. (@ds-sloth)
 
 Changelog for 1.3.7
 -Fix vanilla peculiarity where medals were sometimes not collected when killed, guarded by "fix-medal-kill" [Modern Mode] (@ds-sloth, thanks to @Superbloxen for the report)

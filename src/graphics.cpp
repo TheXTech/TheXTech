@@ -1014,19 +1014,20 @@ void DrawBackdrop(const Screen_t& screen)
 
             Location_t full = newLoc(0, 0, XRender::TargetW, XRender::TargetH);
             // horizontal
-            if(screen.Type == 4 || (screen.Type == 5 && (screen.DType == 1 || screen.DType == 2)))
+            if(screen.Type == 4 || (screen.Type == 5 && (screen.DType == 1 || screen.DType == 2)) || (screen.Type == 9 && (i != 2 || screen.active_end() != 3)))
             {
                 full.Width = XRender::TargetW / 2;
                 // our screen on right
-                if(((screen.Type == 4 || (screen.Type == 5 && screen.DType == 1)) && i == 1) || (screen.DType == 2 && i == 0))
+                if(((screen.Type == 4 || (screen.Type == 5 && screen.DType == 1)) && i == 1) || (screen.DType == 2 && i == 0) || (screen.Type == 9 && (i == 1 || i == 3)))
                     full.X = XRender::TargetW / 2;
             }
+
             // vertical
-            else if(screen.Type == 1 || (screen.Type == 5 && (screen.DType == 3 || screen.DType == 4 || screen.DType == 6)))
+            if(screen.Type == 1 || (screen.Type == 5 && (screen.DType == 3 || screen.DType == 4 || screen.DType == 6)) || screen.Type == 9)
             {
                 full.Height = XRender::TargetH / 2;
                 // our screen on bottom
-                if(((screen.Type == 1 || (screen.Type == 5 && (screen.DType == 3 || screen.DType == 6))) && i == 1) || (screen.DType == 4 && i == 0))
+                if(((screen.Type == 1 || (screen.Type == 5 && (screen.DType == 3 || screen.DType == 6))) && i == 1) || (screen.DType == 4 && i == 0) || (screen.Type == 9 && (i == 2 || i == 3)))
                     full.Y = XRender::TargetH / 2;
             }
 
