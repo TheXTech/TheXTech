@@ -95,6 +95,8 @@ inline void s_change_item()
     cur_item_changed = true;
     value_marquee.reset_width();
     value_tooltip_marquee.reset_width();
+    s_set_dirty();
+    UpdateConfig();
 }
 
 inline size_t get_num_items()
@@ -312,7 +314,6 @@ inline BaseConfigOption_t<true>* PrepareAction(bool to_delete = false)
 
         g_config.m_options[i]->unset();
         s_change_item();
-        UpdateConfig();
 
         // consider this the deleted option
         if(to_delete)
@@ -396,9 +397,7 @@ void Do()
 
         if(opt && opt->change())
         {
-            s_set_dirty();
             s_change_item();
-            UpdateConfig();
             PlaySoundMenu(SFX_Do);
         }
         else
@@ -417,9 +416,7 @@ void RotateLeft()
 
     if(opt && opt->rotate_left())
     {
-        s_set_dirty();
         s_change_item();
-        UpdateConfig();
         PlaySoundMenu(SFX_Do);
     }
     else
@@ -437,9 +434,7 @@ void RotateRight()
 
     if(opt && opt->rotate_right())
     {
-        s_set_dirty();
         s_change_item();
-        UpdateConfig();
         PlaySoundMenu(SFX_Do);
     }
     else
@@ -457,10 +452,8 @@ void Delete()
 
     if(opt && opt->is_set() && opt != &g_config.playstyle && opt != &g_config.creator_compat)
     {
-        s_set_dirty();
-        s_change_item();
         opt->unset();
-        UpdateConfig();
+        s_change_item();
         PlaySoundMenu(SFX_PlayerShrink);
     }
     else
