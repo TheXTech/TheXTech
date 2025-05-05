@@ -76,6 +76,15 @@ static std::string s_temp_string;
 // Config_t* const config_levels[] = {nullptr, nullptr, &g_gameInfo, &g_config_game_user, &g_config_episode_creator, &g_config_episode_user,
 //     &g_config_file_creator, nullptr, &g_config_cmdline, nullptr};
 
+inline bool s_deferred_changes()
+{
+#if defined(CUSTOM_AUDIO) && defined(RENDER_CUSTOM)
+    return false;
+#else
+    return section_index != SECTION_NONE && g_config.m_options[section_index] == &g_config.advanced;
+#endif
+}
+
 inline void s_set_dirty()
 {
     global_dirty = true;
@@ -96,7 +105,9 @@ inline void s_change_item()
     value_marquee.reset_width();
     value_tooltip_marquee.reset_width();
     s_set_dirty();
-    UpdateConfig();
+
+    if(!s_deferred_changes())
+        UpdateConfig();
 }
 
 inline size_t get_num_items()
@@ -300,7 +311,7 @@ inline BaseConfigOption_t<true>* PrepareAction(bool to_delete = false)
     {
         opt->m_set = ConfigSetLevel::unset;
 
-        if(g_config.m_options[i]->is_set())
+        if(g_config.m_options[i]->is_set() && !(s_deferred_changes() && to_delete))
             opt->update_from(*g_config.m_options[i], ConfigSetLevel::set);
         else
             opt->set_from_default(ConfigSetLevel::set);
@@ -452,6 +463,8 @@ void Delete()
 
     if(opt && opt->is_set() && opt != &g_config.playstyle && opt != &g_config.creator_compat)
     {
+        // restore to default internally -- this helps when directly displaying g_config_game_user items
+        opt->set_from_default(ConfigSetLevel::set);
         opt->unset();
         s_change_item();
         PlaySoundMenu(SFX_PlayerShrink);
@@ -466,8 +479,11 @@ bool Back();
 
 void Select()
 {
-    // disabling for now
-    return;
+    if(s_deferred_changes())
+    {
+        UpdateConfig();
+        PlaySoundMenu(SFX_PSwitch);
+    }
 }
 
 bool Back()
@@ -495,6 +511,9 @@ bool Back()
     }
     else
     {
+        if(s_deferred_changes())
+            UpdateConfig();
+
         if(section_index < g_config.m_options.size() && g_config.m_options[section_index] == &g_config.compat)
             s_check_friends_edited();
 
@@ -751,6 +770,13 @@ bool Mouse_Render(bool mouse, bool render)
     {
         BaseConfigOption_t<true>* opt = g_config.m_options[visible_items[i]];
 
+        if(s_deferred_changes())
+        {
+            BaseConfigOption_t<true>* user_opt = g_config_game_user.m_options[visible_items[i]];
+            if(user_opt->m_set != ConfigSetLevel::unset || opt->m_set == ConfigSetLevel::user_config)
+                opt = user_opt;
+        }
+
         bool is_header = is_subsection(i);
 
         // for subsection headers, indent to left and allow to fill screen
@@ -826,6 +852,30 @@ bool Mouse_Render(bool mouse, bool render)
             else
                 vcolor = XTColorF(0.5f, 0.5f, 0.5f, 1.0f);
             break;
+        }
+
+        if(s_deferred_changes())
+        {
+            const BaseConfigOption_t<true>* main_opt = g_config.m_options[visible_items[i]];
+            if(!(*opt == *main_opt))
+                vcolor = XTColor(240, 255, 32);
+            else
+            {
+                auto* opt_impl = dynamic_cast<ConfigSetupEnum_t<true>*>(opt);
+                const auto* main_opt_impl = dynamic_cast<const ConfigSetupEnum_t<true>*>(main_opt);
+
+                // provide value for "Auto" from main option
+                if(opt_impl && main_opt_impl && opt_impl != main_opt_impl)
+                {
+                    if(main_opt_impl->m_value == 0)
+                        opt_impl->obtained = main_opt_impl->obtained;
+                    else
+                        opt_impl->obtained = 0;
+                }
+
+                if(main_opt_impl && main_opt_impl->m_value != 0 && main_opt_impl->m_value != main_opt_impl->obtained)
+                    vcolor = XTColor(192, 96, 96);
+            }
         }
 
         if(tight_mode && i != cur_item)
