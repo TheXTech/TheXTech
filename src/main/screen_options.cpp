@@ -78,7 +78,7 @@ static std::string s_temp_string;
 
 inline bool s_deferred_changes()
 {
-#if defined(CUSTOM_AUDIO) && defined(RENDER_CUSTOM)
+#if (defined(CUSTOM_AUDIO) || defined(__16M__)) && defined(RENDER_CUSTOM)
     return false;
 #else
     return section_index != SECTION_NONE && g_config.m_options[section_index] == &g_config.advanced;
