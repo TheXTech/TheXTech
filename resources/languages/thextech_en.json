@@ -657,9 +657,16 @@
                     "auto": "Auto",
                     "desktop": "Desktop",
                     "desktop-tip": "Keep the current screen resolution",
-                    "real": "Exclusive",
-                    "real-tip": "Set physical screen resolution"
-                }
+                    "exclusive": "Exclusive",
+                    "exclusive-tip": "Set physical screen resolution"
+                },
+                "fullscreen-depth": {
+                    "16": "16-bit",
+                    "32": "32-bit",
+                    "_name": "Exclusive bit depth",
+                    "auto": "Auto"
+                },
+                "fullscreen-res": "Exclusive res"
             },
             "audio": {
                 "_header": "Audio",
@@ -771,7 +778,8 @@
                     "linear": "Smooth",
                     "nearest": "Nearest",
                     "full": "Full",
-                    "center": "Center"
+                    "center": "Center",
+                    "3x": "3x"
                 },
                 "show-episode-title": {
                     "_name": "Episode name",
