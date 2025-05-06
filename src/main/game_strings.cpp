@@ -46,7 +46,9 @@ void initGameStrings()
     g_gameStrings.messageScanningLevels = "Scanning levels...";
     g_gameStrings.formatMinutesSeconds = "{0}m{1}s";
 
+#ifndef NO_WINDOW_FOCUS_TRACKING
     g_gameStrings.screenPaused = "Paused";
+#endif
 
     g_gameStrings.warpNeedStarCount = "You need {0} {1} to enter.";
 
