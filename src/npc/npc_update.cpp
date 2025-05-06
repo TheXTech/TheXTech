@@ -952,19 +952,16 @@ void UpdateNPCs()
                 {
                     if(NPC[A].TimeLeft <= 1)
                     {
-                        NPCQueues::Active.erase(A);
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
                     else if(NPC[A].Direction == -1 && NPC[A].Location.X < Player[NPC[A].JustActivated].Location.X)
                     {
-                        NPCQueues::Active.erase(A);
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
                     else if(NPC[A].Direction == 1 && NPC[A].Location.X > Player[NPC[A].JustActivated].Location.X)
                     {
-                        NPCQueues::Active.erase(A);
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
@@ -983,8 +980,6 @@ void UpdateNPCs()
                 else if(NPC[A].Type == NPCID_CANNONENEMY)
                     NPC[A].Special = 100;
             }
-            else if(!NPC[A].Generator && !NPCQueues::check_active(NPC[A]))
-                NPCQueues::Active.erase(A);
 
             if(NPC[A].Type == NPCID_STATUE_S3 || NPC[A].Type == NPCID_STATUE_S4)
                 NPC[A].Special = iRand(200);
@@ -1000,8 +995,8 @@ void UpdateNPCs()
                 NPC[A].Projectile = false;
 
             // this allows us to exclude Vines from the set of active NPCs (without checking their status every frame if they do need to be active)
-            if(NPC[A]->IsAVine)
-                NPCQueues::update(NPC[A]);
+            if(!NPCQueues::check_active(NPC[A]))
+                NPCQueues::Active.erase(A);
         }
         // check for active NPCs that are falling off
         else if(NPC[A].Location.Y > level[NPC[A].Section].Height && NPC[A].Location.Y > level[NPC[A].Section].Height + 16)
