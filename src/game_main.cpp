@@ -2144,6 +2144,17 @@ void CheckActive()
     // If LevelEditor = False Then Exit Sub
     while(!XWindow::hasWindowInputFocus())
     {
+        if(!focusLost)
+        {
+            XRender::setTargetTexture();
+            XRender::renderRect(0, 0, XRender::TargetW, XRender::TargetH, {0, 0, 0, 127}, true);
+            SuperPrintScreenCenter(g_gameStrings.screenPaused.empty() ? "Paused" : g_gameStrings.screenPaused, 3, XRender::TargetH / 2);
+            pLogDebug("Window Focus lost");
+            focusLost = true;
+        }
+
+        XRender::repaint();
+
         XEvents::waitEvents();
 //        If LevelEditor = True Or MagicHand = True Then frmLevelWindow.vScreen(1).MousePointer = 0
         SyncSysCursorDisplay();
@@ -2153,12 +2164,6 @@ void CheckActive()
         resetTimeBuffer();
         //keyDownEnter = false;
         //keyDownAlt = false;
-
-        if(!focusLost)
-        {
-            pLogDebug("Window Focus lost");
-            focusLost = true;
-        }
 
 //        if(musicPlaying && !MusicPaused)
 //        {

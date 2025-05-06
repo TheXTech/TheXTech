@@ -38,6 +38,7 @@ Changelog for 1.3.7.1-dev
 -Advanced options are now applied only when hitting Select or returning to the previous screen. (@ds-sloth, thanks to @Wohlstand for the suggestion)
 -Fix TheXTech v1.3.7-beta visual bug in which the backdrop did not have proper borders in 4P split screen at 1440p. (@ds-sloth)
 -Fix TheXTech v1.3.7 bug in which input methods might get disconnected when switching between battle leves in 3/4-player mode. (@ds-sloth)
+-Added an explicit indication that game is suspended when window is out of focus by showing the "Paused" label over the gray filter. (@Wohlstand)
 
 Changelog for 1.3.7
 -Fix vanilla peculiarity where medals were sometimes not collected when killed, guarded by "fix-medal-kill" [Modern Mode] (@ds-sloth, thanks to @Superbloxen for the report)

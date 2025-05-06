@@ -369,7 +369,8 @@
             "sysInfoError": "Error!",
             "sysInfoTitle": "Info",
             "sysInfoWarning": "Warning!"
-        }
+        },
+        "screenPaused": "Paused"
     },
     "languageName": "English",
     "menu": {

@@ -434,6 +434,8 @@ XTechTranslate::XTechTranslate()
     m_engineMap.insert({"game.message.scanningLevels",             &g_gameStrings.messageScanningLevels});
     m_engineMap.insert({"game.format.minutesSeconds",              &g_gameStrings.formatMinutesSeconds});
 
+    m_engineMap.insert({"game.screenPaused",               &g_gameStrings.screenPaused});
+
     m_engineMap.insert({"game.pause.continue",             &g_gameStrings.pauseItemContinue});
     m_engineMap.insert({"game.pause.restartLevel",         &g_gameStrings.pauseItemRestartLevel});
     m_engineMap.insert({"game.pause.resetCheckpoints",     &g_gameStrings.pauseItemResetCheckpoints});
