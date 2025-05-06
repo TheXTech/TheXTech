@@ -545,7 +545,7 @@ void ItemList_t::make_translation(XTechTranslate& translate, const char* group, 
             if(header < 0)
                 translate.m_assetsMap.insert({fmt::sprintf_ne("editor.%s.auto.%s%d", group, prefix, indices[i]), &names[i]});
             else if(header < (int)families.size())
-                translate.m_assetsMap.insert({fmt::sprintf_ne("editor.%s.%s.%d%d", group, families[header].second.c_str(), prefix, indices[i]), &names[i]});
+                translate.m_assetsMap.insert({fmt::sprintf_ne("editor.%s.%s.%s%d", group, families[header].second.c_str(), prefix, indices[i]), &names[i]});
             else
                 translate.m_assetsMap.insert({fmt::sprintf_ne("editor.%s.fam%s.%s%d", group, header, prefix, indices[i]), &names[i]});
         }
