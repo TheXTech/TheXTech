@@ -494,6 +494,14 @@ void ShowLayer(layerindex_t L, bool NoEffect)
             {
                 bool hit = false;
 
+                // see if it's close to a canonical screen (within 8px), and disallow it from activating if not
+                // (fixes mostly vanilla bug which occurs because visible NPCs move following Deactivate but hidden NPCs don't)
+                Location_t tempLocation = NPC[A].Location;
+                tempLocation.X -= 8;
+                tempLocation.Y -= 8;
+                tempLocation.Width += 16;
+                tempLocation.Height += 16;
+
                 for(int screen_i = 0; !hit && screen_i < c_screenCount; screen_i++)
                 {
                     const Screen_t& screen = Screens[screen_i];
@@ -508,7 +516,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
                     {
                         int vscreen_Z = screen.vScreen_refs[vscreen_i];
 
-                        if(vScreenCollision(vscreen_Z, NPC[A].Location))
+                        if(vScreenCollision(vscreen_Z, tempLocation))
                             hit = true;
                     }
                 }
