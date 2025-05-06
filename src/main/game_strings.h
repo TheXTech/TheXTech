@@ -37,6 +37,8 @@ struct GameContent
     std::string messageScanningLevels;
     std::string formatMinutesSeconds;
 
+    std::string screenPaused;
+
     std::string warpNeedStarCount;
 
     std::string pauseItemContinue;
