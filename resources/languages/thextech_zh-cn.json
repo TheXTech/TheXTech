@@ -653,11 +653,9 @@
                 "inaccurate-gifs": "错误GIF图片渲染",
                 "fullscreen-type": {
                     "desktop-tip": "以当前分辨率显示",
-                    "real": "物理",
                     "desktop": "电脑",
                     "auto": "自动选择",
-                    "_name": "全屏模式显示类型",
-                    "real-tip": "以物理显示器的分辨率显示"
+                    "_name": "全屏模式显示类型"
                 }
             },
             "audio": {
