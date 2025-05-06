@@ -37,7 +37,9 @@ struct GameContent
     std::string messageScanningLevels;
     std::string formatMinutesSeconds;
 
+#ifndef NO_WINDOW_FOCUS_TRACKING
     std::string screenPaused;
+#endif
 
     std::string warpNeedStarCount;
 
