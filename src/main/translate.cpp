@@ -434,7 +434,7 @@ XTechTranslate::XTechTranslate()
     m_engineMap.insert({"game.message.scanningLevels",             &g_gameStrings.messageScanningLevels});
     m_engineMap.insert({"game.format.minutesSeconds",              &g_gameStrings.formatMinutesSeconds});
 
-#ifndef NO_WINDOW_FOCUS_TRACKING
+#if !defined(NO_WINDOW_FOCUS_TRACKING) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
     m_engineMap.insert({"game.screenPaused",               &g_gameStrings.screenPaused});
 #endif
 
@@ -466,7 +466,7 @@ XTechTranslate::XTechTranslate()
 
     m_engineMap.insert({"game.connect.phraseDropMe",              &g_gameStrings.connectDropMe});
 
-#ifdef THEXTECH_ENABLE_EDITOR
+#if defined(THEXTECH_ENABLE_EDITOR) || !defined(THEXTECH_DISABLE_LANG_TOOLS)
     m_engineMap.insert({"editor.block.pickContents",       &g_editorStrings.pickBlockContents});
 
     m_engineMap.insert({"editor.block.letterWidth",        &g_editorStrings.blockLetterWidth});
