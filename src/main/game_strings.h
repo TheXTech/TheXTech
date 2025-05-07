@@ -23,7 +23,6 @@
 #define GAME_STRINGS_H
 
 #include <string>
-#include <vector>
 
 struct GameContent
 {
@@ -37,7 +36,7 @@ struct GameContent
     std::string messageScanningLevels;
     std::string formatMinutesSeconds;
 
-#ifndef NO_WINDOW_FOCUS_TRACKING
+#if !defined(NO_WINDOW_FOCUS_TRACKING) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
     std::string screenPaused;
 #endif
 

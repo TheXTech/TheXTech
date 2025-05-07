@@ -46,7 +46,7 @@ void initGameStrings()
     g_gameStrings.messageScanningLevels = "Scanning levels...";
     g_gameStrings.formatMinutesSeconds = "{0}m{1}s";
 
-#ifndef NO_WINDOW_FOCUS_TRACKING
+#if !defined(NO_WINDOW_FOCUS_TRACKING) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
     g_gameStrings.screenPaused = "Paused";
 #endif
 
