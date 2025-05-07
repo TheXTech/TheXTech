@@ -4636,6 +4636,9 @@ void WaterCheck(const int A)
                     if(!p.Controls.Jump && !p.Controls.AltJump)
                         p.CanJump = true;
 
+                    if(p.State == PLR_STATE_CYCLONE)
+                        p.DoubleJump = true;
+
                     p.SwimCount = 0;
 
                     if(p.Location.SpeedY > 0.5_n)
