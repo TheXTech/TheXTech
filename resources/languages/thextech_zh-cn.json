@@ -369,7 +369,8 @@
             "shoe-block": "穿上鞋子时，可以抵挡大多数火焰！",
             "pound-altrun": "按下“第二奔跑”键，进行震地！",
             "pound-down": "按下“下”键，进行震地！"
-        }
+        },
+        "screenPaused": "游戏暂停"
     },
     "languageName": "简体中文",
     "menu": {
@@ -655,8 +656,17 @@
                     "desktop-tip": "以当前分辨率显示",
                     "desktop": "电脑",
                     "auto": "自动选择",
-                    "_name": "全屏模式显示类型"
-                }
+                    "_name": "全屏模式显示类型",
+                    "exclusive-tip": "设置实际画面大小",
+                    "exclusive": "独立设置"
+                },
+                "fullscreen-depth": {
+                    "auto": "自动",
+                    "_name": "位深",
+                    "16": "16位",
+                    "32": "32位"
+                },
+                "fullscreen-res": "分辨率"
             },
             "audio": {
                 "_header": "音频选项",
@@ -791,7 +801,8 @@
                     "1x": "1倍",
                     "nearest": "最近邻居",
                     "full": "完全缩放",
-                    "linear": "双线性"
+                    "linear": "双线性",
+                    "3x": "3倍"
                 },
                 "3d-compat-mode": "三维兼容模式",
                 "3d-compat-mode-tip": "在同一个三维平面下绘制所有对象",
