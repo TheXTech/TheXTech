@@ -71,11 +71,11 @@ num_t num_t::times(num_t o) const
     uint64_t frac_i_times_frac_o_32 = (uint64_t)frac_i * frac_o;
 
     // banker's rounding
-    int64_t frac_i_times_frac_o_round = (frac_i_times_frac_o_32 + ((int64_t)1 << 31));
-    if((frac_i_times_frac_o_round & 0xFFFFFFFFLL) == 0)
+    uint64_t frac_i_times_frac_o_round = (frac_i_times_frac_o_32 + ((uint64_t)1 << 31));
+    if((frac_i_times_frac_o_round & 0xFFFFFFFFULL) == 0)
     {
-        if(frac_i_times_frac_o_round & 0x100000000LL)
-            frac_i_times_frac_o_round -= 0x100000000LL;
+        if(frac_i_times_frac_o_round & 0x100000000ULL)
+            frac_i_times_frac_o_round -= 0x100000000ULL;
     }
 
     int64_t frac_i_times_frac_o = frac_i_times_frac_o_round >> 32;
