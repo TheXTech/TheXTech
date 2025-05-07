@@ -501,6 +501,7 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
         }
 #else
         {
+            UNUSED(fontSize);
             offsetX += m_interLetterSpace;
         }
 #endif
