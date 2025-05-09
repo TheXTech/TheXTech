@@ -583,6 +583,8 @@ void UpdateEditor()
                     }
 
                     EditorCursor.Warp = Warp[A];
+                    EditorCursor.Layer = EditorCursor.Warp.Layer;
+
                     if(!Warp[A].PlacedEnt && !Warp[A].PlacedExit)
                         KillWarp(A);
                 }
