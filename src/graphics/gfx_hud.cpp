@@ -497,7 +497,7 @@ void DrawMedals(int X, int Y, bool warp, uint8_t max, uint8_t prev, uint8_t ckpt
     int total_len = 0;
 
     if(g_config.medals_show_policy == Config_t::MEDALS_SHOW_COUNTS)
-        label = fmt::sprintf_ne("%d/%u", got_count, max);
+        label = fmt::sprintf_ne("%d/%u", got_count, (unsigned)max);
     else
         label = fmt::sprintf_ne("%d", got_count);
 
