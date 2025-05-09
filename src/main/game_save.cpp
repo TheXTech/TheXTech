@@ -38,6 +38,7 @@
 
 #include "main/level_save_info.h"
 #include "menu_main.h"
+#include "saved_layers.h"
 
 std::string makeGameSavePath(std::string episode, std::string world, std::string saveFile)
 {
@@ -326,6 +327,10 @@ void SaveGame()
     for(const auto& star : Star)
         sav.gottenStars.emplace_back(star.level, star.Section);
 
+    savedLayerSaveEntry savedLayer;
+    for(A = 0; ExportSavedLayer(nullptr, savedLayer, A); A++)
+        sav.savedLayers.push_back(savedLayer);
+
     sav.totalStars = uint32_t(MaxWorldStars);
 
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
@@ -471,6 +476,9 @@ void LoadGame()
         star.Section = p.second;
         Star.push_back(std::move(star));
     }
+
+    for(auto& p : sav.savedLayers)
+        LoadSavedLayer(nullptr, p);
 
     numStars = int(sav.gottenStars.size());
 

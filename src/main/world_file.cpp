@@ -36,6 +36,7 @@
 #include "../main/trees.h"
 #include "level_file.h"
 #include "world_file.h"
+#include "saved_layers.h"
 #include "main/game_info.h"
 #include "main/level_save_info.h"
 #include "main/screen_progress.h"
@@ -107,6 +108,11 @@ bool OpenWorld(std::string FilePath)
     LoadCustomConfig();
     FindCustomPlayers();
     LoadCustomGFX(true);
+    if(!LoadDefaultSavedLayers())
+    {
+        MessageText = "savedlayers.ini invalid";
+        return false;
+    }
 
     // bool compatModern = (g_config.compatibility_mode == Config_t::COMPAT_OFF);
 
@@ -677,6 +683,8 @@ void ClearWorld(bool quick)
         UnloadCustomSound();
         LoadPlayerDefaults();
     }
+
+    ClearSavedLayers();
 
     MaxWorldStars = 0;
     numTiles = 0;

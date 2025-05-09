@@ -883,6 +883,7 @@ set(THEXTECH_SRC
     src/collision.cpp
     src/load_gfx.cpp
     src/layers.cpp
+    src/saved_layers.cpp
     src/custom.cpp
     src/graphics.cpp
     src/main.cpp
