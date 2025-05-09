@@ -541,11 +541,11 @@ void ItemList_t::make_translation(XTechTranslate& translate, const char* group, 
         if(indices[i] != -1)
         {
             if(header < 0)
-                translate.m_assetsMap.insert({fmt::sprintf_ne("editor.%s.auto.%s%d", group, prefix, indices[i]), &names[i]});
+                translate.m_assetsMap.insert({fmt::sprintf_ne("editor.%s.auto.%s%d", group, prefix, (int)indices[i]), &names[i]});
             else if(header < (int)families.size())
-                translate.m_assetsMap.insert({fmt::sprintf_ne("editor.%s.%s.%s%d", group, families[header].second.c_str(), prefix, indices[i]), &names[i]});
+                translate.m_assetsMap.insert({fmt::sprintf_ne("editor.%s.%s.%s%d", group, families[header].second.c_str(), prefix, (int)indices[i]), &names[i]});
             else
-                translate.m_assetsMap.insert({fmt::sprintf_ne("editor.%s.fam%s.%s%d", group, header, prefix, indices[i]), &names[i]});
+                translate.m_assetsMap.insert({fmt::sprintf_ne("editor.%s.fam%s.%s%d", group, header, prefix, (int)indices[i]), &names[i]});
         }
         else if(!names[i].empty())
         {
@@ -554,7 +554,7 @@ void ItemList_t::make_translation(XTechTranslate& translate, const char* group, 
             if(header < (int)families.size())
                 translate.m_assetsMap.insert({fmt::sprintf_ne("editor.%s.%s.header", group, families[header].second.c_str()), &names[i]});
             else
-                translate.m_assetsMap.insert({fmt::sprintf_ne("editor.%s.fam%s.header", group, header), &names[i]});
+                translate.m_assetsMap.insert({fmt::sprintf_ne("editor.%s.fam%d.header", group, header), &names[i]});
         }
     }
 }

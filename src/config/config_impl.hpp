@@ -319,7 +319,7 @@ void ConfigOption_t<true, std::pair<int, int>>::save_to_ini(IniProcessing* ini)
 template<>
 const std::string& ConfigOption_t<true, std::array<uint8_t, 3>>::get_display_value(std::string& out) const
 {
-    out = fmt::sprintf_ne("%u,%u,%u", m_value[0], m_value[1], m_value[2]);
+    out = fmt::sprintf_ne("%u,%u,%u", (unsigned)m_value[0], (unsigned)m_value[1], (unsigned)m_value[2]);
     return out;
 }
 
