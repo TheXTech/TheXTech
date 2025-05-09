@@ -24,6 +24,7 @@
 #include <string>
 #include <memory>
 #include <stdarg.h>
+#include <stdint.h>
 
 #include "../logger.h"
 
