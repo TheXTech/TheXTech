@@ -144,37 +144,37 @@ bool SwapLayers(layerindex_t index_1, layerindex_t index_2)
 
     std::swap(Layer[index_1], Layer[index_2]);
 
-    // repoint all of Layer 1's objects to index 2
+    // repoint all of the new Layer 1's objects to index 1
     for(int A : Layer[index_1].NPCs)
-        NPC[A].Layer = index_2;
-
-    for(int A : Layer[index_1].blocks)
-        Block[A].Layer = index_2;
-
-    for(int A : Layer[index_1].BGOs)
-        Background[A].Layer = index_2;
-
-    for(int A : Layer[index_1].warps)
-        Warp[A].Layer = index_2;
-
-    for(int A : Layer[index_1].waters)
-        Water[A].Layer = index_2;
-
-    // repoint all of Layer 2's objects to index 1
-    for(int A : Layer[index_2].NPCs)
         NPC[A].Layer = index_1;
 
-    for(int A : Layer[index_2].blocks)
+    for(int A : Layer[index_1].blocks)
         Block[A].Layer = index_1;
 
-    for(int A : Layer[index_2].BGOs)
+    for(int A : Layer[index_1].BGOs)
         Background[A].Layer = index_1;
 
-    for(int A : Layer[index_2].warps)
+    for(int A : Layer[index_1].warps)
         Warp[A].Layer = index_1;
 
-    for(int A : Layer[index_2].waters)
+    for(int A : Layer[index_1].waters)
         Water[A].Layer = index_1;
+
+    // repoint all of the new Layer 2's objects to index 2
+    for(int A : Layer[index_2].NPCs)
+        NPC[A].Layer = index_2;
+
+    for(int A : Layer[index_2].blocks)
+        Block[A].Layer = index_2;
+
+    for(int A : Layer[index_2].BGOs)
+        Background[A].Layer = index_2;
+
+    for(int A : Layer[index_2].warps)
+        Warp[A].Layer = index_2;
+
+    for(int A : Layer[index_2].waters)
+        Water[A].Layer = index_2;
 
     // swap AttLayers
     for(int A = 1; A <= numNPCs; A++)

@@ -62,6 +62,7 @@ Changelog for 1.3.7.1-dev
 -Added an explicit indication that game is suspended when window is out of focus by showing the "Paused" label over the gray filter. (@Wohlstand)
 -Fix TheXTech v1.3.7-beta bug in which bullet generators not facing the player could become inactive. (@ds-sloth, thanks to @Liebning for the report)
 -Tune TheXTech v1.3.7 Modern/Classic Mode logic for when to activate NPCs shown by events to better match Vanilla. (@ds-sloth, thanks to @Liebning for the report)
+-Fix critical TheXTech v1.3.6 editor bug where swapping the order of layers resulting in objects losing their layers. (@ds-sloth, thanks to @ChristianSilvermoon for the report)
 
 Changelog for 1.3.7
 -Fix vanilla peculiarity where medals were sometimes not collected when killed, guarded by "fix-medal-kill" [Modern Mode] (@ds-sloth, thanks to @Superbloxen for the report)
