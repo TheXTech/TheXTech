@@ -42,6 +42,8 @@ struct Layer_t
     bool EffectStop = false;
 //    Hidden As Boolean
     bool Hidden = false;
+    // Index into SavedLayers array, plus 1. (Normally 0, indicating a non-saved layer.)
+    uint8_t SavedLayer = 0;
     // NEW: time until layer rejoins the main table
     uint8_t join_timer = 0;
 //    Name As String

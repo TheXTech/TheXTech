@@ -39,6 +39,7 @@
 #include "../sound.h"
 #include "../sorting.h"
 #include "../layers.h"
+#include "saved_layers.h"
 #include "config.h"
 #include "../graphics.h"
 #include "../editor.h"
@@ -1556,6 +1557,19 @@ void OpenLevelDataPost()
 
     for(int A = 0; A < numLayers; A++)
     {
+        // check if layer is a saved layer
+        for(int i = 0; i < numSavedLayers; i++)
+        {
+            if(SDL_strcasecmp(Layer[A].Name.c_str(), SavedLayers[i].Name.data()) == 0)
+            {
+                Layer[A].SavedLayer = i + 1;
+                if(!LevelEditor)
+                    Layer[A].Hidden = !SavedLayers[i].Visible;
+                break;
+            }
+        }
+
+        // hide layer if needed
         if(Layer[A].Hidden)
             HideLayer(A, true);
     }

@@ -23,6 +23,7 @@
 #include "sdl_proxy/sdl_stdinc.h"
 #include "globals.h"
 #include "layers.h"
+#include "saved_layers.h"
 #include "effect.h"
 #include "collision.h"
 #include "npc.h"
@@ -453,6 +454,9 @@ void ShowLayer(layerindex_t L, bool NoEffect)
     int A = 0;
     int B = 0;
 
+    if(Layer[L].SavedLayer)
+        SavedLayers[Layer[L].SavedLayer - 1].Visible = true;
+
     Layer[L].Hidden = false;
     if(L == LAYER_DESTROYED_BLOCKS)
         Layer[L].Hidden = true;
@@ -597,6 +601,9 @@ void HideLayer(layerindex_t L, bool NoEffect)
 {
     if(L == LAYER_NONE)
         return;
+
+    if(Layer[L].SavedLayer)
+        SavedLayers[Layer[L].SavedLayer - 1].Visible = false;
 
     Layer[L].Hidden = true;
 
