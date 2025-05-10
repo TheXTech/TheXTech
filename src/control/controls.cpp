@@ -894,8 +894,12 @@ bool Update(bool check_lost_devices)
     if(l_SharedControls.LegacyPause && !old_shared_legacy)
         XMessage::PushMessage({XMessage::Type::shared_controls, 0, 1});
 
+    if(l_SharedControls.ForcePause && !old_shared_force)
+        XMessage::PushMessage({XMessage::Type::shared_controls, 0, 2});
+
     SharedPause = false;
     SharedPauseLegacy = false;
+    SharedPauseForce = false;
 
     // sync any messages, and reset player controls to raw controls
     XMessage::Tick();
