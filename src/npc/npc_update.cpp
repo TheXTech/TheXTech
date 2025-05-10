@@ -1081,10 +1081,13 @@ interrupt_Activation:
                 else if(NPC[A]->IsFish && NPC[A].Special == 2 && NPC[A].Location.SpeedY > 0)
                     speedVar /= 2;
 
-                if(NPC[A].Location.SpeedY >= 3) // Terminal Velocity in water
+                // new logic for iceballs fired upwards by a Polar Swim player
+                if(NPC[A].Type == NPCID_PLR_ICEBALL && NPC[A].Special4)
+                    Physics.NPCGravity /= 4;
+                // SMBX 1.3 logic: Terminal Velocity in water
+                else if(NPC[A].Location.SpeedY >= 3)
                     NPC[A].Location.SpeedY = 3;
-
-                if(NPC[A].Location.SpeedY < -3)
+                else if(NPC[A].Location.SpeedY < -3)
                     NPC[A].Location.SpeedY = -3;
             }
             // as far as I'm aware it would make absolutely no difference if this did not happen for NPCID_RAFT

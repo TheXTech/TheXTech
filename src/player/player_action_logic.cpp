@@ -455,44 +455,6 @@ void PlayerThrowBall(const int A)
     bool throw_up = p.Controls.Up;
     int throw_dir = p.Direction;
 
-    // animation and logic for polar throwing while aquatic-swimming
-    if(p.AquaticSwim)
-    {
-        p.FireBallCD -= 10;
-
-        int plr_frame = 16;
-
-        if(p.Controls.Left || p.Controls.Right)
-        {
-            // use left/right frame
-        }
-        else if((p.Controls.Down && !p.Controls.Up) || Player[A].Frame == 19 || Player[A].Frame == 20 || Player[A].Frame == 21)
-            plr_frame = 19;
-        else if(p.Controls.Up || Player[A].Frame == 40 || Player[A].Frame == 41 || Player[A].Frame == 42)
-        {
-            throw_up = true;
-            plr_frame = 40;
-        }
-
-        // center NPC and don't slow it down
-        if(plr_frame != 16)
-        {
-            NPC[numNPCs].Wet = 2;
-            NPC[numNPCs].Location.X = p.Location.X + (p.Location.Width - NPC[numNPCs].Location.Width) / 2;
-            NPC[numNPCs].Location.Y += (plr_frame == 19) ? 8 : -8;
-            p.SpinFireDir = -(p.SpinFireDir | 1);
-            throw_dir = p.SpinFireDir;
-        }
-
-        if(!p.SwimCount)
-        {
-            p.Frame = plr_frame;
-            p.FrameCount = 60;
-        }
-    }
-    else if(!p.SpinJump)
-        p.FrameCount = 110;
-
     NPC[numNPCs].Location.SpeedX = 5 * throw_dir + (p.Location.SpeedX) / 3.5_ri;
 
     if(throw_ice)
@@ -530,6 +492,63 @@ void PlayerThrowBall(const int A)
 
     if(p.StandingOnNPC != 0)
         NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX + NPC[p.StandingOnNPC].Location.SpeedX) / 3.5_ri;
+
+    // special speed and animation code for polar swimming
+    if(p.AquaticSwim)
+    {
+        // player animation code
+        p.FireBallCD -= 10;
+
+        int plr_frame = 16;
+
+        if(p.Controls.Left || p.Controls.Right)
+        {
+            // use left/right frame
+        }
+        else if((p.Controls.Down && !p.Controls.Up) || Player[A].Frame == 19 || Player[A].Frame == 20 || Player[A].Frame == 21)
+            plr_frame = 19;
+        else if(p.Controls.Up || Player[A].Frame == 40 || Player[A].Frame == 41 || Player[A].Frame == 42)
+        {
+            throw_up = true;
+            plr_frame = 40;
+        }
+
+        if(!p.SwimCount)
+        {
+            p.Frame = plr_frame;
+            p.FrameCount = 60;
+        }
+
+        // center NPC if player is moving up/down
+        if(plr_frame != 16)
+        {
+            NPC[numNPCs].Location.X = p.Location.X + (p.Location.Width - NPC[numNPCs].Location.Width) / 2;
+            NPC[numNPCs].Location.Y += (plr_frame == 19) ? 8 : -8;
+            NPC[numNPCs].Direction = throw_dir;
+            throw_dir = 0;
+        }
+
+        // don't slow NPC down in its first frame of processing
+        NPC[numNPCs].Wet = 2;
+
+        // reset NPC speed
+        NPC[numNPCs].Location.SpeedX = 4 * throw_dir;
+        NPC[numNPCs].Location.SpeedY = (throw_dir) ? 2 : 3;
+
+        // special logic for throwing upwards during Polar Swim
+        if(throw_up)
+        {
+            NPC[numNPCs].Special4 = 1; // low gravity and no speed cap
+            NPC[numNPCs].Special5 = 3; // prevent bouncing
+            NPC[numNPCs].Location.SpeedY = -NPC[numNPCs].Location.SpeedY;
+        }
+
+        // add player momentum
+        NPC[numNPCs].Location.SpeedX += p.Location.SpeedX;
+        NPC[numNPCs].Location.SpeedY += p.Location.SpeedY;
+    }
+    else if(!p.SpinJump)
+        p.FrameCount = 110;
 
     PlayerThrownNpcMazeCheck(p, NPC[numNPCs]);
 
