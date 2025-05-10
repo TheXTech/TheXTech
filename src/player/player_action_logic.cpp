@@ -402,9 +402,6 @@ void PlayerThrowBall(const int A)
     if(numNPCs >= maxNPCs - 100)
         return;
 
-    if(!p.SpinJump && !p.AquaticSwim)
-        p.FrameCount = 110;
-
     numNPCs++;
     NPC[numNPCs] = NPC_t();
     NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
@@ -452,26 +449,70 @@ void PlayerThrowBall(const int A)
     if(p.Character == 4)
         p.FireBallCD = 25;
 
-    NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX) / 3.5_ri;
+    if(p.State == PLR_STATE_POLAR && p.Slippy)
+        p.FireBallCD -= 5;
+
+    bool throw_up = p.Controls.Up;
+    int throw_dir = p.Direction;
+
+    // animation and logic for polar throwing while aquatic-swimming
+    if(p.AquaticSwim)
+    {
+        p.FireBallCD -= 10;
+
+        int plr_frame = 16;
+
+        if(p.Controls.Left || p.Controls.Right)
+        {
+            // use left/right frame
+        }
+        else if((p.Controls.Down && !p.Controls.Up) || Player[A].Frame == 19 || Player[A].Frame == 20 || Player[A].Frame == 21)
+            plr_frame = 19;
+        else if(p.Controls.Up || Player[A].Frame == 40 || Player[A].Frame == 41 || Player[A].Frame == 42)
+        {
+            throw_up = true;
+            plr_frame = 40;
+        }
+
+        // center NPC and don't slow it down
+        if(plr_frame != 16)
+        {
+            NPC[numNPCs].Wet = 2;
+            NPC[numNPCs].Location.X = p.Location.X + (p.Location.Width - NPC[numNPCs].Location.Width) / 2;
+            NPC[numNPCs].Location.Y += (plr_frame == 19) ? 8 : -8;
+            p.SpinFireDir = -(p.SpinFireDir | 1);
+            throw_dir = p.SpinFireDir;
+        }
+
+        if(!p.SwimCount)
+        {
+            p.Frame = plr_frame;
+            p.FrameCount = 60;
+        }
+    }
+    else if(!p.SpinJump)
+        p.FrameCount = 110;
+
+    NPC[numNPCs].Location.SpeedX = 5 * throw_dir + (p.Location.SpeedX) / 3.5_ri;
 
     if(throw_ice)
     {
         PlaySoundSpatial(SFX_Iceball, p.Location);
 
-        NPC[numNPCs].Location.SpeedY = (p.Controls.Up) ? -8 : 5;
+        NPC[numNPCs].Location.SpeedY = (throw_up) ? -8 : 5;
         NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.8_r;
     }
     else
     {
         PlaySoundSpatial(SFX_Fireball, p.Location);
 
-        NPC[numNPCs].Location.SpeedY = (p.Controls.Up) ? -6 : 20;
+        NPC[numNPCs].Location.SpeedY = (throw_up) ? -6 : 20;
 
         if(NPC[numNPCs].Special == 2)
             NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.85_r;
     }
 
-    if(p.Controls.Up)
+    if(throw_up)
     {
         if(p.StandingOnNPC != 0)
             NPC[numNPCs].Location.SpeedY += NPC[p.StandingOnNPC].Location.SpeedY / 10;
