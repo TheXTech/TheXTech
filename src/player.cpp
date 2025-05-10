@@ -1860,12 +1860,12 @@ void PlayerFrame(Player_t &p)
                 {
                     p.FrameCount = 60;
 
-                    if(p.Controls.Up)
-                        p.Frame = 40;
-                    else if(p.Controls.Down)
-                        p.Frame = 19;
-                    else
+                    if(p.Controls.Left || p.Controls.Right)
                         p.Frame = 16;
+                    else if(p.Controls.Up)
+                        p.Frame = 40;
+                    else // if(p.Controls.Down)
+                        p.Frame = 19;
                 }
             }
         }
