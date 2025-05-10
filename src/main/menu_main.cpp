@@ -1340,8 +1340,6 @@ bool mainMenuUpdate()
                 }
                 else
                 {
-                    UnloadCustomPlayerPreviews();
-
                     MenuCursor = selSave - 1;
                     if(menuPlayersNum == 1)
                         MenuMode = MENU_SELECT_SLOT_1P;
@@ -1938,6 +1936,8 @@ bool mainMenuUpdate()
                     // enter save select
                     else
                     {
+                        LoadCustomPlayerPreviews(SelectWorld[selWorld].WorldPath.c_str());
+
                         FindSaves();
                         MenuMode *= MENU_SELECT_SLOT_BASE;
                         MenuCursor = 0;
@@ -2105,6 +2105,8 @@ bool mainMenuUpdate()
                 if(menuBackPress)
                 {
 //'save select back
+                    UnloadCustomPlayerPreviews();
+
                     MenuMode /= MENU_SELECT_SLOT_BASE;
 
                     // Restore menu state
@@ -2153,8 +2155,6 @@ bool mainMenuUpdate()
                         }
 
                         PlaySoundMenu(SFX_Do);
-
-                        LoadCustomPlayerPreviews(SelectWorld[selWorld].WorldPath.c_str());
 
                         if(MenuMode == MENU_SELECT_SLOT_2P)
                             ConnectScreen::MainMenu_Start(2);

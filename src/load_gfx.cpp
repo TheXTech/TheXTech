@@ -1384,6 +1384,10 @@ void LoadCustomGFX(bool include_world, const char* preview_players_from)
 
         g_dirEpisode.setCurDir(preview_players_from);
         g_dirCustom.setCurDir("");
+
+        loadCGFX(AppPath + "graphics/ui/Interface5.png",
+                 "Interface5",
+                 nullptr, nullptr, &GFX.isCustom(38), GFX.Interface[5], false, true);
     }
 
 
