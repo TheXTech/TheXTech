@@ -110,11 +110,9 @@ void Handle(const Message& m)
         if(m.message == 0)
             SharedPause = true;
         else if(m.message == 1)
-            SharedPause = false;
-        else if(m.message == 2)
             SharedPauseLegacy = true;
-        else if(m.message == 3)
-            SharedPauseLegacy = false;
+        else if(m.message == 2)
+            SharedPauseForce = true;
     }
     else if(m.type == Type::enter_code)
         run_cheat(m);
