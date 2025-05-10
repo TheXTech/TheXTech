@@ -98,6 +98,9 @@ bool NPC_InactiveIgnore(const NPC_t& n)
 
 bool NPC_InactiveRender(const NPC_t& n)
 {
+    if(n->InactiveRender == NPCTraits_t::SMOKE)
+        return false;
+
     return n.Inert
         || n.Stuck
         || n->InactiveRender == NPCTraits_t::SHOW_ALWAYS
