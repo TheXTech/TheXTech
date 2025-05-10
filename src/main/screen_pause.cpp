@@ -274,6 +274,9 @@ void UnlockCheats()
 {
     s_cheat_menu_bits = 15;
     s_cheat_menu_frame = CommonFrame;
+
+    if(GamePaused == PauseCode::PauseScreen)
+        TextEntryScreen::Init(g_gameStrings.pauseItemEnterCode, s_CheatScreen_callback);
 }
 
 void Init(int plr, bool LegacyPause)
