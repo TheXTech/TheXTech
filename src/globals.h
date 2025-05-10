@@ -1892,6 +1892,7 @@ extern EditorControls_t EditorControls;
 
 extern bool SharedPause;
 extern bool SharedPauseLegacy;
+extern bool SharedPauseForce;
 
 // extern RangeArr<CursorControls_t, 1, maxLocalPlayers> PlayerCursor;
 

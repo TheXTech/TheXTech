@@ -25,6 +25,7 @@ struct SharedControls_t
 {
     bool Pause = false;
     bool LegacyPause = false; // modifier, only set if Pause is also set
+    bool ForcePause = false; // modifier, only set by the enter cheats hotkey to allow pausing at certain times
     bool QuitCredits = false;
     bool MenuUp = false;
     bool MenuDown = false;

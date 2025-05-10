@@ -148,6 +148,7 @@ void Hotkeys::Activate(size_t i, int player)
 
     case Buttons::EnterCheats:
         l_SharedControls.Pause = true;
+        l_SharedControls.ForcePause = true;
         PauseScreen::UnlockCheats();
         return;
 
@@ -823,6 +824,7 @@ bool Update(bool check_lost_devices)
     // track whether shared controls buttons were pressed last frame, to modify the global versions
     bool old_shared_pause = l_SharedControls.Pause;
     bool old_shared_legacy = l_SharedControls.LegacyPause;
+    bool old_shared_force = l_SharedControls.ForcePause;
 
     // reset per-frame state for SharedCursor
     SharedCursor.Move = false;

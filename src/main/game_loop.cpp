@@ -375,7 +375,7 @@ resume_UpdateEvents:
         updateScreenFaders();
 
         // Pause game and CaptainN logic
-        if(LevelMacro == LEVELMACRO_OFF && CheckLiving() > 0)
+        if((LevelMacro == LEVELMACRO_OFF && CheckLiving() > 0) || SharedPauseForce)
         {
             // this is always able to pause the game even when CaptainN is enabled.
             if(SharedPause)

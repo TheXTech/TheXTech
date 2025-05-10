@@ -279,6 +279,7 @@ CursorControls_t SharedCursor;
 
 bool SharedPause;
 bool SharedPauseLegacy;
+bool SharedPauseForce;
 
 // RangeArrI<int, 1, numSounds, 0> Sound;
 RangeArrI<vbint_t, 1, numSounds, 0> SoundPause;
