@@ -1106,7 +1106,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
 
                                             if(is_winged)
                                                 NPC[A].Location.SpeedX += -Block[B].Location.SpeedX * 1.2_r;
-                                            else if(NPC[A]->IsAShell)
+                                            else if(NPC[A]->IsAShell && !NPC[A].Wings)
                                                 NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
                                         }
                                     }
