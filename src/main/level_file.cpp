@@ -1527,6 +1527,10 @@ void OpenLevelDataPost()
                     NPC[numNPCs_new] = NPC[A];
             }
 
+            // clear the deleted NPCs (prevents NPC index shenanigans)
+            for(int A = numNPCs_new + 1; A <= numNPCs; A++)
+                NPC[A] = NPC_t();
+
             numNPCs = numNPCs_new;
         }
 
