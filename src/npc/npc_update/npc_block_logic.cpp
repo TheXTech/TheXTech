@@ -277,7 +277,6 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                                     Block[B].Hidden = true;
                                                     syncLayersTrees_Block(B);
                                                     numNPCs++;
-                                                    NPC[numNPCs] = NPC_t();
                                                     NPC[numNPCs].Location.Width = 28;
                                                     NPC[numNPCs].Location.Height = 32;
                                                     NPC[numNPCs].Type = NPCID_COIN_S3;

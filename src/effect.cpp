@@ -551,7 +551,6 @@ void UpdateEffects()
                 {
                     numNPCs++;
                     auto &nn = NPC[numNPCs];
-                    nn = NPC_t();
                     nn.Type = NPCID(e.NewNpc);
 
                     nn.Location.Height = nn->THeight;
@@ -734,7 +733,6 @@ void UpdateEffects()
                     {
                         numNPCs++;
                         auto &nn = NPC[numNPCs];
-                        nn = NPC_t();
                         nn.Location = e.Location;
                         nn.Active = true;
                         nn.TimeLeft = 100;
@@ -796,7 +794,6 @@ void UpdateEffects()
                 e.Life = 0;
                 numNPCs++;
                 auto &nn = NPC[numNPCs];
-                nn = NPC_t();
                 nn.Location = e.Location;
                 nn.Active = true;
                 nn.TimeLeft = 100;

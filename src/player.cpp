@@ -245,7 +245,6 @@ static void s_makePetMount(int A)
     const Player_t& p = Player[A];
 
     numNPCs++;
-    NPC[numNPCs] = NPC_t();
 
     NPC[numNPCs].Direction = p.Direction;
     NPC[numNPCs].Active = true;
@@ -1102,7 +1101,6 @@ void PlayerHurt(const int A)
                     {
                         p.Mount = 0;
                         numNPCs++;
-                        NPC[numNPCs] = NPC_t();
                         NPC[numNPCs].Direction = p.Direction;
                         if(NPC[numNPCs].Direction == 1)
                             NPC[numNPCs].Frame = 4;
@@ -3359,7 +3357,6 @@ void YoshiSpit(const int A)
             for(B = 1; B <= 3; B++)
             {
                 numNPCs++;
-                NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Direction = p.Direction;
                 NPC[numNPCs].Type = NPCID_PET_FIRE;
                 NPC[numNPCs].Frame = EditorNPCFrame(NPC[numNPCs].Type, NPC[numNPCs].Direction);
@@ -3563,7 +3560,6 @@ void PlayerDismount(const int A)
         Player[A].Mount = 0;
         Player[A].StandingOnNPC = 0;
         numNPCs++;
-        NPC[numNPCs] = NPC_t();
         Player[A].FlyCount = 0;
         Player[A].RunCount = 0;
         Player[A].CanFly = false;
@@ -4479,7 +4475,6 @@ void ClownCar()
                 {
                     NPC[B].Special = 1;
                     numNPCs++;
-                    NPC[numNPCs] = NPC_t();
                     NPC[B].Special2 = numNPCs;
 
                     NPC[numNPCs].Active = true;
@@ -5066,7 +5061,6 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
 
                     // For B = 1 To 3
                         numNPCs++;
-                        NPC[numNPCs] = NPC_t();
                         NPC[numNPCs].CantHurt = 10000;
                         NPC[numNPCs].CantHurtPlayer = A;
                         NPC[numNPCs].BattleOwner = A;
@@ -5168,7 +5162,6 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     NPC[p.HoldingNPC].Special = 1;
                     NPC[p.HoldingNPC].Special2 = numNPCs + 1;
                     numNPCs++;
-                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].Section = p.Section;
                     NPC[numNPCs].TimeLeft = 100;

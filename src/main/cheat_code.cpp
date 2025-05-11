@@ -298,7 +298,6 @@ static void itsRainingMen()
         for(int B = -100; B <= 900; B += 34)
         {
             numNPCs++;
-            NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Type = NPCID_LIFE_S3;
             NPC[numNPCs].Location.Y = Player[C].Location.Y - 600;
             NPC[numNPCs].Location.X = Player[C].Location.X - 400 + B;
@@ -322,7 +321,6 @@ static void dontTypeThis()
         for(int B = -100; B <= 900; B += 34)
         {
             numNPCs++;
-            NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Type = NPCID_BOMB;
             NPC[numNPCs].Location.Y = Player[C].Location.Y - 600;
             NPC[numNPCs].Location.X = Player[C].Location.X - 400 + B;
@@ -1139,7 +1137,6 @@ static void grantItemHeld(NPCID npcid, NPCEffect eff = NPCEFF_NORMAL, int specia
         if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
         {
             numNPCs++;
-            NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Type = npcid;
             NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
             NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;

@@ -371,7 +371,6 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         for(int i = 0; i < 2; i++)
                                         {
                                             numNPCs++;
-                                            NPC[numNPCs] = NPC_t();
                                             NPC[numNPCs].Active = true;
                                             NPC[numNPCs].TimeLeft = 100;
                                             NPC[numNPCs].Section = Player[A].Section;

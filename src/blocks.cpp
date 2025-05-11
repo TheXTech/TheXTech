@@ -332,7 +332,6 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     numNPCs++;
                     auto &nn = NPC[numNPCs];
 
-                    nn = NPC_t();
                     nn.Active = true;
                     nn.TimeLeft = 100;
 
@@ -408,7 +407,6 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             {
                 numNPCs++;
                 auto &nn = NPC[numNPCs];
-                nn = NPC_t();
                 nn.Active = true;
                 nn.TimeLeft = 100;
 
@@ -774,7 +772,6 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     {
         numNPCs++;
         auto &nn = NPC[numNPCs];
-        nn = NPC_t();
         nn.Active = true;
         nn.TimeLeft = 1;
         nn.Type = NPCID_COIN_S4;
@@ -1759,7 +1756,6 @@ bool PSwitch(bool enabled)
                 {
                     numNPCs++;
                     auto &nn = NPC[numNPCs];
-                    nn = NPC_t();
                     nn.Active = true;
                     nn.TimeLeft = 1;
 
@@ -1879,7 +1875,6 @@ bool PSwitch(bool enabled)
                 {
                     numNPCs++;
                     auto &nn = NPC[numNPCs];
-                    nn = NPC_t();
                     nn.Layer = Block[A].Layer;
                     nn.TriggerDeath = Block[A].TriggerDeath;
                     nn.TriggerLast = Block[A].TriggerLast;

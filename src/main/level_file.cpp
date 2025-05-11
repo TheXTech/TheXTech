@@ -907,8 +907,6 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
 
         auto &npc = NPC[numNPCs];
 
-        npc = NPC_t();
-
         npc.Location.X = n.x;
         npc.Location.Y = n.y;
         if(!LevelEditor)

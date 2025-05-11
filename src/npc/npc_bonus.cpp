@@ -86,7 +86,6 @@ void DropBonus(int A)
     // drop the bonus!
     PlaySoundSpatial(SFX_DropItem, plr.Location);
     numNPCs++;
-    NPC[numNPCs] = NPC_t();
     NPC[numNPCs].Type = Player[A].HeldBonus;
     NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
     NPC[numNPCs].Location.Height = 32;

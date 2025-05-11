@@ -158,7 +158,6 @@ void PlayerShootChar5Beam(int A)
         PlaySoundSpatial(SFX_HeroFireRod, Player[A].Location);
 
     numNPCs++;
-    NPC[numNPCs] = NPC_t();
 
     if(ShadowMode)
         NPC[numNPCs].Shadow = true;
@@ -225,7 +224,6 @@ void PlayerThrowBomb(int A)
     p.Bombs -= 1;
 
     numNPCs++;
-    NPC[numNPCs] = NPC_t();
     NPC[numNPCs].Active = true;
     NPC[numNPCs].TimeLeft = Physics.NPCTimeOffScreen;
     NPC[numNPCs].Section = p.Section;
@@ -296,7 +294,6 @@ void PlayerThrowHeavy(const int A)
     p.FireBallCD = 25;
 
     numNPCs++;
-    NPC[numNPCs] = NPC_t();
     NPC[numNPCs].Type = NPCID_PLR_HEAVY;
     if(ShadowMode)
         NPC[numNPCs].Shadow = true;
@@ -403,7 +400,6 @@ void PlayerThrowBall(const int A)
         return;
 
     numNPCs++;
-    NPC[numNPCs] = NPC_t();
     NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
 
     bool throw_ice = (p.State == PLR_STATE_ICE || p.State == PLR_STATE_POLAR);

@@ -285,7 +285,6 @@ resume_TriggerLast:
             if(iRand(10) < 3)
             {
                 numNPCs++;
-                NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Type = NPCID_GEM_1;
                 if(iRand(5) == 0)
                     NPC[numNPCs].Type = NPCID_GEM_5;
@@ -1125,7 +1124,6 @@ resume_TriggerLast:
                 if(!DontSpawnExit)
                 {
                     numNPCs++;
-                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = NPCID_GOALORB_S2;
                     NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
                     NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;

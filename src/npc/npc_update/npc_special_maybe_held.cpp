@@ -563,7 +563,6 @@ void NPCSpecialMaybeHeld(int A)
                 if(NPC[A].Special3 == 29)
                 {
                     numNPCs++;
-                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].TimeLeft = 100;
                     NPC[numNPCs].Direction = NPC[A].Direction;
@@ -609,7 +608,6 @@ void NPCSpecialMaybeHeld(int A)
                 PlaySoundSpatial(SFX_HeavyToss, NPC[A].Location);
                 NPC[A].SpecialX = 0; // -15
                 numNPCs++;
-                NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Location.Height = 32;
                 NPC[numNPCs].Location.Width = 32;
                 NPC[numNPCs].Location.X = NPC[A].Location.X;
@@ -729,7 +727,6 @@ void NPCSpecialMaybeHeld(int A)
                 {
                     NPC[A].Special = 0;
                     numNPCs++;
-                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Inert = NPC[A].Inert;
                     bool tempBool = false;
                     NPC[numNPCs].Direction = NPC[A].Direction;
@@ -851,7 +848,6 @@ void NPCSpecialMaybeHeld(int A)
         if(NPC[A].Projectile && NPC[A].Special2 == 0 && NPC[A].Special == 0 /*&& false*/)
         {
             numNPCs++;
-            NPC[numNPCs] = NPC_t();
             NPC[A].Special2 = numNPCs;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].Section = NPC[A].Section;

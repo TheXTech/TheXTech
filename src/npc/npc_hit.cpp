@@ -1308,7 +1308,6 @@ void NPCHit(int A, int B, int C)
             else
             {
                 numNPCs++;
-                NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Location = NPC[A].Location;
                 NPC[numNPCs].Location.Y -= 32;
                 NPC[numNPCs].Type = NPCID(NPC[A].Type + 8);
@@ -1388,7 +1387,6 @@ void NPCHit(int A, int B, int C)
             if(B == 7 && NPC[A].Type >= NPCID_GRN_SHELL_S4 && NPC[A].Type <= NPCID_GRN_HIT_TURTLE_S4)
             {
                 numNPCs++;
-                NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Location = NPC[A].Location;
                 NPC[numNPCs].Location.Y -= 32;
                 NPC[numNPCs].Type = NPCID(NPC[A].Type + 4);

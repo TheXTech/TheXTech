@@ -441,7 +441,6 @@ void DropNPC(int A, int NPCType)
     {
         PlaySound(SFX_DropItem);
         numNPCs++;
-        NPC[numNPCs] = NPC_t();
         NPC[numNPCs].Type = NPCType;
         NPC[numNPCs].Location.Width = NPCWidth(NPCType);
         NPC[numNPCs].Location.Height = NPCHeight(NPCType);
@@ -818,7 +817,6 @@ void NPCSpecial(int A)
         if(!tempBool || npc.Special == 1)
         {
             numNPCs++;
-            NPC[numNPCs] = NPC_t();
             if(npc.Type == NPCID_RED_VINE_TOP_S3)
                 NPC[numNPCs].Type = NPCID_RED_VINE_S3;
             else if(npc.Type == NPCID_GRN_VINE_TOP_S3)
@@ -1144,7 +1142,6 @@ void NPCSpecial(int A)
                 for(int i = 1; i <= 4; i++)
                 {
                     numNPCs++;
-                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = NPCID_QUAD_BALL;
                     NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
                     NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
@@ -1543,7 +1540,6 @@ void NPCSpecial(int A)
                     PlaySoundSpatial(SFX_Transform, npc.Location);
 
                 numNPCs++;
-                NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].TimeLeft = 100;
                 NPC[numNPCs].Direction = npc.Direction;
@@ -1713,7 +1709,6 @@ void NPCSpecial(int A)
             {
                 PlaySoundSpatial(SFX_BigFireball, npc.Location);
                 numNPCs++;
-                NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].TimeLeft = 100;
                 NPC[numNPCs].Direction = npc.Direction;
@@ -1844,7 +1839,6 @@ void NPCSpecial(int A)
             {
                 npc.Special = 20;
                 numNPCs++;
-                NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Layer = LAYER_SPAWNED_NPCS;
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].Direction = npc.Direction;
@@ -2112,7 +2106,6 @@ void NPCSpecial(int A)
         {
             npc.SpecialY = 0;
             numNPCs++;
-            NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Inert = npc.Inert;
             NPC[numNPCs].Location.Height = 32;
             NPC[numNPCs].Location.Width = 28;
@@ -2427,7 +2420,6 @@ void NPCSpecial(int A)
             if((npc.Special3 % 10) == 0)
             {
                 numNPCs++;
-                NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Inert = npc.Inert;
                 NPC[numNPCs].Location.Height = 32;
                 NPC[numNPCs].Location.Width = 32;
@@ -2779,7 +2771,6 @@ void NPCSpecial(int A)
             {
                 PlaySoundSpatial(SFX_HeavyToss, npc.Location);
                 numNPCs++;
-                NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Inert = npc.Inert;
                 NPC[numNPCs].Location.Height = 32;
                 NPC[numNPCs].Location.Width = 32;
@@ -2812,7 +2803,6 @@ void NPCSpecial(int A)
                 if(npc.Special3 == 40)
                 {
                     numNPCs++;
-                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].TimeLeft = 100;
                     NPC[numNPCs].Direction = npc.Direction;
@@ -3140,7 +3130,6 @@ void NPCSpecial(int A)
         if(tempBool)
         {
             numNPCs++;
-            NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Active = true;
             NPC[numNPCs].Section = npc.Section;
             NPC[numNPCs].TimeLeft = 100;
@@ -3714,7 +3703,6 @@ void SpecialNPC(int A)
                 else if(NPC[A].Special == 50)
                 {
                     numNPCs++;
-                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].TimeLeft = 100;
                     NPC[numNPCs].Direction = NPC[A].Direction;
@@ -4487,7 +4475,6 @@ void SpecialNPC(int A)
         {
             NPC[A].Special = 0;
             numNPCs++;
-            NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Inert = NPC[A].Inert;
             NPC[numNPCs].Type = NPCID_STATUE_FIRE;
             NPC[numNPCs].Direction = NPC[A].Direction;
@@ -4561,7 +4548,6 @@ void SpecialNPC(int A)
             PlaySoundSpatial(SFX_HeavyToss, NPC[A].Location);
             NPC[A].SpecialX = -15;
             numNPCs++;
-            NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Inert = NPC[A].Inert;
             NPC[numNPCs].Location.Height = 32;
             NPC[numNPCs].Location.Width = 32;
@@ -4930,7 +4916,6 @@ void SpecialNPC(int A)
                 NPC[A].Special5 = 0;
 
                 numNPCs++;
-                NPC[numNPCs] = NPC_t();
 
                 if(NPC[A].Location.to_right_of(p.Location))
                     NPC[numNPCs].Direction = -1;
@@ -5297,7 +5282,6 @@ void SpecialNPC(int A)
                 if(NPC[A].Special2 == 260)
                 {
                     numNPCs++;
-                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].Direction = NPC[A].Direction;
                     NPC[numNPCs].Type = (NPC[A].Special) ? (NPCID)NPC[A].Special : NPCID_SPIT_BOSS_BALL;
