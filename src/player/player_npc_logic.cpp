@@ -1275,7 +1275,12 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
     }
     else
     {
-        if(Player[A].StandingOnNPC != 0)
+        // Vanilla bugfix: the player is normally forced to stay on a moving NPC by allowing its downwards speed to reach the terminal velocity (12).
+        // And then this code "unsets" that extreme downwards speed. But if the player's SpeedY has been changed since that time, unexpected things can happen:
+        // * If it became negative (upwards), then the player will clip downward through the moving NPC here (by subtracting that upwards value from the Y coordinate). This occurs when Char5 is hurt on Mushroom Heights in Princess Cliche.
+        // * If the player hit ground, then the player's speed should now be zero. But this will reset it to being downward, possibly allowing downward clipping. This occurs with NPCID_CHECKER_PLATFORM in Frozen Valley in The Fallen Spirits.
+        // * This fix shouldn't apply to moving blocks (which have negative NPC indexes) because the player's speed is sometimes set to 0 or 1 while on a moving block, and in those cases this code helps the player keep moving with the block.
+        if(Player[A].StandingOnNPC != 0 && !(Player[A].StandingOnNPC > 0 && g_config.fix_player_downward_clip && Player[A].Location.SpeedY < 8))
         {
             if(Player[A].StandingOnNPC < 0)
                 Player[A].Location.SpeedX += NPC[Player[A].StandingOnNPC].Location.SpeedX;
