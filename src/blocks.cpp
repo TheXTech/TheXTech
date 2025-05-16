@@ -815,6 +815,9 @@ void BlockShakeUp(int A)
     if(Block[A].Hidden)
         return;
 
+    if(iBlocks >= maxBlocks)
+        return; // iBlock array overflown
+
     // Block[A].ShakeY = -12; // Go up
     // Block[A].ShakeY2 = 12; // Come back down
     // Block[A].ShakeY3 = 0;
@@ -834,6 +837,9 @@ void BlockShakeUpPow(int A)
     if(Block[A].Hidden)
         return;
 
+    if(iBlocks >= maxBlocks)
+        return; // iBlock array overflown
+
     // Block[A].ShakeY = -6; // Go up
     // Block[A].ShakeY2 = 6; // Come back down
     // Block[A].ShakeY3 = 0;
@@ -852,6 +858,9 @@ void BlockShakeDown(int A)
 {
     if(Block[A].Hidden)
         return;
+
+    if(iBlocks >= maxBlocks)
+        return; // iBlock array overflown
 
     // Block[A].ShakeY = 12; // Go down
     // Block[A].ShakeY2 = -12; // Come back up
@@ -881,8 +890,12 @@ void BlockHitHard(int A)
     else
     {
         Block[A].Kill = true;
-        iBlocks++;
-        iBlock[iBlocks] = A;
+
+        if(iBlocks < maxBlocks)
+        {
+            iBlocks++;
+            iBlock[iBlocks] = A;
+        }
     }
 }
 
@@ -901,8 +914,11 @@ void SafelyKillBlock(int A)
     }
 
     block.Kill = 9;
-    iBlocks++;
-    iBlock[iBlocks] = A;
+    if(iBlocks < maxBlocks)
+    {
+        iBlocks++;
+        iBlock[iBlocks] = A;
+    }
 }
 
 bool KillBlock(int A, bool Splode)
@@ -1803,7 +1819,7 @@ bool PSwitch(bool enabled)
                     numBlock--;
 
                     // make sure that iBlock isn't forgotten (this is done for all blocks below if the compat flag is set)
-                    if(!g_config.emulate_classic_block_order)
+                    if(!g_config.emulate_classic_block_order && iBlocks <= maxBlocks)
                     {
                         iBlocks++;
                         iBlock[iBlocks] = A;
