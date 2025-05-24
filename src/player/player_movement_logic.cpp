@@ -998,7 +998,7 @@ void PlayerMovementY(int A)
                 Player[A].Location.SpeedY += Physics.PlayerGravity;
 
             bool has_fly_block = (Player[A].HoldingNPC > 0) && (NPC[Player[A].HoldingNPC].Type == NPCID_FLY_BLOCK || NPC[Player[A].HoldingNPC].Type == NPCID_FLY_CANNON);
-            bool no_cyclone_glide = (Player[A].Location.SpeedY >= 0) && (Player[A].Mount || Player[A].HoldingNPC); // glide down in cases where player can't cyclone
+            bool no_cyclone_glide = (Player[A].Location.SpeedY >= 0) && (Player[A].Mount || Player[A].HoldingNPC) && !Player[A].GroundPound; // glide down in cases where player can't cyclone
 
             if(has_fly_block || (Player[A].State == PLR_STATE_CYCLONE && (!Player[A].DoubleJump || no_cyclone_glide)))
             {
