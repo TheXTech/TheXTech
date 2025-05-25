@@ -50,7 +50,7 @@ struct Item
     const SelectWorld_t* operator->() const;
 };
 
-static std::vector<Item> m_items;
+static std::vector<Item> s_items;
 static int s_current_item = 0;
 static int s_recent_item = -1;
 
@@ -68,8 +68,7 @@ const SelectWorld_t* Item::operator->() const
 {
     const std::vector<SelectWorld_t>& SelectorList
         = (MenuMode == MENU_BATTLE_MODE) ? SelectBattle :
-            ((MenuMode == MENU_EDITOR) ? SelectWorldEditable :
-                SelectWorld);
+            SelectWorld;
 
     if(m_index > 0 && m_index < (int)SelectorList.size())
         return &SelectorList[m_index];
@@ -84,16 +83,22 @@ const SelectWorld_t* Item::operator->() const
 
 void Prepare()
 {
+    s_items.clear();
+
     const std::vector<SelectWorld_t>& SelectorList
         = (MenuMode == MENU_BATTLE_MODE) ? SelectBattle :
-            ((MenuMode == MENU_EDITOR) ? SelectWorldEditable :
-                SelectWorld);
+            SelectWorld;
 
     for(size_t i = 1; i < SelectorList.size(); i++)
     {
         // filtering condition can go here
-        m_items.emplace_back();
-        m_items.back().m_index = i;
+        if(MenuMode == MENU_EDITOR && !SelectorList[i].editable)
+            continue;
+        else if(MenuMode != MENU_BATTLE_MODE && i >= SelectorList.size() - 2)
+            continue;
+
+        s_items.emplace_back();
+        s_items.back().m_index = i;
 
         // load thumbnail here
     }
@@ -101,26 +106,26 @@ void Prepare()
     // find recent item
     s_recent_item = -1;
 
-    for(size_t i = 1; i < SelectorList.size(); ++i)
+    for(size_t i = 0; i < s_items.size(); ++i)
     {
         // special editor entry for battle levels
-        bool is_battle = (MenuMode == MENU_EDITOR && i == SelectorList.size() - 2);
+        bool is_battle = (MenuMode == MENU_EDITOR && s_items[i].m_index == (int)SelectorList.size() - 2);
 
-        auto &w = SelectorList[i];
+        auto &w = SelectorList[s_items[i].m_index];
         const std::string wPath = (!is_battle) ? w.WorldPath + w.WorldFile : "battle";
 
         if((MenuMode == MENU_1PLAYER_GAME && wPath == g_recentWorld1p) ||
            (MenuMode == MENU_2PLAYER_GAME && wPath == g_recentWorld2p) ||
            (MenuMode == MENU_EDITOR && wPath == g_recentWorldEditor))
         {
-            s_recent_item = (int)i - 1;
+            s_recent_item = (int)i;
         }
     }
 
     if(s_recent_item >= 0)
     {
         s_current_item = s_recent_item;
-        worldCurs = s_recent_item - 1;
+        worldCurs = s_recent_item - 2;
     }
     else
     {
@@ -176,11 +181,11 @@ int Logic()
     {
         int B = 0;
 
-        for(int A = minShow - 1; A <= maxShow - 1; A++)
+        for(int A = minShow; A < maxShow; A++)
         {
             if(SharedCursor.Y >= MenuY + B * 30 && SharedCursor.Y <= MenuY + B * 30 + 16)
             {
-                int menuLen = 19 * static_cast<int>(m_items[A]->WorldName.size());
+                int menuLen = 19 * static_cast<int>(s_items[A]->WorldName.size());
 
                 if(SharedCursor.X >= MenuX && SharedCursor.X <= MenuX + menuLen)
                 {
@@ -215,11 +220,11 @@ int Logic()
             // listMenuLastScroll = worldCurs;
             // listMenuLastCursor = s_current_item;
 
-            selWorld = m_items[s_current_item].m_index;
+            selWorld = s_items[s_current_item].m_index;
 
             MenuCursorCanMove = false;
 
-            if(m_items[s_current_item]->disabled)
+            if(s_items[s_current_item]->disabled)
                 disabled = true;
 
             if(!disabled)
@@ -258,9 +263,9 @@ int Logic()
         {
             if(leftPressed || rightPressed)
             {
-                int first_new_content = (g_gameInfo.disableBattleMode) ? NumSelectWorldEditable : NumSelectWorldEditable - 1;
+                int first_new_content = (g_gameInfo.disableBattleMode) ? s_items.size() - 1 : s_items.size() - 2;
 
-                if(MenuMode == MENU_EDITOR && s_current_item + 1 >= first_new_content)
+                if(MenuMode == MENU_EDITOR && s_current_item >= first_new_content)
                 {
                     if(MenuCursorCanMove)
                     {
@@ -304,27 +309,19 @@ int Logic()
         dontWrap = true;
     }
 
-    if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME
-        || MenuMode == MENU_BATTLE_MODE || MenuMode == MENU_EDITOR)
+    if(dontWrap)
     {
-        maxShow = (MenuMode == MENU_BATTLE_MODE) ? NumSelectBattle :
-            ((MenuMode == MENU_EDITOR) ? NumSelectWorldEditable :
-                NumSelectWorld);
-
-        if(dontWrap)
-        {
-            if(s_current_item >= maxShow)
-                s_current_item = maxShow - 1;
-            if(s_current_item < 0)
-                s_current_item = 0;
-        }
-        else
-        {
-            if(s_current_item >= maxShow)
-                s_current_item = 0;
-            if(s_current_item < 0)
-                s_current_item = maxShow - 1;
-        }
+        if(s_current_item >= (int)s_items.size())
+            s_current_item = (int)s_items.size() - 1;
+        if(s_current_item < 0)
+            s_current_item = 0;
+    }
+    else
+    {
+        if(s_current_item >= (int)s_items.size())
+            s_current_item = 0;
+        if(s_current_item < 0)
+            s_current_item = (int)s_items.size() - 1;
     }
 
     return 0;
@@ -337,60 +334,54 @@ void Render()
 
     // std::string tempStr;
 
-    minShow = 1;
-    maxShow = (MenuMode == MENU_BATTLE_MODE) ? NumSelectBattle :
-        ((MenuMode == MENU_EDITOR) ? NumSelectWorldEditable :
-            NumSelectWorld);
-    const std::vector<SelectWorld_t>& SelectorList
-        = (MenuMode == MENU_BATTLE_MODE) ? SelectBattle :
-            ((MenuMode == MENU_EDITOR) ? SelectWorldEditable :
-                SelectWorld);
+    minShow = 0;
+    maxShow = s_items.size();
 
     int original_maxShow = maxShow;
     if(maxShow > 5)
     {
         minShow = worldCurs;
-        maxShow = minShow + 4;
+        maxShow = minShow + 5;
 
-        if(s_current_item <= minShow - 1)
+        if(s_current_item <= minShow)
             worldCurs -= 1;
 
         if(s_current_item >= maxShow - 1)
             worldCurs += 1;
 
-        if(worldCurs < 1)
-            worldCurs = 1;
+        if(worldCurs < 0)
+            worldCurs = 0;
 
-        if(worldCurs > original_maxShow - 4)
-            worldCurs = original_maxShow - 4;
+        if(worldCurs > original_maxShow - 5)
+            worldCurs = original_maxShow - 5;
 
         minShow = worldCurs;
-        maxShow = minShow + 4;
+        maxShow = minShow + 5;
     }
 
-    for(auto A = minShow; A <= maxShow; A++)
+    for(auto A = minShow; A < maxShow; A++)
     {
-        auto w = SelectorList[A];
+        const Item& w = s_items[A];
 
         XTColor color;
-        color.r = (A == s_recent_item + 1) ? 0 : 255;
+        color.r = (A == s_recent_item) ? 0 : 255;
 
-        if(w.disabled)
+        if(w->disabled)
             color = {127, 127, 127};
 
-        if(w.probably_incompatible)
+        if(w->probably_incompatible)
             color = {255, 127, 127};
 
         int B = A - minShow + 1;
 
-        SuperPrint(w.WorldName, 3, MenuX, MenuY - 30 + (B * 30), color);
+        SuperPrint(w->WorldName, 3, MenuX, MenuY - 30 + (B * 30), color);
     }
 
     // preview type of content being created
-    int first_new_content = (g_gameInfo.disableBattleMode) ? NumSelectWorldEditable : NumSelectWorldEditable - 1;
-    if(MenuMode == MENU_EDITOR && s_current_item + 1 >= first_new_content)
+    int first_new_content = (g_gameInfo.disableBattleMode) ? s_items.size() - 1 : s_items.size() - 2;
+    if(MenuMode == MENU_EDITOR && s_current_item >= first_new_content)
     {
-        int B = s_current_item + 1 - minShow + 1;
+        int B = s_current_item - minShow + 1;
 
         // draw mode icon
         int mode_icon_X = MenuX + 340;
@@ -430,13 +421,13 @@ void Render()
     }
 
     // render the scroll indicators
-    if(minShow > 1)
+    if(minShow > 0)
         XRender::renderTextureBasic(XRender::TargetW/2 - 8, MenuY - 20, GFX.MCursor[1]);
 
     if(maxShow < original_maxShow)
         XRender::renderTextureBasic(XRender::TargetW/2 - 8, MenuY + 140, GFX.MCursor[2]);
 
-    int B = s_current_item - minShow + 1;
+    int B = s_current_item - minShow;
 
     if(B >= 0 && B < 5)
         XRender::renderTextureBasic(MenuX - 20, MenuY + (B * 30), GFX.MCursor[0]);

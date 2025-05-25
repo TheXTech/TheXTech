@@ -116,10 +116,8 @@ static uint8_t s_episode_playstyle = 0;
 static uint8_t s_episode_speedrun_mode = 0;
 
 int NumSelectWorld = 0;
-int NumSelectWorldEditable = 0;
 int NumSelectBattle = 0;
 std::vector<SelectWorld_t> SelectWorld;
-std::vector<SelectWorld_t> SelectWorldEditable;
 std::vector<SelectWorld_t> SelectBattle;
 
 
@@ -432,8 +430,6 @@ void FindWorlds()
 
     SelectWorld.clear();
     SelectWorld.emplace_back(SelectWorld_t()); // Dummy entry
-    SelectWorldEditable.clear();
-    SelectWorldEditable.push_back(SelectWorld_t()); // Dummy entry
 
 #ifndef PGE_NO_THREADING
     if(SDL_AtomicGet(&loading))
@@ -543,8 +539,6 @@ static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName
             pLogDebug("Translated world title: %s", w.WorldName.c_str());
 
         SelectWorld.push_back(w);
-        if(editable)
-            SelectWorldEditable.push_back(w);
 
 #ifdef THEXTECH_ENABLE_SDL_NET
         if(wPath.size() > 2 && wPath[0] == ':' && wPath[1] == 'a')
@@ -696,26 +690,20 @@ static void s_FinishFindWorlds()
         return a.WorldName < b.WorldName;
     });
 
-    tinysort(SelectWorldEditable.begin(), SelectWorldEditable.end(),
-              [](const SelectWorld_t& a, const SelectWorld_t& b)
-    {
-        return a.WorldName < b.WorldName;
-    });
-
     NumSelectWorld = (int)(SelectWorld.size() - 1);
 
     if(!g_gameInfo.disableBattleMode)
     {
         SelectWorld_t battles = SelectWorld_t();
         battles.WorldName = g_mainMenu.editorBattles;
-        SelectWorldEditable.push_back(battles);
+        battles.editable = true;
+        SelectWorld.push_back(battles);
     }
 
     SelectWorld_t createWorld = SelectWorld_t();
     createWorld.WorldName = g_mainMenu.editorNewWorld;
-    SelectWorldEditable.push_back(createWorld);
-
-    NumSelectWorldEditable = ((int)SelectWorldEditable.size() - 1);
+    createWorld.editable = true;
+    SelectWorld.push_back(createWorld);
 
     ContentSelectScreen::Prepare();
 
@@ -732,8 +720,6 @@ void LoadSingleWorld(const std::string wPath)
 
     SelectWorld.clear();
     SelectWorld.emplace_back(SelectWorld_t()); // Dummy entry
-    SelectWorldEditable.clear();
-    SelectWorldEditable.push_back(SelectWorld_t()); // Dummy entry
 
     std::string fName = Files::basename(wPath);
     std::string epDir = wPath.substr(0, wPath.size() - fName.size());
@@ -1462,7 +1448,7 @@ bool mainMenuUpdate()
             {
                 if(MenuMode == MENU_EDITOR)
                 {
-                    if(selWorld == NumSelectWorldEditable)
+                    if(selWorld == (int)SelectWorld.size() - 1)
                     {
                         ClearWorld(true);
                         WorldName = TextEntryScreen::Run(g_mainMenu.editorPromptNewWorldName);
@@ -1501,7 +1487,7 @@ bool mainMenuUpdate()
 #endif
                         }
                     }
-                    else if(!g_gameInfo.disableBattleMode && selWorld == NumSelectWorldEditable - 1)
+                    else if(!g_gameInfo.disableBattleMode && selWorld == (int)SelectWorld.size() - 2)
                     {
                         ClearWorld(true);
                         GameMenu = false;
@@ -1558,8 +1544,8 @@ bool mainMenuUpdate()
                         ClearLevel();
                         ClearGame();
                         SetupPlayers();
-                        std::string wPath = SelectWorldEditable[selWorld].WorldPath
-                            + SelectWorldEditable[selWorld].WorldFile;
+                        std::string wPath = SelectWorld[selWorld].WorldPath
+                            + SelectWorld[selWorld].WorldFile;
                         OpenWorld(wPath);
                         if(g_recentWorldEditor != wPath)
                         {

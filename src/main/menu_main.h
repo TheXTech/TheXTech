@@ -31,7 +31,6 @@ extern int NumSelectWorld;
 extern int NumSelectWorldEditable; // NEW
 extern int NumSelectBattle; // NEW
 extern std::vector<SelectWorld_t> SelectWorld;
-extern std::vector<SelectWorld_t> SelectWorldEditable; // NEW
 extern std::vector<SelectWorld_t> SelectBattle; // NEW
 
 // Menu modes
