@@ -504,17 +504,15 @@ void FindWorlds()
 
 static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName, WorldData& head, TranslateEpisode& tr, bool editable)
 {
-    std::string wPath = epDir + fName;
+    SelectWorld_t w;
+    w.WorldFilePath = epDir + fName;
 
-    PGE_FileFormats_misc::RWopsTextInput in(Files::open_file(wPath, "r"), wPath);
+    PGE_FileFormats_misc::RWopsTextInput in(Files::open_file(w.WorldFilePath, "r"), w.WorldFilePath);
 
     if(FileFormats::OpenWorldFileHeaderT(in, head))
     {
-        SelectWorld_t w;
         w.WorldName = head.EpisodeTitle;
         head.charactersToS64();
-        w.WorldPath = epDir;
-        w.WorldFile = fName;
         if(w.WorldName.empty())
             w.WorldName = fName;
 
@@ -550,21 +548,22 @@ static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName
 static void s_LoadWorldArchive(const std::string& archive)
 {
     SelectWorld_t w;
-    w.WorldPath = "@";
-    w.WorldPath += archive;
-    w.WorldPath += ":/";
+    w.WorldFilePath = "@";
+    w.WorldFilePath += archive;
+    w.WorldFilePath += ":/";
 
-    IniProcessing ini = Files::load_ini(w.WorldPath + "_meta.ini");
+    IniProcessing ini = Files::load_ini(w.WorldFilePath + "_meta.ini");
 
     ini.beginGroup("content");
 
     // confirm filename exists
-    ini.read("filename", w.WorldFile, w.WorldFile);
-    if(w.WorldFile.empty())
+    ini.read("filename", w.WorldName, w.WorldName);
+    if(w.WorldName.empty())
     {
         pLogInfo("Episode [%s] not loaded; could not parse _meta.ini", archive.c_str());
         return;
     }
+    w.WorldFilePath += w.WorldName;
 
     // confirm engine support
     std::string engine;
@@ -639,9 +638,6 @@ static void s_LoadWorldArchive(const std::string& archive)
     title_key += '-';
     title_key += CurrentLangDialect;
     ini.read(title_key.c_str(), w.WorldName, w.WorldName);
-
-    if(w.WorldName.empty())
-        w.WorldName = w.WorldFile;
 
     ini.endGroup();
 
@@ -793,8 +789,9 @@ void FindLevels()
             if(FileFormats::OpenLevelFileHeaderT(in, head))
             {
                 SelectWorld_t w;
-                w.WorldPath = battleRoot.path;
-                w.WorldFile = fName;
+                w.WorldFilePath = battleRoot.path;
+                w.WorldFilePath += '/';
+                w.WorldFilePath += fName;
                 w.WorldName = head.LevelName;
                 if(w.WorldName.empty())
                     w.WorldName = fName;
@@ -1544,8 +1541,7 @@ bool mainMenuUpdate()
                         ClearLevel();
                         ClearGame();
                         SetupPlayers();
-                        std::string wPath = SelectWorld[selWorld].WorldPath
-                            + SelectWorld[selWorld].WorldFile;
+                        const std::string& wPath = SelectWorld[selWorld].WorldFilePath;
                         OpenWorld(wPath);
                         if(g_recentWorldEditor != wPath)
                         {
@@ -1583,7 +1579,7 @@ bool mainMenuUpdate()
                 // enter save select
                 else
                 {
-                    LoadCustomPlayerPreviews(SelectWorld[selWorld].WorldPath.c_str());
+                    LoadCustomPlayerPreviews(Files::dirname(SelectWorld[selWorld].WorldFilePath).c_str());
 
                     FindSaves();
                     MenuMode *= MENU_SELECT_SLOT_BASE;

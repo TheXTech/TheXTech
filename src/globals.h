@@ -1444,9 +1444,9 @@ struct SelectWorld_t
 //    WorldName As String
     std::string WorldName;
 //    WorldPath As String
-    std::string WorldPath;
-//    WorldFile As String
-    std::string WorldFile;
+    // std::string WorldPath;
+//    WorldFile As String (NEW: Full filepath)
+    std::string WorldFilePath;
 //    blockChar(1 To numCharacters) As Boolean
     RangeArrI<bool, 1, numCharacters, false> blockChar;
 // EXTRA:

@@ -112,7 +112,7 @@ void Prepare()
         bool is_battle = (MenuMode == MENU_EDITOR && s_items[i].m_index == (int)SelectorList.size() - 2);
 
         auto &w = SelectorList[s_items[i].m_index];
-        const std::string wPath = (!is_battle) ? w.WorldPath + w.WorldFile : "battle";
+        const std::string wPath = (!is_battle) ? w.WorldFilePath : "battle";
 
         if((MenuMode == MENU_1PLAYER_GAME && wPath == g_recentWorld1p) ||
            (MenuMode == MENU_2PLAYER_GAME && wPath == g_recentWorld2p) ||

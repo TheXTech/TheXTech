@@ -679,7 +679,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
             selWorld = 1;
 
-            if(SelectWorld[selWorld].WorldPath.empty())
+            if(SelectWorld[selWorld].WorldFilePath.empty())
             {
                 LevelSelect = false;
                 TestLevel = true;
@@ -1254,13 +1254,13 @@ int GameMain(const CmdLineSetup_t &setup)
                 if(GoToLevel.empty())
                 {
                     if(FileRecentSubHubLevel.empty())
-                        levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
+                        levelPath = FileNamePathWorld + StartLevel;
                     else
-                        levelPath = SelectWorld[selWorld].WorldPath + FileRecentSubHubLevel;
+                        levelPath = FileNamePathWorld + FileRecentSubHubLevel;
                 }
                 else
                 {
-                    levelPath = SelectWorld[selWorld].WorldPath + GoToLevel;
+                    levelPath = FileNamePathWorld + GoToLevel;
                     GoToLevel.clear();
                 }
 
@@ -2459,7 +2459,7 @@ void StartEpisode()
     UnloadCustomSound();
     Archives::unmount_episode();
 
-    std::string wPath = SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile;
+    std::string wPath = SelectWorld[selWorld].WorldFilePath;
     std::string recentWorldIntroPrev = g_recentWorldIntro;
     bool doSaveConfig = false;
 
@@ -2546,7 +2546,7 @@ void StartEpisode()
         ClearLevel();
 
         std::string levelName = (FileRecentSubHubLevel.empty() ? StartLevel : FileRecentSubHubLevel);
-        std::string levelPath = SelectWorld[selWorld].WorldPath + levelName;
+        std::string levelPath = FileNamePathWorld + levelName;
 
         levelPath = s_prepare_episode_path(levelPath);
 
@@ -2620,10 +2620,10 @@ void StartBattleMode()
             selWorld = (iRand(NumSelectBattle - 1)) + 2;
     }
 
-    std::string levelPath = SelectBattle[selWorld].WorldPath + SelectBattle[selWorld].WorldFile;
+    const std::string& levelPath = SelectBattle[selWorld].WorldFilePath;
     if(!OpenLevel(levelPath))
     {
-        ReportLoadFailure(SelectBattle[selWorld].WorldFile);
+        ReportLoadFailure(levelPath);
         ErrorQuit = true;
     }
     SetupPlayers();

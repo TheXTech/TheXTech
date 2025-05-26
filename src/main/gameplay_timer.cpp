@@ -139,8 +139,7 @@ void GameplayTimer::load()
     }
 
     IniProcessing o;
-    std::string savePath = makeGameSavePath(SelectWorld[selWorld].WorldPath,
-                                            SelectWorld[selWorld].WorldFile,
+    std::string savePath = makeGameSavePath(SelectWorld[selWorld].WorldFilePath,
                                             fmt::format_ne("timers{0}.ini", selSave));
     o.open(savePath);
 
@@ -169,8 +168,7 @@ void GameplayTimer::save()
         return;
 
     IniProcessing o;
-    std::string savePath = makeGameSavePath(SelectWorld[selWorld].WorldPath,
-                                            SelectWorld[selWorld].WorldFile,
+    std::string savePath = makeGameSavePath(SelectWorld[selWorld].WorldFilePath,
                                             fmt::format_ne("timers{0}.ini", selSave));
     o.open(savePath);
 
