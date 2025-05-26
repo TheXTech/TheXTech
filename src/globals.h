@@ -1452,7 +1452,6 @@ struct SelectWorld_t
 // EXTRA:
     bool bugfixes_on_by_default = false;
     bool editable = false;
-    bool highlight = false;
     bool disabled = false;
     bool probably_incompatible = false;
 

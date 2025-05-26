@@ -402,7 +402,7 @@ void MainMenu_Start(int minPlayers)
     for(int i = 0; i < maxLocalPlayers; i++)
         l_screen->charSelect[i] = 0;
 
-    if(!(g_forceCharacter && SelectWorld[selWorld].highlight && SelectWorld[selWorld].blockChar[s_recent_char[0]]))
+    if(!(g_forceCharacter && SelectWorld[selWorld].blockChar[s_recent_char[0]]))
         s_InitBlockCharacter();
 
     for(int i = 0; i < maxLocalPlayers; i++)
