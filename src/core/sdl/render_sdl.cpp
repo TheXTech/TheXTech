@@ -46,6 +46,12 @@
 #define UNUSED(x) (void)x
 #endif
 
+#ifdef THEXTECH_BIG_ENDIAN
+#   define DEFAULT_PIXEL_COLOUR_FORMAT   SDL_PIXELFORMAT_RGBA8888
+#else
+#   define DEFAULT_PIXEL_COLOUR_FORMAT   SDL_PIXELFORMAT_ABGR8888
+#endif
+
 // Workaround for older SDL versions that lacks the floating-point based rects and points
 #if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 10)
 #define XTECH_SDL_NO_RECTF_SUPPORT
@@ -175,7 +181,7 @@ bool RenderSDL::initRender(SDL_Window *window)
     m_maxTextureHeight = ri.max_texture_height;
 
     m_tBuffer = SDL_CreateTexture(m_gRenderer,
-                                  SDL_PIXELFORMAT_ARGB8888,
+                                  DEFAULT_PIXEL_COLOUR_FORMAT,
                                   SDL_TEXTUREACCESS_TARGET,
                                   ScaleWidth, ScaleHeight);
 
@@ -184,7 +190,7 @@ bool RenderSDL::initRender(SDL_Window *window)
         pLogWarning("Render SDL: Failed to create the normal texture render buffer: %s, trying to create a power-2 texture...", SDL_GetError());
         m_pow2 = true;
         m_tBuffer = SDL_CreateTexture(m_gRenderer,
-                                      SDL_PIXELFORMAT_ARGB8888,
+                                      DEFAULT_PIXEL_COLOUR_FORMAT,
                                       SDL_TEXTUREACCESS_TARGET,
                                       pow2roundup(ScaleWidth), pow2roundup(ScaleHeight));
     }
@@ -382,7 +388,7 @@ void RenderSDL::updateViewport()
         {
             SDL_DestroyTexture(m_tBuffer);
 
-            m_tBuffer = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET,
+            m_tBuffer = SDL_CreateTexture(m_gRenderer, DEFAULT_PIXEL_COLOUR_FORMAT, SDL_TEXTUREACCESS_TARGET,
                                           m_pow2 ? pow2roundup(XRender::TargetW) : XRender::TargetW,
                                           m_pow2 ? pow2roundup(XRender::TargetH) : XRender::TargetH);
             SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
@@ -560,7 +566,7 @@ textureTryAgain:
             if(newW != width || newH != height)
             {
                 pLogDebug("Render SDL: Converting surface into Power-2 (Orig: %u x %u, P2: %u x %u)...", width, height, newW, newH);
-                SDL_Surface *newSurface = SDL_CreateRGBSurfaceWithFormat(0, newW, newH, 32, SDL_PIXELFORMAT_ARGB8888);
+                SDL_Surface *newSurface = SDL_CreateRGBSurfaceWithFormat(0, newW, newH, 32, DEFAULT_PIXEL_COLOUR_FORMAT);
                 if(newSurface)
                 {
                     SDL_Rect rect = {0, 0, (int)width, (int)height};
