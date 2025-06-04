@@ -688,13 +688,11 @@ static void s_FinishFindWorlds()
 
     NumSelectWorld = (int)(SelectWorld.size() - 1);
 
-    if(!g_gameInfo.disableBattleMode)
-    {
-        SelectWorld_t battles = SelectWorld_t();
-        battles.WorldName = g_mainMenu.editorBattles;
-        battles.editable = true;
-        SelectWorld.push_back(battles);
-    }
+    SelectWorld_t battles = SelectWorld_t();
+    battles.WorldName = g_mainMenu.editorBattles;
+    battles.WorldFilePath = "battle";
+    battles.editable = true;
+    SelectWorld.push_back(battles);
 
     SelectWorld_t createWorld = SelectWorld_t();
     createWorld.WorldName = g_mainMenu.editorNewWorld;
@@ -1519,9 +1517,11 @@ bool mainMenuUpdate()
                         OpenLevel(lPath);
                         EditorBackup(); // EditorRestore() gets called when not in world editor
 
-                        if(g_recentWorldEditor != "battle")
+                        // todo: de-dupe with below
+                        const std::string& wPath = SelectWorld[selWorld].WorldFilePath;
+                        if(g_recentWorldEditor != wPath)
                         {
-                            g_recentWorldEditor = "battle";
+                            g_recentWorldEditor = wPath;
                             SaveConfig();
                         }
 

@@ -89,12 +89,23 @@ void Prepare()
         = (MenuMode == MENU_BATTLE_MODE) ? SelectBattle :
             SelectWorld;
 
+    size_t editor_entries_start = SelectorList.size() - 2;
+    size_t editor_battle_levels = editor_entries_start;
+    // size_t editor_new_world = SelectorList.size() - 1;
+
     for(size_t i = 1; i < SelectorList.size(); i++)
     {
         // filtering condition can go here
-        if(MenuMode == MENU_EDITOR && !SelectorList[i].editable)
-            continue;
-        else if(MenuMode != MENU_BATTLE_MODE && i >= SelectorList.size() - 2)
+        if(MenuMode == MENU_EDITOR)
+        {
+            if(!SelectorList[i].editable)
+                continue;
+
+            if(g_gameInfo.disableBattleMode && i == editor_battle_levels)
+                continue;
+        }
+        // skip the special editor worlds if not in editor
+        else if(MenuMode != MENU_BATTLE_MODE && i >= editor_entries_start)
             continue;
 
         s_items.emplace_back();
@@ -108,11 +119,8 @@ void Prepare()
 
     for(size_t i = 0; i < s_items.size(); ++i)
     {
-        // special editor entry for battle levels
-        bool is_battle = (MenuMode == MENU_EDITOR && s_items[i].m_index == (int)SelectorList.size() - 2);
-
         auto &w = SelectorList[s_items[i].m_index];
-        const std::string wPath = (!is_battle) ? w.WorldFilePath : "battle";
+        const std::string& wPath = w.WorldFilePath;
 
         if((MenuMode == MENU_1PLAYER_GAME && wPath == g_recentWorld1p) ||
            (MenuMode == MENU_2PLAYER_GAME && wPath == g_recentWorld2p) ||
