@@ -36,8 +36,9 @@ alignas(8) static uint8_t s_main_thread_stack[96 * 1024];
 static int s_argc;
 static char** s_argv;
 
-static int s_run()
+static int s_run(void* arg)
 {
+    (void)arg;
     return _entry_point(s_argc, s_argv);
 }
 

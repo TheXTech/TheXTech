@@ -246,7 +246,7 @@ static void strToPlayerSetup(int player, const std::string &setupString)
 }
 #endif
 
-#ifdef SDL_MAIN_NEEDED
+#if defined(SDL_MAIN_NEEDED) || defined(__16M__)
 extern "C"
 #endif
 int main(int argc, char**argv)
