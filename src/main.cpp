@@ -286,7 +286,7 @@ int main(int argc, char**argv)
        titleID == MII_MAKER_USA_TITLE_ID ||
        titleID == MII_MAKER_EUR_TITLE_ID)
     {
-        // Important: OSEnableHomeButtonMenu must come befoe ProcUIInitEx.
+        // Important: OSEnableHomeButtonMenu must be called before ProcUIInitEx.
         OSEnableHomeButtonMenu(FALSE);
         g_isHBLauncher = true;
     }
