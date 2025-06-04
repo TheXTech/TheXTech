@@ -1705,7 +1705,7 @@ void UpdateLoadREAL()
 
         if(assets_reload)
         {
-            ScreenAssetPack::DrawBackground(1.0);
+            ScreenAssetPack::DrawBackground(64);
             DrawDeviceBattery();
         }
         else if(!gfxLoaderTestMode)
