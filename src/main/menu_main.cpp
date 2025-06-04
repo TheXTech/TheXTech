@@ -539,8 +539,8 @@ static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName
         SelectWorld.push_back(w);
 
 #ifdef THEXTECH_ENABLE_SDL_NET
-        if(wPath.size() > 2 && wPath[0] == ':' && wPath[1] == 'a')
-            w.lz4_content_hash = md5::string_to_u32(wPath);
+        if(w.WorldFilePath.size() > 2 && w.WorldFilePath[0] == ':' && w.WorldFilePath[1] == 'a')
+            w.lz4_content_hash = md5::string_to_u32(w.WorldFilePath);
 #endif
     }
 }
