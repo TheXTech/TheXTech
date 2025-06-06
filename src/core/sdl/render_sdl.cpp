@@ -420,6 +420,9 @@ void RenderSDL::resetViewport()
 //#endif
 
     SDL_RenderSetViewport(m_gRenderer, nullptr);
+#ifdef __vita__
+    SDL_RenderSetClipRect(m_gRenderer, nullptr);
+#endif
 
     m_viewport_x = 0;
     m_viewport_y = 0;
@@ -445,6 +448,11 @@ void RenderSDL::setViewport(int x, int y, int w, int h)
 
     topLeftViewport = {x, y, w, h};
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
+
+#ifdef __vita__
+    topLeftViewport = {0, 0, w, h};
+    SDL_RenderSetClipRect(m_gRenderer, &topLeftViewport);
+#endif
 
     m_viewport_x = x;
     m_viewport_y = y;
