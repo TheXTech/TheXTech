@@ -169,6 +169,9 @@ jobs:
         for q in ./build/package/*.zip; do
             UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
         done
+        if [ "${BRANCH_NAME}" = "main" ]; then
+          UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} build/thextech.vpk -o thextech-vitadb-nightly.vpk;"
+        fi
         lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 
     - name: List Build Directory
