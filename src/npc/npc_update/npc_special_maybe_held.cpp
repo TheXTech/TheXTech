@@ -703,7 +703,7 @@ void NPCSpecialMaybeHeld(int A)
 
             if(numNPCs < maxNPCs)
             {
-                if(fEqual(C, -1) && NPC[A].HoldingPlayer == 0 && NPC[A].vehiclePlr == 0)
+                if(fiEqual(C, -1) && NPC[A].HoldingPlayer == 0 && NPC[A].vehiclePlr == 0)
                     NPC[A].Special = 0;
                 else if(Player[NPC[A].vehiclePlr].Controls.Run || NPC[A].vehiclePlr == 0)
                 {
