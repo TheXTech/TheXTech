@@ -77,6 +77,13 @@ void worldWaitForFade(int waitTicks)
         if(!g_config.unlimited_framerate)
             PGE_Delay(1);
     }
+
+    // Ensure everything is clear
+    if(GameIsActive)
+    {
+        XEvents::doEvents();
+        GraphicsClearScreen();
+    }
 }
 
 

@@ -41,6 +41,8 @@ void doShakeScreenClear();
 void UpdateGraphics2(bool skipRepaint = false);
 // Unpack all visible lazily-loaded graphics
 void GraphicsLazyPreLoad();
+// Draws the black screen (A final screen clean-up before quitting, even frame-skip is enabled)
+void GraphicsClearScreen();
 // Public Sub UpdateGraphics() 'This draws the graphic to the screen when in a level/game menu/outro/level editor
 // This draws the graphic to the screen when in a level/game menu/outro/level editor
 void UpdateGraphics(bool skipRepaint = false);

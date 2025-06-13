@@ -1379,6 +1379,18 @@ void UpdateGraphicsScreen(Screen_t& screen);
 //! extra non-gameplay related draws (menus and information display)
 void UpdateGraphicsMeta();
 
+void GraphicsClearScreen()
+{
+    if(!GameIsActive)
+        return;
+
+    XRender::setTargetTexture();
+    XRender::resetViewport();
+    XRender::setDrawPlane(PLANE_GAME_BACKDROP);
+    XRender::clearBuffer();
+    XRender::repaint();
+}
+
 // This draws the graphic to the screen when in a level/game menu/outro/level editor
 void UpdateGraphics(bool skipRepaint)
 {
