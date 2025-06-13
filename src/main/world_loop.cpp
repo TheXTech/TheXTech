@@ -82,8 +82,11 @@ void worldWaitForFade(int waitTicks)
     }
 
     // Ensure everything is clear
-    XEvents::doEvents();
-    UpdateGraphics2Clear();
+    if(GameIsActive)
+    {
+        XEvents::doEvents();
+        GraphicsClearScreen();
+    }
 }
 
 

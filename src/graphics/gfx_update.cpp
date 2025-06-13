@@ -1459,7 +1459,7 @@ void UpdateGraphicsScreen(Screen_t& screen);
 //! extra non-gameplay related draws (menus and information display)
 void UpdateGraphicsMeta();
 
-void UpdateGraphicsClear()
+void GraphicsClearScreen()
 {
     if(!GameIsActive)
         return;

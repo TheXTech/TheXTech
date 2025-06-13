@@ -962,7 +962,7 @@ int GameMain(const CmdLineSetup_t &setup)
                         });
 
             // Ensure everything is clear
-            UpdateGraphicsClear();
+            GraphicsClearScreen();
             XEvents::doEvents();
         }
 
@@ -1174,7 +1174,7 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             // Ensure everything is clear
-            UpdateGraphicsClear();
+            GraphicsClearScreen();
             XEvents::doEvents();
         }
 
@@ -1562,7 +1562,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 });
 
                 // Ensure everything is clear
-                UpdateGraphicsClear();
+                GraphicsClearScreen();
                 XEvents::doEvents();
             }
 
