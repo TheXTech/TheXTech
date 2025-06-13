@@ -1520,12 +1520,12 @@ void EveryonesDead()
         ReturnWarpSaved = 0;
     }
 
+    // Ensure everything is clear
+    GraphicsClearScreen();
+
 // Play fade effect instead of wait (see ProcessLastDead() above)
     if(!g_config.EnableInterLevelFade)
     {
-        XRender::setTargetTexture();
-        XRender::clearBuffer();
-        XRender::repaint();
 //    if(MagicHand)
 //        BitBlt frmLevelWindow::vScreen[1].hdc, 0, 0, frmLevelWindow::vScreen[1].ScaleWidth, frmLevelWindow::vScreen[1].ScaleHeight, 0, 0, 0, vbWhiteness;
         if(!g_config.unlimited_framerate)
