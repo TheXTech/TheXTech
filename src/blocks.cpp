@@ -593,7 +593,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 nn.Location.Width = NPCWidth(NPCID_POWER_S3);
 
             // Make block a bit smaller to allow player take a bonus easier (Redigit's idea)
-            if(!is_ancient && fiEqual(b.Location.Width, 32))
+            if(!is_ancient && fEqual(b.Location.Width, 32.0))
             {
                 // set value directly to make sure Location.Width == 31.9 heuristic works on low-mem builds
                 // b.Location.Width -= 0.1;

@@ -1755,7 +1755,7 @@ void UpdateNPCs()
 
             // Originally applied for all NPCs, even if inactive.
             // Moved here because speedVar is only validly set here.
-            if(!fiEqual(speedVar, 1) && !fiEqual(speedVar, 0))
+            if(!fEqual(speedVar, 1.0f) && !fEqual(speedVar, 0.0f))
             {
                 NPC[A].RealSpeedX = float(NPC[A].Location.SpeedX);
                 NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * double(speedVar);
