@@ -94,6 +94,19 @@ static inline int s_round2int(num_t d)
     return num_t::floor(d + 0.5_n);
 }
 
+
+void UpdateGraphics2Clear()
+{
+    if(!GameIsActive)
+        return;
+
+    XRender::setTargetTexture();
+    XRender::resetViewport();
+    XRender::setDrawPlane(PLANE_GAME_BACKDROP);
+    XRender::clearBuffer();
+    XRender::repaint();
+}
+
 // draws GFX to screen when on the world map/world map editor
 void UpdateGraphics2(bool skipRepaint)
 {

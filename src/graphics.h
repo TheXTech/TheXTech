@@ -37,11 +37,15 @@ void doShakeScreen(int force, int type);
 void doShakeScreen(int forceX, int forceY, int type, int duration, int decay, const Location_t& source);
 void doShakeScreenClear();
 
+// Draws the black screen (A final screen clean-up before quitting, even frame-skip is enabled)
+void UpdateGraphics2Clear();
 // Public Sub UpdateGraphics2() 'draws GFX to screen when on the world map/world map editor
 // draws GFX to screen when on the world map/world map editor
 void UpdateGraphics2(bool skipRepaint = false);
 // Unpack all visible lazily-loaded graphics
 void GraphicsLazyPreLoad();
+// Draws the black screen (A final screen clean-up before quitting, even frame-skip is enabled)
+void UpdateGraphicsClear();
 // Public Sub UpdateGraphics() 'This draws the graphic to the screen when in a level/game menu/outro/level editor
 // This draws the graphic to the screen when in a level/game menu/outro/level editor
 void UpdateGraphics(bool skipRepaint = false);

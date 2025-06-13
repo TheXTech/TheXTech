@@ -960,6 +960,10 @@ int GameMain(const CmdLineSetup_t &setup)
                         {
                             SetupScreens();
                         });
+
+            // Ensure everything is clear
+            UpdateGraphicsClear();
+            XEvents::doEvents();
         }
 
         // quickly exit if returned to menu from world test
@@ -1168,6 +1172,10 @@ int GameMain(const CmdLineSetup_t &setup)
                 speedRun_saveStats();
                 return 0;// Break on quit
             }
+
+            // Ensure everything is clear
+            UpdateGraphicsClear();
+            XEvents::doEvents();
         }
 
         // World Map
@@ -1552,6 +1560,10 @@ int GameMain(const CmdLineSetup_t &setup)
                     }
                     return false;
                 });
+
+                // Ensure everything is clear
+                UpdateGraphicsClear();
+                XEvents::doEvents();
             }
 
             // store to level save info if level won

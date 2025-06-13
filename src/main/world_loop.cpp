@@ -80,6 +80,10 @@ void worldWaitForFade(int waitTicks)
         if(!g_config.unlimited_framerate)
             PGE_Delay(1);
     }
+
+    // Ensure everything is clear
+    XEvents::doEvents();
+    UpdateGraphics2Clear();
 }
 
 
