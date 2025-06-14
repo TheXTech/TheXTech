@@ -1165,8 +1165,6 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
                     || (loc2_exists && vScreenCollision(c_Z2, loc2)));
             }
 
-            cannot_reset = (render || onscreen_canonical);
-
             // Possible situations where we need to activate as original:
             if(
                    ForcedControls
@@ -1178,6 +1176,20 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
                 can_activate = onscreen_canonical;
             else
                 can_activate = render;
+
+            // normally, don't reset anything that would be capable of activating
+            cannot_reset = (can_activate || onscreen_canonical);
+
+            // if it will look different after resetting, don't reset it
+            if(!cannot_reset && render &&
+                    (!NPC_InactiveRender(NPC[A])
+                        || std::floor(NPC[A].Location.X) != std::floor(NPC[A].DefaultLocationX)
+                        || std::floor(NPC[A].Location.Y) != std::floor(NPC[A].DefaultLocationY)
+                    )
+                )
+            {
+                cannot_reset = true;
+            }
         }
 
         if(NPC[A].Generator)
@@ -1270,10 +1282,6 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
             }
         }
 
-        // TODO: experiment with allowing resetting NPCs that are onscreen, cannot activate, and are not rendered
-        // if(!can_activate && !render && onscreen)
-        //     cannot_reset = false;
-
         // activate the NPC if allowed
         if(can_activate)
         {
@@ -1341,7 +1349,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
         if(hp_door_scroll)
             render = false;
 
-        if(fill_draw_queue && render && (NPC[A].Reset[2] || NPC[A].Active || NPC[A].Type == NPCID_CONVEYOR))
+        if(fill_draw_queue && render && (NPC[A].Reset[2] || NPC[A].Active || !cannot_reset))
         {
             NPC_Draw_Queue_p.add(A);
 
