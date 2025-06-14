@@ -1026,6 +1026,8 @@ int GameMain(const CmdLineSetup_t &setup)
             LevelBeatCode = 0;
             curWorldLevel = 0;
 
+            lunaReset();
+            ResetSoundFX();
             ClearWorld();
 
             ReturnWarp = 0;
