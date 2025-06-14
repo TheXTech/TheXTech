@@ -171,7 +171,7 @@ bool DeathCounter::TryLoadStats()
     if(got != sizeof(int32_t) || tempint < 5)
     {
         if(got != sizeof(int32_t))
-            pLogWarning("Demos counter: Failed to read version number at the %s file", counterFile.c_str());
+            pLogWarning("Fails counter: Failed to read version number at the %s file", counterFile.c_str());
 
         mStatFileOK = false;
         mEnabled = false;
@@ -269,7 +269,7 @@ void DeathCounter::ReadRecords(SDL_RWops *statsfile)
 
     if(got != sizeof(tempint))
     {
-        pLogWarning("Demos counter: Failed to read the number of records");
+        pLogWarning("Fails counter: Failed to read the number of records");
         return;
     }
 

@@ -247,6 +247,7 @@ void FindSaves()
                 gDeathCounter.Recount();
                 info.FailsEnabled = true;
                 info.Fails = gDeathCounter.mCurTotalDeaths;
+                gDeathCounter.quit();
             }
         }
     }
