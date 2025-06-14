@@ -20,6 +20,7 @@ Changelog for 1.3.8-dev
 -Battle mode: allow eaten player to escape by repeatedly hitting Jump (@ds-sloth)
 -Fix SMBX 1.3 peculiarity where NPCs would not respawn when coming back onscreen during a timestop, guarded by compat flag "fix-timestop-respawn" [Modern Mode] (@ds-sloth)
 -Add experimental support for attaching wings to NPCs to the game and editor (@ds-sloth)
+-Modern mode: allow static, always-shown NPCs (eg, O or bullet shooters) to deactivate while onscreen (@Wohlstand, @ds-sloth)
 
 Changelog for 1.3.7.1-dev
 -Add GameCube controller support for Wii (@ds-sloth)
