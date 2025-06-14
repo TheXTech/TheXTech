@@ -69,6 +69,7 @@ Changelog for 1.3.7.1-dev
 -Fixed the viewport problem on non-SMBX resolutions at the PS Vita (@Wohlstand, @ds-sloth)
 -Fixed the early interrupting of the level workflow when going to the inter-level warp on some platforms (@Wohlstand)
 -Fixed the visual glitch of the last screen fade out frame being frozen instead of complete going into darkness (@Wohlstand)
+-Fixed the bug that causes gamesave's fails counter not being copied or removed via game menu (@Wohlstand)
 
 Changelog for 1.3.7
 -Fix vanilla peculiarity where medals were sometimes not collected when killed, guarded by "fix-medal-kill" [Modern Mode] (@ds-sloth, thanks to @Superbloxen for the report)
