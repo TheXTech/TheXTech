@@ -1624,19 +1624,15 @@ void UnDuck(Player_t &p)
 void CheckSection(const int A)
 {
     // finds out what section the player is in and handles the music for section changes
-    int B = 0;
-    int C = 0;
-    int oldSection = 0;
-    int foundSection = 0;
-    int do_music_update_at = -1;
-    auto &p = Player[A];
-
     if(LevelSelect)
         return;
 
-    oldSection = p.Section;
+    auto &p = Player[A];
 
-    for(B = 0; B < numSections; B++)
+    int oldSection = p.Section;
+    int foundSection_loop = 0;
+
+    for(int B = 0; B < numSections; B++)
     {
         if(p.Location.X + p.Location.Width >= level[B].X)
         {
@@ -1646,13 +1642,14 @@ void CheckSection(const int A)
                 {
                     if(p.Location.Y <= level[B].Height)
                     {
-                        foundSection = 1;
+                        foundSection_loop = 1;
 
                         if(oldSection != B /*&& (nPlay.Online == false || nPlay.MySlot == A - 1)*/)
                         {
                             p.Section = B;
-                            do_music_update_at = B;
+
                             // there was a music update here that used a less strict criterion of never interrupting music tracks below 0
+
                             break;
                         }
                     }
@@ -1661,9 +1658,9 @@ void CheckSection(const int A)
         }
     }
 
-    if(!foundSection)
+    if(foundSection_loop == 0)
     {
-        for(B = 0; B < numSections; B++)
+        for(int B = 0; B < numSections; B++)
         {
             if(p.Location.X + p.Location.Width >= LevelREAL[B].X)
             {
@@ -1674,13 +1671,12 @@ void CheckSection(const int A)
                         if(p.Location.Y <= LevelREAL[B].Height)
                         {
                             p.Section = B;
-                            foundSection = 2;
+                            foundSection_loop = 2;
 
-                            if(oldSection != B)
-                                do_music_update_at = B;
                             // there was a music update here that used the stricter criterion of never interrupting music tracks below 0, or 6 or 15
 
-                            for(C = 1; C <= numPlayers; C++)
+                            // move player to a different player in the section
+                            for(int C = 1; C <= numPlayers; C++)
                             {
                                 if(Player[C].Section == p.Section && C != A)
                                 {
@@ -1699,32 +1695,33 @@ void CheckSection(const int A)
     }
 
 
-    // audiovisual updates
-    // if(foundSection && p.Section != oldSection && !GameMenu && (&ScreenByPlayer(A) == l_screen))
-    if(do_music_update_at >= 0)
+    // audiovisual updates if player's section changed (ignore if menu is active or player is offscreen)
+    if(p.Section != oldSection && !GameMenu && (&ScreenByPlayer(A) == l_screen))
     {
-        B = do_music_update_at;
+        int B = p.Section;
 
         UpdateSoundFX(B);
 
         bool boss_track = (curMusic == 6 || curMusic == 15);
 
-        if(curMusic >= 0 && ((foundSection == 1 && !GameMenu) || (foundSection == 2 && !boss_track))) // Dont interupt boss / switch music
+        if(curMusic < 0)
         {
-            if(curMusic != bgMusic[B] || (delayMusicIsSet() && bgMusic[B] != 24))
-            {
+            // don't interrupt switch music
+        }
+        else if(foundSection_loop == 2 && boss_track)
+        {
+            // don't interrupt boss track (this condition only existed in the second loop above)
+        }
+        // do change music -- normal music change
+        else if(curMusic != bgMusic[B] || (delayMusicIsSet() && bgMusic[B] != 24))
+        {
+            StartMusic(B);
+        }
+        // custom music change
+        else if(bgMusic[B] == 24)
+        {
+            if(oldSection >= 0 && CustomMusic[oldSection] != CustomMusic[p.Section])
                 StartMusic(B);
-            }
-            else if(bgMusic[B] == 24)
-            {
-                if(oldSection >= 0)
-                {
-                    if(CustomMusic[oldSection] != CustomMusic[p.Section])
-                    {
-                        StartMusic(B);
-                    }
-                }
-            }
         }
 
         ClearBuffer = true;
