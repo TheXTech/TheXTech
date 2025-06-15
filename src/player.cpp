@@ -860,13 +860,7 @@ void SetupPlayers()
         }
 
         // section check
-        Player[A].Section = -1;
-        CheckSection(A); // find the section the player is in
-        if(Player[A].Section == -1)
-        {
-            Player[A].Section = 0;
-            CheckSection(A);
-        }
+        CheckSection_Init(A); // find the section the player is in
 
         // Set player's direction to left automatically when a start point is located at right side of the section
         if(Player[A].Location.X + Player[A].Location.Width / 2 > level[Player[A].Section].X + (level[Player[A].Section].Width - level[Player[A].Section].X) / 2)
@@ -1734,6 +1728,20 @@ void CheckSection(const int A)
             XRender::unloadTexture(GFXBackground2[oldSection]);
         }
 #endif
+    }
+}
+
+// routine moved from SetupPlayers and now used at several other call sites during level start
+void CheckSection_Init(const int A)
+{
+    Player[A].Section = -1;
+
+    CheckSection(A);
+
+    if(Player[A].Section == -1)
+    {
+        Player[A].Section = 0;
+        // SetupPlayers originally called CheckSection again here but the result could not have been different
     }
 }
 

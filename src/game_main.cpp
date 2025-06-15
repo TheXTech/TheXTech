@@ -1430,8 +1430,7 @@ int GameMain(const CmdLineSetup_t &setup)
                         }
 
                         PlayerFrame(p);
-                        p.Section = -1;
-                        CheckSection(A);
+                        CheckSection_Init(A);
                         SoundPause[SFX_Warp] = 0;
                         p.Effect = PLREFF_WAITING;
                         p.Effect2 = 950;
@@ -1443,8 +1442,7 @@ int GameMain(const CmdLineSetup_t &setup)
 //                            .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height - .Location.Height
                         p.Location.Y = warp.Exit.Y + warp.Exit.Height - p.Location.Height;
 
-                        p.Section = -1;
-                        CheckSection(A);
+                        CheckSection_Init(A);
                         p.Effect = PLREFF_WAITING;
                         p.Effect2 = 2000;
                     }
@@ -1452,8 +1450,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     {
                         p.Location.X = warp.Exit.X + (warp.Exit.Width - p.Location.Width) / 2;
                         p.Location.Y = warp.Exit.Y + warp.Exit.Height - p.Location.Height;
-                        p.Section = -1;
-                        CheckSection(A);
+                        CheckSection_Init(A);
                         p.WarpCD = 50;
 
                         if(warp.eventExit != EVENT_NONE)

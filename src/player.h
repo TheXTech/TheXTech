@@ -67,6 +67,8 @@ void ProcessLastDead();
 void UnDuck(struct Player_t &p);
 // Public Sub CheckSection(A As Integer)
 void CheckSection(const int A);
+// special CheckSection routine used to initialize players, allows music in section 0 to play
+void CheckSection_Init(const int A);
 // Public Sub PlayerFrame(A As Integer)
 void PlayerFrame(const int A);
 void PlayerFrame(struct Player_t &p);
