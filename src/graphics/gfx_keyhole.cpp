@@ -94,7 +94,7 @@ void RenderTexturePlayerScale(int Z, int dst_x, int dst_y, int dst_w, int dst_h,
     Background_t& keyhole = Background[LevelMacroWhich];
 
     // basis of 128
-    unsigned scale = (ratio < 199) ? 128 : (327 - ratio);
+    int scale = (ratio < 199) ? 128 : (327 - ratio);
 
     num_t cx = vScreen[Z].X + keyhole.Location.X + keyhole.Location.Width / 2;
     num_t cy = vScreen[Z].Y + keyhole.Location.Y + 12;
