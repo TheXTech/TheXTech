@@ -1628,6 +1628,7 @@ void CheckSection(const int A)
     int C = 0;
     int oldSection = 0;
     int foundSection = 0;
+    int do_music_update_at = -1;
     auto &p = Player[A];
 
     if(LevelSelect)
@@ -1650,9 +1651,8 @@ void CheckSection(const int A)
                         if(oldSection != B /*&& (nPlay.Online == false || nPlay.MySlot == A - 1)*/)
                         {
                             p.Section = B;
-
+                            do_music_update_at = B;
                             // there was a music update here that used a less strict criterion of never interrupting music tracks below 0
-
                             break;
                         }
                     }
@@ -1676,6 +1676,8 @@ void CheckSection(const int A)
                             p.Section = B;
                             foundSection = 2;
 
+                            if(oldSection != B)
+                                do_music_update_at = B;
                             // there was a music update here that used the stricter criterion of never interrupting music tracks below 0, or 6 or 15
 
                             for(C = 1; C <= numPlayers; C++)
@@ -1696,16 +1698,18 @@ void CheckSection(const int A)
         }
     }
 
+
     // audiovisual updates
-    if(foundSection && p.Section != oldSection && !GameMenu && (&ScreenByPlayer(A) == l_screen))
+    // if(foundSection && p.Section != oldSection && !GameMenu && (&ScreenByPlayer(A) == l_screen))
+    if(do_music_update_at >= 0)
     {
-        B = p.Section;
+        B = do_music_update_at;
 
         UpdateSoundFX(B);
 
         bool boss_track = (curMusic == 6 || curMusic == 15);
 
-        if(curMusic >= 0 && !(foundSection == 2 && boss_track)) // Dont interupt boss / switch music
+        if(curMusic >= 0 && ((foundSection == 1 && !GameMenu) || (foundSection == 2 && !boss_track))) // Dont interupt boss / switch music
         {
             if(curMusic != bgMusic[B] || (delayMusicIsSet() && bgMusic[B] != 24))
             {
