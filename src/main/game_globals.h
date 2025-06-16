@@ -29,9 +29,13 @@
 extern ScreenFader g_levelScreenFader;
 extern RangeArr<ScreenFader, 0, c_vScreenCount> g_levelVScreenFader;
 
+// delay following current level should be shortened by 16 frames / 250 milliseconds,
+// because current level ended with the fade out from an offscreen exit
+extern bool g_ShortDelay;
+
 extern void clearScreenFaders();
 extern void updateScreenFaders();
-// extern void levelWaitForFade();
+extern void levelWaitForFade(int waitTicks); // wait waitTicks frames for the fader (or no-fader) to finish
 extern void editorWaitForFade();
 
 #endif // GAME_GLOBALS_H

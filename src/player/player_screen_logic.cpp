@@ -458,14 +458,6 @@ void PlayerOffscreenExitCheck(int A)
     {
         offScreenExit = true;
     }
-    else if(g_config.EnableInterLevelFade)
-    {
-        int nearby = SDL_min((int)nearby_left, (int)nearby_right);
-        int fade = (32 - nearby) * 2;
-
-        if(fade > 0 && g_levelScreenFader.m_current_fade < fade && g_levelScreenFader.m_target_fade == 0 && g_levelScreenFader.m_current_fade == g_levelScreenFader.m_step)
-            g_levelScreenFader.setupFader(fade, fade, 0, ScreenFader::S_FADE);
-    }
 
     if(offScreenExit)
     {
@@ -481,7 +473,17 @@ void PlayerOffscreenExitCheck(int A)
         EndLevel = true;
         LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;
-        g_levelScreenFader.setupFader(65, 65, 0, ScreenFader::S_FADE);
+
+        if(!GoToLevelNoGameThing)
+        {
+            if(g_config.EnableInterLevelFade)
+                g_levelScreenFader.setupFader(4, 0, 65, ScreenFader::S_FADE);
+            else
+                g_levelScreenFader.setupFader(65, 0, 65, ScreenFader::S_FADE);
+
+            levelWaitForFade(16);
+            g_ShortDelay = true;
+        }
     }
 }
 

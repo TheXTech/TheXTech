@@ -111,6 +111,8 @@
 
 #include "main/trees.h"
 
+bool g_ShortDelay = false;
+
 void CheckActive();
 // set up sizable blocks
 void SizableBlocks();
@@ -1284,7 +1286,8 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 if(!GoToLevelNoGameThing)
                 {
-                    GameThing(1000, 3);
+                    GameThing(1000 - (g_ShortDelay * 250), 3);
+                    g_ShortDelay = false;
                 }
                 else if(XMessage::GetStatus() != XMessage::Status::replay)
                 {
@@ -1292,6 +1295,8 @@ int GameMain(const CmdLineSetup_t &setup)
                     XRender::clearBuffer();
                     XRender::repaint();
                 }
+
+                GoToLevelNoGameThing = false;
             }
             else
             {
@@ -1811,19 +1816,23 @@ void NextLevel()
         XEvents::doEvents();
     }
 
-    if(!TestLevel && GoToLevel.empty() && !NoMap)
+    // do an inter-level delay here if there won't be a GameThing later
+    if(!TestLevel && GoToLevel.empty() && !NoMap && FileRecentSubHubLevel.empty())
     {
         if(XMessage::GetStatus() != XMessage::Status::local)
         {
-            for(int i = 0; i < 32; i++)
+            for(int i = 0; i < ((g_ShortDelay) ? 16 : 32); i++)
                 Controls::Update(false);
         }
         else if(!g_config.unlimited_framerate)
-            PGE_Delay(500);
+            PGE_Delay(500 - (g_ShortDelay * 250));
+
+        g_ShortDelay = false;
     }
 
     if(BattleMode && !LevelEditor && !TestLevel)
     {
+        g_ShortDelay = false;
         EndLevel = false;
         GameMenu = true;
         MenuMode = MENU_BATTLE_MODE;
@@ -2457,6 +2466,7 @@ void StartEpisode()
     Lives = 3;
     LevelSelect = true;
     GameMenu = false;
+    g_ShortDelay = false;
     UpdateInternalRes();
     XRender::setTargetTexture();
     XRender::clearBuffer();

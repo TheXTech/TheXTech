@@ -92,21 +92,22 @@ void updateScreenFaders()
         g_levelVScreenFader[s].update();
 }
 
-#if 0
-void levelWaitForFade()
+void levelWaitForFade(int waitTicks)
 {
-    while(!g_levelScreenFader.isComplete() && GameIsActive)
+    while(waitTicks >= 0 && GameIsActive)
     {
         XEvents::doEvents();
 
         if(canProceedFrame())
         {
             computeFrameTime1();
+            Controls::Update(false);
             UpdateGraphicsDraw();
             UpdateSound();
             XEvents::doEvents();
             computeFrameTime2();
             updateScreenFaders();
+            waitTicks--;
         }
 
         if(!g_config.unlimited_framerate)
@@ -120,7 +121,6 @@ void levelWaitForFade()
         GraphicsClearScreen();
     }
 }
-#endif
 
 void editorWaitForFade()
 {
