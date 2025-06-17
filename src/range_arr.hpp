@@ -108,8 +108,9 @@ public:
 #   ifdef RANGE_ARR_USE_HEAP
         SDL_assert_release(array); // When array won't initialize
 #   endif
-        SDL_assert_release(index <= end);
-        SDL_assert_release(index >= begin);
+        if(index > end || index < begin)
+            SDL_assert_release(false && "RangeArray out of range");
+
         return *(array + index + offset);
     }
 
@@ -118,8 +119,9 @@ public:
 #   ifdef RANGE_ARR_USE_HEAP
         SDL_assert_release(array); // When array won't initialize
 #   endif
-        SDL_assert_release(index <= end);
-        SDL_assert_release(index >= begin);
+        if(index > end || index < begin)
+            SDL_assert_release(false && "RangeArray out of range");
+
         return *(array + index + offset);
     }
 #endif
@@ -205,8 +207,9 @@ public:
 #   ifdef RANGE_ARR_USE_HEAP
         SDL_assert_release(array); // When array won't initialize
 #   endif
-        SDL_assert_release(index <= end);
-        SDL_assert_release(index >= begin);
+        if(index > end || index < begin)
+            SDL_assert_release(false && "RangeArray out of range");
+
         return *(array + index + offset);
     }
 
@@ -215,8 +218,9 @@ public:
 #   ifdef RANGE_ARR_USE_HEAP
         SDL_assert_release(array); // When array won't initialize
 #   endif
-        SDL_assert_release(index <= end);
-        SDL_assert_release(index >= begin);
+        if(index > end || index < begin)
+            SDL_assert_release(false && "RangeArray out of range");
+
         return *(array + index + offset);
     }
 #endif
