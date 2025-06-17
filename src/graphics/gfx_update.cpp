@@ -2039,24 +2039,27 @@ void UpdateGraphicsScreen(Screen_t& screen)
             for(; nextBackground < (int)screenBackgrounds.size(); nextBackground++) // First backgrounds
             {
                 int A = screenBackgrounds[nextBackground];
+                const auto &bgo = Background[A];
+                auto &bgoGfx = GFXBackgroundBMP[bgo.Type];
+                const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
+                const vbint_t bgoFrame = BackgroundFrame[bgo.Type];
 
                 if(A > numBackground)
                     break;
 
-                if(Background[A].SortPriority >= Background_t::PRI_NORM_START)
+                if(bgo.SortPriority >= Background_t::PRI_NORM_START)
                     break;
 
                 g_stats.checkedBGOs++;
-                if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
+                if(vScreenCollision(Z, bgo.Location) && !bgo.Hidden)
                 {
                     g_stats.renderedBGOs++;
-                    XRender::renderTextureBasic(camX + s_round2int(Background[A].Location.X),
-                                          camY + s_round2int(Background[A].Location.Y),
-                                          GFXBackground[Background[A].Type].w,
-                                          BackgroundHeight[Background[A].Type],
-                                          GFXBackgroundBMP[Background[A].Type], 0,
-                                          BackgroundHeight[Background[A].Type] *
-                                          BackgroundFrame[Background[A].Type]);
+                    XRender::renderTextureBasic(camX + s_round2int(bgo.Location.X),
+                                          camY + s_round2int(bgo.Location.Y),
+                                          bgoGfx.w,
+                                          bgoHeight,
+                                          bgoGfx, 0,
+                                          bgoHeight * bgoFrame);
                 }
             }
         }
@@ -2066,29 +2069,35 @@ void UpdateGraphicsScreen(Screen_t& screen)
             for(; nextBackground < (int)screenBackgrounds.size() && (int)screenBackgrounds[nextBackground] < MidBackground; nextBackground++)  // First backgrounds
             {
                 int A = screenBackgrounds[nextBackground];
+                const auto &bgo = Background[A];
+
                 g_stats.checkedBGOs++;
 
-                if(Background[A].Hidden)
+                if(bgo.Hidden)
                     continue;
 
-                int sX = camX + s_round2int(Background[A].Location.X);
+                int sX = camX + s_round2int(bgo.Location.X);
                 if(sX > vScreen[Z].Width)
                     continue;
 
-                int sY = camY + s_round2int(Background[A].Location.Y);
+                int sY = camY + s_round2int(bgo.Location.Y);
                 if(sY > vScreen[Z].Height)
                     continue;
 
-                if(sX + GFXBackground[Background[A].Type].w >= 0 && sY + BackgroundHeight[Background[A].Type] >= 0 /*&& !Background[A].Hidden*/)
+                auto &bgoGfx = GFXBackgroundBMP[bgo.Type];
+                const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
+
+                if(sX + bgoGfx.w >= 0 && sY + bgoHeight >= 0 /*&& !bgo.Hidden*/)
                 {
+                    const vbint_t bgoFrame = BackgroundFrame[bgo.Type];
                     g_stats.renderedBGOs++;
                     XRender::renderTextureBasic(sX,
                                           sY,
-                                          GFXBackground[Background[A].Type].w,
-                                          BackgroundHeight[Background[A].Type],
-                                          GFXBackgroundBMP[Background[A].Type],
+                                          bgoGfx.w,
+                                          bgoHeight,
+                                          bgoGfx,
                                           0,
-                                          BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
+                                          bgoHeight * bgoFrame);
                 }
             }
         }
@@ -2121,23 +2130,27 @@ void UpdateGraphicsScreen(Screen_t& screen)
             for(; nextBackground < (int)screenBackgrounds.size(); nextBackground++)  // Second backgrounds
             {
                 int A = screenBackgrounds[nextBackground];
+                const auto &bgo = Background[A];
+                auto &bgoGfx = GFXBackgroundBMP[bgo.Type];
+                const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
+                const vbint_t bgoFrame = BackgroundFrame[bgo.Type];
 
                 if(A > numBackground)
                     break;
 
-                if(Background[A].SortPriority >= Background_t::PRI_FG_START)
+                if(bgo.SortPriority >= Background_t::PRI_FG_START)
                     break;
 
                 g_stats.checkedBGOs++;
-                if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
+                if(vScreenCollision(Z, bgo.Location) && !bgo.Hidden)
                 {
                     g_stats.renderedBGOs++;
-                    XRender::renderTextureBasic(camX + s_round2int(Background[A].Location.X),
-                                          camY + s_round2int(Background[A].Location.Y),
-                                          GFXBackground[Background[A].Type].w,
-                                          BackgroundHeight[Background[A].Type],
-                                          GFXBackgroundBMP[Background[A].Type], 0,
-                                          BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
+                    XRender::renderTextureBasic(camX + s_round2int(bgo.Location.X),
+                                          camY + s_round2int(bgo.Location.Y),
+                                          bgoGfx.w,
+                                          bgoHeight,
+                                          bgoGfx, 0,
+                                          bgoHeight * bgoFrame);
                 }
             }
         }
@@ -2146,29 +2159,36 @@ void UpdateGraphicsScreen(Screen_t& screen)
             for(; nextBackground < (int)screenBackgrounds.size() && (int)screenBackgrounds[nextBackground] <= LastBackground; nextBackground++)  // Second backgrounds
             {
                 int A = screenBackgrounds[nextBackground];
+                const auto &bgo = Background[A];
 
                 g_stats.checkedBGOs++;
 
-                if(Background[A].Hidden)
+                if(bgo.Hidden)
                     continue;
 
-                int sX = camX + s_round2int(Background[A].Location.X);
+                int sX = camX + s_round2int(bgo.Location.X);
                 if(sX > vScreen[Z].Width)
                     continue;
 
-                int sY = camY + s_round2int(Background[A].Location.Y);
+                int sY = camY + s_round2int(bgo.Location.Y);
                 if(sY > vScreen[Z].Height)
                     continue;
 
-                if(sX + BackgroundWidth[Background[A].Type] >= 0 && sY + BackgroundHeight[Background[A].Type] >= 0 /*&& !Background[A].Hidden*/)
+                const vbint_t bgoWidth = BackgroundWidth[bgo.Type];
+                const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
+
+                if(sX + bgoWidth >= 0 && sY + bgoHeight >= 0 /*&& !bgo.Hidden*/)
                 {
+                    auto &bgoGfx = GFXBackgroundBMP[bgo.Type];
+                    const vbint_t bgoFrame = BackgroundFrame[bgo.Type];
+
                     g_stats.renderedBGOs++;
                     XRender::renderTextureBasic(sX,
                                           sY,
-                                          BackgroundWidth[Background[A].Type],
-                                          BackgroundHeight[Background[A].Type],
-                                          GFXBackgroundBMP[Background[A].Type],
-                                          0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
+                                          bgoWidth,
+                                          bgoHeight,
+                                          bgoGfx,
+                                          0, bgoHeight * bgoFrame);
                 }
             }
         }
@@ -2176,28 +2196,34 @@ void UpdateGraphicsScreen(Screen_t& screen)
         for(int oBackground = (int)screenBackgrounds.size() - 1; oBackground > 0 && (int)screenBackgrounds[oBackground] > numBackground; oBackground--)  // Locked doors
         {
             int A = screenBackgrounds[oBackground];
+            const auto &bgo = Background[A];
 
             g_stats.checkedBGOs++;
 
-            if(Background[A].Hidden || !(Background[A].Type == 98 || Background[A].Type == 160))
+            if(bgo.Hidden || !(bgo.Type == 98 || bgo.Type == 160))
                 continue;
 
-            int sX = camX + s_round2int(Background[A].Location.X);
+            int sX = camX + s_round2int(bgo.Location.X);
             if(sX > vScreen[Z].Width)
                 continue;
 
-            int sY = camY + s_round2int(Background[A].Location.Y);
+            int sY = camY + s_round2int(bgo.Location.Y);
             if(sY > vScreen[Z].Height)
                 continue;
 
-            if(sX + BackgroundWidth[Background[A].Type] >= 0 && sY + BackgroundHeight[Background[A].Type] >= 0)
+            const vbint_t bgoWidth = BackgroundWidth[bgo.Type];
+            const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
+
+            if(sX + bgoWidth >= 0 && sY + bgoHeight >= 0)
             {
+                auto &bgoGfx = GFXBackgroundBMP[bgo.Type];
+                const vbint_t bgoFrame = BackgroundFrame[bgo.Type];
                 g_stats.renderedBGOs++;
                 XRender::renderTextureBasic(sX,
                                       sY,
-                                      BackgroundWidth[Background[A].Type], BackgroundHeight[Background[A].Type],
-                                      GFXBackgroundBMP[Background[A].Type],
-                                      0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
+                                      bgoWidth, bgoHeight,
+                                      bgoGfx,
+                                      0, bgoHeight * bgoFrame);
             }
         }
 
@@ -2995,20 +3021,24 @@ void UpdateGraphicsScreen(Screen_t& screen)
             for(; nextBackground < (int)screenBackgrounds.size(); nextBackground++)  // Foreground objects
             {
                 int A = screenBackgrounds[nextBackground];
+                const auto &bgo = Background[A];
 
                 if(A > numBackground)
                     continue;
 
                 g_stats.checkedBGOs++;
-                if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
+                if(vScreenCollision(Z, bgo.Location) && !bgo.Hidden)
                 {
+                    auto &bgoGfx = GFXBackgroundBMP[bgo.Type];
+                    const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
+                    const vbint_t bgoFrame = BackgroundFrame[bgo.Type];
                     g_stats.renderedBGOs++;
-                    XRender::renderTextureBasic(camX + s_round2int(Background[A].Location.X),
-                                          camY + s_round2int(Background[A].Location.Y),
-                                          GFXBackground[Background[A].Type].w,
-                                          BackgroundHeight[Background[A].Type],
-                                          GFXBackgroundBMP[Background[A].Type], 0,
-                                          BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
+                    XRender::renderTextureBasic(camX + s_round2int(bgo.Location.X),
+                                          camY + s_round2int(bgo.Location.Y),
+                                          bgoGfx.w,
+                                          bgoHeight,
+                                          bgoGfx, 0,
+                                          bgoHeight * bgoFrame);
                 }
             }
         }
@@ -3017,24 +3047,33 @@ void UpdateGraphicsScreen(Screen_t& screen)
             for(; nextBackground < (int)screenBackgrounds.size() && (int)screenBackgrounds[nextBackground] <= numBackground; nextBackground++)  // Foreground objects
             {
                 int A = screenBackgrounds[nextBackground];
+                const auto &bgo = Background[A];
 
                 g_stats.checkedBGOs++;
 
-                if(Background[A].Hidden)
+                if(bgo.Hidden)
                     continue;
 
-                int sX = camX + s_round2int(Background[A].Location.X);
+                int sX = camX + s_round2int(bgo.Location.X);
                 if(sX > vScreen[Z].Width)
                     continue;
 
-                int sY = camY + s_round2int(Background[A].Location.Y);
+                int sY = camY + s_round2int(bgo.Location.Y);
                 if(sY > vScreen[Z].Height)
                     continue;
 
-                if(sX + GFXBackground[Background[A].Type].w >= 0 && sY + BackgroundHeight[Background[A].Type] >= 0 /*&& !Background[A].Hidden*/)
+                auto &bgoGfx = GFXBackgroundBMP[bgo.Type];
+                const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
+
+                if(sX + bgoGfx.w >= 0 && sY + bgoHeight >= 0 /*&& !bgo.Hidden*/)
                 {
                     g_stats.renderedBGOs++;
-                    XRender::renderTextureBasic(sX, sY, GFXBackground[Background[A].Type].w, BackgroundHeight[Background[A].Type], GFXBackground[Background[A].Type], 0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
+                    const vbint_t bgoFrame = BackgroundFrame[bgo.Type];
+                    XRender::renderTextureBasic(sX, sY,
+                                                bgoGfx.w,
+                                                bgoHeight,
+                                                bgoGfx, 0,
+                                                bgoHeight * bgoFrame);
                 }
             }
         }
