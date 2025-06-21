@@ -1438,29 +1438,7 @@ extern bool g_forceCharacter;
 //Public blockCharacter(0 To 20) As Boolean
 extern RangeArrI<bool, 0, 20, false> blockCharacter;
 
-//Public Type SelectWorld
-struct SelectWorld_t
-{
-//    WorldName As String
-    std::string WorldName;
-//    WorldPath As String
-    // std::string WorldPath;
-//    WorldFile As String (NEW: Full filepath)
-    std::string WorldFilePath;
-//    blockChar(1 To numCharacters) As Boolean
-    RangeArrI<bool, 1, numCharacters, false> blockChar;
-// EXTRA:
-    bool bugfixes_on_by_default = false;
-    bool editable = false;
-    bool disabled = false;
-    bool probably_incompatible = false;
-
-#ifdef THEXTECH_ENABLE_SDL_NET
-    // content hash of packed episode
-    uint32_t lz4_content_hash = 0;
-#endif
-//End Type
-};
+struct SelectWorld_t; // moved to main_menu.h
 
 //Public OwedMount(0 To maxPlayers) As Integer 'when a yoshi/boot is taken from the player this returns after going back to the world map
 extern RangeArrI<vbint_t, 0, maxPlayers, 0> OwedMount;

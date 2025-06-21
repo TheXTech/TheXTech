@@ -23,10 +23,44 @@
 #define MENU_MAIN_H
 
 #include <string>
+#include <memory>
+#include <stdint.h>
+
 #include "global_constants.h"
+#include "std_picture.h"
 #include "range_arr.hpp"
 
-struct SelectWorld_t;
+//Public Type SelectWorld
+struct SelectWorld_t
+{
+//    WorldName As String
+    std::string WorldName;
+//    WorldPath As String
+    // std::string WorldPath;
+//    WorldFile As String (NEW: Full filepath, or <URL for remote assets)
+    std::string WorldFilePath;
+
+    // NEW: repo annotations
+    std::string CreatorName;
+    std::string Description;
+    std::unique_ptr<StdPicture> screenshot;
+    uint32_t ReleaseDate = 0; // reserved for now
+
+//    blockChar(1 To numCharacters) As Boolean
+    RangeArrI<bool, 1, numCharacters, false> blockChar;
+// EXTRA:
+    bool bugfixes_on_by_default = false;
+    bool editable = false;
+    bool disabled = false;
+    bool probably_incompatible = false;
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+    // content hash of packed episode
+    uint32_t lz4_content_hash = 0;
+#endif
+//End Type
+};
+
 extern int NumSelectWorld;
 extern int NumSelectWorldEditable; // NEW
 extern int NumSelectBattle; // NEW

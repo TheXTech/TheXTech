@@ -536,12 +536,12 @@ static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName
         if(tr.tryTranslateTitle(epDir, fName, w.WorldName))
             pLogDebug("Translated world title: %s", w.WorldName.c_str());
 
-        SelectWorld.push_back(w);
-
 #ifdef THEXTECH_ENABLE_SDL_NET
         if(w.WorldFilePath.size() > 2 && w.WorldFilePath[0] == ':' && w.WorldFilePath[1] == 'a')
             w.lz4_content_hash = md5::string_to_u32(w.WorldFilePath);
 #endif
+
+        SelectWorld.push_back(std::move(w));
     }
 }
 
@@ -665,7 +665,7 @@ static void s_LoadWorldArchive(const std::string& archive)
 #endif
 
     // store it!
-    SelectWorld.push_back(w);
+    SelectWorld.push_back(std::move(w));
 }
 
 static void s_FinishFindWorlds()
@@ -692,12 +692,12 @@ static void s_FinishFindWorlds()
     battles.WorldName = g_mainMenu.editorBattles;
     battles.WorldFilePath = "battle";
     battles.editable = true;
-    SelectWorld.push_back(battles);
+    SelectWorld.push_back(std::move(battles));
 
     SelectWorld_t createWorld = SelectWorld_t();
     createWorld.WorldName = g_mainMenu.editorNewWorld;
     createWorld.editable = true;
-    SelectWorld.push_back(createWorld);
+    SelectWorld.push_back(std::move(createWorld));
 
     ContentSelectScreen::Prepare();
 
@@ -794,7 +794,7 @@ void FindLevels()
                 if(w.WorldName.empty())
                     w.WorldName = fName;
                 w.editable = battleRoot.editable;
-                SelectBattle.push_back(w);
+                SelectBattle.push_back(std::move(w));
 
 #ifdef THEXTECH_PRELOAD_LEVELS
                 if(LoadingInProcess)
