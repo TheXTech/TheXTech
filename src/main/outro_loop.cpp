@@ -370,7 +370,7 @@ void SetupCredits()
                            tests and debugs: and also, they introduced the SMBX to me (Vitaliy), in 2013
                            and inspired me to all my future projects (Moondust Project and TheXTech). */
     AddCredit("Krissy Silvermoon"); // For testing and design feedback since 2021 until at least 2025
-    AddCredit("Sapphire Bullet Bill"); // For testing and gameplay feedback since 2022 until at least 2024
+    AddCredit("Sapphire Bullet Bill"); // For testing and gameplay feedback since 2022 until at least 2025
     AddCredit("Bubble"); // For bugtesting in 2021-2022
     AddCredit("Trickii"); // For extensive bugtesting in 2024
     AddCredit("AntonioGZZ96"); // For careful bugtesting in 2024
