@@ -2040,9 +2040,6 @@ void UpdateGraphicsScreen(Screen_t& screen)
             {
                 int A = screenBackgrounds[nextBackground];
                 const auto &bgo = Background[A];
-                auto &bgoGfx = GFXBackgroundBMP[bgo.Type];
-                const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
-                const vbint_t bgoFrame = BackgroundFrame[bgo.Type];
 
                 if(A > numBackground)
                     break;
@@ -2054,6 +2051,11 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(vScreenCollision(Z, bgo.Location) && !bgo.Hidden)
                 {
                     g_stats.renderedBGOs++;
+
+                    auto &bgoGfx = GFXBackgroundBMP[bgo.Type];
+                    const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
+                    const vbint_t bgoFrame = BackgroundFrame[bgo.Type];
+
                     XRender::renderTextureBasic(camX + s_round2int(bgo.Location.X),
                                           camY + s_round2int(bgo.Location.Y),
                                           bgoGfx.w,
@@ -2131,9 +2133,6 @@ void UpdateGraphicsScreen(Screen_t& screen)
             {
                 int A = screenBackgrounds[nextBackground];
                 const auto &bgo = Background[A];
-                auto &bgoGfx = GFXBackgroundBMP[bgo.Type];
-                const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
-                const vbint_t bgoFrame = BackgroundFrame[bgo.Type];
 
                 if(A > numBackground)
                     break;
@@ -2145,6 +2144,11 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(vScreenCollision(Z, bgo.Location) && !bgo.Hidden)
                 {
                     g_stats.renderedBGOs++;
+
+                    auto &bgoGfx = GFXBackgroundBMP[bgo.Type];
+                    const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
+                    const vbint_t bgoFrame = BackgroundFrame[bgo.Type];
+
                     XRender::renderTextureBasic(camX + s_round2int(bgo.Location.X),
                                           camY + s_round2int(bgo.Location.Y),
                                           bgoGfx.w,
