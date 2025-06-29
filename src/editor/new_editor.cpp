@@ -5209,9 +5209,14 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
         {
             if(currently_in || !editorScreen.active)
                 swap_screens();
-            EditorCursor.Mode = OptCursor_t::LVL_SELECT;
-            m_last_mode = OptCursor_t::LVL_SELECT;
+
             if(!currently_in)
+            {
+                EditorCursor.Mode = OptCursor_t::LVL_SELECT;
+                m_last_mode = OptCursor_t::LVL_SELECT;
+            }
+
+            if(!in_section_settings)
                 m_special_page = SPECIAL_PAGE_SECTION_SETTINGS;
         }
 
