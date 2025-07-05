@@ -60,17 +60,6 @@ jobs:
         fi
         cmake --version
 
-    - name: Install updated maxmod
-      run: |
-        cd ..
-        git clone https://github.com/ds-sloth/maxmod.git -b master --depth 1 maxmod
-        cd maxmod
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/NDS.cmake -DCMAKE_BUILD_TYPE=MinSizeRel
-        make -j4
-        sudo make install
-
     - uses: TheXTech/checkout@v0.1
 
     - uses: TheXTech/branch-name@v0.1
