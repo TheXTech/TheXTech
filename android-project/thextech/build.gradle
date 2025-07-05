@@ -135,7 +135,7 @@ android {
         }
 
         minSdkVersion 16
-        targetSdkVersion 34
+        targetSdkVersion 35
 
         versionName xTechVersionString
         versionCode xTechVersionNumber
