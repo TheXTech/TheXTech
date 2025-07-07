@@ -32,6 +32,7 @@ jobs:
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
             -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/WiiU.cmake \
             -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/wiiu-local \
+            -DSDL2_DIR=/opt/devkitpro/portlibs/wiiu-local/lib/cmake/SDL2 \
             -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/wiiu",
 
             deps_cmdline: "echo 'DevkitPro SDK is already pre-installed'",
@@ -78,7 +79,7 @@ jobs:
     - name: Install modified SDL2
       run: |
         cd ..
-        git clone https://github.com/Wohlstand/SDL.git -b wiiu-sdl2-2.28 --depth 1 SDL2
+        git clone https://github.com/Wohlstand/SDL.git -b wiiu-fixes-2.28--06-2025 --depth 1 SDL2
         cd SDL2
         mkdir build
         cd build
