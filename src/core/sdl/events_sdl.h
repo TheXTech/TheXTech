@@ -29,6 +29,9 @@
 class EventsSDL final : public AbstractEvents_t
 {
     SDL_Event m_event = {};
+#ifdef __WIIU__
+    bool m_gotExit = false;
+#endif
 
 public:
     EventsSDL();

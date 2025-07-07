@@ -50,18 +50,31 @@ void EventsSDL::init(FrmMain *form)
 
 void EventsSDL::doEvents()
 {
+#ifdef __WIIU__
+    if(m_gotExit)
+        return;
+#endif
+
     while(SDL_PollEvent(&m_event))
     {
         processEvent();
 #ifdef __WIIU__
         if(m_event.type == SDL_QUIT) // Don't process any events after quit
+        {
+            m_gotExit = true;
             break;
+        }
 #endif
     }
 }
 
 void EventsSDL::waitEvents()
 {
+#ifdef __WIIU__
+    if(m_gotExit)
+        return;
+#endif
+
     if(SDL_WaitEventTimeout(&m_event, 1000))
         processEvent();
     doEvents();
@@ -69,6 +82,11 @@ void EventsSDL::waitEvents()
 
 void EventsSDL::processEvent()
 {
+#ifdef __WIIU__
+    if(m_gotExit)
+        return;
+#endif
+
     if(Controls::ProcessEvent(&m_event))
         return;
 
