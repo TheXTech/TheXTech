@@ -322,8 +322,11 @@ void UpdateInternalRes()
     XRender::updateViewport();
 
     // recenter the game menu graphics
-    if(GameMenu)
+    if(GameMenu && (l_screen->W != new_ScreenW || l_screen->H != new_ScreenH))
     {
+        l_screen->W = new_ScreenW;
+        l_screen->H = new_ScreenH;
+
         SetupScreens();
         CenterScreens();
         GameMenu = false;
