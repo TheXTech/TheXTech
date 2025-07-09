@@ -109,9 +109,9 @@
                 "propBounds": ""
             },
             "bounds": {
-                "changeAllSectionBoundsToCurrent": "Cambiare tutte le sezioni collegate a quella attuale?",
+                "changeAllSectionBoundsToCurrent": "Vuoi cambiare tutte le sezioni collegate a quella attuale?",
                 "shouldEvent": "",
-                "changeSectionBoundsToCurrent": ""
+                "changeSectionBoundsToCurrent": "Vuoi cambiare la sezione {0} collegate a quella attuale?"
             },
             "controlsForEventN": "Controlli per evento {0}",
             "header": "Eventi:",
@@ -165,7 +165,7 @@
         "block": {
             "pickContents": "Scegli il contenuto del blocco",
             "canBreak": "Distrugge",
-            "canBreakTooltip": "Viene distrutto se colpito da",
+            "canBreakTooltip": "Viene distrutto quando colpito",
             "inside": "Dentro:",
             "letterHeight": "H",
             "letterWidth": "W",
@@ -173,7 +173,7 @@
             "invis": "Invisib"
         },
         "browser": {
-            "askOverwriteFile": "Sovrascrivere{0}?",
+            "askOverwriteFile": "Vuoi Sovrascrivere{0}?",
             "itemNewFile": "<Nuovo File>",
             "itemNewFolder": "<Nuova Cartella>",
             "newFile": "Nuovo File",
