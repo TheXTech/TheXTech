@@ -2569,7 +2569,7 @@ void zTestLevel(bool magicHand, bool interProcess)
         ElapsedTimer time;
         time.start();
         //wait for accepting of level data
-        bool timeOut = false;
+        // bool timeOut = false;
         int attempts = 0;
 
         pLogDebug("ICP: Waiting reply....");
@@ -2593,10 +2593,13 @@ void zTestLevel(bool magicHand, bool interProcess)
             if(attempts > 4)
             {
                 pLogWarning("ICP: Wait timeout");
-                timeOut = true;
+                // timeOut = true;
                 IntProc::setState("ERROR: Wait time out.");
+                MessageText = "No responce from the connected Editor. Game will be closed."; // FIXME: Make this translatable later
                 UpdateLoadREAL();
-                PGE_Delay(1000);
+                g_MessageType = MESSAGE_TYPE_SYS_WARNING;
+                PauseGame(PauseCode::Message);
+                // PGE_Delay(1000);
                 GameIsActive = false;
                 return;
             }
@@ -2606,12 +2609,13 @@ void zTestLevel(bool magicHand, bool interProcess)
 
         UpdateLoadREAL();
 
-        if(!timeOut && !OpenLevelData(IntProc::editor->m_acceptedLevel, IntProc::editor->m_accepted_lvl_path)) //-V560
+        if(!OpenLevelData(IntProc::editor->m_acceptedLevel, IntProc::editor->m_accepted_lvl_path)) //-V560
         {
             pLogWarning("Bad file format!");
             pLogDebug("ERROR: Bad data format");
             UpdateLoadREAL();
-            PGE_Delay(1000);
+            ReportLoadFailure("<Interprocess>");
+            // PGE_Delay(1000);
             GameIsActive = false;
             return;
         }
