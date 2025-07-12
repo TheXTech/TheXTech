@@ -1,0 +1,3 @@
+This update features a lot of platform-related improvements and stabilisation. Since this update the exclusive full-screen modes on some platforms (such as retro computers) are supported to maintain the graphics performance which is impossible with the regular configuration and windowed mode.
+
+Read more here: https://github.com/Wohlstand/TheXTech/releases/tag/v1.3.7.1
