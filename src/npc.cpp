@@ -39,6 +39,7 @@
 #include "layers.h"
 
 #include "npc/npc_queues.h"
+#include "npc/npc_activation.h"
 #include "npc/section_overlap.h"
 #include "npc/npc_cockpit_bits.h"
 #include "npc/npc_update/npc_update_priv.h"
@@ -231,10 +232,21 @@ void Deactivate(int A)
                 NPC[A].Inert = false;
                 NPC[A].Stuck = false;
             }
+
             // reset variables back to default
             NPC[A].Quicksand = 0;
             NPC[A].NoLavaSplash = false;
             NPC[A].Active = false;
+
+            // prevent instantly respawning, unless the animation will be totally seamless
+            if(!g_config.fix_npc_camera_logic
+                || !NPC_InactiveRender(NPC[A])
+                || num_t::floor(NPC[A].Location.X) != num_t::floor(NPC[A].DefaultLocationX)
+                || num_t::floor(NPC[A].Location.Y) != num_t::floor(NPC[A].DefaultLocationY))
+            {
+                NPC[A].Reset[1] = false;
+                NPC[A].Reset[2] = false;
+            }
 
             // reset variables
             NPC[A].Type = NPC[A].DefaultType;
@@ -265,8 +277,7 @@ void Deactivate(int A)
             NPC[A].Killed = 0;
             NPC[A].Shadow = false;
             NPC[A].oldAddBelt = 0;
-            NPC[A].Reset[1] = false;
-            NPC[A].Reset[2] = false;
+
             // DefaultSpecial
             NPC[A].Special = NPC[A].DefaultSpecial;
             NPC[A].Special2 = 0; // NPC[A].DefaultSpecial2; // moved to Variant for the one type (NPCID_MAGIC_DOOR) that used it
