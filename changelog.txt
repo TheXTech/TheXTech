@@ -1,6 +1,6 @@
 TheXTech Changelog.
 
-Changelog for 1.3.7.1-dev
+Changelog for 1.3.7.1
 -Add GameCube controller support for Wii (@ds-sloth)
 -Fix TheXTech 1.3.7 peculiarity where NPCs that hid themselves on activation would be shown before coming onscreen (@ds-sloth)
 -Fix TheXTech 1.3.7 peculiarity where player preview sprites in the main menu would not use the correct death effects (@ds-sloth)
@@ -49,6 +49,7 @@ Changelog for 1.3.7.1-dev
 -Fixed the visual glitch of the last screen fade out frame being frozen instead of complete going into darkness (@Wohlstand)
 -Fixed the bug that causes gamesave's fails counter not being copied or removed via game menu (@Wohlstand)
 -Fix TheXTech 1.3.7-beta editor bug where a player object could become deselected when closing the editor pane (@ds-sloth, thanks to @fbitninja for the report)
+-Fixed the incorrect work of the Java-coded INI parser on Android that led some properties being loaded incorrectly (for example, valid background picture fails to load) (@Wohlstand)
 
 Changelog for 1.3.7
 -Fix vanilla peculiarity where medals were sometimes not collected when killed, guarded by "fix-medal-kill" [Modern Mode] (@ds-sloth, thanks to @Superbloxen for the report)
