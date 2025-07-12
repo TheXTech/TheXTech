@@ -45,11 +45,34 @@ public class IniFile
                     {
                         String key = m.group(1).trim();
                         String value = m.group(2).trim();
+
+                        Boolean quoteOpen = false;
+                        for(int i = 0; i < value.length(); ++i)
+                        {
+                            char c = value.charAt(i);
+                            if(!quoteOpen && c == '"')
+                            {
+                                quoteOpen = true;
+                            }
+                            else if(quoteOpen && c == '"')
+                            {
+                                quoteOpen = false;
+                            }
+                            else if(!quoteOpen && c == ';')
+                            {
+                                value = value.substring(0, i).trim();
+                                break; // Found leading comment, let's strip it!
+                            }
+                        }
+
                         if(value.startsWith("\"") && value.endsWith("\""))
                             value = value.substring(1, value.length()-1).trim();
+
                         Map<String, String> kv = _entries.get(section);
+
                         if(kv == null)
                             _entries.put(section, kv = new HashMap<>());
+
                         kv.put(key, value);
                     }
                 }
