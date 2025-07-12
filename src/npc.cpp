@@ -41,6 +41,7 @@
 #include "layers.h"
 
 #include "npc/npc_queues.h"
+#include "npc/npc_activation.h"
 #include "npc/section_overlap.h"
 #include "npc/npc_cockpit_bits.h"
 
@@ -140,10 +141,23 @@ void Deactivate(int A)
                 NPC[A].Inert = false;
                 NPC[A].Stuck = false;
             }
+
             // reset variables back to default
             NPC[A].Quicksand = 0;
             NPC[A].NoLavaSplash = false;
             NPC[A].Active = false;
+
+            // prevent instantly respawning, unless the animation will be totally seamless
+            if(!g_config.fix_npc_camera_logic
+                || !NPC_InactiveRender(NPC[A])
+                || std::floor(NPC[A].Location.X) != std::floor(NPC[A].DefaultLocationX)
+                || std::floor(NPC[A].Location.Y) != std::floor(NPC[A].DefaultLocationY))
+            {
+                NPC[A].Reset[1] = false;
+                NPC[A].Reset[2] = false;
+            }
+
+            // reset variables
             NPC[A].Type = NPC[A].DefaultType;
             NPC[A].ResetLocation();
             NPC[A].Direction = NPC[A].DefaultDirection;
@@ -160,8 +174,8 @@ void Deactivate(int A)
             NPC[A].Killed = 0;
             NPC[A].Shadow = false;
             NPC[A].oldAddBelt = 0;
-            NPC[A].Reset[1] = false;
-            NPC[A].Reset[2] = false;
+
+            // DefaultSpecial
             NPC[A].Special = NPC[A].DefaultSpecial;
             NPC[A].Special2 = NPC[A].DefaultSpecial2;
             NPC[A].Special3 = 0;
