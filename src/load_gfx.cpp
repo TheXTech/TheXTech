@@ -1675,10 +1675,23 @@ void UpdateLoadREAL()
         }
         else
         {
+            // Display the IPC status
             if(!state.empty())
-                SuperPrint(state, 3, Left + 10, Top + 10);
+                SuperPrint(state, 3, 10, 10);
             else
-                SuperPrint(g_gameStrings.loaderStatusLoadData, 3, Left + 10, Top + 10);
+                SuperPrint(g_gameStrings.loaderStatusLoadData, 3, 10, 10);
+        }
+
+        if(gh_w < 400)
+        {
+            Left = 0;
+            Right = XRender::TargetW;
+        }
+
+        if(gh_h < 240)
+        {
+            // Top = 0;
+            Bottom = XRender::TargetH;
         }
 
         XRender::renderTextureBasic(Right - (GFX.Loader.w + 50), Bottom - (GFX.Loader.h + 8), GFX.Loader);
