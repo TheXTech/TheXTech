@@ -173,7 +173,7 @@ bool GFX_t::load()
     {
         if(i == 4 && (XRender::TargetW < 800 || XRender::TargetH < 480))
         {
-            auto n = fmt::format_ne("MenuGFX{0}-320p", i);
+            const char *n = "MenuGFX4-320p";
 #   ifdef X_IMG_EXT
             if(Files::fileExists(m_uiPath + n + UI_IMG_EXT) || Files::fileExists(m_uiPath + n + ".png"))
 #   else
