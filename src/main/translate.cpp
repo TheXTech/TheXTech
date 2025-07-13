@@ -429,6 +429,8 @@ XTechTranslate::XTechTranslate()
 #if defined(THEXTECH_INTERPROC_SUPPORTED) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
     m_engineMap.insert({"game.error.openIPCDataFailed",            &g_gameStrings.errorOpenIPCDataFailed});
 #endif
+    m_engineMap.insert({"game.error.errorTooOldEngine",            &g_gameStrings.errorTooOldEngine});
+    m_engineMap.insert({"game.error.errorTooOldGameAssets",        &g_gameStrings.errorTooOldGameAssets});
     m_engineMap.insert({"game.error.errorInvalidEnterWarp",        &g_gameStrings.errorInvalidEnterWarp});
     m_engineMap.insert({"game.error.errorNoStartPoint",            &g_gameStrings.errorNoStartPoint});
 #if defined(THEXTECH_INTERPROC_SUPPORTED) && !defined(THEXTECH_DISABLE_LANG_TOOLS)

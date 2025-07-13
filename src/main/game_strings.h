@@ -34,6 +34,8 @@ struct GameContent
 #if defined(THEXTECH_INTERPROC_SUPPORTED) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
     std::string errorOpenIPCDataFailed;
 #endif
+    std::string errorTooOldEngine;
+    std::string errorTooOldGameAssets;
     std::string errorInvalidEnterWarp;
     std::string errorNoStartPoint;
 #if defined(THEXTECH_INTERPROC_SUPPORTED) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
