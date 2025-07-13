@@ -171,7 +171,7 @@ bool GFX_t::load()
 
     For(i, 1, 4)
     {
-        if(i == 4 && (XRender::TargetW < 800 || XRender::TargetH < 600))
+        if(i == 4 && (XRender::TargetW < 800 || XRender::TargetH < 480))
         {
             auto n = fmt::format_ne("MenuGFX{0}-320p", i);
 #   ifdef X_IMG_EXT
