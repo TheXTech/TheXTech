@@ -70,7 +70,12 @@ void GFX_t::loadImage(StdPicture &img, const std::string &fileName)
 #if defined(X_IMG_EXT) && !defined(X_NO_PNG_GIF)
     if(!img.inited)
     {
-        path_ext = path + ".png";
+        path_ext = fileName + ".png";
+        if(!m_uiPathTr.empty() && Files::fileExists(m_uiPathTr + path_ext))
+            path_ext = m_uiPathTr + path_ext; // Load localized variant
+        else
+            path_ext = m_uiPath + path_ext; // Load original
+
         pLogDebug("Could not load, trying %s...", path_ext.c_str());
         XRender::LoadPicture(img, path_ext);
     }
@@ -167,7 +172,7 @@ bool GFX_t::load()
     For(i, 1, 4)
     {
 #if defined(UI_PLATFORM_EXT)
-        auto n = uiPath + fmt::format_ne("MenuGFX{0}" UI_PLATFORM_EXT, i);
+        auto n = fmt::format_ne("MenuGFX{0}" UI_PLATFORM_EXT, i);
 #   ifdef X_IMG_EXT
         if(Files::fileExists(n + UI_IMG_EXT) || Files::fileExists(n + ".png"))
 #   else
