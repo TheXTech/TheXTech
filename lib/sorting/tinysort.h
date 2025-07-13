@@ -24,7 +24,7 @@
 #include <functional>
 #include <iterator>
 
-// an extremely simple introsort implementation intended for correctness as a stable sort, and code size.
+// an extremely simple insertion sort implementation intended for correctness as a stable sort, and code size.
 // DO NOT USE IF PERFORMANCE IS IMPORTANT.
 template<class it, class compare_func>
 inline void tinysort(it begin, it end, compare_func comp)
