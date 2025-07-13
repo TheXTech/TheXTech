@@ -1,7 +1,7 @@
 TheXTech Changelog.
 
 Changelog for 1.3.7.2-dev
--<empty>
+-Added support for the localisation of the loading screen (@Wohlstand)
 
 Changelog for 1.3.7.1
 -Add GameCube controller support for Wii (@ds-sloth)
@@ -284,7 +284,7 @@ Changelog for 1.3.6.1
 -Fixed bug where touchscreen controller would stay active during text entry screen without rendering (@ds-sloth)
 -Added an ability to place multiple stars at the same section using the Unique Star ID special value. (@Wohlstand)
 -Added support for Discord Rich Presense support (need to enable it at the game settings). (@Wohlstand)
--Added the localization system which allows you to translate engine into other languages than English. (@Wohlstand)
+-Added the localisation system which allows you to translate engine into other languages than English. (@Wohlstand)
 -Deep revision of the game's internal NPC and render logic, with up to 2x higher framerates on very large levels. (@ds-sloth)
 -Fixed vanilla bug where player could be crushed by a sloped ceiling (@ds-sloth)
 -Fixed vanilla bug where player could be crushed by a horizontally (not vertically) moving ceiling (@ds-sloth)

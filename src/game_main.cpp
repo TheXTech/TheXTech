@@ -117,15 +117,15 @@ static int loadingThread(void *waiter_ptr)
     UNUSED(waiter_ptr);
 #endif
 
-    LoaderUpdateDebugString("Game info");
+    LoaderUpdateDebugString(g_gameStrings.loaderStatusGameInfo);
     initGameInfo();
     cheats_reset();
 
-    LoaderUpdateDebugString("Translations");
+    LoaderUpdateDebugString(g_gameStrings.loaderStatusTranslations);
     XLanguage::findLanguages(); // find present translations
     ReloadTranslations(); // load translations
 
-    LoaderUpdateDebugString("Asset packs");
+    LoaderUpdateDebugString(g_gameStrings.loaderStatusAssetPacks);
     GetAssetPacks();
 
     SetupPhysics(); // Setup Physics
@@ -148,7 +148,7 @@ static int loadingThread(void *waiter_ptr)
 
     InitSound(); // Setup sound effects
 
-    LoaderUpdateDebugString("Finishing...", true);
+    LoaderUpdateDebugString(g_gameStrings.loaderStatusFinishing, true);
     UpdateLoad();
 
 #ifndef PGE_NO_THREADING

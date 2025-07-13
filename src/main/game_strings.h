@@ -30,6 +30,13 @@ struct GameContent
     std::string msgBoxTitleWarning;
     std::string msgBoxTitleError;
 
+    std::string loaderStatusLoadData;
+    std::string loaderStatusLoadFile;
+    std::string loaderStatusGameInfo;
+    std::string loaderStatusTranslations;
+    std::string loaderStatusAssetPacks;
+    std::string loaderStatusFinishing;
+
     std::string errorOpenFileFailed;
 #if defined(THEXTECH_INTERPROC_SUPPORTED) || !defined(THEXTECH_DISABLE_LANG_TOOLS)
     std::string errorOpenIPCDataFailed;

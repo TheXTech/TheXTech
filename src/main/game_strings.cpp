@@ -28,6 +28,13 @@ void initGameStrings()
     g_gameStrings.msgBoxTitleWarning = "Warning!";
     g_gameStrings.msgBoxTitleError = "Error!";
 
+    g_gameStrings.loaderStatusLoadData = "Loading data...";
+    g_gameStrings.loaderStatusLoadFile = "Load: {0}";
+    g_gameStrings.loaderStatusGameInfo = "Game info";
+    g_gameStrings.loaderStatusTranslations = "Translations";
+    g_gameStrings.loaderStatusAssetPacks = "Asset packs";
+    g_gameStrings.loaderStatusFinishing = "Finishing...";
+
     g_gameStrings.errorOpenFileFailed = "Can't open \"{0}\": file doesn't exist or corrupted.";
 #if defined(THEXTECH_INTERPROC_SUPPORTED) || !defined(THEXTECH_DISABLE_LANG_TOOLS)
     g_gameStrings.errorOpenIPCDataFailed = "Can't proceed received file data because of corruption or other errors.";

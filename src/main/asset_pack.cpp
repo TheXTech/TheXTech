@@ -29,8 +29,10 @@
 #include <IniProcessor/ini_processing.h>
 
 #include "main/asset_pack.h"
+#include "main/translate.h"
 #include "core/render.h"
 #include "core/msgbox.h"
+#include "core/language.h"
 
 #include "sound.h"
 #include "gfx.h"
@@ -525,6 +527,9 @@ bool InitUIAssetsFrom(const std::string& id, bool skip_gfx)
     g_AssetPackID = pack.full_id();
 
     pLogDebug("Loading assets from %s", AppPath.c_str());
+
+    XLanguage::findLanguages(); // find present translations
+    ReloadTranslations(); // load translations
 
     if(!skip_gfx && !GFX.load())
         return false;
