@@ -31,20 +31,20 @@ struct GameContent
     std::string msgBoxTitleError;
 
     std::string errorOpenFileFailed;
-#if defined(THEXTECH_INTERPROC_SUPPORTED) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
+#if defined(THEXTECH_INTERPROC_SUPPORTED) || !defined(THEXTECH_DISABLE_LANG_TOOLS)
     std::string errorOpenIPCDataFailed;
 #endif
     std::string errorTooOldEngine;
     std::string errorTooOldGameAssets;
     std::string errorInvalidEnterWarp;
     std::string errorNoStartPoint;
-#if defined(THEXTECH_INTERPROC_SUPPORTED) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
+#if defined(THEXTECH_INTERPROC_SUPPORTED) || !defined(THEXTECH_DISABLE_LANG_TOOLS)
     std::string errorIPCTimeOut;
 #endif
     std::string messageScanningLevels;
     std::string formatMinutesSeconds;
 
-#if defined(THEXTECH_INTERPROC_SUPPORTED) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
+#if defined(THEXTECH_INTERPROC_SUPPORTED) || !defined(THEXTECH_DISABLE_LANG_TOOLS)
     std::string ipcStatusWaitingInput;
     std::string ipcStatusDataTransferStarted;
     std::string ipcStatusDataAccepted;
@@ -53,7 +53,7 @@ struct GameContent
     std::string ipcStatusLoadingDone;
 #endif
 
-#if !defined(NO_WINDOW_FOCUS_TRACKING) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
+#if !defined(NO_WINDOW_FOCUS_TRACKING) || !defined(THEXTECH_DISABLE_LANG_TOOLS)
     std::string screenPaused;
 #endif
 
