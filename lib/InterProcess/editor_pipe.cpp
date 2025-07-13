@@ -12,6 +12,8 @@
 #include "intproc.h"
 #include <fmt_format_ne.h>
 
+#include "main/game_strings.h"
+
 /**************************************************************************************************************/
 
 int EditorPipe::run(void *self)
@@ -181,7 +183,7 @@ void EditorPipe::icomingData(const std::string &in)
     {
         m_doAcceptLevelData = false;
         pLogDebug("LVLX accepting is done!");
-        IntProc::setState("LVLX Accepted, do parsing of LVLX");
+        IntProc::setState(g_gameStrings.ipcStatusDataAccepted);
     }
 
     if(m_doAcceptLevelData)
@@ -207,7 +209,7 @@ void EditorPipe::icomingData(const std::string &in)
         m_accepted_lvl_path   = std::string(in.c_str() + offset, (in.size() - offset));//skip "SEND_LVLX: "
         Strings::doTrim(m_accepted_lvl_path);
         m_doAcceptLevelData  = true;
-        IntProc::setState("Accepted SEND_LVLX");
+        IntProc::setState(g_gameStrings.ipcStatusDataTransferStarted);
         sendMessage(m_doAcceptLevelDataParts ? "READY_PARTS\n\n" : "READY\n\n");
     }
     else if(in.compare(0, 10, "PARSE_LVLX") == 0)
@@ -216,7 +218,7 @@ void EditorPipe::icomingData(const std::string &in)
         m_doParseLevelData = true;
         m_doAcceptLevelDataParts = false;
         m_acceptedLevel.open(&m_acceptedRawData, m_accepted_lvl_path);
-        IntProc::setState("LVLX is valid: 1");
+        IntProc::setState(g_gameStrings.ipcStatusDataValid);
 
         m_levelAccepted_lock.lock();
         m_levelAccepted = true;

@@ -29,6 +29,9 @@ void initGameStrings()
     g_gameStrings.msgBoxTitleError = "Error!";
 
     g_gameStrings.errorOpenFileFailed = "Can't open \"{0}\": file doesn't exist or corrupted.";
+#if defined(THEXTECH_INTERPROC_SUPPORTED) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
+    g_gameStrings.errorOpenIPCDataFailed = "Can't proceed received file data because of corruption or other errors.";
+#endif
     g_gameStrings.errorInvalidEnterWarp = "Can't start the level "
                                           "because of an invalid "
                                           "entrance warp {1} was "
@@ -43,8 +46,21 @@ void initGameStrings()
                                       "\n"
                                       "File: {0}";
 
+#if defined(THEXTECH_INTERPROC_SUPPORTED) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
+    g_gameStrings.errorIPCTimeOut = "No responce from the connected Editor. Game will be closed.";
+#endif
+
     g_gameStrings.messageScanningLevels = "Scanning levels...";
     g_gameStrings.formatMinutesSeconds = "{0}m{1}s";
+
+#if defined(THEXTECH_INTERPROC_SUPPORTED) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
+    g_gameStrings.ipcStatusWaitingInput = "Waiting for input data...";
+    g_gameStrings.ipcStatusDataTransferStarted = "Started data tansfer...";
+    g_gameStrings.ipcStatusDataAccepted = "Data accepted, the parsing started...";
+    g_gameStrings.ipcStatusDataValid = "Accepted data is valid";
+    g_gameStrings.ipcStatusErrorTimeout = "ERROR: Wait time out.";
+    g_gameStrings.ipcStatusLoadingDone = "Done. Starting game...";
+#endif
 
 #if !defined(NO_WINDOW_FOCUS_TRACKING) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
     g_gameStrings.screenPaused = "Paused";

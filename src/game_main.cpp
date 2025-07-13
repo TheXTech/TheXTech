@@ -308,18 +308,24 @@ static void s_ExpandSectionForMenu()
         menu_section.Y = menu_section.Height - 2160;
 }
 
-void ReportLoadFailure(const std::string& filename)
+void ReportLoadFailure(const std::string& filename, bool isIPC)
 {
 #ifdef THEXTECH_ENABLE_SDL_NET
     XMessage::Disconnect();
+#endif
+#if !defined(THEXTECH_INTERPROC_SUPPORTED)
+    UNUSED(isIPC);
 #endif
 
     g_MessageType = MESSAGE_TYPE_SYS_WARNING;
 
     // temporarily store error code from load process in MessageTitle string
     std::swap(MessageText, MessageTitle);
-
+#if defined(THEXTECH_INTERPROC_SUPPORTED)
+    MessageText = isIPC ? g_gameStrings.errorOpenIPCDataFailed : fmt::format_ne(g_gameStrings.errorOpenFileFailed, filename);
+#else
     MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, filename);
+#endif
 
     // add error code from load process
     if(!MessageTitle.empty())

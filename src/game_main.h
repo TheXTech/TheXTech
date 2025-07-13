@@ -44,7 +44,7 @@ void SetupPhysics();
 void initAll();
 
 //! Report the failure to load a level, pausing the game with a message box
-void ReportLoadFailure(const std::string& filename);
+void ReportLoadFailure(const std::string& filename, bool isIPC = false);
 
 //! NEW: (re)load all file-based assets from the current asset pack directory
 void MainLoadAll();
