@@ -1236,6 +1236,45 @@ file(GLOB THEXTECH_HEADS_SRC
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 
 # ----------------------------------------------------
+# Non-buildable meta files such as change log, Readmes, etc.
+set(THEXTECH_EXTRA_RESOURCES
+    changelog.txt
+    README.md
+    README.RUS.md
+    README.ESP.md
+    resources/thextech.plist.in
+    resources/thextech.plist.tiger.in
+    resources/emscripten/manifest.json.in
+    resources/emscripten/shell_minimal.html
+    resources/emscripten/sw.js.in
+    resources/flatpak/appdata.xml.in
+    resources/flatpak/build.yml
+    resources/haiku/PackageInfo.in
+    resources/haiku/icon.hvif
+    resources/haiku/icon.rdef
+    resources/vita/frag.cgf
+    resources/vita/vert.cgv
+    resources/vita/sce_sys/icon0.png
+    resources/vita/sce_sys/livearea/contents/bg.png
+    resources/vita/sce_sys/livearea/contents/startup.png
+    resources/vita/sce_sys/livearea/contents/template.xml.in
+    resources/nds/icon.bmp
+    resources/switch/splash_logo.png
+    resources/switch/thextech-logo.jpg
+    resources/switch/thextech-logo.png
+    resources/tiger/TheXTechRun.in
+    resources/wii/icon.png
+    resources/wii/meta.xml.in
+    resources/wiiu/icon.png
+    resources/wiiu/meta.xml.in
+    resources/wiiu/wuhb-splash.png
+)
+
+list(APPEND THEXTECH_SRC ${THEXTECH_EXTRA_RESOURCES})
+set_source_files_properties(${THEXTECH_EXTRA_RESOURCES} PROPERTIES HEADER_FILE_ONLY ON)
+source_group("Resources" FILES ${THEXTECH_EXTRA_RESOURCES})
+
+# ----------------------------------------------------
 
 if(WIN32 AND NOT EMSCRIPTEN)
     list(APPEND THEXTECH_SRC resources/thextech.rc)
