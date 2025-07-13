@@ -302,7 +302,10 @@ void Render(bool now_loading = false)
         if(B > XRender::TargetH)
             B = XRender::TargetH;
 
-        XRender::renderTexture(R - 168, B - 24, GFX.Loader);
+        R -= (GFX.Loader.w + 50);
+        B -= (GFX.Loader.h + 8);
+
+        XRender::renderTexture(R, B, GFX.Loader);
     }
 
     XRender::repaint();
