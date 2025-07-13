@@ -334,7 +334,9 @@
             "errorInvalidEnterWarp": "作为关卡起点的传送点{1}号不存在，因此无法进入关卡。\n传送点总数：{2}\n\n文件：{0}",
             "errorNoStartPoint": "未放置玩家起点或传送点入口，因此无法进入关卡。\n\n文件：{0}",
             "openFileFailed": "无法打开文件\"{0}\"：文件不存在或已损坏。",
-            "warpNeedStarCount": "你需要{0}{2}{1}才能进入此传送点。"
+            "warpNeedStarCount": "你需要{0}{2}{1}才能进入此传送点。",
+            "IPCTimeOut": "加载编辑器时无响应，即将退出游戏。",
+            "openIPCDataFailed": "无法接收文件数据：文件可能已损坏，或者发生其他错误。"
         },
         "format": {
             "minutesSeconds": "{0}分{1}秒"
@@ -370,7 +372,15 @@
             "pound-altrun": "按下“第二奔跑”键，进行震地！",
             "pound-down": "按下“下”键，进行震地！"
         },
-        "screenPaused": "游戏暂停"
+        "screenPaused": "游戏暂停",
+        "ipcStatus": {
+            "dataAccepted": "已接收到数据，开始解析……",
+            "dataTransferStarted": "开始传输数据……",
+            "dataValid": "接收的数据是有效数据",
+            "errorTimeout": "错误：等待超时。",
+            "loadingdone": "加载完成，即将开始游戏……",
+            "waitingInput": "等待玩家按键输入……"
+        }
     },
     "languageName": "简体中文",
     "menu": {
