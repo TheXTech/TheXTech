@@ -426,13 +426,28 @@ XTechTranslate::XTechTranslate()
     m_engineMap.insert({"game.msgbox.sysInfoError",                &g_gameStrings.msgBoxTitleError});
 
     m_engineMap.insert({"game.error.openFileFailed",               &g_gameStrings.errorOpenFileFailed});
+#if defined(THEXTECH_INTERPROC_SUPPORTED) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
+    m_engineMap.insert({"game.error.openIPCDataFailed",            &g_gameStrings.errorOpenIPCDataFailed});
+#endif
     m_engineMap.insert({"game.error.errorInvalidEnterWarp",        &g_gameStrings.errorInvalidEnterWarp});
     m_engineMap.insert({"game.error.errorNoStartPoint",            &g_gameStrings.errorNoStartPoint});
+#if defined(THEXTECH_INTERPROC_SUPPORTED) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
+    m_engineMap.insert({"game.error.IPCTimeOut",                   &g_gameStrings.errorIPCTimeOut});
+#endif
 
     m_engineMap.insert({"game.error.warpNeedStarCount",            &g_gameStrings.warpNeedStarCount});
 
     m_engineMap.insert({"game.message.scanningLevels",             &g_gameStrings.messageScanningLevels});
     m_engineMap.insert({"game.format.minutesSeconds",              &g_gameStrings.formatMinutesSeconds});
+
+#if defined(THEXTECH_INTERPROC_SUPPORTED) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
+    m_engineMap.insert({"game.ipcStatus.waitingInput",             &g_gameStrings.ipcStatusWaitingInput});
+    m_engineMap.insert({"game.ipcStatus.dataTransferStarted",      &g_gameStrings.ipcStatusDataTransferStarted});
+    m_engineMap.insert({"game.ipcStatus.dataAccepted",             &g_gameStrings.ipcStatusDataAccepted});
+    m_engineMap.insert({"game.ipcStatus.dataValid",                &g_gameStrings.ipcStatusDataValid});
+    m_engineMap.insert({"game.ipcStatus.errorTimeout",             &g_gameStrings.ipcStatusErrorTimeout});
+    m_engineMap.insert({"game.ipcStatus.loadingdone",              &g_gameStrings.ipcStatusLoadingDone});
+#endif
 
 #if !defined(NO_WINDOW_FOCUS_TRACKING) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
     m_engineMap.insert({"game.screenPaused",               &g_gameStrings.screenPaused});
