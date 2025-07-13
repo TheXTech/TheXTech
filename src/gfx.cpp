@@ -122,11 +122,10 @@ bool GFX_t::load()
 {
     m_uiPath = AppPath + "graphics/ui/";
     m_uiPathTr.clear();
-    std::string langDir;
 
     if(!CurrentLanguage.empty())
     {
-        langDir = CurrentLanguage + "-" + CurrentLangDialect;
+        std::string langDir = CurrentLanguage + "-" + CurrentLangDialect;
         if(!CurrentLangDialect.empty() && DirMan::exists(m_uiPath + "i18n/" + langDir))
             m_uiPathTr = m_uiPath + "i18n/" + langDir + "/";
         else if(DirMan::exists(m_uiPath + "i18n/" + CurrentLanguage))
