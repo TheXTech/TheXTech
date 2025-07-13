@@ -41,19 +41,22 @@ class GFX_t
     //! Holder of "is custom" flag
     bool m_isCustom[m_isCustomVolume];
 
+    std::string m_uiPathTr;
+    std::string m_uiPath;
+
     /*!
      * \brief Internal function of the texture loading
      * \param img Target texture
-     * \param path Path to the texture file (excluding extension)
+     * \param fileName File name of the texture file (excluding extension)
      */
-    void loadImage(StdPicture &img, const std::string &path);
+    void loadImage(StdPicture &img, const std::string &fileName);
 
     /*!
      * \brief Internal function to load a frame border including its texture
      * \param border Target border to load
-     * \param path Path to texture file (excluding extension); border info will not include extension either
+     * \param fileName File name of the texture file (excluding extension); border info will not include extension either
      */
-    void loadBorder(FrameBorder& border, const std::string& path);
+    void loadBorder(FrameBorder& border, const std::string& fileName);
 
     //! Counter of loading errors
     int m_loadErrors = 0;

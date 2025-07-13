@@ -41,6 +41,7 @@
 #include "core/events.h"
 #include "main/asset_pack.h"
 #include "main/screen_asset_pack.h"
+#include "main/game_strings.h"
 
 #include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
@@ -1603,7 +1604,7 @@ void LoaderUpdateDebugString(const std::string &strig, bool forceUpdate)
 #ifndef PGE_NO_THREADING
     SDL_LockMutex(gfxLoaderDebugMutex);
 #endif
-    gfxLoaderDebugString = "Load: " + strig;
+    gfxLoaderDebugString = fmt::format_ne(g_gameStrings.loaderStatusLoadFile, strig);
     if(forceUpdate)
         gfxLoaderDebugStringUpdated = true;
 #ifndef PGE_NO_THREADING
@@ -1717,7 +1718,7 @@ void UpdateLoadREAL()
             if(!state.empty())
                 SuperPrint(state, 3, Left + 10, Top + 10);
             else
-                SuperPrint("Loading data...", 3, Left + 10, Top + 10);
+                SuperPrint(g_gameStrings.loaderStatusLoadData, 3, Left + 10, Top + 10);
         }
 
         XRender::renderTextureBasic(Right - (GFX.Loader.w + 50), Bottom - (GFX.Loader.h + 8), GFX.Loader);

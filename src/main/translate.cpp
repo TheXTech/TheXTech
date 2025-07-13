@@ -425,6 +425,13 @@ XTechTranslate::XTechTranslate()
     m_engineMap.insert({"game.msgbox.sysInfoWarning",              &g_gameStrings.msgBoxTitleWarning});
     m_engineMap.insert({"game.msgbox.sysInfoError",                &g_gameStrings.msgBoxTitleError});
 
+    m_engineMap.insert({"game.loader.statusLoadData",              &g_gameStrings.loaderStatusLoadData});
+    m_engineMap.insert({"game.loader.statusLoadFile",              &g_gameStrings.loaderStatusLoadFile});
+    m_engineMap.insert({"game.loader.statusGameInfo",              &g_gameStrings.loaderStatusGameInfo});
+    m_engineMap.insert({"game.loader.statusTranslations",          &g_gameStrings.loaderStatusTranslations});
+    m_engineMap.insert({"game.loader.statusAssetPacks",            &g_gameStrings.loaderStatusAssetPacks});
+    m_engineMap.insert({"game.loader.statusFinishing",             &g_gameStrings.loaderStatusFinishing});
+
     m_engineMap.insert({"game.error.openFileFailed",               &g_gameStrings.errorOpenFileFailed});
 #if defined(THEXTECH_INTERPROC_SUPPORTED) || !defined(THEXTECH_DISABLE_LANG_TOOLS)
     m_engineMap.insert({"game.error.openIPCDataFailed",            &g_gameStrings.errorOpenIPCDataFailed});

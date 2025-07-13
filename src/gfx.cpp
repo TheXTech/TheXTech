@@ -29,6 +29,7 @@
 
 #include <IniProcessor/ini_processing.h>
 #include <Utils/files_ini.h>
+#include <DirManager/dirman.h>
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
 
@@ -54,9 +55,14 @@
 GFX_t GFX;
 
 
-void GFX_t::loadImage(StdPicture &img, const std::string &path)
+void GFX_t::loadImage(StdPicture &img, const std::string &fileName)
 {
-    std::string path_ext = path + UI_IMG_EXT;
+    std::string path_ext = fileName + UI_IMG_EXT;
+
+    if(!m_uiPathTr.empty() && Files::fileExists(m_uiPathTr + path_ext))
+        path_ext = m_uiPathTr + path_ext; // Load localized variant
+    else
+        path_ext = m_uiPath + path_ext; // Load original
 
     pLogDebug("Loading texture %s...", path_ext.c_str());
     XRender::LoadPicture(img, path_ext);
@@ -79,22 +85,29 @@ void GFX_t::loadImage(StdPicture &img, const std::string &path)
     m_loadedImages.push_back(&img);
 }
 
-void GFX_t::loadBorder(FrameBorder& border, const std::string& path)
+void GFX_t::loadBorder(FrameBorder& border, const std::string& fileName)
 {
-    loadImage(border.tex, path);
+    std::string path_dst;
+
+    if(!m_uiPathTr.empty() && Files::fileExists(m_uiPathTr + fileName + ".ini"))
+        path_dst = m_uiPathTr + fileName; // Load localized variant
+    else
+        path_dst = m_uiPath + fileName; // Load original
+
+    loadImage(border.tex, fileName);
 
     if(!border.tex.inited)
         return;
 
-    IniProcessing ini = Files::load_ini(path + ".ini");
+    IniProcessing ini = Files::load_ini(path_dst + ".ini");
     loadFrameInfo(ini, border);
 
     // warn if invalid
     const FrameBorderInfo& i = border;
     if(i.le + i.li + i.ri + i.re > border.tex.w)
-        pLogWarning("Invalid border: total internal/external width is %d but [%s] is only %dpx wide.", i.le + i.li + i.ri + i.re, path.c_str(), border.tex.w);
+        pLogWarning("Invalid border: total internal/external width is %d but [%s] is only %dpx wide.", i.le + i.li + i.ri + i.re, path_dst.c_str(), border.tex.w);
     if(i.te + i.ti + i.bi + i.be > border.tex.h)
-        pLogWarning("Invalid border: total internal/external height is %d but [%s] is only %dpx tall.", i.te + i.ti + i.bi + i.be, path.c_str(), border.tex.h);
+        pLogWarning("Invalid border: total internal/external height is %d but [%s] is only %dpx tall.", i.te + i.ti + i.bi + i.be, path_dst.c_str(), border.tex.h);
 }
 
 GFX_t::GFX_t() noexcept
@@ -102,43 +115,54 @@ GFX_t::GFX_t() noexcept
 
 bool GFX_t::load()
 {
-    std::string uiPath = AppPath + "graphics/ui/";
+    m_uiPath = AppPath + "graphics/ui/";
+    m_uiPathTr.clear();
+    std::string langDir;
 
-    loadImage(BMVs, uiPath + "BMVs");
-    loadImage(BMWin, uiPath + "BMWin");
+    if(!CurrentLanguage.empty())
+    {
+        langDir = CurrentLanguage + "-" + CurrentLangDialect;
+        if(!CurrentLangDialect.empty() && DirMan::exists(m_uiPath + "i18n/" + langDir))
+            m_uiPathTr = m_uiPath + "i18n/" + langDir + "/";
+        else if(DirMan::exists(m_uiPath + "i18n/" + CurrentLanguage))
+            m_uiPathTr = m_uiPath + "i18n/" + CurrentLanguage + "/";
+    }
+
+    loadImage(BMVs, "BMVs");
+    loadImage(BMWin, "BMWin");
     For(i, 1, 3)
-        loadImage(Boot[i], uiPath + fmt::sprintf_ne("Boot%d", i));
+        loadImage(Boot[i], fmt::sprintf_ne("Boot%d", i));
 
     For(i, 1, 5)
-        loadImage(CharacterName[i], uiPath + fmt::sprintf_ne("CharacterName%d", i));
+        loadImage(CharacterName[i], fmt::sprintf_ne("CharacterName%d", i));
 
-    loadImage(Chat, uiPath + "Chat");
+    loadImage(Chat, "Chat");
 
     For(i, 0, 2)
-        loadImage(Container[i], uiPath + fmt::sprintf_ne("Container%d", i));
+        loadImage(Container[i], fmt::sprintf_ne("Container%d", i));
 
     For(i, 1, 3)
-        loadImage(ECursor[i], uiPath + fmt::sprintf_ne("ECursor%d", i));
+        loadImage(ECursor[i], fmt::sprintf_ne("ECursor%d", i));
 
     For(i, 0, 9)
-        loadImage(Font1[i], uiPath + fmt::sprintf_ne("Font1_%d", i));
+        loadImage(Font1[i], fmt::sprintf_ne("Font1_%d", i));
 
     For(i, 1, 3)
-        loadImage(Font2[i], uiPath + fmt::sprintf_ne("Font2_%d", i));
+        loadImage(Font2[i], fmt::sprintf_ne("Font2_%d", i));
 
-    loadImage(Font2S, uiPath + "Font2S");
+    loadImage(Font2S, "Font2S");
 
     For(i, 1, 2)
-        loadImage(Heart[i], uiPath + fmt::sprintf_ne("Heart%d", i));
+        loadImage(Heart[i], fmt::sprintf_ne("Heart%d", i));
 
     For(i, 0, 8)
-        loadImage(Interface[i], uiPath + fmt::sprintf_ne("Interface%d", i));
+        loadImage(Interface[i], fmt::sprintf_ne("Interface%d", i));
 
-    loadImage(LoadCoin, uiPath + "LoadCoin");
-    loadImage(Loader, uiPath + "Loader");
+    loadImage(LoadCoin, "LoadCoin");
+    loadImage(Loader, "Loader");
 
     For(i, 0, 3)
-        loadImage(MCursor[i], uiPath + fmt::sprintf_ne("MCursor%d", i));
+        loadImage(MCursor[i], fmt::sprintf_ne("MCursor%d", i));
 
     For(i, 1, 4)
     {
@@ -156,22 +180,22 @@ bool GFX_t::load()
 
         pLogWarning("File %s%s doesn't exist, trying to load generic one...", n.c_str(), UI_IMG_EXT);
 #endif
-        loadImage(MenuGFX[i], uiPath + fmt::sprintf_ne("MenuGFX%d", i));
+        loadImage(MenuGFX[i], fmt::sprintf_ne("MenuGFX%d", i));
     }
 
-    loadImage(Mount[2], uiPath + "Mount");
+    loadImage(Mount[2], "Mount");
 
     For(i, 0, 7)
-        loadImage(nCursor[i], uiPath + fmt::sprintf_ne("nCursor%d", i));
+        loadImage(nCursor[i], fmt::sprintf_ne("nCursor%d", i));
 
-    loadImage(TextBox, uiPath + "TextBox");
+    loadImage(TextBox, "TextBox");
 
     For(i, 1, 2)
-        loadImage(Tongue[i], uiPath + fmt::sprintf_ne("Tongue%d", i));
+        loadImage(Tongue[i], fmt::sprintf_ne("Tongue%d", i));
 
     // loadImage(Warp, uiPath + "Warp");
 
-    loadImage(YoshiWings, uiPath + "YoshiWings");
+    loadImage(YoshiWings, "YoshiWings");
 
     // Add new required assets here. Also update load_gfx.cpp:loadCustomUIAssets()
 
@@ -186,32 +210,32 @@ bool GFX_t::load()
         return false;
     }
 
-    loadImage(CycloneAcc, uiPath + "CycloneAcc");
+    loadImage(CycloneAcc, "CycloneAcc");
 
-    loadImage(EIcons, uiPath + "EditorIcons");
-
-    if(m_loadErrors > 0)
-        m_loadErrors = 0;
-
-    loadImage(PCursor, uiPath + "PCursor");
+    loadImage(EIcons, "EditorIcons");
 
     if(m_loadErrors > 0)
         m_loadErrors = 0;
 
-    loadImage(Medals, uiPath + "Medals");
+    loadImage(PCursor, "PCursor");
 
     if(m_loadErrors > 0)
         m_loadErrors = 0;
 
-    loadImage(CharSelIcons, uiPath + "CharSelIcons");
-
-    loadBorder(CharSelFrame, uiPath + "CharSelFrame");
+    loadImage(Medals, "Medals");
 
     if(m_loadErrors > 0)
         m_loadErrors = 0;
 
-    loadImage(Backdrop, uiPath + "Backdrop");
-    loadBorder(Backdrop_Border, uiPath + "Backdrop_Border");
+    loadImage(CharSelIcons, "CharSelIcons");
+
+    loadBorder(CharSelFrame, "CharSelFrame");
+
+    if(m_loadErrors > 0)
+        m_loadErrors = 0;
+
+    loadImage(Backdrop, "Backdrop");
+    loadBorder(Backdrop_Border, "Backdrop_Border");
 
     if(m_loadErrors > 0)
     {
@@ -219,8 +243,8 @@ bool GFX_t::load()
         m_loadErrors = 0;
     }
 
-    loadImage(WorldMapFrame_Tile, uiPath + "WorldMapFrame_Tile");
-    loadBorder(WorldMapFrame_Border, uiPath + "WorldMapFrame_Border");
+    loadImage(WorldMapFrame_Tile, "WorldMapFrame_Tile");
+    loadBorder(WorldMapFrame_Border, "WorldMapFrame_Border");
 
     if(m_loadErrors > 0)
     {
@@ -228,12 +252,12 @@ bool GFX_t::load()
         m_loadErrors = 0;
     }
 
-    loadImage(Camera, uiPath + "Camera");
+    loadImage(Camera, "Camera");
 
     if(m_loadErrors > 0)
         m_loadErrors = 0;
 
-    loadImage(Balance, uiPath + "Balance");
+    loadImage(Balance, "Balance");
 
     if(m_loadErrors > 0)
         m_loadErrors = 0;
