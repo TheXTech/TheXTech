@@ -1,5 +1,8 @@
 TheXTech Changelog.
 
+Changelog for 1.3.7.2-dev
+-<empty>
+
 Changelog for 1.3.7.1
 -Add GameCube controller support for Wii (@ds-sloth)
 -Fix TheXTech 1.3.7 peculiarity where NPCs that hid themselves on activation would be shown before coming onscreen (@ds-sloth)
