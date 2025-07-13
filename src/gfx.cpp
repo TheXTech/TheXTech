@@ -171,12 +171,26 @@ bool GFX_t::load()
 
     For(i, 1, 4)
     {
+        if(i == 4 && (XRender::TargetW < 800 || XRender::TargetH < 600))
+        {
+            auto n = fmt::format_ne("MenuGFX{0}-320p", i);
+#   ifdef X_IMG_EXT
+            if(Files::fileExists(m_uiPath + n + UI_IMG_EXT) || Files::fileExists(m_uiPath + n + ".png"))
+#   else
+            if(Files::fileExists(m_uiPath + n + UI_IMG_EXT))
+#   endif
+            {
+                loadImage(MenuGFX[i], n);
+                continue;
+            }
+        }
+
 #if defined(UI_PLATFORM_EXT)
         auto n = fmt::format_ne("MenuGFX{0}" UI_PLATFORM_EXT, i);
 #   ifdef X_IMG_EXT
-        if(Files::fileExists(n + UI_IMG_EXT) || Files::fileExists(n + ".png"))
+        if(Files::fileExists(m_uiPath + n + UI_IMG_EXT) || Files::fileExists(m_uiPath + n + ".png"))
 #   else
-        if(Files::fileExists(n + UI_IMG_EXT))
+        if(Files::fileExists(m_uiPath + n + UI_IMG_EXT))
 #   endif
         {
             loadImage(MenuGFX[i], n);
