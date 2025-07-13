@@ -1112,6 +1112,7 @@ file(GLOB THEXTECH_HEADS_SRC
     lib/Graphics/*.h
     lib/tclap/*.h
     lib/fmt/*.h
+    lib/sorting/*.h
     lib/json/*.hpp
     src/*.h
     src/*.hpp
