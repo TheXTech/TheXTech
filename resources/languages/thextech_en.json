@@ -336,7 +336,9 @@
             "openFileFailed": "Can't open \"{0}\": file doesn't exist or corrupted.",
             "warpNeedStarCount": "You need {0} {1} to enter.",
             "IPCTimeOut": "No responce from the connected Editor. Game will be closed.",
-            "openIPCDataFailed": "Can't proceed received file data because of corruption or other errors."
+            "openIPCDataFailed": "Can't proceed received file data because of corruption or other errors.",
+            "errorTooOldEngine": "Content requires a newer engine feature level ({0}) than the current version ({1}). Please update TheXTech.",
+            "errorTooOldGameAssets": "Content requires a newer asset pack feature level ({0}) than the current asset pack ({1}). Please upgrade your game asset pack."
         },
         "hint": {
             "pound-altrun": "Press Alt Run to pound downwards!",
@@ -380,6 +382,14 @@
             "errorTimeout": "ERROR: Wait time out.",
             "loadingdone": "Done. Starting game...",
             "waitingInput": "Waiting for input data..."
+        },
+        "loader": {
+            "statusAssetPacks": "Asset packs",
+            "statusFinishing": "Finishing...",
+            "statusGameInfo": "Game info",
+            "statusLoadData": "Loading data...",
+            "statusLoadFile": "Load: {0}",
+            "statusTranslations": "Translations"
         }
     },
     "languageName": "English",
