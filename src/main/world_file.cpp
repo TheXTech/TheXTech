@@ -73,6 +73,9 @@ using callback_error = std::runtime_error;
 
 bool OpenWorld_Post(const WorldLoad& load);
 
+// defined in level_file.cpp
+[[ noreturn ]] void priv_FeatureLevelError(const std::string& errMsg, int reqFeatureLevel, int curFeatureLevel);
+
 bool OpenWorld(std::string FilePath)
 {
     // USE PGE-FL here
@@ -197,9 +200,9 @@ bool OpenWorld_Head(void* userdata, WorldData& wld)
 #endif
 
     if(reqFeatureLevel > engineFeatureLevel)
-        throw callback_error(fmt::format_ne(g_gameStrings.errorTooOldEngine, reqFeatureLevel, engineFeatureLevel));
+        priv_FeatureLevelError(g_gameStrings.errorTooOldEngine, reqFeatureLevel, engineFeatureLevel);
     else if(reqFeatureLevel > g_gameInfo.contentFeatureLevel)
-        throw callback_error(fmt::format_ne(g_gameStrings.errorTooOldGameAssets, reqFeatureLevel, g_gameInfo.contentFeatureLevel));
+        priv_FeatureLevelError(g_gameStrings.errorTooOldGameAssets, reqFeatureLevel, g_gameInfo.contentFeatureLevel);
 
     WorldName = wld.EpisodeTitle;
 
