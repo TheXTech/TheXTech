@@ -392,11 +392,11 @@ void ConfigEnumOption_t<false, value_t>::make_translation(XTechTranslate& transl
     if((ConfigOption_t<false, value_t>::m_scope & Options_t::Scope::MakeTranslation) == 0)
         return;
 
-    translate.m_engineMap.insert({fmt::sprintf_ne("menu.options.%s.%s._name", cur_section_id, m_internal_name), &m_display_name});
+    XTechTranslate::insert(translate.m_engineMap, fmt::sprintf_ne("menu.options.%s.%s._name", cur_section_id, m_internal_name), &m_display_name);
 
     // some obscure behavior of the GCC version in Ubuntu 16.04 necessitates qualifying m_display_tooltip with the base class scope
     if(!BaseConfigOption_t<false>::m_display_tooltip.empty())
-        translate.m_engineMap.insert({fmt::sprintf_ne("menu.options.%s.%s._tooltip", cur_section_id, m_internal_name), &m_display_tooltip});
+        XTechTranslate::insert(translate.m_engineMap, fmt::sprintf_ne("menu.options.%s.%s._tooltip", cur_section_id, m_internal_name), &m_display_tooltip);
 
     for(auto& value : m_enum_values)
     {
@@ -404,10 +404,10 @@ void ConfigEnumOption_t<false, value_t>::make_translation(XTechTranslate& transl
             continue;
 
         if(!value.m_display_name.empty())
-            translate.m_engineMap.insert({fmt::sprintf_ne("menu.options.%s.%s.%s", cur_section_id, m_internal_name, value.m_internal_name), &value.m_display_name});
+            XTechTranslate::insert(translate.m_engineMap, fmt::sprintf_ne("menu.options.%s.%s.%s", cur_section_id, m_internal_name, value.m_internal_name), &value.m_display_name);
 
         if(!value.m_display_tooltip.empty())
-            translate.m_engineMap.insert({fmt::sprintf_ne("menu.options.%s.%s.%s-tip", cur_section_id, m_internal_name, value.m_internal_name), &value.m_display_tooltip});
+            XTechTranslate::insert(translate.m_engineMap, fmt::sprintf_ne("menu.options.%s.%s.%s-tip", cur_section_id, m_internal_name, value.m_internal_name), &value.m_display_tooltip);
     }
 }
 

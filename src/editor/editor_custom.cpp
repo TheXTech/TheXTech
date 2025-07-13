@@ -543,20 +543,20 @@ void ItemList_t::make_translation(XTechTranslate& translate, const char* group, 
         if(indices[i] != -1)
         {
             if(header < 0)
-                translate.m_assetsMap.insert({fmt::sprintf_ne("editor.%s.auto.%s%d", group, prefix, (int)indices[i]), &names[i]});
+                XTechTranslate::insert(translate.m_assetsMap, fmt::sprintf_ne("editor.%s.auto.%s%d", group, prefix, (int)indices[i]), &names[i]);
             else if(header < (int)families.size())
-                translate.m_assetsMap.insert({fmt::sprintf_ne("editor.%s.%s.%s%d", group, families[header].second.c_str(), prefix, (int)indices[i]), &names[i]});
+                XTechTranslate::insert(translate.m_assetsMap, fmt::sprintf_ne("editor.%s.%s.%s%d", group, families[header].second.c_str(), prefix, (int)indices[i]), &names[i]);
             else
-                translate.m_assetsMap.insert({fmt::sprintf_ne("editor.%s.fam%s.%s%d", group, header, prefix, (int)indices[i]), &names[i]});
+                XTechTranslate::insert(translate.m_assetsMap, fmt::sprintf_ne("editor.%s.fam%s.%s%d", group, header, prefix, (int)indices[i]), &names[i]);
         }
         else if(!names[i].empty())
         {
             header++;
 
             if(header < (int)families.size())
-                translate.m_assetsMap.insert({fmt::sprintf_ne("editor.%s.%s.header", group, families[header].second.c_str()), &names[i]});
+                XTechTranslate::insert(translate.m_assetsMap, fmt::sprintf_ne("editor.%s.%s.header", group, families[header].second.c_str()), &names[i]);
             else
-                translate.m_assetsMap.insert({fmt::sprintf_ne("editor.%s.fam%d.header", group, header), &names[i]});
+                XTechTranslate::insert(translate.m_assetsMap, fmt::sprintf_ne("editor.%s.fam%d.header", group, header), &names[i]);
         }
     }
 }
@@ -1501,14 +1501,14 @@ void Load(XTechTranslate* translate)
     editor.read("any", list_level_exit_names[0], "Any");
     editor.read("none", list_level_exit_names[1], "None");
 
-    translate->m_assetsMap.insert({fmt::sprintf_ne("editor.exit-codes.%s", "any"), &(list_level_exit_names[0])});
-    translate->m_assetsMap.insert({fmt::sprintf_ne("editor.exit-codes.%s", "none"), &(list_level_exit_names[1])});
+    XTechTranslate::insert(translate->m_assetsMap, fmt::sprintf_ne("editor.exit-codes.%s", "any"), &(list_level_exit_names[0]));
+    XTechTranslate::insert(translate->m_assetsMap, fmt::sprintf_ne("editor.exit-codes.%s", "none"), &(list_level_exit_names[1]));
 
     for(size_t i = 1; i + 1 < list_level_exit_names.size(); i++)
     {
         const std::string s = fmt::sprintf_ne("code%zu", i);
         editor.read(s.c_str(), list_level_exit_names[i + 1], s);
-        translate->m_assetsMap.insert({fmt::sprintf_ne("editor.exit-codes.%zu", i), &(list_level_exit_names[i + 1])});
+        XTechTranslate::insert(translate->m_assetsMap, fmt::sprintf_ne("editor.exit-codes.%zu", i), &(list_level_exit_names[i + 1]));
     }
 
     editor.endGroup();
@@ -1552,7 +1552,7 @@ void Load(XTechTranslate* translate)
     if(translate)
     {
         for(uint8_t i = 0; i < block_families.size(); i++)
-            translate->m_assetsMap.insert({fmt::sprintf_ne("editor.block.%s", block_family_keys[i].c_str()), &(block_families[i].name)});
+            XTechTranslate::insert(translate->m_assetsMap, fmt::sprintf_ne("editor.block.%s", block_family_keys[i].c_str()), &(block_families[i].name));
     }
 
 
@@ -1595,7 +1595,7 @@ void Load(XTechTranslate* translate)
     if(translate)
     {
         for(uint8_t i = 0; i < bgo_families.size(); i++)
-            translate->m_assetsMap.insert({fmt::sprintf_ne("editor.bgo.%s", bgo_family_keys[i].c_str()), &(bgo_families[i].name)});
+            XTechTranslate::insert(translate->m_assetsMap, fmt::sprintf_ne("editor.bgo.%s", bgo_family_keys[i].c_str()), &(bgo_families[i].name));
     }
 
 
@@ -1641,7 +1641,7 @@ void Load(XTechTranslate* translate)
     if(translate)
     {
         for(uint8_t i = 0; i < npc_families.size(); i++)
-            translate->m_assetsMap.insert({fmt::sprintf_ne("editor.npc.%s", npc_family_keys[i].c_str()), &(npc_families[i].name)});
+            XTechTranslate::insert(translate->m_assetsMap, fmt::sprintf_ne("editor.npc.%s", npc_family_keys[i].c_str()), &(npc_families[i].name));
     }
 
 
@@ -1683,7 +1683,7 @@ void Load(XTechTranslate* translate)
     if(translate)
     {
         for(uint8_t i = 0; i < tile_families.size(); i++)
-            translate->m_assetsMap.insert({fmt::sprintf_ne("editor.tile.%s", tile_family_keys[i].c_str()), &(tile_families[i].name)});
+            XTechTranslate::insert(translate->m_assetsMap, fmt::sprintf_ne("editor.tile.%s", tile_family_keys[i].c_str()), &(tile_families[i].name));
     }
 
 

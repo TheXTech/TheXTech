@@ -433,7 +433,7 @@ void InitTranslations(XTechTranslate& translate)
 
         top_index = s_hint_text_index[i];
 
-        translate.m_engineMap.insert({fmt::format_ne("game.hint.{0}", s_hints[i].tr_id), &(s_translated_hint_text[top_index])});
+        XTechTranslate::insert(translate.m_engineMap, fmt::format_ne("game.hint.{0}", s_hints[i].tr_id), &(s_translated_hint_text[top_index]));
     }
 }
 
