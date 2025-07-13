@@ -32,6 +32,14 @@ void initGameStrings()
 #if defined(THEXTECH_INTERPROC_SUPPORTED) && !defined(THEXTECH_DISABLE_LANG_TOOLS)
     g_gameStrings.errorOpenIPCDataFailed = "Can't proceed received file data because of corruption or other errors.";
 #endif
+    g_gameStrings.errorTooOldEngine = "Content can't be loaded because it requires higher "
+                                      "features level ({0}) than this engine can offer ({1}). "
+                                      "Please update TheXTech.";
+    g_gameStrings.errorTooOldGameAssets = "Content can't be loaded with the current game assets "
+                                          "pack because it installs too low feature level ({1}) "
+                                          "than is required ({0}). Please upgrade your game assets "
+                                          "pack to support higher feature level.";
+
     g_gameStrings.errorInvalidEnterWarp = "Can't start the level "
                                           "because of an invalid "
                                           "entrance warp {1} was "

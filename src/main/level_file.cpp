@@ -23,6 +23,7 @@
 
 #include <json/json_rwops_input.hpp>
 #include <json/json.hpp>
+#include <fmt_format_ne.h>
 #include <algorithm>
 
 #ifdef __16M__
@@ -46,6 +47,7 @@
 #include "level_file.h"
 #include "main/level_save_info.h"
 #include "main/level_medals.h"
+#include "main/game_strings.h"
 #include "main/screen_progress.h"
 #include "main/game_strings.h"
 #include "main/game_info.h"
@@ -390,9 +392,9 @@ bool OpenLevel_Head(void* userdata, LevelData& head)
 #endif
 
     if(reqFeatureLevel > engineFeatureLevel)
-        throw callback_error("Content cannot be loaded. Please update TheXTech.");
+        throw callback_error(fmt::format_ne(g_gameStrings.errorTooOldEngine, reqFeatureLevel, engineFeatureLevel));
     else if(reqFeatureLevel > g_gameInfo.contentFeatureLevel)
-        throw callback_error("Content cannot be loaded. Please update your game assets.");
+        throw callback_error(fmt::format_ne(g_gameStrings.errorTooOldGameAssets, reqFeatureLevel, g_gameInfo.contentFeatureLevel));
 
     // Level-wide extra settings
     if(!head.custom_params.empty())

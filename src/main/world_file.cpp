@@ -23,6 +23,7 @@
 
 #include <json/json_rwops_input.hpp>
 #include <json/json.hpp>
+#include <fmt_format_ne.h>
 
 #include "core/render.h"
 
@@ -145,9 +146,9 @@ bool OpenWorld_Head(void* userdata, WorldData& wld)
         load.FileRelease = int(wld.meta.RecentFormatVersion);
 
     if(reqFeatureLevel > engineFeatureLevel)
-        throw callback_error("Content cannot be loaded. Please update TheXTech.");
+        throw callback_error(fmt::format_ne(g_gameStrings.errorTooOldEngine, reqFeatureLevel, engineFeatureLevel));
     else if(reqFeatureLevel > g_gameInfo.contentFeatureLevel)
-        throw callback_error("Content cannot be loaded. Please update your game assets.");
+        throw callback_error(fmt::format_ne(g_gameStrings.errorTooOldGameAssets, reqFeatureLevel, g_gameInfo.contentFeatureLevel));
 
     WorldName = wld.EpisodeTitle;
 
