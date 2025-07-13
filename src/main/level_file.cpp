@@ -93,6 +93,13 @@ using callback_error = PGE_FileFormats_misc::callback_error;
 using callback_error = std::runtime_error;
 #endif
 
+[[ noreturn ]] void priv_FeatureLevelError(const std::string& errMsg, int reqFeatureLevel, int curFeatureLevel)
+{
+    // use MessageText as a temporary store -- the error gets processed before returning to game code control
+    MessageText = fmt::format_ne(errMsg, reqFeatureLevel, curFeatureLevel);
+    throw callback_error(MessageText.c_str());
+}
+
 void addMissingLvlSuffix(std::string &fileName)
 {
     if(!fileName.empty() && !Files::hasSuffix(fileName, ".lvl") && !Files::hasSuffix(fileName, ".lvlx") && !Files::hasSuffix(fileName, "tst"))
@@ -392,9 +399,9 @@ bool OpenLevel_Head(void* userdata, LevelData& head)
 #endif
 
     if(reqFeatureLevel > engineFeatureLevel)
-        throw callback_error(fmt::format_ne(g_gameStrings.errorTooOldEngine, reqFeatureLevel, engineFeatureLevel));
+        priv_FeatureLevelError(g_gameStrings.errorTooOldEngine, reqFeatureLevel, engineFeatureLevel);
     else if(reqFeatureLevel > g_gameInfo.contentFeatureLevel)
-        throw callback_error(fmt::format_ne(g_gameStrings.errorTooOldGameAssets, reqFeatureLevel, g_gameInfo.contentFeatureLevel));
+        priv_FeatureLevelError(g_gameStrings.errorTooOldGameAssets, reqFeatureLevel, g_gameInfo.contentFeatureLevel);
 
     // Level-wide extra settings
     if(!head.custom_params.empty())
