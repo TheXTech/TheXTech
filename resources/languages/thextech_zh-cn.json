@@ -336,7 +336,9 @@
             "openFileFailed": "无法打开文件\"{0}\"：文件不存在或已损坏。",
             "warpNeedStarCount": "你需要{0}{2}{1}才能进入此传送点。",
             "IPCTimeOut": "加载编辑器时无响应，即将退出游戏。",
-            "openIPCDataFailed": "无法接收文件数据：文件可能已损坏，或者发生其他错误。"
+            "openIPCDataFailed": "无法接收文件数据：文件可能已损坏，或者发生其他错误。",
+            "errorTooOldEngine": "该文件需要版本{0}或更高版本的TheXTech引擎才能正常运作，当前TheXTech引擎版本为{1}。请更新引擎。",
+            "errorTooOldGameAssets": "该文件需要版本{0}或更高版本的游戏组件才能正常运作，当前游戏组件版本为{1}。请更新游戏组件。"
         },
         "format": {
             "minutesSeconds": "{0}分{1}秒"
@@ -380,6 +382,14 @@
             "errorTimeout": "错误：等待超时。",
             "loadingdone": "加载完成，即将开始游戏……",
             "waitingInput": "等待玩家按键输入……"
+        },
+        "loader": {
+            "statusAssetPacks": "游戏组件",
+            "statusFinishing": "完成加载……",
+            "statusGameInfo": "游戏信息",
+            "statusLoadData": "正在加载数据……",
+            "statusLoadFile": "正在加载：(0)",
+            "statusTranslations": "翻译"
         }
     },
     "languageName": "简体中文",

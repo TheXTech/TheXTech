@@ -5,7 +5,10 @@
             "fam-misc": {
                 "bg2-40": "Geheime Mine",
                 "bg2-46": "Raumschiff",
-                "bg2-47": "Raumbasis"
+                "bg2-47": "Raumbasis",
+                "bg2-16": "Weltraum-Krater",
+                "bg2-45": "Weltraum-Sumpf",
+                "header": "Versch."
             },
             "fam-set1": {
                 "bg2-41": "Burg",
@@ -13,7 +16,9 @@
                 "bg2-51": "Wüste",
                 "bg2-7": "Unterirdisch",
                 "bg2-8": "Nacht",
-                "bg2-9": "Nacht 2"
+                "bg2-9": "Nacht 2",
+                "bg2-10": "Oberwelt",
+                "header": "Set 1"
             },
             "fam-set2": {
                 "bg2-25": "Unterirdisch",
@@ -28,11 +33,25 @@
             },
             "fam-set3": {
                 "bg2-13": "Wolken",
-                "bg2-14": "Wüste"
+                "bg2-14": "Wüste",
+                "bg2-1": "Blöcke",
+                "bg2-15": "Dungeon 2",
+                "bg2-17": "Schiff",
+                "bg2-2": "Hügel",
+                "bg2-20": "Wald",
+                "bg2-21": "Kampf",
+                "bg2-22": "Wasserfall"
             },
             "auto": {
                 "bg2-0": "Keine"
             }
         }
+    },
+    "character": {
+        "name1": "Charakter1",
+        "name2": "Charakter2",
+        "name3": "Charakter3",
+        "name4": "Character4",
+        "name5": "Charakter5"
     }
 }

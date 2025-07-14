@@ -336,7 +336,9 @@
             "openFileFailed": "無法打開檔案\"{0}\"：檔案不存在或已損壞。",
             "warpNeedStarCount": "你需要{0}{2}{1}才能進入此傳送點。",
             "openIPCDataFailed": "無法接收檔案數據：檔案可能已損壞，或者發生其他錯誤。",
-            "IPCTimeOut": "載入編輯器時無響應，即將退出遊戲。"
+            "IPCTimeOut": "載入編輯器時無響應，即將退出遊戲。",
+            "errorTooOldEngine": "該檔案需要版本{0}或更高版本的TheXTech引擎才能正常運作，當前TheXTech引擎版本為{1}。請更新引擎。",
+            "errorTooOldGameAssets": "該檔案需要版本{0}或更高版本的遊戲組件才能正常運作，當前遊戲組件版本為{1}。請更新遊戲組件。"
         },
         "pause": {
             "continue": "繼續遊戲",
@@ -380,6 +382,14 @@
             "dataValid": "接收的數據是有效數據",
             "dataTransferStarted": "開始傳輸數據……",
             "dataAccepted": "已接收到數據，開始解析……"
+        },
+        "loader": {
+            "statusAssetPacks": "遊戲組件",
+            "statusFinishing": "完成加載……",
+            "statusGameInfo": "遊戲信息",
+            "statusLoadData": "正在加載數據……",
+            "statusLoadFile": "正在加載：{0}",
+            "statusTranslations": "翻譯"
         }
     },
     "languageName": "繁體中文",

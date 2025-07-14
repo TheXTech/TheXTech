@@ -11,7 +11,46 @@
         },
         "events": {
             "header": "Ereignisse:",
-            "itemNewEvent": "<Neues Ereignis>"
+            "itemNewEvent": "<Neues Ereignis>",
+            "bounds": {
+                "changeAllSectionBoundsToCurrent": "Alle Sekt. Grenzen zur jetzigen ändern?",
+                "changeSectionBoundsToCurrent": "{0} Sekt. Grenzen zur Jetzigen ändern?",
+                "shouldEvent": "Sollte Event {0}"
+            },
+            "controlsForEventN": "Steuerung für Event {0}",
+            "deletion": {
+                "cancel": "Nein: Event nicht löschen",
+                "confirm": "Ja: Event löschen",
+                "deletingEvent": "Event {0} wird gelöscht"
+            },
+            "desc": {
+                "activate": "NPC betritt Bildschirm",
+                "death": "NPC stirbt",
+                "destroy": "Block wird zerstört",
+                "enter": "Warp wird betreten",
+                "hit": "Block wird getroffen",
+                "layerClear": "alles in der Objektebene ist verschwunden",
+                "phraseTriggersAfterTemplate": "{0} wird {1} ms nach Event {2} ausgelöst",
+                "phraseTriggersWhenTemplate": "{0} wird ausgelöst wenn {1}",
+                "talk": "Spieler redet mit NPC"
+            },
+            "headerTriggerEvent": "Auslöser:",
+            "label": {
+                "activate": "Aktivieren",
+                "death": "Tod",
+                "destroy": "Zerstören",
+                "enter": "Betreten",
+                "hit": "Treffer",
+                "layerClear": "Ebene leeren"
+            }
+        },
+        "block": {
+            "canBreak": "Zerstörbar",
+            "canBreakTooltip": "Klassisch: Wird nach einem Treffer zerstört",
+            "inside": "Inhalt:",
+            "invis": "N. Sicht",
+            "pickContents": "Wähle Block Inhalt",
+            "slick": "Glatt"
         }
     }
 }
