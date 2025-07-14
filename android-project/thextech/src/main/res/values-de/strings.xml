@@ -35,4 +35,7 @@
     <string name="cheat_dialog_title">Befehl eingeben:</string>
     <string name="launcher_gameSelect_clearList">Liste löschen</string>
     <string name="launcher_gameSelect_pickTheDir">Verzeichnis auswählen...</string>
+    <string name="launcher_gameselect_toast_selected">Spiel geändert zu: %s</string>
+    <string name="launcher_gameselect_toast_listclean">Die Spieleliste wurde geleert.</string>
+    <string name="launcher_gameselect_clearlist_title">Die Spieleliste leeren</string>
 </resources>
