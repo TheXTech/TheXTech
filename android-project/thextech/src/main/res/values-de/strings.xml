@@ -38,4 +38,6 @@
     <string name="launcher_gameselect_toast_selected">Spiel geändert zu: %s</string>
     <string name="launcher_gameselect_toast_listclean">Die Spieleliste wurde geleert.</string>
     <string name="launcher_gameselect_clearlist_title">Die Spieleliste leeren</string>
+    <string name="launcher_gameselect_clearlist_question">Willst du sicher die Spieleliste leeren?</string>
+    <string name="launcher_openfile_indirectly">Kann keinen absoluten Pfad für die geöffnete Datei finden, weshalb sie in den internen Spiele-Ordner verschoben wurde. Extra Ressourcen (so wie eigene Grafiken, Musik, Configs, Scripte usw.) können nicht geladen werden. Möchtest du das Spiel trotzdem starten?</string>
 </resources>

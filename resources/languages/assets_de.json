@@ -40,10 +40,30 @@
                 "bg2-2": "Hügel",
                 "bg2-20": "Wald",
                 "bg2-21": "Kampf",
-                "bg2-22": "Wasserfall"
+                "bg2-22": "Wasserfall",
+                "bg2-23": "Panzer",
+                "bg2-24": "Endboss",
+                "bg2-26": "Pilz-Dealer",
+                "bg2-27": "Burg",
+                "bg2-35": "Schnee-Bäume",
+                "bg2-36": "Wolken 2",
+                "bg2-37": "Schnee-Hügel",
+                "bg2-38": "Höhle",
+                "bg2-39": "Höhle 2",
+                "bg2-4": "Röhren",
+                "bg2-56": "Unterwasser"
             },
             "auto": {
                 "bg2-0": "Keine"
+            },
+            "fam-set4": {
+                "bg2-11": "Hügel",
+                "bg2-12": "Bäume",
+                "bg2-18": "Villa",
+                "bg2-19": "Wald",
+                "bg2-29": "Nacht",
+                "bg2-30": "Höhle",
+                "bg2-31": "Wolken"
             }
         }
     },

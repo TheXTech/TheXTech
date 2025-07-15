@@ -41,7 +41,35 @@
                 "destroy": "Zerstören",
                 "enter": "Betreten",
                 "hit": "Treffer",
-                "layerClear": "Ebene leeren"
+                "layerClear": "Ebene leeren",
+                "next": "Weiter",
+                "talk": "Sprechen"
+            },
+            "layers": {
+                "headerHide": "Verstecken:",
+                "headerMove": "Bewegen:",
+                "headerShow": "Zeigen:",
+                "headerToggle": "Umschalten:"
+            },
+            "letter": {
+                "activate": "A:",
+                "death": "T:",
+                "destroy": "Z:",
+                "enter": "B:",
+                "hit": "G:",
+                "layerClear": "E:",
+                "talk": "S:"
+            },
+            "promptEventName": "Event Name",
+            "promptEventText": "Event Text",
+            "props": {
+                "controls": "Steuerung",
+                "endGame": "Spiel beenden",
+                "layerSmoke": "Rauch"
+            },
+            "sections": {
+                "actionKeep": "Behalten",
+                "actionReset": "Zurücksetzen"
             }
         },
         "block": {
