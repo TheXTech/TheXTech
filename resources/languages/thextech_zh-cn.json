@@ -388,7 +388,7 @@
             "statusFinishing": "完成加载……",
             "statusGameInfo": "游戏信息",
             "statusLoadData": "正在加载数据……",
-            "statusLoadFile": "正在加载：(0)",
+            "statusLoadFile": "正在加载：{0}",
             "statusTranslations": "翻译"
         }
     },
