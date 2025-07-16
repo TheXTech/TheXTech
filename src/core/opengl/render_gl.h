@@ -274,6 +274,8 @@ private:
     bool m_has_es3_shaders = false;
     bool m_has_npot_textures = false;
     bool m_has_bgra_textures = false;
+    //! Enforce colour format for some destination hardware
+    GLenum m_forceFormat = 0;
 
 
     // preferences
