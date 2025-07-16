@@ -234,6 +234,20 @@ bool RenderGL::initOpenGL()
             return false;
         }
     }
+
+    // Intel Iris Xe GPUs are faulty, textures gets seriously corrupted, this happens even in commercial games.
+    // Details: https://github.com/TheXTech/TheXTech/issues/859
+    // Also here: https://www.ixbt.com/news/2020/10/04/iris-xe-intel.html (in Russian)
+    if(SDL_strcmp(gl_renderer, "Intel(R) Iris(R) Xe Graphics") == 0)
+    {
+        pLogWarning("Render GL: faulty Intel Iris Xe GPU detected, it's impossible to guarantee the render quality here [See details: https://github.com/TheXTech/TheXTech/issues/859]");
+
+        if(g_config.render_mode == Config_t::RENDER_ACCELERATED_AUTO)
+        {
+            pLogWarning("Falling back to SDL2...");
+            return false;
+        }
+    }
 #endif
 
     pLogInfo("Render GL: successfully initialized OpenGL %d.%d (Profile %s)", m_gl_majver, m_gl_minver, get_profile_name(m_gl_profile));
