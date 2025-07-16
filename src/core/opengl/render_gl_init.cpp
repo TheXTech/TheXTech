@@ -241,12 +241,8 @@ bool RenderGL::initOpenGL()
     if(SDL_strcmp(gl_renderer, "Intel(R) Iris(R) Xe Graphics") == 0)
     {
         pLogWarning("Render GL: faulty Intel Iris Xe GPU detected, it's impossible to guarantee the render quality here [See details: https://github.com/TheXTech/TheXTech/issues/859]");
-
-        if(g_config.render_mode == Config_t::RENDER_ACCELERATED_AUTO)
-        {
-            pLogWarning("Falling back to SDL2...");
-            return false;
-        }
+        pLogWarning("Colour format will be enforced to the GL_RGBA.");
+        m_forceFormat = GL_RGBA;
     }
 #endif
 
