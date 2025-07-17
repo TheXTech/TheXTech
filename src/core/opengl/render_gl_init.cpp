@@ -104,20 +104,19 @@ void RenderGL::try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint pro
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minver);
     context = SDL_GL_CreateContext(window);
 
-    if(context)
-        g_config.render_mode.obtained = mode;
-    else
+    if(!context)
+    {
         pLogInfo("Render GL: context creation failed: %s", SDL_GetError());
-}
+        return;
+    }
 
-void RenderGL::fetch_gl_info()
-{
+    // initialization succeeded, save context info
+    g_config.render_mode.obtained = mode;
+
     // Check version
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &m_gl_profile);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &m_gl_majver);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &m_gl_minver);
-
-    m_gl_profile = SDL_GL_CONTEXT_PROFILE_COMPATIBILITY;
 
     // can't trust SDL2
     m_gl_ver_string = glGetString(GL_VERSION);
@@ -226,8 +225,6 @@ bool RenderGL::initOpenGL()
     }
 #endif
 
-    fetch_gl_info();
-
     const char* gl_renderer = (const char*)glGetString(GL_RENDERER);
 
 #ifdef _WIN32
@@ -279,17 +276,14 @@ bool RenderGL::initOpenGL()
         try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
 #   endif
 #endif
-
-        fetch_gl_info();
     }
 #endif
 
     pLogInfo("Render GL: successfully initialized OpenGL %d.%d (Profile %s)", m_gl_majver, m_gl_minver, get_profile_name(m_gl_profile));
     if(m_gl_ver_string)
         pLogInfo("OpenGL version: %s", m_gl_ver_string);
-    else
-        pLogInfo("OpenGL version: %d.%d", m_gl_majver, m_gl_minver);
-    pLogInfo("OpenGL renderer: %s", gl_renderer);
+    if(gl_renderer)
+        pLogInfo("OpenGL renderer: %s", gl_renderer);
 #ifdef RENDERGL_HAS_SHADERS
     if(m_gl_majver >= 2)
         pLogInfo("GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));

@@ -439,7 +439,7 @@ private:
     // Otherwise, instance flags will be set to reflect actual capabilities
 
     /*!
-     * \brief Helper function to attempt to initialize an SDL OpenGL context of the desired profile and version
+     * \brief Helper function to attempt to initialize an SDL OpenGL context of the desired profile and version. On success, updates all context-related variables.
      * \param[inout] context: reference to nullable SDL_GLContext. If non-null, no-op (already inited). If null, attempts initialization and signals success by leaving context non-null.
      * \param[in] window: SDL_Window to use for the context
      * \param profile: OpenGL profile to initialize
@@ -447,11 +447,6 @@ private:
      * \param minver: minimum OpenGL minor version to initialize
      */
     static void try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint profile, GLint majver, GLint minver, Config_t::RenderMode_t mode);
-
-    /*!
-     * \brief Fetches meta-data of the current context and stores in local variables
-     */
-    void fetch_gl_info();
 
     // initializes a single framebuffer with the game's current screen resolution scaled by the appropriate scaling factor
     // if a render target (BUFFER_GAME, BUFFER_INT_PASS_1, BUFFER_INT_PASS_2), will include depth
