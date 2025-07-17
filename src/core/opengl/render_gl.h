@@ -274,8 +274,13 @@ private:
     bool m_has_es3_shaders = false;
     bool m_has_npot_textures = false;
     bool m_has_bgra_textures = false;
+
+    // Tweaks (If something goes wrong)
+
     //! Enforce colour format for some destination hardware
-    GLenum m_forceFormat = 0;
+    GLenum m_tweak_force_format = 0;
+    //! Should the depth buffer avoided? (At some GPUs it causes serious issues)
+    bool m_tweak_no_depth_buffer = false;
 
 
     // preferences
