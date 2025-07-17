@@ -113,6 +113,7 @@ void RenderGL::try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint pro
 bool RenderGL::initOpenGL()
 {
     SDL_version compiled, linked;
+    bool m_isIrisXe = false;
     SDL_VERSION(&compiled);
     SDL_GetVersion(&linked);
     pLogInfo("Render GL: compiled for SDL %d.%d.%d, running with SDL %d.%d.%d",
@@ -241,8 +242,9 @@ bool RenderGL::initOpenGL()
     if(SDL_strcmp(gl_renderer, "Intel(R) Iris(R) Xe Graphics") == 0)
     {
         pLogWarning("Render GL: faulty Intel Iris Xe GPU detected, it's impossible to guarantee the render quality here [See details: https://github.com/TheXTech/TheXTech/issues/859]");
-        pLogWarning("Colour format will be enforced to the GL_RGBA.");
+        pLogWarning("Colour format will be enforced to the GL_RGBA and deph test will be disabled");
         m_forceFormat = GL_RGBA;
+        m_isIrisXe = true;
     }
 #endif
 
@@ -272,8 +274,8 @@ bool RenderGL::initOpenGL()
 
     bool gles1 = (m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES && m_gl_majver == 1);
 
-    // depth buffering broken on some ancient Android phones under OpenGL ES 1
-    if(depth >= 16 && !gles1)
+    // depth buffering broken on some ancient Android phones under OpenGL ES 1 and on Intel Iris Xe
+    if(depth >= 16 && !gles1 && !m_isIrisXe)
         m_use_depth_buffer = true;
 
     // Check capabilities
