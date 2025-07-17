@@ -254,7 +254,7 @@ bool RenderGL::initOpenGL()
 
     // On VirtualBox, when using Compatibility profile, the render fails to display content
     // and the black screen appears. Loading Core profile works just fine.
-    if(m_gl_profile != SDL_GL_CONTEXT_PROFILE_CORE && SDL_strcmp(gl_renderer, "SVGA3D; build: RELEASE;  ") == 0)
+    if(m_gl_profile == SDL_GL_CONTEXT_PROFILE_COMPATIBILITY && SDL_strcmp(gl_renderer, "SVGA3D; build: RELEASE;  ") == 0)
     {
         pLogWarning("Render GL: Detected VirtualBox's SVGA3D backend, initializing the Core profile to avoid black screen");
 
@@ -262,22 +262,10 @@ bool RenderGL::initOpenGL()
         m_gContext = nullptr;
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
-        if(g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL)
-            try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 3, 3, Config_t::RENDER_ACCELERATED_OPENGL);
-#endif
-#ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
-        if(g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL_LEGACY)
-            try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
-#endif
-#ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
         try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 3, 3, Config_t::RENDER_ACCELERATED_OPENGL);
 #endif
 #ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
-#   ifdef __APPLE__
-        try_init_gl(m_gContext, m_window, 0, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
-#   else
-        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
-#   endif
+        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
 #endif
 
         fetch_gl_info();
