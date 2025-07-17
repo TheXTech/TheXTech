@@ -91,10 +91,10 @@ static void APIENTRY s_HandleGLDebugMessage(GLenum source, GLenum type, GLuint i
 
 #endif
 
-void RenderGL::try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint profile, GLint majver, GLint minver, Config_t::RenderMode_t mode)
+void RenderGL::try_init_gl(GLint profile, GLint majver, GLint minver, Config_t::RenderMode_t mode)
 {
     // context already initialized
-    if(context)
+    if(m_gContext)
         return;
 
     pLogInfo("Render GL: attempting to create OpenGL %s %d.%d+ context...", get_profile_name(profile), majver, minver);
@@ -102,9 +102,9 @@ void RenderGL::try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint pro
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, profile);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, majver);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minver);
-    context = SDL_GL_CreateContext(window);
+    m_gContext = SDL_GL_CreateContext(m_window);
 
-    if(!context)
+    if(!m_gContext)
     {
         pLogInfo("Render GL: context creation failed: %s", SDL_GetError());
         return;
@@ -157,54 +157,54 @@ bool RenderGL::initOpenGL()
 #ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
     if(g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL)
     {
-        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 3, 3, Config_t::RENDER_ACCELERATED_OPENGL);
-        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 3, 3, Config_t::RENDER_ACCELERATED_OPENGL);
+        try_init_gl(SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 3, 3, Config_t::RENDER_ACCELERATED_OPENGL);
+        try_init_gl(SDL_GL_CONTEXT_PROFILE_CORE, 3, 3, Config_t::RENDER_ACCELERATED_OPENGL);
     }
 #endif
 
 #ifdef THEXTECH_BUILD_GL_ES_MODERN
     if(g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL_ES)
     {
-        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 3, 0, Config_t::RENDER_ACCELERATED_OPENGL_ES);
-        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 2, 0, Config_t::RENDER_ACCELERATED_OPENGL_ES);
+        try_init_gl(SDL_GL_CONTEXT_PROFILE_ES, 3, 0, Config_t::RENDER_ACCELERATED_OPENGL_ES);
+        try_init_gl(SDL_GL_CONTEXT_PROFILE_ES, 2, 0, Config_t::RENDER_ACCELERATED_OPENGL_ES);
     }
 #endif
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
     if(g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL_LEGACY)
-        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
+        try_init_gl(SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
 #endif
 
 #ifdef THEXTECH_BUILD_GL_ES_LEGACY
     if(g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY)
-        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY);
+        try_init_gl(SDL_GL_CONTEXT_PROFILE_ES, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY);
 #endif
 
     // default fallback sequence
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
-    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 3, 3, Config_t::RENDER_ACCELERATED_OPENGL);
+    try_init_gl(SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 3, 3, Config_t::RENDER_ACCELERATED_OPENGL);
 #endif
 
 #ifdef THEXTECH_BUILD_GL_ES_MODERN
-    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 3, 0, Config_t::RENDER_ACCELERATED_OPENGL_ES);
-    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 2, 0, Config_t::RENDER_ACCELERATED_OPENGL_ES);
+    try_init_gl(SDL_GL_CONTEXT_PROFILE_ES, 3, 0, Config_t::RENDER_ACCELERATED_OPENGL_ES);
+    try_init_gl(SDL_GL_CONTEXT_PROFILE_ES, 2, 0, Config_t::RENDER_ACCELERATED_OPENGL_ES);
 #endif
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
-    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 3, 3, Config_t::RENDER_ACCELERATED_OPENGL);
+    try_init_gl(SDL_GL_CONTEXT_PROFILE_CORE, 3, 3, Config_t::RENDER_ACCELERATED_OPENGL);
 #endif
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
 #   ifdef __APPLE__
-    try_init_gl(m_gContext, m_window, 0, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
+    try_init_gl(0, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
 #   else
-    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
+    try_init_gl(SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
 #   endif
 #endif
 
 #ifdef THEXTECH_BUILD_GL_ES_LEGACY
-    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY);
+    try_init_gl(SDL_GL_CONTEXT_PROFILE_ES, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY);
 #endif
 
     if(!m_gContext)
@@ -259,10 +259,10 @@ bool RenderGL::initOpenGL()
         m_gContext = nullptr;
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
-        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 3, 3, Config_t::RENDER_ACCELERATED_OPENGL);
+        try_init_gl(SDL_GL_CONTEXT_PROFILE_CORE, 3, 3, Config_t::RENDER_ACCELERATED_OPENGL);
 #endif
 #ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
-        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
+        try_init_gl(SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
 #endif
     }
 #endif
