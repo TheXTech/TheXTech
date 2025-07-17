@@ -278,8 +278,6 @@ private:
 
     // Tweaks (If something goes wrong)
 
-    //! Enforce colour format for some destination hardware
-    GLenum m_tweak_force_format = 0;
     //! Should the depth buffer avoided? (At some GPUs it causes serious issues)
     bool m_tweak_no_depth_buffer = false;
 
