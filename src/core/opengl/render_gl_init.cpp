@@ -110,6 +110,35 @@ void RenderGL::try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint pro
         pLogInfo("Render GL: context creation failed: %s", SDL_GetError());
 }
 
+void RenderGL::fetch_gl_info()
+{
+    // Check version
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &m_gl_profile);
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &m_gl_majver);
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &m_gl_minver);
+
+    m_gl_profile = SDL_GL_CONTEXT_PROFILE_COMPATIBILITY;
+
+    // can't trust SDL2
+    m_gl_ver_string = glGetString(GL_VERSION);
+    if(m_gl_ver_string)
+    {
+        for(int ver_end = 0; m_gl_ver_string[ver_end] != '\0'; ver_end++)
+        {
+            int ver_start = ver_end - 2;
+
+            if(ver_start >= 0
+                && m_gl_ver_string[ver_start] >= '0' && m_gl_ver_string[ver_start] <= '9'
+                && m_gl_ver_string[ver_end]   >= '0' && m_gl_ver_string[ver_end]   <= '9')
+            {
+                m_gl_majver = m_gl_ver_string[ver_start] - '0';
+                m_gl_minver = m_gl_ver_string[ver_end] - '0';
+                break;
+            }
+        }
+    }
+}
+
 bool RenderGL::initOpenGL()
 {
     SDL_version compiled, linked;
@@ -197,29 +226,7 @@ bool RenderGL::initOpenGL()
     }
 #endif
 
-    // Check version
-    SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &m_gl_profile);
-    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &m_gl_majver);
-    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &m_gl_minver);
-
-    // can't trust SDL2
-    const GLubyte* gl_ver_string = glGetString(GL_VERSION);
-    if(gl_ver_string)
-    {
-        for(int ver_end = 0; gl_ver_string[ver_end] != '\0'; ver_end++)
-        {
-            int ver_start = ver_end - 2;
-
-            if(ver_start >= 0
-                && gl_ver_string[ver_start] >= '0' && gl_ver_string[ver_start] <= '9'
-                && gl_ver_string[ver_end]   >= '0' && gl_ver_string[ver_end]   <= '9')
-            {
-                m_gl_majver = gl_ver_string[ver_start] - '0';
-                m_gl_minver = gl_ver_string[ver_end] - '0';
-                break;
-            }
-        }
-    }
+    fetch_gl_info();
 
     const char* gl_renderer = (const char*)glGetString(GL_RENDERER);
 
@@ -244,10 +251,44 @@ bool RenderGL::initOpenGL()
         pLogWarning("Depth buffer will be disabled.");
         m_tweak_no_depth_buffer = true;
     }
+
+    // On VirtualBox, when using Compatibility profile, the render fails to display content
+    // and the black screen appears. Loading Core profile works just fine.
+    if(m_gl_profile != SDL_GL_CONTEXT_PROFILE_CORE && SDL_strcmp(gl_renderer, "SVGA3D; build: RELEASE;  ") == 0)
+    {
+        pLogWarning("Render GL: Detected VirtualBox's SVGA3D backend, initializing the Core profile to avoid black screen");
+
+        SDL_GL_DeleteContext(m_gContext);
+        m_gContext = nullptr;
+
+#ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
+        if(g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL)
+            try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 3, 3, Config_t::RENDER_ACCELERATED_OPENGL);
+#endif
+#ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
+        if(g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL_LEGACY)
+            try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
+#endif
+#ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
+        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 3, 3, Config_t::RENDER_ACCELERATED_OPENGL);
+#endif
+#ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
+#   ifdef __APPLE__
+        try_init_gl(m_gContext, m_window, 0, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
+#   else
+        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
+#   endif
+#endif
+
+        fetch_gl_info();
+    }
 #endif
 
     pLogInfo("Render GL: successfully initialized OpenGL %d.%d (Profile %s)", m_gl_majver, m_gl_minver, get_profile_name(m_gl_profile));
-    pLogInfo("OpenGL version: %s", gl_ver_string);
+    if(m_gl_ver_string)
+        pLogInfo("OpenGL version: %s", m_gl_ver_string);
+    else
+        pLogInfo("OpenGL version: %d.%d", m_gl_majver, m_gl_minver);
     pLogInfo("OpenGL renderer: %s", gl_renderer);
 #ifdef RENDERGL_HAS_SHADERS
     if(m_gl_majver >= 2)

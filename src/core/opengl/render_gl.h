@@ -264,6 +264,7 @@ private:
     GLint m_gl_majver = 0;
     GLint m_gl_minver = 0;
     GLint m_gl_profile = 0;
+    const GLubyte* m_gl_ver_string = nullptr;
 
     bool m_use_logicop = false;
     bool m_use_shaders = false;
@@ -446,6 +447,11 @@ private:
      * \param minver: minimum OpenGL minor version to initialize
      */
     static void try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint profile, GLint majver, GLint minver, Config_t::RenderMode_t mode);
+
+    /*!
+     * \brief Fetches meta-data of the current context and stores in local variables
+     */
+    void fetch_gl_info();
 
     // initializes a single framebuffer with the game's current screen resolution scaled by the appropriate scaling factor
     // if a render target (BUFFER_GAME, BUFFER_INT_PASS_1, BUFFER_INT_PASS_2), will include depth
