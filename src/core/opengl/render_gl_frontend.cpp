@@ -881,10 +881,9 @@ void RenderGL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t 
 
 #ifdef THEXTECH_BIG_ENDIAN
     target.d.format = GL_RGBA;
-    const GLenum cpu_format = (m_tweak_force_format > 0) ? m_tweak_force_format : GL_RGBA;
+    const GLenum cpu_format = GL_RGBA;
 #else
-    target.d.format = (m_tweak_force_format > 0) ? m_tweak_force_format :
-                      (m_has_bgra_textures) ? GL_BGRA_EXT : GL_RGBA;
+    target.d.format = (m_has_bgra_textures) ? GL_BGRA_EXT : GL_RGBA;
     const GLenum cpu_format = GL_BGRA_EXT;
 #endif
 
@@ -981,7 +980,7 @@ void RenderGL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    auto internal_format = (m_tweak_force_format > 0 || m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES) ? target.d.format : GL_RGBA;
+    auto internal_format = (m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES) ? target.d.format : GL_RGBA;
 
     glTexImage2D(GL_TEXTURE_2D,
         0,
