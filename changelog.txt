@@ -2,8 +2,6 @@ TheXTech Changelog.
 
 Changelog for 1.3.7.2-dev
 -Added support for the localisation of the loading screen (@Wohlstand)
--Added workaround for the texture corruption problem on Windows 10+ with the Intel Iris Xe GPU: the depth buffer will be completely disabled here to avoid glitches (@Wohlstand)
--Implemented the proper initialisation of the OpenGL on VirtualBox's SVGA3D driver (@Wohlstand)
 
 Changelog for 1.3.7.1
 -Add GameCube controller support for Wii (@ds-sloth)
@@ -56,6 +54,9 @@ Changelog for 1.3.7.1
 -Fix TheXTech 1.3.7-beta editor bug where a player object could become deselected when closing the editor pane (@ds-sloth, thanks to @fbitninja for the report)
 -Fixed the incorrect work of the Java-coded INI parser on Android that led some properties being loaded incorrectly (for example, valid background picture fails to load) (@Wohlstand)
 -On failures while using interprocess-based level testing, the explicit error messages will be shown (@Wohlstand)
+1.3.7.1-hotfix:
+-Added workaround for the texture corruption problem on Windows 10+ with the Intel Iris Xe GPU: the depth buffer will be completely disabled here to avoid glitches (@Wohlstand)
+-Implemented the proper initialisation of the OpenGL on VirtualBox's SVGA3D driver (@Wohlstand)
 
 Changelog for 1.3.7
 -Fix vanilla peculiarity where medals were sometimes not collected when killed, guarded by "fix-medal-kill" [Modern Mode] (@ds-sloth, thanks to @Superbloxen for the report)
