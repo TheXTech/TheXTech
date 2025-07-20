@@ -334,7 +334,10 @@
             "errorInvalidEnterWarp": "Não foi possível iniciar o nível devido a um teleporte de entrada invalido em {1}.\nTotal de entradas no teleporte: {2}\n\nArquivo: {0}",
             "errorNoStartPoint": "Não foi possível iniciar o nível por este nível não conter ponto de inicio ou entradas de teleporte especificadas.\n\nArquivo: {0}",
             "openFileFailed": "\"{0}\" não foi aberto: Arquivo inexistente ou corrompido.",
-            "warpNeedStarCount": "Você precisa de\n{0} {1} para entrar."
+            "warpNeedStarCount": "Você precisa de\n{0} {1} para entrar.",
+            "errorTooOldGameAssets": "O conteúdo requer um pacote de recursos de fase mais recente ({0}) do que o pacote de recursos atual ({1}). Atualize seu pacote de recursos do jogo.",
+            "IPCTimeOut": "Sem Resposta do editor conectado o jogo será fechado",
+            "errorTooOldEngine": "O conteúdo requer um nível de recurso de mecanismo mais recente ({0}) do que a versão atual ({1}). Atualize o TheXTech."
         },
         "message": {
             "scanningLevels": "Buscando níveis..."
