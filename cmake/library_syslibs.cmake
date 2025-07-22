@@ -10,7 +10,7 @@ endif()
 
 if(NINTENDO_SWITCH)
     list(APPEND THEXTECH_SYSLIBS
-        EGL glapi drm_nouveau nx pthread
+        EGL glapi drm_nouveau nx pthread GLESv2
     )
 endif()
 
