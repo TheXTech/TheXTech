@@ -882,6 +882,7 @@ set(THEXTECH_SRC
     src/control/duplicate.cpp
     src/control/controls.cpp
     src/script/msg_preprocessor.cpp
+    src/script/msg_macros.cpp
     src/logic/object_graph.cpp
     src/change_res.cpp
     src/effect.cpp
