@@ -11,7 +11,7 @@
     <string name="setup_speedrunner">Спийдрънер</string>
     <string name="setup_touchpad_style">Стил на контролера</string>
     <string name="setup_assets_path_label">Промяна на абсолютният път на ресурсите</string>
-    <string name="launcher_no_resources_question">Играта изисква ресурсен пакет за да работи. Моля, изтеглете ресурсите на играта и ги разопаковайте във всяка удобна директория. Искате ли да изберете вече разопакована папка\?</string>
+    <string name="launcher_no_resources_question">Играта изисква ресурсен пакет за да работи. Моля, изтеглете ресурсите на играта и ги разопаковайте във всяка удобна директория. Искате ли да изберете вече разопакована папка?</string>
     <string name="setup_feedback_enable_vibration">Разрешаване на вибрация</string>
     <string name="setup_feedback_vibration_strength">Сила на вибрация</string>
     <string name="setup_feedback_vibration_length">Дължина на вибрация</string>
