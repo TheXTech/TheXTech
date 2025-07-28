@@ -29,4 +29,15 @@
     <string name="settings_button">Paramètres</string>
     <string name="start_game_button">Démarrer le jeu</string>
     <string name="title_activity_game_settings">Paramètres du jeu</string>
+    <string name="cheat_dialog_ok"></string>
+    <string name="launcher_gameSelect_clearList"></string>
+    <string name="launcher_gameselect_toast_selected"></string>
+    <string name="setup_renderer_label"></string>
+    <string name="launcher_openfile_indirectly"></string>
+    <string name="cheat_dialog_cancel"></string>
+    <string name="launcher_gameselect_clearlist_question"></string>
+    <string name="launcher_gameselect_toast_listclean"></string>
+    <string name="launcher_gameselect_clearlist_title"></string>
+    <string name="launcher_gameSelect_pickTheDir"></string>
+    <string name="cheat_dialog_title"></string>
 </resources>
