@@ -470,7 +470,8 @@
     "objects": {
         "wordStarAccusativeSingular": "",
         "wordFails": "",
-        "wordStarAccusativePlural": ""
+        "wordStarAccusativePlural": "",
+        "wordStarAccusativeDualOrCounter": ""
     },
     "languageName": ""
 }

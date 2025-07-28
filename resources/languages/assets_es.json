@@ -464,7 +464,8 @@
     "objects": {
         "wordStarAccusativeSingular": "estrella",
         "wordFails": "Fallas",
-        "wordStarAccusativePlural": "estrellas"
+        "wordStarAccusativePlural": "estrellas",
+        "wordStarAccusativeDualOrCounter": ""
     },
     "character": {
         "name2": "",
