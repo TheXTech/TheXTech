@@ -16,7 +16,7 @@
     <string name="setup_speedrunner">Швидке проходження</string>
     <string name="setup_touchpad_style">Стиль контролера</string>
     <string name="setup_assets_path_label">Змінити абсолютний шлях до ресурсів</string>
-    <string name="launcher_no_resources_question">Гра потребує необхідний пакет ресурсів. Будь ласка, завантажте пакет ресурсів і розпакуйте його в будь-яку зручну для вас директорію. Чи бажаєте ви вибрати директорію з вже розпакованим пакетом ресурсів\?</string>
+    <string name="launcher_no_resources_question">Гра потребує необхідний пакет ресурсів. Будь ласка, завантажте пакет ресурсів і розпакуйте його в будь-яку зручну для вас директорію. Чи бажаєте ви вибрати директорію з вже розпакованим пакетом ресурсів?</string>
     <string name="setup_feedback_enable_vibration">Увімкнути вібрацію</string>
     <string name="setup_feedback_vibration_strength">Сила вібрації</string>
     <string name="setup_feedback_vibration_length">Час вібрації</string>
@@ -37,5 +37,5 @@
     <string name="launcher_gameselect_toast_selected">Вибрана гра: %s</string>
     <string name="launcher_gameselect_toast_listclean">Список ігр очищено.</string>
     <string name="launcher_gameselect_clearlist_title">Очистити список ігр</string>
-    <string name="launcher_gameselect_clearlist_question">Ви справді бажаєте очистити список ігр\?</string>
+    <string name="launcher_gameselect_clearlist_question">Ви справді бажаєте очистити список ігр?</string>
 </resources>
