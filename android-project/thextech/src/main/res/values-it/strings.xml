@@ -40,4 +40,5 @@
     <string name="cheat_dialog_title"></string>
     <string name="setup_feedback_vibration_length"></string>
     <string name="setup_sr_stopwatchSemiTransparent"></string>
+    <string name="managePermExplainText"></string>
 </resources>

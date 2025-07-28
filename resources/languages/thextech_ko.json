@@ -403,10 +403,22 @@
                 "advanced-video": "",
                 "use-native-osk": "",
                 "fullscreen-type": {
-                    "_name": ""
+                    "_name": "",
+                    "exclusive": "",
+                    "desktop-tip": "",
+                    "desktop": "",
+                    "exclusive-tip": "",
+                    "auto": ""
                 },
                 "inaccurate-gifs-tip": "",
-                "inaccurate-gifs": ""
+                "inaccurate-gifs": "",
+                "fullscreen-depth": {
+                    "16": "",
+                    "auto": "",
+                    "_name": "",
+                    "32": ""
+                },
+                "fullscreen-res": ""
             },
             "main": {
                 "unlimited-framerate": "",
@@ -474,7 +486,8 @@
                     "0_5x": "",
                     "full": "",
                     "linear": "이중선형",
-                    "2x": ""
+                    "2x": "",
+                    "3x": ""
                 },
                 "_header": "",
                 "display-controllers": "",
@@ -799,7 +812,11 @@
             "warpNeedStarCount": "입력하려면 {0} {1}이(가) 필요합니다.",
             "errorInvalidEnterWarp": "잘못된 입구 워프 {1}이(가) 지정되었기 때문에 레벨을 시작할 수 없습니다.\n총 워프 항목: {2}\n\n파일: {0}",
             "openFileFailed": "\"{0}\"을(를) 열 수 없습니다. 파일이 존재하지 않거나 손상되었습니다.",
-            "errorNoStartPoint": "사용 가능한 시작점이 배치되지 않았거나 입구 워프가 지정되어 있지 않아 레벨을 시작할 수 없습니다.\n\n파일: {0}"
+            "errorNoStartPoint": "사용 가능한 시작점이 배치되지 않았거나 입구 워프가 지정되어 있지 않아 레벨을 시작할 수 없습니다.\n\n파일: {0}",
+            "errorTooOldGameAssets": "",
+            "openIPCDataFailed": "",
+            "IPCTimeOut": "",
+            "errorTooOldEngine": ""
         },
         "pause": {
             "continue": "계속하기",
@@ -834,6 +851,23 @@
             "shoe-block": "",
             "pound-altrun": "",
             "pound-down": ""
-        }
+        },
+        "loader": {
+            "statusLoadData": "",
+            "statusGameInfo": "",
+            "statusLoadFile": "",
+            "statusFinishing": "",
+            "statusAssetPacks": "",
+            "statusTranslations": ""
+        },
+        "ipcStatus": {
+            "loadingdone": "",
+            "dataAccepted": "",
+            "dataTransferStarted": "",
+            "errorTimeout": "",
+            "dataValid": "",
+            "waitingInput": ""
+        },
+        "screenPaused": ""
     }
 }
