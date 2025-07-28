@@ -40,4 +40,5 @@
     <string name="launcher_gameselect_toast_selected">遊戲已更改為：%s</string>
     <string name="launcher_gameselect_clearlist_title">清除遊戲列表</string>
     <string name="managePermExplainText">此遊戲使用的是用戶在直接在本地存儲的數據（例如關卡、素材、音樂、音效、設置等），即允許用戶修改或擴展內容。不幸的是安卓 11 以上的版本不支持設置資料夾權限。因此當遊戲運行時，請您開啓所有檔案的訪問權限。</string>
+    <string name="app_name" translatable="false"></string>
 </resources>

@@ -400,7 +400,13 @@
                     "_name": ""
                 },
                 "choose-assets-on-launch": "",
-                "advanced-video": ""
+                "advanced-video": "",
+                "use-native-osk": "",
+                "fullscreen-type": {
+                    "_name": ""
+                },
+                "inaccurate-gifs-tip": "",
+                "inaccurate-gifs": ""
             },
             "main": {
                 "unlimited-framerate": "",
@@ -519,7 +525,9 @@
                     "vanilla": "",
                     "vanilla-tip": "",
                     "_name": ""
-                }
+                },
+                "hub-resume-tip": "",
+                "hub-resume": ""
             },
             "speedrun": {
                 "mode": {
@@ -713,7 +721,8 @@
                 "phraseNewClassic": "새 클래식 프로파일",
                 "typeClassic": "클래식",
                 "typeNunchuck": "눈챠크",
-                "typeWiimote": "위모트"
+                "typeWiimote": "위모트",
+                "typeGamecube": ""
             },
             "options": {
                 "textEntryStyle": "텍스트 입력 스타일",
@@ -822,7 +831,9 @@
             "char5-bombs": "모으려면 Run을 누르고, 던지려면 Alt Run을 누르세요.",
             "gray-bricks": "",
             "heavy-duck": "",
-            "shoe-block": ""
+            "shoe-block": "",
+            "pound-altrun": "",
+            "pound-down": ""
         }
     }
 }

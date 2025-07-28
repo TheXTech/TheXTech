@@ -383,7 +383,13 @@
                     "_tooltip": ""
                 },
                 "choose-assets-on-launch": "",
-                "webm-recording": ""
+                "webm-recording": "",
+                "use-native-osk": "",
+                "fullscreen-type": {
+                    "_name": ""
+                },
+                "inaccurate-gifs-tip": "",
+                "inaccurate-gifs": ""
             },
             "audio": {
                 "sfx-audio-fx": "",
@@ -415,7 +421,9 @@
                     "_name": "",
                     "modern": ""
                 },
-                "_header": ""
+                "_header": "",
+                "hub-resume-tip": "",
+                "hub-resume": ""
             },
             "video": {
                 "scale-mode": {
@@ -613,7 +621,8 @@
                 "phraseNewClassic": "",
                 "phraseNewNunchuck": "",
                 "typeClassic": "",
-                "typeNunchuck": ""
+                "typeNunchuck": "",
+                "typeGamecube": ""
             },
             "caseMouse": "",
             "profile": {
@@ -796,7 +805,9 @@
             "gray-bricks": "",
             "rainbow-surf": "",
             "heavy-duck": "",
-            "shoe-block": ""
+            "shoe-block": "",
+            "pound-altrun": "",
+            "pound-down": ""
         },
         "message": {
             "scanningLevels": ""

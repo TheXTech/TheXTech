@@ -15,4 +15,29 @@
     <string name="setup_max_framerate_mode">Modalità frame-rate massimi</string>
     <string name="setup_touchscreen_mode">Modalità controller</string>
     <string name="setup_sr_speedrunMode">Modalità Speed-Run</string>
+    <string name="setup_feedback"></string>
+    <string name="cheat_dialog_ok"></string>
+    <string name="launcher_gameSelect_clearList"></string>
+    <string name="launcher_gameselect_toast_selected"></string>
+    <string name="setup_feedback_vibration_strength"></string>
+    <string name="setup_renderer_label"></string>
+    <string name="touchscreen_vibration_test_label"></string>
+    <string name="setup_speedrunner"></string>
+    <string name="setup_touchpad_style"></string>
+    <string name="launcher_openfile_indirectly"></string>
+    <string name="managePermExplainTitle"></string>
+    <string name="setup_feedback_enable_vibration"></string>
+    <string name="cheat_dialog_cancel"></string>
+    <string name="launcher_no_resources_question"></string>
+    <string name="launcher_gameselect_clearlist_question"></string>
+    <string name="setup_show_battery_status_label"></string>
+    <string name="launcher_gameselect_toast_listclean"></string>
+    <string name="setup_assets_path_label"></string>
+    <string name="setup_show_controller_state_label"></string>
+    <string name="launcher_gameselect_clearlist_title"></string>
+    <string name="app_name" translatable="false"></string>
+    <string name="launcher_gameSelect_pickTheDir"></string>
+    <string name="cheat_dialog_title"></string>
+    <string name="setup_feedback_vibration_length"></string>
+    <string name="setup_sr_stopwatchSemiTransparent"></string>
 </resources>

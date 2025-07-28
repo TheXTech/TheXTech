@@ -14,4 +14,7 @@
     <string name="touchscreenControllerType1">Disabilita quando la tastiera hardware è collegata</string>
     <string name="touchscreenControllerType2">Sempre disattivato</string>
     <string name="speedRunMode2">Modalitò 2 (Disabilita le funzioni di time-winning)</string>
+    <string name="rendererGles" translatable="false"></string>
+    <string name="rendererGles11" translatable="false"></string>
+    <string name="rendererSdl" translatable="false"></string>
 </resources>

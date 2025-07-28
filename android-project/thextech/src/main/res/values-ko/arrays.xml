@@ -14,4 +14,7 @@
     <string name="touchPadStyle1">닌텐도/Xbox 스타일 (A/B/X/Y)</string>
     <string name="touchPadStyle0">게임 내 동작</string>
     <string name="batteryStatusShow0">표시하지 않음</string>
+    <string name="rendererGles" translatable="false"></string>
+    <string name="rendererGles11" translatable="false"></string>
+    <string name="rendererSdl" translatable="false"></string>
 </resources>
