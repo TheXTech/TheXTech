@@ -87,7 +87,25 @@
                     "_name": ""
                 },
                 "record-gameplay-data": "",
-                "webm-recording": ""
+                "webm-recording": "",
+                "use-native-osk": "",
+                "fullscreen-type": {
+                    "_name": "",
+                    "exclusive": "",
+                    "desktop-tip": "",
+                    "desktop": "",
+                    "exclusive-tip": "",
+                    "auto": ""
+                },
+                "inaccurate-gifs-tip": "",
+                "inaccurate-gifs": "",
+                "fullscreen-depth": {
+                    "16": "",
+                    "auto": "",
+                    "_name": "",
+                    "32": ""
+                },
+                "fullscreen-res": ""
             },
             "speedrun": {
                 "mode": {
@@ -136,7 +154,9 @@
                     "file-only": "",
                     "enable": "",
                     "disable": ""
-                }
+                },
+                "hub-resume-tip": "",
+                "hub-resume": ""
             },
             "main": {
                 "background-work-tip": "",
@@ -199,7 +219,8 @@
                     "full": "",
                     "center": "",
                     "_name": "",
-                    "integer": ""
+                    "integer": "",
+                    "3x": ""
                 },
                 "show-episode-title": {
                     "bottom-tip": "",
@@ -366,7 +387,8 @@
                     "buttonZ": "",
                     "buttonC": ""
                 },
-                "typeClassic": ""
+                "typeClassic": "",
+                "typeGamecube": ""
             },
             "joystickSimpleEditor": "",
             "caseMouse": "",
@@ -775,7 +797,11 @@
             "errorInvalidEnterWarp": "",
             "openFileFailed": "",
             "errorNoStartPoint": "",
-            "warpNeedStarCount": ""
+            "warpNeedStarCount": "",
+            "errorTooOldGameAssets": "",
+            "openIPCDataFailed": "",
+            "IPCTimeOut": "",
+            "errorTooOldEngine": ""
         },
         "hint": {
             "no-lives-new": "",
@@ -784,7 +810,9 @@
             "gray-bricks": "",
             "heavy-duck": "",
             "rainbow-surf": "",
-            "shoe-block": ""
+            "shoe-block": "",
+            "pound-altrun": "",
+            "pound-down": ""
         },
         "format": {
             "minutesSeconds": ""
@@ -808,7 +836,24 @@
             "sysInfoWarning": "",
             "sysInfoTitle": "",
             "sysInfoError": ""
-        }
+        },
+        "loader": {
+            "statusLoadData": "",
+            "statusGameInfo": "",
+            "statusLoadFile": "",
+            "statusFinishing": "",
+            "statusAssetPacks": "",
+            "statusTranslations": ""
+        },
+        "ipcStatus": {
+            "loadingdone": "",
+            "dataAccepted": "",
+            "dataTransferStarted": "",
+            "errorTimeout": "",
+            "dataValid": "",
+            "waitingInput": ""
+        },
+        "screenPaused": ""
     },
     "languageName": "",
     "outro": {

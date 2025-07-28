@@ -340,13 +340,19 @@
             "char5-bombs": "",
             "rainbow-surf": "",
             "heavy-duck": "",
-            "shoe-block": ""
+            "shoe-block": "",
+            "pound-altrun": "",
+            "pound-down": ""
         },
         "error": {
             "openFileFailed": "",
             "errorNoStartPoint": "",
             "warpNeedStarCount": "",
-            "errorInvalidEnterWarp": ""
+            "errorInvalidEnterWarp": "",
+            "errorTooOldGameAssets": "",
+            "openIPCDataFailed": "",
+            "IPCTimeOut": "",
+            "errorTooOldEngine": ""
         },
         "format": {
             "minutesSeconds": ""
@@ -367,7 +373,24 @@
             "sysInfoWarning": "",
             "sysInfoError": "",
             "sysInfoTitle": ""
-        }
+        },
+        "loader": {
+            "statusLoadData": "",
+            "statusGameInfo": "",
+            "statusLoadFile": "",
+            "statusFinishing": "",
+            "statusAssetPacks": "",
+            "statusTranslations": ""
+        },
+        "ipcStatus": {
+            "loadingdone": "",
+            "dataAccepted": "",
+            "dataTransferStarted": "",
+            "errorTimeout": "",
+            "dataValid": "",
+            "waitingInput": ""
+        },
+        "screenPaused": ""
     },
     "menu": {
         "battle": {
@@ -509,7 +532,8 @@
                 "typeWiimote": "",
                 "phraseNewNunchuck": "",
                 "phraseNewClassic": "",
-                "typeNunchuck": ""
+                "typeNunchuck": "",
+                "typeGamecube": ""
             },
             "joystickSimpleEditor": "",
             "wordProfiles": "",
@@ -605,7 +629,25 @@
                     "qhd": "",
                     "default": ""
                 },
-                "record-gameplay-data": ""
+                "record-gameplay-data": "",
+                "use-native-osk": "",
+                "fullscreen-type": {
+                    "_name": "",
+                    "exclusive": "",
+                    "desktop-tip": "",
+                    "desktop": "",
+                    "exclusive-tip": "",
+                    "auto": ""
+                },
+                "inaccurate-gifs-tip": "",
+                "inaccurate-gifs": "",
+                "fullscreen-depth": {
+                    "16": "",
+                    "auto": "",
+                    "_name": "",
+                    "32": ""
+                },
+                "fullscreen-res": ""
             },
             "episode-options": {
                 "playstyle": {
@@ -624,7 +666,9 @@
                     "_name": "",
                     "_tooltip": "",
                     "disable": ""
-                }
+                },
+                "hub-resume-tip": "",
+                "hub-resume": ""
             },
             "main": {
                 "discord-rpc": "",
@@ -688,7 +732,8 @@
                     "0_5x": "",
                     "1x": "",
                     "linear": "",
-                    "_name": ""
+                    "_name": "",
+                    "3x": ""
                 },
                 "show-episode-title": {
                     "off": "",

@@ -174,7 +174,8 @@
             "7": "Coletar",
             "8": "Barra de Fim",
             "any": "Qualquer",
-            "none": "Nenhum"
+            "none": "Nenhum",
+            "9": ""
         },
         "music": {
             "auto": {

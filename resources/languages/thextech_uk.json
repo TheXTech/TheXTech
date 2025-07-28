@@ -85,7 +85,25 @@
                 "audio-buffer-size": {
                     "_name": "",
                     "_tooltip": ""
-                }
+                },
+                "use-native-osk": "",
+                "fullscreen-type": {
+                    "_name": "",
+                    "exclusive": "",
+                    "desktop-tip": "",
+                    "desktop": "",
+                    "exclusive-tip": "",
+                    "auto": ""
+                },
+                "inaccurate-gifs-tip": "",
+                "inaccurate-gifs": "",
+                "fullscreen-depth": {
+                    "16": "",
+                    "auto": "",
+                    "_name": "",
+                    "32": ""
+                },
+                "fullscreen-res": ""
             },
             "main": {
                 "multiplayer": "",
@@ -143,7 +161,8 @@
                     "_name": "",
                     "nearest": "",
                     "integer": "",
-                    "linear": ""
+                    "linear": "",
+                    "3x": ""
                 },
                 "internal-res": {
                     "nds": "",
@@ -226,7 +245,9 @@
                     "classic": "",
                     "classic-tip": ""
                 },
-                "_header": ""
+                "_header": "",
+                "hub-resume-tip": "",
+                "hub-resume": ""
             },
             "speedrun": {
                 "mode": {
@@ -347,7 +368,8 @@
                     "buttonC": "",
                     "prefixN": "",
                     "buttonZ": ""
-                }
+                },
+                "typeGamecube": ""
             },
             "wordButtons": "",
             "hotkeys": {
@@ -791,7 +813,11 @@
             "openFileFailed": "",
             "errorInvalidEnterWarp": "",
             "warpNeedStarCount": "",
-            "errorNoStartPoint": ""
+            "errorNoStartPoint": "",
+            "errorTooOldGameAssets": "",
+            "openIPCDataFailed": "",
+            "IPCTimeOut": "",
+            "errorTooOldEngine": ""
         },
         "hint": {
             "no-lives-old": "",
@@ -800,7 +826,9 @@
             "shoe-block": "",
             "heavy-duck": "",
             "rainbow-surf": "",
-            "no-lives-new": ""
+            "no-lives-new": "",
+            "pound-altrun": "",
+            "pound-down": ""
         },
         "pause": {
             "enterCode": "",
@@ -821,7 +849,24 @@
         },
         "message": {
             "scanningLevels": ""
-        }
+        },
+        "loader": {
+            "statusLoadData": "",
+            "statusGameInfo": "",
+            "statusLoadFile": "",
+            "statusFinishing": "",
+            "statusAssetPacks": "",
+            "statusTranslations": ""
+        },
+        "ipcStatus": {
+            "loadingdone": "",
+            "dataAccepted": "",
+            "dataTransferStarted": "",
+            "errorTimeout": "",
+            "dataValid": "",
+            "waitingInput": ""
+        },
+        "screenPaused": ""
     },
     "languageName": "",
     "pluralRules": ""

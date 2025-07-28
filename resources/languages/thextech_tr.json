@@ -334,7 +334,11 @@
             "openFileFailed": "",
             "warpNeedStarCount": "",
             "errorInvalidEnterWarp": "",
-            "errorNoStartPoint": ""
+            "errorNoStartPoint": "",
+            "errorTooOldGameAssets": "",
+            "openIPCDataFailed": "",
+            "IPCTimeOut": "",
+            "errorTooOldEngine": ""
         },
         "pause": {
             "continue": "",
@@ -355,7 +359,9 @@
             "shoe-block": "",
             "heavy-duck": "",
             "no-lives-old": "",
-            "no-lives-new": ""
+            "no-lives-new": "",
+            "pound-altrun": "",
+            "pound-down": ""
         },
         "message": {
             "scanningLevels": ""
@@ -367,7 +373,24 @@
             "sysInfoWarning": "",
             "sysInfoError": "",
             "sysInfoTitle": ""
-        }
+        },
+        "loader": {
+            "statusLoadData": "",
+            "statusGameInfo": "",
+            "statusLoadFile": "",
+            "statusFinishing": "",
+            "statusAssetPacks": "",
+            "statusTranslations": ""
+        },
+        "ipcStatus": {
+            "loadingdone": "",
+            "dataAccepted": "",
+            "dataTransferStarted": "",
+            "errorTimeout": "",
+            "dataValid": "",
+            "waitingInput": ""
+        },
+        "screenPaused": ""
     },
     "languageName": "Türkçe",
     "menu": {
@@ -533,7 +556,8 @@
                     "caseIR": "",
                     "dPad": "",
                     "shake": ""
-                }
+                },
+                "typeGamecube": ""
             },
             "wordButtons": "",
             "wordProfiles": "",
@@ -643,7 +667,25 @@
                 },
                 "choose-assets-on-launch": "",
                 "audio-enable": "",
-                "record-gameplay-data": ""
+                "record-gameplay-data": "",
+                "use-native-osk": "",
+                "fullscreen-type": {
+                    "_name": "",
+                    "exclusive": "",
+                    "desktop-tip": "",
+                    "desktop": "",
+                    "exclusive-tip": "",
+                    "auto": ""
+                },
+                "inaccurate-gifs-tip": "",
+                "inaccurate-gifs": "",
+                "fullscreen-depth": {
+                    "16": "",
+                    "auto": "",
+                    "_name": "",
+                    "32": ""
+                },
+                "fullscreen-res": ""
             },
             "episode-options": {
                 "creator-compat": {
@@ -662,7 +704,9 @@
                     "modern": "",
                     "vanilla-tip": "",
                     "_name": ""
-                }
+                },
+                "hub-resume-tip": "",
+                "hub-resume": ""
             },
             "main": {
                 "background-work": "",
@@ -713,7 +757,8 @@
                     "nearest": "",
                     "full": "",
                     "linear": "",
-                    "integer": ""
+                    "integer": "",
+                    "3x": ""
                 },
                 "info-meta": "",
                 "show-episode-title": {

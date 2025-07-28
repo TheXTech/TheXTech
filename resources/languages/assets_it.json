@@ -33,7 +33,8 @@
                 "bg2-37": "Colline innevate",
                 "bg2-15": "Cripta 2",
                 "bg2-3": "Cripta",
-                "header": "Set 3"
+                "header": "Set 3",
+                "bg2-26": ""
             },
             "auto": {
                 "bg2-0": "Nessuno"
@@ -98,7 +99,13 @@
             "fam-water1": "Acqua",
             "fam-water2": "Acqua",
             "fam-water3": "Acqua",
-            "fam-water4": "Acqua"
+            "fam-water4": "Acqua",
+            "fam-sandbg3": "",
+            "fam-art2": "",
+            "fam-bars4": "",
+            "fam-platform4": "",
+            "fam-space5": "",
+            "fam-sandfg3": ""
         },
         "block": {
             "fam-special3": "Speciale",
@@ -139,7 +146,16 @@
             "fam-pipes5-3": "Tubi lunghi",
             "fam-ruins5": "Rovine",
             "fam-wood3": "Legno",
-            "fam-woods4": "Bosco"
+            "fam-woods4": "Bosco",
+            "fam-steampunk3": "",
+            "fam-sized1": "",
+            "fam-hurts3": "",
+            "fam-sized4": "",
+            "fam-switch4": "",
+            "fam-sized3": "",
+            "fam-lava4": "",
+            "fam-metal5-1": "",
+            "fam-sized2": ""
         },
         "music": {
             "fam-misc": {
@@ -148,12 +164,19 @@
                 "music18": "Spiaggia",
                 "music23": "Bosco eroico",
                 "music38": "Villaggio della giungla",
-                "music55": "Tema del titolo"
+                "music55": "Tema del titolo",
+                "music56": "",
+                "music20": "",
+                "music8": "",
+                "music13": ""
             },
             "fam-fight": {
                 "music52": "Sotterraneo",
                 "music39": "Tempio",
-                "music40": "Cavaliere"
+                "music40": "Cavaliere",
+                "music53": "",
+                "music19": "",
+                "header": ""
             },
             "fam-rpg": {
                 "music34": "Città",
@@ -162,17 +185,28 @@
                 "music21": "Battaglia",
                 "music31": "Mare",
                 "music32": "Stagno",
-                "music33": "Nuvole"
+                "music33": "Nuvole",
+                "music30": ""
             },
             "fam-set3": {
                 "music1": "Aria aperta",
                 "music3": "Cripta",
                 "music4": "Sotterraneo",
-                "header": "Set 3"
+                "header": "Set 3",
+                "music2": "",
+                "music6": "",
+                "music54": "",
+                "music47": ""
             },
             "fam-world": {
                 "music10": "Aria aperta",
-                "music41": "Cripta"
+                "music41": "Cripta",
+                "header": "",
+                "music28": "",
+                "music51": "",
+                "music48": "",
+                "music29": "",
+                "music17": ""
             },
             "fam-64": {
                 "music14": "Deserto",
@@ -181,34 +215,249 @@
                 "music35": "Neve",
                 "music36": "Boss",
                 "music49": "Acqua",
-                "music50": "Caverna"
+                "music50": "Caverna",
+                "header": ""
             },
             "fam-set1": {
                 "music42": "Cripta",
                 "music9": "Aria aperta",
                 "music7": "Sotterraneo",
-                "header": "Set 1"
+                "header": "Set 1",
+                "music46": ""
             },
             "fam-set2": {
                 "music5": "Aria aperta",
                 "music25": "Sotterraneo",
-                "header": "Set 2"
+                "header": "Set 2",
+                "music43": "",
+                "music15": ""
+            },
+            "fam-space": {
+                "music11": "",
+                "music22": "",
+                "header": "",
+                "music45": "",
+                "music44": "",
+                "music12": ""
+            },
+            "auto": {
+                "music0": "",
+                "music24": ""
             }
         },
         "worldMusic": {
             "fam-set3": {
-                "header": "Set 3"
+                "header": "Set 3",
+                "wmusic11": "",
+                "wmusic10": "",
+                "wmusic2": "",
+                "wmusic1": "",
+                "wmusic9": "",
+                "wmusic3": "",
+                "wmusic8": "",
+                "wmusic6": ""
             },
             "fam-world": {
-                "wmusic13": "Cripta"
+                "wmusic13": "Cripta",
+                "wmusic4": "",
+                "header": "",
+                "wmusic12": "",
+                "wmusic16": "",
+                "wmusic14": "",
+                "wmusic15": "",
+                "wmusic7": ""
+            },
+            "auto": {
+                "wmusic0": ""
+            },
+            "fam-new": {
+                "header": "",
+                "wmusic5": ""
             }
         },
         "npc": {
             "fam-char3": "Personaggio",
-            "fam-char5": "Personaggio"
+            "fam-char5": "Personaggio",
+            "fam-sign4": "",
+            "fam-plat3": "",
+            "fam-blocks2": "",
+            "fam-enemies5": "",
+            "fam-shell1": "",
+            "fam-boss5": "",
+            "fam-veg2": "",
+            "fam-boss1": "",
+            "fam-boss4": "",
+            "fam-warp2": "",
+            "fam-shell3": "",
+            "fam-plant3": "",
+            "fam-vine1": "",
+            "fam-items1": "",
+            "fam-exit3": "",
+            "fam-boss2": "",
+            "fam-enemies3": "",
+            "fam-exit4": "",
+            "fam-boss3": "",
+            "fam-vine3": "",
+            "fam-plat4": "",
+            "fam-plat1": "",
+            "fam-pet4": "",
+            "fam-items5": "",
+            "fam-items3": "",
+            "fam-blocks3": "",
+            "fam-enemies1": "",
+            "fam-enemies2": "",
+            "fam-ckpt4": "",
+            "fam-vine4": "",
+            "fam-switch5": "",
+            "fam-vine2": "",
+            "fam-exit2": "",
+            "fam-items2": "",
+            "fam-items4": "",
+            "fam-enemies4": ""
         },
         "exit-codes": {
-            "4": "Chiave"
+            "4": "Chiave",
+            "7": "",
+            "5": "",
+            "any": "",
+            "6": "",
+            "3": "",
+            "8": "",
+            "1": "",
+            "2": "",
+            "none": "",
+            "9": ""
+        },
+        "sound": {
+            "fam-player": {
+                "sound54": "",
+                "sound24": "",
+                "sound73": "",
+                "sound12": "",
+                "sound34": "",
+                "sound75": "",
+                "sound72": "",
+                "header": "",
+                "sound25": "",
+                "sound18": "",
+                "sound35": "",
+                "sound46": "",
+                "sound15": "",
+                "sound76": "",
+                "sound5": "",
+                "sound71": "",
+                "sound33": "",
+                "sound1": "",
+                "sound23": "",
+                "sound17": "",
+                "sound10": "",
+                "sound6": "",
+                "sound2": ""
+            },
+            "auto": {
+                "sound0": ""
+            },
+            "fam-jingle": {
+                "sound8": "",
+                "sound20": "",
+                "sound60": "",
+                "sound45": "",
+                "header": "",
+                "sound52": "",
+                "sound40": "",
+                "sound31": "",
+                "sound19": "",
+                "sound21": ""
+            },
+            "fam-boss": {
+                "sound67": "",
+                "sound41": "",
+                "sound69": "",
+                "sound39": "",
+                "sound38": "",
+                "sound70": "",
+                "sound44": "",
+                "header": "",
+                "sound63": "",
+                "sound68": "",
+                "sound62": ""
+            },
+            "fam-hero": {
+                "sound83": "",
+                "sound84": "",
+                "sound88": "",
+                "sound86": "",
+                "sound87": "",
+                "header": "",
+                "sound82": "",
+                "sound80": "",
+                "sound77": "",
+                "sound81": "",
+                "sound85": "",
+                "sound53": "",
+                "sound78": "",
+                "sound79": ""
+            },
+            "fam-item": {
+                "sound4": "",
+                "sound14": "",
+                "sound22": "",
+                "sound16": "",
+                "sound61": "",
+                "sound74": "",
+                "sound9": "",
+                "sound64": "",
+                "sound3": "",
+                "sound56": "",
+                "sound7": "",
+                "sound59": "",
+                "header": "",
+                "sound65": "",
+                "sound32": "",
+                "sound51": "",
+                "sound57": "",
+                "sound66": "",
+                "sound43": "",
+                "sound42": "",
+                "sound58": "",
+                "sound37": ""
+            },
+            "fam-pet": {
+                "sound55": "",
+                "sound48": "",
+                "sound49": "",
+                "sound50": "",
+                "header": "",
+                "sound36": ""
+            },
+            "fam-ui": {
+                "sound11": "",
+                "header": "",
+                "sound13": "",
+                "sound30": "",
+                "sound47": "",
+                "sound29": "",
+                "sound26": ""
+            },
+            "fam-world": {
+                "header": "",
+                "sound28": "",
+                "sound27": ""
+            }
+        },
+        "tile": {
+            "fam-desert1": "",
+            "fam-lilac4": "",
+            "fam-grass1": "",
+            "fam-dirt2": "",
+            "fam-marble3": "",
+            "fam-granite3": "",
+            "fam-stonewall3": "",
+            "fam-clouds4": "",
+            "fam-grass2": "",
+            "fam-snow1": "",
+            "fam-wall2": "",
+            "fam-lava3": ""
         }
     },
     "character": {
@@ -220,6 +469,9 @@
     },
     "objects": {
         "wordStarAccusativePlural": "stelle",
-        "wordStarAccusativeSingular": "stella"
-    }
+        "wordStarAccusativeSingular": "stella",
+        "wordStarAccusativeDualOrCounter": "",
+        "wordFails": ""
+    },
+    "languageName": ""
 }

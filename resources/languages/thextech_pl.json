@@ -72,7 +72,25 @@
                 },
                 "advanced-audio": "",
                 "_tooltip": "",
-                "audio-enable": ""
+                "audio-enable": "",
+                "use-native-osk": "",
+                "fullscreen-type": {
+                    "_name": "",
+                    "exclusive": "",
+                    "desktop-tip": "",
+                    "desktop": "",
+                    "exclusive-tip": "",
+                    "auto": ""
+                },
+                "inaccurate-gifs-tip": "",
+                "inaccurate-gifs": "",
+                "fullscreen-depth": {
+                    "16": "",
+                    "auto": "",
+                    "_name": "",
+                    "32": ""
+                },
+                "fullscreen-res": ""
             },
             "episode-options": {
                 "creator-compat": {
@@ -91,7 +109,9 @@
                     "vanilla-tip": "",
                     "modern": ""
                 },
-                "_header": ""
+                "_header": "",
+                "hub-resume-tip": "",
+                "hub-resume": ""
             },
             "speedrun": {
                 "mode": {
@@ -151,7 +171,8 @@
                     "1x": "",
                     "linear": "",
                     "nearest": "",
-                    "0_5x": ""
+                    "0_5x": "",
+                    "3x": ""
                 },
                 "display-controllers": "",
                 "info-game": "",
@@ -371,7 +392,8 @@
                     "buttonX": "",
                     "rStick": ""
                 },
-                "phraseNewNunchuck": ""
+                "phraseNewNunchuck": "",
+                "typeGamecube": ""
             },
             "controlsNewProfile": "",
             "phraseNewProfOldJoy": "",
@@ -790,7 +812,11 @@
             "warpNeedStarCount": "",
             "errorInvalidEnterWarp": "",
             "openFileFailed": "",
-            "errorNoStartPoint": ""
+            "errorNoStartPoint": "",
+            "errorTooOldGameAssets": "",
+            "openIPCDataFailed": "",
+            "IPCTimeOut": "",
+            "errorTooOldEngine": ""
         },
         "hint": {
             "no-lives-new": "",
@@ -799,7 +825,9 @@
             "gray-bricks": "",
             "shoe-block": "",
             "rainbow-surf": "",
-            "heavy-duck": ""
+            "heavy-duck": "",
+            "pound-altrun": "",
+            "pound-down": ""
         },
         "message": {
             "scanningLevels": ""
@@ -808,7 +836,24 @@
             "sysInfoWarning": "",
             "sysInfoTitle": "",
             "sysInfoError": ""
-        }
+        },
+        "loader": {
+            "statusLoadData": "",
+            "statusGameInfo": "",
+            "statusLoadFile": "",
+            "statusFinishing": "",
+            "statusAssetPacks": "",
+            "statusTranslations": ""
+        },
+        "ipcStatus": {
+            "loadingdone": "",
+            "dataAccepted": "",
+            "dataTransferStarted": "",
+            "errorTimeout": "",
+            "dataValid": "",
+            "waitingInput": ""
+        },
+        "screenPaused": ""
     },
     "outro": {
         "qualityControl": "",

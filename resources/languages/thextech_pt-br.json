@@ -337,7 +337,8 @@
             "warpNeedStarCount": "Você precisa de\n{0} {1} para entrar.",
             "errorTooOldGameAssets": "O conteúdo requer um pacote de recursos de fase mais recente ({0}) do que o pacote de recursos atual ({1}). Atualize seu pacote de recursos do jogo.",
             "IPCTimeOut": "Sem Resposta do editor conectado o jogo será fechado",
-            "errorTooOldEngine": "O conteúdo requer um nível de recurso de mecanismo mais recente ({0}) do que a versão atual ({1}). Atualize o TheXTech."
+            "errorTooOldEngine": "O conteúdo requer um nível de recurso de mecanismo mais recente ({0}) do que a versão atual ({1}). Atualize o TheXTech.",
+            "openIPCDataFailed": ""
         },
         "message": {
             "scanningLevels": "Buscando níveis..."
@@ -372,7 +373,24 @@
             "sysInfoError": "Erro!",
             "sysInfoTitle": "Informação",
             "sysInfoWarning": "Aviso!"
-        }
+        },
+        "loader": {
+            "statusLoadData": "",
+            "statusGameInfo": "",
+            "statusLoadFile": "",
+            "statusFinishing": "",
+            "statusAssetPacks": "",
+            "statusTranslations": ""
+        },
+        "ipcStatus": {
+            "loadingdone": "",
+            "dataAccepted": "",
+            "dataTransferStarted": "",
+            "errorTimeout": "",
+            "dataValid": "",
+            "waitingInput": ""
+        },
+        "screenPaused": ""
     },
     "menu": {
         "controls": {
@@ -633,7 +651,25 @@
                     "none": "Nenhum",
                     "all-tip": "Menos travamentos no carregamento do que 'Seguro'",
                     "all": "Todas"
-                }
+                },
+                "use-native-osk": "",
+                "fullscreen-type": {
+                    "_name": "",
+                    "exclusive": "",
+                    "desktop-tip": "",
+                    "desktop": "",
+                    "exclusive-tip": "",
+                    "auto": ""
+                },
+                "inaccurate-gifs-tip": "",
+                "inaccurate-gifs": "",
+                "fullscreen-depth": {
+                    "16": "",
+                    "auto": "",
+                    "_name": "",
+                    "32": ""
+                },
+                "fullscreen-res": ""
             },
             "main": {
                 "_header": "Principal",
@@ -691,7 +727,8 @@
                     "full": "",
                     "linear": "",
                     "2x": "2x",
-                    "_name": ""
+                    "_name": "",
+                    "3x": ""
                 },
                 "show-fails-counter-tip": "",
                 "enable-inter-level-fade-effect": "",
@@ -771,7 +808,9 @@
                     "vanilla-tip": "",
                     "vanilla": "",
                     "modern-tip": ""
-                }
+                },
+                "hub-resume-tip": "",
+                "hub-resume": ""
             },
             "compatibility": {
                 "reset-all": "",

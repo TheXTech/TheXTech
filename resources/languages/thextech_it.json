@@ -383,7 +383,25 @@
                     "_tooltip": ""
                 },
                 "choose-assets-on-launch": "",
-                "webm-recording": ""
+                "webm-recording": "",
+                "use-native-osk": "",
+                "fullscreen-type": {
+                    "_name": "",
+                    "exclusive": "",
+                    "desktop-tip": "",
+                    "desktop": "",
+                    "exclusive-tip": "",
+                    "auto": ""
+                },
+                "inaccurate-gifs-tip": "",
+                "inaccurate-gifs": "",
+                "fullscreen-depth": {
+                    "16": "",
+                    "auto": "",
+                    "_name": "",
+                    "32": ""
+                },
+                "fullscreen-res": ""
             },
             "audio": {
                 "sfx-audio-fx": "",
@@ -415,7 +433,9 @@
                     "_name": "",
                     "modern": ""
                 },
-                "_header": ""
+                "_header": "",
+                "hub-resume-tip": "",
+                "hub-resume": ""
             },
             "video": {
                 "scale-mode": {
@@ -427,7 +447,8 @@
                     "1x": "",
                     "nearest": "",
                     "full": "",
-                    "linear": ""
+                    "linear": "",
+                    "3x": ""
                 },
                 "battery-status": {
                     "low-tip": "",
@@ -613,7 +634,8 @@
                 "phraseNewClassic": "",
                 "phraseNewNunchuck": "",
                 "typeClassic": "",
-                "typeNunchuck": ""
+                "typeNunchuck": "",
+                "typeGamecube": ""
             },
             "caseMouse": "",
             "profile": {
@@ -787,7 +809,11 @@
             "warpNeedStarCount": "",
             "openFileFailed": "",
             "errorInvalidEnterWarp": "",
-            "errorNoStartPoint": ""
+            "errorNoStartPoint": "",
+            "errorTooOldGameAssets": "",
+            "openIPCDataFailed": "",
+            "IPCTimeOut": "",
+            "errorTooOldEngine": ""
         },
         "hint": {
             "no-lives-old": "",
@@ -796,7 +822,9 @@
             "gray-bricks": "",
             "rainbow-surf": "",
             "heavy-duck": "",
-            "shoe-block": ""
+            "shoe-block": "",
+            "pound-altrun": "",
+            "pound-down": ""
         },
         "message": {
             "scanningLevels": ""
@@ -808,7 +836,24 @@
             "sysInfoError": "",
             "sysInfoTitle": "",
             "sysInfoWarning": ""
-        }
+        },
+        "loader": {
+            "statusLoadData": "",
+            "statusGameInfo": "",
+            "statusLoadFile": "",
+            "statusFinishing": "",
+            "statusAssetPacks": "",
+            "statusTranslations": ""
+        },
+        "ipcStatus": {
+            "loadingdone": "",
+            "dataAccepted": "",
+            "dataTransferStarted": "",
+            "errorTimeout": "",
+            "dataValid": "",
+            "waitingInput": ""
+        },
+        "screenPaused": ""
     },
     "outro": {
         "qualityControl": "",
