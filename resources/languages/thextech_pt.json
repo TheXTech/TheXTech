@@ -361,7 +361,9 @@
             "char5-bombs": "",
             "rainbow-surf": "",
             "shoe-block": "",
-            "heavy-duck": ""
+            "heavy-duck": "",
+            "pound-altrun": "",
+            "pound-down": ""
         },
         "msgbox": {
             "sysInfoTitle": "",
@@ -506,7 +508,8 @@
                 "phraseNewNunchuck": "Novo Perfil - Nunchuck",
                 "typeClassic": "Classic",
                 "typeNunchuck": "Nunchuck",
-                "typeWiimote": "Wiimote"
+                "typeWiimote": "Wiimote",
+                "typeGamecube": ""
             },
             "cursor": {
                 "up": "Rato Cima",
@@ -643,7 +646,13 @@
                     "safe-tip": "",
                     "safe": ""
                 },
-                "audio-enable": ""
+                "audio-enable": "",
+                "use-native-osk": "",
+                "fullscreen-type": {
+                    "_name": ""
+                },
+                "inaccurate-gifs-tip": "",
+                "inaccurate-gifs": ""
             },
             "main": {
                 "two-screen-mode": {
@@ -787,7 +796,9 @@
                     "modern-tip": "",
                     "vanilla-tip": "",
                     "vanilla": ""
-                }
+                },
+                "hub-resume-tip": "",
+                "hub-resume": ""
             },
             "compatibility": {
                 "_header": "",

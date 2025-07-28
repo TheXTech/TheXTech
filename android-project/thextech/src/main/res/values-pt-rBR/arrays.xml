@@ -14,4 +14,7 @@
     <string name="touchPadStyle1">Estilo Nintendo/Xbox (A/B/X/Y)</string>
     <string name="touchPadStyle2">Estilo PlayStation (𐄂/○/□/△)</string>
     <string name="touchscreenControllerType0">Sempre na tela</string>
+    <string name="rendererGles" translatable="false"></string>
+    <string name="rendererGles11" translatable="false"></string>
+    <string name="rendererSdl" translatable="false"></string>
 </resources>

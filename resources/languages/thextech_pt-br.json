@@ -633,7 +633,13 @@
                     "none": "Nenhum",
                     "all-tip": "Menos travamentos no carregamento do que 'Seguro'",
                     "all": "Todas"
-                }
+                },
+                "use-native-osk": "",
+                "fullscreen-type": {
+                    "_name": ""
+                },
+                "inaccurate-gifs-tip": "",
+                "inaccurate-gifs": ""
             },
             "main": {
                 "_header": "Principal",
@@ -771,7 +777,9 @@
                     "vanilla-tip": "",
                     "vanilla": "",
                     "modern-tip": ""
-                }
+                },
+                "hub-resume-tip": "",
+                "hub-resume": ""
             },
             "compatibility": {
                 "reset-all": "",

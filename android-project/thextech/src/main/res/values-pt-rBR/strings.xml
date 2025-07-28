@@ -40,4 +40,5 @@
     <string name="setup_sr_stopwatchSemiTransparent">Cronômetro semitransparente</string>
     <string name="managePermExplainText">Este jogo utiliza recursos (como níveis, episódios, gráficos, músicas, sons, configurações, etc.) que foram alocadas pelo usuário no armazenamento local. Isso permite que o usuário modifique e expanda o conteúdo para propósitos próprios exatamente como a versão Desktop do jogo. Infelizmente, a partir do Android 11, não existe uma maneira de garantir acesso individual a uma única pasta em vez de um arquivo. Para rodar o jogo, você deve garantir acesso a todos os arquivos pelas razões citadas acima.</string>
     <string name="launcher_openfile_indirectly">Não foi possível acessar o caminho absoluto para o arquivo aberto, foi criada uma copia no armazenamento do jogo. Recursos personalizados (como gráficos, músicas, configurações, scripts, e outros) não serão carregados. Quer iniciar o jogo mesmo assim?</string>
+    <string name="app_name" translatable="false"></string>
 </resources>
