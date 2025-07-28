@@ -1,828 +1,425 @@
 {
+    "game": {
+        "connect": {
+            "dropAddTitle": "プレイヤー数の へんこう",
+            "phraseChangeChar": "キャラクターの へんこう",
+            "phraseDropMe": "ゲームから ぬける",
+            "phraseDropPX": "P{0}をゲームから ぬけさせる",
+            "phraseForceResume": "強制的に 再開",
+            "phraseHoldStart": "スタートボタンを ながおし",
+            "phrasePressAButton": "Aボタンを おしてください",
+            "phraseSetControls": "操作を せっていする",
+            "phraseStartToForceRes": "スタートボタンをおして 強制的に再開",
+            "phraseStartToResume": "スタートボタンをおして 再開",
+            "phraseTestControls": "テスト コントロール",
+            "phraseTestProfile": "テスト プロファイル",
+            "phraseWaitingForInput": "入力を まっています...",
+            "reconnectTitle": "再せつぞく する",
+            "splitPressSelect_1": "選択してください",
+            "splitPressSelect_2": "そうさ 設定",
+            "wordDisconnect": "せつだん する"
+        },
+        "error": {
+            "warpNeedStarCount": "ここにはいるには {0}個の{1}がひつようです。"
+        },
+        "hint": {
+            "pound-altrun": "オルトダッシュで ヒップドロップだ！",
+            "pound-down": "下を押して ヒップドロップだ！",
+            "no-lives-new": "コインがなくなった? まえがりに なるよ！ スコアにきをつけて...",
+            "no-lives-old": "気を付けて...もうすぐ ゲームオーバーだぞ！",
+            "rainbow-surf": "つかんで、はしって、下に入力して コウラをはなせば サーフィンだ！",
+            "char5-bombs": "ダッシュボタンで バクダンを回収できる。オルトダッシュで はっしゃだ！",
+            "heavy-duck": "しゃがめば ほとんどの炎を ブロックできる！",
+            "shoe-block": "履いていれば ほとんどの炎を ブロックできる！",
+            "gray-bricks": "いくつかのブロックは とくしゅなアイテムで こわせるぞ！"
+        },
+        "message": {
+            "scanningLevels": "レベルをスキャン中..."
+        },
+        "format": {
+            "minutesSeconds": "{0}分{1}秒"
+        },
+        "pause": {
+            "continue": "ゲームに もどる",
+            "playerSetup": "プレイヤー数の 変更",
+            "enterCode": "コードを 入力する",
+            "quit": "ゲームを やめる",
+            "quitTesting": "テストを やめる",
+            "resetCheckpoints": "チェックポイントを リセットする",
+            "restartLevel": "コースを やりなおす",
+            "returnToEditor": "エディターに もどる",
+            "saveAndContinue": "セーブして つづける",
+            "saveAndQuit": "セーブして やめる"
+        },
+        "screenPaused": "ポーズ中"
+    },
+    "languageName": "日本語",
     "menu": {
-        "options": {
-            "advanced": {
-                "audio-sample-rate": {
-                    "44100": "",
-                    "11025": "",
-                    "22050": "",
-                    "_name": "",
-                    "48000": "",
-                    "16000": "",
-                    "32000": ""
+        "abbrevMilliseconds": "MS",
+        "battle": {
+            "errorNoLevels": "コースがないため バトルモードをあそべません。"
+        },
+        "caseNone": "<なし>",
+        "controls": {
+            "buttons": {
+                "altJump": "オルト ジャンプ",
+                "altRun": "オルト ダッシュ",
+                "down": "下",
+                "drop": "ストックアイテム",
+                "jump": "ジャンプ",
+                "left": "左",
+                "right": "右",
+                "run": "ダッシュ",
+                "start": "スタート",
+                "up": "上"
+            },
+            "caseInvalid": "(無効)",
+            "caseMouse": "(マウス)",
+            "caseTouch": "(タッチ)",
+            "controlsConnected": "接続中:",
+            "controlsDeleteKey": "(オルトジャンプで削除)",
+            "controlsDeviceTypes": "デバイスの 種類",
+            "controlsInUse": "(使用中)",
+            "controlsNewProfile": "<あたらしいプロファイルをつくる>",
+            "controlsNotInUse": "(使用していません)",
+            "controlsReallyDeleteProfile": "ほんとうにこのプロファイルを消しますか？",
+            "controlsTitle": "そうさ設定",
+            "cursor": {
+                "down": "マウス 下",
+                "left": "マウス 左",
+                "primary": "左クリック",
+                "right": "マウス 右",
+                "secondary": "右クリック",
+                "tertiary": "中クリック",
+                "up": "マウス 上"
+            },
+            "hotkeys": {
+                "debugInfo": "デバッグじょうほう",
+                "enterCheats": "コードにゅうりょく",
+                "fullscreen": "フルスクリーン",
+                "legacyPause": "旧ポーズ画面",
+                "recordGif": "GIFをほぞん",
+                "screenshot": "スクリーンショット",
+                "toggleHUD": "HUDのきりかえ",
+                "vanillaCam": "バニラ カメラ"
+            },
+            "options": {
+                "batteryStatus": "バッテリー状態",
+                "maxPlayers": "最大人数",
+                "rumble": "振動",
+                "textEntryStyle": "テキスト入力方法"
+            },
+            "joystickSimpleEditor": "シンプルな エディター操作",
+            "phraseNewProfOldJoy": "古いジョイスティック向けプロファイルをつくる",
+            "profile": {
+                "cursorControls": "カーソルの そうさ設定",
+                "deleteProfile": "プロファイルを 削除",
+                "editorControls": "エディターの そうさ設定",
+                "hotkeys": "ホットキー",
+                "playerControls": "プレイヤーの そうさ設定",
+                "renameProfile": "プロファイルの おなまえ変更"
+            },
+            "tDS": {
+                "buttonSelect": "セレクト",
+                "buttonStart": "スタート",
+                "cStick": "Cスティック",
+                "dPad": "十字キー",
+                "tStick": "スライドパッド"
+            },
+            "touchscreen": {
+                "layout": {
+                    "longOld": "ロング(旧)",
+                    "phabletOld": "ファブレット(旧)",
+                    "phoneOld": "スマホ(旧)",
+                    "standard": "スタンダード",
+                    "tabletOld": "タブレット(旧)",
+                    "tight": "タイト",
+                    "tinyOld": "小さめ(旧)"
                 },
-                "advanced-video": "",
+                "option": {
+                    "feedbackLength": "振動の ながさ",
+                    "feedbackStrength": "振動の つよさ",
+                    "holdRun": "ゲーム開始時に ダッシュボタンをホールド",
+                    "interfaceStyle": "インターフェース スタイル",
+                    "layoutStyle": "レイアウト スタイル",
+                    "resetLayout": "レイアウトを リセット",
+                    "sStartSpacing": "S-Start Spacing",
+                    "scaleButtons": "ボタンの大きさをかえる",
+                    "scaleDPad": "十字キーの大きさをかえる",
+                    "scaleFactor": "拡大係数",
+                    "showCodeButton": "コード入力ボタン"
+                },
+                "style": {
+                    "actions": "アクション"
+                }
+            },
+            "types": {
+                "gamepad": "コントローラー",
+                "keyboard": "キーボード",
+                "oldJoystick": "旧ジョイスティック",
+                "touchscreen": "タッチスクリーン"
+            },
+            "wii": {
+                "phraseNewClassic": "あたらしいクラシックコントローラー プロファイルをつくる",
+                "phraseNewNunchuck": "あたらしいヌンチャク プロファイルをつくる",
+                "typeClassic": "クラシック",
+                "typeNunchuck": "ヌンチャク",
+                "typeWiimote": "Wiiリモコン",
+                "typeGamecube": "GCコントローラー",
+                "wiimote": {
+                    "buttonHome": "ホーム",
+                    "dPad": "十字キー",
+                    "shake": "リモコンを振る"
+                }
+            },
+            "wordButtons": "ボタン",
+            "wordProfiles": "プロファイル"
+        },
+        "game": {
+            "gameBattleRandom": "ランダムコース",
+            "gameCopySave": "セーブをコピーする",
+            "gameEraseSave": "セーブをけす",
+            "gameEraseSlot": "削除するスロットを選択してください。",
+            "gameNoBattleLevels": "<バトルコースがありません>",
+            "gameNoEpisodesToPlay": "<エピソードがありません>",
+            "warnEpCompat": "このエピソードはほかのSMBXバージョン向けにつくられているため うまく遊べないかもしれません。",
+            "gameSlotContinue": "スロット {0} ... {1}%",
+            "gameSlotNew": "スロット {0} ... NEW GAME",
+            "gameSourceSlot": "コピーするセーブをえらんでください。",
+            "gameTargetSlot": "どこにコピーする？",
+            "phraseScore": "スコア: {0}",
+            "phraseTime": "プレイ時間: {0}"
+        },
+        "loading": "ロード中...",
+        "main": {
+            "main1PlayerGame": "1プレイヤー ゲーム",
+            "mainBattleGame": "バトル ゲーム",
+            "mainEditor": "ステージ エディター",
+            "mainExit": "ゲームを やめる",
+            "mainMultiplayerGame": "2プレイヤー ゲーム",
+            "mainOptions": "設定",
+            "mainPlayEpisode": "エピソードを あそぶ"
+        },
+        "options": {
+            "restartEngine": "変更は再起動後に有効になります。",
+            "advanced": {
+                "_header": "高度な設定",
+                "_tooltip": "ゲームをこまかく変える 技術的な設定です。",
+                "advanced-audio": "音声",
+                "advanced-video": "映像",
                 "audio-buffer-size": {
-                    "_tooltip": "",
-                    "_name": ""
+                    "_name": "バッファサイズ",
+                    "_tooltip": "あげればあげるほどポップ音がへりますが、ゲームの負荷がより重くなります"
                 },
                 "audio-channels": {
-                    "_name": "",
-                    "stereo": "",
-                    "mono": ""
+                    "_name": "チャンネル",
+                    "mono": "モノラル",
+                    "stereo": "ステレオ"
                 },
-                "_tooltip": "",
-                "advanced-audio": "",
+                "audio-enable": "有効",
                 "audio-format": {
-                    "_tooltip": "",
-                    "_name": ""
+                    "_name": "オーディオフォーマット",
+                    "_tooltip": "サウンドドライバーのフォーマットをえらびます。"
                 },
-                "audio-enable": "",
+                "audio-sample-rate": {
+                    "_name": "サンプルレート"
+                },
                 "log-level": {
-                    "_name": "",
-                    "none": "",
-                    "warning": "",
-                    "info": "",
-                    "fatal": "",
-                    "critical": "",
-                    "debug": ""
+                    "_name": "ログレベル",
+                    "critical": "致命的",
+                    "debug": "デバッグ",
+                    "fatal": "重大",
+                    "info": "情報のみ",
+                    "none": "なし",
+                    "warning": "警告"
                 },
-                "choose-assets-on-launch": "",
-                "_header": "",
+                "record-gameplay-data": "ゲームプレイを録画",
                 "render": {
-                    "hw": "",
-                    "opengl": "",
-                    "_name": "",
-                    "opengl-tip": "",
-                    "opengl11": "",
-                    "opengl11-tip": "",
-                    "opengles": "",
-                    "sw": "",
-                    "opengles-tip": "",
-                    "opengles11": "",
-                    "sdl": "",
-                    "opengles11-tip": "",
-                    "sdl-tip": ""
+                    "_name": "描画モード",
+                    "hw": "自動",
+                    "opengl-tip": "すべてのあたらしい視覚エフェクトとSMBX64への完全な正確性をサポートしたデスクトップAPIです。",
+                    "opengl11-tip": "SMBX64への完全な正確性のみをサポートしたふるいデスクトップAPIです。",
+                    "opengles-tip": "すべてのあたらしい視覚エフェクトとSMBX64への高い正確性をサポートしたモバイルAPIです。",
+                    "opengles11-tip": "SMBX64への完全な正確性のみをサポートしたふるいモバイルAPIです。",
+                    "sdl-tip": "基本のクロスプラットフォーム描画APIです。"
                 },
-                "record-gameplay-data": "",
                 "scale-down-textures": {
-                    "_name": "",
-                    "none": "",
-                    "safe-tip": "",
-                    "_tooltip": "",
-                    "none-tip": "",
-                    "all": "",
-                    "safe": "",
-                    "all-tip": ""
+                    "_name": "画像をスケールダウンする",
+                    "_tooltip": "画像の解像度を1xとしてメモリを保全します。",
+                    "all": "すべて",
+                    "all-tip": "「安全」よりもスタッタリングがすくないです。",
+                    "none": "None",
+                    "none-tip": "ロード中のスタッタリングがもっともすくないです。",
+                    "safe": "安全",
+                    "safe-tip": "画像が2xになっているときチェックします。"
                 },
+                "inaccurate-gifs": "ふせいかくなGIF",
+                "inaccurate-gifs-tip": "GIFが描画されたときの3Dエフェクトを許可します。",
+                "webm-recording": "WEBMで録画",
                 "internal-res-4p": {
-                    "qsmbx": "",
-                    "_name": "",
-                    "fhd": "",
-                    "default": "",
-                    "qhd": ""
+                    "_name": "4人プレイ時の画面サイズ",
+                    "default": "デフォルト"
                 },
-                "webm-recording": ""
-            },
-            "restartEngine": "",
-            "episode-options": {
-                "creator-compat": {
-                    "_name": "",
-                    "file-only": "",
-                    "_tooltip": "",
-                    "disable": "",
-                    "enable": ""
+                "fullscreen-type": {
+                    "_name": "フルスクリーンタイプ",
+                    "auto": "自動",
+                    "desktop": "デスクトップ",
+                    "desktop-tip": "現在の画面解像度を保持します。",
+                    "exclusive": "限定的",
+                    "exclusive-tip": "物理的に画面解像度を変更します。"
                 },
-                "_header": "",
-                "playstyle": {
-                    "classic-tip": "",
-                    "modern": "",
-                    "vanilla": "",
-                    "vanilla-tip": "",
-                    "modern-tip": "",
-                    "classic": "",
-                    "_name": ""
+                "fullscreen-depth": {
+                    "auto": "自動"
                 }
+            },
+            "audio": {
+                "_header": "音声",
+                "audio-music-volume": "音楽のボリューム",
+                "audio-prefs": "オーディオせってい",
+                "audio-sfx-volume": "効果音のボリューム",
+                "sfx-audio-fx": "エコー効果",
+                "sfx-modern": "モダンな効果音",
+                "sfx-modern-tip": "TheXTechで追加された あたらしい効果音を使います。",
+                "sfx-pet-beat": "ペット・グルーブ",
+                "sfx-pet-beat-tip": "ペットにのっているあいだ、とくべつなグルーブが再生されます。",
+                "sfx-spatial-audio": "立体音響",
+                "sfx-spatial-audio-tip": "画面外の音をちいさくします。"
+            },
+            "controls": {
+                "_header": "そうさ設定"
+            },
+            "episode-options": {
+                "_header": "エピソードせってい",
+                "playstyle": {
+                    "_name": "プレイスタイル",
+                    "classic": "クラシック",
+                    "classic-tip": "限定的なアップデートのみ",
+                    "modern": "モダン",
+                    "modern-tip": "すべてのアップデート",
+                    "vanilla": "バニラ",
+                    "vanilla-tip": "アップデートなし"
+                },
+                "hub-resume": "ワールドマップでのワープをほぞん",
+                "hub-resume-tip": "さいごに入ったワープからゲームを再開します。"
+            },
+            "main": {
+                "_header": "メイン",
+                "background-work": "バックグラウンドで実行",
+                "background-work-tip": "非フォーカス中でもジョイスティックでゲームをプレイできるようにします。",
+                "four-screen-mode": {
+                    "_name": "4Pゲームの画面モード",
+                    "shared": "共有",
+                    "split": "分割"
+                },
+                "frame-skip": "フレームスキップ",
+                "language": "言語",
+                "multiplayer": "マルチプレイヤー",
+                "timing": "フレームタイミング",
+                "two-screen-mode": {
+                    "_name": "2Pゲームの画面モード",
+                    "shared": "共有",
+                    "smbx": "SMBXスタイル",
+                    "split": "左右分割",
+                    "topbottom": "上下分割"
+                },
+                "unlimited-framerate": "フレームレートのせいげんを解除",
+                "vsync": "垂直同期"
+            },
+            "video": {
+                "_header": "映像",
+                "battery-status": {
+                    "_name": "デバイスのバッテリー残量",
+                    "fullscreen": "フルスクリーン時",
+                    "fullscreen-tip": "フルスクリーンのときのみ表示します。",
+                    "low": "残量低下時",
+                    "low-tip": "バッテリー残量低下時にのみ表示します。",
+                    "off": "オフ",
+                    "on": "常時"
+                },
+                "display-controllers": "操作を表示",
+                "effects": "画面効果",
+                "enable-inter-level-fade-effect": "コース移行時にフェード",
+                "fullscreen": "フルスクリーン",
+                "info-game": "画面上のゲーム情報",
+                "info-meta": "画面上のメタ情報",
+                "info-run": "画面上のラン情報",
+                "internal-res": {
+                    "3ds": "800x480 (3DS)",
+                    "_name": "画面サイズ",
+                    "_tooltip": "ゲーム画面の解像度をへんこうします。",
+                    "dynamic": "ダイナミック"
+                },
+                "scale-mode": {
+                    "_name": "スケールモード",
+                    "integer": "整数",
+                    "linear": "スムーズ",
+                    "nearest": "二アレスト",
+                    "full": "フル",
+                    "center": "中心"
+                },
+                "show-episode-title": {
+                    "_name": "エピソード名",
+                    "bottom": "下部",
+                    "bottom-tip": "スピードランタイマーの上に表示します。",
+                    "off": "オフ",
+                    "top": "上部",
+                    "top-tip": "画面上部に表示します。"
+                },
+                "3d-compat-mode": "3D互換モード",
+                "3d-compat-mode-tip": "1つの3D平面上にすべてのオブジェクトを描画します。",
+                "show-fails-counter": "ミスカウンター",
+                "show-fails-counter-tip": "現在のコースとエピソード全体それぞれの合計ミス数を表示します。",
+                "show-fps": "フレームレート",
+                "show-medals-counter": "メダルカウンター",
+                "show-medals-counter-tip": "コース入り口でHUDにメダルを表示します。",
+                "show-playtime-counter": {
+                    "_name": "プレイ時間カウンター",
+                    "_tooltip": "現在のコースとエピソード全体それぞれの経過時間を表示します。",
+                    "animated": "アニメーション",
+                    "animated-tip": "コースクリア時にカウンターが虹色に光ります。",
+                    "off": "オフ",
+                    "off-tip": "スピードラン中のみ表示します。",
+                    "opaque": "不透明",
+                    "transparent": "半透明"
+                },
+                "show-screen-shake": "画面の揺れ",
+                "video-system": "システム",
+                "world-map-stars-show": "ワールドマップでのスターカウンター",
+                "world-map-stars-show-tip": "コースで集めたスターのかずをワールドマップでも表示します。"
+            },
+            "view-credits": {
+                "_header": "クレジットを見る"
             },
             "speedrun": {
                 "mode": {
-                    "1": "",
-                    "0": "",
-                    "2": "",
-                    "_name": "",
-                    "3": ""
+                    "_name": "スピードラン モード"
                 }
-            },
-            "compatibility": {
-                "bugfixes": "",
-                "autocode": "",
-                "features": "",
-                "reset-all": "",
-                "_header": "",
-                "_tooltip": ""
-            },
-            "main": {
-                "_header": "",
-                "four-screen-mode": {
-                    "shared": "",
-                    "split": "",
-                    "_name": ""
-                },
-                "background-work": "",
-                "multiplayer": "",
-                "background-work-tip": "",
-                "timing": "",
-                "discord-rpc": "",
-                "frame-skip": "",
-                "language": "",
-                "two-screen-mode": {
-                    "topbottom": "",
-                    "split": "",
-                    "smbx": "",
-                    "shared": "",
-                    "_name": ""
-                },
-                "unlimited-framerate": "",
-                "vsync": ""
-            },
-            "video": {
-                "scale-mode": {
-                    "nearest": "",
-                    "integer": "",
-                    "full": "",
-                    "linear": "",
-                    "center": "",
-                    "2x": "",
-                    "_name": "",
-                    "0_5x": "",
-                    "1x": ""
-                },
-                "show-episode-title": {
-                    "_name": "",
-                    "top-tip": "",
-                    "bottom-tip": "",
-                    "off": "",
-                    "top": "",
-                    "bottom": ""
-                },
-                "show-medals-counter": "",
-                "show-fails-counter-tip": "",
-                "3d-compat-mode-tip": "",
-                "3d-compat-mode": "",
-                "show-fails-counter": "",
-                "show-fps": "",
-                "show-medals-counter-tip": "",
-                "show-playtime-counter": {
-                    "_tooltip": "",
-                    "animated-tip": "",
-                    "_name": "",
-                    "animated": "",
-                    "opaque": "",
-                    "off-tip": "",
-                    "transparent": "",
-                    "off": ""
-                },
-                "show-screen-shake": "",
-                "world-map-stars-show-tip": "",
-                "video-system": "",
-                "world-map-stars-show": "",
-                "_header": "",
-                "battery-status": {
-                    "_name": "",
-                    "low": "",
-                    "fullscreen": "",
-                    "low-tip": "",
-                    "fullscreen-tip": "",
-                    "off": "",
-                    "on": ""
-                },
-                "internal-res": {
-                    "3ds": "",
-                    "smbx": "",
-                    "hd": "",
-                    "nds": "",
-                    "hello": "",
-                    "smbx-wide": "",
-                    "_name": "",
-                    "_tooltip": "",
-                    "gba": "",
-                    "snes": "",
-                    "vga": "",
-                    "dynamic": ""
-                },
-                "display-controllers": "",
-                "effects": "",
-                "fullscreen": "",
-                "enable-inter-level-fade-effect": "",
-                "info-meta": "",
-                "info-run": "",
-                "info-game": ""
-            },
-            "view-credits": {
-                "_header": ""
-            },
-            "controls": {
-                "_header": ""
-            },
-            "audio": {
-                "audio-music-volume": "",
-                "_header": "",
-                "audio-prefs": "",
-                "sfx-modern-tip": "",
-                "sfx-spatial-audio-tip": "",
-                "sfx-modern": "",
-                "sfx-spatial-audio": "",
-                "sfx-audio-fx": "",
-                "sfx-pet-beat": "",
-                "audio-sfx-volume": "",
-                "sfx-pet-beat-tip": ""
             }
         },
-        "character": {
-            "selectCharacter": ""
-        },
-        "controls": {
-            "caseTouch": "",
-            "touchscreen": {
-                "layout": {
-                    "tabletOld": "",
-                    "longOld": "",
-                    "phabletOld": "",
-                    "standard": "",
-                    "tinyOld": "",
-                    "phoneOld": "",
-                    "tight": ""
-                },
-                "option": {
-                    "holdRun": "",
-                    "scaleFactor": "",
-                    "feedbackLength": "",
-                    "showCodeButton": "",
-                    "resetLayout": "",
-                    "feedbackStrength": "",
-                    "scaleDPad": "",
-                    "interfaceStyle": "",
-                    "sStartSpacing": "",
-                    "scaleButtons": "",
-                    "layoutStyle": ""
-                },
-                "style": {
-                    "actions": "",
-                    "ABXY": "",
-                    "XODA": ""
-                }
-            },
-            "buttons": {
-                "run": "",
-                "start": "",
-                "right": "",
-                "drop": "",
-                "left": "",
-                "jump": "",
-                "altJump": "",
-                "down": "",
-                "altRun": "",
-                "up": ""
-            },
-            "controlsConnected": "",
-            "controlsDeleteKey": "",
-            "controlsDeviceTypes": "",
-            "editor": {
-                "prevSection": "",
-                "scrollLeft": "",
-                "scrollDown": "",
-                "modeErase": "",
-                "modeSelect": "",
-                "nextSection": "",
-                "scrollRight": "",
-                "fastScroll": "",
-                "switchScreens": "",
-                "scrollUp": "",
-                "testPlay": ""
-            },
-            "controlsNewProfile": "",
-            "tDS": {
-                "buttonL": "",
-                "buttonB": "",
-                "buttonY": "",
-                "dPad": "",
-                "buttonA": "",
-                "buttonSelect": "",
-                "buttonX": "",
-                "buttonR": "",
-                "buttonStart": "",
-                "tStick": "",
-                "buttonZL": "",
-                "cStick": "",
-                "casePen": "",
-                "buttonZR": ""
-            },
-            "types": {
-                "oldJoystick": "",
-                "keyboard": "",
-                "gamepad": "",
-                "touchscreen": ""
-            },
-            "wii": {
-                "classic": {
-                    "buttonX": "",
-                    "buttonRT": "",
-                    "buttonLT": "",
-                    "buttonZR": "",
-                    "buttonZL": "",
-                    "buttonY": "",
-                    "rStick": "",
-                    "lStick": ""
-                },
-                "phraseNewNunchuck": "",
-                "wiimote": {
-                    "shake": "",
-                    "buttonHome": "",
-                    "buttonB": "",
-                    "buttonPlus": "",
-                    "dPad": "",
-                    "caseIR": "",
-                    "buttonA": "",
-                    "button1": "",
-                    "buttonMinus": "",
-                    "button2": ""
-                },
-                "typeNunchuck": "",
-                "typeWiimote": "",
-                "phraseNewClassic": "",
-                "typeClassic": "",
-                "nunchuck": {
-                    "buttonC": "",
-                    "buttonZ": "",
-                    "prefixN": ""
-                }
-            },
-            "hotkeys": {
-                "debugInfo": "",
-                "toggleHUD": "",
-                "recordGif": "",
-                "fullscreen": "",
-                "enterCheats": "",
-                "legacyPause": "",
-                "screenshot": "",
-                "vanillaCam": ""
-            },
-            "caseInvalid": "",
-            "profile": {
-                "hotkeys": "",
-                "renameProfile": "",
-                "playerControls": "",
-                "editorControls": "",
-                "cursorControls": "",
-                "deleteProfile": ""
-            },
-            "options": {
-                "textEntryStyle": "",
-                "batteryStatus": "",
-                "maxPlayers": "",
-                "rumble": ""
-            },
-            "joystickSimpleEditor": "",
-            "controlsReallyDeleteProfile": "",
-            "cursor": {
-                "down": "",
-                "tertiary": "",
-                "secondary": "",
-                "right": "",
-                "left": "",
-                "primary": "",
-                "up": ""
-            },
-            "phraseNewProfOldJoy": "",
-            "controlsTitle": "",
-            "controlsInUse": "",
-            "wordButtons": "",
-            "controlsNotInUse": "",
-            "caseMouse": "",
-            "wordProfiles": ""
-        },
-        "caseNone": "",
-        "game": {
-            "gameNoEpisodesToPlay": "",
-            "gameSlotNew": "",
-            "gameSlotContinue": "",
-            "gameSourceSlot": "",
-            "phraseScore": "",
-            "gameTargetSlot": "",
-            "gameBattleRandom": "",
-            "gameCopySave": "",
-            "gameEraseSave": "",
-            "gameEraseSlot": "",
-            "phraseTime": "",
-            "gameNoBattleLevels": "",
-            "warnEpCompat": ""
-        },
-        "main": {
-            "mainMultiplayerGame": "",
-            "main1PlayerGame": "",
-            "mainBattleGame": "",
-            "mainExit": "",
-            "mainEditor": "",
-            "mainOptions": "",
-            "mainPlayEpisode": ""
-        },
-        "wordProfile": "",
-        "wordPlayer": "",
-        "wordNo": "",
-        "wordHide": "",
-        "wordShow": "",
-        "wordWaiting": "",
-        "editor": {
-            "battles": "",
-            "promptNewWorldName": "",
-            "errorMissingResources": "",
-            "makeFor": "",
-            "newWorld": ""
-        },
-        "wordBack": "",
-        "wordOn": "",
-        "wordOff": "",
-        "battle": {
-            "errorNoLevels": ""
-        },
-        "abbrevMilliseconds": "",
-        "loading": "",
-        "wordYes": "",
-        "wordResume": ""
-    },
-    "editor": {
-        "file": {
-            "optionCancelAction": "",
-            "convert": {
-                "descNew": ""
-            },
-            "optionYesSaveThenAction": "",
-            "optionProceedWithConversion": "",
-            "sectionWorld": "",
-            "actionExit": "",
-            "commandOpen": "",
-            "commandNew": "",
-            "actionRevert": "",
-            "formatLegacy": "",
-            "formatModern": "",
-            "optionActionWithoutSave": "",
-            "labelCurrentFile": "",
-            "labelFormat": "",
-            "actionOpen": "",
-            "confirmConvertFormatTo": "",
-            "confirmConfirmAction": "",
-            "confirmSaveBeforeAction": "",
-            "actionClearWorld": "",
-            "commandSave": "",
-            "sectionLevel": "",
-            "commandSaveAs": "",
-            "actionClearLevel": "",
-            "optionCancelConversion": ""
-        },
-        "labelSortLayer": "",
-        "layers": {
-            "deletion": {
-                "cancel": "",
-                "confirmPreserve": "",
-                "header": "",
-                "preserveLayerContents": "",
-                "confirmDelete": ""
-            },
-            "label": "",
-            "labelAttachedLayer": "",
-            "labelAttached": "",
-            "itemNewLayer": "",
-            "header": "",
-            "desc": {
-                "att": ""
-            },
-            "promptLayerName": "",
-            "labelMoveLayer": "",
-            "abbrevAttLayer": "",
-            "default": ""
-        },
-        "labelSortOffset": "",
-        "npc": {
-            "ai": {
-                "jump": "",
-                "headerCustomAi": "",
-                "aiIs": "",
-                "UD": "",
-                "LR": "",
-                "leap": "",
-                "use1_0Ai": "",
-                "swim": "",
-                "target": ""
-            },
-            "abbrevGen": "",
-            "tooltipExpandSection": "",
-            "stuckStop": "",
-            "gen": {
-                "direction": "",
-                "effectIs": "",
-                "effectShoot": "",
-                "effectWarp": "",
-                "header": ""
-            },
-            "props": {
-                "attachSurface": "",
-                "active": "",
-                "facing": ""
-            },
-            "inertNice": "",
-            "inContainer": ""
-        },
-        "level": {
-            "startPos": "",
-            "alwaysVis": "",
-            "bigBG": "",
-            "gameStart": "",
-            "pathUnlocks": "",
-            "pathBG": "",
-            "levelName": ""
-        },
-        "mapPos": "",
-        "pageBlankOfBlank": "",
-        "phraseRadiusIndex": "",
-        "phraseGenericIndex": "",
-        "phraseDelayIsMs": "",
-        "phraseAreYouSure": "",
-        "phraseTextOf": "",
-        "phraseWarpIndex": "",
-        "phraseSectionIndex": "",
-        "section": {
-            "horizWrap": "",
-            "vertWrap": "",
-            "noTurnBack": "",
-            "offscreenExit": "",
-            "scroll": "",
-            "setBounds": "",
-            "underwater": ""
-        },
-        "select": {
-            "allSectPropBlankForEventN": "",
-            "sectBlankPropBlankForEventN": "",
-            "sectionBlankPropBlank": "",
-            "soundForEventN": "",
-            "worldMusic": "",
-            "warpTransitEffect": "",
-            "pathBlankUnlock": ""
-        },
-        "testPlay": {
-            "magicHand": "",
-            "pet": "",
-            "power": "",
-            "char": "",
-            "boot": ""
-        },
-        "tooltip": {
-            "paths": "",
-            "select": "",
-            "scenes": "",
-            "settings": "",
-            "blocks": "",
-            "NPCs": "",
-            "erase": "",
-            "show": "",
-            "music": "",
-            "levels": "",
-            "warps": "",
-            "BGOs": "",
-            "layers": "",
-            "events": "",
-            "area": "",
-            "eraseAll": "",
-            "water": "",
-            "tiles": "",
-            "file": ""
-        },
-        "warp": {
-            "dir": "",
-            "cannonExit": "",
-            "effect": "",
-            "in": "",
-            "lvlWarp": "",
-            "item": "",
-            "needStarCount": "",
-            "out": "",
-            "needFloor": "",
-            "needKey": "",
-            "speed": "",
-            "showStartScene": "",
-            "ride": "",
-            "showStarCount": "",
-            "placing": "",
-            "style": {
-                "style": "",
-                "door": "",
-                "pipe": "",
-                "blipInstant": "",
-                "portal": ""
-            },
-            "starLockMessage": "",
-            "title": "",
-            "target": "",
-            "transit": {
-                "name0": "",
-                "name2": "",
-                "name1": "",
-                "name4": "",
-                "name5": "",
-                "name3": ""
-            },
-            "to": "",
-            "toMap": "",
-            "twoWay": "",
-            "allow": ""
-        },
-        "wordMode": "",
-        "wordEvent": {
-            "nominative": "",
-            "typeLabel": "",
-            "genitive": ""
-        },
-        "wordNPC": {
-            "genitive": "",
-            "nominative": ""
-        },
-        "world": {
-            "hubWorld": "",
-            "phraseCreditIndex": "",
-            "name": "",
-            "introLevel": "",
-            "allowChars": "",
-            "totalStars": "",
-            "retryOnFail": ""
-        },
-        "wordText": "",
-        "wordWidth": "",
-        "events": {
-            "controlsForEventN": "",
-            "sections": {
-                "actionSet": "",
-                "actionKeep": "",
-                "actionReset": "",
-                "propBounds": "",
-                "propBackground": "",
-                "propMusic": "",
-                "phraseAllSections": ""
-            },
-            "desc": {
-                "phraseTriggersAfterTemplate": "",
-                "death": "",
-                "phraseTriggersWhenTemplate": "",
-                "layerClear": "",
-                "destroy": "",
-                "activate": "",
-                "talk": "",
-                "enter": "",
-                "hit": ""
-            },
-            "label": {
-                "next": "",
-                "hit": "",
-                "activate": "",
-                "destroy": "",
-                "death": "",
-                "enter": "",
-                "layerClear": "",
-                "talk": ""
-            },
-            "letter": {
-                "hit": "",
-                "death": "",
-                "activate": "",
-                "talk": "",
-                "layerClear": "",
-                "enter": "",
-                "destroy": ""
-            },
-            "bounds": {
-                "changeSectionBoundsToCurrent": "",
-                "changeAllSectionBoundsToCurrent": "",
-                "shouldEvent": ""
-            },
-            "itemNewEvent": "",
-            "headerTriggerEvent": "",
-            "props": {
-                "layerSmoke": "",
-                "sound": "",
-                "endGame": "",
-                "controls": "",
-                "autostart": ""
-            },
-            "layers": {
-                "headerMove": "",
-                "headerToggle": "",
-                "headerHide": "",
-                "headerShow": ""
-            },
-            "header": "",
-            "deletion": {
-                "confirm": "",
-                "cancel": "",
-                "deletingEvent": ""
-            },
-            "settingsForEvent": "",
-            "promptEventText": "",
-            "promptEventName": ""
-        },
-        "block": {
-            "letterHeight": "",
-            "letterWidth": "",
-            "inside": "",
-            "slick": "",
-            "pickContents": "",
-            "canBreakTooltip": "",
-            "canBreak": "",
-            "invis": ""
-        },
-        "browser": {
-            "askOverwriteFile": "",
-            "saveFile": "",
-            "itemNewFolder": "",
-            "openFile": "",
-            "newFile": "",
-            "itemNewFile": ""
-        },
-        "letterRight": "",
-        "letterDown": "",
-        "letterCoordX": "",
-        "letterLeft": "",
-        "toggleMagicBlock": "",
-        "wordInstant": "",
-        "wordCoins": "",
-        "wordEnabled": "",
-        "wordHeight": "",
-        "water": {
-            "title": ""
-        },
-        "phraseCountMore": "",
-        "letterUp": "",
-        "letterCoordY": ""
-    },
-    "game": {
-        "connect": {
-            "dropAddTitle": "",
-            "phraseChangeChar": "",
-            "phraseForceResume": "",
-            "phraseSetControls": "",
-            "phraseHoldStart": "",
-            "phrasePressAButton": "",
-            "phraseStartToForceRes": "",
-            "phraseTestProfile": "",
-            "splitPressSelect_2": "",
-            "phraseDropMe": "",
-            "phraseDropPX": "",
-            "reconnectTitle": "",
-            "phraseWaitingForInput": "",
-            "phraseStartToResume": "",
-            "splitPressSelect_1": "",
-            "wordDisconnect": "",
-            "phraseTestControls": ""
-        },
-        "format": {
-            "minutesSeconds": ""
-        },
-        "hint": {
-            "no-lives-new": "",
-            "gray-bricks": "",
-            "char5-bombs": "",
-            "rainbow-surf": "",
-            "no-lives-old": "",
-            "shoe-block": "",
-            "heavy-duck": ""
-        },
-        "pause": {
-            "saveAndContinue": "",
-            "resetCheckpoints": "",
-            "returnToEditor": "",
-            "saveAndQuit": "",
-            "enterCode": "",
-            "quit": "",
-            "continue": "",
-            "quitTesting": "",
-            "playerSetup": "",
-            "restartLevel": ""
-        },
-        "error": {
-            "warpNeedStarCount": "",
-            "openFileFailed": "",
-            "errorInvalidEnterWarp": "",
-            "errorNoStartPoint": ""
-        },
-        "msgbox": {
-            "sysInfoTitle": "",
-            "sysInfoError": "",
-            "sysInfoWarning": ""
-        },
-        "message": {
-            "scanningLevels": ""
-        }
+        "wordBack": "もどる",
+        "wordHide": "非表示",
+        "wordNo": "いいえ",
+        "wordOff": "オフ",
+        "wordOn": "オン",
+        "wordPlayer": "プレイヤー",
+        "wordProfile": "プロファイル",
+        "wordResume": "再開",
+        "wordShow": "表示",
+        "wordWaiting": "待機中",
+        "wordYes": "はい"
     },
     "outro": {
-        "customSprites": "",
-        "levelDesign": "",
-        "engineCredits": "",
-        "originalBy": "",
-        "gameCredits": "",
-        "nameAndrewSpinks": "",
-        "cppPortDevelopers": "",
-        "qualityControl": "",
-        "psVitaPortBy": "",
-        "specialThanks": "",
-        "nameVitalyNovichkov": ""
+        "cppPortDevelopers": "C++移植 開発者",
+        "customSprites": ":カスタムスプライト",
+        "engineCredits": "エンジン",
+        "gameCredits": "ゲーム",
+        "levelDesign": "レベルデザイン",
+        "nameVitalyNovichkov": "ノヴィチコーフ・ヴィターリ",
+        "originalBy": "オリジナル VB6コード",
+        "psVitaPortBy": "PSVita移植",
+        "qualityControl": "品質管理",
+        "specialThanks": "スペシャルサンクス"
     },
-    "languageName": "",
-    "pluralRules": ""
+    "pluralRules": "singular-only"
 }
+
