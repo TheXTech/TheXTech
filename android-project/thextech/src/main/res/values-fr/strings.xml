@@ -40,4 +40,5 @@
     <string name="launcher_gameselect_clearlist_title"></string>
     <string name="launcher_gameSelect_pickTheDir"></string>
     <string name="cheat_dialog_title"></string>
+    <string name="app_name" translatable="false"></string>
 </resources>
