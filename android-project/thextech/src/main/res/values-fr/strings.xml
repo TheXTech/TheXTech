@@ -7,7 +7,7 @@
     <string name="setup_feedback_vibration_length">Durée des vibrations</string>
     <string name="setup_feedback_vibration_strength">Intensité des vibrations</string>
     <string name="setup_feedback_enable_vibration">Activer les vibrations</string>
-    <string name="launcher_no_resources_question">Le jeu nécessite un paquet de ressources. Veuillez télécharger les ressources du jeu et les décompresser dans le répertoire de votre choix. Voulez-vous sélectionner un dossier déjà décompressé \?</string>
+    <string name="launcher_no_resources_question">Le jeu nécessite un paquet de ressources. Veuillez télécharger les ressources du jeu et les décompresser dans le répertoire de votre choix. Voulez-vous sélectionner un dossier déjà décompressé ?</string>
     <string name="setup_assets_path_label">Modifier le chemin absolu des ressources</string>
     <string name="managePermExplainText">Ce jeu utilise des ressources (comme des niveaux, des épisodes, des graphiques, de la musique, des sons, des configurations, etc.) qui ont été placées par l\'utilisateur directement sur le magasin local. Ce concept permet aux utilisateurs de modifier et d\'étendre le contenu pour leurs propres besoins, comme cela a été fait pour la version de bureau de ce jeu. Malheureusement, Android 11+ ne permet pas d\'accorder des droits de lecture individuels pour le répertoire spécifié au lieu d\'un seul fichier. Pour exécuter ce jeu, vous devez avoir accès à tous les fichiers du jeu pour les raisons expliquées.</string>
     <string name="managePermExplainTitle">L\'autorisation d\'accès à tous les fichiers est nécessaire</string>
