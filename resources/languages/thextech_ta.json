@@ -334,7 +334,11 @@
             "errorNoStartPoint": "கிடைக்கக்கூடிய தொடக்க புள்ளிகள் அல்லது நுழைவு வார்ப் குறிப்பிடப்படாததால் மட்டத்தைத் தொடங்க முடியாது.\n\n கோப்பு: {0}",
             "errorInvalidEnterWarp": "தவறான நுழைவு வார்ப் {1} குறிப்பிடப்பட்டதால் மட்டத்தைத் தொடங்க முடியாது.\n மொத்த வார்ப் உள்ளீடுகள்: {2}\n\n கோப்பு: {0}",
             "openFileFailed": "\"{0}\" ஐ திறக்க முடியாது: கோப்பு இல்லை அல்லது சிதைக்கப்படவில்லை.",
-            "warpNeedStarCount": "நுழைய உங்களுக்கு {0} {1} தேவை."
+            "warpNeedStarCount": "நுழைய உங்களுக்கு {0} {1} தேவை.",
+            "errorTooOldGameAssets": "",
+            "openIPCDataFailed": "",
+            "IPCTimeOut": "",
+            "errorTooOldEngine": ""
         },
         "message": {
             "scanningLevels": "அளவை ச்கேனிங் ..."
@@ -370,7 +374,23 @@
             "saveAndContinue": "சேமித்து தொடரவும்",
             "saveAndQuit": "சேமித்து வெளியேறவும்"
         },
-        "screenPaused": "இடைநிறுத்தப்பட்டது"
+        "screenPaused": "இடைநிறுத்தப்பட்டது",
+        "loader": {
+            "statusLoadData": "",
+            "statusGameInfo": "",
+            "statusLoadFile": "",
+            "statusFinishing": "",
+            "statusAssetPacks": "",
+            "statusTranslations": ""
+        },
+        "ipcStatus": {
+            "loadingdone": "",
+            "dataAccepted": "",
+            "dataTransferStarted": "",
+            "errorTimeout": "",
+            "dataValid": "",
+            "waitingInput": ""
+        }
     },
     "menu": {
         "controls": {

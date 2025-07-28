@@ -555,7 +555,12 @@
                 "webm-recording": "",
                 "use-native-osk": "",
                 "fullscreen-type": {
-                    "_name": ""
+                    "_name": "",
+                    "exclusive": "",
+                    "desktop-tip": "",
+                    "desktop": "",
+                    "exclusive-tip": "",
+                    "auto": ""
                 },
                 "inaccurate-gifs-tip": "",
                 "record-gameplay-data": "",
@@ -566,7 +571,14 @@
                 },
                 "advanced-video": "",
                 "audio-enable": "",
-                "advanced-audio": ""
+                "advanced-audio": "",
+                "fullscreen-depth": {
+                    "16": "",
+                    "auto": "",
+                    "_name": "",
+                    "32": ""
+                },
+                "fullscreen-res": ""
             },
             "video": {
                 "internal-res": {
@@ -625,7 +637,8 @@
                     "1x": "",
                     "linear": "",
                     "_name": "",
-                    "integer": ""
+                    "integer": "",
+                    "3x": ""
                 },
                 "fullscreen": "",
                 "3d-compat-mode-tip": "",
@@ -785,7 +798,11 @@
             "errorInvalidEnterWarp": "",
             "openFileFailed": "",
             "warpNeedStarCount": "",
-            "errorNoStartPoint": ""
+            "errorNoStartPoint": "",
+            "errorTooOldGameAssets": "",
+            "openIPCDataFailed": "",
+            "IPCTimeOut": "",
+            "errorTooOldEngine": ""
         },
         "pause": {
             "playerSetup": "",
@@ -820,7 +837,24 @@
         },
         "message": {
             "scanningLevels": ""
-        }
+        },
+        "loader": {
+            "statusLoadData": "",
+            "statusGameInfo": "",
+            "statusLoadFile": "",
+            "statusFinishing": "",
+            "statusAssetPacks": "",
+            "statusTranslations": ""
+        },
+        "ipcStatus": {
+            "loadingdone": "",
+            "dataAccepted": "",
+            "dataTransferStarted": "",
+            "errorTimeout": "",
+            "dataValid": "",
+            "waitingInput": ""
+        },
+        "screenPaused": ""
     },
     "outro": {
         "originalBy": "",
