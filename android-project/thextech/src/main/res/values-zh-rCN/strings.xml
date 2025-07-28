@@ -40,4 +40,5 @@
     <string name="launcher_gameselect_clearlist_question">要清除游戏列表吗？</string>
     <string name="launcher_openfile_indirectly">无法检索所打开文件的指定绝对路径，但已复制到该游戏所在的内置存储位置，因此无法加载外部资源（例如自定义素材、音乐、设置、脚本等）。您还要启动游戏吗？</string>
     <string name="setup_renderer_label">图形渲染类型</string>
+    <string name="app_name" translatable="false"></string>
 </resources>
