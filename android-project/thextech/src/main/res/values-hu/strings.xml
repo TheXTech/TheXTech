@@ -19,7 +19,7 @@
     <string name="setup_touchpad_style">Kontrollerstílus</string>
     <string name="managePermExplainTitle">Fájlhozzáférési jog szükséges</string>
     <string name="setup_assets_path_label">A források abszolút útvonalának megváltoztatása</string>
-    <string name="launcher_no_resources_question">A játék bizonyos adatcsomagokat igényel működéséhez. Kérjük töltsd le és tömörítsd ki az adatokat a megfelelő könyvtárba. Szeretnél kiválasztani egy már kicsomagolt adatcsomagot\?</string>
+    <string name="launcher_no_resources_question">A játék bizonyos adatcsomagokat igényel működéséhez. Kérjük töltsd le és tömörítsd ki az adatokat a megfelelő könyvtárba. Szeretnél kiválasztani egy már kicsomagolt adatcsomagot?</string>
     <string name="setup_feedback_enable_vibration">Rezgés engedélyezése</string>
     <string name="setup_feedback_vibration_strength">Rezgés erőssége</string>
     <string name="setup_feedback_vibration_length">Rezgés hossza</string>
@@ -35,7 +35,7 @@
     <string name="launcher_gameSelect_clearList">Lista ürítése</string>
     <string name="launcher_gameselect_clearlist_title">Játéklista ürítése</string>
     <string name="launcher_gameselect_toast_listclean">A jétéklista ürítve.</string>
-    <string name="launcher_gameselect_clearlist_question">Biztosan szeretnéd üríteni a játéklistát\?</string>
+    <string name="launcher_gameselect_clearlist_question">Biztosan szeretnéd üríteni a játéklistát?</string>
     <string name="setup_speedrunner">Sprintjáték</string>
     <string name="launcher_gameselect_toast_selected">Játék váltva: %s</string>
     <string name="setup_renderer_label"></string>
