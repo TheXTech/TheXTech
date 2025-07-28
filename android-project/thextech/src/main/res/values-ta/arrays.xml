@@ -14,4 +14,7 @@
     <string name="touchscreenControllerType2">எப்போதும் முடக்கு</string>
     <string name="batteryStatusShow0">ஒருபோதும் காட்ட வேண்டாம்</string>
     <string name="batteryStatusShow2">எப்போதும் காட்டு</string>
+    <string name="rendererGles" translatable="false"></string>
+    <string name="rendererGles11" translatable="false"></string>
+    <string name="rendererSdl" translatable="false"></string>
 </resources>

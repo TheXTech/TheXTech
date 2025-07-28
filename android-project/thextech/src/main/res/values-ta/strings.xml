@@ -40,4 +40,5 @@
     <string name="launcher_gameselect_clearlist_title">விளையாட்டு பட்டியலை அழிக்கவும்</string>
     <string name="launcher_gameselect_clearlist_question">விளையாட்டுகளின் பட்டியலை நீங்கள் உண்மையில் அழிக்க விரும்புகிறீர்களா?</string>
     <string name="launcher_openfile_indirectly">திறந்த கோப்பிற்கான நேரடி முழுமையான பாதையை மீட்டெடுக்க முடியாது, எனவே, இது விளையாட்டின் உள் சேமிப்பகத்தில் சமாளிக்கப்பட்டது. கூடுதல் ஆதாரங்களை (தனிப்பயன் கிராபிக்ச், இசை, உள்ளமைவுகள், ச்கிரிப்ட்கள் போன்றவை) ஏற்ற முடியாது. நீங்கள் எந்த வகையிலும் விளையாட்டைத் தொடங்க விரும்புகிறீர்களா?</string>
+    <string name="app_name" translatable="false"></string>
 </resources>
