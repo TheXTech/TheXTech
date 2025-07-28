@@ -410,7 +410,10 @@
                 "audio-enable": "Activar",
                 "use-native-osk": "Teclado del sistema",
                 "inaccurate-gifs-tip": "Permite efecto 3D cuando hay imagenes GIF",
-                "inaccurate-gifs": "GIF inexactos"
+                "inaccurate-gifs": "GIF inexactos",
+                "fullscreen-type": {
+                    "_name": ""
+                }
             },
             "audio": {
                 "sfx-audio-fx": "Efectos de eco",
@@ -610,7 +613,8 @@
                 "typeNunchuck": "Nunchuk",
                 "phraseNewNunchuck": "Nuevo Perfil Nunchuk",
                 "typeWiimote": "Wii Remote",
-                "phraseNewClassic": "Nuevo Perfil Classic"
+                "phraseNewClassic": "Nuevo Perfil Classic",
+                "typeGamecube": ""
             },
             "wordProfiles": "Perfiles",
             "wordButtons": "Botones",

@@ -355,7 +355,9 @@
             "shoe-block": "",
             "heavy-duck": "",
             "no-lives-old": "",
-            "no-lives-new": ""
+            "no-lives-new": "",
+            "pound-altrun": "",
+            "pound-down": ""
         },
         "message": {
             "scanningLevels": ""
@@ -533,7 +535,8 @@
                     "caseIR": "",
                     "dPad": "",
                     "shake": ""
-                }
+                },
+                "typeGamecube": ""
             },
             "wordButtons": "",
             "wordProfiles": "",
@@ -643,7 +646,13 @@
                 },
                 "choose-assets-on-launch": "",
                 "audio-enable": "",
-                "record-gameplay-data": ""
+                "record-gameplay-data": "",
+                "use-native-osk": "",
+                "fullscreen-type": {
+                    "_name": ""
+                },
+                "inaccurate-gifs-tip": "",
+                "inaccurate-gifs": ""
             },
             "episode-options": {
                 "creator-compat": {
@@ -662,7 +671,9 @@
                     "modern": "",
                     "vanilla-tip": "",
                     "_name": ""
-                }
+                },
+                "hub-resume-tip": "",
+                "hub-resume": ""
             },
             "main": {
                 "background-work": "",

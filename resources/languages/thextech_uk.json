@@ -85,7 +85,13 @@
                 "audio-buffer-size": {
                     "_name": "",
                     "_tooltip": ""
-                }
+                },
+                "use-native-osk": "",
+                "fullscreen-type": {
+                    "_name": ""
+                },
+                "inaccurate-gifs-tip": "",
+                "inaccurate-gifs": ""
             },
             "main": {
                 "multiplayer": "",
@@ -226,7 +232,9 @@
                     "classic": "",
                     "classic-tip": ""
                 },
-                "_header": ""
+                "_header": "",
+                "hub-resume-tip": "",
+                "hub-resume": ""
             },
             "speedrun": {
                 "mode": {
@@ -347,7 +355,8 @@
                     "buttonC": "",
                     "prefixN": "",
                     "buttonZ": ""
-                }
+                },
+                "typeGamecube": ""
             },
             "wordButtons": "",
             "hotkeys": {
@@ -800,7 +809,9 @@
             "shoe-block": "",
             "heavy-duck": "",
             "rainbow-surf": "",
-            "no-lives-new": ""
+            "no-lives-new": "",
+            "pound-altrun": "",
+            "pound-down": ""
         },
         "pause": {
             "enterCode": "",

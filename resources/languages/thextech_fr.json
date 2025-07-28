@@ -340,7 +340,9 @@
             "char5-bombs": "",
             "rainbow-surf": "",
             "heavy-duck": "",
-            "shoe-block": ""
+            "shoe-block": "",
+            "pound-altrun": "",
+            "pound-down": ""
         },
         "error": {
             "openFileFailed": "",
@@ -509,7 +511,8 @@
                 "typeWiimote": "",
                 "phraseNewNunchuck": "",
                 "phraseNewClassic": "",
-                "typeNunchuck": ""
+                "typeNunchuck": "",
+                "typeGamecube": ""
             },
             "joystickSimpleEditor": "",
             "wordProfiles": "",
@@ -605,7 +608,13 @@
                     "qhd": "",
                     "default": ""
                 },
-                "record-gameplay-data": ""
+                "record-gameplay-data": "",
+                "use-native-osk": "",
+                "fullscreen-type": {
+                    "_name": ""
+                },
+                "inaccurate-gifs-tip": "",
+                "inaccurate-gifs": ""
             },
             "episode-options": {
                 "playstyle": {
@@ -624,7 +633,9 @@
                     "_name": "",
                     "_tooltip": "",
                     "disable": ""
-                }
+                },
+                "hub-resume-tip": "",
+                "hub-resume": ""
             },
             "main": {
                 "discord-rpc": "",

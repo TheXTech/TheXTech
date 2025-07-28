@@ -87,7 +87,13 @@
                     "_name": ""
                 },
                 "record-gameplay-data": "",
-                "webm-recording": ""
+                "webm-recording": "",
+                "use-native-osk": "",
+                "fullscreen-type": {
+                    "_name": ""
+                },
+                "inaccurate-gifs-tip": "",
+                "inaccurate-gifs": ""
             },
             "speedrun": {
                 "mode": {
@@ -136,7 +142,9 @@
                     "file-only": "",
                     "enable": "",
                     "disable": ""
-                }
+                },
+                "hub-resume-tip": "",
+                "hub-resume": ""
             },
             "main": {
                 "background-work-tip": "",
@@ -366,7 +374,8 @@
                     "buttonZ": "",
                     "buttonC": ""
                 },
-                "typeClassic": ""
+                "typeClassic": "",
+                "typeGamecube": ""
             },
             "joystickSimpleEditor": "",
             "caseMouse": "",
@@ -784,7 +793,9 @@
             "gray-bricks": "",
             "heavy-duck": "",
             "rainbow-surf": "",
-            "shoe-block": ""
+            "shoe-block": "",
+            "pound-altrun": "",
+            "pound-down": ""
         },
         "format": {
             "minutesSeconds": ""

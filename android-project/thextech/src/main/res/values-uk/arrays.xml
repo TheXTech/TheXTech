@@ -13,4 +13,8 @@
     <string name="batteryStatusShow0">Ховати</string>
     <string name="batteryStatusShow1">Показувати при низькому заряді</string>
     <string name="batteryStatusShow2">Завжди показувати</string>
+    <string name="rendererGles" translatable="false"></string>
+    <string name="rendererGles11" translatable="false"></string>
+    <string name="rendererDefault"></string>
+    <string name="rendererSdl" translatable="false"></string>
 </resources>

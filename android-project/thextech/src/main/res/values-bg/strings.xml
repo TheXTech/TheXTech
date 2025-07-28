@@ -32,4 +32,12 @@
     <string name="cheat_dialog_ok">Изпълнение</string>
     <string name="setup_show_battery_status_label">Състояние на батерията на устройството</string>
     <string name="cheat_dialog_cancel">Отказ</string>
+    <string name="launcher_gameSelect_clearList"></string>
+    <string name="launcher_gameselect_toast_selected"></string>
+    <string name="setup_renderer_label"></string>
+    <string name="launcher_openfile_indirectly"></string>
+    <string name="launcher_gameselect_clearlist_question"></string>
+    <string name="launcher_gameselect_toast_listclean"></string>
+    <string name="launcher_gameselect_clearlist_title"></string>
+    <string name="launcher_gameSelect_pickTheDir"></string>
 </resources>

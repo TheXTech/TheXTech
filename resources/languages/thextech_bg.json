@@ -79,7 +79,13 @@
                     "safe-tip": ""
                 },
                 "choose-assets-on-launch": "",
-                "audio-enable": ""
+                "audio-enable": "",
+                "use-native-osk": "",
+                "fullscreen-type": {
+                    "_name": ""
+                },
+                "inaccurate-gifs-tip": "",
+                "inaccurate-gifs": ""
             },
             "video": {
                 "show-fails-counter": "",
@@ -171,7 +177,9 @@
                     "vanilla-tip": "",
                     "modern": ""
                 },
-                "_header": ""
+                "_header": "",
+                "hub-resume-tip": "",
+                "hub-resume": ""
             },
             "main": {
                 "background-work": "",
@@ -343,7 +351,8 @@
                 "typeWiimote": "",
                 "phraseNewClassic": "",
                 "typeNunchuck": "",
-                "typeClassic": ""
+                "typeClassic": "",
+                "typeGamecube": ""
             },
             "buttons": {
                 "altJump": "",
@@ -793,7 +802,9 @@
             "gray-bricks": "",
             "rainbow-surf": "",
             "heavy-duck": "",
-            "shoe-block": ""
+            "shoe-block": "",
+            "pound-altrun": "",
+            "pound-down": ""
         },
         "message": {
             "scanningLevels": ""

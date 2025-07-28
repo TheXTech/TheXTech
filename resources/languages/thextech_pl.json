@@ -72,7 +72,13 @@
                 },
                 "advanced-audio": "",
                 "_tooltip": "",
-                "audio-enable": ""
+                "audio-enable": "",
+                "use-native-osk": "",
+                "fullscreen-type": {
+                    "_name": ""
+                },
+                "inaccurate-gifs-tip": "",
+                "inaccurate-gifs": ""
             },
             "episode-options": {
                 "creator-compat": {
@@ -91,7 +97,9 @@
                     "vanilla-tip": "",
                     "modern": ""
                 },
-                "_header": ""
+                "_header": "",
+                "hub-resume-tip": "",
+                "hub-resume": ""
             },
             "speedrun": {
                 "mode": {
@@ -371,7 +379,8 @@
                     "buttonX": "",
                     "rStick": ""
                 },
-                "phraseNewNunchuck": ""
+                "phraseNewNunchuck": "",
+                "typeGamecube": ""
             },
             "controlsNewProfile": "",
             "phraseNewProfOldJoy": "",
@@ -799,7 +808,9 @@
             "gray-bricks": "",
             "shoe-block": "",
             "rainbow-surf": "",
-            "heavy-duck": ""
+            "heavy-duck": "",
+            "pound-altrun": "",
+            "pound-down": ""
         },
         "message": {
             "scanningLevels": ""

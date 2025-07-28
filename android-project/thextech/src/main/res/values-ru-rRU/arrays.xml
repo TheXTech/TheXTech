@@ -14,4 +14,7 @@
     <string name="batteryStatusShow1">Показывать при слабом заряде</string>
     <string name="batteryStatusShow2">Показывать всегда</string>
     <string name="rendererDefault">По-умолчанию</string>
+    <string name="rendererGles" translatable="false"></string>
+    <string name="rendererGles11" translatable="false"></string>
+    <string name="rendererSdl" translatable="false"></string>
 </resources>
