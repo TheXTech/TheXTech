@@ -352,7 +352,11 @@
             "errorInvalidEnterWarp": "========= ERRO! ==========\n\nNão foi possível iniciar o nível devido a um teleporte de entrada invalido em {1}.\nTotal de entradas no teleporte: {2}\n\nFicheiro: {0}",
             "errorNoStartPoint": "========= ERRO! ==========\n\nNão foi possível iniciar o nível por este nível não conter ponto de inicio ou entradas de teleporte especificadas.\n\nFicheiro: {0}",
             "openFileFailed": "ERRO: \"{0}\" nao foi aberto: Ficheiro inexistente ou corrompido.",
-            "warpNeedStarCount": "Precisa de\n{0} {1} para entrar."
+            "warpNeedStarCount": "Precisa de\n{0} {1} para entrar.",
+            "errorTooOldGameAssets": "",
+            "openIPCDataFailed": "",
+            "IPCTimeOut": "",
+            "errorTooOldEngine": ""
         },
         "hint": {
             "no-lives-new": "",
@@ -369,7 +373,24 @@
             "sysInfoTitle": "",
             "sysInfoWarning": "",
             "sysInfoError": ""
-        }
+        },
+        "loader": {
+            "statusLoadData": "",
+            "statusGameInfo": "",
+            "statusLoadFile": "",
+            "statusFinishing": "",
+            "statusAssetPacks": "",
+            "statusTranslations": ""
+        },
+        "ipcStatus": {
+            "loadingdone": "",
+            "dataAccepted": "",
+            "dataTransferStarted": "",
+            "errorTimeout": "",
+            "dataValid": "",
+            "waitingInput": ""
+        },
+        "screenPaused": ""
     },
     "menu": {
         "abbrevMilliseconds": "MS",
@@ -649,10 +670,22 @@
                 "audio-enable": "",
                 "use-native-osk": "",
                 "fullscreen-type": {
-                    "_name": ""
+                    "_name": "",
+                    "exclusive": "",
+                    "desktop-tip": "",
+                    "desktop": "",
+                    "exclusive-tip": "",
+                    "auto": ""
                 },
                 "inaccurate-gifs-tip": "",
-                "inaccurate-gifs": ""
+                "inaccurate-gifs": "",
+                "fullscreen-depth": {
+                    "16": "",
+                    "auto": "",
+                    "_name": "",
+                    "32": ""
+                },
+                "fullscreen-res": ""
             },
             "main": {
                 "two-screen-mode": {
@@ -741,7 +774,8 @@
                     "center": "",
                     "linear": "",
                     "nearest": "",
-                    "full": ""
+                    "full": "",
+                    "3x": ""
                 },
                 "show-episode-title": {
                     "bottom-tip": "",
