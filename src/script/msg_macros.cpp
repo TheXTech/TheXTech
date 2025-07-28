@@ -120,13 +120,13 @@ static CondCmd enumerateCmd(const std::string &token)
         ret = CondCmd_Else;
     else if(token == "endif")
         ret = CondCmd_Endif;
-    else if(token == "iw_if")
+    else if(token == "if_iw")
         ret = CondCmd_IW_If;
-    else if(token == "in_if")
+    else if(token == "if_in")
         ret = CondCmd_IN_If;
-    else if(token == "iw_endif")
+    else if(token == "endif_iw")
         ret = CondCmd_IW_Endif;
-    else if(token == "in_endif")
+    else if(token == "endif_in")
         ret = CondCmd_IN_Endif;
     else
         ret = CondCmd_Unknown;
