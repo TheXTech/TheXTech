@@ -14,7 +14,4 @@
     <string name="batteryStatusShow1">Mostrar caso a bateria esteja baixa</string>
     <string name="batteryStatusShow2">Exibir sempre</string>
     <string name="rendererDefault">Padrão</string>
-    <string name="rendererGles" translatable="false"></string>
-    <string name="rendererGles11" translatable="false"></string>
-    <string name="rendererSdl" translatable="false"></string>
 </resources>

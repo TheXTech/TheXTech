@@ -14,7 +14,4 @@
     <string name="batteryStatusShow2">显示</string>
     <string name="batteryStatusShow1">仅在电池电量低时显示</string>
     <string name="rendererDefault">默认</string>
-    <string name="rendererGles" translatable="false"></string>
-    <string name="rendererGles11" translatable="false"></string>
-    <string name="rendererSdl" translatable="false"></string>
 </resources>

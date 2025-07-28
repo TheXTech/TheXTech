@@ -1,20 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="rendererGles" translatable="false"></string>
-    <string name="touchscreenControllerType1"></string>
-    <string name="rendererGles11" translatable="false"></string>
-    <string name="rendererDefault"></string>
-    <string name="speedRunMode2"></string>
-    <string name="speedRunMode0"></string>
-    <string name="batteryStatusShow2"></string>
-    <string name="batteryStatusShow1"></string>
-    <string name="rendererSdl" translatable="false"></string>
-    <string name="touchPadStyle2"></string>
-    <string name="speedRunMode3"></string>
-    <string name="speedRunMode1"></string>
-    <string name="touchscreenControllerType2"></string>
-    <string name="touchscreenControllerType0"></string>
-    <string name="touchPadStyle1"></string>
-    <string name="touchPadStyle0"></string>
-    <string name="batteryStatusShow0"></string>
-</resources>
+    </resources>
