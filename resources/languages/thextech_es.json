@@ -412,8 +412,20 @@
                 "inaccurate-gifs-tip": "Permite efecto 3D cuando hay imagenes GIF",
                 "inaccurate-gifs": "GIF inexactos",
                 "fullscreen-type": {
-                    "_name": ""
-                }
+                    "_name": "",
+                    "exclusive": "",
+                    "desktop-tip": "",
+                    "desktop": "",
+                    "exclusive-tip": "",
+                    "auto": ""
+                },
+                "fullscreen-depth": {
+                    "16": "",
+                    "auto": "",
+                    "_name": "",
+                    "32": ""
+                },
+                "fullscreen-res": ""
             },
             "audio": {
                 "sfx-audio-fx": "Efectos de eco",
@@ -476,7 +488,8 @@
                     "full": "Completa",
                     "center": "Centrada",
                     "linear": "Lineal",
-                    "integer": "Entera"
+                    "integer": "Entera",
+                    "3x": ""
                 },
                 "info-game": "Info. en pantalla de juego",
                 "show-playtime-counter": {
@@ -798,7 +811,11 @@
             "errorInvalidEnterWarp": "Imposible comenzar el nivel debido a que un pasaje de entrada inválido {1} fue especificado.\nTotal Pasajes de Entrada: {2}\n\nArchivo: {0}",
             "openFileFailed": "Imposible abrir \"{0}\": El archivo está corrupto o no existe.",
             "warpNeedStarCount": "Necesitas {0} {1} para entrar.",
-            "errorNoStartPoint": "Imposible empezar nivel debido a que no hay puntos de comienzo colocados ni pasajes de entrada especificados.\n\nArchivo: {0}"
+            "errorNoStartPoint": "Imposible empezar nivel debido a que no hay puntos de comienzo colocados ni pasajes de entrada especificados.\n\nArchivo: {0}",
+            "errorTooOldGameAssets": "",
+            "openIPCDataFailed": "",
+            "IPCTimeOut": "",
+            "errorTooOldEngine": ""
         },
         "pause": {
             "restartLevel": "Reiniciar Nivel",
@@ -833,7 +850,24 @@
             "sysInfoWarning": "¡Aviso!",
             "sysInfoTitle": "Información",
             "sysInfoError": "¡Error!"
-        }
+        },
+        "loader": {
+            "statusLoadData": "",
+            "statusGameInfo": "",
+            "statusLoadFile": "",
+            "statusFinishing": "",
+            "statusAssetPacks": "",
+            "statusTranslations": ""
+        },
+        "ipcStatus": {
+            "loadingdone": "",
+            "dataAccepted": "",
+            "dataTransferStarted": "",
+            "errorTimeout": "",
+            "dataValid": "",
+            "waitingInput": ""
+        },
+        "screenPaused": ""
     },
     "languageName": "Español"
 }

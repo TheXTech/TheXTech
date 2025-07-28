@@ -23,7 +23,11 @@
             "warpNeedStarCount": "",
             "errorInvalidEnterWarp": "",
             "openFileFailed": "",
-            "errorNoStartPoint": ""
+            "errorNoStartPoint": "",
+            "errorTooOldGameAssets": "",
+            "openIPCDataFailed": "",
+            "IPCTimeOut": "",
+            "errorTooOldEngine": ""
         },
         "hint": {
             "pound-altrun": "",
@@ -54,11 +58,27 @@
             "saveAndContinue": "",
             "saveAndQuit": ""
         },
-        "screenPaused": "ポーズ中",
+        "screenPaused": "",
         "msgbox": {
             "sysInfoWarning": "",
             "sysInfoTitle": "",
             "sysInfoError": ""
+        },
+        "loader": {
+            "statusLoadData": "",
+            "statusGameInfo": "",
+            "statusLoadFile": "",
+            "statusFinishing": "",
+            "statusAssetPacks": "",
+            "statusTranslations": ""
+        },
+        "ipcStatus": {
+            "loadingdone": "",
+            "dataAccepted": "",
+            "dataTransferStarted": "",
+            "errorTimeout": "",
+            "dataValid": "",
+            "waitingInput": ""
         }
     },
     "languageName": "",
@@ -236,7 +256,7 @@
             "gameEraseSlot": "",
             "gameNoBattleLevels": "",
             "gameNoEpisodesToPlay": "",
-            "warnEpCompat": "このエピソードはほかのSMBXバージョン向けにつくられているため うまく遊べないかもしれません。",
+            "warnEpCompat": "",
             "gameSlotContinue": "",
             "gameSlotNew": "",
             "gameSourceSlot": "",
@@ -331,17 +351,21 @@
                 },
                 "fullscreen-type": {
                     "_name": "",
-                    "auto": "自動",
-                    "desktop": "デスクトップ",
-                    "desktop-tip": "現在の画面解像度を保持します。",
-                    "exclusive": "限定的",
-                    "exclusive-tip": "物理的に画面解像度を変更します。"
+                    "auto": "",
+                    "desktop": "",
+                    "desktop-tip": "",
+                    "exclusive": "",
+                    "exclusive-tip": ""
                 },
                 "fullscreen-depth": {
-                    "auto": "自動"
+                    "auto": "",
+                    "16": "",
+                    "_name": "",
+                    "32": ""
                 },
                 "choose-assets-on-launch": "",
-                "use-native-osk": ""
+                "use-native-osk": "",
+                "fullscreen-res": ""
             },
             "audio": {
                 "_header": "",
@@ -445,7 +469,8 @@
                     "center": "",
                     "0_5x": "",
                     "2x": "",
-                    "1x": ""
+                    "1x": "",
+                    "3x": ""
                 },
                 "show-episode-title": {
                     "_name": "",

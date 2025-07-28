@@ -40,4 +40,5 @@
     <string name="launcher_gameselect_toast_selected">Játék váltva: %s</string>
     <string name="setup_renderer_label"></string>
     <string name="launcher_openfile_indirectly"></string>
+    <string name="app_name" translatable="false"></string>
 </resources>

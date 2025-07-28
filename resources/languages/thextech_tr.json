@@ -334,7 +334,11 @@
             "openFileFailed": "",
             "warpNeedStarCount": "",
             "errorInvalidEnterWarp": "",
-            "errorNoStartPoint": ""
+            "errorNoStartPoint": "",
+            "errorTooOldGameAssets": "",
+            "openIPCDataFailed": "",
+            "IPCTimeOut": "",
+            "errorTooOldEngine": ""
         },
         "pause": {
             "continue": "",
@@ -369,7 +373,24 @@
             "sysInfoWarning": "",
             "sysInfoError": "",
             "sysInfoTitle": ""
-        }
+        },
+        "loader": {
+            "statusLoadData": "",
+            "statusGameInfo": "",
+            "statusLoadFile": "",
+            "statusFinishing": "",
+            "statusAssetPacks": "",
+            "statusTranslations": ""
+        },
+        "ipcStatus": {
+            "loadingdone": "",
+            "dataAccepted": "",
+            "dataTransferStarted": "",
+            "errorTimeout": "",
+            "dataValid": "",
+            "waitingInput": ""
+        },
+        "screenPaused": ""
     },
     "languageName": "Türkçe",
     "menu": {
@@ -649,10 +670,22 @@
                 "record-gameplay-data": "",
                 "use-native-osk": "",
                 "fullscreen-type": {
-                    "_name": ""
+                    "_name": "",
+                    "exclusive": "",
+                    "desktop-tip": "",
+                    "desktop": "",
+                    "exclusive-tip": "",
+                    "auto": ""
                 },
                 "inaccurate-gifs-tip": "",
-                "inaccurate-gifs": ""
+                "inaccurate-gifs": "",
+                "fullscreen-depth": {
+                    "16": "",
+                    "auto": "",
+                    "_name": "",
+                    "32": ""
+                },
+                "fullscreen-res": ""
             },
             "episode-options": {
                 "creator-compat": {
@@ -724,7 +757,8 @@
                     "nearest": "",
                     "full": "",
                     "linear": "",
-                    "integer": ""
+                    "integer": "",
+                    "3x": ""
                 },
                 "info-meta": "",
                 "show-episode-title": {

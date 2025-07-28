@@ -75,10 +75,22 @@
                 "audio-enable": "",
                 "use-native-osk": "",
                 "fullscreen-type": {
-                    "_name": ""
+                    "_name": "",
+                    "exclusive": "",
+                    "desktop-tip": "",
+                    "desktop": "",
+                    "exclusive-tip": "",
+                    "auto": ""
                 },
                 "inaccurate-gifs-tip": "",
-                "inaccurate-gifs": ""
+                "inaccurate-gifs": "",
+                "fullscreen-depth": {
+                    "16": "",
+                    "auto": "",
+                    "_name": "",
+                    "32": ""
+                },
+                "fullscreen-res": ""
             },
             "episode-options": {
                 "creator-compat": {
@@ -159,7 +171,8 @@
                     "1x": "",
                     "linear": "",
                     "nearest": "",
-                    "0_5x": ""
+                    "0_5x": "",
+                    "3x": ""
                 },
                 "display-controllers": "",
                 "info-game": "",
@@ -799,7 +812,11 @@
             "warpNeedStarCount": "",
             "errorInvalidEnterWarp": "",
             "openFileFailed": "",
-            "errorNoStartPoint": ""
+            "errorNoStartPoint": "",
+            "errorTooOldGameAssets": "",
+            "openIPCDataFailed": "",
+            "IPCTimeOut": "",
+            "errorTooOldEngine": ""
         },
         "hint": {
             "no-lives-new": "",
@@ -819,7 +836,24 @@
             "sysInfoWarning": "",
             "sysInfoTitle": "",
             "sysInfoError": ""
-        }
+        },
+        "loader": {
+            "statusLoadData": "",
+            "statusGameInfo": "",
+            "statusLoadFile": "",
+            "statusFinishing": "",
+            "statusAssetPacks": "",
+            "statusTranslations": ""
+        },
+        "ipcStatus": {
+            "loadingdone": "",
+            "dataAccepted": "",
+            "dataTransferStarted": "",
+            "errorTimeout": "",
+            "dataValid": "",
+            "waitingInput": ""
+        },
+        "screenPaused": ""
     },
     "outro": {
         "qualityControl": "",
