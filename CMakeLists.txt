@@ -1277,6 +1277,13 @@ list(APPEND THEXTECH_SRC ${THEXTECH_EXTRA_RESOURCES})
 set_source_files_properties(${THEXTECH_EXTRA_RESOURCES} PROPERTIES HEADER_FILE_ONLY ON)
 source_group("Resources" FILES ${THEXTECH_EXTRA_RESOURCES})
 
+# ------------------ Unit tests ----------------------
+option(WITH_UNIT_TESTS "Enable unit testing" OFF)
+if(WITH_UNIT_TESTS)
+    enable_testing()
+    add_subdirectory(test)
+endif()
+
 # ----------------------------------------------------
 
 if(WIN32 AND NOT EMSCRIPTEN)
