@@ -21,7 +21,7 @@
         },
         "error": {
             "warpNeedStarCount": "",
-            "errorInvalidEnterWarp": "",
+            "errorInvalidEnterWarp": "無効な入口ワープ{1}が指定されたため、コースを開始できませんでした。\nワープエントリの合計数: {2}\n\nファイルパス: {0}",
             "openFileFailed": "",
             "errorNoStartPoint": "",
             "errorTooOldGameAssets": "",
@@ -47,7 +47,7 @@
             "minutesSeconds": ""
         },
         "pause": {
-            "continue": "",
+            "continue": "ゲームを つづける",
             "playerSetup": "",
             "enterCode": "",
             "quit": "",
@@ -153,15 +153,15 @@
                 "cStick": "",
                 "dPad": "",
                 "tStick": "",
-                "buttonY": "",
-                "buttonB": "",
-                "buttonZL": "",
-                "casePen": "",
-                "buttonZR": "",
-                "buttonA": "",
-                "buttonX": "",
-                "buttonL": "",
-                "buttonR": ""
+                "buttonY": "Y",
+                "buttonB": "B",
+                "buttonZL": "ZL",
+                "casePen": "(タッチペン)",
+                "buttonZR": "ZR",
+                "buttonA": "A",
+                "buttonX": "X",
+                "buttonL": "L",
+                "buttonR": "R"
             },
             "touchscreen": {
                 "layout": {
@@ -188,8 +188,8 @@
                 },
                 "style": {
                     "actions": "",
-                    "XODA": "",
-                    "ABXY": ""
+                    "XODA": "XODA",
+                    "ABXY": "ABXY"
                 }
             },
             "types": {
@@ -201,7 +201,7 @@
             "wii": {
                 "phraseNewClassic": "",
                 "phraseNewNunchuck": "",
-                "typeClassic": "",
+                "typeClassic": "クラシック コントローラー",
                 "typeNunchuck": "",
                 "typeWiimote": "",
                 "typeGamecube": "",
@@ -209,7 +209,7 @@
                     "buttonHome": "",
                     "dPad": "",
                     "shake": "",
-                    "caseIR": "",
+                    "caseIR": "(センサー)",
                     "buttonPlus": "",
                     "buttonMinus": "",
                     "button1": "",
@@ -483,7 +483,7 @@
                 "3d-compat-mode": "",
                 "3d-compat-mode-tip": "",
                 "show-fails-counter": "",
-                "show-fails-counter-tip": "",
+                "show-fails-counter-tip": "現在のコースとエピソード全体でのそれぞれの合計ミス数を表示します。",
                 "show-fps": "",
                 "show-medals-counter": "",
                 "show-medals-counter-tip": "",
@@ -535,7 +535,7 @@
         "wordWaiting": "",
         "wordYes": "",
         "character": {
-            "selectCharacter": ""
+            "selectCharacter": "{0} game"
         },
         "editor": {
             "makeFor": "",
@@ -556,7 +556,7 @@
         "psVitaPortBy": "",
         "qualityControl": "",
         "specialThanks": "",
-        "nameAndrewSpinks": ""
+        "nameAndrewSpinks": "アンドリュー・スピンクス"
     },
     "pluralRules": "",
     "editor": {
