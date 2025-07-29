@@ -22,6 +22,14 @@
 #include <vector>
 #include "msg_macros.h"
 
+#ifdef MOONDUST_MSG_MACROS_ERROR_HANDLING
+#   define MSG_MACRO_ERROR_ARG , MsgMacroErrors *error
+#   define MSG_MACRO_ERROR_FWD_ARG , error
+#else
+#   define MSG_MACRO_ERROR_ARG
+#   define MSG_MACRO_ERROR_FWD_ARG
+#endif
+
 #ifndef MOONDUST_UNIT_TEST
 static
 #endif
@@ -172,9 +180,10 @@ static void toLower(std::string &n)
         c = std::tolower(c);
 }
 
-static bool check_cond_if(const std::vector<std::string> &tokens, bool needElif, CondCmd &ret_cmd, CondFunc &ret_func, std::vector<int> &values)
+static bool check_cond_if(const std::vector<std::string> &tokens, bool needElif, CondCmd &ret_cmd, CondFunc &ret_func, std::vector<int> &values MSG_MACRO_ERROR_ARG)
 {
     bool wantComma = false;
+    bool parenOpen = false;
     std::string cond, func;
 
     values.clear();
@@ -188,18 +197,61 @@ static bool check_cond_if(const std::vector<std::string> &tokens, bool needElif,
     ret_cmd = enumerateCmd(cond);
 
     if(!needElif && ret_cmd != CondCmd_If && ret_cmd != CondCmd_IW_If && ret_cmd != CondCmd_IN_If)
+    {
+#ifdef MOONDUST_MSG_MACROS_ERROR_HANDLING
+        if(error && *error == MSG_MACRO_ERROR_OK)
+        {
+            if(ret_cmd == CondCmd_Unknown)
+                *error = MSG_MACRO_ERROR_UNKNOWN_CMD;
+        }
+#endif
         return false;
+    }
 
     if(needElif && ret_cmd != CondCmd_Elif)
+    {
+#ifdef MOONDUST_MSG_MACROS_ERROR_HANDLING
+        if(error && *error == MSG_MACRO_ERROR_OK)
+        {
+            if(ret_cmd == CondCmd_Unknown)
+                *error = MSG_MACRO_ERROR_UNKNOWN_CMD;
+        }
+#endif
         return false;
+    }
 
-    if(tokens.size() < 5)
+#ifdef MOONDUST_MSG_MACROS_ERROR_HANDLING
+    if(tokens.size() < 3)
+    {
+        if(error && *error == MSG_MACRO_ERROR_OK && tokens.size() > 1)
+            *error = MSG_MACRO_ERROR_BAD_CMD_SYNTAX;
+    }
+#endif
+
+    if(tokens.size() < 4)
+    {
+#ifdef MOONDUST_MSG_MACROS_ERROR_HANDLING
+        if(error && *error == MSG_MACRO_ERROR_OK)
+            *error = MSG_MACRO_ERROR_BAD_FUNC_SYNTAX;
+#endif
         return false;
+    }
 
     func = tokens[1];
     toLower(func);
 
     ret_func = enumerateFunc(func);
+
+    if(tokens[2] != "(")
+    {
+#ifdef MOONDUST_MSG_MACROS_ERROR_HANDLING
+        if(error && *error == MSG_MACRO_ERROR_OK)
+            *error = MSG_MACRO_ERROR_BAD_FUNC_SYNTAX;
+#endif
+        return false;
+    }
+
+    parenOpen = true;
 
     for(size_t i = 3; i < tokens.size(); ++i)
     {
@@ -208,12 +260,26 @@ static bool check_cond_if(const std::vector<std::string> &tokens, bool needElif,
         if(wantComma)
         {
             if(s != "," && s != ")")
+            {
+#ifdef MOONDUST_MSG_MACROS_ERROR_HANDLING
+                if(error && *error == MSG_MACRO_ERROR_OK)
+                    *error = MSG_MACRO_ERROR_BAD_FUNC_SYNTAX;
+#endif
                 return false;
+            }
 
             if(s == ")") // Arguments parsing done
             {
                 if(i != tokens.size() - 1)
+                {
+#ifdef MOONDUST_MSG_MACROS_ERROR_HANDLING
+                    if(error && *error == MSG_MACRO_ERROR_OK)
+                        *error = MSG_MACRO_ERROR_EXTRA_SYMBOLS_AT_END;
+#endif
                     return false;
+                }
+
+                parenOpen = false;
 
                 break;
             }
@@ -223,42 +289,78 @@ static bool check_cond_if(const std::vector<std::string> &tokens, bool needElif,
         else
         {
             if(!isUNum(s))
+            {
+#ifdef MOONDUST_MSG_MACROS_ERROR_HANDLING
+                if(error && *error == MSG_MACRO_ERROR_OK)
+                    *error = MSG_MACRO_ERROR_BAD_FUNC_ARGS;
+#endif
                 return false;
+            }
 
             wantComma = true;
             values.push_back(std::atoi(s.c_str()));
         }
     }
 
+    if(parenOpen)
+    {
+#ifdef MOONDUST_MSG_MACROS_ERROR_HANDLING
+        if(error && *error == MSG_MACRO_ERROR_OK)
+            *error = MSG_MACRO_ERROR_BAD_FUNC_SYNTAX;
+#endif
+    }
+
     return !values.empty();
 }
 
-static bool check_cond_else(const std::vector<std::string> &tokens, CondCmd &ret_cmd)
+static bool check_cond_else(const std::vector<std::string> &tokens, CondCmd &ret_cmd MSG_MACRO_ERROR_ARG)
 {
     std::string cond;
 
     if(tokens.empty() || tokens.size() > 1)
+    {
+#ifdef MOONDUST_MSG_MACROS_ERROR_HANDLING
+        if(error && *error == MSG_MACRO_ERROR_OK && tokens.size() > 1)
+            *error = MSG_MACRO_ERROR_BAD_CMD_SYNTAX;
+#endif
         return false;
+    }
 
     cond = tokens[0];
     toLower(cond);
 
     ret_cmd = enumerateCmd(cond);
+
+#ifdef MOONDUST_MSG_MACROS_ERROR_HANDLING
+    if(error && *error == MSG_MACRO_ERROR_OK && ret_cmd == CondCmd_Unknown)
+        *error = MSG_MACRO_ERROR_UNKNOWN_CMD;
+#endif
 
     return ret_cmd == CondCmd_Else;
 }
 
-static bool check_cond_endif(const std::vector<std::string> &tokens, CondCmd &ret_cmd)
+static bool check_cond_endif(const std::vector<std::string> &tokens, CondCmd &ret_cmd MSG_MACRO_ERROR_ARG)
 {
     std::string cond;
 
     if(tokens.empty() || tokens.size() > 1)
+    {
+#ifdef MOONDUST_MSG_MACROS_ERROR_HANDLING
+        if(error && *error == MSG_MACRO_ERROR_OK && tokens.size() > 1)
+            *error = MSG_MACRO_ERROR_BAD_CMD_SYNTAX;
+#endif
         return false;
+    }
 
     cond = tokens[0];
     toLower(cond);
 
     ret_cmd = enumerateCmd(cond);
+
+#ifdef MOONDUST_MSG_MACROS_ERROR_HANDLING
+    if(error && *error == MSG_MACRO_ERROR_OK && ret_cmd == CondCmd_Unknown)
+        *error = MSG_MACRO_ERROR_UNKNOWN_CMD;
+#endif
 
     return ret_cmd == CondCmd_Endif || ret_cmd == CondCmd_IW_Endif || ret_cmd == CondCmd_IN_Endif;
 }
@@ -287,7 +389,7 @@ static CondLineTail replace_newline(CondCmd cmd)
     }
 }
 
-void msgMacroProcess(const std::string &in, std::string &ret, int macro_player, int macro_state)
+void msgMacroProcess(const std::string &in, std::string &ret, int macro_player, int macro_state MSG_MACRO_ERROR_ARG)
 {
     struct State
     {
@@ -296,6 +398,11 @@ void msgMacroProcess(const std::string &in, std::string &ret, int macro_player, 
         bool skip_to_endif = false;
         CondCmd init_cmd = CondCmd_Unknown;
     };
+
+#ifdef MOONDUST_MSG_MACROS_ERROR_HANDLING
+    if(error)
+        *error = MSG_MACRO_ERROR_OK;
+#endif
 
     if(in.empty())
         return;
@@ -330,7 +437,7 @@ void msgMacroProcess(const std::string &in, std::string &ret, int macro_player, 
 
         hasMacro = msgMacroParseTokens(t, tokens);
 
-        if(hasMacro && check_cond_if(tokens, st.open, e_cmd, e_func, values))
+        if(hasMacro && check_cond_if(tokens, st.open, e_cmd, e_func, values MSG_MACRO_ERROR_FWD_ARG))
         {
             bool isValid = true;
             st.cond_true = false;
@@ -371,6 +478,10 @@ void msgMacroProcess(const std::string &in, std::string &ret, int macro_player, 
             }
             else // invalid line
             {
+#ifdef MOONDUST_MSG_MACROS_ERROR_HANDLING
+                if(error && *error == MSG_MACRO_ERROR_OK && e_func == CondFunc_Unknown)
+                    *error = MSG_MACRO_ERROR_UNKNOWN_FUNC;
+#endif
                 isValid = false;
                 if(!ret.empty())
                     ret.push_back('\n');
@@ -380,14 +491,14 @@ void msgMacroProcess(const std::string &in, std::string &ret, int macro_player, 
             if(!isValid)
                 st.init_cmd = CondCmd_Unknown;
         }
-        else if(hasMacro && st.open && check_cond_endif(tokens, e_cmd))
+        else if(hasMacro && st.open && check_cond_endif(tokens, e_cmd MSG_MACRO_ERROR_FWD_ARG))
         {
             st.open = false;
             st.cond_true = false;
             st.skip_to_endif = false;
             st.init_cmd = e_cmd;
         }
-        else if(hasMacro && st.open && check_cond_else(tokens, e_cmd))
+        else if(hasMacro && st.open && check_cond_else(tokens, e_cmd MSG_MACRO_ERROR_FWD_ARG))
         {
             st.open = true;
             st.cond_true = !st.skip_to_endif;
