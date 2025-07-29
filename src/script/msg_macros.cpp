@@ -294,6 +294,7 @@ void msgMacroProcess(const std::string &in, std::string &ret, int macro_player, 
         bool open = false;
         bool cond_true = false;
         bool skip_to_endif = false;
+        CondCmd init_cmd = CondCmd_Unknown;
     };
 
     if(in.empty())
@@ -337,6 +338,9 @@ void msgMacroProcess(const std::string &in, std::string &ret, int macro_player, 
             if(st.open && st.skip_to_endif)
                 continue;
 
+            if(e_cmd == CondCmd_If || e_cmd == CondCmd_IW_If || e_cmd == CondCmd_IN_If)
+                st.init_cmd = e_cmd;
+
             if(e_func == CondFunc_Player) // check whaever player
             {
                 st.open = true;
@@ -373,15 +377,15 @@ void msgMacroProcess(const std::string &in, std::string &ret, int macro_player, 
                 ret.append(t);
             }
 
-            if(isValid)
-                tail = replace_newline(e_cmd);
+            if(!isValid)
+                st.init_cmd = CondCmd_Unknown;
         }
         else if(hasMacro && st.open && check_cond_endif(tokens, e_cmd))
         {
             st.open = false;
             st.cond_true = false;
             st.skip_to_endif = false;
-            tail = replace_newline(e_cmd);
+            st.init_cmd = e_cmd;
         }
         else if(hasMacro && st.open && check_cond_else(tokens, e_cmd))
         {
@@ -396,6 +400,9 @@ void msgMacroProcess(const std::string &in, std::string &ret, int macro_player, 
         {
             if(!ret.empty())
             {
+                tail = replace_newline(st.init_cmd);
+                st.init_cmd = CondCmd_Unknown;
+
                 switch(tail)
                 {
                 case COND_LineTail_NewLine:
