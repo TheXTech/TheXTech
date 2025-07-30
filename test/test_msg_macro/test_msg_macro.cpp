@@ -323,11 +323,13 @@ TEST_CASE("[message-box text macros] Error handling")
     SECTION("Unknown function")
     {
         testMessageValidness("Hello!\n#if drillingneighbour(1)\nYou are plumber?!\n#else\nWho are you?\n#endif\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_UNKNOWN_FUNC);
+        testMessageValidness("Hello!\n#if drillingneighbour(1) , some\nYou are plumber?!\n#else\nWho are you?\n#endif\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_UNKNOWN_FUNC);
     }
 
 
     SECTION("Bad function syntax")
     {
+        testMessageValidness("Hello!\n#if player\nYou are plumber?!\n#elif player(2)\nWho are you?\n#endif\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_BAD_FUNC_SYNTAX);
         testMessageValidness("Hello!\n#if player(\nYou are plumber?!\n#elif player(2)\nWho are you?\n#endif\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_BAD_FUNC_SYNTAX);
         testMessageValidness("Hello!\n#if player(1)\nYou are plumber?!\n#elif player)\nWho are you?\n#endif\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_BAD_FUNC_SYNTAX);
         testMessageValidness("Hello!\n#if player)1)\nYou are plumber?!\n#else\nWho are you?\n#endif\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_BAD_FUNC_SYNTAX);
@@ -347,13 +349,18 @@ TEST_CASE("[message-box text macros] Error handling")
     SECTION("Junk at end of line")
     {
         testMessageValidness("Hello!\n#if player(1)мыши\nYou are plumber?!\n#else\nWho are you?\n#endif\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_EXTRA_SYMBOLS_AT_END);
-        testMessageValidness("Hello!\n#if player(1)\nYou are plumber?!\n#elif plazer(  3331, 31) , some\nWho are you?\n#endif\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_EXTRA_SYMBOLS_AT_END);
+        testMessageValidness("Hello!\n#if player(1)\nYou are plumber?!\n#elif player(  3331, 31) , some\nWho are you?\n#endif\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_EXTRA_SYMBOLS_AT_END);
+        testMessageValidness("Hello!\n#if player(1)\nYou are plumber?!\n#else player(2)\nWho are you?\n#endif\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_EXTRA_SYMBOLS_AT_END);
+        testMessageValidness("Hello!\n#if player(1)\nYou are plumber?!\n#else\nWho are you?\n#endif player(2)\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_EXTRA_SYMBOLS_AT_END);
     }
 
-    SECTION("Bad use of else and endif")
+    SECTION("Illegal command")
     {
-        testMessageValidness("Hello!\n#if player\nYou are plumber?!\n#elif player(2)\nWho are you?\n#endif\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_BAD_CMD_SYNTAX);
-        testMessageValidness("Hello!\n#if player(1)\nYou are plumber?!\n#else player(2)\nWho are you?\n#endif\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_BAD_CMD_SYNTAX);
-        testMessageValidness("Hello!\n#if player(1)\nYou are plumber?!\n#else\nWho are you?\n#endif player(2)\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_BAD_CMD_SYNTAX);
+        testMessageValidness("Hello!\n#elif player(1)\nYou are plumber?!\n#else\nWho are you?\n#endif\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_ILLEGAL_CMD);
+        testMessageValidness("Hello!\n#else\nYou are plumber?!\nWho are you?\n#endif\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_ILLEGAL_CMD);
+        testMessageValidness("Hello!\n#if player(1)\nYou are plumber?!\n#else\nWho are you?\n#else\nWho are you really?\n#endif\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_ILLEGAL_CMD);
+        testMessageValidness("Hello!\n#if player(1)\nYou are plumber?!\n#else\nWho are you?\n#elif player(2)\nL is real...ly out of order\n#endif\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_ILLEGAL_CMD);
+        testMessageValidness("Hello!\n#endif\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_ILLEGAL_CMD);
+        testMessageValidness("Hello!\n#if player(1)\nYou are plumber?!\n#if player(2)\nsecond if without finishing first\n#endif\nI have nothing to tell you!", 1, -1, MSG_MACRO_ERROR_ILLEGAL_CMD);
     }
 }
