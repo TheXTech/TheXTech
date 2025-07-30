@@ -25,7 +25,7 @@
 
 #ifdef MOONDUST_MSG_MACROS_ERROR_HANDLING
 #   define MSG_MACRO_ERROR_ARG , MsgMacroErrors *error
-#   define D_ERROR(arg) *error = arg
+#   define D_ERROR(arg) if(error) *error = arg
 #   define D_ELSE_SEEN(arg) else_seen = arg
 #   define D_CHECK_ELSE_SEEN else_seen
 #else
