@@ -20,13 +20,13 @@
             "wordDisconnect": ""
         },
         "error": {
-            "warpNeedStarCount": "",
+            "warpNeedStarCount": "ここに入るには {0}個の{1}がひつようです。",
             "errorInvalidEnterWarp": "無効な入口ワープ{1}が指定されたため、コースを開始できませんでした。\nワープエントリの合計数: {2}\n\nファイルパス: {0}",
-            "openFileFailed": "",
-            "errorNoStartPoint": "",
+            "openFileFailed": "\"{0}\"をひらけませんでした。\nファイルが存在しないか、こわれています。",
+            "errorNoStartPoint": "利用可能なスタートポイント、または入口ワープがセットされていないため、コースを開始できませんでした。\n\nファイルパス:{0}",
             "errorTooOldGameAssets": "",
             "openIPCDataFailed": "",
-            "IPCTimeOut": "",
+            "IPCTimeOut": "エディターからの反応がありませんでした。ゲームを終了します。",
             "errorTooOldEngine": ""
         },
         "hint": {
@@ -38,7 +38,7 @@
             "char5-bombs": "",
             "heavy-duck": "",
             "shoe-block": "",
-            "gray-bricks": ""
+            "gray-bricks": "いくつかのブロックは\nとくしゅなアイテムで\nこわせるぞ！"
         },
         "message": {
             "scanningLevels": ""
@@ -58,30 +58,30 @@
             "saveAndContinue": "",
             "saveAndQuit": ""
         },
-        "screenPaused": "",
+        "screenPaused": "ポーズちゅう",
         "msgbox": {
             "sysInfoWarning": "",
             "sysInfoTitle": "",
             "sysInfoError": ""
         },
         "loader": {
-            "statusLoadData": "",
-            "statusGameInfo": "",
-            "statusLoadFile": "",
-            "statusFinishing": "",
-            "statusAssetPacks": "",
-            "statusTranslations": ""
+            "statusLoadData": "データを読み込み中...",
+            "statusGameInfo": "ゲーム情報",
+            "statusLoadFile": "ロード:{0}",
+            "statusFinishing": "完了中です...",
+            "statusAssetPacks": "アセットパック",
+            "statusTranslations": "翻訳"
         },
         "ipcStatus": {
-            "loadingdone": "",
+            "loadingdone": "完了しました。ゲームを開始中です...",
             "dataAccepted": "",
             "dataTransferStarted": "",
-            "errorTimeout": "",
+            "errorTimeout": "エラー:タイムアウトしました。",
             "dataValid": "",
-            "waitingInput": ""
+            "waitingInput": "入力データをまっています..."
         }
     },
-    "languageName": "",
+    "languageName": "日本語",
     "menu": {
         "abbrevMilliseconds": "",
         "battle": {
@@ -547,7 +547,7 @@
     },
     "outro": {
         "cppPortDevelopers": "",
-        "customSprites": "",
+        "customSprites": "カスタムスプライト",
         "engineCredits": "",
         "gameCredits": "",
         "levelDesign": "",
@@ -686,13 +686,13 @@
                 "headerToggle": ""
             },
             "desc": {
-                "activate": "",
-                "destroy": "",
-                "hit": "",
+                "activate": "NPCが画面に入ったとき",
+                "destroy": "ブロックが破壊されたとき",
+                "hit": "ブロックにヒットしたとき",
                 "layerClear": "",
-                "enter": "",
+                "enter": "ワープに入ったとき",
                 "phraseTriggersAfterTemplate": "",
-                "death": "",
+                "death": "NPCがやられたとき",
                 "phraseTriggersWhenTemplate": "",
                 "talk": ""
             },
@@ -714,9 +714,9 @@
             "headerTriggerEvent": "",
             "header": "",
             "deletion": {
-                "confirm": "",
-                "cancel": "",
-                "deletingEvent": ""
+                "confirm": "はい:イベントを さくじょする",
+                "cancel": "いいえ:イベントを さくじょしない",
+                "deletingEvent": "イベント {0}をさくじょ中..."
             },
             "controlsForEventN": "",
             "settingsForEvent": ""
@@ -783,23 +783,23 @@
             "inContainer": ""
         },
         "block": {
-            "invis": "",
-            "canBreak": "",
-            "letterHeight": "",
-            "letterWidth": "",
-            "slick": "",
-            "canBreakTooltip": "",
-            "pickContents": "",
-            "inside": ""
+            "invis": "とうめい化",
+            "canBreak": "破壊可能",
+            "letterHeight": "たて",
+            "letterWidth": "よこ",
+            "slick": "すべりやすい",
+            "canBreakTooltip": "レガシー:ヒット時に破壊",
+            "pickContents": "ブロックの中身を\nえらんでください",
+            "inside": "なかみ:"
         },
         "letterLeft": "",
         "browser": {
-            "askOverwriteFile": "",
-            "openFile": "",
-            "itemNewFolder": "",
-            "itemNewFile": "",
-            "saveFile": "",
-            "newFile": ""
+            "askOverwriteFile": "{0}を\n上書きして よろしいですか？",
+            "openFile": "ファイルを ひらく",
+            "itemNewFolder": "<あたらしい フォルダー>",
+            "itemNewFile": "<あたらしい ファイル>",
+            "saveFile": "ファイルを ほぞん",
+            "newFile": "あたらしい ファイル"
         },
         "level": {
             "startPos": "",
