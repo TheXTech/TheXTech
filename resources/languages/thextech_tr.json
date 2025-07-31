@@ -21,8 +21,8 @@
         "events": {
             "bounds": {
                 "changeAllSectionBoundsToCurrent": "Bütün kısımları buna dönüştür?",
-                "changeSectionBoundsToCurrent": "{0} kısımını buna dönüştür?",
-                "shouldEvent": ""
+                "changeSectionBoundsToCurrent": "{0} kısımının ayarlarını buna bağla?",
+                "shouldEvent": "{0} Olayı Şunu Yapmalı Mı"
             },
             "controlsForEventN": "'{0}' olayı için kontroller",
             "deletion": {
@@ -35,36 +35,36 @@
                 "death": "NPC ölür",
                 "destroy": "blok yok edildi",
                 "enter": "ışınlanma girildi",
-                "hit": "Bloğa vurulduğunda",
-                "layerClear": "obje katmanındaki her şey temizlenir",
-                "phraseTriggersAfterTemplate": "{2} yaşandıktan ms sonra {0} aktifleştirir {1}'i",
-                "phraseTriggersWhenTemplate": "{0}: {1} etkinleştir",
+                "hit": "bloğa vurulduğunda",
+                "layerClear": "obje katmanındaki her şey temizlendiğinde",
+                "phraseTriggersAfterTemplate": "{2} yaşandıktan ms sonra {0} etkinleştirir {1}'i",
+                "phraseTriggersWhenTemplate": "{1} {0}'i etkinleştir",
                 "talk": "NPC ile konuşulduğunda"
             },
             "header": "Olaylar:",
             "headerTriggerEvent": "Etkinleştir:",
             "itemNewEvent": "<Yeni Olay>",
             "label": {
-                "activate": "Aktifleştiğinde",
-                "death": "Öldüğünde",
+                "activate": "Aktifleştir",
+                "death": "Ölüm",
                 "destroy": "Yok Et",
-                "enter": "",
+                "enter": "Giriş",
                 "hit": "Vuruldu",
-                "layerClear": "Katmanı Temiz",
-                "next": "",
-                "talk": "Konuştuğunda"
+                "layerClear": "Katmanı Temizle",
+                "next": "Sonraki",
+                "talk": "Konuş"
             },
             "layers": {
-                "headerHide": "Sakla:",
+                "headerHide": "Gizle:",
                 "headerMove": "Hareket Ettir:",
                 "headerShow": "Göster:",
-                "headerToggle": ""
+                "headerToggle": "Geçiş Yap:"
             },
             "letter": {
                 "activate": "A:",
                 "death": "Ö:",
                 "destroy": "Y:",
-                "enter": "",
+                "enter": "G:",
                 "hit": "V:",
                 "layerClear": "Ka:",
                 "talk": "Ko:"
@@ -74,7 +74,7 @@
             "props": {
                 "autostart": "OtoBaşla",
                 "controls": "Kontroller",
-                "endGame": "",
+                "endGame": "Oyun sonu",
                 "sound": "Ses",
                 "layerSmoke": "Duman"
             },
@@ -102,14 +102,14 @@
             "confirmConfirmAction": "{0} yapmak istediğine emin misin?",
             "confirmConvertFormatTo": "{0} formatına dönüştürülsün mü?",
             "confirmSaveBeforeAction": "{0} yapmadan kaydet?",
-            "formatLegacy": "",
+            "formatLegacy": "Legacy",
             "formatModern": "Modern",
             "labelCurrentFile": "Şu anki dosya:",
             "labelFormat": "Biçim:",
             "optionActionWithoutSave": "Kaydetmeden {0}",
             "optionCancelAction": "İptal: {0} yapma",
-            "optionCancelConversion": "",
-            "optionProceedWithConversion": "",
+            "optionCancelConversion": "Dönüştürmeyi iptal et",
+            "optionProceedWithConversion": "Dönüştürmeye devam et",
             "optionYesSaveThenAction": "Evet: kaydet ve {0}",
             "sectionLevel": "Seviye",
             "sectionWorld": "Dünya",
@@ -118,7 +118,7 @@
             }
         },
         "layers": {
-            "abbrevAttLayer": "",
+            "abbrevAttLayer": "Takılı: ",
             "default": "Varsayılan",
             "deletion": {
                 "cancel": "İptal: katmanı silme",
@@ -169,10 +169,10 @@
             },
             "gen": {
                 "direction": "Yönü",
-                "effectIs": "",
-                "effectShoot": "",
-                "effectWarp": "",
-                "header": ""
+                "effectIs": "Efekt: {0}",
+                "effectShoot": "Ateşle",
+                "effectWarp": "Işınla",
+                "header": "Jeneratör Ayarları"
             },
             "inContainer": "İçi",
             "inertNice": "Dost",
@@ -217,7 +217,7 @@
             "pet": "",
             "power": ""
         },
-        "toggleMagicBlock": "",
+        "toggleMagicBlock": "Büyülü Blok",
         "tooltip": {
             "BGOs": "",
             "NPCs": "",
@@ -234,7 +234,7 @@
             "select": "",
             "settings": "",
             "show": "",
-            "tiles": "",
+            "tiles": "Tilelar",
             "warps": "",
             "water": "",
             "area": ""
@@ -555,7 +555,7 @@
                     "buttonPlus": "",
                     "caseIR": "",
                     "dPad": "",
-                    "shake": ""
+                    "shake": "Salla"
                 },
                 "typeGamecube": ""
             },
@@ -695,7 +695,7 @@
                     "enable": "",
                     "file-only": ""
                 },
-                "_header": "",
+                "_header": "Bölüm Ayarları",
                 "playstyle": {
                     "modern-tip": "",
                     "classic": "",
@@ -758,30 +758,30 @@
                     "full": "",
                     "linear": "",
                     "integer": "",
-                    "3x": ""
+                    "3x": "3x"
                 },
                 "info-meta": "",
                 "show-episode-title": {
-                    "_name": "",
-                    "bottom": "",
-                    "top": "",
-                    "off": "",
+                    "_name": "Bölüm adı",
+                    "bottom": "Alt",
+                    "top": "Üst",
+                    "off": "Kapalı",
                     "top-tip": "",
-                    "bottom-tip": ""
+                    "bottom-tip": "Speedrun sayacının üzerinde göster"
                 },
                 "show-playtime-counter": {
-                    "opaque": "",
-                    "animated-tip": "",
-                    "off": "",
-                    "off-tip": "",
+                    "opaque": "Opak",
+                    "animated-tip": "Seviye sonuna gökkuşağı efekti ekle",
+                    "off": "Kapalı",
+                    "off-tip": "Sadece speedrun esnasında göster",
                     "_tooltip": "",
-                    "_name": "",
-                    "transparent": "",
+                    "_name": "Oynama sayısı sayacı",
+                    "transparent": "Yarı şeffaf",
                     "animated": ""
                 },
                 "_header": "",
-                "world-map-stars-show-tip": "",
-                "3d-compat-mode-tip": "",
+                "world-map-stars-show-tip": "Toplanmış yıldızları seviye üzerinde göster",
+                "3d-compat-mode-tip": "Bütün objeleri bir 3D düzlemde çiz",
                 "battery-status": {
                     "_name": "",
                     "low-tip": "",
@@ -797,22 +797,22 @@
                 "fullscreen": "",
                 "info-game": "",
                 "3d-compat-mode": "",
-                "show-screen-shake": "",
-                "world-map-stars-show": "",
-                "video-system": "",
+                "show-screen-shake": "Ekran sallanması",
+                "world-map-stars-show": "Dünya haritası yıldızları",
+                "video-system": "Sistem",
                 "show-medals-counter-tip": "",
-                "show-fps": "",
+                "show-fps": "Framerate",
                 "show-fails-counter-tip": "",
-                "show-medals-counter": "",
-                "show-fails-counter": ""
+                "show-medals-counter": "Madalya sayacı",
+                "show-fails-counter": "Hata sayacı"
             },
             "speedrun": {
                 "mode": {
-                    "3": "",
-                    "_name": "",
-                    "0": "",
-                    "2": "",
-                    "1": ""
+                    "3": "3",
+                    "_name": "Speedrun modu",
+                    "0": "0",
+                    "2": "2",
+                    "1": "1"
                 }
             },
             "audio": {
@@ -844,9 +844,9 @@
             },
             "restartEngine": ""
         },
-        "wordBack": "",
-        "wordHide": "",
-        "wordNo": "",
+        "wordBack": "Geri",
+        "wordHide": "Gizle",
+        "wordNo": "Hayır",
         "wordOff": "Kapalı",
         "wordOn": "Açık",
         "wordPlayer": "Oyuncu",

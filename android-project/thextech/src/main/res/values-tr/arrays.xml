@@ -4,7 +4,7 @@
     <string name="touchscreenControllerType1">Klavye takılı olduğu zaman kapat</string>
     <string name="touchscreenControllerType2">Her zaman kapalı</string>
     <string name="speedRunMode0">Kapat</string>
-    <string name="speedRunMode2">2. Seçenek (Zaman kazanan özellikleri kapat)</string>
+    <string name="speedRunMode2">2. Seçenek (Zaman kazandıran özellikleri kapat)</string>
     <string name="touchPadStyle2">PlayStation tarzı (X/O/D/A)</string>
     <string name="touchPadStyle1">Nintendo/Xbox tarzı (A/B/X/Y)</string>
     <string name="batteryStatusShow1">Batarya düşükken göster</string>
