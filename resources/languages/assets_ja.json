@@ -1,9 +1,9 @@
 {
     "character": {
-        "name2": "",
+        "name2": "Char2",
         "name5": "",
         "name3": "",
-        "name1": "",
+        "name1": "Char1",
         "name4": ""
     },
     "editor": {
@@ -473,5 +473,5 @@
         "wordFails": "",
         "wordStarAccusativePlural": ""
     },
-    "languageName": ""
+    "languageName": "日本語"
 }
