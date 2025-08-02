@@ -832,7 +832,7 @@ PGE_Size FontManager::optimizeTextPx(std::string& text,
 {
     /****************Word wrap*********************/
     size_t  lastspace = 0;
-    int     count = 1;
+    // int     count = 1;
     size_t  height = 0;
     size_t  maxWidth = 0;
     size_t  maxWidthAtSpace = 0;
@@ -885,7 +885,7 @@ PGE_Size FontManager::optimizeTextPx(std::string& text,
             height += line_h;
             line_h = 0;
 
-            count++;
+            // count++;
             break;
 
         default:
@@ -924,7 +924,7 @@ PGE_Size FontManager::optimizeTextPx(std::string& text,
 
                 height += line_h;
                 line_h = 0;
-                count++;
+                // count++;
             }
         }
 

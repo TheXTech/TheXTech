@@ -154,6 +154,7 @@ int Logic()
     bool menuBackPress = l_SharedControls.MenuBack;
 
     bool altPressed = false;
+    UNUSED(altPressed);
 
     for(int i = 0; i < l_screen->player_count; i++)
     {
