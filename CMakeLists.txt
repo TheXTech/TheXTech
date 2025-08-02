@@ -140,6 +140,11 @@ endif()
 #endif()
 set(USE_SYSTEM_LIBS_DEFAULT OFF)
 
+
+if(UNIX)
+    option(PORTMASTER "Make a special build for PortMaster" OFF)
+endif()
+
 if(HAIKU OR NINTENDO_SWITCH OR NINTENDO_WII OR NINTENDO_WIIU OR XTECH_MACOSX_TIGER OR PORTMASTER)
     set(USE_SYSTEM_SDL2_DEFAULT ON)  # Should be used on Haiku, own SDL2 Haiku build on CMake is broken
 else()
@@ -317,10 +322,6 @@ if(NINTENDO_WIIU)
     set(THEXTECH_BUILD_GL_ES_LEGACY OFF CACHE BOOL "" FORCE)
 endif()
 
-if(UNIX)
-    option(PORTMASTER "Make a special build for PortMaster" OFF)
-endif()
-
 if(PORTMASTER)
     message("Special build for PortMaster.")
 
@@ -328,7 +329,6 @@ if(PORTMASTER)
     set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
     set(THEXTECH_BUILD_GL_ES_MODERN ON CACHE BOOL "" FORCE)
     set(THEXTECH_BUILD_GL_ES_LEGACY OFF CACHE BOOL "" FORCE)
-    set(USE_SYSTEM_SDL2 ON CACHE BOOL "" FORCE)
     set(PGE_SHARED_SDLMIXER OFF CACHE BOOL "" FORCE)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
