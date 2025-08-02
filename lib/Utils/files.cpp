@@ -143,6 +143,7 @@ void Files::Data::init_from_mem(const unsigned char* data, size_t size)
     m_length = static_cast<long long int>(size);
 }
 
+#ifdef FILES_DISOWN_NEEDED
 void* Files::Data::disown()
 {
     if(!m_free_me)
@@ -156,6 +157,7 @@ void* Files::Data::disown()
 
     return ret;
 }
+#endif
 
 FILE *Files::utf8_fopen(const char *filePath, const char *modes)
 {
