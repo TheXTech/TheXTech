@@ -538,11 +538,6 @@ void SetupEditorGraphics()
 
 static inline int s_round2int(double d)
 {
-    return std::floor(d + 0.5);
-}
-
-static inline int s_round2int_plr(double d)
-{
 #ifdef PGE_MIN_PORT
     return (int)(std::floor(d / 2 + 0.5)) * 2;
 #else
@@ -553,18 +548,10 @@ static inline int s_round2int_plr(double d)
 static inline IntegerLocation_t s_round2int(const SpeedlessLocation_t& d)
 {
     IntegerLocation_t ret;
-
-    ret.X = s_round2int(d.X); ret.Y = s_round2int(d.Y); ret.Width = s_round2int(d.Width); ret.Height = s_round2int(d.Height);
-
-    return ret;
-}
-
-static inline IntegerLocation_t s_round2int_plr(const SpeedlessLocation_t& d)
-{
-    IntegerLocation_t ret;
-
-    ret.X = s_round2int_plr(d.X); ret.Y = s_round2int_plr(d.Y); ret.Width = s_round2int_plr(d.Width); ret.Height = s_round2int_plr(d.Height);
-
+    ret.X = s_round2int(d.X);
+    ret.Y = s_round2int(d.Y);
+    ret.Width = s_round2int(d.Width);
+    ret.Height = s_round2int(d.Height);
     return ret;
 }
 
@@ -578,8 +565,8 @@ void PlayerWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2)
     auto &warp_dir_enter = backward ? warp.Direction2 : warp.Direction;
     auto &warp_dir_exit = backward ? warp.Direction : warp.Direction2;
 
-    IntegerLocation_t warp_enter = s_round2int_plr(_warp_enter);
-    IntegerLocation_t warp_exit = s_round2int_plr(_warp_exit);
+    IntegerLocation_t warp_enter = s_round2int(_warp_enter);
+    IntegerLocation_t warp_exit = s_round2int(_warp_exit);
 
     // .Effect = 3      -- Warp Pipe
     // .Effect2 = 0     -- Entering
@@ -664,8 +651,8 @@ void NPCWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2)
     auto &warp_dir_enter = backward ? warp.Direction2 : warp.Direction;
     auto &warp_dir_exit = backward ? warp.Direction : warp.Direction2;
 
-    IntegerLocation_t warp_enter = s_round2int_plr(_warp_enter);
-    IntegerLocation_t warp_exit = s_round2int_plr(_warp_exit);
+    IntegerLocation_t warp_enter = s_round2int(_warp_enter);
+    IntegerLocation_t warp_exit = s_round2int(_warp_exit);
 
     // player(a).effect = 3      -- Warp Pipe
     // player(a).effect2 = 0     -- Entering
@@ -898,8 +885,8 @@ void DrawFrozenNPC(int Z, int A)
 
     if(NPC[A].HoldingPlayer != 0)
     {
-        sX = camX + s_round2int_plr(NPC[A].Location.X);
-        sY = camY + s_round2int_plr(NPC[A].Location.Y);
+        sX = camX + s_round2int(NPC[A].Location.X);
+        sY = camY + s_round2int(NPC[A].Location.Y);
     }
 
     // collision already checked elsewhere
