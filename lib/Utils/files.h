@@ -29,8 +29,12 @@
 
 struct SDL_RWops;
 
-#if defined(__GNUC__) && !defined(__llvm__) && !defined(__INTEL_COMPILER)
-#   define FILES_NODISCARD_ATTR [[nodiscard]]
+#if defined(__GNUC__) && !defined(__llvm__) && !defined(__INTEL_COMPILER) && defined(__has_cpp_attribute)
+#   if __has_cpp_attribute(nodiscard)
+#       define FILES_NODISCARD_ATTR [[nodiscard]]
+#   else
+#       define FILES_NODISCARD_ATTR // Nothing!
+#   endif
 #else
 #   define FILES_NODISCARD_ATTR // Nothing!
 #endif
