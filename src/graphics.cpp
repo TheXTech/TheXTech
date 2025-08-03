@@ -538,7 +538,7 @@ void SetupEditorGraphics()
 
 static inline int s_round2int(double d)
 {
-    return std::floor(d + 0.5_n);
+    return std::floor(d + 0.5);
 }
 
 static inline int s_round2int_plr(num_t d)
