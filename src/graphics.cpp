@@ -541,7 +541,7 @@ static inline int s_round2int(double d)
     return std::floor(d + 0.5);
 }
 
-static inline int s_round2int_plr(num_t d)
+static inline int s_round2int_plr(double d)
 {
 #ifdef PGE_MIN_PORT
     return (int)(std::floor(d / 2 + 0.5)) * 2;
