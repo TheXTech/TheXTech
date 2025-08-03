@@ -551,21 +551,13 @@ static inline int s_round2int_plr(num_t d)
 #endif
 }
 
-static inline IntegerLocation_t s_round2int(const SpeedlessLocation_t& d)
-{
-    IntegerLocation_t ret;
-
-    ret.X = s_round2int(d.X); ret.Y = s_round2int(d.Y); ret.Width = s_round2int(d.Width); ret.Height = s_round2int(d.Height);
-
-    return ret;
-}
-
 static inline IntegerLocation_t s_round2int_plr(const SpeedlessLocation_t& d)
 {
     IntegerLocation_t ret;
-
-    ret.X = s_round2int_plr(d.X); ret.Y = s_round2int_plr(d.Y); ret.Width = s_round2int_plr(d.Width); ret.Height = s_round2int_plr(d.Height);
-
+    ret.X = s_round2int_plr(d.X);
+    ret.Y = s_round2int_plr(d.Y);
+    ret.Width = s_round2int_plr(d.Width);
+    ret.Height = s_round2int_plr(d.Height);
     return ret;
 }
 
