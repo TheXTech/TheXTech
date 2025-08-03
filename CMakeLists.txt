@@ -223,7 +223,7 @@ option(THEXTECH_NO_BUILD_DATE "Disables the using of the build timestamp in orde
 
 option(THEXTECH_ENABLE_AUDIO_FX "Enable real-time audio effects support" ON)
 
-option(THEXTECH_FIXED_POINT "Experimental: use fixed-point arithmetic for gameplay logic" OFF)
+option(THEXTECH_FIXED_POINT "Experimental: use fixed-point arithmetic for gameplay logic" ON)
 
 option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
 

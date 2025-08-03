@@ -44,6 +44,29 @@ jobs:
             package_filename_suffix: "ubuntu-24-04-amd64",
             upload_directory: ""
           }
+        - {
+            name: "Ubuntu 24.04 x86_64 (no-SDL, legacy floats)",
+            os: ubuntu-24.04,
+
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
+            -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
+            -DUSE_STATIC_LIBC=ON \
+            -DUSE_SYSTEM_LIBS=OFF \
+            -DTHEXTECH_CLI_BUILD=ON \
+            -DTHEXTECH_NO_SDL_BUILD=ON \
+            -DTHEXTECH_FIXED_POINT=OFF",
+
+            deps_cmdline: "sudo apt-get update -qq \
+            && sudo apt-get install -qq cmake ninja-build lftp \
+            build-essential",
+
+            executable_name: "thextech",
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            executable_name_suffix: "",
+            package_filename_suffix: "ubuntu-24-04-amd64-legacy-floats",
+            upload_directory: ""
+          }
 
     steps:
     - name: Check for the upload support

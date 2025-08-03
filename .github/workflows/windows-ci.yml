@@ -60,6 +60,25 @@ jobs:
             lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlMinGWw64/mingw32/"
           }
         - {
+            name: "Windows - 32-bit (legacy floats)",
+            os: windows-latest,
+
+            extra_options: "-DCMAKE_PREFIX_PATH=C:/WohlMinGWw64/mingw32 \
+            -DTHEXTECH_EXECUTABLE_NAME=thextech \
+            -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_windows_mingw_toolchain_x32.cmake \
+            -DTHEXTECH_FIXED_POINT=OFF",
+
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            extra_path: "/c/WohlMinGWw64/mingw32/bin",
+            executable_name_suffix: "",
+            package_filename_suffix: "win32-legacy-floats",
+            upload_directory: "www/win32/",
+            mingw_download: "https://wohlsoft.ru/docs/Software/MinGW/i686-12.2.0-release-posix-dwarf-rt_v10-rev1.7z", mingw_install_dir: "C:/WohlMinGWw64/",
+            ninja_download: "https://wohlsoft.ru/docs/Software/Ninja-Build/ninja-win.zip", ninja_install_dir: "C:/WohlMinGWw64/mingw32/bin",
+            lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlMinGWw64/mingw32/"
+          }
+        - {
             name: "Windows - ARM64",
             os: windows-2022,
             extra_options: "-A ARM64 -DTHEXTECH_EXECUTABLE_NAME=thextech",
