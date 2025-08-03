@@ -1,3 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    </resources>
+    <string name="touchscreenControllerType0">つねに有効にする</string>
+    <string name="batteryStatusShow0">表示しない</string>
+    <string name="batteryStatusShow1">残量低下時に表示</string>
+    <string name="batteryStatusShow2">つねに表示</string>
+    <string name="rendererDefault">デフォルト</string>
+</resources>
