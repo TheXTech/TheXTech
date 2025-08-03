@@ -181,11 +181,64 @@ void s_drawWaterBox(int camX, int camY, const Water_t& w)
         false);
 }
 
+void s_drawPlayer(int Z, int A, num_t sceneX, num_t sceneY)
+{
+    Player_t& p = Player[A];
+
+    p.Character = testPlayer[A].Character;
+    p.State = testPlayer[A].State;
+    p.Mount = testPlayer[A].Mount;
+    p.MountType = testPlayer[A].MountType;
+
+    if(p.Character < 1 || p.Character > numCharacters)
+        p.Character = A;
+    if(p.State < 1 || p.State > numStates)
+        p.State = 2;
+
+    p.Direction = 1;
+    p.Location.SpeedY = 0;
+    p.Location.SpeedX = 0;
+    p.Controls.Left = false;
+    p.Controls.Right = false;
+    p.SpinJump = false;
+    p.Dead = false;
+    p.Immune2 = false;
+    p.Fairy = false;
+    p.TimeToLive = 0;
+    p.Effect = PLREFF_NORMAL;
+    p.MountSpecial = 0;
+    p.HoldingNPC = 0;
+    if(p.Duck)
+        UnDuck(p);
+    PlayerFrame(p);
+
+    if(p.MountType == 3)
+    {
+        p.YoshiWingsFrameCount += 1;
+        p.YoshiWingsFrame = 0;
+        if(p.YoshiWingsFrameCount <= 12)
+            p.YoshiWingsFrame = 1;
+        else if(p.YoshiWingsFrameCount >= 24)
+            p.YoshiWingsFrameCount = 0;
+        if(p.Direction == 1)
+            p.YoshiWingsFrame += 2;
+    }
+
+    int C = Physics.PlayerHeight[p.Character][p.State] - Physics.PlayerHeight[A][2];
+
+    p.Location.X = sceneX;
+    p.Location.Y = sceneY - C;
+    p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
+    p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+    SizeCheck(p);
+
+    DrawPlayer(p, Z);
+}
+
 void DrawEditorLevel(int Z)
 {
     int A = 0;
     int B = 0;
-    int C = 0;
     int S = curSection; // Level section to display
 
     // camera offsets to add to all object positions before drawing
@@ -213,58 +266,7 @@ void DrawEditorLevel(int Z)
         {
             if(!(PlayerStart[A].Width > 0)) continue;
             if(vScreenCollision(Z, PlayerStart[A]))
-            {
-                Player_t& p = Player[A];
-
-                p.Character = testPlayer[A].Character;
-                p.State = testPlayer[A].State;
-                p.Mount = testPlayer[A].Mount;
-                p.MountType = testPlayer[A].MountType;
-
-                if(p.Character < 1 || p.Character > numCharacters)
-                    p.Character = A;
-                if(p.State < 1 || p.State > numStates)
-                    p.State = 2;
-
-                p.Direction = 1;
-                p.Location.SpeedY = 0;
-                p.Location.SpeedX = 0;
-                p.Controls.Left = false;
-                p.Controls.Right = false;
-                p.SpinJump = false;
-                p.Dead = false;
-                p.Immune2 = false;
-                p.Fairy = false;
-                p.TimeToLive = 0;
-                p.Effect = PLREFF_NORMAL;
-                p.MountSpecial = 0;
-                p.HoldingNPC = 0;
-                if(p.Duck)
-                    UnDuck(p);
-                PlayerFrame(p);
-
-                if(p.MountType == 3)
-                {
-                    p.YoshiWingsFrameCount += 1;
-                    p.YoshiWingsFrame = 0;
-                    if(p.YoshiWingsFrameCount <= 12)
-                        p.YoshiWingsFrame = 1;
-                    else if(p.YoshiWingsFrameCount >= 24)
-                        p.YoshiWingsFrameCount = 0;
-                    if(p.Direction == 1)
-                        p.YoshiWingsFrame += 2;
-                }
-
-                C = Physics.PlayerHeight[p.Character][p.State] - Physics.PlayerHeight[A][2];
-
-                p.Location.X = PlayerStart[A].X;
-                p.Location.Y = PlayerStart[A].Y - C;
-                p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
-                p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
-                SizeCheck(p);
-
-                DrawPlayer(p, Z);
-            }
+                s_drawPlayer(Z, A, PlayerStart[A].X, PlayerStart[A].Y);
         }
 
         // render water
@@ -401,60 +403,7 @@ void DrawEditorLevel(int Z)
         else if(e.Mode == OptCursor_t::LVL_PLAYERSTART) // Player start points
         {
             if(e.SubMode == 4 || e.SubMode == 5)
-            {
-                A = e.SubMode - 3;
-
-                Player_t& p = Player[A];
-
-                p.Character = testPlayer[A].Character;
-                p.State = testPlayer[A].State;
-                p.Mount = testPlayer[A].Mount;
-                p.MountType = testPlayer[A].MountType;
-
-                if(p.Character < 1 || p.Character > numCharacters)
-                    p.Character = A;
-                if(p.State < 1 || p.State > numStates)
-                    p.State = 2;
-
-                p.Direction = 1;
-                p.Location.SpeedY = 0;
-                p.Location.SpeedX = 0;
-                p.Controls.Left = false;
-                p.Controls.Right = false;
-                p.SpinJump = false;
-                p.Dead = false;
-                p.Immune2 = false;
-                p.Fairy = false;
-                p.TimeToLive = 0;
-                p.Effect = PLREFF_NORMAL;
-                p.MountSpecial = 0;
-                p.HoldingNPC = 0;
-                if(p.Duck)
-                    UnDuck(p);
-                PlayerFrame(p);
-
-                if(p.MountType == 3)
-                {
-                    p.YoshiWingsFrameCount += 1;
-                    p.YoshiWingsFrame = 0;
-                    if(p.YoshiWingsFrameCount <= 12)
-                        p.YoshiWingsFrame = 1;
-                    else if(p.YoshiWingsFrameCount >= 24)
-                        p.YoshiWingsFrameCount = 0;
-                    if(p.Direction == 1)
-                        p.YoshiWingsFrame += 2;
-                }
-
-                C = Physics.PlayerHeight[p.Character][p.State] - Physics.PlayerHeight[A][2];
-
-                p.Location.X = e.Location.X;
-                p.Location.Y = e.Location.Y - C;
-                p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
-                p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
-                SizeCheck(p);
-
-                DrawPlayer(p, Z);
-            }
+                s_drawPlayer(Z, e.SubMode - 3, e.Location.X, e.Location.Y);
         }
 
         else if(e.Mode == OptCursor_t::LVL_BGOS) // BGOs
