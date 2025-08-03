@@ -2194,7 +2194,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
     if(m_special_subpage > this->num_test_players)
         return;
 
-    SuperPrintR(mode, g_editorStrings.testChar, 3, e_ScreenW / 2 + 10, 234);
+    SuperPrintR(mode, g_editorStrings.testChar, 3, e_ScreenW / 2 - 30, 234);
 
     constexpr int block_for_char[] = {622, 623, 624, 625, 631};
     for(int ch = 1; ch <= 5; ch++)
@@ -2202,32 +2202,33 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
         bool pPctive = testPlayer[m_special_subpage].Character == ch;
         int block = block_for_char[ch - 1];
 
-        if(UpdateButton(mode, e_ScreenW / 2 + 80 + 4 + 40*ch, 220 + 4, GFXBlock[block], pPctive, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW / 2 + 40 + 4 + 40*ch, 220 + 4, GFXBlock[block], pPctive, 0, 0, 32, 32))
             testPlayer[m_special_subpage].Character = ch;
     }
 
-    SuperPrintR(mode, g_editorStrings.testPower, 3, e_ScreenW / 2 + 10, 274);
+    SuperPrintR(mode, g_editorStrings.testPower, 3, e_ScreenW / 2 - 30, 274);
 
     if(testPlayer[m_special_subpage].State == 0)
         testPlayer[m_special_subpage].State = 2;
 
-    constexpr int NPC_for_state[] = {0, NPCID_POWER_S3, NPCID_FIRE_POWER_S3, NPCID_LEAF_POWER, NPCID_STATUE_POWER, NPCID_HEAVY_POWER, NPCID_ICE_POWER_S3};
-    for(int state = 1; state <= 7; state++)
+    constexpr int NPC_for_state[] = {0, NPCID_POWER_S3, NPCID_FIRE_POWER_S3, NPCID_LEAF_POWER, NPCID_STATUE_POWER, NPCID_HEAVY_POWER, NPCID_ICE_POWER_S3, NPCID_AQUATIC_POWER, NPCID_POLAR_POWER, NPCID_CYCLONE_POWER, NPCID_SHELL_POWER};
+    int max_state = (g_gameInfo.contentFeatureLevel >= 1030790) ? 11 : 7;
+    for(int state = 1; state <= max_state; state++)
     {
         bool pActive = testPlayer[m_special_subpage].State == state;
         int sNPC = NPC_for_state[state - 1];
 
         bool selected;
         if(!sNPC)
-            selected = UpdateButton(mode, e_ScreenW / 2 + 120 + 4 + 40 * ((state - 1) % 5), 260 + 4 + ((state - 1) / 5) * 40, GFX.EIcons, pActive, 0, 0, 1, 1);
+            selected = UpdateButton(mode, e_ScreenW / 2 + 80 + 4 + 40 * ((state - 1) % 6), 260 + 4 + ((state - 1) / 6) * 40, GFX.EIcons, pActive, 0, 0, 1, 1);
         else
-            selected = UpdateButton(mode, e_ScreenW / 2 + 120 + 4 + 40 * ((state - 1) % 5), 260 + 4 + ((state - 1) / 5) * 40, GFXNPC[sNPC], pActive, 0, 0, 32, 32);
+            selected = UpdateButton(mode, e_ScreenW / 2 + 80 + 4 + 40 * ((state - 1) % 6), 260 + 4 + ((state - 1) / 6) * 40, GFXNPC[sNPC], pActive, 0, 0, 32, 32);
 
         if(selected)
             testPlayer[m_special_subpage].State = state;
     }
 
-    SuperPrintR(mode, g_editorStrings.testBoot, 3, e_ScreenW / 2 + 10, 354);
+    SuperPrintR(mode, g_editorStrings.testBoot, 3, e_ScreenW / 2 - 30, 354);
 
     constexpr int NPC_for_boot[] = {NPCID_GRN_BOOT, NPCID_RED_BOOT, NPCID_BLU_BOOT};
     for(int boot = 1; boot <= 3; boot++)
@@ -2235,7 +2236,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
         bool pActive = testPlayer[m_special_subpage].Mount == 1 && testPlayer[m_special_subpage].MountType == boot;
         int pNPC = NPC_for_boot[boot - 1];
 
-        if(UpdateButton(mode, e_ScreenW / 2 + 80 + 4 + 40*boot, 340 + 4, GFXNPC[pNPC], pActive, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW / 2 + 40 + 4 + 40*boot, 340 + 4, GFXNPC[pNPC], pActive, 0, 0, 32, 32))
         {
             if(pActive)
             {
@@ -2249,7 +2250,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
         }
     }
 
-    SuperPrintR(mode, g_editorStrings.testPet, 3, e_ScreenW / 2 + 10, 394);
+    SuperPrintR(mode, g_editorStrings.testPet, 3, e_ScreenW / 2 - 30, 394);
 
     constexpr int NPC_for_yoshi[] = {NPCID_PET_GREEN, NPCID_PET_BLUE, NPCID_PET_YELLOW, NPCID_PET_RED, NPCID_PET_BLACK, NPCID_PET_PURPLE, NPCID_PET_PINK, NPCID_PET_CYAN};
     for(int yoshi = 1; yoshi <= 8; yoshi++)
@@ -2257,7 +2258,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
         bool pActive = testPlayer[m_special_subpage].Mount == 3 && testPlayer[m_special_subpage].MountType == yoshi;
         int pNPC = NPC_for_yoshi[yoshi - 1];
 
-        if(UpdateButton(mode, e_ScreenW / 2 + 120 + 4 + 40 * ((yoshi - 1) % 5), 380 + 4 + ((yoshi - 1) / 5) * 40, GFXNPC[pNPC], pActive, 0, 0, 72, 56))
+        if(UpdateButton(mode, e_ScreenW / 2 + 80 + 4 + 40 * ((yoshi - 1) % 6), 380 + 4 + ((yoshi - 1) / 6) * 40, GFXNPC[pNPC], pActive, 0, 0, 72, 56))
         {
             if(pActive)
             {
