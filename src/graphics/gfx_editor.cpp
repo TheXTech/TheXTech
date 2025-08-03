@@ -221,9 +221,9 @@ void DrawEditorLevel(int Z)
                 p.Mount = testPlayer[A].Mount;
                 p.MountType = testPlayer[A].MountType;
 
-                if(p.Character < 1 || p.Character > 5)
+                if(p.Character < 1 || p.Character > numCharacters)
                     p.Character = A;
-                if(p.State < 1 || p.State > 7)
+                if(p.State < 1 || p.State > numStates)
                     p.State = 2;
 
                 p.Direction = 1;
@@ -411,9 +411,9 @@ void DrawEditorLevel(int Z)
                 p.Mount = testPlayer[A].Mount;
                 p.MountType = testPlayer[A].MountType;
 
-                if(p.Character < 1 || p.Character > 5)
+                if(p.Character < 1 || p.Character > numCharacters)
                     p.Character = A;
-                if(p.State < 1 || p.State > 7)
+                if(p.State < 1 || p.State > numStates)
                     p.State = 2;
 
                 p.Direction = 1;

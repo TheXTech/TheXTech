@@ -200,13 +200,13 @@ static void strToPlayerSetup(int player, const std::string &setupString)
 
     if(p.Character < 1)
         p.Character = 1;
-    else if(p.Character > 5)
-        p.Character = 5;
+    else if(p.Character > numCharacters)
+        p.Character = numCharacters;
 
     if(p.State < 1)
         p.State = 1;
-    else if(p.State > 7)
-        p.State = 7;
+    else if(p.State >= numStates)
+        p.State = numStates;
 
     if(p.HeldBonus >= maxNPCType)
         p.HeldBonus = NPCID_NULL;
