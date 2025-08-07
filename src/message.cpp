@@ -65,7 +65,7 @@ void Handle(const Message& m)
 
         SwapCharacter(screen.players[m.player], m.message);
 
-        if(LevelSelect)
+        if(LevelSelect && !GameMenu)
             SetupPlayers();
     }
     else if(m.type == Type::add_player || m.type == Type::add_player_dead)
