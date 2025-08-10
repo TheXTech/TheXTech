@@ -144,38 +144,12 @@ void Prepare()
 
 int Logic()
 {
-    bool upPressed = l_SharedControls.MenuUp;
-    bool downPressed = l_SharedControls.MenuDown;
-    bool leftPressed = l_SharedControls.MenuLeft;
-    bool rightPressed = l_SharedControls.MenuRight;
-    bool homePressed = SharedCursor.Tertiary;
+    MenuControls_t menuControls = Controls::GetMenuControls();
 
-    bool menuDoPress = l_SharedControls.MenuDo || l_SharedControls.Pause;
-    bool menuBackPress = l_SharedControls.MenuBack;
+    menuControls.Back |= (SharedCursor.Secondary && MenuMouseRelease);
 
-    bool altPressed = false;
-    UNUSED(altPressed);
-
-    for(int i = 0; i < l_screen->player_count; i++)
-    {
-        Controls_t &c = Controls::g_RawControls[i];
-
-        menuDoPress |= c.Start || c.Jump;
-        menuBackPress |= c.Run;
-
-        upPressed |= c.Up;
-        downPressed |= c.Down;
-        leftPressed |= c.Left;
-        rightPressed |= c.Right;
-
-        homePressed |= c.Drop;
-        altPressed |= c.AltJump;
-    }
-
-    menuBackPress |= SharedCursor.Secondary && MenuMouseRelease;
-
-    if(menuBackPress && menuDoPress)
-        menuDoPress = false;
+    if(menuControls.Back && menuControls.Do)
+        menuControls.Do = false;
 
     int MenuX, MenuY;
     GetMenuPos(&MenuX, &MenuY);
@@ -216,13 +190,13 @@ int Logic()
 
     if(MenuCursorCanMove || MenuMouseClick)
     {
-        if(menuBackPress)
+        if(menuControls.Back)
         {
             PlaySoundMenu(SFX_Slide);
             MenuCursorCanMove = false;
             return -1;
         }
-        else if(menuDoPress || MenuMouseClick)
+        else if(menuControls.Do || MenuMouseClick)
         {
             bool disabled = false;
             // Save menu state
@@ -266,11 +240,11 @@ int Logic()
         else
             s_current_item += 1;
     }
-    else if(leftPressed || rightPressed || upPressed || downPressed)
+    else if(menuControls.Left || menuControls.Right || menuControls.Up || menuControls.Down)
     {
         if(MenuCursorCanMove || ScrollDelay == 0)
         {
-            if(leftPressed || rightPressed)
+            if(menuControls.Left || menuControls.Right)
             {
                 int first_new_content = (g_gameInfo.disableBattleMode) ? s_items.size() - 1 : s_items.size() - 2;
 
@@ -289,7 +263,7 @@ int Logic()
                     ScrollDelay = 15;
                     dontWrap = true;
 
-                    if(leftPressed)
+                    if(menuControls.Left)
                         s_current_item -= 3;
                     else
                         s_current_item += 3;
@@ -300,7 +274,7 @@ int Logic()
                 PlaySoundMenu(SFX_Slide);
                 ScrollDelay = -1;
 
-                if(upPressed)
+                if(menuControls.Up)
                     s_current_item -= 1;
                 else
                     s_current_item += 1;
@@ -310,7 +284,7 @@ int Logic()
         }
     }
 
-    if(homePressed && MenuCursorCanMove && s_recent_item >= 0)
+    if(menuControls.Home && MenuCursorCanMove && s_recent_item >= 0)
     {
         PlaySoundMenu(SFX_Camera);
         s_current_item = s_recent_item;

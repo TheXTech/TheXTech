@@ -1227,6 +1227,42 @@ void RemoveNullInputMethods()
     }
 }
 
+MenuControls_t GetMenuControls(int limit_player)
+{
+    MenuControls_t ret;
+    ret.Up = l_SharedControls.MenuUp;
+    ret.Down = l_SharedControls.MenuDown;
+    ret.Left = l_SharedControls.MenuLeft;
+    ret.Right = l_SharedControls.MenuRight;
+    ret.Home = SharedCursor.Tertiary;
+
+    ret.Do = l_SharedControls.MenuDo || l_SharedControls.Pause;
+    ret.Back = l_SharedControls.MenuBack;
+
+    ret.Erase = false;
+
+    for(int i = 0; l_screen && i < l_screen->player_count; i++)
+    {
+        if(limit_player != 0 && l_screen->players[i] != limit_player)
+            continue;
+
+        const Controls_t &c = Controls::g_RawControls[i];
+
+        ret.Do |= c.Start || c.Jump;
+        ret.Back |= c.Run;
+
+        ret.Up |= c.Up;
+        ret.Down |= c.Down;
+        ret.Left |= c.Left;
+        ret.Right |= c.Right;
+
+        ret.Home |= c.Drop;
+        ret.Erase |= c.AltJump;
+    }
+
+    return ret;
+}
+
 
 // player is 1-indexed :(
 void Rumble(int player, int ms, float strength)

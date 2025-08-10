@@ -704,47 +704,35 @@ bool Logic()
         return true;
     }
 
-    bool upPressed = l_SharedControls.MenuUp;
-    bool downPressed = l_SharedControls.MenuDown;
-    bool leftPressed = l_SharedControls.MenuLeft;
-    bool rightPressed = l_SharedControls.MenuRight;
+    MenuControls_t menuControls = Controls::GetMenuControls();
 
     bool startPressed = false;
-    bool doPressed = l_SharedControls.MenuDo;
-    bool backPressed = l_SharedControls.MenuBack;
 
     for(int i = 0; i < l_screen->player_count; i++)
     {
-        Controls_t &c = Controls::g_RawControls[i];
+        const Controls_t &c = Controls::g_RawControls[i];
 
         startPressed |= c.Start;
-        doPressed |= c.Jump || c.AltJump;
-        backPressed |= c.Run || c.AltRun;
-
-        upPressed |= c.Up;
-        downPressed |= c.Down;
-        leftPressed |= c.Left;
-        rightPressed |= c.Right;
     }
 
     if(MenuCursorCanMove)
     {
-        if(upPressed)
+        if(menuControls.Up)
             GoUp();
 
-        if(downPressed)
+        if(menuControls.Down)
             GoDown();
 
-        if(leftPressed)
+        if(menuControls.Left)
             GoLeft();
 
-        if(rightPressed)
+        if(menuControls.Right)
             GoRight();
 
-        if(backPressed)
+        if(menuControls.Back)
             Backspace();
 
-        if((doPressed && DoAction()) || startPressed)
+        if((menuControls.Do && DoAction()) || startPressed)
         {
             s_finalize();
             return true;
@@ -752,7 +740,7 @@ bool Logic()
     }
 
 
-    if(!upPressed && !downPressed && !leftPressed && !rightPressed && !doPressed && !backPressed && !startPressed)
+    if(!menuControls.Up && !menuControls.Down && !menuControls.Left && !menuControls.Right && !menuControls.Do && !menuControls.Back && !startPressed)
     {
         MenuCursorCanMove = true;
     }

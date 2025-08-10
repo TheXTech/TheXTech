@@ -171,28 +171,15 @@ void Render()
 
 bool Logic()
 {
-    bool upPressed = l_SharedControls.MenuUp;
-    bool downPressed = l_SharedControls.MenuDown;
+    MenuControls_t menuControls = Controls::GetMenuControls();
 
-    bool menuDoPress = l_SharedControls.MenuDo || l_SharedControls.Pause;
-
-    for(int i = 0; i < l_screen->player_count; i++)
-    {
-        Controls_t &c = Controls::g_RawControls[i];
-
-        menuDoPress |= c.Start || c.Jump;
-
-        upPressed |= c.Up;
-        downPressed |= c.Down;
-    }
-
-    if(!upPressed && !downPressed && !menuDoPress)
+    if(!menuControls.Up && !menuControls.Down && !menuControls.Do)
         MenuCursorCanMove = true;
 
     if(!MenuCursorCanMove)
         return false;
 
-    if(upPressed)
+    if(menuControls.Up)
     {
         PlaySoundMenu(SFX_Slide);
         s_cur_item--;
@@ -202,7 +189,7 @@ bool Logic()
         return false;
     }
 
-    if(downPressed)
+    if(menuControls.Down)
     {
         PlaySoundMenu(SFX_Slide);
         s_cur_item++;
@@ -212,7 +199,7 @@ bool Logic()
         return false;
     }
 
-    if(menuDoPress && s_cur_item >= 0 && s_cur_item <= 3)
+    if(menuControls.Do && s_cur_item >= 0 && s_cur_item <= 3)
     {
         PlaySoundMenu(SFX_Do);
 

@@ -35,6 +35,19 @@ struct SharedControls_t
     bool MenuBack = false;
 };
 
+// Control struct combined from shared controls and individual player controls, based on player controls' requested layout
+struct MenuControls_t
+{
+    bool Up = false;
+    bool Down = false;
+    bool Left = false;
+    bool Right = false;
+    bool Do = false;
+    bool Back = false;
+    bool Erase = false;
+    bool Home = false;
+};
+
 // Each player has one; there is also a shared fallback mouse
 struct CursorControls_t
 {

@@ -814,6 +814,9 @@ bool SetInputMethodProfile(InputMethod *method, InputMethodProfile *profile);
 void ClearInputMethods();
 void RemoveNullInputMethods();
 
+// Resolve current menu controls
+MenuControls_t GetMenuControls(int limit_player = 0);
+
 // player is 1-indexed as an actual player here
 void Rumble(int player, int ms, float strength);
 void RumbleAllPlayers(int ms, float strength);
