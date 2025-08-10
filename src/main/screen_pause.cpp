@@ -414,63 +414,32 @@ void Render()
 
 bool Logic(int plr)
 {
-    bool upPressed = SharedControls.MenuUp;
-    bool downPressed = SharedControls.MenuDown;
-    bool leftPressed = SharedControls.MenuLeft;
-    bool rightPressed = SharedControls.MenuRight;
-
-    bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
-    bool menuBackPress = SharedControls.MenuBack;
-
-    // there was previously code to copy all players' controls from the main player, but this is no longer necessary (and actively harmful in the SingleCoop case)
+    if(plr > numPlayers)
+        plr = 0;
 
     if(!g_config.multiplayer_pause_controls && plr == 0)
         plr = 1;
 
-    if(plr == 0)
-    {
-        for(int i = 1; i <= numPlayers; i++)
-        {
-            const Controls_t& c = Player[i].Controls;
+    // there was previously code to copy all players' controls from the main player, but this is no longer necessary (and actively harmful in the SingleCoop case)
 
-            menuDoPress |= (c.Start || c.Jump);
-            menuBackPress |= c.Run;
-
-            upPressed |= c.Up;
-            downPressed |= c.Down;
-            leftPressed |= c.Left;
-            rightPressed |= c.Right;
-        }
-    }
-    else
-    {
-        const Controls_t& c = Player[plr].Controls;
-
-        menuDoPress |= (c.Start || c.Jump);
-        menuBackPress |= c.Run;
-
-        upPressed |= c.Up;
-        downPressed |= c.Down;
-        leftPressed |= c.Left;
-        rightPressed |= c.Right;
-    }
+    MenuControls_t menuControls = Controls::GetMenuControls(plr);
 
     if(!MenuCursorCanMove_Back)
     {
-        if(!menuBackPress && MenuCursorCanMove)
+        if(!menuControls.Back && MenuCursorCanMove)
             MenuCursorCanMove_Back = true;
 
-        menuBackPress = false;
+        menuControls.Back = false;
     }
-    else if(menuBackPress)
+    else if(menuControls.Back)
         MenuCursorCanMove_Back = false;
 
-    if(menuBackPress && menuDoPress)
-        menuDoPress = false;
+    if(menuControls.Back && menuControls.Do)
+        menuControls.Do = false;
 
     if(!MenuCursorCanMove)
     {
-        if(!menuDoPress && !menuBackPress && !upPressed && !downPressed && (s_pause_type == PauseType::Legacy || (!leftPressed && !rightPressed)))
+        if(!menuControls.Do && !menuControls.Back && !menuControls.Up && !menuControls.Down && (s_pause_type == PauseType::Legacy || (!menuControls.Left && !menuControls.Right)))
             MenuCursorCanMove = true;
 
         return false;
@@ -481,7 +450,7 @@ bool Logic(int plr)
 
     int max_item = (int)s_items.size() - 1;
 
-    if(menuBackPress)
+    if(menuControls.Back)
     {
         if(MenuCursor != max_item)
             PlaySound(SFX_Slide);
@@ -494,7 +463,7 @@ bool Logic(int plr)
         // fixes TheXTech 1.3.7-beta bug where hitting escape (bound to both Shared Back and P1 Do) would immediately exit
         MenuCursorCanMove = false;
     }
-    else if(upPressed)
+    else if(menuControls.Up)
     {
         PlaySound(SFX_Slide);
         MenuCursor = MenuCursor - 1;
@@ -503,7 +472,7 @@ bool Logic(int plr)
         if(s_cheat_menu_bits < 14)
             s_cheat_menu_bits = 0;
     }
-    else if(downPressed)
+    else if(menuControls.Down)
     {
         PlaySound(SFX_Slide);
         MenuCursor = MenuCursor + 1;
@@ -512,7 +481,7 @@ bool Logic(int plr)
         if(s_cheat_menu_bits < 14)
             s_cheat_menu_bits = 0;
     }
-    else if(leftPressed && s_pause_type != PauseType::Legacy)
+    else if(menuControls.Left && s_pause_type != PauseType::Legacy)
     {
         if(s_cheat_menu_bits == 0 || s_cheat_menu_bits == 2 || s_cheat_menu_bits == 5 || s_cheat_menu_bits == 9)
         {
@@ -529,7 +498,7 @@ bool Logic(int plr)
         else if(s_cheat_menu_bits < 14)
             s_cheat_menu_bits = 1;
     }
-    else if(rightPressed && s_pause_type != PauseType::Legacy)
+    else if(menuControls.Right && s_pause_type != PauseType::Legacy)
     {
         if(s_cheat_menu_bits != 0 && s_cheat_menu_bits != 2 && s_cheat_menu_bits != 5 && s_cheat_menu_bits != 9 && s_cheat_menu_bits < 14)
         {
@@ -553,7 +522,7 @@ bool Logic(int plr)
         else if(s_cheat_menu_bits < 14)
             s_cheat_menu_bits = 0;
     }
-    else if(menuDoPress && s_cheat_menu_bits < 14)
+    else if(menuControls.Do && s_cheat_menu_bits < 14)
         s_cheat_menu_bits = 0;
 
     if(MenuCursor < 0)
@@ -659,7 +628,7 @@ bool Logic(int plr)
 
     bool stopPause = false;
 
-    if(menuDoPress && MenuCursor >= 0 && MenuCursor < (int)s_items.size())
+    if(menuControls.Do && MenuCursor >= 0 && MenuCursor < (int)s_items.size())
         stopPause = s_items[MenuCursor].callback();
 
     return stopPause;

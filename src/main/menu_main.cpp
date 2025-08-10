@@ -702,39 +702,14 @@ bool mainMenuUpdate()
     int menuLen;
     // Player_t blankPlayer;
 
-    bool upPressed = SharedControls.MenuUp;
-    bool downPressed = SharedControls.MenuDown;
-    bool leftPressed = SharedControls.MenuLeft;
-    bool rightPressed = SharedControls.MenuRight;
-    bool homePressed = SharedCursor.Tertiary;
+    MenuControls_t menuControls = Controls::GetMenuControls();
 
-    bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
-    bool menuBackPress = SharedControls.MenuBack;
+    menuControls.Back |= (SharedCursor.Secondary && MenuMouseRelease);
 
-    bool altPressed = false;
+    if(menuControls.Back && menuControls.Do)
+        menuControls.Do = false;
 
-    for(int i = 0; i < l_screen->player_count; i++)
-    {
-        Controls_t &c = Controls::g_RawControls[i];
-
-        menuDoPress |= c.Start || c.Jump;
-        menuBackPress |= c.Run;
-
-        upPressed |= c.Up;
-        downPressed |= c.Down;
-        leftPressed |= c.Left;
-        rightPressed |= c.Right;
-
-        homePressed |= c.Drop;
-        altPressed |= c.AltJump;
-    }
-
-    menuBackPress |= SharedCursor.Secondary && MenuMouseRelease;
-
-    if(menuBackPress && menuDoPress)
-        menuDoPress = false;
-
-    bool should_enter_ap_screen = homePressed && s_can_enter_ap_screen() && MenuCursorCanMove;
+    bool should_enter_ap_screen = menuControls.Home && s_can_enter_ap_screen() && MenuCursorCanMove;
 
     if(should_enter_ap_screen && GetAssetPacks().size() <= 1)
     {
@@ -762,14 +737,14 @@ bool mainMenuUpdate()
     {
         {
             bool k = false;
-            k |= menuBackPress;
-            k |= menuDoPress;
-            k |= upPressed;
-            k |= downPressed;
-            k |= leftPressed;
-            k |= rightPressed;
-            k |= homePressed;
-            k |= altPressed;
+            k |= menuControls.Back;
+            k |= menuControls.Do;
+            k |= menuControls.Up;
+            k |= menuControls.Down;
+            k |= menuControls.Left;
+            k |= menuControls.Right;
+            k |= menuControls.Home;
+            k |= menuControls.Erase;
 
             if(!k)
                 MenuCursorCanMove = true;
@@ -779,7 +754,7 @@ bool mainMenuUpdate()
         {
             int cursorDelta = 0;
 
-            if(upPressed)
+            if(menuControls.Up)
             {
                 if(MenuCursorCanMove)
                 {
@@ -789,7 +764,7 @@ bool mainMenuUpdate()
 
                 MenuCursorCanMove = false;
             }
-            else if(downPressed)
+            else if(menuControls.Down)
             {
                 if(MenuCursorCanMove)
                 {
@@ -832,7 +807,7 @@ bool mainMenuUpdate()
 #ifndef PGE_NO_THREADING
         if(SDL_AtomicGet(&loading))
         {
-            if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
+            if((menuControls.Do && MenuCursorCanMove) || MenuMouseClick)
                 PlaySoundMenu(SFX_BlockHit);
 
             if(MenuCursor != 0)
@@ -847,7 +822,7 @@ bool mainMenuUpdate()
             if(MenuMouseRelease && SharedCursor.Primary)
                 MenuMouseClick = true;
 
-            if(menuBackPress && MenuCursorCanMove)
+            if(menuControls.Back && MenuCursorCanMove)
             {
                 int quitKeyPos = 2;
 
@@ -866,7 +841,7 @@ bool mainMenuUpdate()
                 PlaySoundMenu(SFX_Slide);
             }
 
-            if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
+            if((menuControls.Do && MenuCursorCanMove) || MenuMouseClick)
             {
                 MenuCursorCanMove = false;
                 MenuMode = MENU_MAIN;
@@ -914,7 +889,7 @@ bool mainMenuUpdate()
                 }
             }
 
-            if(menuBackPress && MenuCursorCanMove)
+            if(menuControls.Back && MenuCursorCanMove)
             {
                 int quitKeyPos = 2;
 
@@ -940,7 +915,7 @@ bool mainMenuUpdate()
                     PlaySoundMenu(SFX_Slide);
                 }
             }
-            else if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
+            else if((menuControls.Do && MenuCursorCanMove) || MenuMouseClick)
             {
                 MenuCursorCanMove = false;
                 PlayerCharacter = 0;
@@ -1363,7 +1338,7 @@ bool mainMenuUpdate()
             {
                 int first_new_content = (g_gameInfo.disableBattleMode) ? NumSelectWorldEditable : NumSelectWorldEditable - 1;
 
-                if(menuBackPress)
+                if(menuControls.Back)
                 {
                     MenuCursor = MenuMode - 1;
 
@@ -1386,14 +1361,14 @@ bool mainMenuUpdate()
                     PlaySoundMenu(SFX_Slide);
                     MenuCursorCanMove = false;
                 }
-                else if((leftPressed || rightPressed) && MenuMode == MENU_EDITOR && MenuCursor + 1 >= first_new_content)
+                else if((menuControls.Left || menuControls.Right) && MenuMode == MENU_EDITOR && MenuCursor + 1 >= first_new_content)
                 {
                     s_editor_target_thextech = !s_editor_target_thextech;
                     PlaySoundMenu(SFX_Climbing);
                     MenuCursorCanMove = false;
                     ScrollDelay = -1;
                 }
-                else if(menuDoPress || MenuMouseClick)
+                else if(menuControls.Do || MenuMouseClick)
                 {
                     bool disabled = false;
                     // Save menu state
@@ -1554,7 +1529,7 @@ bool mainMenuUpdate()
             // DropItem / Tertiary cursor button is return to last episode.
             bool dontWrap = false;
 
-            if(leftPressed && (MenuCursorCanMove || ScrollDelay == 0))
+            if(menuControls.Left && (MenuCursorCanMove || ScrollDelay == 0))
             {
                 PlaySoundMenu(SFX_Saw);
                 MenuCursor -= 3;
@@ -1562,7 +1537,7 @@ bool mainMenuUpdate()
                 ScrollDelay = 15;
                 dontWrap = true;
             }
-            else if(rightPressed && (MenuCursorCanMove || ScrollDelay == 0))
+            else if(menuControls.Right && (MenuCursorCanMove || ScrollDelay == 0))
             {
                 PlaySoundMenu(SFX_Saw);
                 MenuCursor += 3;
@@ -1570,7 +1545,7 @@ bool mainMenuUpdate()
                 ScrollDelay = 15;
                 dontWrap = true;
             }
-            else if((leftPressed || rightPressed) && !SharedCursor.Move)
+            else if((menuControls.Left || menuControls.Right) && !SharedCursor.Move)
             {
                 ScrollDelay -= 1;
             }
@@ -1587,7 +1562,7 @@ bool mainMenuUpdate()
                 dontWrap = true;
             }
 
-            if(homePressed && MenuCursorCanMove && menuRecentEpisode >= 0)
+            if(menuControls.Home && MenuCursorCanMove && menuRecentEpisode >= 0)
             {
                 PlaySoundMenu(SFX_Camera);
                 MenuCursor = menuRecentEpisode;
@@ -1635,7 +1610,7 @@ bool mainMenuUpdate()
             if(MenuCursor >= 0 && MenuCursor < maxSaveSlots && SaveSlotInfo[MenuCursor + 1].ConfigDefaults == 0)
             {
                 // switch mode
-                if(MenuCursorCanMove && (leftPressed || rightPressed) && s_episode_speedrun_mode == 0)
+                if(MenuCursorCanMove && (menuControls.Left || menuControls.Right) && s_episode_speedrun_mode == 0)
                 {
                     if(s_episode_playstyle == Config_t::MODE_MODERN)
                         s_episode_playstyle = Config_t::MODE_CLASSIC;
@@ -1647,12 +1622,12 @@ bool mainMenuUpdate()
                 }
 
                 // only enter the menu if allowed by the global speedrun mode
-                if(MenuCursorCanMove && homePressed && g_config.speedrun_mode.m_set == ConfigSetLevel::cmdline)
+                if(MenuCursorCanMove && menuControls.Home && g_config.speedrun_mode.m_set == ConfigSetLevel::cmdline)
                 {
                     PlaySoundMenu(SFX_BlockHit);
                 }
                 // enter vanilla mode if an existing save slot
-                else if(MenuCursorCanMove && homePressed && SaveSlotInfo[MenuCursor + 1].Progress >= 0)
+                else if(MenuCursorCanMove && menuControls.Home && SaveSlotInfo[MenuCursor + 1].Progress >= 0)
                 {
                     int target_bugfixes = (SelectWorld[selWorld].bugfixes_on_by_default) ? Config_t::MODE_MODERN : Config_t::MODE_CLASSIC;
 
@@ -1665,7 +1640,7 @@ bool mainMenuUpdate()
                     MenuCursorCanMove = false;
                 }
                 // go to speedrun menu otherwise
-                else if(MenuCursorCanMove && homePressed)
+                else if(MenuCursorCanMove && menuControls.Home)
                 {
                     PlaySoundMenu(SFX_PlayerGrow);
                     selSave = MenuCursor + 1;
@@ -1698,7 +1673,7 @@ bool mainMenuUpdate()
 
             if(MenuCursorCanMove || MenuMouseClick)
             {
-                if(menuBackPress)
+                if(menuControls.Back)
                 {
 //'save select back
                     MenuMode /= MENU_SELECT_SLOT_BASE;
@@ -1710,7 +1685,7 @@ bool mainMenuUpdate()
                     MenuCursorCanMove = false;
                     PlaySoundMenu(SFX_Slide);
                 }
-                else if(menuDoPress || MenuMouseClick)
+                else if(menuControls.Do || MenuMouseClick)
                 {
                     if(MenuCursor == c_menuItemSavesCopy) // Copy the gamesave
                     {
@@ -1781,7 +1756,7 @@ bool mainMenuUpdate()
 
             if(MenuCursorCanMove || MenuMouseClick)
             {
-                if(menuBackPress)
+                if(menuControls.Back)
                 {
 //'save select back
                     if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
@@ -1797,7 +1772,7 @@ bool mainMenuUpdate()
                     MenuCursorCanMove = false;
                     PlaySoundMenu(SFX_Do);
                 }
-                else if(menuDoPress || MenuMouseClick)
+                else if(menuControls.Do || MenuMouseClick)
                 {
                     SDL_assert_release(IF_INRANGE(MenuCursor, 0, maxSaveSlots - 1));
                     int slot = MenuCursor + 1;
@@ -1849,7 +1824,7 @@ bool mainMenuUpdate()
 
             if(MenuCursorCanMove || MenuMouseClick)
             {
-                if(menuBackPress)
+                if(menuControls.Back)
                 {
 //'save select back
                     MenuMode -= MENU_SELECT_SLOT_DELETE_ADD;
@@ -1857,7 +1832,7 @@ bool mainMenuUpdate()
                     PlaySoundMenu(SFX_Do);
                     MenuCursorCanMove = false;
                 }
-                else if(menuDoPress || MenuMouseClick)
+                else if(menuControls.Do || MenuMouseClick)
                 {
                     MenuMode -= MENU_SELECT_SLOT_DELETE_ADD;
                     DeleteSave(selWorld, (MenuCursor + 1));
@@ -1883,7 +1858,7 @@ bool mainMenuUpdate()
 
             if(MenuCursorCanMove || MenuMouseClick)
             {
-                if(menuBackPress)
+                if(menuControls.Back)
                 {
 //'save select back
                     MenuMode -= MENU_SELECT_SLOT_ADVMODE_ADD;
@@ -1892,7 +1867,7 @@ bool mainMenuUpdate()
                     PlaySoundMenu(SFX_Slide);
                     MenuCursorCanMove = false;
                 }
-                else if(menuDoPress || MenuMouseClick)
+                else if(menuControls.Do || MenuMouseClick)
                 {
                     if(MenuCursor < 3)
                     {

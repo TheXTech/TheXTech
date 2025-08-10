@@ -330,41 +330,28 @@ bool Logic()
     if(SharedCursor.Primary || SharedCursor.Secondary || SharedCursor.Tertiary)
         SharedCursor.Move = true;
 
-    bool leftPressed = SharedControls.MenuLeft || SharedCursor.ScrollUp;
-    bool rightPressed = SharedControls.MenuRight || SharedCursor.ScrollDown;
+    MenuControls_t menuControls = Controls::GetMenuControls();
 
-    bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
-    bool menuBackPress = SharedControls.MenuBack;
+    menuControls.Left |= SharedCursor.ScrollUp;
+    menuControls.Right |= SharedCursor.ScrollDown;
 
-    for(int i = 0; i < l_screen->player_count; i++)
-    {
-        Controls_t &c = Controls::g_RawControls[i];
+    menuControls.Back |= (SharedCursor.Secondary && MenuMouseRelease);
 
-        menuDoPress |= c.Start || c.Jump;
-        menuBackPress |= c.Run;
-
-        leftPressed |= c.Left;
-        rightPressed |= c.Right;
-    }
-
-    menuBackPress |= SharedCursor.Secondary && MenuMouseRelease;
-    menuDoPress |= SharedCursor.Primary && MenuMouseRelease;
-
-    if(menuBackPress && menuDoPress)
-        menuDoPress = false;
+    if(menuControls.Back && menuControls.Do)
+        menuControls.Do = false;
 
     if(!MenuCursorCanMove)
     {
         bool k = false;
-        k |= menuBackPress;
-        k |= menuDoPress;
-        k |= leftPressed;
-        k |= rightPressed;
+        k |= menuControls.Back;
+        k |= menuControls.Do;
+        k |= menuControls.Left;
+        k |= menuControls.Right;
 
         if(!k)
             MenuCursorCanMove = true;
     }
-    else if(menuDoPress)
+    else if(menuControls.Do)
     {
         // check if we are still on the same asset pack
         int cur_idx = s_cur_idx;
@@ -413,7 +400,7 @@ bool Logic()
         MenuMouseRelease = false;
         return true;
     }
-    else if(menuBackPress && g_AssetsLoaded)
+    else if(menuControls.Back && g_AssetsLoaded)
     {
         PlaySoundMenu(SFX_Slide);
 
@@ -435,14 +422,14 @@ bool Logic()
         MenuMouseRelease = false;
         return true;
     }
-    else if(leftPressed)
+    else if(menuControls.Left)
     {
         MenuCursorCanMove = false;
 
         PlaySoundMenu(SFX_Climbing);
         s_target_idx--;
     }
-    else if(rightPressed)
+    else if(menuControls.Right)
     {
         MenuCursorCanMove = false;
 
