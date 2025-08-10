@@ -664,7 +664,7 @@ bool OpenLevel_Event(void* userdata, LevelSMBX64Event& e)
 
         auto &event = Events[A];
 
-        event = Events_t();
+        event.reinit();
 
         event.Name = e.name;
         if(!e.msg.empty())

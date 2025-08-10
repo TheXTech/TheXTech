@@ -668,12 +668,10 @@ void SetLayer(layerindex_t /*LayerName*/)
 
 void InitializeEvent(Events_t& event)
 {
-    event = Events_t();
+    event.reinit();
+
     for(int i = 0; i <= maxSections; i++)
-    {
-        event.section[i] = EventSection_t();
         event.section[i].position.X = EventSection_t::LESet_Nothing;
-    }
 }
 
 bool SwapEvents(eventindex_t index_1, eventindex_t index_2)
@@ -814,7 +812,7 @@ bool DeleteEvent(eventindex_t index)
         SwapEvents(B, B+1);
 
     numEvents--;
-    Events[numEvents] = Events_t();
+    Events[numEvents].reinit();
 
     return true;
 }

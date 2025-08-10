@@ -150,6 +150,13 @@ struct Events_t
 //    AutoStart As Boolean
     bool AutoStart = false;
 //End Type
+
+    // reinitialize in place
+    void reinit()
+    {
+        Events_t::~Events_t();
+        new(this)Events_t();
+    }
 };
 
 //Public Layer(0 To 100) As Layer
