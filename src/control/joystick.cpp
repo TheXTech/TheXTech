@@ -1840,6 +1840,16 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
     if(found == this->m_lastProfileByGUID.end())
         found = this->m_lastProfileByGUID.find(active_joystick->guid);
 
+    // and finally by middle 16 chars of GUID
+    if(found == this->m_lastProfileByGUID.end() && active_joystick->guid.size() == 32)
+    {
+        for(found = this->m_lastProfileByGUID.begin(); found != this->m_lastProfileByGUID.end(); ++found)
+        {
+            if(found->first.size() == 32 && memcmp(found->first.c_str() + 8, active_joystick->guid.c_str() + 8, 16) == 0)
+                break;
+        }
+    }
+
     if(found != this->m_lastProfileByGUID.end())
     {
         method->Profile = found->second;

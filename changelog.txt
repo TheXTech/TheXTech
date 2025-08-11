@@ -29,6 +29,7 @@ Changelog for 1.3.7.2-dev
 -Menus: Alt Run is now used to erase options, instead of Alt Jump (@ds-sloth)
 -Menus: Alt Jump may now advance message boxes and start levels, guarded by existing compat flag "multiplayer-pause-controls" [Modern/Classic Mode] (@ds-sloth)
 -Controls: add Alt Menu Controls option to controller profiles, which makes Jump act as Back and Alt Jump act as Confirm, to improve experience on Japanese-layout controllers (@ds-sloth)
+-Controls: re-use controller profile when connected on different interfaces (@ds-sloth)
 
 Changelog for 1.3.7.1
 -Add GameCube controller support for Wii (@ds-sloth)
