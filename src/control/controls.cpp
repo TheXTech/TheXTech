@@ -1310,7 +1310,7 @@ MenuControls_t GetMenuControls(int limit_player)
         ret.Right |= c.Right;
 
         ret.Home |= c.Drop;
-        ret.Erase |= c.AltJump;
+        ret.Erase |= c.AltRun;
     }
 
     return ret;
