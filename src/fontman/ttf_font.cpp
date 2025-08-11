@@ -285,7 +285,16 @@ bool TtfFont::hasLanguage(const std::string &lang) const
         if(end == std::string::npos)
             end = m_languages.size();
 
-        if(Strings::trim(m_languages.substr(beg, end - beg)) == lang)
+        // trim word
+        auto trim_beg = beg;
+        while(m_languages[trim_beg] == ' ' && trim_beg < end)
+            trim_beg++;
+
+        auto trim_end = end;
+        while(trim_end > trim_beg && m_languages[trim_end - 1] == ' ')
+            trim_end--;
+
+        if(SDL_strncmp(m_languages.c_str() + trim_beg, lang.c_str(), trim_end - trim_beg) == 0)
             return true;
 
         beg = end + 1;
