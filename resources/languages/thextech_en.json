@@ -420,6 +420,7 @@
             "caseTouch": "(Touch)",
             "controlsConnected": "Connected:",
             "controlsDeleteKey": "(Alt Jump to Delete)",
+            "controlsDeleteKey2": "(Alt Run to Delete)",
             "controlsDeviceTypes": "Device Types",
             "controlsInUse": "(In Use)",
             "controlsNewProfile": "<New Profile>",
@@ -462,6 +463,7 @@
                 "batteryStatus": "Battery Status",
                 "maxPlayers": "Max Players",
                 "rumble": "Rumble",
+                "altMenuControls": "Alt Menu Controls",
                 "textEntryStyle": "Text Entry Style"
             },
             "joystickSimpleEditor": "Simple Editor Controls",

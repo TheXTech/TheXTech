@@ -646,6 +646,7 @@
             "controlsInUse": "(En uso)",
             "controlsNewProfile": "<Nuevo Perfil>",
             "controlsDeleteKey": "(Salto Alt para Borrar)",
+            "controlsDeleteKey2": "(Correr Alt para Borrar)",
             "controlsNotInUse": "(No en uso)",
             "tDS": {
                 "buttonStart": "Comenzar",

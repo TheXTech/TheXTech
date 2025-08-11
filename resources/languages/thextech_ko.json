@@ -626,6 +626,7 @@
                 "primary": "1차"
             },
             "controlsDeleteKey": "(대체 점프로 삭제)",
+            "controlsDeleteKey2": "(대체 실행로 삭제)",
             "caseInvalid": "(유효하지 않음)",
             "caseMouse": "(마우스)",
             "caseTouch": "(터치)",

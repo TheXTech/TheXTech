@@ -552,6 +552,7 @@
                 "oldJoystick": "Joystick Antigo"
             },
             "controlsDeleteKey": "(Pulo Alt para Apagar)",
+            "controlsDeleteKey2": "(Correr Alt para Apagar)",
             "joystickSimpleEditor": ""
         },
         "game": {
