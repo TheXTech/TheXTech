@@ -417,6 +417,7 @@ void WorldLoop()
 
 resume_from_pause:
 
+        // find player's current level
         TinyLocation_t tempLocation = WorldPlayer[1].Location;
         tempLocation.Width -= 8;
         tempLocation.Height -= 8;
@@ -436,6 +437,21 @@ resume_from_pause:
             }
         }
 
+        // NEW: allow CanAltJump to start levels (for starting levels using AltJump)
+        if(g_config.multiplayer_pause_controls)
+        {
+            if(Player[1].Controls.AltJump)
+            {
+                if(Player[1].CanAltJump)
+                    Player[1].Controls.Jump = true;
+
+                Player[1].CanAltJump = false;
+            }
+            else
+                Player[1].CanAltJump = true;
+        }
+
+        // geneeral controls / movement logic
         if(Player[1].Controls.Up)
         {
             tempLocation.Y -= 32;
