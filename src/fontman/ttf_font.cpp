@@ -19,6 +19,7 @@
 
 #include <SDL2/SDL_rwops.h>
 #include <Utils/files.h>
+#include <Utils/strings.h>
 
 #include "ttf_font.h"
 #include "sdl_proxy/sdl_stdinc.h"
@@ -262,6 +263,36 @@ void TtfFont::setDoublePixel(bool enable)
 bool TtfFont::doublePixel() const
 {
     return m_doublePixel;
+}
+
+void TtfFont::setLanguages(const std::string &langs)
+{
+    m_languages = langs;
+}
+
+bool TtfFont::hasLanguage(const std::string &lang) const
+{
+    std::string::size_type beg = 0;
+    std::string::size_type end = 0;
+
+    if(m_languages.empty())
+        return false;
+
+    do
+    {
+        end = m_languages.find(',', beg);
+
+        if(end == std::string::npos)
+            end = m_languages.size();
+
+        if(Strings::trim(m_languages.substr(beg, end - beg)) == lang)
+            return true;
+
+        beg = end + 1;
+    }
+    while(end < m_languages.size() - 1);
+
+    return false;
 }
 
 PGE_Size TtfFont::glyphSize(const char* utf8char, uint32_t charNum, uint32_t fontSize)

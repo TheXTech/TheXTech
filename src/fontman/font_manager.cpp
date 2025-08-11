@@ -295,11 +295,12 @@ static bool s_loadFontsFromDir(DirListCI &fonts_root,
     {
         for(int i = 1; ;++i)
         {
-            std::string key = fmt::format_ne("file{0}", i);
-            std::string keyAntiAlias = fmt::format_ne("file{0}-antialias", i);
-            std::string keyBitmapSize = fmt::format_ne("file{0}-bitmap-size", i);
-            std::string keyFontName = fmt::format_ne("file{0}-font-name", i);
-            std::string keyDoublePixel = fmt::format_ne("file{0}-double-pixel", i);
+            std::string key = fmt::sprintf_ne("file%d", i);
+            std::string keyAntiAlias = fmt::sprintf_ne("file%d-antialias", i);
+            std::string keyBitmapSize = fmt::sprintf_ne("file%d-bitmap-size", i);
+            std::string keyFontName = fmt::sprintf_ne("file%d-font-name", i);
+            std::string keyDoublePixel = fmt::sprintf_ne("file%d-double-pixel", i);
+            std::string keyLangsPriority = fmt::sprintf_ne("file%d-lang-priority", i);
 
             if(!overrider.hasKey(key))
                 break; // Stop look up on a first missing key
@@ -328,6 +329,9 @@ static bool s_loadFontsFromDir(DirListCI &fonts_root,
 #endif
             overrider.read(keyDoublePixel.c_str(), doublePixel, doublePixelDefault);
 
+            std::string langsPriority;
+            overrider.read(keyLangsPriority.c_str(), langsPriority, std::string());
+
             std::string fontPath = fonts_root.getCurDir() + sSubDir + fontFile;
 
             outTtfFonts.emplace_back();
@@ -336,6 +340,7 @@ static bool s_loadFontsFromDir(DirListCI &fonts_root,
             tf.setAntiAlias(antiAlias);
             tf.setBitmapSize(bitmapSize);
             tf.setDoublePixel(doublePixel);
+            tf.setLanguages(langsPriority);
 
             pLogDebug("Loading TTF font %s...", fontPath.c_str());
             tf.loadFont(fontPath);
@@ -511,6 +516,37 @@ void FontManager::quit()
 
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
     closeFreeType();
+#endif
+}
+
+void FontManager::updateDefaultFontByLang(const std::string &lang, const std::string &country)
+{
+#ifdef THEXTECH_ENABLE_TTF_SUPPORT
+    g_defaultTtfFont = nullptr;
+
+    if(g_ttfFonts.empty())
+        return; // Nothing to choose
+
+    // Just use a first font in the list by default
+    g_defaultTtfFont = &g_ttfFonts.front();
+
+    for(auto &f : g_ttfFonts)
+    {
+        if(!country.empty() && f.hasLanguage(fmt::sprintf_ne("%s-%s", lang.c_str(), country.c_str())))
+        {
+            g_defaultTtfFont = &f;
+            break;
+        }
+
+        if(f.hasLanguage(lang))
+        {
+            g_defaultTtfFont = &f;
+            break;
+        }
+    }
+#else
+    (void)lang;
+    (void)country;
 #endif
 }
 
