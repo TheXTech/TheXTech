@@ -575,12 +575,14 @@ public:
         {
             rumble = 0,
             show_power_status,
+            alt_menu_controls,
             COUNT
         };
     };
 
     bool m_rumbleEnabled = false;
     bool m_showPowerStatus = false;
+    bool m_altMenuControls = false;
 
     // assume that the IniProcessing* is already in the correct group
     // saves/loads the shared options and calls the device-specific Save/LoadConfig

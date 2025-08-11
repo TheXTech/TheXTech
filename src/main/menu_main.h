@@ -169,6 +169,7 @@ struct MainMenuContent
 
     std::string controlsOptionRumble;
     std::string controlsOptionBatteryStatus;
+    std::string controlsOptionAltMenuControls;
 
     std::string wordProfiles;
     std::string wordButtons;

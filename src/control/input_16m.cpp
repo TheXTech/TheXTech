@@ -302,6 +302,8 @@ InputMethodProfile_16M::InputMethodProfile_16M()
     this->m_editor_keys[EditorControls::Buttons::TestPlay] = KEYID_START;
 
     this->m_hotkeys[Hotkeys::Buttons::VanillaCam] = KEYID_L;
+
+    this->m_altMenuControls = true;
 }
 
 bool InputMethodProfile_16M::PollPrimaryButton(ControlsClass c, size_t i)

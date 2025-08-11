@@ -206,6 +206,8 @@ void InputMethodProfile::SaveConfig_All(IniProcessing* ctl)
     if(this->Type->PowerStatusSupported())
         ctl->setValue("show-power-status", this->m_showPowerStatus);
 
+    ctl->setValue("alt-menu-controls", this->m_altMenuControls);
+
     this->SaveConfig(ctl);
 }
 
@@ -216,6 +218,9 @@ void InputMethodProfile::LoadConfig_All(IniProcessing* ctl)
 
     if(this->Type->PowerStatusSupported())
         ctl->read("show-power-status", this->m_showPowerStatus, this->m_showPowerStatus);
+
+    // defaults to false to avoid changes when users upgrade from earlier versions of TheXTech
+    ctl->read("alt-menu-controls", this->m_altMenuControls, false);
 
     this->LoadConfig(ctl);
 }
@@ -251,8 +256,10 @@ const char* InputMethodProfile::GetOptionName(size_t i)
 
     if(i == CommonOptions::rumble)
         return g_mainMenu.controlsOptionRumble.c_str();
-    else if(i == CommonOptions::show_power_status) // -V547 Should be here to fail when adding new enum fields
+    else if(i == CommonOptions::show_power_status)
         return g_mainMenu.controlsOptionBatteryStatus.c_str();
+    else if(i == CommonOptions::alt_menu_controls) // -V547 Should be here to fail when adding new enum fields
+        return g_mainMenu.controlsOptionAltMenuControls.c_str();
     else
         return nullptr;
 }
@@ -277,12 +284,19 @@ const char* InputMethodProfile::GetOptionValue(size_t i)
         else
             return g_mainMenu.wordOff.c_str();
     }
-    else if(i == CommonOptions::show_power_status) // -V547 Should be here to fail when adding new enum fields
+    else if(i == CommonOptions::show_power_status)
     {
         if(this->m_showPowerStatus)
             return g_mainMenu.wordShow.c_str();
         else
             return g_mainMenu.wordHide.c_str();
+    }
+    else if(i == CommonOptions::alt_menu_controls) // -V547 Should be here to fail when adding new enum fields
+    {
+        if(this->m_altMenuControls)
+            return g_mainMenu.wordOn.c_str();
+        else
+            return g_mainMenu.wordOff.c_str();
     }
     else
         return nullptr;
@@ -314,9 +328,14 @@ bool InputMethodProfile::OptionChange(size_t i)
 
         return true;
     }
-    else if(i == CommonOptions::show_power_status) // -V547 Should be here to fail when adding new enum fields
+    else if(i == CommonOptions::show_power_status)
     {
         this->m_showPowerStatus = !this->m_showPowerStatus;
+        return true;
+    }
+    else if(i == CommonOptions::alt_menu_controls) // -V547 Should be here to fail when adding new enum fields
+    {
+        this->m_altMenuControls = !this->m_altMenuControls;
         return true;
     }
     else
