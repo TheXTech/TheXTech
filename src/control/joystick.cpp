@@ -42,6 +42,32 @@
 namespace Controls
 {
 
+// hardcoded list of GUIDs that prefer alt (Japanese) menu control layout -- middle 16 bytes only
+static const char* s_alt_guids_16[] =
+{
+    "7e05000030030000", // Wii U Pro Controller
+    "7e05000006200000", // Switch 1 Joy-Con (L)
+    "7e05000007200000", // Switch 1 Joy-Con (R)
+    "7e05000008200000", // Switch 1 Joy-Cons
+    "7e05000009200000", // Switch 1 Pro Controller
+    "7e05000017200000", // Switch 1 SNES Controller
+    "7e05000069200000", // Switch 2 Pro Controller
+};
+
+static bool s_AltControlsDefault(const std::string& guid)
+{
+    if(guid.size() != 32)
+        return false;
+
+    for(size_t i = 0; i < sizeof(s_alt_guids_16) / sizeof(const char*); i++)
+    {
+        if(memcmp(guid.c_str() + 8, s_alt_guids_16[i], 16) == 0)
+            return true;
+    }
+
+    return false;
+}
+
 /*====================================================*\
 || implementation for InputMethod_Joystick            ||
 \*====================================================*/
@@ -705,7 +731,7 @@ StatusInfo InputMethod_Joystick::GetStatus()
 // the job of this function is to initialize the class in a consistent state
 InputMethodProfile_Joystick::InputMethodProfile_Joystick()
 {
-    this->InitAsController();
+    this->InitAsController(false);
     this->m_showPowerStatus = false;
 }
 
@@ -761,7 +787,7 @@ void InputMethodProfile_Joystick::InitAsJoystick()
     this->m_cursor_keys[CursorControls::Buttons::Secondary].assign(KM_Key::JoyAxis, 5, 1);
 }
 
-void InputMethodProfile_Joystick::InitAsController()
+void InputMethodProfile_Joystick::InitAsController(bool use_alt_controls)
 {
     this->m_controllerProfile = true;
 
@@ -769,17 +795,23 @@ void InputMethodProfile_Joystick::InitAsController()
     this->m_keys[PlayerControls::Buttons::Down].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_DPAD_DOWN, 1);
     this->m_keys[PlayerControls::Buttons::Left].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_DPAD_LEFT, 1);
     this->m_keys[PlayerControls::Buttons::Right].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_DPAD_RIGHT, 1);
-#ifdef __WIIU__ // On Wii U, controls are swapped
-    this->m_keys[PlayerControls::Buttons::Jump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_B, 1);
-    this->m_keys[PlayerControls::Buttons::AltJump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_A, 1);
-    this->m_keys[PlayerControls::Buttons::Run].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_Y, 1);
-    this->m_keys[PlayerControls::Buttons::AltRun].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_X, 1);
-#else
-    this->m_keys[PlayerControls::Buttons::Jump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_A, 1);
-    this->m_keys[PlayerControls::Buttons::AltJump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_B, 1);
-    this->m_keys[PlayerControls::Buttons::Run].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_X, 1);
-    this->m_keys[PlayerControls::Buttons::AltRun].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_Y, 1);
-#endif
+
+    if(use_alt_controls)
+    {
+        this->m_keys[PlayerControls::Buttons::Jump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_B, 1);
+        this->m_keys[PlayerControls::Buttons::AltJump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_A, 1);
+        this->m_keys[PlayerControls::Buttons::Run].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_Y, 1);
+        this->m_keys[PlayerControls::Buttons::AltRun].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_X, 1);
+        this->m_altMenuControls = true;
+    }
+    else
+    {
+        this->m_keys[PlayerControls::Buttons::Jump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_A, 1);
+        this->m_keys[PlayerControls::Buttons::AltJump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_B, 1);
+        this->m_keys[PlayerControls::Buttons::Run].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_X, 1);
+        this->m_keys[PlayerControls::Buttons::AltRun].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_Y, 1);
+    }
+
     this->m_keys[PlayerControls::Buttons::Drop].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_BACK, 1);
     this->m_keys[PlayerControls::Buttons::Start].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_START, 1);
 
@@ -1858,7 +1890,19 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
     if(!method->Profile)
     {
         if(active_joystick->ctrl)
+        {
             method->Profile = this->AddProfile();
+
+            // Detect whether alt controls are appropriate here given a hardcoded list of GUIDs.
+            if(s_AltControlsDefault(active_joystick->guid))
+            {
+                pLogInfo("New controller profile will use alt menu controls layout");
+
+                auto* p = dynamic_cast<InputMethodProfile_Joystick*>(method->Profile);
+                if(p)
+                    p->InitAsController(true);
+            }
+        }
         else
             method->Profile = this->AddOldJoystickProfile();
 

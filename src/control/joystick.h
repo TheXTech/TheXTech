@@ -135,7 +135,7 @@ public:
     InputMethodProfile_Joystick();
 
     void InitAsJoystick();
-    void InitAsController();
+    void InitAsController(bool use_alt_controls);
     void ExpandAsJoystick();
     void ExpandAsController();
     void SaveConfig_Legacy(IniProcessing *ctl);
