@@ -71,6 +71,9 @@ public:
     void setDoublePixel(bool enable);
     bool doublePixel() const;
 
+    void setLanguages(const std::string &langs);
+    bool hasLanguage(const std::string &lang) const;
+
     /*!
      * \brief Get a size of one glyph
      * \param utf8char Pointer to one UTF-8 character
@@ -144,6 +147,9 @@ private:
     bool m_isReady = false;
     //! Handalable name of the font
     std::string m_fontName;
+
+    //! Comma-separated list of languages that should bring this font being loaded first
+    std::string m_languages;
 
     //! Recently used pixel size of the font
     uint32_t     m_recentPixelSize = 10;

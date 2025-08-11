@@ -83,7 +83,7 @@ void RasterFont::loadFont(const std::string &font_ini)
     font.read("ttf-outlines", m_ttfOutlines, false);
     font.read("ttf-colour", ttfColourPacked, 0xFFFFFFFF);
     font.read("ttf-outlines-colour", ttfOutlinesColourPacked, 0x000000FF);
-    font.read("ttf-fallback", m_ttfFallback, "");
+    font.read("ttf-fallback", m_ttfFallback, std::string());
     font.read("ttf-size", m_ttfSize, -1);
 #if defined(THEXTECH_USE_1X_FONT_MODE) // Use special fonts targeted to smaller screen resolutions
     font.read("ttf-fallback-1x", m_ttfFallback, m_ttfFallback);

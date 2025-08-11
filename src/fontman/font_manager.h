@@ -59,6 +59,13 @@ void initFull();
 void quit();
 
 /**
+ * @brief Once language had been toggled, a different default TTF font may be chosen
+ * \param lang Language code
+ * \param country Country code (may be empty)
+ */
+void updateDefaultFontByLang(const std::string &lang, const std::string &country);
+
+/**
  * @brief Attempts to load custom fonts for the episode and for the level
  */
 void loadCustomFonts();

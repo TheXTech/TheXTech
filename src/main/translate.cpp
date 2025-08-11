@@ -1109,6 +1109,8 @@ void ReloadTranslations()
 {
     XLanguage::resolveLanguage(g_config.language);
 
+    FontManager::updateDefaultFontByLang(CurrentLanguage, CurrentLangDialect);
+
     XTechTranslate translator;
     translator.reset();
     if(translator.translate())
