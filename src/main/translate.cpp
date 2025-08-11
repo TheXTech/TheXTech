@@ -247,7 +247,7 @@ XTechTranslate::XTechTranslate()
 
     insert(m_engineMap, "menu.controls.controlsTitle",          &g_mainMenu.controlsTitle);
     insert(m_engineMap, "menu.controls.controlsConnected",      &g_mainMenu.controlsConnected);
-    insert(m_engineMap, "menu.controls.controlsDeleteKey",      &g_mainMenu.controlsDeleteKey);
+    insert(m_engineMap, "menu.controls.controlsDeleteKey2",     &g_mainMenu.controlsDeleteKey);
     insert(m_engineMap, "menu.controls.controlsDeviceTypes",    &g_mainMenu.controlsDeviceTypes);
     insert(m_engineMap, "menu.controls.controlsInUse",          &g_mainMenu.controlsInUse);
     insert(m_engineMap, "menu.controls.controlsNotInUse",       &g_mainMenu.controlsNotInUse);

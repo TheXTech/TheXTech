@@ -420,6 +420,7 @@
             "caseTouch": "(Touch)",
             "controlsConnected": "Connected:",
             "controlsDeleteKey": "(Alt Jump to Delete)",
+            "controlsDeleteKey2": "(Alt Run to Delete)",
             "controlsDeviceTypes": "Device Types",
             "controlsInUse": "(In Use)",
             "controlsNewProfile": "<New Profile>",

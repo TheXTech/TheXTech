@@ -420,6 +420,7 @@
             "caseTouch": "（觸屏）",
             "controlsConnected": "已連接：",
             "controlsDeleteKey": "（按第二跳躍鍵清除）",
+            "controlsDeleteKey2": "（按第二奔跑鍵清除）",
             "controlsDeviceTypes": "設備類型",
             "controlsInUse": "（已使用）",
             "controlsNewProfile": "<新建配置>",

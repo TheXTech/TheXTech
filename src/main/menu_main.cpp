@@ -185,7 +185,7 @@ void initMainMenu()
 
     g_mainMenu.controlsTitle = "Controls";
     g_mainMenu.controlsConnected = "Connected:";
-    g_mainMenu.controlsDeleteKey = "(Alt Jump to Delete)";
+    g_mainMenu.controlsDeleteKey = "(Alt Run to Delete)";
     g_mainMenu.controlsDeviceTypes = "Device Types";
     g_mainMenu.controlsInUse = "(In Use)";
     g_mainMenu.controlsNotInUse = "(Not In Use)";
