@@ -1294,14 +1294,27 @@ MenuControls_t GetMenuControls(int limit_player)
 
     ret.Erase = false;
 
-    for(int i = 0; l_screen && i < l_screen->player_count; i++)
+    for(size_t i = 0; l_screen && i < (size_t)l_screen->player_count; i++)
     {
         if(limit_player != 0 && l_screen->players[i] != limit_player)
             continue;
 
-        const Controls_t &c = Controls::g_RawControls[i];
+        const Controls_t &c = g_RawControls[i];
 
-        ret.Do |= c.Start || c.Jump;
+        // alt menu controls: Jump is back, AltJump is Do
+        if(i < g_InputMethods.size() && g_InputMethods[i] && g_InputMethods[i]->Profile && g_InputMethods[i]->Profile->m_altMenuControls)
+        {
+            ret.Back |= c.Jump;
+            ret.Do |= c.AltJump;
+        }
+        // normal menu controls: Jump is Do, AltJump is Back
+        else
+        {
+            ret.Do |= c.Jump;
+            ret.Back |= c.AltJump;
+        }
+
+        ret.Do |= c.Start;
         ret.Back |= c.Run;
 
         ret.Up |= c.Up;
