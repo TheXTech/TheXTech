@@ -5,6 +5,7 @@ Changelog for 1.3.7.2-dev
 -Modern mode: allow static, always-shown NPCs (eg, O or bullet shooters) to deactivate while onscreen (@Wohlstand, @ds-sloth)
 -Added an ability to assign some TTF font per language (@Wohlstand)
 -Menus: Alt Run is now used to erase options, instead of Alt Jump (@ds-sloth)
+-Menus: Alt Jump may now advance message boxes and start levels, guarded by existing compat flag "multiplayer-pause-controls" [Modern/Classic Mode] (@ds-sloth)
 -Controls: add Alt Menu Controls option to controller profiles, which makes Jump act as Back and Alt Jump act as Confirm, to improve experience on Japanese-layout controllers (@ds-sloth)
 
 Changelog for 1.3.7.1

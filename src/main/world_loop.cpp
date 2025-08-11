@@ -380,6 +380,7 @@ void WorldLoop()
 
     if(WorldPlayer[1].Move == 0)
     {
+        // find player's current level
         tempLocation = WorldPlayer[1].Location;
         tempLocation.Width -= 8;
         tempLocation.Height -= 8;
@@ -398,6 +399,7 @@ void WorldLoop()
             }
         }
 
+        // pause logic
         if(SharedControls.Pause)
         {
             PauseGame(PauseCode::PauseScreen, 0);
@@ -411,6 +413,21 @@ void WorldLoop()
                 break;
         }
 
+        // NEW: allow CanAltJump to start levels (for starting levels using AltJump)
+        if(g_config.multiplayer_pause_controls)
+        {
+            if(Player[1].Controls.AltJump)
+            {
+                if(Player[1].CanAltJump)
+                    Player[1].Controls.Jump = true;
+
+                Player[1].CanAltJump = false;
+            }
+            else
+                Player[1].CanAltJump = true;
+        }
+
+        // general controls / movement logic
         if(Player[1].Controls.Up)
         {
             tempLocation.Y -= 32;

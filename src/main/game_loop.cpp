@@ -412,22 +412,20 @@ bool MessageScreen_Logic(int plr)
     if(!g_config.multiplayer_pause_controls && plr == 0)
         plr = 1;
 
-    if(plr == 0)
+    for(int i = 1; i <= numPlayers; i++)
     {
-        for(int i = 1; i <= numPlayers; i++)
-        {
-            const Controls_t& c = Player[i].Controls;
+        // in exclusive mode, skip other players
+        if(plr != 0 && i != plr)
+            continue;
 
-            menuDoPress |= (c.Start || c.Jump);
-            menuBackPress |= c.Run;
-        }
-    }
-    else
-    {
-        const Controls_t& c = Player[plr].Controls;
+        const Controls_t& c = Player[i].Controls;
 
         menuDoPress |= (c.Start || c.Jump);
         menuBackPress |= c.Run;
+
+        // NEW: allow AltJump (Do in alt menu layout) to advance messages
+        if(g_config.multiplayer_pause_controls && c.AltJump)
+            menuDoPress = true;
     }
 
     if(!MenuCursorCanMove_Back)
@@ -638,6 +636,10 @@ int PauseGame(PauseCode code, int plr)
     {
         Player[i].UnStart = false;
         Player[i].CanJump = false;
+
+        // NEW: disable AltJump (used by alt menu controls and optionally used in standard menu controls)
+        if(g_config.multiplayer_pause_controls)
+            Player[i].CanAltJump = false;
     }
 
     MenuCursorCanMove = false;
