@@ -576,6 +576,8 @@ void InputMethodProfile_Wii::InitAs(uint8_t expansion)
         this->m_cursor_keys2[CursorControls::Buttons::CursorRight] = WPAD_STICK_RR;
         this->m_cursor_keys2[CursorControls::Buttons::Primary] = WPAD_CLASSIC_BUTTON_FULL_R;
         this->m_cursor_keys2[CursorControls::Buttons::Secondary] = WPAD_CLASSIC_BUTTON_FULL_L;
+
+        this->m_altMenuControls = true;
     }
     else
     {

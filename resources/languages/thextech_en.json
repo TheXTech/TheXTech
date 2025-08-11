@@ -462,6 +462,7 @@
                 "batteryStatus": "Battery Status",
                 "maxPlayers": "Max Players",
                 "rumble": "Rumble",
+                "altMenuControls": "Alt Menu Controls",
                 "textEntryStyle": "Text Entry Style"
             },
             "joystickSimpleEditor": "Simple Editor Controls",

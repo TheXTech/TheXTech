@@ -201,6 +201,7 @@ void initMainMenu()
     g_mainMenu.controlsOptionRumble = "Rumble";
     // g_mainMenu.controlsOptionGroundPoundButton = "Ground Pound Button";
     g_mainMenu.controlsOptionBatteryStatus = "Battery Status";
+    g_mainMenu.controlsOptionAltMenuControls = "Alt Menu Controls";
 
     g_mainMenu.wordProfiles = "Profiles";
     g_mainMenu.wordButtons  = "Buttons";

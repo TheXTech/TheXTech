@@ -268,6 +268,7 @@ XTechTranslate::XTechTranslate()
 
     insert(m_engineMap, "menu.controls.options.rumble",         &g_mainMenu.controlsOptionRumble);
     insert(m_engineMap, "menu.controls.options.batteryStatus",  &g_mainMenu.controlsOptionBatteryStatus);
+    insert(m_engineMap, "menu.controls.options.altMenuControls",  &g_mainMenu.controlsOptionAltMenuControls);
     insert(m_engineMap, "menu.controls.options.maxPlayers",     &g_controlsStrings.sharedOptionMaxPlayers);
 
     insert(m_engineMap, "menu.controls.buttons.up",      &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Up]);
