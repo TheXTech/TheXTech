@@ -2166,16 +2166,33 @@ int PlayerBox::Logic()
 
     const Controls_t& c = Controls::g_RawControls[p];
 
+    bool c_Do, c_Back, c_AltDo, c_AltBack;
+
+    if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p] && Controls::g_InputMethods[p]->Profile && Controls::g_InputMethods[p]->Profile->m_altMenuControls)
+    {
+        c_Do = c.AltJump;
+        c_Back = c.Jump || c.Run;
+        c_AltDo = c.AltRun;
+        c_AltBack = c.Run;
+    }
+    else
+    {
+        c_Do = c.Jump;
+        c_Back = c.Run || c.AltJump;
+        c_AltDo = c.AltJump;
+        c_AltBack = c.AltRun;
+    }
+
     if(m_just_added)
     {
         // play drop item noise?
         bool play_noise = (s_context != Context::LegacyMenu);
 
         // block back if a new-added player
-        if((int)Controls::g_InputMethods.size() > s_minPlayers && (c.Run || l_SharedControls.MenuBack))
+        if((int)Controls::g_InputMethods.size() > s_minPlayers && (c_Back || l_SharedControls.MenuBack))
             m_input_ready = false;
         // if pressing back, don't play drop item noise
-        else if(c.Run || l_SharedControls.MenuBack)
+        else if(c_Back || l_SharedControls.MenuBack)
             play_noise = false;
 
         // if about to move cursor, don't play drop item noise
@@ -2183,7 +2200,7 @@ int PlayerBox::Logic()
             play_noise = false;
 
         // don't allow going forwards at main menu
-        if(s_context == Context::MainMenu && m_input_ready && (c.Jump || c.Start))
+        if(s_context == Context::MainMenu && m_input_ready && (c_Do || c.Start))
             m_input_ready = false;
 
         if(play_noise)
@@ -2215,8 +2232,8 @@ int PlayerBox::Logic()
             || (m_konami_bits == 5 && c.Right)
             || (m_konami_bits == 6 && c.Left)
             || (m_konami_bits == 7 && c.Right)
-            || (m_konami_bits == 8 && c.AltRun)
-            || (m_konami_bits == 9 && c.AltJump))
+            || (m_konami_bits == 8 && c_AltBack)
+            || (m_konami_bits == 9 && c_AltDo))
         {
             m_konami_bits++;
 
@@ -2319,7 +2336,7 @@ int PlayerBox::Logic()
             m_marquee_state.reset_width();
             m_input_ready = false;
         }
-        else if(c.Run)
+        else if(c_Back)
             m_menu_item += 1;
         else if(m_menu_item >= 0)
             m_menu_item -= 2;
@@ -2351,12 +2368,12 @@ int PlayerBox::Logic()
 
         return 0;
     }
-    else if(c.Run || (Is1P() && l_SharedControls.MenuBack))
+    else if(c_Back || (Is1P() && l_SharedControls.MenuBack))
     {
         if(Back())
             return -1;
     }
-    else if(c.Jump || c.Start || (Is1P() && l_SharedControls.MenuDo))
+    else if(c_Do || c.Start || (Is1P() && l_SharedControls.MenuDo))
     {
         if(Do())
         {
