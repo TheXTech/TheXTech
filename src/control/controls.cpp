@@ -462,18 +462,13 @@ bool InputMethodType::DeleteProfile(InputMethodProfile* profile, const std::vect
     if(loc == this->m_profiles.end())
         return false;
 
-    int player_no = 0;
-
     for(InputMethod* method : active_methods)
     {
         if(!method)
             continue;
 
         if(method->Profile == profile)
-            return false;
-
-        player_no ++;
-        UNUSED(player_no);
+            DeleteInputMethod(method);
     }
 
     for(int i = 0; i < maxLocalPlayers; i++)
