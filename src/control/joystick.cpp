@@ -853,102 +853,6 @@ void InputMethodProfile_Joystick::InitAsController(bool use_alt_controls)
     this->m_cursor_keys[CursorControls::Buttons::Secondary].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_TRIGGERLEFT, 1);
 }
 
-void InputMethodProfile_Joystick::ExpandAsJoystick()
-{
-    this->m_legacyProfile = false;
-    this->m_controllerProfile = false;
-
-    // controller keys are stored in m_keys, joystick in m_keys2
-    // copy joystick keys from m_keys2 to m_keys
-    this->m_keys[PlayerControls::Buttons::Up] = this->m_keys2[PlayerControls::Buttons::Up];
-    this->m_keys[PlayerControls::Buttons::Down] = this->m_keys2[PlayerControls::Buttons::Down];
-    this->m_keys[PlayerControls::Buttons::Left] = this->m_keys2[PlayerControls::Buttons::Left];
-    this->m_keys[PlayerControls::Buttons::Right] = this->m_keys2[PlayerControls::Buttons::Right];
-    this->m_keys[PlayerControls::Buttons::Jump] = this->m_keys2[PlayerControls::Buttons::Jump];
-    this->m_keys[PlayerControls::Buttons::AltJump] = this->m_keys2[PlayerControls::Buttons::AltJump];
-    this->m_keys[PlayerControls::Buttons::Run] = this->m_keys2[PlayerControls::Buttons::Run];
-    this->m_keys[PlayerControls::Buttons::AltRun] = this->m_keys2[PlayerControls::Buttons::AltRun];
-    this->m_keys[PlayerControls::Buttons::Drop] = this->m_keys2[PlayerControls::Buttons::Drop];
-    this->m_keys[PlayerControls::Buttons::Start] = this->m_keys2[PlayerControls::Buttons::Start];
-
-    // clear all of the old joystick keys that have been copied over
-    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
-        this->m_keys2[i].assign(KM_Key::NoControl, -1, -1);
-
-    // this is needed because using the LStick was not configurable before
-    this->m_keys2[PlayerControls::Buttons::Up].assign(KM_Key::JoyAxis, 1, -1);
-    this->m_keys2[PlayerControls::Buttons::Down].assign(KM_Key::JoyAxis, 1, 1);
-    this->m_keys2[PlayerControls::Buttons::Left].assign(KM_Key::JoyAxis, 0, -1);
-    this->m_keys2[PlayerControls::Buttons::Right].assign(KM_Key::JoyAxis, 0, 1);
-
-    // clear all of the non-standard controllers, then fill in some of them
-    for(size_t i = 0; i < CursorControls::n_buttons; i++)
-    {
-        this->m_cursor_keys[i].assign(KM_Key::NoControl, -1, -1);
-        this->m_cursor_keys2[i].assign(KM_Key::NoControl, -1, -1);
-    }
-
-    for(size_t i = 0; i < EditorControls::n_buttons; i++)
-    {
-        this->m_editor_keys[i].assign(KM_Key::NoControl, -1, -1);
-        this->m_editor_keys2[i].assign(KM_Key::NoControl, -1, -1);
-    }
-
-    for(size_t i = 0; i < Hotkeys::n_buttons; i++)
-    {
-        this->m_hotkeys[i].assign(KM_Key::NoControl, -1, -1);
-        this->m_hotkeys2[i].assign(KM_Key::NoControl, -1, -1);
-    }
-
-    this->m_cursor_keys[CursorControls::Buttons::CursorUp].assign(KM_Key::JoyAxis, 3, -1);
-    this->m_cursor_keys[CursorControls::Buttons::CursorDown].assign(KM_Key::JoyAxis, 3, 1);
-    this->m_cursor_keys[CursorControls::Buttons::CursorLeft].assign(KM_Key::JoyAxis, 2, -1);
-    this->m_cursor_keys[CursorControls::Buttons::CursorRight].assign(KM_Key::JoyAxis, 2, 1);
-}
-
-void InputMethodProfile_Joystick::ExpandAsController()
-{
-    this->m_legacyProfile = false;
-    this->m_controllerProfile = true;
-
-    // controller keys are stored in m_keys, joystick in m_keys2
-    // no action needed for m_keys
-
-    // clear all of the old joystick keys, then fill in some of them
-    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
-        this->m_keys2[i].assign(KM_Key::NoControl, -1, -1);
-
-    // this is needed because using the LStick was not configurable before
-    this->m_keys2[PlayerControls::Buttons::Up].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTY, -1);
-    this->m_keys2[PlayerControls::Buttons::Down].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTY, 1);
-    this->m_keys2[PlayerControls::Buttons::Left].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTX, -1);
-    this->m_keys2[PlayerControls::Buttons::Right].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTX, 1);
-
-    // clear all of the non-standard controllers, then fill in some of them
-    for(size_t i = 0; i < CursorControls::n_buttons; i++)
-    {
-        this->m_cursor_keys[i].assign(KM_Key::NoControl, -1, -1);
-        this->m_cursor_keys2[i].assign(KM_Key::NoControl, -1, -1);
-    }
-
-    for(size_t i = 0; i < EditorControls::n_buttons; i++)
-    {
-        this->m_editor_keys[i].assign(KM_Key::NoControl, -1, -1);
-        this->m_editor_keys2[i].assign(KM_Key::NoControl, -1, -1);
-    }
-
-    for(size_t i = 0; i < Hotkeys::n_buttons; i++)
-    {
-        this->m_hotkeys[i].assign(KM_Key::NoControl, -1, -1);
-        this->m_hotkeys2[i].assign(KM_Key::NoControl, -1, -1);
-    }
-
-    this->m_cursor_keys[CursorControls::Buttons::CursorUp].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_RIGHTY, -1);
-    this->m_cursor_keys[CursorControls::Buttons::CursorDown].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_RIGHTY, 1);
-    this->m_cursor_keys[CursorControls::Buttons::CursorLeft].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_RIGHTX, -1);
-    this->m_cursor_keys[CursorControls::Buttons::CursorRight].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_RIGHTX, 1);
-}
-
 bool InputMethodProfile_Joystick::PollPrimaryButton(ControlsClass c, size_t i)
 {
     // note: m_canPoll is initialized to false
@@ -1551,34 +1455,6 @@ void InputMethodProfile_Joystick::SaveConfig_Legacy(IniProcessing* ctl)
     }
 }
 
-void InputMethodProfile_Joystick::LoadConfig_Legacy(IniProcessing* ctl)
-{
-    std::string name;
-
-    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
-    {
-        name = PlayerControls::GetButtonName_INI(i);
-        size_t orig_l = name.size();
-
-        ctl->read(name.replace(orig_l, std::string::npos, "-ctrl-type").c_str(),
-                  this->m_keys[i].type, this->m_keys[i].type);
-        ctl->read(name.replace(orig_l, std::string::npos, "-ctrl-id").c_str(),
-                  this->m_keys[i].id, this->m_keys[i].id);
-        ctl->read(name.replace(orig_l, std::string::npos, "-ctrl-val").c_str(),
-                  this->m_keys[i].val, this->m_keys[i].val);
-
-        ctl->read(name.replace(orig_l, std::string::npos, "-type").c_str(),
-                  this->m_keys2[i].type, this->m_keys2[i].type);
-        ctl->read(name.replace(orig_l, std::string::npos, "-id").c_str(),
-                  this->m_keys2[i].id, this->m_keys2[i].id);
-        ctl->read(name.replace(orig_l, std::string::npos, "-val").c_str(),
-                  this->m_keys2[i].val, this->m_keys2[i].val);
-    }
-
-    this->m_legacyProfile = true;
-    this->m_simple_editor = true;
-}
-
 size_t InputMethodProfile_Joystick::GetOptionCount_Custom()
 {
     return 1;
@@ -1642,10 +1518,6 @@ InputMethodType_Joystick::InputMethodType_Joystick()
 
 InputMethodType_Joystick::~InputMethodType_Joystick()
 {
-    for(InputMethodProfile_Joystick* profile : this->m_hiddenProfiles)
-        delete profile;
-
-    this->m_hiddenProfiles.clear();
     this->m_lastProfileByGUID.clear();
 
     // A single pass would be much more efficient,
@@ -1851,24 +1723,7 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
     }
 
     if(found != this->m_lastProfileByGUID.end())
-    {
         method->Profile = found->second;
-        InputMethodProfile_Joystick* profile = dynamic_cast<InputMethodProfile_Joystick*>(found->second);
-
-        if(profile->m_legacyProfile)
-        {
-            // expanding a legacy profile based on information from controller
-            profile->Name = method->Name + " P" + std::to_string(my_index + 1);
-
-            if(active_joystick->ctrl)
-                profile->ExpandAsController();
-            else
-                profile->ExpandAsJoystick();
-
-            this->m_profiles.push_back(method->Profile);
-            this->m_hiddenProfiles.erase(profile);
-        }
-    }
 
 #if 0
     // Inappropriate method that causes different types of controllers to share a profile
@@ -2245,24 +2100,8 @@ void InputMethodType_Joystick::SaveConfig_Custom(IniProcessing* ctl)
         auto loc = std::find(this->m_profiles.begin(), this->m_profiles.end(), it->second);
         size_t index = loc - this->m_profiles.begin();
 
-        if(index == this->m_profiles.size())
-        {
-            // this probably a legacy profile, let's check.
-            auto* p = dynamic_cast<InputMethodProfile_Joystick*>(it->second);
-
-            if(p && p->m_legacyProfile)
-            {
-                ctl->endGroup();
-                ctl->beginGroup("joystick-uuid-" + it->first);
-                p->SaveConfig_Legacy(ctl);
-                ctl->endGroup();
-                ctl->beginGroup(this->Name);
-            }
-        }
-        else
-        {
+        if(index != this->m_profiles.size())
             ctl->setValue(name.replace(uuid_begin, std::string::npos, it->first).c_str(), index);
-        }
     }
 }
 
@@ -2291,42 +2130,6 @@ void InputMethodType_Joystick::LoadConfig_Custom(IniProcessing* ctl)
     }
 
     ctl->endGroup();
-
-    // load legacy controller profiles
-    keys = ctl->childGroups();
-    keyNeed = "joystick-uuid-";
-
-    for(std::string& k : keys)
-    {
-        std::string::size_type r = k.find(keyNeed);
-
-        if(/*r != std::string::npos &&*/ r == 0)
-        {
-            std::string guid = k.substr(14); // length of "joystick-uuid-"
-
-            // once legacy controller has been converted, forget about it
-            if(this->m_lastProfileByGUID.find(guid) != this->m_lastProfileByGUID.end())
-                continue;
-
-            ctl->beginGroup(k);
-            auto* profile = new(std::nothrow) InputMethodProfile_Joystick;
-
-            if(profile)
-            {
-                profile->Type = this;
-                profile->LoadConfig_Legacy(ctl);
-                this->m_hiddenProfiles.insert(profile);
-                this->m_lastProfileByGUID[guid] = profile;
-                pLogDebug("Loaded legacy profile as '%s'.", guid.c_str());
-            }
-            else
-            {
-                pLogWarning("Could not allocate legacy profile (out of memory).");
-            }
-
-            ctl->endGroup();
-        }
-    }
 
     ctl->beginGroup(this->Name);
 }
