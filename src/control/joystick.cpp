@@ -817,9 +817,9 @@ void InputMethodProfile_Joystick::InitAsController(bool use_alt_controls)
 
 #ifdef VITA
         // Vita's layout under SDL is normal (Cross/A button is South), but Japanese Vitas do use the alt menu controls (Circle button advances in menus)
-        SceCommonDialogConfigParam menu_config;
-        sceCommonDialogConfigParamInit(&menu_config);
-        if(menu_config.enterButtonAssign == SCE_SYSTEM_PARAM_ENTER_BUTTON_CIRCLE)
+        int enter_button = SCE_SYSTEM_PARAM_ENTER_BUTTON_CROSS;
+        sceAppUtilSystemParamGetInt(SCE_SYSTEM_PARAM_ID_ENTER_BUTTON, &enter_button);
+        if(enter_button == SCE_SYSTEM_PARAM_ENTER_BUTTON_CIRCLE)
             this->m_altMenuControls = true;
 #endif
     }
