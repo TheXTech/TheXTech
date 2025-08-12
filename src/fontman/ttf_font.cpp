@@ -329,7 +329,7 @@ PGE_Size TtfFont::glyphSize(const char* utf8char, uint32_t charNum, uint32_t fon
     default:
     {
         const TheGlyph &glyph = getGlyph(fontSize, get_utf8_char(&cx));
-        ret.setWidth(glyph.width > 0 ? uint32_t(glyph.advance >> 6) : (fontSize >> 2));
+        ret.setWidth(glyph.info.width > 0 ? uint32_t(glyph.info.advance_x >> 6) : (fontSize >> 2));
         break;
     }
 
@@ -388,7 +388,7 @@ PGE_Size TtfFont::printText(const char *text, size_t text_size,
         {
             if(crop_info)
             {
-                if(!crop_info->letter_alpha(letter_alpha, color.a, offsetX, offsetX + (glyph.advance >> 6)))
+                if(!crop_info->letter_alpha(letter_alpha, color.a, offsetX, offsetX + (glyph.info.advance_x >> 6)))
                     break;
             }
 
@@ -397,16 +397,16 @@ PGE_Size TtfFont::printText(const char *text, size_t text_size,
                 int32_t glyph_x = x + static_cast<int32_t>(offsetX);
                 int32_t glyph_y = y + static_cast<int32_t>(offsetY + fontSize);
                 XRender::renderTextureScale(
-                    glyph_x + glyph.left,
-                    glyph_y - glyph.top,
-                    (m_doublePixel ? (glyph.width * 2) : glyph.width),
-                    (m_doublePixel ? (glyph.height * 2) : glyph.height),
+                    glyph_x + glyph.info.left,
+                    glyph_y - glyph.info.top,
+                    (m_doublePixel ? (glyph.info.width * 2) : glyph.info.width),
+                    (m_doublePixel ? (glyph.info.height * 2) : glyph.info.height),
                     *glyph.tx,
                     color.with_alpha(letter_alpha)
                 );
             }
         }
-        offsetX += glyph.tx ? uint32_t(glyph.advance >> 6) : (fontSize >> 2);
+        offsetX += glyph.tx ? uint32_t(glyph.info.advance_x >> 6) : (fontSize >> 2);
 
         strIt += static_cast<size_t>(trailingBytesForUTF8[ucx]);
     }
@@ -468,10 +468,10 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
             for(size_t i = 0; i < 4; ++i)
             {
                 XRender::renderTextureScale(
-                    glyph_x + glyph.left + offsets[i][0],
-                    glyph_y - glyph.top + offsets[i][1],
-                    glyph.width * scaleSize,
-                    glyph.height * scaleSize,
+                    glyph_x + glyph.info.left + offsets[i][0],
+                    glyph_y - glyph.info.top + offsets[i][1],
+                    glyph.info.width * scaleSize,
+                    glyph.info.height * scaleSize,
                     *glyph.tx,
                     color.with_alpha(scaled_a) * OL_color
                 );
@@ -479,15 +479,15 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
         }
 
         XRender::renderTextureScale(
-            glyph_x + glyph.left,
-            glyph_y - glyph.top,
-            glyph.width * scaleSize,
-            glyph.height * scaleSize,
+            glyph_x + glyph.info.left,
+            glyph_y - glyph.info.top,
+            glyph.info.width * scaleSize,
+            glyph.info.height * scaleSize,
             *glyph.tx,
             color
         );
 
-        return glyph.width;
+        return glyph.info.width;
     }
 
     return fontSize;
@@ -496,14 +496,7 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
 TtfFont::TheGlyphInfo TtfFont::getGlyphInfo(const char *u8char, uint32_t fontSize)
 {
     TheGlyph glyph = getGlyph(fontSize, get_utf8_char(u8char));
-    TheGlyphInfo info;
-    info.width = glyph.width;
-    info.height = glyph.height;
-    info.left = glyph.left;
-    info.top = glyph.top;
-    info.advance = glyph.advance;
-    info.glyph_width = glyph.glyph_width;
-    return info;
+    return glyph.info;
 }
 
 const TtfFont::TheGlyph &TtfFont::getGlyph(uint32_t fontSize, char32_t character)
@@ -720,12 +713,22 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(StdPicture &texture, uint32_t fontSi
     XRender::loadTexture(texture, width, height, image, pitch);
 
     t_glyph.tx      = &texture;
-    t_glyph.width   = width;
-    t_glyph.height  = height;
-    t_glyph.left    = glyph->bitmap_left;
-    t_glyph.top     = glyph->bitmap_top;
-    t_glyph.advance = int32_t(glyph->advance.x);
-    t_glyph.glyph_width = glyph->advance.x;
+    t_glyph.info.width   = width;
+    t_glyph.info.height  = height;
+    t_glyph.info.left    = glyph->bitmap_left;
+    t_glyph.info.top     = glyph->bitmap_top;
+    t_glyph.info.advance_x = int32_t(glyph->advance.x);
+    t_glyph.info.advance_y = int32_t(glyph->advance.y);
+    t_glyph.info.metric_h_bearing_x = int32_t(glyph->metrics.horiBearingX);
+    t_glyph.info.metric_h_bearing_y = int32_t(glyph->metrics.horiBearingY);
+    t_glyph.info.metric_h_advance = int32_t(glyph->metrics.horiAdvance);
+    t_glyph.info.metric_v_bearing_x = int32_t(glyph->metrics.vertBearingX);
+    t_glyph.info.metric_v_bearing_y = int32_t(glyph->metrics.vertBearingY);
+    t_glyph.info.metric_v_advance = int32_t(glyph->metrics.vertAdvance);
+    t_glyph.info.metric_w = int32_t(glyph->metrics.width);
+    t_glyph.info.metric_h = int32_t(glyph->metrics.height);
+    t_glyph.info.glyph_width = glyph->advance.x;
+    t_glyph.info.glyph_height = glyph->advance.y;
 
     delete [] image;
 

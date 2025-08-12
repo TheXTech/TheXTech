@@ -132,12 +132,26 @@ public:
 
     struct TheGlyphInfo
     {
+        TheGlyphInfo() = default;
+        TheGlyphInfo(const TheGlyphInfo &) = default;
+        TheGlyphInfo &operator=(const TheGlyphInfo &) = default;
+
         uint32_t width  = 0;
         uint32_t height = 0;
         int32_t  left   = 0;
         int32_t  top    = 0;
-        int32_t  advance = 0;
+        int32_t  advance_x = 0;
+        int32_t  advance_y = 0;
+        int32_t  metric_h_bearing_x = 0;
+        int32_t  metric_h_bearing_y = 0;
+        int32_t  metric_h_advance = 0;
+        int32_t  metric_v_bearing_x = 0;
+        int32_t  metric_v_bearing_y = 0;
+        int32_t  metric_v_advance = 0;
+        int32_t  metric_w = 0;
+        int32_t  metric_h = 0;
         FT_Pos   glyph_width = 0;
+        FT_Pos   glyph_height = 0;
     };
 
     TheGlyphInfo getGlyphInfo(const char *u8char, uint32_t fontSize);
@@ -170,12 +184,7 @@ private:
     {
         TheGlyph() = default;
         StdPicture *tx     = nullptr;
-        uint32_t width  = 0;
-        uint32_t height = 0;
-        int32_t  left   = 0;
-        int32_t  top    = 0;
-        int32_t  advance = 0;
-        FT_Pos   glyph_width = 0;
+        TheGlyphInfo info;
     };
 
     //! Default dummy glyph
