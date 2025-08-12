@@ -26,6 +26,10 @@
 #include <SDL2/SDL_haptic.h>
 #include <SDL2/SDL_events.h>
 
+#ifdef VITA
+#    include <vitasdk.h>
+#endif
+
 #include <Utils/strings.h>
 #include <Logger/logger.h>
 
@@ -810,6 +814,14 @@ void InputMethodProfile_Joystick::InitAsController(bool use_alt_controls)
         this->m_keys[PlayerControls::Buttons::AltJump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_B, 1);
         this->m_keys[PlayerControls::Buttons::Run].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_X, 1);
         this->m_keys[PlayerControls::Buttons::AltRun].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_Y, 1);
+
+#ifdef VITA
+        // Vita's layout under SDL is normal (Cross/A button is South), but Japanese Vitas do use the alt menu controls (Circle button advances in menus)
+        SceCommonDialogConfigParam menu_config;
+        sceCommonDialogConfigParamInit(&menu_config);
+        if(menu_config.enterButtonAssign == SCE_SYSTEM_PARAM_ENTER_BUTTON_CIRCLE)
+            this->m_altMenuControls = true;
+#endif
     }
 
     this->m_keys[PlayerControls::Buttons::Drop].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_BACK, 1);
