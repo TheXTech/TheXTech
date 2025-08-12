@@ -154,7 +154,7 @@ struct Events_t
     // reinitialize in place
     void reinit()
     {
-        Events_t::~Events_t();
+        this->~Events_t();
         new(this)Events_t();
     }
 };
