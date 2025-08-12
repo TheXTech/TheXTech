@@ -49,6 +49,7 @@ namespace Controls
 // hardcoded list of GUIDs that prefer alt (Japanese) menu control layout -- middle 16 bytes only
 static const char* s_alt_guids_16[] =
 {
+    "7e05000006030000", // Wii Classic Controller
     "7e05000030030000", // Wii U Pro Controller
     "7e05000006200000", // Switch 1 Joy-Con (L)
     "7e05000007200000", // Switch 1 Joy-Con (R)
@@ -56,6 +57,18 @@ static const char* s_alt_guids_16[] =
     "7e05000009200000", // Switch 1 Pro Controller
     "7e05000017200000", // Switch 1 SNES Controller
     "7e05000069200000", // Switch 2 Pro Controller
+    "d620000013a70000", // PowerA Switch 1 Controller
+    "d620000011a70000", // PowerA Core Plus Switch 1 Controller
+    "5769696d6f746520", // Wii U Pro Controller (alt GUID)
+    "4c69632050726f20", // Switch 1 Pro Controller (alt GUID)
+#ifdef __WIIU__ // Special GUIDs on Wii U
+    "5769692055204761", // Wii U GamePad (on Wii U)
+    "5769692055205072", // Wii U Pro Controller (on Wii U)
+    "57696920436c6173", // Wii Classic Controller (on Wii U)
+#endif
+#ifdef __SWITCH__ // Special GUIDs on Switch 1
+    "5377697463682043", // Switch 1 virtual controller
+#endif
 };
 
 static bool s_AltControlsDefault(const std::string& guid)
