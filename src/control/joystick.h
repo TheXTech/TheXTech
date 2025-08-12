@@ -110,7 +110,6 @@ public:
     using InputMethodProfile::Type;
 
     bool m_controllerProfile = false;
-    bool m_legacyProfile = false;
 
     // current settings
     bool m_simple_editor = true;
@@ -136,8 +135,6 @@ public:
 
     void InitAsJoystick();
     void InitAsController(bool use_alt_controls);
-    void ExpandAsJoystick();
-    void ExpandAsController();
     void SaveConfig_Legacy(IniProcessing *ctl);
     void LoadConfig_Legacy(IniProcessing *ctl);
 
@@ -185,7 +182,6 @@ class InputMethodType_Joystick : public InputMethodType
 {
 private:
     std::unordered_map<int, JoystickDevices *> m_availableJoysticks;
-    std::set<InputMethodProfile_Joystick *> m_hiddenProfiles; // owns unconverted legacy profiles
     std::unordered_map<std::string, InputMethodProfile *> m_lastProfileByGUID;
 
     InputMethodProfile *AllocateProfile() noexcept override;
