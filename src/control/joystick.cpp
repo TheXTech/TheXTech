@@ -2094,6 +2094,15 @@ void InputMethodType_Joystick::SaveConfig_Custom(IniProcessing* ctl)
     std::string name = "last-profile-";
     int uuid_begin = (int)name.size();
 
+    // clear any old default controller profiles (keeping a copy of the set of keys in a stack-allocated vector)
+    std::vector<std::string> keys_to_clear = ctl->allKeys();
+    for(const std::string& key : keys_to_clear)
+    {
+        // delete any key with the prefix "last-profile-"
+        if(SDL_strncmp(key.c_str(), name.c_str(), name.size()) == 0)
+            ctl->clearValue(key.c_str());
+    }
+
     // set all default controller profiles
     for(auto it = m_lastProfileByGUID.begin(); it != m_lastProfileByGUID.end(); ++it)
     {
