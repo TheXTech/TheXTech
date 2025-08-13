@@ -58,11 +58,10 @@ set(VITA_ADDTL_LIBS
 
 if(THEXTECH_BUILD_GL_ES_MODERN)
     list(APPEND VITA_ADDTL_LIBS
+        SceShaccCgExt
+        taihen_stub
         SceIme_stub
-        libIMGEGL_stub
-        libgpu_es4_ext_stub
-        libGLESv2_stub
-    )
+     )
 endif()
 
 # VITA_CMAKE_FLAGS is used in conjunction with ExternalProject_Add

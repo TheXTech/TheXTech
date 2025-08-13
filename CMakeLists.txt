@@ -292,7 +292,8 @@ if(VITA)
     set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
     set(THEXTECH_BUILD_GL_ES_LEGACY OFF CACHE BOOL "" FORCE)
 
-    # note: this needs to be removed, and USE_SYSTEM_SDL2 needs to be disabled, to test Vita GLESv2 support
+    # note: to test GLESv2 on Vita, remove the below line, install VitaGL with shader support and Northfear's SDL2 fork, and enable USE_SYSTEM_SDL2
+    # As of August 2025, Northfear's SDL2 fork invalidly reports the OpenGL profile as Compatibility instead of ES, and VitaGL doesn't support clearing buffers, and its shader transpiler is imperfect
     set(THEXTECH_BUILD_GL_ES_MODERN OFF CACHE BOOL "" FORCE)
 endif()
 
@@ -1440,6 +1441,10 @@ if(NINTENDO_SWITCH)
 endif()
 
 if(VITA)
+    if(THEXTECH_BUILD_GL_ES_MODERN)
+        target_link_libraries(A2XT_Int INTERFACE vitaGL vitashark)
+    endif()
+
     # Link Vita specific libraries to the generic interface.
     target_link_libraries(A2XT_Int INTERFACE ${VITA_ADDTL_LIBS})
 
