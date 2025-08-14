@@ -66,6 +66,9 @@ static const char* s_alt_guids_16[] =
     "5769692055205072", // Wii U Pro Controller (on Wii U)
     "57696920436c6173", // Wii Classic Controller (on Wii U)
 #endif
+#ifdef __SWITCH__ // Special GUIDs on Switch 1
+    "5377697463682043", // Switch 1 virtual controller
+#endif
 };
 
 static bool s_AltControlsDefault(const std::string& guid)
@@ -832,13 +835,11 @@ void InputMethodProfile_Joystick::InitAsController(bool use_alt_controls)
         if(enter_button == SCE_SYSTEM_PARAM_ENTER_BUTTON_CIRCLE)
             this->m_altMenuControls = true;
 #endif
-
-#ifdef __SWITCH__
-        // Switch's layout under SDL is a lie -- SDL calls the south button A when it's actually labeled B. So, use normal layout, but Alt Menu logic.
-        // There's also code to fix the display of button glyphs in s_nameButton
-        this->m_altMenuControls = true;
-#endif
     }
+
+    pLogDebug("Initializing controller with mode: [%s] controls and [%s] menus.",
+        use_alt_controls ? "Alt" : "Standard",
+        this->m_altMenuControls ? "Alt" : "Standard");
 
     this->m_keys[PlayerControls::Buttons::Drop].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_BACK, 1);
     this->m_keys[PlayerControls::Buttons::Start].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_START, 1);
@@ -1192,17 +1193,6 @@ static const char* s_nameButton(const KM_Key& k)
         break;
 
     case KM_Key::CtrlButton:
-#ifdef __SWITCH__
-        // fix for incorrect SDL2 names
-        if(k.id == SDL_CONTROLLER_BUTTON_A)
-            return "B";
-        else if(k.id == SDL_CONTROLLER_BUTTON_B)
-            return "A";
-        else if(k.id == SDL_CONTROLLER_BUTTON_X)
-            return "Y";
-        else if(k.id == SDL_CONTROLLER_BUTTON_Y)
-            return "X";
-#endif
         return SDL_GameControllerGetStringForButton((SDL_GameControllerButton)k.id);
         break;
 
@@ -1549,6 +1539,21 @@ InputMethodType_Joystick::InputMethodType_Joystick()
     this->Name = "Joystick";
 
     SDL_JoystickEventState(SDL_ENABLE);
+
+#ifdef __SWITCH__
+    // Sets the correct mapping for Switch controllers
+    SDL_GameControllerAddMapping("000038f853776974636820436f6e7400,"
+                                 "Switch Controller,"
+                                 "a:b0,b:b1,x:b2,y:b3,"
+                                 "back:b11,start:b10,"
+                                 "dpdown:b15,dpleft:b12,dpright:b14,dpup:b13,"
+                                 "leftshoulder:b6,rightshoulder:b7,"
+                                 "lefttrigger:b8,righttrigger:b9,"
+                                 "leftstick:b4,rightstick:b5,"
+                                 "leftx:a0,lefty:a1,"
+                                 "rightx:a2,righty:a3,");
+#endif
+
     int num = SDL_NumJoysticks();
 
     for(int i = 0; i < num; ++i)
@@ -1800,12 +1805,14 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
             // Detect whether alt controls are appropriate here given a hardcoded list of GUIDs.
             if(s_AltControlsDefault(active_joystick->guid))
             {
-                pLogInfo("New controller profile will use alt menu controls layout");
+                pLogInfo("New controller profile will use alt menu controls layout [Controller GUID: %s]", active_joystick->guid.c_str());
 
                 auto* p = dynamic_cast<InputMethodProfile_Joystick*>(method->Profile);
                 if(p)
                     p->InitAsController(true);
             }
+            else
+                pLogDebug("New controller profile will use standard menu controls layout [Controller GUID: %s]", active_joystick->guid.c_str());
         }
         else
             method->Profile = this->AddOldJoystickProfile();
