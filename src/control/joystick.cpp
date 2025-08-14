@@ -75,7 +75,7 @@ static bool s_AltControlsDefault(const std::string& guid)
 
     for(size_t i = 0; i < sizeof(s_alt_guids_16) / sizeof(const char*); i++)
     {
-        if(memcmp(guid.c_str() + 8, s_alt_guids_16[i], 16) == 0)
+        if(SDL_memcmp(guid.c_str() + 8, s_alt_guids_16[i], 16) == 0)
             return true;
     }
 
