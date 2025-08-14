@@ -30,6 +30,10 @@ namespace XPower
 // information about device or a bound input method
 struct StatusInfo
 {
+    StatusInfo() = default;
+    StatusInfo(const StatusInfo &) = default;
+    StatusInfo &operator=(const StatusInfo &) = default;
+
     typedef enum _PowerStatus
     {
         POWER_DISABLED = -1,
@@ -39,6 +43,7 @@ struct StatusInfo
         POWER_CHARGING,
         POWER_CHARGED
     } PowerStatus;
+
     PowerStatus power_status = POWER_DISABLED;
     numf_t power_level = 1;
     const char *info_string = nullptr;

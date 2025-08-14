@@ -78,7 +78,7 @@ static bool s_AltControlsDefault(const std::string& guid)
 
     for(size_t i = 0; i < sizeof(s_alt_guids_16) / sizeof(const char*); i++)
     {
-        if(memcmp(guid.c_str() + 8, s_alt_guids_16[i], 16) == 0)
+        if(SDL_memcmp(guid.c_str() + 8, s_alt_guids_16[i], 16) == 0)
             return true;
     }
 
@@ -837,6 +837,10 @@ void InputMethodProfile_Joystick::InitAsController(bool use_alt_controls)
 #endif
     }
 
+    pLogDebug("Initializing controller with mode: [%s] controls and [%s] menus.",
+        use_alt_controls ? "Alt" : "Standard",
+        this->m_altMenuControls ? "Alt" : "Standard");
+
     this->m_keys[PlayerControls::Buttons::Drop].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_BACK, 1);
     this->m_keys[PlayerControls::Buttons::Start].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_START, 1);
 
@@ -1535,6 +1539,21 @@ InputMethodType_Joystick::InputMethodType_Joystick()
     this->Name = "Joystick";
 
     SDL_JoystickEventState(SDL_ENABLE);
+
+#ifdef __SWITCH__
+    // Sets the correct mapping for Switch controllers
+    SDL_GameControllerAddMapping("000038f853776974636820436f6e7400,"
+                                 "Switch Controller,"
+                                 "a:b0,b:b1,x:b2,y:b3,"
+                                 "back:b11,start:b10,"
+                                 "dpdown:b15,dpleft:b12,dpright:b14,dpup:b13,"
+                                 "leftshoulder:b6,rightshoulder:b7,"
+                                 "lefttrigger:b8,righttrigger:b9,"
+                                 "leftstick:b4,rightstick:b5,"
+                                 "leftx:a0,lefty:a1,"
+                                 "rightx:a2,righty:a3,");
+#endif
+
     int num = SDL_NumJoysticks();
 
     for(int i = 0; i < num; ++i)
@@ -1786,12 +1805,14 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
             // Detect whether alt controls are appropriate here given a hardcoded list of GUIDs.
             if(s_AltControlsDefault(active_joystick->guid))
             {
-                pLogInfo("New controller profile will use alt menu controls layout");
+                pLogInfo("New controller profile will use alt menu controls layout [Controller GUID: %s]", active_joystick->guid.c_str());
 
                 auto* p = dynamic_cast<InputMethodProfile_Joystick*>(method->Profile);
                 if(p)
                     p->InitAsController(true);
             }
+            else
+                pLogDebug("New controller profile will use standard menu controls layout [Controller GUID: %s]", active_joystick->guid.c_str());
         }
         else
             method->Profile = this->AddOldJoystickProfile();

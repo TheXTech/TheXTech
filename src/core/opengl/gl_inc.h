@@ -66,7 +66,7 @@
 #ifdef THEXTECH_BUILD_GL_ES_MODERN
 #    include <SDL2/SDL_opengles2.h>
 
-#    if defined(__ANDROID__) || defined(__VITA__)
+#    if defined(__ANDROID__)
 
 #        define GL_UNIFORM_BUFFER       0x8A11
 #        define GL_DRAW_FRAMEBUFFER     0x8CA9
@@ -78,6 +78,15 @@ extern GL_APICALL void (* GL_APIENTRY glBindBufferBase) (GLenum target, GLuint i
 extern GL_APICALL void (* GL_APIENTRY glBlitFramebuffer) (GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
 
 #        define RENDERGL_LOAD_ES3_SYMBOLS
+#    elif defined(__VITA__)
+#        define GL_UNIFORM_BUFFER       0x8A11
+#        define GL_DRAW_FRAMEBUFFER     0x8CA9
+#        define GL_RGB16F               0x881B
+
+// defined in some Vita header, but presumably null
+
+extern GL_APICALL void (* GL_APIENTRY glBindBufferBase) (GLenum target, GLuint index, GLuint buffer);
+extern GL_APICALL void (* GL_APIENTRY glBlitFramebuffer) (GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
 #    else
 #        include <GLES3/gl3.h>
 #    endif

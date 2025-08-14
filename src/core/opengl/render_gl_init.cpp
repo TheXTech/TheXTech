@@ -227,6 +227,11 @@ bool RenderGL::initOpenGL()
 
     const char* gl_renderer = (const char*)glGetString(GL_RENDERER);
 
+#ifdef VITA
+    // temporary: VitaGL doesn't support clearing buffers, including depth buffer
+    m_tweak_no_depth_buffer = true;
+#endif
+
 #ifdef _WIN32
     if(SDL_strcmp(gl_renderer, "GDI Generic") == 0)
     {

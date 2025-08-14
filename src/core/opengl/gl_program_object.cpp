@@ -290,8 +290,10 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
     glLinkProgram(program);
 
     // detach the shaders
+#ifndef VITA
     glDetachShader(program, vertex_shader);
     glDetachShader(program, fragment_shader);
+#endif
 
     // Check the link status
     GLint status;
