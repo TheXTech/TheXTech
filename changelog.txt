@@ -33,6 +33,7 @@ Changelog for 1.3.7.2-dev
 -Controls: remove ability to load controller profiles saved by versions before v1.3.6 (2022) (@ds-sloth)
 -Controls: fix v1.3.6 bug where controller was assigned the wrong profile after its original profile was deleted (@ds-sloth)
 -Controls: allow deleting a profile in use. This will allow the controller's profile to be reset. (@ds-sloth)
+-Controls: fix face button labels on Switch port. (@ds-sloth)
 -Visuals: fix v1.3.7.1 bug where there was a black frame during the transition from the main menu to the asset pack select screen (@ds-sloth)
 
 Changelog for 1.3.7.1

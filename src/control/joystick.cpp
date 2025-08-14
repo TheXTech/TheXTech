@@ -66,9 +66,6 @@ static const char* s_alt_guids_16[] =
     "5769692055205072", // Wii U Pro Controller (on Wii U)
     "57696920436c6173", // Wii Classic Controller (on Wii U)
 #endif
-#ifdef __SWITCH__ // Special GUIDs on Switch 1
-    "5377697463682043", // Switch 1 virtual controller
-#endif
 };
 
 static bool s_AltControlsDefault(const std::string& guid)
@@ -835,6 +832,12 @@ void InputMethodProfile_Joystick::InitAsController(bool use_alt_controls)
         if(enter_button == SCE_SYSTEM_PARAM_ENTER_BUTTON_CIRCLE)
             this->m_altMenuControls = true;
 #endif
+
+#ifdef __SWITCH__
+        // Switch's layout under SDL is a lie -- SDL calls the south button A when it's actually labeled B. So, use normal layout, but Alt Menu logic.
+        // There's also code to fix the display of button glyphs in s_nameButton
+        this->m_altMenuControls = true;
+#endif
     }
 
     this->m_keys[PlayerControls::Buttons::Drop].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_BACK, 1);
@@ -1189,6 +1192,17 @@ static const char* s_nameButton(const KM_Key& k)
         break;
 
     case KM_Key::CtrlButton:
+#ifdef __SWITCH__
+        // fix for incorrect SDL2 names
+        if(k.id == SDL_CONTROLLER_BUTTON_A)
+            return "B";
+        else if(k.id == SDL_CONTROLLER_BUTTON_B)
+            return "A";
+        else if(k.id == SDL_CONTROLLER_BUTTON_X)
+            return "Y";
+        else if(k.id == SDL_CONTROLLER_BUTTON_Y)
+            return "X";
+#endif
         return SDL_GameControllerGetStringForButton((SDL_GameControllerButton)k.id);
         break;
 
