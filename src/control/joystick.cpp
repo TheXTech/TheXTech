@@ -61,13 +61,13 @@ static const char* s_alt_guids_16[] =
     "d620000011a70000", // PowerA Core Plus Switch 1 Controller
     "5769696d6f746520", // Wii U Pro Controller (alt GUID)
     "4c69632050726f20", // Switch 1 Pro Controller (alt GUID)
-#ifdef __SWITCH__ // Special GUIDs on Switch
-    "5377697463682043", // "Switch Controller"
-#endif
 #ifdef __WIIU__ // Special GUIDs on Wii U
     "5769692055204761", // Wii U GamePad (on Wii U)
     "5769692055205072", // Wii U Pro Controller (on Wii U)
     "57696920436c6173", // Wii Classic Controller (on Wii U)
+#endif
+#ifdef __SWITCH__ // Special GUIDs on Switch 1
+    "5377697463682043", // Switch 1 virtual controller
 #endif
 };
 
