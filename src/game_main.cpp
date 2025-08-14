@@ -1183,9 +1183,12 @@ int GameMain(const CmdLineSetup_t &setup)
                 return 0;// Break on quit
             }
 
-            // Ensure everything is clear
-            GraphicsClearScreen();
-            XEvents::doEvents();
+            // Ensure everything is clear if the main menu is no longer active
+            if(!ScreenAssetPack::g_LoopActive)
+            {
+                GraphicsClearScreen();
+                XEvents::doEvents();
+            }
         }
 
         // World Map
