@@ -463,7 +463,8 @@
                 "batteryStatus": "電池狀態",
                 "maxPlayers": "玩家上限",
                 "rumble": "Rumble控制器",
-                "textEntryStyle": "文字輸入使用設備"
+                "textEntryStyle": "文字輸入使用設備",
+                "altMenuControls": "切換確定/返回按鍵"
             },
             "phraseNewProfOldJoy": "新建老式手柄配置",
             "profile": {
