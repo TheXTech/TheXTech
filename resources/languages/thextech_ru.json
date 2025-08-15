@@ -462,7 +462,8 @@
                 "batteryStatus": "Состояние батареи",
                 "maxPlayers": "Макс. игроков",
                 "rumble": "Вибрация",
-                "textEntryStyle": "Тип ввода текста"
+                "textEntryStyle": "Тип ввода текста",
+                "altMenuControls": "Альт. управление меню"
             },
             "phraseNewProfOldJoy": "Новый профиль для ст.джойстика",
             "profile": {
@@ -561,7 +562,8 @@
             },
             "wordButtons": "Кнопки",
             "wordProfiles": "Профили",
-            "joystickSimpleEditor": "Простое управление редактором"
+            "joystickSimpleEditor": "Простое управление редактором",
+            "controlsDeleteKey2": "(Альт-Бег, чтобы удалить)"
         },
         "editor": {
             "errorMissingResources": "Извините, но для встроенного редактора не хватает файла {0}.",
