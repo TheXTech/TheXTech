@@ -593,7 +593,7 @@ void PlayerMovementY(int A)
     if(Player[A].Wet > 0 || Player[A].WetFrame)
         Player[A].CanFloat = false;
 
-    bool has_wall_traction = CanWallJump && (Player[A].Pinched.Left2 == 2 || Player[A].Pinched.Right4 == 2) && !Player[A].SpinJump && (!Player[A].SlippyWall || Player[A].State == PLR_STATE_POLAR) && Player[A].HoldingNPC == 0 && Player[A].Mount == 0 && !Player[A].Duck;
+    bool has_wall_traction = CanWallJump && (Player[A].Pinched.Left2 == 2 || Player[A].Pinched.Right4 == 2) && !Player[A].SpinJump && (!Player[A].SlippyWall || Player[A].State == PLR_STATE_POLAR) && Player[A].HoldingNPC == 0 && Player[A].Mount == 0 && !Player[A].Duck && !(Player[A].State == PLR_STATE_CYCLONE && !Player[A].DoubleJump);
 
     // handles the regular jump
     if(Player[A].Controls.Jump || (Player[A].Controls.AltJump &&
