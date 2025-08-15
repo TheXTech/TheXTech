@@ -195,7 +195,7 @@
             "horizWrap": "Ligar Esq-Dir",
             "setBounds": "Def. Bordas",
             "underwater": "Subaquático",
-            "vertWrap": ""
+            "vertWrap": "TP. Vertical"
         },
         "select": {
             "sectionBlankPropBlank": "Secção {0}{1}",
@@ -349,48 +349,48 @@
             "minutesSeconds": "{0}m{1}s"
         },
         "error": {
-            "errorInvalidEnterWarp": "========= ERRO! ==========\n\nNão foi possível iniciar o nível devido a um teleporte de entrada invalido em {1}.\nTotal de entradas no teleporte: {2}\n\nFicheiro: {0}",
-            "errorNoStartPoint": "========= ERRO! ==========\n\nNão foi possível iniciar o nível por este nível não conter ponto de inicio ou entradas de teleporte especificadas.\n\nFicheiro: {0}",
-            "openFileFailed": "ERRO: \"{0}\" nao foi aberto: Ficheiro inexistente ou corrompido.",
+            "errorInvalidEnterWarp": "Não foi possível iniciar o nível devido a um teleporte de entrada invalido em {1}.\nTotal de entradas no teleporte: {2}\n\nFicheiro: {0}",
+            "errorNoStartPoint": "Não foi possível iniciar o nível por este nível não conter ponto de inicio ou entradas de teleporte especificadas.\n\nFicheiro: {0}",
+            "openFileFailed": "\"{0}\" não foi aberto: Ficheiro inexistente ou corrompido.",
             "warpNeedStarCount": "Precisa de\n{0} {1} para entrar.",
-            "errorTooOldGameAssets": "",
+            "errorTooOldGameAssets": "O conteúdo requer um pacote de recursos de fase mais recente ({0}) do que o pacote de recursos atual ({1}). Atualize o seu pacote de recursos do jogo.",
             "openIPCDataFailed": "",
-            "IPCTimeOut": "",
-            "errorTooOldEngine": ""
+            "IPCTimeOut": "Sem resposta do editor conectado. O jogo irá ser fechado.",
+            "errorTooOldEngine": "O conteúdo requer um nível de recurso de mecanismo mais recente ({0}) do que a versão atual ({1}). Atualize o TheXTech."
         },
         "hint": {
-            "no-lives-new": "",
-            "no-lives-old": "",
-            "gray-bricks": "",
-            "char5-bombs": "",
-            "rainbow-surf": "",
-            "shoe-block": "",
-            "heavy-duck": "",
-            "pound-altrun": "",
-            "pound-down": ""
+            "no-lives-new": "Sem moedas? Empréstimo! Olhe à sua pontuação...",
+            "no-lives-old": "Cuidado - Fim de Jogo iminente!",
+            "gray-bricks": "Alguns blocos são vulneráveis a habilidades.",
+            "char5-bombs": "Pressione Correr para segurar e Correr ALT para jogar.",
+            "rainbow-surf": "Apanhe, corra, abaixe e depois surfe.",
+            "shoe-block": "Usar isto bloqueia a maioria das - mas não todas - chamas!",
+            "heavy-duck": "Pato para bloquear a maioria das - mas não todas - chamas!",
+            "pound-altrun": "Pressione Alt Run para bater para baixo!",
+            "pound-down": "Pressione para baixo para bater para baixo!"
         },
         "msgbox": {
-            "sysInfoTitle": "",
-            "sysInfoWarning": "",
-            "sysInfoError": ""
+            "sysInfoTitle": "Informação",
+            "sysInfoWarning": "Aviso!",
+            "sysInfoError": "Erro!"
         },
         "loader": {
             "statusLoadData": "",
             "statusGameInfo": "",
             "statusLoadFile": "",
-            "statusFinishing": "",
+            "statusFinishing": "A terminar...",
             "statusAssetPacks": "",
-            "statusTranslations": ""
+            "statusTranslations": "Traduções"
         },
         "ipcStatus": {
             "loadingdone": "",
-            "dataAccepted": "",
+            "dataAccepted": "Dados aceites, a análise começou...",
             "dataTransferStarted": "",
             "errorTimeout": "",
             "dataValid": "",
             "waitingInput": ""
         },
-        "screenPaused": ""
+        "screenPaused": "Pausado"
     },
     "menu": {
         "abbrevMilliseconds": "MS",
@@ -435,7 +435,7 @@
                 "toggleHUD": "Interface",
                 "debugInfo": "Depurar",
                 "legacyPause": "Pausa Alt",
-                "vanillaCam": ""
+                "vanillaCam": "Câmara vanilla"
             },
             "options": {
                 "batteryStatus": "Estado da Pilha",
@@ -530,7 +530,7 @@
                 "typeClassic": "Classic",
                 "typeNunchuck": "Nunchuck",
                 "typeWiimote": "Wiimote",
-                "typeGamecube": ""
+                "typeGamecube": "GameCube"
             },
             "cursor": {
                 "up": "Rato Cima",
@@ -601,179 +601,179 @@
                 "render": {
                     "opengl-tip": "",
                     "opengl11-tip": "",
-                    "opengles": "",
-                    "opengl11": "",
+                    "opengles": "OpenGL ES 2+",
+                    "opengl11": "OpenGL 1.1",
                     "opengles11-tip": "",
-                    "hw": "",
-                    "_name": "",
-                    "opengl": "",
+                    "hw": "Automático",
+                    "_name": "Modo de renderização",
+                    "opengl": "OpenGL 3+",
                     "opengles-tip": "",
-                    "sdl": "",
-                    "opengles11": "",
+                    "sdl": "SDL2",
+                    "opengles11": "OpenGL ES 1.1+",
                     "sdl-tip": "",
-                    "sw": ""
+                    "sw": "Software"
                 },
                 "audio-channels": {
-                    "mono": "",
-                    "_name": "",
-                    "stereo": ""
+                    "mono": "Mono",
+                    "_name": "Canais",
+                    "stereo": "Estéreo"
                 },
                 "audio-buffer-size": {
-                    "_tooltip": "",
-                    "_name": ""
+                    "_tooltip": "Aumente para menos engasgos a custo de desempenho",
+                    "_name": "Tamanho do buffer"
                 },
                 "audio-sample-rate": {
-                    "16000": "",
-                    "22050": "",
-                    "_name": "",
-                    "11025": "",
-                    "32000": "",
-                    "44100": "",
-                    "48000": ""
+                    "16000": "16000 Hz",
+                    "22050": "22050 Hz",
+                    "_name": "Taxa de amostragem",
+                    "11025": "11025 Hz",
+                    "32000": "32000 Hz",
+                    "44100": "44100 Hz",
+                    "48000": "48000 Hz"
                 },
-                "choose-assets-on-launch": "",
+                "choose-assets-on-launch": "Escolher assets ao iniciar",
                 "audio-format": {
-                    "_tooltip": "",
-                    "_name": ""
+                    "_tooltip": "Formato para driver de som",
+                    "_name": "Formato de áudio"
                 },
                 "log-level": {
-                    "critical": "",
-                    "_name": "",
-                    "debug": "",
-                    "info": "",
-                    "none": "",
-                    "fatal": "",
-                    "warning": ""
+                    "critical": "Crítico",
+                    "_name": "Nível de depuração (log)",
+                    "debug": "Depuração",
+                    "info": "Informação",
+                    "none": "Nada",
+                    "fatal": "Fatal",
+                    "warning": "Aviso"
                 },
                 "webm-recording": "",
                 "internal-res-4p": {
-                    "qsmbx": "",
-                    "default": "",
-                    "qhd": "",
+                    "qsmbx": "1600x1200 (QSMBX)",
+                    "default": "Padrão",
+                    "qhd": "2560x1440 (QHD)",
                     "_name": "",
-                    "fhd": ""
+                    "fhd": "1920x1080 (FHD)"
                 },
-                "advanced-audio": "",
-                "_tooltip": "",
-                "advanced-video": "",
-                "_header": "",
-                "record-gameplay-data": "",
+                "advanced-audio": "Áudio",
+                "_tooltip": "Opções técnicas para operações internas",
+                "advanced-video": "Vídeo",
+                "_header": "Avançado",
+                "record-gameplay-data": "Gravar jogatina",
                 "scale-down-textures": {
-                    "_tooltip": "",
-                    "_name": "",
-                    "all-tip": "",
-                    "all": "",
-                    "none": "",
-                    "none-tip": "",
-                    "safe-tip": "",
-                    "safe": ""
+                    "_tooltip": "Armazena imagens como 1x para economizar memória",
+                    "_name": "Reduzir escala das imagens",
+                    "all-tip": "Menos travamentos no carregamento do que 'Seguro'",
+                    "all": "Todas",
+                    "none": "Nenhum",
+                    "none-tip": "Menos travamentos",
+                    "safe-tip": "Verifica se as imagens estão no formato 2x",
+                    "safe": "Seguro"
                 },
-                "audio-enable": "",
+                "audio-enable": "Ativar",
                 "use-native-osk": "",
                 "fullscreen-type": {
-                    "_name": "",
-                    "exclusive": "",
+                    "_name": "Tipo de ecrã inteiro",
+                    "exclusive": "Exclusivo",
                     "desktop-tip": "",
-                    "desktop": "",
+                    "desktop": "Área de trabalho",
                     "exclusive-tip": "",
-                    "auto": ""
+                    "auto": "Auto"
                 },
                 "inaccurate-gifs-tip": "",
-                "inaccurate-gifs": "",
+                "inaccurate-gifs": "GIFs imprecisos",
                 "fullscreen-depth": {
-                    "16": "",
-                    "auto": "",
+                    "16": "16-bit",
+                    "auto": "Auto",
                     "_name": "",
-                    "32": ""
+                    "32": "32-bit"
                 },
                 "fullscreen-res": ""
             },
             "main": {
                 "two-screen-mode": {
                     "topbottom": "",
-                    "shared": "",
-                    "split": "",
+                    "shared": "Partilhado",
+                    "split": "Esquerda/direita",
                     "smbx": "",
                     "_name": ""
                 },
-                "language": "",
-                "discord-rpc": "",
+                "language": "Idioma",
+                "discord-rpc": "Integração com Discord",
                 "timing": "",
-                "multiplayer": "",
+                "multiplayer": "Multijogador",
                 "unlimited-framerate": "",
                 "background-work-tip": "",
                 "background-work": "",
-                "_header": "",
+                "_header": "Principal",
                 "frame-skip": "",
                 "four-screen-mode": {
                     "split": "",
-                    "shared": "",
+                    "shared": "Partilhado",
                     "_name": ""
                 },
-                "vsync": ""
+                "vsync": "V-Sync"
             },
             "audio": {
                 "sfx-pet-beat-tip": "",
                 "sfx-pet-beat": "",
                 "sfx-modern-tip": "",
-                "_header": "",
-                "sfx-modern": "",
-                "audio-music-volume": "",
-                "sfx-audio-fx": "",
-                "audio-sfx-volume": "",
-                "audio-prefs": "",
-                "sfx-spatial-audio": "",
-                "sfx-spatial-audio-tip": ""
+                "_header": "Áudio",
+                "sfx-modern": "Efeitos modernos",
+                "audio-music-volume": "Volume da música",
+                "sfx-audio-fx": "Efeitos de eco",
+                "audio-sfx-volume": "Volume dos efeitos",
+                "audio-prefs": "Referências",
+                "sfx-spatial-audio": "Som espacial",
+                "sfx-spatial-audio-tip": "Reduz o volume de sons fora do ecrã"
             },
             "speedrun": {
                 "mode": {
-                    "0": "",
-                    "2": "",
-                    "1": "",
+                    "0": "0",
+                    "2": "2",
+                    "1": "1",
                     "3": "",
                     "_name": ""
                 }
             },
             "view-credits": {
-                "_header": ""
+                "_header": "Ver créditos"
             },
             "video": {
                 "world-map-stars-show-tip": "",
                 "battery-status": {
-                    "off": "",
-                    "on": "",
+                    "off": "Desligado",
+                    "on": "Sempre",
                     "_name": "",
                     "low-tip": "",
-                    "low": "",
+                    "low": "Baixo",
                     "fullscreen-tip": "",
-                    "fullscreen": ""
+                    "fullscreen": "Ecrã inteiro"
                 },
                 "internal-res": {
-                    "hd": "",
-                    "hello": "",
-                    "gba": "",
-                    "dynamic": "",
+                    "hd": "1280x720 (HD)",
+                    "hello": "768x432 (HELLO)",
+                    "gba": "480x320 (GBA)",
+                    "dynamic": "Dinâmico",
                     "_tooltip": "",
-                    "_name": "",
-                    "3ds": "",
-                    "vga": "",
-                    "nds": "",
-                    "smbx": "",
-                    "snes": "",
+                    "_name": "Tamanho do ecrã",
+                    "3ds": "800x480 (3DS)",
+                    "vga": "640x480 (VGA)",
+                    "nds": "512x384 (NDS)",
+                    "smbx": "800x600 (SMBX)",
+                    "snes": "512x448 (SNES)",
                     "smbx-wide": ""
                 },
-                "_header": "",
-                "fullscreen": "",
+                "_header": "Vídeo",
+                "fullscreen": "Ecrã inteiro",
                 "enable-inter-level-fade-effect": "",
                 "info-game": "",
                 "scale-mode": {
-                    "1x": "",
-                    "2x": "",
-                    "integer": "",
-                    "_name": "",
-                    "0_5x": "",
-                    "center": "",
-                    "linear": "",
+                    "1x": "1x",
+                    "2x": "2x",
+                    "integer": "Inteiros",
+                    "_name": "Modo de escala",
+                    "0_5x": "0,5x",
+                    "center": "Centro",
+                    "linear": "Suave",
                     "nearest": "",
                     "full": "",
                     "3x": ""
@@ -781,7 +781,7 @@
                 "show-episode-title": {
                     "bottom-tip": "",
                     "_name": "",
-                    "off": "",
+                    "off": "Desligado",
                     "bottom": "",
                     "top-tip": "",
                     "top": ""
@@ -789,17 +789,17 @@
                 "3d-compat-mode": "",
                 "show-playtime-counter": {
                     "_name": "",
-                    "transparent": "",
+                    "transparent": "Transparente",
                     "animated": "",
                     "_tooltip": "",
-                    "opaque": "",
+                    "opaque": "Opaco",
                     "animated-tip": "",
-                    "off": "",
+                    "off": "Desl.",
                     "off-tip": ""
                 },
                 "show-medals-counter-tip": "",
                 "show-screen-shake": "",
-                "video-system": "",
+                "video-system": "Sistema",
                 "world-map-stars-show": "",
                 "info-run": "",
                 "info-meta": "",
@@ -812,24 +812,24 @@
                 "show-fps": ""
             },
             "controls": {
-                "_header": ""
+                "_header": "Controlos"
             },
             "episode-options": {
                 "_header": "",
                 "creator-compat": {
                     "_tooltip": "",
                     "_name": "",
-                    "disable": "",
-                    "enable": "",
-                    "file-only": ""
+                    "disable": "Desativar",
+                    "enable": "Ativar",
+                    "file-only": "Somente ficheiro"
                 },
                 "playstyle": {
                     "_name": "",
-                    "classic-tip": "",
-                    "classic": "",
-                    "modern": "",
-                    "modern-tip": "",
-                    "vanilla-tip": "",
+                    "classic-tip": "Atualizações minimais",
+                    "classic": "Classic",
+                    "modern": "Moderno (PGE-X)",
+                    "modern-tip": "Todas atualizações",
+                    "vanilla-tip": "Nenhumas atualizações",
                     "vanilla": ""
                 },
                 "hub-resume-tip": "",
@@ -837,7 +837,7 @@
             },
             "compatibility": {
                 "_header": "",
-                "features": "",
+                "features": "Funcionalidades",
                 "bugfixes": "",
                 "reset-all": "",
                 "autocode": "",

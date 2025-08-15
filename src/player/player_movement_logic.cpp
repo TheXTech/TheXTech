@@ -593,7 +593,7 @@ void PlayerMovementY(int A)
     if(Player[A].Wet > 0 || Player[A].WetFrame)
         Player[A].CanFloat = false;
 
-    bool has_wall_traction = CanWallJump && (Player[A].Pinched.Left2 == 2 || Player[A].Pinched.Right4 == 2) && !Player[A].SpinJump && (!Player[A].SlippyWall || Player[A].State == PLR_STATE_POLAR) && Player[A].HoldingNPC == 0 && Player[A].Mount == 0 && !Player[A].Duck;
+    bool has_wall_traction = CanWallJump && (Player[A].Pinched.Left2 == 2 || Player[A].Pinched.Right4 == 2) && !Player[A].SpinJump && (!Player[A].SlippyWall || Player[A].State == PLR_STATE_POLAR) && Player[A].HoldingNPC == 0 && Player[A].Mount == 0 && !Player[A].Duck && !(Player[A].State == PLR_STATE_CYCLONE && !Player[A].DoubleJump);
 
     // handles the regular jump
     if(Player[A].Controls.Jump || (Player[A].Controls.AltJump &&
@@ -991,7 +991,12 @@ void PlayerMovementY(int A)
         if(Player[A].NoGravity == 0)
         {
             if(has_wall_traction && Player[A].Location.SpeedY > 0)
+            {
                 Player[A].Location.SpeedY += Physics.PlayerGravity / 2;
+
+                if(Player[A].Location.SpeedY > Physics.PlayerTerminalVelocity / 2)
+                    Player[A].Location.SpeedY = Physics.PlayerTerminalVelocity / 2;
+            }
             else if(Player[A].Character == 2)
                 Player[A].Location.SpeedY += Physics.PlayerGravity * 0.9_r;
             else
