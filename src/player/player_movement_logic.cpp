@@ -991,7 +991,12 @@ void PlayerMovementY(int A)
         if(Player[A].NoGravity == 0)
         {
             if(has_wall_traction && Player[A].Location.SpeedY > 0)
+            {
                 Player[A].Location.SpeedY += Physics.PlayerGravity / 2;
+
+                if(Player[A].Location.SpeedY > Physics.PlayerTerminalVelocity / 2)
+                    Player[A].Location.SpeedY = Physics.PlayerTerminalVelocity / 2;
+            }
             else if(Player[A].Character == 2)
                 Player[A].Location.SpeedY += Physics.PlayerGravity * 0.9_r;
             else
