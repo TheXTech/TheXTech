@@ -48,11 +48,6 @@ static inline int s_round2int_plr(num_t d)
 //! Get left pixel at the player sprite
 int pfrX(const StdPicture& tx, const Player_t& p)
 {
-#if !defined(THEXTECH_WIP_FEATURES) && !defined(PGE_MIN_PORT)
-    UNUSED(tx);
-    return ((p.Frame * p.Direction + 49) / 10) * 100;
-
-#else
     // FIXME: Replace this heuristic logic with a proper texture flags mechanism
 
     // will use internal flags (tx.flags & PLAYER_MODERN and tx.flags & PLAYER_CUSTOM) in future
@@ -91,17 +86,11 @@ int pfrX(const StdPicture& tx, const Player_t& p)
         else
             return col_w * col;
     }
-#endif
 }
 
 //! Get top pixel at the player sprite
 int pfrY(const StdPicture& tx, const Player_t& p)
 {
-#if !defined(THEXTECH_WIP_FEATURES) && !defined(PGE_MIN_PORT)
-    UNUSED(tx);
-    return ((p.Frame * p.Direction + 49) % 10) * 100;
-
-#else
     // FIXME: Replace this heuristic logic with a proper texture flags mechanism
     if(tx.h != 512)
         return ((p.Frame * p.Direction + 49) % 10) * 100;
@@ -135,7 +124,6 @@ int pfrY(const StdPicture& tx, const Player_t& p)
         else
             return row_h * row;
     }
-#endif
 }
 
 //! Get width at the player sprite
