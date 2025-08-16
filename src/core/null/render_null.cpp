@@ -242,7 +242,7 @@ void lazyLoadPictureFromList(StdPicture_Sub& target, PGE_FileFormats_misc::TextI
         }
     }
 
-    if(!okay || w < 0 || w > 8192 || h < 0 || h > 8192)
+    if(!okay || w < 0 || w >= 32768 || h < 0 || h >= 32768)
     {
         pLogWarning("Could not load image %s dimensions from load list", target.l.path);
         target.inited = false;
