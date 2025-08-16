@@ -122,6 +122,43 @@ static bool tryPNG(SDL_RWops* file, uint32_t *w, uint32_t *h)
     return true;
 }
 
+static bool tryQOI(SDL_RWops* file, uint32_t *w, uint32_t *h)
+{
+    SDL_RWseek(file, 0, RW_SEEK_SET);
+    const char *qoif = "qoif";
+    char header[14];
+
+    if(SDL_RWread(file, header, 1, 14) != 14)
+        return false;
+
+    if(SDL_memcmp(&header[0], qoif, 4) != 0)
+        return false;
+
+    // check channels valid
+    if(header[12] != 3 && header[12] != 4)
+        return false;
+
+    // check colorspace valid
+    if(header[13] != 0 && header[13] != 1)
+        return false;
+
+#define UINT(d) static_cast<unsigned int>(d)
+    *w = ((UINT(header[7]) & 0xFF) | ((UINT(header[6]) << 8) & 0xFF00) |
+         ((UINT(header[5]) << 16) & 0xFF0000) | ((UINT(header[4]) << 24) & 0xFF000000));
+
+    *h = ((UINT(header[11]) & 0xFF) | ((UINT(header[10]) << 8) & 0xFF00) |
+         ((UINT(header[9]) << 16) & 0xFF0000) | ((UINT(header[8]) << 24) & 0xFF000000));
+#undef UINT
+
+    // mark of a 1x texture
+    if(header[13] == 1)
+    {
+        *w *= 2;
+        *h *= 2;
+    }
+
+    return true;
+}
 
 static char *findJpegHead(char *src, size_t src_size)
 {
@@ -222,10 +259,13 @@ static bool tryJPEG(SDL_RWops* file, uint32_t *w, uint32_t *h)
 bool PGE_ImageInfo::getImageSizeRW(SDL_RWops *image, uint32_t *w, uint32_t *h, int *errCode)
 {
     bool ret = false;
-    if(tryGIF(image, w, h))
+    if(tryPNG(image, w, h))
         ret = true;
     else
-    if(tryPNG(image, w, h))
+    if(tryQOI(image, w, h))
+        ret = true;
+    else
+    if(tryGIF(image, w, h))
         ret = true;
     else
     if(tryBMP(image, w, h))

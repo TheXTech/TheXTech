@@ -74,6 +74,16 @@ public:
     static FIBITMAP *loadImage(const Files::Data &raw, bool convertTo32bit = true);
 
     /*!
+     * \brief Loads QOI image from a memory buffer
+     * \param raw - QOI buffer
+     * \param[out] depthTestSupported - whether QOI indicates that depth test is supported (sets channels flag to 3)
+     * \return FreeImage descriptor to loaded image
+     *
+     * Implemented in xt_qoi.cpp
+     */
+    static FIBITMAP *loadQOI(const Files::Data &raw, bool &depthTestSupported);
+
+    /*!
      * \brief Loads mask image from a disk
      * \param file full or relative path to the file
      * \param maskIsPng if set, set the RGB channels of the mask to the inverse alpha channel of the loaded image
