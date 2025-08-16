@@ -375,7 +375,7 @@
             "sysInfoError": "Erro!"
         },
         "loader": {
-            "statusLoadData": "",
+            "statusLoadData": "A carregar dados…",
             "statusGameInfo": "",
             "statusLoadFile": "",
             "statusFinishing": "A terminar...",
@@ -388,7 +388,7 @@
             "dataTransferStarted": "",
             "errorTimeout": "",
             "dataValid": "",
-            "waitingInput": ""
+            "waitingInput": "À espera de dados de entrada..."
         },
         "screenPaused": "Pausado"
     },
