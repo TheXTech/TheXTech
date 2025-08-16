@@ -506,7 +506,18 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
         return;
 
-    FIBITMAP *sourceImage = GraphicsHelps::loadImage(target.l.raw);
+    bool is_qoi = false;
+    bool qoi_depth_test_supported = false;
+
+    // first try loading as QOI
+    FIBITMAP *sourceImage = GraphicsHelps::loadQOI(target.l.raw, qoi_depth_test_supported);
+
+    // then try loading as normal image
+    if(sourceImage)
+        is_qoi = true;
+    else
+        sourceImage = GraphicsHelps::loadImage(target.l.raw);
+
     if(!sourceImage)
     {
         pLogCritical("Lazy-decompress has failed: invalid image data");
@@ -558,20 +569,6 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     if(!target.l.rawMask.empty())
         m_lazyLoadedBytes += (w * h * 4);
 
-    RGBQUAD upperColor;
-    FreeImage_GetPixelColor(sourceImage, 0, static_cast<unsigned int>(h - 1), &upperColor);
-    target.ColorUpper.r = upperColor.rgbRed;
-    target.ColorUpper.b = upperColor.rgbBlue;
-    target.ColorUpper.g = upperColor.rgbGreen;
-    target.ColorUpper.a = 255;
-
-    RGBQUAD lowerColor;
-    FreeImage_GetPixelColor(sourceImage, 0, 0, &lowerColor);
-    target.ColorLower.r = lowerColor.rgbRed;
-    target.ColorLower.b = lowerColor.rgbBlue;
-    target.ColorLower.g = lowerColor.rgbGreen;
-    target.ColorLower.a = 255;
-
     if(target.l.colorKey) // Apply transparent color for key pixels
     {
         PGE_Pix colSrc = {target.l.keyRgb[0],
@@ -583,9 +580,24 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         GraphicsHelps::replaceColor(sourceImage, colSrc, colDst);
     }
 
-    FreeImage_FlipVertical(sourceImage);
+    if(!is_qoi)
+        FreeImage_FlipVertical(sourceImage);
     if(maskImage)
         FreeImage_FlipVertical(maskImage);
+
+    RGBQUAD upperColor;
+    FreeImage_GetPixelColor(sourceImage, 0, 0, &upperColor);
+    target.ColorUpper.r = upperColor.rgbRed;
+    target.ColorUpper.b = upperColor.rgbBlue;
+    target.ColorUpper.g = upperColor.rgbGreen;
+    target.ColorUpper.a = 255;
+
+    RGBQUAD lowerColor;
+    FreeImage_GetPixelColor(sourceImage, 0, static_cast<unsigned int>(h - 1), &lowerColor);
+    target.ColorLower.r = lowerColor.rgbRed;
+    target.ColorLower.b = lowerColor.rgbBlue;
+    target.ColorLower.g = lowerColor.rgbGreen;
+    target.ColorLower.a = 255;
 
     // don't touch texture info, that was set on original load
     // target.w = static_cast<int>(w);
@@ -599,9 +611,12 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         shrink2x = (w >= Uint32(target.w) && h >= Uint32(target.h));
         break;
     case Config_t::SCALE_DOWN_SAFE:
-        shrink2x = GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target));
-        if(maskImage)
-            shrink2x &= GraphicsHelps::validateFor2xScaleDown(maskImage, StdPictureGetOrigPath(target));
+        // only do it if the texture isn't already downscaled, and wasn't already testing during QOI conversion
+        shrink2x = (w >= Uint32(target.w) && h >= Uint32(target.h) && !is_qoi);
+        if(shrink2x)
+            shrink2x = GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target));
+        if(maskImage && shrink2x)
+            shrink2x = GraphicsHelps::validateFor2xScaleDown(maskImage, StdPictureGetOrigPath(target));
         break;
     case Config_t::SCALE_DOWN_NONE:
     default:
@@ -653,8 +668,15 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         }
     }
 
-    if(!g_render->depthTestSupported() || maskImage || !GraphicsHelps::validateForDepthTest(sourceImage, StdPictureGetOrigPath(target)))
+    if(!g_render->depthTestSupported()
+        || maskImage
+        || ((is_qoi)
+            ? !qoi_depth_test_supported
+            : GraphicsHelps::validateForDepthTest(sourceImage, StdPictureGetOrigPath(target)))
+        )
+    {
         target.d.invalidateDepthTest();
+    }
 
     uint32_t w_mask = 0;
     uint32_t h_mask = 0;

@@ -1106,6 +1106,7 @@ else()
         src/core/sdl/events_sdl.cpp
         src/core/sdl/sdl_core.cpp
         src/core/power/power_sdl.cpp
+        lib/Graphics/xt_qoi.cpp
     )
 
     if(NOT THEXTECH_FORCE_FULLSCREEN AND NOT EMSCRIPTEN)
