@@ -694,6 +694,45 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(StdPicture &texture, uint32_t fontSi
         break;
     }
 
+    case FT_PIXEL_MODE_BGRA:
+    {
+        if(bitmap.pitch >= 0)
+        {
+            for(uint32_t h = 0; h < height; ++h)
+            {
+                for(uint32_t w = 0; w < width; ++w)
+                {
+                    uint8_t colour[4];
+                    SDL_memcpy(colour, bitmap.buffer + static_cast<uint32_t>(bitmap.pitch) * ((height - 1) - h) + w * 4, 4);
+                    size_t hp = (4 * width) * (height - 1 - h);
+                    uint32_t *dst = reinterpret_cast<uint32_t*>(image + hp + (4 * w));
+                    *dst++ = colour[2];
+                    *dst++ = colour[1];
+                    *dst++ = colour[0];
+                    *dst++ = colour[3];
+                }
+            }
+        }
+        else if(bitmap.pitch < 0)
+        {
+            for(uint32_t h = 0; h < height; ++h)
+            {
+                for(uint32_t w = 0; w < width; ++w)
+                {
+                    uint8_t colour[4];
+                    SDL_memcpy(colour, (bitmap.buffer - (static_cast<uint32_t>(bitmap.pitch) * h) + w * 4), 4);
+                    size_t hp = (4 * width) * h;
+                    uint32_t *dst = reinterpret_cast<uint32_t*>(image + hp + (4 * w));
+                    *dst++ = colour[2];
+                    *dst++ = colour[1];
+                    *dst++ = colour[0];
+                    *dst++ = colour[3];
+                }
+            }
+        }
+        break;
+    }
+
     default:
         pLogWarning("TtfFont::TheGlyph: FIXME: The pixel mode %d is not supported yet!", bitmap.pixel_mode);
         break;
