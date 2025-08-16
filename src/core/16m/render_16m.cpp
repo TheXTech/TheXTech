@@ -740,7 +740,7 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
     if(!fs.empty())
     {
         int w, h, flags;
-        if(sscanf(fs.c_str(), "%d\n%d\n%d\n", &w, &h, &flags) != 3 || w < 0 || w > 8192 || h < 0 || h > 8192)
+        if(sscanf(fs.c_str(), "%d\n%d\n%d\n", &w, &h, &flags) != 3 || w < 0 || w >= 32768 || h < 0 || h >= 32768)
         {
             pLogWarning("Could not load image %s dimensions from size file", path.c_str());
             target.inited = false;
@@ -793,7 +793,7 @@ void lazyLoadPictureFromList(StdPicture_Sub& target, PGE_FileFormats_misc::TextI
         }
     }
 
-    if(!okay || w < 0 || w > 8192 || h < 0 || h > 8192)
+    if(!okay || w < 0 || w >= 32768 || h < 0 || h >= 32768)
     {
         pLogWarning("Could not load image %s dimensions from load list", target.l.path);
         target.inited = false;
