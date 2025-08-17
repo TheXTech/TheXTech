@@ -471,12 +471,12 @@ uint32_t TtfFont::drawGlyphB(const char *u8char, int32_t x, int32_t baseline_y, 
 
         if(drawOutlines)
         {
-            const double offsets[4][2] =
+            const int offsets[4][2] =
             {
-                {-scaleSize, 0.0},
-                { scaleSize, 0.0},
-                {0.0, -scaleSize},
-                {0.0,  scaleSize}
+                {-scaleSize, 0},
+                { scaleSize, 0},
+                {0, -scaleSize},
+                {0,  scaleSize}
             };
 
             // take square of Alpha to match blend of normal text
