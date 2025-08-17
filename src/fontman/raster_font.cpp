@@ -438,6 +438,7 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
                 uint32_t font_size_use = (m_ttfSize > 0) ? m_ttfSize : m_letterWidth;
 
                 int y_offset = 0;
+                int baseline = h;
                 bool doublePixel = font->doublePixel();
 
                 if(font->bitmapSize())
@@ -448,9 +449,15 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
                     if(fontSize == 0)
                         y_offset = 0;
                     else if(doublePixel)
+                    {
                         y_offset = ((int)fontSize - (font->bitmapSize() * 2)) / 2;
+                        baseline += - (h / 2) + font->bitmapSize();
+                    }
                     else
+                    {
                         y_offset = ((int)fontSize - font->bitmapSize()) / 2;
+                        baseline += - (h / 2) + (font->bitmapSize() / 2);
+                    }
 
                     font_size_use = font->bitmapSize();
                 }
@@ -463,12 +470,9 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
 
                 if(doublePixel)
                 {
-                    y_offset += h - (glyph.top * 2);
                     glyph_width *= 2;
                     glyph_height *= 2;
                 }
-                else
-                    y_offset += h - glyph.top;
 
                 if(glyph_height + 2 > line_offset)
                     line_offset = glyph_height + 2;
@@ -486,9 +490,9 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
 
                 if(letter_alpha != 0)
                 {
-                    font->drawGlyph(&cx,
+                    font->drawGlyphB(&cx,
                                     x + static_cast<int32_t>(offsetX + m_glyphOffsetX),
-                                    y + static_cast<int32_t>(offsetY + m_glyphOffsetY) - 2 + y_offset,
+                                    y + baseline + y_offset,
                                     font_size_use,
                                     (doublePixel ? 2 : 1),
                                     m_ttfOutlines,

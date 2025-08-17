@@ -111,7 +111,7 @@ public:
     FontType getFontType() const override;
 
     /**
-     * @brief Draw a single glyph
+     * @brief Draw a single glyph by x-y coordinates
      * @param u8char Pointer to UTF8 multi-byte character
      * @param x X position to draw
      * @param y Y position do draw
@@ -126,6 +126,26 @@ public:
      */
     uint32_t drawGlyph(const char* u8char,
                        int32_t x, int32_t y, uint32_t fontSize, int scaleSize = 1,
+                       bool drawOutlines = false,
+                       XTColor color = XTColor(),
+                       XTColor OL_color = XTColor());
+
+    /**
+     * @brief Draw a single glyph relative to baseline offset
+     * @param u8char Pointer to UTF8 multi-byte character
+     * @param x X position to draw
+     * @param baseline_y Y position of the baseline to draw
+     * @param fontSize Size of font
+     * @param scaleSize Scale rendered texture
+     * @param drawOutlines Draw the outline at every glyph
+     * @param Red Red color level from 0.0 to 1.0
+     * @param Green Green color level from 0.0 to 1.0
+     * @param Blue Blue color level from 0.0 to 1.0
+     * @param Alpha Transparency level from 0.0 to 1.0
+     * @return Width of the glypth
+     */
+    uint32_t drawGlyphB(const char* u8char,
+                       int32_t x, int32_t baseline_y, uint32_t fontSize, int scaleSize = 1,
                        bool drawOutlines = false,
                        XTColor color = XTColor(),
                        XTColor OL_color = XTColor());

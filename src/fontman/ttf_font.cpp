@@ -440,17 +440,34 @@ BaseFontEngine::FontType TtfFont::getFontType() const
     return FONT_TTF;
 }
 
+// #define TTF_RENDER_DEBUG
+
 uint32_t TtfFont::drawGlyph(const char *u8char,
                             int32_t x, int32_t y, uint32_t fontSize, int scaleSize,
                             bool drawOutlines,
                             XTColor color,
                             XTColor OL_color)
 {
+#ifdef TTF_RENDER_DEBUG
     const TheGlyph &glyph = getGlyph(fontSize, get_utf8_char(u8char));
+
+    if(glyph.tx)
+        XRender::renderRect(x, y, glyph.info.width * scaleSize, glyph.info.height * scaleSize, XTColor(0, 0, 255, 128), false);
+#endif
+
+    return drawGlyphB(u8char, x, y + static_cast<int32_t>(fontSize * scaleSize), fontSize, scaleSize, drawOutlines, color, OL_color);
+}
+
+uint32_t TtfFont::drawGlyphB(const char *u8char, int32_t x, int32_t baseline_y, uint32_t fontSize, int scaleSize, bool drawOutlines, XTColor color, XTColor OL_color)
+{
+    const TheGlyph &glyph = getGlyph(fontSize, get_utf8_char(u8char));
+
     if(glyph.tx)
     {
-        int32_t glyph_x = x;
-        int32_t glyph_y = y + static_cast<int32_t>(fontSize);
+        int32_t glyph_x = x + (glyph.info.left * scaleSize);
+        int32_t glyph_y = baseline_y - (glyph.info.top * scaleSize);
+        int32_t glyph_w = glyph.info.width * scaleSize;
+        int32_t glyph_h = glyph.info.height * scaleSize;
 
         if(drawOutlines)
         {
@@ -468,24 +485,19 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
             for(size_t i = 0; i < 4; ++i)
             {
                 XRender::renderTextureScale(
-                    glyph_x + glyph.info.left + offsets[i][0],
-                    glyph_y - glyph.info.top + offsets[i][1],
-                    glyph.info.width * scaleSize,
-                    glyph.info.height * scaleSize,
-                    *glyph.tx,
+                    glyph_x + offsets[i][0], glyph_y + offsets[i][1],
+                    glyph_w, glyph_h, *glyph.tx,
                     color.with_alpha(scaled_a) * OL_color
                 );
             }
         }
 
-        XRender::renderTextureScale(
-            glyph_x + glyph.info.left,
-            glyph_y - glyph.info.top,
-            glyph.info.width * scaleSize,
-            glyph.info.height * scaleSize,
-            *glyph.tx,
-            color
-        );
+        XRender::renderTextureScale(glyph_x, glyph_y, glyph_w, glyph_h, *glyph.tx, color);
+
+#ifdef TTF_RENDER_DEBUG
+        XRender::renderRect(x, baseline_y - glyph_h, glyph_w, glyph_h, XTColor(0, 0, 255, 128), false);
+        XRender::renderRect(glyph_x, glyph_y, glyph_w, glyph_h, XTColor(255, 0, 0, 128), false);
+#endif
 
         return glyph.info.width;
     }
@@ -577,8 +589,10 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(StdPicture &texture, uint32_t fontSi
 
     FT_Int32 ftLoadFlags = FT_LOAD_RENDER;
 
-    if(!m_enableAntialias)
-        ftLoadFlags |= FT_LOAD_MONOCHROME | FT_LOAD_TARGET_MONO;
+    if(FT_HAS_COLOR(cur_font))
+        ftLoadFlags |= FT_LOAD_COLOR;
+    else if(!m_enableAntialias)
+        ftLoadFlags |= FT_LOAD_TARGET_MONO | FT_LOAD_MONOCHROME;
 
     error = FT_Load_Glyph(cur_font, t_glyphIndex, ftLoadFlags);
     if(error != 0)
@@ -706,9 +720,10 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(StdPicture &texture, uint32_t fontSi
                     SDL_memcpy(colour, bitmap.buffer + static_cast<uint32_t>(bitmap.pitch) * ((height - 1) - h) + w * 4, 4);
                     size_t hp = (4 * width) * (height - 1 - h);
                     uint32_t *dst = reinterpret_cast<uint32_t*>(image + hp + (4 * w));
-                    *dst++ = colour[2];
-                    *dst++ = colour[1];
-                    *dst++ = colour[0];
+                    // Convert pre-multiplied to normal format
+                    *dst++ = colour[0] > 0 ? colour[2] / colour[0]: 0;
+                    *dst++ = colour[0] > 0 ? colour[1] / colour[0]: 0;
+                    *dst++ = colour[0] > 0 ? colour[0] / colour[0]: 0;
                     *dst++ = colour[3];
                 }
             }
@@ -723,9 +738,10 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(StdPicture &texture, uint32_t fontSi
                     SDL_memcpy(colour, (bitmap.buffer - (static_cast<uint32_t>(bitmap.pitch) * h) + w * 4), 4);
                     size_t hp = (4 * width) * h;
                     uint32_t *dst = reinterpret_cast<uint32_t*>(image + hp + (4 * w));
-                    *dst++ = colour[2];
-                    *dst++ = colour[1];
-                    *dst++ = colour[0];
+                    // Convert pre-multiplied to normal format
+                    *dst++ = colour[0] > 0 ? colour[2] / colour[0]: 0;
+                    *dst++ = colour[0] > 0 ? colour[1] / colour[0]: 0;
+                    *dst++ = colour[0] > 0 ? colour[0] / colour[0]: 0;
                     *dst++ = colour[3];
                 }
             }
@@ -768,6 +784,38 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(StdPicture &texture, uint32_t fontSi
     t_glyph.info.metric_h = int32_t(glyph->metrics.height);
     t_glyph.info.glyph_width = glyph->advance.x;
     t_glyph.info.glyph_height = glyph->advance.y;
+
+
+#ifdef DEBUG_BUILD
+    UTF8 glyph8[6] = {0, 0, 0, 0, 0, 0};
+    UTF8 *glyph8_ptr = static_cast<UTF8*>(glyph8);
+    const UTF32 glyph32[2] = {character, 0};
+    const UTF32 *glyph32_ptr1 = static_cast<const UTF32*>(glyph32);
+    PGEFF_ConvertUTF32toUTF8(&glyph32_ptr1, glyph32 + 1, &glyph8_ptr, glyph8 + 5, strictConversion);
+
+    D_pLogDebug("TTF Glyph info %s 0x%08X: w=%u, h=%u, l=%d t=%d, ax=%d, ay=%d, "
+        "mhbx=%d, mhby=%d, mha=%d, mvbx=%d, mvby=%d, mva=%d, "
+        "mhbx=%d, mhby=%d, mha=%d, mw=%d, mh=%d, gw=%ld, gh=%ld",
+        glyph8,
+        character,
+        t_glyph.info.width,
+        t_glyph.info.height,
+        t_glyph.info.left,
+        t_glyph.info.top,
+        (t_glyph.info.advance_x >> 6),
+        (t_glyph.info.advance_y >> 6),
+        (t_glyph.info.metric_h_bearing_x >> 6),
+        (t_glyph.info.metric_h_bearing_y >> 6),
+        (t_glyph.info.metric_h_advance >> 6),
+        (t_glyph.info.metric_v_bearing_x >> 6),
+        (t_glyph.info.metric_v_bearing_y >> 6),
+        (t_glyph.info.metric_v_advance >> 6),
+        (t_glyph.info.metric_w >> 6),
+        (t_glyph.info.metric_h >> 6),
+        (t_glyph.info.glyph_width >> 6),
+        (t_glyph.info.glyph_height >> 6)
+    );
+#endif
 
     delete [] image;
 
