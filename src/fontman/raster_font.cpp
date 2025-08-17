@@ -330,7 +330,7 @@ PGE_Size RasterFont::glyphSize(const char* utf8char, uint32_t charNum, uint32_t 
                     font_size_use /= 2;
 
                 TtfFont::TheGlyphInfo glyph = font->getGlyphInfo(&cx, font_size_use);
-                uint32_t glyph_width = glyph.width > 0 ? uint32_t(glyph.advance >> 6) : (font_size_use >> 2);
+                uint32_t glyph_width = glyph.width > 0 ? uint32_t(glyph.advance_x >> 6) : (font_size_use >> 2);
                 uint32_t glyph_height = glyph.height;
                 if(doublePixel)
                 {
@@ -441,6 +441,7 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
                 uint32_t font_size_use = (m_ttfSize > 0) ? m_ttfSize : m_letterWidth;
 
                 int y_offset = 0;
+                int baseline = h;
                 bool doublePixel = font->doublePixel();
 
                 if(font->bitmapSize())
@@ -451,9 +452,15 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
                     if(fontSize == 0)
                         y_offset = 0;
                     else if(doublePixel)
+                    {
                         y_offset = ((int)fontSize - (font->bitmapSize() * 2)) / 2;
+                        baseline += - (h / 2) + font->bitmapSize();
+                    }
                     else
+                    {
                         y_offset = ((int)fontSize - font->bitmapSize()) / 2;
+                        baseline += - (h / 2) + (font->bitmapSize() / 2);
+                    }
 
                     font_size_use = font->bitmapSize();
                 }
@@ -461,8 +468,9 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
                     font_size_use /= 2;
 
                 TtfFont::TheGlyphInfo glyph = font->getGlyphInfo(&cx, font_size_use);
-                uint32_t glyph_width = glyph.width > 0 ? uint32_t(glyph.advance >> 6) : (font_size_use >> 2);
+                uint32_t glyph_width = glyph.width > 0 ? uint32_t(glyph.advance_x >> 6) : (font_size_use >> 2);
                 uint32_t glyph_height = glyph.height;
+
                 if(doublePixel)
                 {
                     glyph_width *= 2;
@@ -485,9 +493,9 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
 
                 if(letter_alpha != 0)
                 {
-                    font->drawGlyph(&cx,
+                    font->drawGlyphB(&cx,
                                     x + static_cast<int32_t>(offsetX + m_glyphOffsetX),
-                                    y + static_cast<int32_t>(offsetY + m_glyphOffsetY) - 2 + y_offset,
+                                    y + baseline + y_offset,
                                     font_size_use,
                                     (doublePixel ? 2.0 : 1.0),
                                     m_ttfOutlines,

@@ -111,7 +111,7 @@ public:
     FontType getFontType() const override;
 
     /**
-     * @brief Draw a single glyph
+     * @brief Draw a single glyph by x-y coordinates
      * @param u8char Pointer to UTF8 multi-byte character
      * @param x X position to draw
      * @param y Y position do draw
@@ -130,14 +130,48 @@ public:
                        XTColor color = XTColor(),
                        XTColor OL_color = XTColor());
 
+    /**
+     * @brief Draw a single glyph relative to baseline offset
+     * @param u8char Pointer to UTF8 multi-byte character
+     * @param x X position to draw
+     * @param baseline_y Y position of the baseline to draw
+     * @param fontSize Size of font
+     * @param scaleSize Scale rendered texture
+     * @param drawOutlines Draw the outline at every glyph
+     * @param Red Red color level from 0.0 to 1.0
+     * @param Green Green color level from 0.0 to 1.0
+     * @param Blue Blue color level from 0.0 to 1.0
+     * @param Alpha Transparency level from 0.0 to 1.0
+     * @return Width of the glypth
+     */
+    uint32_t drawGlyphB(const char* u8char,
+                       int32_t x, int32_t baseline_y, uint32_t fontSize, int scaleSize = 1,
+                       bool drawOutlines = false,
+                       XTColor color = XTColor(),
+                       XTColor OL_color = XTColor());
+
     struct TheGlyphInfo
     {
+        TheGlyphInfo() = default;
+        TheGlyphInfo(const TheGlyphInfo &) = default;
+        TheGlyphInfo &operator=(const TheGlyphInfo &) = default;
+
         uint32_t width  = 0;
         uint32_t height = 0;
         int32_t  left   = 0;
         int32_t  top    = 0;
-        int32_t  advance = 0;
+        int32_t  advance_x = 0;
+        int32_t  advance_y = 0;
+        int32_t  metric_h_bearing_x = 0;
+        int32_t  metric_h_bearing_y = 0;
+        int32_t  metric_h_advance = 0;
+        int32_t  metric_v_bearing_x = 0;
+        int32_t  metric_v_bearing_y = 0;
+        int32_t  metric_v_advance = 0;
+        int32_t  metric_w = 0;
+        int32_t  metric_h = 0;
         FT_Pos   glyph_width = 0;
+        FT_Pos   glyph_height = 0;
     };
 
     TheGlyphInfo getGlyphInfo(const char *u8char, uint32_t fontSize);
@@ -170,12 +204,7 @@ private:
     {
         TheGlyph() = default;
         StdPicture *tx     = nullptr;
-        uint32_t width  = 0;
-        uint32_t height = 0;
-        int32_t  left   = 0;
-        int32_t  top    = 0;
-        int32_t  advance = 0;
-        FT_Pos   glyph_width = 0;
+        TheGlyphInfo info;
     };
 
     //! Default dummy glyph
