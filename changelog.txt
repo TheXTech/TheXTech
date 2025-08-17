@@ -13,6 +13,7 @@ Changelog for 1.3.7.2-dev
 -Controls: allow deleting a profile in use. This will allow the controller's profile to be reset. (@ds-sloth)
 -Controls: fix face button labels on Switch port. (@Wohlstand, @ds-sloth)
 -Visuals: fix v1.3.7.1 bug where there was a black frame during the transition from the main menu to the asset pack select screen (@ds-sloth)
+-Fonts: Fixed the incorrect vertical alignment of some TTF glyph. (@Wohlstand)
 
 Changelog for 1.3.7.1
 -Add GameCube controller support for Wii (@ds-sloth)
