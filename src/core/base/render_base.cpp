@@ -672,7 +672,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         || maskImage
         || ((is_qoi)
             ? !qoi_depth_test_supported
-            : GraphicsHelps::validateForDepthTest(sourceImage, StdPictureGetOrigPath(target)))
+            : !GraphicsHelps::validateForDepthTest(sourceImage, StdPictureGetOrigPath(target)))
         )
     {
         target.d.invalidateDepthTest();
