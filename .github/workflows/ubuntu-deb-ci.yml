@@ -272,7 +272,7 @@ jobs:
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name_suffix: "",
-            package_filename_suffix: "ubuntu-22-04-aach64",
+            package_filename_suffix: "ubuntu-22-04-aarch64",
             upload_directory: "www/ubuntu-22-04/"
           }
         - {
