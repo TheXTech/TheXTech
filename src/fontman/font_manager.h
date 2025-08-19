@@ -65,6 +65,23 @@ void quit();
  */
 void updateDefaultFontByLang(const std::string &lang, const std::string &country);
 
+/*!
+ * \brief List of UI metrics categories
+ */
+enum UIMetricsCategory
+{
+    Metrics_MenuMinLineHeight = 0,
+    // FIXME: Implement other categories
+};
+
+/*!
+ * \brief Gets the per language UI metrics value
+ * \param category Metrics category index
+ * \param lang Current language
+ * \return Height in pixels
+ */
+int getMetricsValue(UIMetricsCategory category, const std::string &lang);
+
 /**
  * @brief Attempts to load custom fonts for the episode and for the level
  */

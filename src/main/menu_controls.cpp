@@ -33,6 +33,8 @@
 #include "../gfx.h"
 #include "../core/render.h"
 
+#include "fontman/font_manager.h"
+
 #include "graphics/gfx_frame.h"
 #include "graphics/gfx_marquee.h"
 
@@ -140,14 +142,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         line = 30;
 
     // check for Chinese and Korean languages
-    int min_line_size = 18;
-
-#ifdef THEXTECH_ENABLE_TTF_SUPPORT
-    if(CurrentLanguage == "zh")
-        min_line_size = 26;
-    else if(CurrentLanguage == "ko")
-        min_line_size = 22;
-#endif
+    int min_line_size = FontManager::getMetricsValue(FontManager::Metrics_MenuMinLineHeight, CurrentLanguage); // 18;
 
     // (okay if we don't get 15 lines)
     int max_line = 15;
