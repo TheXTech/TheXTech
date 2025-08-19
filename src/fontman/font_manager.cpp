@@ -551,6 +551,30 @@ void FontManager::updateDefaultFontByLang(const std::string &lang, const std::st
 #endif
 }
 
+int FontManager::getMetricsValue(UIMetricsCategory category, const std::string &lang)
+{
+    // FIXME: Implement the INI-side table of rules instead of hardcoding that
+    // That might work differently if different fonts are used.
+    // Hardcoded rules are fine for content that lacks them
+
+    switch(category)
+    {
+    case Metrics_MenuMinLineHeight:
+#ifdef THEXTECH_ENABLE_TTF_SUPPORT
+        if(lang == "zh")
+            return 26;
+        else if(lang == "ko" || lang == "ja")
+            return 22;
+#endif
+        return 18;
+
+    default:
+            break;
+    }
+
+    return 18;
+}
+
 void FontManager::loadCustomFonts()
 {
     backupDefaultFontMaps();

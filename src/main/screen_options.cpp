@@ -42,6 +42,7 @@
 #include "main/screen_options.h"
 #include "graphics/gfx_frame.h"
 #include "graphics/gfx_marquee.h"
+#include "fontman/font_manager.h"
 #include "main/menu_controls.h"
 #include "controls.h"
 #include "control/controls_methods.h" // to cancel keyboard's double-click fullscreen
@@ -575,14 +576,7 @@ bool Mouse_Render(bool mouse, bool render)
         line = 30;
 
     // check for Chinese and Korean languages
-    int min_line_size = 18;
-
-#ifdef THEXTECH_ENABLE_TTF_SUPPORT
-    if(CurrentLanguage == "zh")
-        min_line_size = 26;
-    else if(CurrentLanguage == "ko")
-        min_line_size = 22;
-#endif
+    int min_line_size = FontManager::getMetricsValue(FontManager::Metrics_MenuMinLineHeight, CurrentLanguage);
 
     // (it's okay if we don't get 15 lines, but we need at least 18px per line.)
     int max_line = 15;
