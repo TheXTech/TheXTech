@@ -4617,6 +4617,9 @@ void WaterCheck(const int A)
                     if(p.Mount == 2 || p.Fairy)
                         continue;
 
+                    if(query_loc.Y + query_loc.Height - Physics.PlayerGravity < Water[B].Location.Y)
+                        continue;
+
                     p.CurMazeZone = B;
 
                     PhysEnv_Maze_PickDirection(p.Location, B, p.MazeZoneStatus);
