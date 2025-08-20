@@ -1410,8 +1410,8 @@ void LoadCustomGFX(bool include_world, const char* preview_players_from)
     {
         for(int A = 1; A <= numStates; ++A)
         {
-            loadCGFX(GfxRoot + fmt::sprintf_ne("{1}/{1}-{0}.png", A, GFXPlayerNames[c]),
-                     fmt::format_ne("{1}-{0}", A, GFXPlayerNames[c]),
+            loadCGFX(GfxRoot + fmt::sprintf_ne("%s/%s-%d.png", GFXPlayerNames[c], GFXPlayerNames[c], A),
+                     fmt::sprintf_ne("%s-%d", GFXPlayerNames[c], A),
                      nullptr, nullptr,
                      nullptr, (*GFXCharacterBMP[c])[A]);
         }
