@@ -208,7 +208,7 @@ static void strToPlayerSetup(int player, const std::string &setupString)
     else if(p.State >= numStates)
         p.State = numStates;
 
-    if(p.HeldBonus >= maxNPCType)
+    if(p.HeldBonus > maxNPCType)
         p.HeldBonus = NPCID_NULL;
 
     if(hasHealth)

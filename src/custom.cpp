@@ -342,7 +342,7 @@ void FindCustomNPCs(/*std::string cFilePath*/)
 //            existingFiles.insert(FileNamePath + FileName  + "/"+ p);
 //    }
 
-    for(int A = 1; A < maxNPCType; ++A)
+    for(int A = 1; A <= maxNPCType; ++A)
     {
         const auto nFile = fmt::sprintf_ne("npc-%d.txt", A);
         // Episode-wide custom NPC setup
