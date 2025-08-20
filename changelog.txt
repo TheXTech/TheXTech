@@ -12,6 +12,7 @@ Changelog for 1.3.7.2-dev
 -Controls: fix v1.3.6 bug where controller was assigned the wrong profile after its original profile was deleted (@ds-sloth)
 -Controls: allow deleting a profile in use. This will allow the controller's profile to be reset. (@ds-sloth)
 -Controls: fix face button labels on Switch port. (@Wohlstand, @ds-sloth)
+-Controls: fix v1.3.6 bug where closing the Enter Code screen with the Start button might prevent successful code entry (@ds-sloth, @Wohlstand)
 -Visuals: fix v1.3.7.1 bug where there was a black frame during the transition from the main menu to the asset pack select screen (@ds-sloth)
 -Fonts: Fixed the incorrect vertical alignment of some TTF glyph. (@Wohlstand)
 -Fix v1.3.7.1 bug where npc-300.txt was not loaded properly - fixes spinning platforms in Lowser's Conquest (@ds-sloth, @Wohlstand)
