@@ -159,10 +159,10 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
     {
         // need to find a new direction
         Location_t edgeLoc;
-        edgeLoc.X = exit_check_x - 16 + target_speed_x * 4;
-        edgeLoc.Y = exit_check_y - 16 + target_speed_y * 4;
-        edgeLoc.Width = 32;
-        edgeLoc.Height = 32;
+        edgeLoc.X = exit_check_x - 15 + target_speed_x * 4;
+        edgeLoc.Y = exit_check_y - 15 + target_speed_y * 4;
+        edgeLoc.Width = 30;
+        edgeLoc.Height = 30;
 
         cleared_to_exit = true;
 
@@ -203,8 +203,8 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
         {
             int new_maze[4] = {0, 0, 0, 0};
 
-            edgeLoc.X = exit_check_x - 16;
-            edgeLoc.Y = exit_check_y - 16;
+            edgeLoc.X = exit_check_x - 15;
+            edgeLoc.Y = exit_check_y - 15;
 
             for(int W : treeWaterQuery(edgeLoc, SORTMODE_NONE))
             {
