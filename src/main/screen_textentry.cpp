@@ -732,7 +732,7 @@ bool Logic()
         if(menuControls.Back)
             Backspace();
 
-        if((menuControls.Do && DoAction()) || startPressed)
+        if(startPressed || (menuControls.Do && DoAction()))
         {
             s_finalize();
             return true;
