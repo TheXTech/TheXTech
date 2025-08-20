@@ -1609,6 +1609,7 @@ void Load(XTechTranslate* translate)
 
     make_pages(s_ordered_npc_families, npc_pages, 10, 11);
 
+    // Not an off-by-one error, this is zero-indexed
     for(int i = 0; i < maxNPCType; i++)
     {
         npc_family_by_type[i] = FAMILY_NONE;
