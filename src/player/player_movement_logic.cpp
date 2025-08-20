@@ -1468,8 +1468,17 @@ void PlayerMazeZoneMovement(int A)
         // prevent unexpected block clipping
         if(Player[A].MazeZoneStatus % 4 == MAZE_DIR_DOWN)
         {
+            // make sure the player won't clip into blocks below the maze zone
             PlayerPush(A, 1);
+
+            // unduck the player now if they were on Mount 3, and then make sure they don't hit the top of the maze zone ceiling
+            if(Player[A].Duck && !Player[A].Controls.Down)
+            {
+                UnDuck(Player[A]);
+                PlayerPush(A, 3);
+            }
         }
+        // help the player hit blocks above the maze zone
         else if(Player[A].MazeZoneStatus % 4 == MAZE_DIR_UP)
         {
             Player[A].StandUp = true;
