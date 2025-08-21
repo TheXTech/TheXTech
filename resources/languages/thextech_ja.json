@@ -247,7 +247,8 @@
                 "scrollLeft": "",
                 "testPlay": "",
                 "scrollDown": ""
-            }
+            },
+            "controlsDeleteKey2": "(オルトダッシュで削除)"
         },
         "game": {
             "gameBattleRandom": "ランダムコース",
