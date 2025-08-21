@@ -408,6 +408,10 @@ void LoadGame()
     else if(g_100s < -9999)
         g_100s = -9999;
 
+    // reset score on load in Vanilla Mode (like SMBX 1.3)
+    if(g_config.playstyle == Config_t::MODE_VANILLA)
+        Score = 0;
+
     curWorldMusic = int(sav.musicID);
     curWorldMusicFile = sav.musicFile;
 

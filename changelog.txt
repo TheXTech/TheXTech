@@ -39,6 +39,7 @@ Changelog for 1.3.7.2-dev
 -Fonts: Fixed the incorrect vertical alignment of some TTF glyph. (@Wohlstand)
 -Fix v1.3.7.1 bug where npc-300.txt was not loaded properly - fixes spinning platforms in Lowser's Conquest (@ds-sloth, @Wohlstand)
 -Fix v1.3.7.1 bug where backup player masks were not loaded (@ds-sloth)
+-Vanilla mode: reset score between gameplay sessions, like SMBX 1.3 (@ds-sloth)
 
 Changelog for 1.3.7.1
 -Add GameCube controller support for Wii (@ds-sloth)

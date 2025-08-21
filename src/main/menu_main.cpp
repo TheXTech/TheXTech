@@ -2158,6 +2158,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
 
         bool hasFails = (g_config.enable_fails_tracking || info.FailsEnabled);
         bool show_timer = info.Time > 0 && (g_config.enable_playtime_tracking || info.ConfigDefaults < 0);
+        bool show_score = (s_episode_playstyle != Config_t::MODE_VANILLA);
 
         // recenter if single row
         if(!show_timer && !hasFails)
@@ -2169,8 +2170,11 @@ static void s_drawGameSaves(int MenuX, int MenuY)
         std::string t;
 
         // Score
-        int row_score = show_timer ? row_1 : row_c;
-        SuperPrint(t = fmt::format_ne(g_mainMenu.phraseScore, info.Score), 3, infobox_x + 10, row_score);
+        if(show_score)
+        {
+            int row_score = show_timer ? row_1 : row_c;
+            SuperPrint(t = fmt::format_ne(g_mainMenu.phraseScore, info.Score), 3, infobox_x + 10, row_score);
+        }
 
         // Gameplay Timer
         if(show_timer)
