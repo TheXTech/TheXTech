@@ -454,6 +454,7 @@ XTechTranslate::XTechTranslate()
     insert(m_engineMap, "game.msgbox.sysInfoWarning",              &g_gameStrings.msgBoxTitleWarning);
     insert(m_engineMap, "game.msgbox.sysInfoError",                &g_gameStrings.msgBoxTitleError);
 
+    insert(m_engineMap, "game.loader.loading",                     &g_gameStrings.loaderLoading);
     insert(m_engineMap, "game.loader.statusLoadData",              &g_gameStrings.loaderStatusLoadData);
     insert(m_engineMap, "game.loader.statusLoadFile",              &g_gameStrings.loaderStatusLoadFile);
     insert(m_engineMap, "game.loader.statusGameInfo",              &g_gameStrings.loaderStatusGameInfo);

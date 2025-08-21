@@ -30,6 +30,7 @@ struct GameContent
     std::string msgBoxTitleWarning;
     std::string msgBoxTitleError;
 
+    std::string loaderLoading;
     std::string loaderStatusLoadData;
     std::string loaderStatusLoadFile;
     std::string loaderStatusGameInfo;

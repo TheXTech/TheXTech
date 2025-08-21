@@ -28,6 +28,7 @@ void initGameStrings()
     g_gameStrings.msgBoxTitleWarning = "Warning!";
     g_gameStrings.msgBoxTitleError = "Error!";
 
+    g_gameStrings.loaderLoading = "Loading...";
     g_gameStrings.loaderStatusLoadData = "Loading data...";
     g_gameStrings.loaderStatusLoadFile = "Load: {0}";
     g_gameStrings.loaderStatusGameInfo = "Game info";
