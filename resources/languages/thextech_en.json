@@ -389,7 +389,8 @@
             "statusGameInfo": "Game info",
             "statusLoadData": "Loading data...",
             "statusLoadFile": "Load: {0}",
-            "statusTranslations": "Translations"
+            "statusTranslations": "Translations",
+            "loading": "Loading..."
         }
     },
     "languageName": "English",
