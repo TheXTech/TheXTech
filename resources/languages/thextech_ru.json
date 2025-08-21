@@ -389,7 +389,8 @@
             "statusGameInfo": "Информация об игре",
             "statusLoadData": "Загрузка данных...",
             "statusLoadFile": "Загрузка: {0}",
-            "statusTranslations": "Переводы"
+            "statusTranslations": "Переводы",
+            "loading": "Загрузка..."
         }
     },
     "languageName": "Русский",
