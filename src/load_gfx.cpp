@@ -144,34 +144,22 @@ static void cgfx_initLangDir()
                 s_langSubDir = "i18n/" + langDir + "/";
             else if(DirMan::exists(g_dirCustom.getCurDir() + "i18n/" + CurrentLanguage))
                 s_langSubDir = "i18n/" + CurrentLanguage + "/";
-            else if(DirMan::exists(g_dirCustom.getCurDir() + langDir))
-                s_langSubDir = langDir + "/";
-            else if(DirMan::exists(g_dirCustom.getCurDir() + CurrentLanguage))
-                s_langSubDir = CurrentLanguage + "/";
 
             // Episode directory
             if(DirMan::exists(g_dirEpisode.getCurDir() + "i18n/" + langDir))
                 s_langSubDirEp = "i18n/" + langDir + "/";
             else if(DirMan::exists(g_dirEpisode.getCurDir() + "i18n/" + CurrentLanguage))
                 s_langSubDirEp = "i18n/" + CurrentLanguage + "/";
-            else if(DirMan::exists(g_dirEpisode.getCurDir() + langDir))
-                s_langSubDirEp = langDir + "/";
-            else if(DirMan::exists(g_dirEpisode.getCurDir() + CurrentLanguage))
-                s_langSubDirEp = CurrentLanguage + "/";
         }
         else
         {
             // Data directory
             if(DirMan::exists(g_dirCustom.getCurDir() + "i18n/" + CurrentLanguage))
                 s_langSubDir = "i18n/" + CurrentLanguage + "/";
-            else if(DirMan::exists(g_dirCustom.getCurDir() + CurrentLanguage))
-                s_langSubDir = CurrentLanguage + "/";
 
             // Episode directory
             if(DirMan::exists(g_dirEpisode.getCurDir() + "i18n/" + CurrentLanguage))
                 s_langSubDirEp = "i18n/" + CurrentLanguage + "/";
-            else if(DirMan::exists(g_dirEpisode.getCurDir() + CurrentLanguage))
-                s_langSubDirEp = CurrentLanguage + "/";
         }
 
         s_useLangDir = !s_langSubDir.empty();
