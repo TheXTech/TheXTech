@@ -389,7 +389,8 @@
             "statusGameInfo": "遊戲信息",
             "statusLoadData": "正在加載數據……",
             "statusLoadFile": "正在加載：{0}",
-            "statusTranslations": "翻譯"
+            "statusTranslations": "翻譯",
+            "loading": "加載中……"
         }
     },
     "languageName": "繁體中文",
