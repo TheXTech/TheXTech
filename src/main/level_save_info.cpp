@@ -256,7 +256,7 @@ static void InitLevelSaveInfo_on_error(void* userdata, FileFormatsError& e)
     SaveInfoInit& si = *static_cast<SaveInfoInit*>(userdata);
     si.on_error();
 
-    pLogWarning("During save info init: %s (line %d).",
+    pLogWarning("During save info init: %s (line %ld).",
                 e.ERROR_info.c_str(),
                 e.ERROR_linenum);
 }
