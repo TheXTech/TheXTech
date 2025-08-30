@@ -1,10 +1,10 @@
 {
     "character": {
         "name2": "Char2",
-        "name5": "",
-        "name3": "",
+        "name5": "Char5",
+        "name3": "Char3",
         "name1": "Char1",
-        "name4": ""
+        "name4": "Char4"
     },
     "editor": {
         "worldMusic": {
@@ -279,7 +279,7 @@
                 "bg2-34": ""
             },
             "auto": {
-                "bg2-0": ""
+                "bg2-0": "なし"
             }
         },
         "npc": {
