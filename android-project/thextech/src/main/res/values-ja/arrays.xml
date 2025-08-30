@@ -5,4 +5,8 @@
     <string name="batteryStatusShow1">残量低下時に表示</string>
     <string name="batteryStatusShow2">つねに表示</string>
     <string name="rendererDefault">デフォルト</string>
+    <string name="touchscreenControllerType1">ハードウェアキーボードが接続されている時は無効にする</string>
+    <string name="touchscreenControllerType2">つねに無効にする</string>
+    <string name="speedRunMode0">オフ</string>
+    <string name="speedRunMode1">モード1(TheXTech ネイティブ)</string>
 </resources>
