@@ -37,7 +37,7 @@ class GFX_t
     //! Holder of loaded textures for easier clean-up
     std::vector<StdPicture*> m_loadedImages;
     //! Capacity of the m_isCustom array (update when new assets are added)
-    static constexpr size_t m_isCustomVolume = 78;
+    static constexpr size_t m_isCustomVolume = 79;
     //! Holder of "is custom" flag
     bool m_isCustom[m_isCustomVolume];
 
@@ -101,6 +101,7 @@ public:
     FrameBorder WorldMapFrame_Border;
     StdPicture Camera;
     StdPicture Balance;
+    StdPicture SaveIcons;
 
     // menu-exclusive graphics, aren't checked in loadCustomUIAssets
     StdPicture Placeholder;

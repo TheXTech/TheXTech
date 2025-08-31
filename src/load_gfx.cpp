@@ -1301,6 +1301,9 @@ static void loadCustomUIAssets()
     loadCGFX("ui", "Balance", -1,
              nullptr, nullptr, &GFX.isCustom(ci++), GFX.Balance, false, true);
 
+    loadCGFX("ui", "SaveIcons", -1,
+             nullptr, nullptr, &GFX.isCustom(ci++), GFX.SaveIcons, false, true);
+
     // Add new optional assets above this line. Also update gfx.cpp: GFX_t::load(), and gfx.h: GFX_t::m_isCustomVolume.
 }
 

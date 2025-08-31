@@ -279,6 +279,8 @@ bool GFX_t::load()
 
     loadImage(Placeholder, "Placeholder");
 
+    loadImage(SaveIcons, "SaveIcons");
+
     if(m_loadErrors > 0)
         m_loadErrors = 0;
 
