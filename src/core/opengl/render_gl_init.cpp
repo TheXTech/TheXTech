@@ -703,6 +703,10 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_game_depth_texture, 0);
         else
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_game_depth_rb);
+
+        // this fixes a bug where the screen could flicker black when resizing the window
+        if(m_use_depth_buffer)
+            glClear(GL_DEPTH_BUFFER_BIT);
     }
 
     // (4) status checking
