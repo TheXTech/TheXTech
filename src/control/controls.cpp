@@ -834,6 +834,7 @@ bool ProcessEvent(const SDL_Event* ev)
 bool Update(bool check_lost_devices)
 {
     bool okay = true;
+    bool prev_okay = true;
 
     // track whether shared controls buttons were pressed last frame, to modify the global versions
     bool old_shared_pause = l_SharedControls.Pause;
@@ -876,6 +877,8 @@ bool Update(bool check_lost_devices)
                 // the method pointer is no longer valid
             }
         }
+        else
+            prev_okay = false;
 
         if(g_hotkeysPressed[Hotkeys::Buttons::LegacyPause] == i + 1)
             newControls.Start = true;
@@ -1003,11 +1006,8 @@ bool Update(bool check_lost_devices)
     }
 
     // indicate if some control slots are missing
-    if(((int)g_InputMethods.size() < l_screen->player_count)
-       && !SingleCoop && !GameMenu && !LevelEditor && !Record::replay_file && check_lost_devices)
-    {
+    if(!prev_okay && !SingleCoop && !GameMenu && !LevelEditor && !Record::replay_file && check_lost_devices)
         okay = false;
-    }
 
     g_disallowHotkeys = false;
 
