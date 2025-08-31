@@ -833,6 +833,7 @@ static Controls_t s_last_controls[maxNetplayPlayers + 1];
 bool Update(bool check_lost_devices)
 {
     bool okay = true;
+    bool prev_okay = true;
 
     // reset per-frame state for SharedCursor
     SharedCursor.Move = false;
@@ -870,6 +871,8 @@ bool Update(bool check_lost_devices)
                 // the method pointer is no longer valid
             }
         }
+        else
+            prev_okay = false;
 
         // push messages corresponding to controls press / release
         XMessage::PushControls(i, newControls);
@@ -1001,11 +1004,8 @@ bool Update(bool check_lost_devices)
     }
 
     // indicate if some control slots are missing
-    if(((int)g_InputMethods.size() < l_screen->player_count)
-       && !SingleCoop && !GameMenu && !LevelEditor && !Record::replay_file && check_lost_devices)
-    {
+    if(!prev_okay && !SingleCoop && !GameMenu && !LevelEditor && !Record::replay_file && check_lost_devices)
         okay = false;
-    }
 
     // trigger hotkeys
     for(size_t i = 0; i < Hotkeys::n_buttons; i++)
