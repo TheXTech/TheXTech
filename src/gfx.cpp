@@ -277,6 +277,8 @@ bool GFX_t::load()
 
     loadImage(Balance, "Balance");
 
+    loadImage(Placeholder, "Placeholder");
+
     if(m_loadErrors > 0)
         m_loadErrors = 0;
 
