@@ -252,7 +252,7 @@ void AddCredit(const std::string &newCredit)
     if(numCredits > maxCreditsLines)
     {
         numCredits = maxCreditsLines;
-        pLogWarning("Can't add more credits lines: max limit has been excited ({0} linex maximum)", maxCreditsLines);
+        pLogWarning("Can't add more credits lines: max limit has been excited (%d linex maximum)", maxCreditsLines);
         return;
     }
 

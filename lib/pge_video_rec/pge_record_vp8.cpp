@@ -131,21 +131,21 @@ static void av_log_callback_pLog(void* avcl, int level, const char* fmt, va_list
         switch(level)
         {
         case(AV_LOG_PANIC):
-            pLogFatal(&av_log_buffer[cutpoint]);
+            pLogFatal("%s", av_log_buffer.c_str() + cutpoint);
             break;
 
         case(AV_LOG_FATAL):
-            pLogCritical(&av_log_buffer[cutpoint]);
+            pLogCritical("%s", av_log_buffer.c_str() + cutpoint);
             break;
 
         case(AV_LOG_ERROR):
         case(AV_LOG_WARNING):
-            pLogWarning(&av_log_buffer[cutpoint]);
+            pLogWarning("%s", av_log_buffer.c_str() + cutpoint);
             break;
 
         case(AV_LOG_INFO):
         case(AV_LOG_VERBOSE):
-            pLogDebug(&av_log_buffer[cutpoint]);
+            pLogDebug("%s", av_log_buffer.c_str() + cutpoint);
             break;
 
         case(AV_LOG_DEBUG):

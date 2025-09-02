@@ -368,7 +368,7 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
 #ifdef PGEFL_CALLBACK_API
 void OpenLevel_Error(void*, FileFormatsError& e)
 {
-    pLogWarning("Error of level file loading: %s (line %d).",
+    pLogWarning("Error of level file loading: %s (line %ld).",
                 e.ERROR_info.c_str(),
                 e.ERROR_linenum);
 

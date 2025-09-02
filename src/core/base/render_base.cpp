@@ -520,7 +520,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         maskImage = GraphicsHelps::loadMask(target.l.rawMask, target.l.isMaskPng);
 
         if(!maskImage)
-            pLogWarning("lazyLoad: failed to load mask image for texture at address %p [%s]", &target, StdPictureGetOrigPath(target).c_str());
+            pLogWarning("lazyLoad: failed to load mask image for texture at address %p [%s]", static_cast<void*>(&target), StdPictureGetOrigPath(target).c_str());
     }
 
     // check if bitmask required / possible and possibly merge
@@ -548,7 +548,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     {
         GraphicsHelps::closeImage(sourceImage);
         pLogWarning("Error lazy-decompressing of image file:\n"
-                    "Reason: %s."
+                    "Reason: %s",
                     "Zero image size!");
         //target = g_renderer->getDummyTexture();
         return;

@@ -72,11 +72,11 @@ static void APIENTRY s_HandleGLDebugMessage(GLenum source, GLenum type, GLuint i
 
     s_gl_message_counts[id]++;
 
-    auto log_call = pLogDebug;
+    auto log_call = static_cast<void (*)(const char*,...)>(pLogDebug);
     if(type == GL_DEBUG_TYPE_ERROR || type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR || severity == GL_DEBUG_SEVERITY_HIGH)
-        log_call = pLogWarning;
+        log_call = static_cast<void (*)(const char*,...)>(pLogWarning);
     else if(type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR || type == GL_DEBUG_TYPE_PORTABILITY || type == GL_DEBUG_TYPE_PERFORMANCE || severity == GL_DEBUG_SEVERITY_MEDIUM)
-        log_call = pLogInfo;
+        log_call = static_cast<void (*)(const char*,...)>(pLogInfo);
 
     UNUSED(source);
     UNUSED(id);
@@ -684,7 +684,7 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
         }
         else
         {
-            pLogDebug("Render GL: Failed to allocate framebuffer %d, falling back to texture buffer (minor)");
+            pLogDebug("Render GL: Failed to allocate framebuffer, falling back to texture buffer (minor)");
             return;
         }
     }

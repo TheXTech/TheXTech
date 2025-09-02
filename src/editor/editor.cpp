@@ -1664,14 +1664,14 @@ void UpdateInterprocess()
     case IntProc::PlaceItem:
     {
         std::string raw = IntProc::getCMD();
-        pLogDebug(raw.c_str());
+        pLogDebug(raw);
         LevelData got;
         PGE_FileFormats_misc::RawTextInput raw_file(&raw);
         FileFormats::ReadExtendedLvlFile(raw_file, got);
 
         if(!got.meta.ReadFileValid)
         {
-            pLogDebug(got.meta.ERROR_info.c_str());
+            pLogDebug(got.meta.ERROR_info);
             break;
         }
 

@@ -244,7 +244,7 @@ void PerformanceStats_t::print_obj_stats(int x, int y)
         3, x + 4, YLINE, XTColorF(0.5f, 1.f, 1.f));
     SuperPrint(fmt::sprintf_ne("G: %04d/%04d/%05d", renderedBGOs, checkedBGOs, numBackground),
         3, x + 4, YLINE, XTColorF(0.5f, 1.f, 1.f));
-    SuperPrint(fmt::sprintf_ne("N: %04d/%04d/%05d", renderedNPCs, NPCQueues::Active.no_change.size(), numNPCs),
+    SuperPrint(fmt::sprintf_ne("N: %04d/%04d/%05d", renderedNPCs, (int)NPCQueues::Active.no_change.size(), numNPCs),
         3, x + 4, YLINE, XTColorF(0.5f, 1.f, 1.f));
     SuperPrint(fmt::sprintf_ne("E: %04d/%04d", renderedEffects, numEffects),
         3, x + 4, YLINE, XTColorF(0.5f, 1.f, 1.f));
@@ -685,7 +685,7 @@ void frameRenderEnd()
         // D_pLogDebug("newTime/nano=%lld (%lld)", newTime/c_frameRateNano, newTime / 1000000);
         if(newTime > c_frameRateNano * 25) // Limit 25 frames being skipped maximum
         {
-            D_pLogDebug("frame_timer: Overloading detected: %lld frames to skip (%lld milliseconds delay)", newTime / c_frameRateNano, newTime / 1000000);
+            D_pLogDebug("frame_timer: Overloading detected: %lld frames to skip (%lld milliseconds delay)", (long long)newTime / c_frameRateNano, (long long)newTime / 1000000);
             newTime = c_frameRateNano * 25;
         }
 

@@ -30,7 +30,7 @@ namespace fmt
 /*
     Exception-less fmt::format version. Instead of exception, the error message will be logged into file
 */
-std::string sprintf_ne(const char *fstr, ...);
+std::string sprintf_ne(const char *fstr, ...) FORMAT_ATTRIBUTE_PRINTF_12;
 
 template <typename... Args>
 std::string format_ne(CStringRef format_str, const Args & ... args)
