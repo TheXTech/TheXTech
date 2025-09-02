@@ -793,11 +793,15 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(StdPicture &texture, uint32_t fontSi
     const UTF32 *glyph32_ptr1 = static_cast<const UTF32*>(glyph32);
     PGEFF_ConvertUTF32toUTF8(&glyph32_ptr1, glyph32 + 1, &glyph8_ptr, glyph8 + 5, strictConversion);
 
-    D_pLogDebug("TTF Glyph info %s 0x%08X: w=%u, h=%u, l=%d t=%d, ax=%d, ay=%d, "
-        "mhbx=%d, mhby=%d, mha=%d, mvbx=%d, mvby=%d, mva=%d, "
-        "mhbx=%d, mhby=%d, mha=%d, mw=%d, mh=%d, gw=%ld, gh=%ld",
+    D_pLogDebug("TTF Glyph info %s 0x%08" PRIX32 ": "
+        "w=%" PRIu32 ", h=%" PRIu32 ", l=%" PRId32 " t=%" PRId32 ", "
+        "ax=%" PRId32 ", ay=%" PRId32 ", "
+        "mhbx=%" PRId32 ", mhby=%" PRId32 ", mha=%" PRId32 ", "
+        "mvbx=%" PRId32 ", mvby=%" PRId32 ", mva=%" PRId32 ", "
+        "mw=%" PRId32 ", mh=%" PRId32 ", "
+        "gw=%ld, gh=%ld",
         glyph8,
-        character,
+        static_cast<unsigned int>(character),
         t_glyph.info.width,
         t_glyph.info.height,
         t_glyph.info.left,

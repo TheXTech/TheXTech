@@ -99,11 +99,11 @@ void EventsSDL::processEvent()
 
 #ifdef DEBUG_BUILD
     case SDL_FINGERDOWN:
-        pLogDebug("Touch finger down at device %d", m_event.tfinger.touchId);
+        pLogDebug("Touch finger down at device %" PRId64, m_event.tfinger.touchId);
         break;
 
     case SDL_FINGERUP:
-        pLogDebug("Touch finger up at device %d", m_event.tfinger.touchId);
+        pLogDebug("Touch finger up at device %" PRId64, m_event.tfinger.touchId);
         break;
 #endif
 

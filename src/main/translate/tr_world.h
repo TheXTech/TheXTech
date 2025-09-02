@@ -263,7 +263,7 @@ public:
 
     bool parse_error(std::size_t position, const std::string& last_token, const nlohmann::detail::exception& ex)
     {
-        pLogWarning("JSON parsing error: pos: %d, last token: %s, exception: %s",
+        pLogWarning("JSON parsing error: pos: %zu, last token: %s, exception: %s",
                      position, last_token.c_str(), ex.what());
         return false;
     }

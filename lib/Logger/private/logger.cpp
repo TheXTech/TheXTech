@@ -237,3 +237,28 @@ void pLogInfo(const char *format, ...)
     pLogGeneric(PGE_LogLevel::Info, "Info", format, arg);
     va_end(arg);
 }
+
+void pLogDebug(const std::string &line)
+{
+    pLogDebug("%s", line.c_str());
+}
+
+void pLogWarning(const std::string &line)
+{
+    pLogWarning("%s", line.c_str());
+}
+
+void pLogCritical(const std::string &line)
+{
+    pLogCritical("%s", line.c_str());
+}
+
+void pLogInfo(const std::string &line)
+{
+    pLogInfo("%s", line.c_str());
+}
+
+void pLogFatal(const std::string &line)
+{
+    pLogFatal("%s", line.c_str());
+}

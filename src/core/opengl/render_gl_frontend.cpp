@@ -339,7 +339,7 @@ bool RenderGL::initRender(SDL_Window *window)
     if(m_depth_read_texture)
         init_string += "depth read";
 
-    pLogInfo(init_string.c_str());
+    pLogInfo(init_string);
 
     GLenum err = glGetError();
     if(err)
@@ -1113,7 +1113,7 @@ void RenderGL::unloadTexture(StdPicture &tx)
     if(corpseIt != m_loadedPictures.end())
         m_loadedPictures.erase(corpseIt);
 
-    D_pLogDebug("RenderGL: unloading texture at %p, new texture count %d...", &tx, (int)m_loadedPictures.size());
+    D_pLogDebug("RenderGL: unloading texture at %p, new texture count %d...", static_cast<void*>(&tx), (int)m_loadedPictures.size());
 
     if(tx.d.texture_id)
         glDeleteTextures(1, &tx.d.texture_id);
@@ -1138,7 +1138,7 @@ void RenderGL::unloadGifTextures()
     {
         if(!tx->l.rawMask.empty())
         {
-            D_pLogDebug("RenderGL: unloading texture at %p on unloadGifTextures()", tx);
+            D_pLogDebug("RenderGL: unloading texture at %p on unloadGifTextures()", static_cast<void*>(tx));
             unloadTexture(*tx);
         }
     }
@@ -1148,7 +1148,7 @@ void RenderGL::clearAllTextures()
 {
     for(StdPicture *tx : m_loadedPictures)
     {
-        D_pLogDebug("RenderGL: unloading texture at %p on clearAllTextures()", tx);
+        D_pLogDebug("RenderGL: unloading texture at %p on clearAllTextures()", static_cast<void*>(tx));
 
         if(tx->d.texture_id)
             glDeleteTextures(1, &tx->d.texture_id);

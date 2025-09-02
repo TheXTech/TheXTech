@@ -756,14 +756,14 @@ public:
     {
         if(ftype == FT_INVALID)
         {
-            pLogWarning("MemEmu: Requested value of invalid type: <Global> 0x%x", address);
+            pLogWarning("MemEmu: Requested value of invalid type: <Global> 0x%x", static_cast<unsigned>(address));
             return 0;
         }
 
         auto ft = m_type.find(address);
         if(ft == m_type.end())
         {
-            pLogWarning("MemEmu: Unknown %s address to read: <Global> 0x%x", FieldtypeToStr(ftype), address);
+            pLogWarning("MemEmu: Unknown %s address to read: <Global> 0x%x", FieldtypeToStr(ftype), static_cast<unsigned>(address));
             return 0;
         }
 
@@ -775,7 +775,7 @@ public:
             if(dres != m_df.end())
             {
                 if(ftype != FT_DFLOAT)
-                    pLogWarning("MemEmu: Read type missmatched at 0x%x (Double expected, %s actually)", address, FieldtypeToStr(ftype));
+                    pLogWarning("MemEmu: Read type missmatched at 0x%x (Double expected, %s actually)", static_cast<unsigned>(address), FieldtypeToStr(ftype));
 
                 return valueToMem(*dres->second, ftype);
             }
@@ -788,7 +788,7 @@ public:
             if(fres != m_ff.end())
             {
                 if(ftype != FT_FLOAT)
-                    pLogWarning("MemEmu: Read type missmatched at 0x%x (Float expected, %s actually)", address, FieldtypeToStr(ftype));
+                    pLogWarning("MemEmu: Read type missmatched at 0x%x (Float expected, %s actually)", static_cast<unsigned>(address), FieldtypeToStr(ftype));
 
                 return valueToMem(*fres->second, ftype);
             }
@@ -801,7 +801,7 @@ public:
             if(ires != m_i32f.end())
             {
                 if(ftype != FT_DWORD && ftype != FT_WORD)
-                    pLogWarning("MemEmu: Read type missmatched at 0x%x (SInt16 or SInt32 expected, %s actually)", address, FieldtypeToStr(ftype));
+                    pLogWarning("MemEmu: Read type missmatched at 0x%x (SInt16 or SInt32 expected, %s actually)", static_cast<unsigned>(address), FieldtypeToStr(ftype));
 
                 return valueToMem(*ires->second, ftype);
             }
@@ -814,7 +814,7 @@ public:
             if(ires != m_i16f.end())
             {
                 if(ftype != FT_WORD)
-                    pLogWarning("MemEmu: Read type missmatched at 0x%x (SInt16 expected, %s actually)", address, FieldtypeToStr(ftype));
+                    pLogWarning("MemEmu: Read type missmatched at 0x%x (SInt16 expected, %s actually)", static_cast<unsigned>(address), FieldtypeToStr(ftype));
 
                 return valueToMem(*ires->second, ftype);
             }
@@ -827,7 +827,7 @@ public:
             if(bres != m_bf.end())
             {
                 if(ftype != FT_WORD && ftype != FT_BYTE)
-                    pLogWarning("MemEmu: Read type missmatched at 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", address, FieldtypeToStr(ftype));
+                    pLogWarning("MemEmu: Read type missmatched at 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", static_cast<unsigned>(address), FieldtypeToStr(ftype));
                 return *bres->second ? 0xffff : 0x0000;
             }
             break;
@@ -855,14 +855,14 @@ public:
     {
         if(ftype == FT_INVALID)
         {
-            pLogWarning("MemEmu: Passed value of invalid type: <Global> 0x%x", address);
+            pLogWarning("MemEmu: Passed value of invalid type: <Global> 0x%x", static_cast<unsigned>(address));
             return;
         }
 
         auto ft = m_type.find(address);
         if(ft == m_type.end())
         {
-            pLogWarning("MemEmu: Unknown %s address to write: 0x%x", FieldtypeToStr(ftype), address);
+            pLogWarning("MemEmu: Unknown %s address to write: 0x%x", FieldtypeToStr(ftype), static_cast<unsigned>(address));
             return;
         }
 
@@ -874,7 +874,7 @@ public:
             if(dres != m_df.end())
             {
                 if(ftype != FT_DFLOAT)
-                    pLogWarning("MemEmu: Write type missmatched at 0x%x (Double expected, %s actually)", address, FieldtypeToStr(ftype));
+                    pLogWarning("MemEmu: Write type missmatched at 0x%x (Double expected, %s actually)", static_cast<unsigned>(address), FieldtypeToStr(ftype));
 
                 memToValue(*dres->second, value, ftype);
                 return;
@@ -888,7 +888,7 @@ public:
             if(fres != m_ff.end())
             {
                 if(ftype != FT_FLOAT)
-                    pLogWarning("MemEmu: Write type missmatched at 0x%x (Float expected, %s actually)", address, FieldtypeToStr(ftype));
+                    pLogWarning("MemEmu: Write type missmatched at 0x%x (Float expected, %s actually)", static_cast<unsigned>(address), FieldtypeToStr(ftype));
 
                 memToValue(*fres->second, value, ftype);
                 return;
@@ -902,7 +902,7 @@ public:
             if(ires != m_i32f.end())
             {
                 if(ftype != FT_DWORD && ftype != FT_WORD)
-                    pLogWarning("MemEmu: Write type missmatched at 0x%x (SInt16 or SInt32 expected, %s actually)", address, FieldtypeToStr(ftype));
+                    pLogWarning("MemEmu: Write type missmatched at 0x%x (SInt16 or SInt32 expected, %s actually)", static_cast<unsigned>(address), FieldtypeToStr(ftype));
 
                 memToValue(*ires->second, value, ftype);
                 return;
@@ -916,7 +916,7 @@ public:
             if(ires != m_i16f.end())
             {
                 if(ftype != FT_WORD)
-                    pLogWarning("MemEmu: Write type missmatched at 0x%x (SInt16 expected, %s actually)", address, FieldtypeToStr(ftype));
+                    pLogWarning("MemEmu: Write type missmatched at 0x%x (SInt16 expected, %s actually)", static_cast<unsigned>(address), FieldtypeToStr(ftype));
 
                 memToValue(*ires->second, value, ftype);
                 return;
@@ -930,7 +930,7 @@ public:
             if(bres != m_bf.end())
             {
                 if(ftype != FT_WORD && ftype != FT_BYTE)
-                    pLogWarning("MemEmu: Write type missmatched at 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", address, FieldtypeToStr(ftype));
+                    pLogWarning("MemEmu: Write type missmatched at 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", static_cast<unsigned>(address), FieldtypeToStr(ftype));
                 *bres->second = (value != 0);
                 return;
             }
@@ -1168,13 +1168,13 @@ public:
 
         if(address >= maxAddr)
         {
-            pLogWarning("MemEmu: Requested value of out-of-range address: %s 0x%x", objName, address);
+            pLogWarning("MemEmu: Requested value of out-of-range address: %s 0x%x", objName, static_cast<unsigned>(address));
             return 0;
         }
 
         if(ftype == FT_INVALID)
         {
-            pLogWarning("MemEmu: Requested value of invalid type: %s 0x%x", objName, address);
+            pLogWarning("MemEmu: Requested value of invalid type: %s 0x%x", objName, static_cast<unsigned>(address));
             return 0;
         }
 
@@ -1189,7 +1189,7 @@ public:
 
         if(vtype == VT_UNKNOWN)
         {
-            pLogWarning("MemEmu: Unknown %s::%s address to read: 0x%x", objName, FieldtypeToStr(ftype), address);
+            pLogWarning("MemEmu: Unknown %s::%s address to read: 0x%x", objName, FieldtypeToStr(ftype), static_cast<unsigned>(address));
             return 0;
         }
 
@@ -1199,7 +1199,7 @@ public:
         {
             SDL_assert(t->field.d);
             if(ftype != FT_DFLOAT)
-                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Double expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Double expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
             return valueToMem(obj->*(t->field.d), ftype);
         }
 
@@ -1207,7 +1207,7 @@ public:
         {
             SDL_assert(t->field.f);
             if(ftype != FT_FLOAT)
-                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Float expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Float expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
             return valueToMem(obj->*(t->field.f), ftype);
         }
 
@@ -1215,7 +1215,7 @@ public:
         {
             SDL_assert(t->field.i32);
             if(ftype != FT_DWORD && ftype != FT_WORD)
-                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
             return valueToMem(obj->*(t->field.i32), ftype);
         }
 
@@ -1223,7 +1223,7 @@ public:
         {
             SDL_assert(t->field.i16);
             if(ftype != FT_WORD)
-                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (SInt16 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (SInt16 expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
             return valueToMem(obj->*(t->field.i16), ftype);
         }
 
@@ -1231,7 +1231,7 @@ public:
         {
             SDL_assert(t->field.u8);
             if(ftype != FT_WORD)
-                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (SInt16 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (SInt16 expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
             return valueToMem(obj->*(t->field.u8), ftype);
         }
 
@@ -1239,7 +1239,7 @@ public:
         {
             SDL_assert(t->field.b);
             if(ftype != FT_WORD && ftype != FT_BYTE)
-                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
             return valueToMem(obj->*(t->field.b), ftype);
         }
 
@@ -1257,7 +1257,7 @@ public:
                 auto &bt = m_type[t->baseAddress];
                 SDL_assert(bt.type == VT_DOUBLE && bt.field.d);
                 if(ftype != FT_BYTE)
-                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
                 return (num_t)getByteX86(obj->*(bt.field.d), t->offset);
             }
 
@@ -1266,7 +1266,7 @@ public:
                 auto &bt = m_type[t->baseAddress];
                 SDL_assert(bt.type == VT_FLOAT && bt.field.f);
                 if(ftype != FT_BYTE)
-                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
                 return (num_t)getByteX86(obj->*(bt.field.f), t->offset);
             }
 
@@ -1275,7 +1275,7 @@ public:
                 auto &bt = m_type[t->baseAddress];
                 SDL_assert(bt.type == VT_INT16 && bt.field.i16);
                 if(ftype != FT_BYTE)
-                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
                 int16_t s = static_cast<int16_t>(obj->*(bt.field.i16));
                 return (num_t)getByteX86(s, t->offset);
             }
@@ -1285,7 +1285,7 @@ public:
                 auto &bt = m_type[t->baseAddress];
                 SDL_assert(bt.type == VT_INT32 && bt.field.i32);
                 if(ftype != FT_BYTE)
-                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
                 int16_t s = static_cast<int16_t>(obj->*(bt.field.i32));
                 return (num_t)getByteX86(s, t->offset);
             }
@@ -1310,13 +1310,13 @@ public:
 
         if(address >= maxAddr)
         {
-            pLogWarning("MemEmu: Requested value of out-of-range address: %s 0x%x", objName, address);
+            pLogWarning("MemEmu: Requested value of out-of-range address: %s 0x%x", objName, static_cast<unsigned>(address));
             return;
         }
 
         if(ftype == FT_INVALID)
         {
-            pLogWarning("MemEmu: Passed value of invalid type: %s 0x%x", objName, address);
+            pLogWarning("MemEmu: Passed value of invalid type: %s 0x%x", objName, static_cast<unsigned>(address));
             return;
         }
 
@@ -1331,7 +1331,7 @@ public:
 
         if(vtype == VT_UNKNOWN)
         {
-            pLogWarning("MemEmu: Unknown %s::%s address to write: 0x%x", objName, FieldtypeToStr(ftype), address);
+            pLogWarning("MemEmu: Unknown %s::%s address to write: 0x%x", objName, FieldtypeToStr(ftype), static_cast<unsigned>(address));
             return;
         }
 
@@ -1341,7 +1341,7 @@ public:
         {
             SDL_assert(t->field.d);
             if(ftype != FT_DFLOAT)
-                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Double expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Double expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
             memToValue(obj->*(t->field.d), value, ftype);
             return;
         }
@@ -1350,7 +1350,7 @@ public:
         {
             SDL_assert(t->field.f);
             if(ftype != FT_FLOAT)
-                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Float expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Float expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
             memToValue(obj->*(t->field.f), value, ftype);
             return;
         }
@@ -1359,7 +1359,7 @@ public:
         {
             SDL_assert(t->field.i32);
             if(ftype != FT_DWORD && ftype != FT_WORD)
-                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
             memToValue(obj->*(t->field.i32), value, ftype);
             return;
         }
@@ -1368,7 +1368,7 @@ public:
         {
             SDL_assert(t->field.i16);
             if(ftype != FT_WORD)
-                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (SInt16 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (SInt16 expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
             memToValue(obj->*(t->field.i16), value, ftype);
             return;
         }
@@ -1377,7 +1377,7 @@ public:
         {
             SDL_assert(t->field.u8);
             if(ftype != FT_WORD)
-                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (SInt16 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (SInt16 expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
             memToValue(obj->*(t->field.u8), value, ftype);
             return;
         }
@@ -1386,7 +1386,7 @@ public:
         {
             SDL_assert(t->field.b);
             if(ftype != FT_WORD && ftype != FT_BYTE)
-                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
             memToValue(obj->*(t->field.b), value, ftype);
             return;
         }
@@ -1406,7 +1406,7 @@ public:
                 auto &bt = m_type[t->baseAddress];
                 SDL_assert(bt.type == VT_DOUBLE && bt.field.d);
                 if(ftype != FT_BYTE)
-                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
                 modifyByteX86(obj->*(bt.field.d), t->offset, f2i_cast<uint8_t>(value));
                 return;
             }
@@ -1416,7 +1416,7 @@ public:
                 auto &bt = m_type[t->baseAddress];
                 SDL_assert(bt.type == VT_FLOAT && bt.field.f);
                 if(ftype != FT_BYTE)
-                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
                 modifyByteX86(obj->*(bt.field.f), t->offset, f2i_cast<uint8_t>(value));
                 return;
             }
@@ -1426,7 +1426,7 @@ public:
                 auto &bt = m_type[t->baseAddress];
                 SDL_assert(bt.type == VT_INT16 && bt.field.i16);
                 if(ftype != FT_BYTE)
-                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
                 int16_t s = static_cast<int16_t>(obj->*(bt.field.i16));
                 modifyByteX86(s, t->offset, f2i_cast<uint8_t>(value));
                 obj->*(bt.field.i16) = static_cast<int>(s);
@@ -1438,7 +1438,7 @@ public:
                 auto &bt = m_type[t->baseAddress];
                 SDL_assert(bt.type == VT_INT32 && bt.field.i32);
                 if(ftype != FT_BYTE)
-                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, static_cast<unsigned>(address), FieldtypeToStr(ftype));
                 int16_t s = static_cast<int16_t>(obj->*(bt.field.i32));
                 modifyByteX86(s, t->offset, f2i_cast<uint8_t>(value));
                 obj->*(bt.field.i32) = static_cast<int>(s);
@@ -1710,7 +1710,7 @@ public:
             case 0x12C: // DuckRelease
                 return valueToMem((bool)obj->DuckRelease, ftype);
             default:
-                pLogWarning("MemEmu: Attempt to read player address 0x%x (invalid byte hacking)", address);
+                pLogWarning("MemEmu: Attempt to read player address 0x%x (invalid byte hacking)", static_cast<unsigned>(address));
                 break;
             }
         }
@@ -1729,7 +1729,7 @@ public:
             case 0x14e: // NPCPinched
                 return valueToMem((int)obj->Pinched.Moving, ftype);
             default:
-                pLogWarning("MemEmu: Attempt to read player address 0x%x (invalid byte hacking)", address);
+                pLogWarning("MemEmu: Attempt to read player address 0x%x (invalid byte hacking)", static_cast<unsigned>(address));
                 break;
             }
         }
@@ -1740,17 +1740,17 @@ public:
     {
         if(address >= 0x80 && address < 0xB0) // YoshiTongue
         {
-            s_spLocMem.setValue(&obj->YoshiTongue, address - 0x80, value, ftype);
+            s_spLocMem.setValue(&obj->YoshiTongue, static_cast<unsigned>(address) - 0x80, value, ftype);
             return;
         }
         else if(address >= 0xC0 && address < 0xF0) // Location
         {
-            s_locMem.setValue(&obj->Location, address - 0xC0, value, ftype);
+            s_locMem.setValue(&obj->Location, static_cast<unsigned>(address) - 0xC0, value, ftype);
             return;
         }
         else if(address >= 0xF2 && address < 0x106) // Controls
         {
-            s_conMem.setValue(&obj->Controls, address - 0xF2, value, ftype);
+            s_conMem.setValue(&obj->Controls, static_cast<unsigned>(address) - 0xF2, value, ftype);
             return;
         }
         else if((address >= 0x5C && address < 0x62) || address == 0x12C) // pound state
@@ -1774,7 +1774,7 @@ public:
                 obj->DuckRelease = in;
                 return;
             default:
-                pLogWarning("MemEmu: Attempt to set player address 0x%x to %d (invalid byte hacking)", address, (int)in);
+                pLogWarning("MemEmu: Attempt to set player address 0x%x to %d (invalid byte hacking)", static_cast<unsigned>(address), (int)in);
                 break;
             }
         }
@@ -1812,7 +1812,7 @@ public:
 
                 return;
             default:
-                pLogWarning("MemEmu: Attempt to set player address 0x%x to %d (invalid byte hacking)", address, in);
+                pLogWarning("MemEmu: Attempt to set player address 0x%x to %d (invalid byte hacking)", static_cast<unsigned>(address), in);
                 break;
             }
         }
@@ -2133,7 +2133,7 @@ public:
         if(address >= 0x78 && address < 0xA8) // Location
             return s_locMem.getValue(&obj->Location, address - 0x78, ftype);
         else if(address >= 0xB8 && address < 0xD8) // invalid part of DefaultLocation
-            pLogWarning("MemEmu: Attempt to read NPC address 0x%x (removed part of DefaultLocation)", address);
+            pLogWarning("MemEmu: Attempt to read NPC address 0x%x (removed part of DefaultLocation)", static_cast<unsigned>(address));
         else if(address == 0x126)
             return obj->Reset[1] ? 0xFFFF : 0;
         else if(address == 0x128)
@@ -2153,7 +2153,7 @@ public:
             case 0x12: // MovingPinched
                 return valueToMem((short)obj->Pinched.Moving, ftype);
             default:
-                pLogWarning("MemEmu: Attempt to read NPC address 0x%x (invalid byte hacking)", address);
+                pLogWarning("MemEmu: Attempt to read NPC address 0x%x (invalid byte hacking)", static_cast<unsigned>(address));
                 break;
             }
         }
@@ -2172,7 +2172,7 @@ public:
         }
         else if(address >= 0xB8 && address < 0xD8) // DefaultLocation, invalid part
         {
-            pLogWarning("MemEmu: Attempt to set NPC address 0x%x (removed part of DefaultLocation)", address);
+            pLogWarning("MemEmu: Attempt to set NPC address 0x%x (removed part of DefaultLocation)", static_cast<unsigned>(address));
             return;
         }
         else if(address == 0x126)
@@ -2223,7 +2223,7 @@ public:
                 obj->Pinched.Moving = in;
                 return;
             default:
-                pLogWarning("MemEmu: Attempt to set NPC address 0x%x to %d (invalid byte hacking)", address, in);
+                pLogWarning("MemEmu: Attempt to set NPC address 0x%x to %d (invalid byte hacking)", static_cast<unsigned>(address), in);
                 return;
             }
         }
@@ -2320,9 +2320,9 @@ SDL_FORCE_INLINE void opXor(D &mem, size_t addr, num_t o2, FIELDTYPE ftype)
 
 void MemAssign(size_t address, num_t value, OPTYPE operation, FIELDTYPE ftype)
 {
-    if(address < GM_BASE || address > GM_END)
+    if((address < GM_BASE) || (address > GM_END))
     {
-        pLogWarning("MemEmu: MemAssign Requested value of out-of-range global address: 0x%x", address);
+        pLogWarning("MemEmu: MemAssign Requested value of out-of-range global address: 0x%x", static_cast<unsigned>(address));
         return;
     }
 
@@ -2502,9 +2502,9 @@ void MemAssign(size_t address, num_t value, OPTYPE operation, FIELDTYPE ftype)
 
 bool CheckMem(size_t address, num_t value, COMPARETYPE ctype, FIELDTYPE ftype)
 {
-    if(address < GM_BASE || address > GM_END)
+    if((address < GM_BASE) || (address > GM_END))
     {
-        pLogWarning("MemEmu: CheckMem Requested value of out-of-range global address: 0x%x", address);
+        pLogWarning("MemEmu: CheckMem Requested value of out-of-range global address: 0x%x", static_cast<unsigned>(address));
         return false;
     }
 
@@ -2586,9 +2586,9 @@ bool CheckMem(size_t address, num_t value, COMPARETYPE ctype, FIELDTYPE ftype)
 
 num_t GetMem(size_t addr, FIELDTYPE ftype)
 {
-    if(addr < GM_BASE || addr > GM_END)
+    if((addr < GM_BASE) || (addr > GM_END))
     {
-        pLogWarning("MemEmu: GetMem Requested value of out-of-range global address: 0x%x", addr);
+        pLogWarning("MemEmu: GetMem Requested value of out-of-range global address: 0x%x", static_cast<unsigned>(addr));
         return 0;
     }
 

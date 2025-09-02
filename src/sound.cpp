@@ -307,7 +307,7 @@ void InitMixerX()
     if(ret < 0)
     {
         std::string msg = fmt::format_ne("Can't open audio stream, continuing without audio: ({0})", Mix_GetError());
-        pLogCritical(msg.c_str());
+        pLogCritical("%s", msg.c_str());
         XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR, "Sound opening error", msg);
     }
     else
@@ -935,7 +935,7 @@ void StartMusic(int A, int fadeInMs)
             processPathArgs(p, FileNamePath, FileName + "/", &s_musicYoshiTrackNumber);
             g_curMusic = Mix_LoadMUS(p.c_str());
             if(!g_curMusic)
-                pLogWarning("Failed to open the music [%s]: ", p.c_str(), Mix_GetError());
+                pLogWarning("Failed to open the music [%s]: %s", p.c_str(), Mix_GetError());
             else
             {
                 s_musicHasYoshiMode = (s_musicYoshiTrackNumber >= 0 && (Mix_GetMusicTracks(g_curMusic) > s_musicYoshiTrackNumber));
@@ -1716,7 +1716,7 @@ void PlayExtSound(const std::string &path, int loops, int volume)
         auto *ch = Mix_LoadWAV(path.c_str());
         if(!ch)
         {
-            pLogWarning("Can't load custom sound: %s", Mix_GetError());
+            pLogWarning("Can't load custom sound %s: %s", path.c_str(), Mix_GetError());
             return;
         }
 
@@ -1735,7 +1735,7 @@ void PlayExtSound(const std::string &path, int loops, int volume)
         SDL_AtomicSet(&extSfxBusy, 0);
     }
     else
-        pLogWarning("Can't play custom sound %s: %s", Mix_GetError());
+        pLogWarning("Can't play custom sound %s: %s", path.c_str(), Mix_GetError());
 }
 
 static void extSfxStopCallback(int channel)

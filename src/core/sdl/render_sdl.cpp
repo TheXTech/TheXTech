@@ -603,7 +603,7 @@ textureTryAgain:
     target.d.h_scale = static_cast<float>(height) / target.h;
 
     m_loadedPictures.insert(&target);
-    D_pLogDebug("RenderSDL: loading texture at %p, new texture count %d...", &target, (int)m_loadedPictures.size());
+    D_pLogDebug("RenderSDL: loading texture at %p, new texture count %d...", static_cast<void*>(&target), (int)m_loadedPictures.size());
 
     target.inited = true;
 
@@ -618,7 +618,7 @@ void RenderSDL::unloadTexture(StdPicture &tx)
     if(corpseIt != m_loadedPictures.end())
         m_loadedPictures.erase(corpseIt);
 
-    D_pLogDebug("RenderSDL: unloading texture at %p, new texture count %d...", &tx, (int)m_loadedPictures.size());
+    D_pLogDebug("RenderSDL: unloading texture at %p, new texture count %d...", static_cast<void*>(&tx), (int)m_loadedPictures.size());
 
     if(tx.d.hasTexture())
         SDL_DestroyTexture(tx.d.texture);
@@ -635,7 +635,7 @@ void RenderSDL::clearAllTextures()
 {
     for(StdPicture *tx : m_loadedPictures)
     {
-        D_pLogDebug("RenderSDL: unloading texture at %p on clearAllTextures()", tx);
+        D_pLogDebug("RenderSDL: unloading texture at %p on clearAllTextures()", static_cast<void*>(tx));
 
         if(tx->d.hasTexture())
             SDL_DestroyTexture(tx->d.texture);

@@ -169,7 +169,7 @@ bool OpenWorld(std::string FilePath)
 #ifdef PGEFL_CALLBACK_API
 void OpenWorld_Error(void*, FileFormatsError& e)
 {
-    pLogWarning("Error of world file loading: %s (line %d).",
+    pLogWarning("Error of world file loading: %s (line %ld).",
                 e.ERROR_info.c_str(),
                 e.ERROR_linenum);
 

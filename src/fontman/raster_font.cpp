@@ -201,7 +201,7 @@ void RasterFont::loadFontMap(const std::string& fontmap_ini)
 
         if(charPosX.empty())
         {
-            pLogDebug("=invalid-X=%d=", x.c_str());
+            pLogDebug("=invalid-X=%s=", x.c_str());
             continue;
         }
 
@@ -209,7 +209,7 @@ void RasterFont::loadFontMap(const std::string& fontmap_ini)
         {
             if(endPos == x.size())
             {
-                pLogWarning("=invalid-Y=%d= in the raster font map %s", x.c_str(), fontmap_ini.c_str());
+                pLogWarning("=invalid-Y=%s= in the raster font map %s", x.c_str(), fontmap_ini.c_str());
                 continue;
             }
             begPos = endPos + 1;//+1 to skip '-' divider
@@ -219,7 +219,7 @@ void RasterFont::loadFontMap(const std::string& fontmap_ini)
             charPosY = x.substr(begPos, endPos);
             if(charPosY.empty())
             {
-                pLogWarning("=invalid-Y=%d= in the raster font map %s", x.c_str(), fontmap_ini.c_str());
+                pLogWarning("=invalid-Y=%s= in the raster font map %s", x.c_str(), fontmap_ini.c_str());
                 continue;
             }
         }
