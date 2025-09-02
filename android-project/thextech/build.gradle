@@ -111,7 +111,7 @@ def xTechVersionNumber = (verNum[0] * 1000000) + (verNum[1] * 10000) + (verNum[2
 println "Project version: " + xTechVersionString + " (Clear version: " + xTechVersionStringClear + ", version code: " + xTechVersionNumber.toString()
 
 android {
-    compileSdk 34
+    compileSdkVersion 35
 
     // Note: The NDK 23 is SIGNIFICANTLY important, because of the support for non-NEON and older Android versions
     //       The NDK 24 removes the support for Android 4.1, 4.2, and 4.3.
