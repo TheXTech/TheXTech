@@ -122,7 +122,7 @@ bool OpenWorld(std::string FilePath)
         PGE_FileFormats_misc::RWopsTextInput in(Files::open_file(FilePath, "r"), FilePath);
         if(!FileFormats::OpenWorldFileT(in, wld))
         {
-            pLogWarning("Error of world \"%s\" file loading: %s (line %d).",
+            pLogWarning("Error of world \"%s\" file loading: %s (line %ld).",
                         FilePath.c_str(),
                         wld.meta.ERROR_info.c_str(),
                         wld.meta.ERROR_linenum);

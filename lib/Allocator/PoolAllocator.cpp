@@ -89,12 +89,12 @@ void PoolAllocator::Free(void* ptr)
         // Fatal error
         XMsgBox::errorMsgBox("Fatal error",
             fmt::sprintf_ne("Attempt to free wrong memory block at the pool allocator:\n"
-            "- Desired address: %0x08llX\n"
-            "- Reported in the node address: %0x08llX\n"
+            "- Desired address: 0x08%llX\n"
+            "- Reported in the node address: 0x%08llX\n"
             "\n"
             "Game will be closed. Please check logs for details.",
             reinterpret_cast<unsigned long long>(ptr),
-            n->data)
+            static_cast<unsigned long long>(n->data))
         );
         abort();
     }
