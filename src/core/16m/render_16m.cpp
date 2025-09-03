@@ -23,6 +23,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <inttypes.h>
 #include <set>
 
 #include <nds.h>
@@ -205,7 +206,7 @@ static int s_loadTextureToRAM(tex_load_data& tex, const std::string& path, int l
     // don't even try to load a texture that would require >=25% of VRAM
     if(data_size > 131072)
     {
-        pLogWarning("Refused to allocate %d bytes", data_size);
+        pLogWarning("Refused to allocate %" PRIu32 " bytes", data_size);
         return 0;
     }
 
@@ -227,7 +228,7 @@ static int s_loadTextureToRAM(tex_load_data& tex, const std::string& path, int l
     // this can go wrong if the file doesn't exist or if the allocation fails
     if(!tex.data.valid() || tex.data.size() != data_size + 32)
     {
-        pLogWarning("Failed to load file %s (%d bytes, got %d)", path.c_str(), data_size + 32, (int)tex.data.size());
+        pLogWarning("Failed to load file %s (%" PRIu32 " bytes, got %zu)", path.c_str(), data_size + 32, tex.data.size());
         return 0;
     }
 
@@ -279,12 +280,12 @@ static int s_loadTexture(const std::string& path, int* tex_out, int* data_size, 
         // allocate, but do not load to VRAM yet
         if(!glTexImage2D(0, 0, tex.type, tex.w, h_enum, 0, tex.params, nullptr))
         {
-            pLogWarning("Could not load texture (%u bytes) to VRAM (%u/524288 used). Requesting free texture memory.", part_data_size, s_loadedVRAM);
+            pLogWarning("Could not load texture (%" PRIu32 " bytes) to VRAM (%" PRIu32 "/524288 used). Requesting free texture memory.", part_data_size, s_loadedVRAM);
             minport_freeTextureMemory();
 
             if(!glTexImage2D(0, 0, tex.type, tex.w, h_enum, 0, tex.params, nullptr))
             {
-                pLogWarning("Still could not load texture (%u bytes) to VRAM (%u/524288 used).", part_data_size, s_loadedVRAM);
+                pLogWarning("Still could not load texture (%" PRIu32 " bytes) to VRAM (%" PRIu32 "/524288 used).", part_data_size, s_loadedVRAM);
                 glDeleteTextures(1, &tex.name[i]);
                 break;
             }
@@ -798,7 +799,7 @@ void lazyLoadPictureFromList(StdPicture_Sub& target, PGE_FileFormats_misc::TextI
 
     if(!okay || w < 0 || w >= 32768 || h < 0 || h >= 32768)
     {
-        pLogWarning("Could not load image %s dimensions from load list", target.l.path);
+        pLogWarning("Could not load image %s dimensions from load list", target.l.path.c_str());
         target.inited = false;
         return;
     }
@@ -850,7 +851,7 @@ void clearAllTextures()
     s_texture_load_queue.clear();
 
     if(s_loadedVRAM != 0)
-        pLogWarning("VRAM use not 0 after clear (%u instead). At risk of use-after-free.", s_loadedVRAM);
+        pLogWarning("VRAM use not 0 after clear (%" PRIu32 " instead). At risk of use-after-free.", s_loadedVRAM);
 
     // useful to combat fragmentation
     s_loadedVRAM = 0;
@@ -869,7 +870,7 @@ void unloadTexture(StdPicture &tx)
 
     if(tx.d.reallyHasTexture())
     {
-        D_pLogDebug("Freeing %d bytes from %s", tx.d.data_size);
+        D_pLogDebug("Freeing %d bytes from %s", tx.d.data_size, tx.l.path.c_str());
         s_loadedVRAM -= tx.d.data_size;
     }
 

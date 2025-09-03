@@ -17,6 +17,7 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
+#include <inttypes.h>
 #include "raster_font.h"
 
 #include "../core/render.h"
@@ -151,7 +152,7 @@ void RasterFont::loadFontMap(const std::string& fontmap_ini)
 
     if((w <= 0) || (h <= 0))
     {
-        pLogWarning("Wrong width and height values! %d x %d",  w, h);
+        pLogWarning("Wrong width and height values! %" PRId32 " x %" PRId32 "",  w, h);
         return;
     }
 

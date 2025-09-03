@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <inttypes.h>
 #include "sdl_proxy/sdl_stdinc.h"
 #include "sdl_proxy/sdl_timer.h"
 
@@ -191,17 +192,17 @@ static void s_print_ram(int x, int y)
     auto m = mallinfo();
 
 #   ifdef __16M__
-    SuperPrint(fmt::sprintf_ne(" RAM: %4d/%4dkb", m.uordblks/1024, s_heap_size/1024),
+    SuperPrint(fmt::sprintf_ne(" RAM: %4zu/%4" PRIu32 " kb", m.uordblks / 1024, s_heap_size / 1024),
                3, x + 4, YLINE);
-    SuperPrint(fmt::sprintf_ne("VRAM: %4d/%4dkb", XRender::s_loadedVRAM/1024, 512),
+    SuperPrint(fmt::sprintf_ne("VRAM: %4" PRIu32 "/%4d kb", XRender::s_loadedVRAM / 1024, 512),
                3, x + 4, YLINE, XTColorF(0.5f, 1.0f, 0.5f));
 #   else
-    SuperPrint(fmt::sprintf_ne(" RAM: %5d/%5dkb", m.uordblks/1024, s_heap_size/1024),
+    SuperPrint(fmt::sprintf_ne(" RAM: %5zu / %5" PRIu32 " kb", m.uordblks / 1024, s_heap_size / 1024),
                3, x + 4, YLINE);
 #   endif
 
 #   ifdef __3DS__
-    SuperPrint(fmt::sprintf_ne("VRAM: %5d/%5dkb", (__ctru_linear_heap_size - linearSpaceFree())/1024, __ctru_linear_heap_size / 1024),
+    SuperPrint(fmt::sprintf_ne("VRAM: %5" PRIu32 "/%5" PRIu32 " kb", (__ctru_linear_heap_size - linearSpaceFree()) / 1024, __ctru_linear_heap_size / 1024),
                3, x + 4, YLINE, XTColorF(0.5f, 1.0f, 0.5f));
 #   endif
 }

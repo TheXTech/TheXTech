@@ -382,7 +382,7 @@ void unloadGifTextures()
 
         if(!last_p->l.mask_path.empty())
         {
-            D_pLogDebug("XRender: unloading texture at %p on unloadGifTextures()", last_p);
+            D_pLogDebug("XRender: unloading texture at %p on unloadGifTextures()", static_cast<void*>(last_p));
             unloadTexture(*last_p);
         }
     }
