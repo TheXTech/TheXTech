@@ -898,7 +898,7 @@ void PlaySoundInternal(int A, int loops, int volume, int l, int r)
 
     UNUSED(loops);
 
-    if(A - 1 > s_sfxEffects.size() || s_sfxEffects[A - 1] == -1 || !g_config.sfx_modern) // Play fallback sound for the missing SFX
+    if(A - 1 > static_cast<int>(s_sfxEffects.size()) || s_sfxEffects[A - 1] == -1 || !g_config.sfx_modern) // Play fallback sound for the missing SFX
         A = getFallbackSfx(A);
     else if(!s_useIceBallSfx && A == SFX_Iceball)
         A = SFX_Fireball; // Fell back into fireball when iceball sound isn't preferred
