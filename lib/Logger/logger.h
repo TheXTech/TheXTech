@@ -65,17 +65,23 @@ extern void pLogWarning(const char *format, ...) FORMAT_ATTRIBUTE_PRINTF_12;
 extern void pLogCritical(const char *format, ...) FORMAT_ATTRIBUTE_PRINTF_12;
 extern void pLogInfo(const char *format, ...) FORMAT_ATTRIBUTE_PRINTF_12;
 extern void pLogFatal(const char *format, ...) FORMAT_ATTRIBUTE_PRINTF_12;
+
+#define pLogDebugS(str) pLogDebug("%s", str)
+#define pLogWarningS(str) pLogWarning("%s", str)
+#define pLogCriticalS(str) pLogCritical("%s", str)
+#define pLogInfoS(str) pLogInfo("%s", str)
+#define pLogFatalS(str) pLogFatal("%s", str)
+
 #ifdef __cplusplus
 }
+#endif
 
+#ifdef __cplusplus
 extern void pLogDebug(const std::string &line);
 extern void pLogWarning(const std::string &line);
 extern void pLogCritical(const std::string &line);
 extern void pLogInfo(const std::string &line);
 extern void pLogFatal(const std::string &line);
-#endif
-
-#ifdef __cplusplus
 extern std::string getLogFilePath();
 #endif
 
