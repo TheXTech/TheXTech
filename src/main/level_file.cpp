@@ -354,7 +354,7 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
     LevelData lvl;
     if(!FileFormats::OpenLevelFileT(input, lvl))
     {
-        pLogWarning("Error of level \"%s\" file loading: %s (line %d).",
+        pLogWarning("Error of level \"%s\" file loading: %s (line %ld).",
                     FilePath.c_str(),
                     lvl.meta.ERROR_info.c_str(),
                     lvl.meta.ERROR_linenum);
@@ -996,7 +996,7 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
         else if(find_Variant_Data(npc.Type))
         {
             if((n.special_data < 0) || (n.special_data >= 256))
-                pLogWarning("Attempted to load npc Type %d with out-of-range variant index %d", (int)npc.Type, (int)n.special_data);
+                pLogWarning("Attempted to load npc Type %d with out-of-range variant index %ld", (int)npc.Type, n.special_data);
             else
                 npc.Variant = (uint8_t)n.special_data;
         }
