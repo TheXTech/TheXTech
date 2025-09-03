@@ -45,6 +45,7 @@ struct qdec_t
     int32_t num;
 
     explicit constexpr qdec_t(int32_t num) : num(num) {}
+    qdec_t(const qdec_t &) = default;
 
     qdec_t& operator=(const qdec_t&) = default;
     qdec_t operator-() const
