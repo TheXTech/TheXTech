@@ -848,7 +848,7 @@ bool OpenLevel_Block(void* userdata, LevelBlock& b)
         {
             const char* error_string = "Block 186 or 457 has a destroy event. TheXTech does not match SMBX 1.3 logic in this case. This content cannot be played in Vanilla mode.";
 
-            pLogWarning("%s", error_string);
+            pLogWarningS(error_string);
 
             if(g_config.playstyle == Config_t::MODE_VANILLA)
                 throw callback_error(error_string);
