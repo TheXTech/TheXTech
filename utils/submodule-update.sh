@@ -6,20 +6,26 @@ cur_dir=$(pwd)
 repo_path=${cur_dir:$projroot_len}
 
 echo "-----------------------------------"
-# echo "Debug: projroot=$projroot"
-# echo "Debug: projroot_len=$projroot_len"
-# echo "Debug: cur_dir=$cur_dir"
-# echo "Debug: repo_path=$repo_path"
+#echo "Debug: projroot=$projroot"
+#echo "Debug: projroot_len=$projroot_len"
+#echo "Debug: cur_dir=$cur_dir"
+#echo "Debug: repo_path=$repo_path"
+
+SED_EXEC=sed
+
+if [[ "$OSTYPE" == "darwin"* || "$OSTYPE" == "freebsd"* ]]; then
+    SED_EXEC=gsed
+fi
 
 dstbranch=""
 found=false
 
 while IFS= read -r line; do
-    line_clear=$(echo "$line" | sed 's/^[ \t]*//g')
+    line_clear=$(echo "$line" | $SED_EXEC 's/^[ \t]*//g')
 
     if $found ; then
         if [[ "$line_clear" == "branch = "* ]]; then
-            dstbranch=$(echo "$line_clear" | sed 's/^branch = *//g')
+            dstbranch=$(echo "$line_clear" | $SED_EXEC 's/^branch = *//g')
             echo "Found branch name: $dstbranch"
             break
         fi
@@ -27,6 +33,11 @@ while IFS= read -r line; do
         found=true
     fi
 done < "$1"
+
+if [[ "$dstbranch" == "" ]]; then
+    echo "Failed to detect brach at the repo $reponame ($repo_path)"
+    exit 1
+fi
 
 reponame=$(basename `git rev-parse --show-toplevel`)
 echo "Updating repo $reponame (path=$repo_path), branch $dstbranch"
