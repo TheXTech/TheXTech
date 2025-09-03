@@ -280,13 +280,13 @@ FIBITMAP* robust_FILoad(const std::string& path, int target_w, bool force_565)
     if(w >= target_w)
         force_565 = false;
 
-    pLogDebug("loading %s, freeimage reports %dx%d (%d-bit), pitch %u", path.c_str(), w, h, (int)FreeImage_GetBPP(rawImage), FreeImage_GetPitch(rawImage));
+    pLogDebug("loading %s, freeimage reports %" PRId32 "x%" PRId32 " (%d-bit), pitch %u", path.c_str(), w, h, (int)FreeImage_GetBPP(rawImage), FreeImage_GetPitch(rawImage));
 
     if((w == 0) || (h == 0))
     {
         GraphicsHelps::closeImage(rawImage);
         pLogWarning("Error loading of image file:\n"
-                    "Reason: %s."
+                    "Reason: %s.",
                     "Zero image size!");
         return nullptr;
     }
@@ -941,7 +941,7 @@ void lazyLoadPictureFromList(StdPicture_Sub& target, PGE_FileFormats_misc::TextI
 
     if(!okay || w < 0 || w >= 32768 || h < 0 || h >= 32768)
     {
-        pLogWarning("Could not load image %s dimensions from load list", target.l.path);
+        pLogWarning("Could not load image %s dimensions from load list", target.l.path.c_str());
         target.inited = false;
         return;
     }
@@ -1096,7 +1096,7 @@ void lazyLoad(StdPicture& target)
 
         if(!FI_tex)
         {
-            pLogWarning("Permanently failed to load %s during image load, %lu free", target.l.path.c_str(), linearSpaceFree());
+            pLogWarning("Permanently failed to load %s during image load, %" PRIu32 " free", target.l.path.c_str(), linearSpaceFree());
             pLogWarning("Error: %d (%s)", errno, strerror(errno));
             target.inited = false;
             return;

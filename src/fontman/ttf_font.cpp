@@ -185,7 +185,7 @@ bool TtfFont::loadFont(const std::string &path)
 
     error = FT_Set_Pixel_Sizes(m_face, 0, m_recentPixelSize);
     if(error)
-        pLogWarning("Failed to set the pixel sizes %u for the font %s: %s", m_recentPixelSize, path.c_str(), FT_Error_String(error));
+        pLogWarning("Failed to set the pixel sizes %" PRIu32 " for the font %s: %s", m_recentPixelSize, path.c_str(), FT_Error_String(error));
 
     error = FT_Select_Charmap(m_face, FT_ENCODING_UNICODE);
     if(error)
@@ -556,7 +556,7 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(StdPicture &texture, uint32_t fontSi
         TTF_MUTEX_LOCK();
         error = FT_Set_Pixel_Sizes(cur_font, 0, fontSize);
         if(error)
-            pLogWarning("TheGlyph::loadGlyph (1) Failed to set the pixel sizes %u for the font %s: %s", fontSize, cur_font->family_name, FT_Error_String(error));
+            pLogWarning("TheGlyph::loadGlyph (1) Failed to set the pixel sizes %" PRIu32 " for the font %s: %s", fontSize, cur_font->family_name, FT_Error_String(error));
         m_recentPixelSize = fontSize;
         TTF_MUTEX_UNLOCK();
     }
@@ -572,7 +572,7 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(StdPicture &texture, uint32_t fontSi
             {
                 error = FT_Set_Pixel_Sizes(fb_font->m_face, 0, fontSize);
                 if(error)
-                    pLogWarning("TheGlyph::loadGlyph (2) Failed to set the pixel sizes %u for the font %s: %s", fontSize, cur_font->family_name, FT_Error_String(error));
+                    pLogWarning("TheGlyph::loadGlyph (2) Failed to set the pixel sizes %" PRIu32 " for the font %s: %s", fontSize, cur_font->family_name, FT_Error_String(error));
                 fb_font->m_recentPixelSize = fontSize;
             }
 
@@ -801,7 +801,7 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(StdPicture &texture, uint32_t fontSi
         "mw=%" PRId32 ", mh=%" PRId32 ", "
         "gw=%ld, gh=%ld",
         glyph8,
-        static_cast<unsigned int>(character),
+        static_cast<uint32_t>(character),
         t_glyph.info.width,
         t_glyph.info.height,
         t_glyph.info.left,

@@ -553,6 +553,9 @@ void FontManager::updateDefaultFontByLang(const std::string &lang, const std::st
 
 int FontManager::getMetricsValue(UIMetricsCategory category, const std::string &lang)
 {
+#ifndef THEXTECH_ENABLE_TTF_SUPPORT
+    UNUSED(lang);
+#endif
     // FIXME: Implement the INI-side table of rules instead of hardcoding that
     // That might work differently if different fonts are used.
     // Hardcoded rules are fine for content that lacks them
