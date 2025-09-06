@@ -9,4 +9,5 @@
     <string name="touchscreenControllerType2">つねに無効にする</string>
     <string name="speedRunMode0">オフ</string>
     <string name="speedRunMode1">モード1(TheXTech ネイティブ)</string>
+    <string name="touchPadStyle2">PSスタイル(‪✕‬/〇/□/△)</string>
 </resources>
