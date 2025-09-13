@@ -667,7 +667,7 @@ void NPCMovementLogic_Wings(int A, const num_t speedVar)
         if(num_t::abs(NPC[A].Location.SpeedY) < 0.5_n)
             NPC[A].Projectile = false;
     }
-    else if(behavior == WING_CHASE || behavior == WING_PARA_CHASE) // chase
+    else if(behavior == WING_CHASE || behavior == WING_PARA_CHASE || behavior == WING_FLEE) // chase
     {
         if(NPC[A].CantHurt > 0)
             NPC[A].CantHurt = 100;
@@ -737,16 +737,12 @@ void NPCMovementLogic_Wings(int A, const num_t speedVar)
                 }
             }
 
-            if(NPC[A].Wet == 2)
-            {
-                NPC[A].Location.SpeedX += 0.025_n * E;
-                NPC[A].Location.SpeedY += 0.025_n / F_div;
-            }
-            else
-            {
-                NPC[A].Location.SpeedX += 0.05_n * E;
-                NPC[A].Location.SpeedY += 0.05_n / F_div;
-            }
+            num_t factor = (NPC[A].Wet == 2) ? 0.025_n : 0.05_n;
+            if(behavior == WING_FLEE && (min_dist < 122500_n || (!g_config.fix_multiplayer_targeting && min_dist < 350_n)))
+                factor = -factor;
+
+            NPC[A].Location.SpeedX += factor * E;
+            NPC[A].Location.SpeedY += factor / F_div;
 
             if(NPC[A].Location.SpeedX > 4)
                 NPC[A].Location.SpeedX = 4;
