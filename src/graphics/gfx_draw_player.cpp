@@ -25,6 +25,7 @@
 #include "collision.h"
 #include "core/render.h"
 #include "gfx.h"
+#include "frame_timer.h"
 
 #include "npc_id.h"
 #include "npc_traits.h"
@@ -558,57 +559,23 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
             // NEW: also, all players' held NPCs during warp
             if((p.Character == 3 || p.Character == 4 || (p.Effect == PLREFF_WARP_PIPE && p.Frame == 15)) && p.HoldingNPC > 0 && p.Effect != PLREFF_WARP_DOOR)
             {
-                if(NPC[p.HoldingNPC].Type != NPCID_ICE_CUBE)
-                {
-                    if(
+                if(
+                    (
                         (
-                            (
-                                 (
-                                        NPC[p.HoldingNPC].HoldingPlayer > 0
-                                        // && Player[NPC[p.HoldingNPC].HoldingPlayer].Effect != PLREFF_WARP_PIPE
-                                  ) ||
-                                 (NPC[p.HoldingNPC].Type == NPCID_TOOTHY && NPC[p.HoldingNPC].vehiclePlr == 0) ||
-                                 (NPC[p.HoldingNPC].Type == NPCID_BULLET && NPC[p.HoldingNPC].CantHurt > 0)
-                             ) ||
-                          NPC[p.HoldingNPC].Effect == NPCEFF_PET_TONGUE
-                        ) &&
-                        NPC[p.HoldingNPC].Type != NPCID_ITEM_BURIED &&
-                     !Player[NPC[p.HoldingNPC].HoldingPlayer].Dead
-                    )
-                    {
-                        int npc_sX = num_t::floor(camX + NPC[p.HoldingNPC].Location.X);
-                        int npc_sY = num_t::floor(camY + NPC[p.HoldingNPC].Location.Y);
-                        int npc_w = s_round2int(NPC[p.HoldingNPC].Location.Width);
-                        int npc_h = s_round2int(NPC[p.HoldingNPC].Location.Height);
-
-                        if(!NPCIsYoshi(NPC[p.HoldingNPC]) && NPC[p.HoldingNPC].Type > 0)
-                        {
-                            if(NPC[p.HoldingNPC]->WidthGFX == 0)
-                            {
-                                RenderTexturePlayer(Z, p, npc_sX + NPC[p.HoldingNPC]->FrameOffsetX,
-                                                      npc_sY + NPC[p.HoldingNPC]->FrameOffsetY,
-                                                      npc_w,
-                                                      npc_h,
-                                                      GFXNPC[NPC[p.HoldingNPC].Type],
-                                                      0,
-                                                      NPC[p.HoldingNPC].Frame * npc_h);
-                            }
-                            else
-                            {
-                                RenderTexturePlayer(Z, p, npc_sX + (NPC[p.HoldingNPC]->FrameOffsetX * -NPC[p.HoldingNPC].Direction) - NPC[p.HoldingNPC]->WidthGFX / 2 + npc_w / 2,
-                                                      npc_sY + NPC[p.HoldingNPC]->FrameOffsetY - NPC[p.HoldingNPC]->HeightGFX + npc_h,
-                                                      NPC[p.HoldingNPC]->WidthGFX,
-                                                      NPC[p.HoldingNPC]->HeightGFX,
-                                                      GFXNPC[NPC[p.HoldingNPC].Type],
-                                                      0,
-                                                      NPC[p.HoldingNPC].Frame * NPC[p.HoldingNPC]->HeightGFX);
-                            }
-                        }
-                    }
-                }
-                else
+                             (
+                                    NPC[p.HoldingNPC].HoldingPlayer > 0
+                                    // && Player[NPC[p.HoldingNPC].HoldingPlayer].Effect != PLREFF_WARP_PIPE
+                              ) ||
+                             (NPC[p.HoldingNPC].Type == NPCID_TOOTHY && NPC[p.HoldingNPC].vehiclePlr == 0) ||
+                             (NPC[p.HoldingNPC].Type == NPCID_BULLET && NPC[p.HoldingNPC].CantHurt > 0)
+                         ) ||
+                      NPC[p.HoldingNPC].Effect == NPCEFF_PET_TONGUE
+                    ) &&
+                    NPC[p.HoldingNPC].Type != NPCID_ITEM_BURIED &&
+                 !Player[NPC[p.HoldingNPC].HoldingPlayer].Dead
+                )
                 {
-                    DrawFrozenNPC(camX, camY, p.HoldingNPC);
+                    DrawNPCHeld(Z, camX, camY, p.HoldingNPC);
                 }
             }
 
@@ -646,5 +613,50 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                 }
             }
         }
+    }
+}
+
+void DrawNPCHeld(int Z, num_t camX, num_t camY, int A)
+{
+    g_stats.renderedNPCs++;
+
+    XTColor cn = (NPC[A].Shadow) ? XTColor(64, 64, 64) : XTColor();
+
+    if(NPC[A].Type == NPCID_ICE_CUBE)
+    {
+        DrawFrozenNPC(camX, camY, A);
+    }
+    else if(!NPCIsYoshi(NPC[A]) && NPC[A].Type > 0)
+    {
+        int sX = num_t::floor(camX + NPC[A].Location.X);
+        int sY = num_t::floor(camY + NPC[A].Location.Y);
+        int w = s_round2int(NPC[A].Location.Width);
+        int h = s_round2int(NPC[A].Location.Height);
+
+        if(NPC[A]->WidthGFX == 0)
+        {
+            RenderTexturePlayer(Z, Player[NPC[A].HoldingPlayer],
+                sX + NPC[A]->FrameOffsetX,
+                sY + NPC[A]->FrameOffsetY,
+                w,
+                h,
+                GFXNPC[NPC[A].Type],
+                0, NPC[A].Frame * h,
+                cn);
+        }
+        else
+        {
+            RenderTexturePlayer(Z, Player[NPC[A].HoldingPlayer],
+                sX + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2 + w / 2,
+                sY + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX + h,
+                NPC[A]->WidthGFX,
+                NPC[A]->HeightGFX,
+                GFXNPC[NPC[A].Type],
+                0, NPC[A].Frame * NPC[A]->HeightGFX,
+                cn);
+        }
+
+        if(NPC[A].Wings)
+            DrawNPCWings(NPC[A], sX, sY, cn);
     }
 }

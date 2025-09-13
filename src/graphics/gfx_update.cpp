@@ -289,7 +289,6 @@ public:
             {
                 Chat[Chat_n] = A;
                 Chat_n += 1;
-                g_stats.renderedNPCs += 1;
             }
         }
 
@@ -301,7 +300,6 @@ public:
                 return;
             Dropped[Dropped_n] = A;
             Dropped_n += 1;
-            g_stats.renderedNPCs += 1;
         }
         else if(
                 (
@@ -317,7 +315,6 @@ public:
                 return;
             Held[Held_n] = A;
             Held_n += 1;
-            g_stats.renderedNPCs += 1;
         }
         else if(NPC[A].Effect == NPCEFF_NORMAL && NPC[A]->Foreground && NPC[A].HoldingPlayer == 0 && !NPC[A]->IsACoin)
         {
@@ -325,7 +322,6 @@ public:
                 return;
             FG[FG_n] = A;
             FG_n += 1;
-            g_stats.renderedNPCs += 1;
         }
         else if(NPC[A].Type == NPCID_ICE_CUBE && NPC[A].Effect == NPCEFF_NORMAL && NPC[A].HoldingPlayer == 0)
         {
@@ -333,7 +329,6 @@ public:
                 return;
             Iced[Iced_n] = A;
             Iced_n += 1;
-            g_stats.renderedNPCs += 1;
         }
         else if(NPC[A].Effect == NPCEFF_NORMAL && NPC[A].HoldingPlayer == 0 &&
             (NPC[A].vehiclePlr > 0 || NPC[A].Type == NPCID_VEHICLE || NPC[A].Type == NPCID_CANNONITEM ||
@@ -344,7 +339,6 @@ public:
                 return;
             Low[Low_n] = A;
             Low_n += 1;
-            g_stats.renderedNPCs += 1;
         }
         else if(NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_JUMP_PLANT ||
             NPC[A].Effect == NPCEFF_MAZE || (NPC[A].HoldingPlayer && Player[NPC[A].HoldingPlayer].CurMazeZone != 0) ||
@@ -360,7 +354,6 @@ public:
                 return;
             BG[BG_n] = A;
             BG_n += 1;
-            g_stats.renderedNPCs += 1;
 
             // vine frames (moved from UpdateNPCs)
             if(NPC[A]->IsAVine)
@@ -378,7 +371,6 @@ public:
 
             Normal[Normal_n] = A;
             Normal_n += 1;
-            g_stats.renderedNPCs += 1;
 
             // some "special" logic that has been moved into the logic portion
             if(NPCIsYoshi(NPC[A].Type))
@@ -392,7 +384,6 @@ public:
         {
             Warning[Warning_n] = A;
             Warning_n += 1;
-            g_stats.renderedNPCs += 1;
         }
     }
 
@@ -478,11 +469,18 @@ static inline void s_get_NPC_tint(int A, XTColor& cn)
     }
 
     cn = n.Shadow ? XTColor(64, 64, 64) : XTColor();
+
+    if(n.Effect == NPCEFF_DROP_ITEM && n.Effect3 != 0)
+    {
+        cn = (NPC[A].Special5 <= 66) ? XTAlpha(128 + (66 - NPC[A].Special5) + (int)(32 * num_t::cos((num_t)NPC[A].Special5 / 4))) : XTAlpha(128);
+    }
 }
 
 // draws a warning icon for offscreen active NPC A on vScreen Z
 void DrawWarningNPC(int Z, num_t camX, num_t camY, int A)
 {
+    g_stats.renderedNPCs++;
+
     XTColor cn;
     s_get_NPC_tint(A, cn);
 
@@ -629,6 +627,240 @@ void DrawNPCWings(const NPC_t& n, int sX, int sY, XTColor cn)
 
         if(one_direction)
             break;
+    }
+}
+
+void DrawNPC(num_t camX, num_t camY, int A)
+{
+    g_stats.renderedNPCs++;
+
+    XTColor cn;
+    s_get_NPC_tint(A, cn);
+
+    int sX = num_t::floor(camX + NPC[A].Location.X);
+    int sY = num_t::floor(camY + NPC[A].Location.Y);
+    int drawX = sX + NPC[A]->FrameOffsetX;
+    int drawY = sY + NPC[A]->FrameOffsetY;
+    int w = s_round2int(NPC[A].Location.Width);
+    int h = s_round2int(NPC[A].Location.Height);
+
+    if(NPC[A].Type == NPCID_MEDAL && g_curLevelMedals.gotten(NPC[A].Variant - 1))
+        cn.a /= 2;
+
+    if(NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_FIRE_PLANT || NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_JUMP_PLANT)
+    {
+        XRender::renderTextureBasic(drawX, drawY, w, h,
+            GFXNPC[NPC[A].Type],
+            0, NPC[A].Frame * NPC[A]->THeight,
+            cn);
+    }
+    else if(NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_LONG_PLANT_DOWN)
+    {
+        XRender::renderTextureBasic(drawX, drawY, w, h,
+            GFXNPC[NPC[A].Type],
+            0, NPC[A].Frame * NPC[A]->THeight + NPC[A]->THeight - h,
+            cn);
+    }
+    else if(NPC[A].Type == NPCID_SIDE_PLANT)
+    {
+        if(NPC[A].Direction == -1)
+        {
+            XRender::renderTextureBasic(drawX, drawY, w, h,
+                GFXNPC[NPC[A].Type],
+                0, NPC[A].Frame * NPC[A]->THeight,
+                cn);
+        }
+        else
+        {
+            XRender::renderTextureBasic(drawX, drawY, w, h,
+                GFXNPC[NPC[A].Type],
+                NPC[A]->TWidth - w, NPC[A].Frame * NPC[A]->THeight,
+                cn);
+        }
+    }
+    else if(NPC[A].Type == NPCID_ICE_CUBE)
+        DrawFrozenNPC(camX, camY, A);
+    else if(NPCIsYoshi(NPC[A]))
+    {
+        int B = 1;
+
+        if(NPC[A].Type == NPCID_PET_GREEN)
+            B = 1;
+        else if(NPC[A].Type == NPCID_PET_BLUE)
+            B = 2;
+        else if(NPC[A].Type == NPCID_PET_YELLOW)
+            B = 3;
+        else if(NPC[A].Type == NPCID_PET_RED)
+            B = 4;
+        else if(NPC[A].Type == NPCID_PET_BLACK)
+            B = 5;
+        else if(NPC[A].Type == NPCID_PET_PURPLE)
+            B = 6;
+        else if(NPC[A].Type == NPCID_PET_PINK)
+            B = 7;
+        else if(NPC[A].Type == NPCID_PET_CYAN)
+            B = 8;
+
+        int YoshiBX = 0;
+        int YoshiBY = 0;
+        int YoshiTX = 20;
+        int YoshiTY = -32;
+        int YoshiTFrame = 0;
+        int YoshiBFrame = 6;
+
+        // there was "special" logic affecting FrameCount and Special2, moved to logic side
+        if(NPC[A].Special == 0)
+        {
+            if(NPC[A].FrameCount >= 70)
+            {
+                // there was a logic assignment here
+            }
+            else if(NPC[A].FrameCount >= 50)
+                YoshiTFrame = 3;
+        }
+        else
+        {
+            if(NPC[A].FrameCount > 8)
+            {
+                YoshiBFrame = 0;
+            }
+            else if(NPC[A].FrameCount > 6)
+            {
+                YoshiBFrame = 1;
+                YoshiTX -= 1;
+                YoshiTY += 2;
+                YoshiBY += 1;
+            }
+            else if(NPC[A].FrameCount > 4)
+            {
+                YoshiBFrame = 2;
+                YoshiTX -= 2;
+                YoshiTY += 4;
+                YoshiBY += 2;
+            }
+            else if(NPC[A].FrameCount > 2)
+            {
+                YoshiBFrame = 1;
+                YoshiTX -= 1;
+                YoshiTY += 2;
+                YoshiBY += 1;
+            }
+            else
+                YoshiBFrame = 0;
+
+            if(NPC[A].Special2 > 30)
+                YoshiTFrame = 0;
+            else if(NPC[A].Special2 > 10)
+                YoshiTFrame = 2;
+        }
+
+        if(YoshiBFrame == 6)
+        {
+            YoshiBY += 10;
+            YoshiTY += 10;
+        }
+
+        if(NPC[A].Direction == 1)
+        {
+            YoshiTFrame += 5;
+            YoshiBFrame += 7;
+        }
+        else
+        {
+            YoshiBX = -YoshiBX;
+            YoshiTX = -YoshiTX;
+        }
+
+        // Yoshi's Body
+        XRender::renderTextureBasic(sX + YoshiBX, sY + YoshiBY, 32, 32, GFXYoshiB[B], 0, 32 * YoshiBFrame, cn);
+
+        // Yoshi's Head
+        XRender::renderTextureBasic(sX + YoshiTX, sY + YoshiTY, 32, 32, GFXYoshiT[B], 0, 32 * YoshiTFrame, cn);
+    }
+    // fix a graphical SMBX64 bug where the draw width and frame stride were incorrect
+    else if(NPC[A].Effect == NPCEFF_EMERGE_UP)
+    {
+        if(NPC[A]->WidthGFX != 0 && g_config.fix_visual_bugs)
+        {
+            XRender::renderTextureBasic(sX + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2 + w / 2, drawY, NPC[A]->WidthGFX, h,
+                GFXNPC[NPC[A].Type],
+                0, NPC[A].Frame * NPC[A]->HeightGFX,
+                cn);
+        }
+        else
+        {
+            XRender::renderTextureBasic(drawX, drawY, w, h,
+                GFXNPC[NPC[A].Type],
+                0, NPC[A].Frame * NPC[A]->THeight,
+                cn);
+        }
+    }
+    else if(NPC[A]->WidthGFX == 0)
+    {
+        XRender::renderTextureBasic(drawX,
+            drawY,
+            w,
+            h,
+            GFXNPC[NPC[A].Type],
+            0, NPC[A].Frame * h,
+            cn);
+    }
+    else
+    {
+        if(NPC[A].Type == NPCID_ITEM_BUBBLE && NPC[A].Special > 0)
+        {
+            int contents_w, contents_h;
+
+            if(NPCWidthGFX(NPC[A].Special) == 0)
+            {
+                contents_w = NPCWidth(NPC[A].Special);
+                contents_h = NPCHeight(NPC[A].Special);
+            }
+            else
+            {
+                contents_w = NPCWidthGFX(NPC[A].Special);
+                contents_h = NPCHeightGFX(NPC[A].Special);
+            }
+
+            int contents_sX = sX + w / 2 - contents_w / 2;
+            int contents_sY = sY + h / 2 - contents_h / 2;
+
+            int B = EditorNPCFrame((NPCID)(NPC[A].Special), NPC[A].Direction);
+
+            // note: using NPC[A]->FrameOffsetX here doesn't really make sense, but it's the SMBX 1.3 logic
+            XRender::renderTextureBasic(contents_sX + NPC[A]->FrameOffsetX, contents_sY, contents_w, contents_h,
+                GFXNPC[NPC[A].Special],
+                0, B * contents_h,
+                cn);
+
+            if(NPC[A].DefaultWings)
+                DrawNPCWings(NPC[A], sX, sY, cn);
+        }
+
+        // WARNING: the BG case previously didn't have -NPC[A].Direction here.
+        // I've checked and only NPCID_SAW, NPCID_JUMP_PLANT, NPCID_BOSS_FRAGILE, NPCID_LIFT_SAND, and NPCID_SLIDE_BLOCK could possibly be affected.
+        // in my episode corpus, none of them set gfxoffsetx to a non-zero value (maybe because it acts differently from normal),
+        // but watch for any visual changes that result from this
+        XRender::renderTextureBasic(sX + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2 + w / 2,
+            drawY - NPC[A]->HeightGFX + h,
+            NPC[A]->WidthGFX,
+            NPC[A]->HeightGFX,
+            GFXNPC[NPC[A].Type],
+            0,
+            NPC[A].Frame * NPC[A]->HeightGFX,
+            cn);
+    }
+
+    if(NPC[A].Wings)
+        DrawNPCWings(NPC[A], sX, sY, cn);
+
+    // countdown during modern item drop
+    if(NPC[A].Effect == NPCEFF_DROP_ITEM && NPC[A].Effect3 != 0 && NPC[A].Special5 <= 66)
+    {
+        int i = (NPC[A].Special5 - 1) / 22 + 1;
+        XRender::renderTextureBasic(sX + w / 2 - GFX.Font1[i].w / 2,
+            sY + h / 2 - GFX.Font1[i].h / 2,
+            GFX.Font1[i]);
     }
 }
 
@@ -2240,77 +2472,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         for(size_t i = 0; i < NPC_Draw_Queue_p.BG_n; i++)
         {
             int A = NPC_Draw_Queue_p.BG[i];
-            XTColor cn;
-            s_get_NPC_tint(A, cn);
-
-            int sX = num_t::floor(camX + NPC[A].Location.X);
-            int sY = num_t::floor(camY + NPC[A].Location.Y);
-            int drawX = sX + NPC[A]->FrameOffsetX;
-            int drawY = sY + NPC[A]->FrameOffsetY;
-            int w = s_round2int(NPC[A].Location.Width);
-            int h = s_round2int(NPC[A].Location.Height);
-
-            if(NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_FIRE_PLANT || NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_JUMP_PLANT)
-            {
-                XRender::renderTextureBasic(drawX, drawY, w, h,
-                    GFXNPC[NPC[A].Type],
-                    0, NPC[A].Frame * NPC[A]->THeight,
-                    cn);
-            }
-            else if(NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_LONG_PLANT_DOWN)
-            {
-                XRender::renderTextureBasic(drawX, drawY, w, h,
-                    GFXNPC[NPC[A].Type],
-                    0, NPC[A].Frame * NPC[A]->THeight + NPC[A]->THeight - h,
-                    cn);
-            }
-            else if(NPC[A].Type == NPCID_SIDE_PLANT)
-            {
-                if(NPC[A].Direction == -1)
-                {
-                    XRender::renderTextureBasic(drawX, drawY, w, h,
-                        GFXNPC[NPC[A].Type],
-                        0, NPC[A].Frame * NPC[A]->THeight,
-                        cn);
-                }
-                else
-                {
-                    XRender::renderTextureBasic(drawX, drawY, w, h,
-                        GFXNPC[NPC[A].Type],
-                        NPC[A]->TWidth - w, NPC[A].Frame * NPC[A]->THeight,
-                        cn);
-                }
-            }
-            else if(NPC[A].Type == NPCID_ICE_CUBE)
-                DrawFrozenNPC(camX, camY, A);
-            // fix a graphical SMBX64 bug where the draw width and frame stride were incorrect
-            else if(NPC[A]->WidthGFX != 0 && NPC[A].Effect == NPCEFF_EMERGE_UP && g_config.fix_visual_bugs)
-            {
-                XRender::renderTextureBasic(drawX - NPC[A]->WidthGFX / 2 + w / 2, drawY, NPC[A]->WidthGFX, h,
-                    GFXNPC[NPC[A].Type],
-                    0, NPC[A].Frame * NPC[A]->HeightGFX,
-                    cn);
-            }
-            else if(NPC[A]->WidthGFX == 0 || NPC[A].Effect == NPCEFF_EMERGE_UP)
-            {
-                XRender::renderTextureBasic(drawX, drawY, w, h,
-                    GFXNPC[NPC[A].Type],
-                    0, NPC[A].Frame * NPC[A]->THeight,
-                    cn);
-            }
-            else
-            {
-                XRender::renderTextureBasic(drawX - NPC[A]->WidthGFX / 2 + w / 2,
-                    drawY - NPC[A]->HeightGFX + h,
-                    NPC[A]->WidthGFX,
-                    NPC[A]->HeightGFX,
-                    GFXNPC[NPC[A].Type],
-                    0, NPC[A].Frame * NPC[A]->HeightGFX,
-                    cn);
-            }
-
-            if(NPC[A].Wings)
-                DrawNPCWings(NPC[A], sX, sY, cn);
+            DrawNPC(camX, camY, A);
         }
 
 
@@ -2418,38 +2580,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         for(size_t i = 0; i < NPC_Draw_Queue_p.Low_n; i++)
         {
             int A = NPC_Draw_Queue_p.Low[i];
-
-            XTColor cn;
-            s_get_NPC_tint(A, cn);
-            if(NPC[A].Type == NPCID_MEDAL && g_curLevelMedals.gotten(NPC[A].Variant - 1))
-                cn.a /= 2;
-
-            int drawX_no_offset = num_t::floor(camX + NPC[A].Location.X);
-            int sY = num_t::floor(camY + NPC[A].Location.Y);
-            int drawY = sY + NPC[A]->FrameOffsetY;
-            int w = s_round2int(NPC[A].Location.Width);
-            int h = s_round2int(NPC[A].Location.Height);
-
-            if(NPC[A]->WidthGFX == 0)
-            {
-                XRender::renderTextureBasic(drawX_no_offset + NPC[A]->FrameOffsetX, drawY, w, h,
-                    GFXNPC[NPC[A].Type],
-                    0, NPC[A].Frame * h,
-                    cn);
-            }
-            else
-            {
-                XRender::renderTextureBasic(drawX_no_offset + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2 + w / 2,
-                    drawY - NPC[A]->HeightGFX + h,
-                    NPC[A]->WidthGFX,
-                    NPC[A]->HeightGFX,
-                    GFXNPC[NPC[A].Type],
-                    0, NPC[A].Frame * NPC[A]->HeightGFX,
-                    cn);
-            }
-
-            if(NPC[A].Wings)
-                DrawNPCWings(NPC[A], drawX_no_offset, sY, cn);
+            DrawNPC(camX, camY, A);
         }
 
 
@@ -2469,177 +2600,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         for(size_t i = 0; i < NPC_Draw_Queue_p.Normal_n; i++)
         {
             int A = NPC_Draw_Queue_p.Normal[i];
-
-            XTColor cn;
-            s_get_NPC_tint(A, cn);
-
-            int sX = num_t::floor(camX + NPC[A].Location.X);
-            int sY = num_t::floor(camY + NPC[A].Location.Y);
-            int w = s_round2int(NPC[A].Location.Width);
-            int h = s_round2int(NPC[A].Location.Height);
-
-            if(!NPCIsYoshi(NPC[A]))
-            {
-                if(NPC[A]->WidthGFX == 0)
-                {
-                    XRender::renderTextureBasic(sX + NPC[A]->FrameOffsetX,
-                        sY + NPC[A]->FrameOffsetY,
-                        w,
-                        h,
-                        GFXNPC[NPC[A].Type],
-                        0, NPC[A].Frame * h,
-                        cn);
-                }
-                else
-                {
-                    if(NPC[A].Type == NPCID_ITEM_BUBBLE && NPC[A].Special > 0)
-                    {
-                        int contents_w, contents_h;
-
-                        if(NPCWidthGFX(NPC[A].Special) == 0)
-                        {
-                            contents_w = NPCWidth(NPC[A].Special);
-                            contents_h = NPCHeight(NPC[A].Special);
-                        }
-                        else
-                        {
-                            contents_w = NPCWidthGFX(NPC[A].Special);
-                            contents_h = NPCHeightGFX(NPC[A].Special);
-                        }
-
-                        int contents_sX = sX + w / 2 - contents_w / 2;
-                        int contents_sY = sY + h / 2 - contents_h / 2;
-
-                        int B = EditorNPCFrame((NPCID)(NPC[A].Special), NPC[A].Direction);
-
-                        XRender::renderTextureBasic(contents_sX + NPC[A]->FrameOffsetX, contents_sY, contents_w, contents_h,
-                            GFXNPC[NPC[A].Special],
-                            0, B * contents_h,
-                            cn);
-
-                        if(NPC[A].DefaultWings)
-                            DrawNPCWings(NPC[A], sX, sY, cn);
-                    }
-
-                    XRender::renderTextureBasic(sX + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2 + w / 2,
-                        sY + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX + h,
-                        NPC[A]->WidthGFX,
-                        NPC[A]->HeightGFX,
-                        GFXNPC[NPC[A].Type],
-                        0,
-                        NPC[A].Frame * NPC[A]->HeightGFX,
-                        cn);
-                }
-            }
-            else
-            {
-                int B = 1;
-
-                if(NPC[A].Type == NPCID_PET_GREEN)
-                    B = 1;
-                else if(NPC[A].Type == NPCID_PET_BLUE)
-                    B = 2;
-                else if(NPC[A].Type == NPCID_PET_YELLOW)
-                    B = 3;
-                else if(NPC[A].Type == NPCID_PET_RED)
-                    B = 4;
-                else if(NPC[A].Type == NPCID_PET_BLACK)
-                    B = 5;
-                else if(NPC[A].Type == NPCID_PET_PURPLE)
-                    B = 6;
-                else if(NPC[A].Type == NPCID_PET_PINK)
-                    B = 7;
-                else if(NPC[A].Type == NPCID_PET_CYAN)
-                    B = 8;
-
-                int YoshiBX = 0;
-                int YoshiBY = 0;
-                int YoshiTX = 0;
-                int YoshiTY = 0;
-                int YoshiTFrame = 0;
-                int YoshiBFrame = 0;
-                YoshiBX = 0;
-                YoshiBY = 0;
-                YoshiTX = 20;
-                YoshiTY = -32;
-                YoshiBFrame = 6;
-                YoshiTFrame = 0;
-
-                // there was "special" logic affecting FrameCount and Special2, moved to logic side
-                if(NPC[A].Special == 0)
-                {
-                    if(NPC[A].FrameCount >= 70)
-                    {
-                        // there was a logic assignment here
-                    }
-                    else if(NPC[A].FrameCount >= 50)
-                        YoshiTFrame = 3;
-                }
-                else
-                {
-                    if(NPC[A].FrameCount > 8)
-                    {
-                        YoshiBFrame = 0;
-                    }
-                    else if(NPC[A].FrameCount > 6)
-                    {
-                        YoshiBFrame = 1;
-                        YoshiTX -= 1;
-                        YoshiTY += 2;
-                        YoshiBY += 1;
-                    }
-                    else if(NPC[A].FrameCount > 4)
-                    {
-                        YoshiBFrame = 2;
-                        YoshiTX -= 2;
-                        YoshiTY += 4;
-                        YoshiBY += 2;
-                    }
-                    else if(NPC[A].FrameCount > 2)
-                    {
-                        YoshiBFrame = 1;
-                        YoshiTX -= 1;
-                        YoshiTY += 2;
-                        YoshiBY += 1;
-                    }
-                    else
-                        YoshiBFrame = 0;
-
-                    if(NPC[A].Special2 > 30)
-                        YoshiTFrame = 0;
-                    else if(NPC[A].Special2 > 10)
-                        YoshiTFrame = 2;
-                }
-
-                if(YoshiBFrame == 6)
-                {
-                    YoshiBY += 10;
-                    YoshiTY += 10;
-                }
-
-                if(NPC[A].Direction == 1)
-                {
-                    YoshiTFrame += 5;
-                    YoshiBFrame += 7;
-                }
-                else
-                {
-                    YoshiBX = -YoshiBX;
-                    YoshiTX = -YoshiTX;
-                }
-
-                // YoshiBX += 4
-                // YoshiTX += 4
-                g_stats.renderedNPCs++;
-                // Yoshi's Body
-                XRender::renderTextureBasic(sX + YoshiBX, sY + YoshiBY, 32, 32, GFXYoshiB[B], 0, 32 * YoshiBFrame, cn);
-
-                // Yoshi's Head
-                XRender::renderTextureBasic(sX + YoshiTX, sY + YoshiTY, 32, 32, GFXYoshiT[B], 0, 32 * YoshiTFrame, cn);
-            }
-
-            if(NPC[A].Wings)
-                DrawNPCWings(NPC[A], sX, sY, cn);
+            DrawNPC(camX, camY, A);
         }
 
         // npc chat bubble
@@ -2745,45 +2706,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         for(size_t i = 0; i < NPC_Draw_Queue_p.Held_n; i++)
         {
             int A = NPC_Draw_Queue_p.Held[i];
-            XTColor cn = NPC[A].Shadow ? XTColor(64, 64, 64) : XTColor();
-
-            if(NPC[A].Type == NPCID_ICE_CUBE)
-            {
-                DrawFrozenNPC(camX, camY, A);
-            }
-            else if(!NPCIsYoshi(NPC[A]) && NPC[A].Type > 0)
-            {
-                int sX = num_t::floor(camX + NPC[A].Location.X);
-                int sY = num_t::floor(camY + NPC[A].Location.Y);
-                int w = s_round2int(NPC[A].Location.Width);
-                int h = s_round2int(NPC[A].Location.Height);
-
-                if(NPC[A]->WidthGFX == 0)
-                {
-                    RenderTexturePlayer(Z, Player[NPC[A].HoldingPlayer],
-                        sX + NPC[A]->FrameOffsetX,
-                        sY + NPC[A]->FrameOffsetY,
-                        w,
-                        h,
-                        GFXNPC[NPC[A].Type],
-                        0, NPC[A].Frame * h,
-                        cn);
-                }
-                else
-                {
-                    RenderTexturePlayer(Z, Player[NPC[A].HoldingPlayer],
-                        sX + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2 + w / 2,
-                        sY + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX + h,
-                        NPC[A]->WidthGFX,
-                        NPC[A]->HeightGFX,
-                        GFXNPC[NPC[A].Type],
-                        0, NPC[A].Frame * NPC[A]->HeightGFX,
-                        cn);
-                }
-
-                if(NPC[A].Wings)
-                    DrawNPCWings(NPC[A], sX, sY, cn);
-            }
+            DrawNPCHeld(Z, camX, camY, A);
         }
 
 
@@ -2871,32 +2794,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         for(size_t i = 0; i < NPC_Draw_Queue_p.FG_n; i++)
         {
             int A = NPC_Draw_Queue_p.FG[i];
-
-            XTColor cn;
-            s_get_NPC_tint(A, cn);
-
-            int sX = num_t::floor(camX + NPC[A].Location.X);
-            int sY = num_t::floor(camY + NPC[A].Location.Y);
-
-            if(NPC[A]->WidthGFX == 0)
-            {
-                XRender::renderTextureBasic(sX + NPC[A]->FrameOffsetX,
-                    sY + NPC[A]->FrameOffsetY,
-                    s_round2int(NPC[A].Location.Width),
-                    s_round2int(NPC[A].Location.Height),
-                    GFXNPC[NPC[A].Type], 0, NPC[A].Frame * s_round2int(NPC[A].Location.Height), cn);
-            }
-            else
-            {
-                XRender::renderTextureBasic(num_t::floor(camX + NPC[A].Location.X + NPC[A].Location.Width / 2) + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2,
-                    num_t::floor(camY + NPC[A].Location.Y + NPC[A].Location.Height) + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX,
-                    NPC[A]->WidthGFX,
-                    NPC[A]->HeightGFX,
-                    GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->HeightGFX, cn);
-            }
-
-            if(NPC[A].Wings)
-                DrawNPCWings(NPC[A], sX, sY, cn);
+            DrawNPC(camX, camY, A);
         }
 
         XRender::setDrawPlane(PLANE_LVL_BLK_HURTS);
@@ -3131,33 +3029,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
             for(size_t i = 0; i < NPC_Draw_Queue_p.Dropped_n; i++)
             {
                 int A = NPC_Draw_Queue_p.Dropped[i];
-
-                // pulse alpha during modern item drop
-                XTColor cn = (NPC[A].Effect3 != 0) ? (NPC[A].Special5 <= 66 ? XTAlpha(128 + (66 - NPC[A].Special5) + (int)(32 * num_t::cos((num_t)NPC[A].Special5 / 4))) : XTAlpha(128)) : XTColor();
-
-                if(NPC[A]->WidthGFX == 0)
-                {
-                    XRender::renderTextureBasic(num_t::floor(camX + NPC[A].Location.X) + NPC[A]->FrameOffsetX,
-                        num_t::floor(camY + NPC[A].Location.Y) + NPC[A]->FrameOffsetY,
-                        s_round2int(NPC[A].Location.Width),
-                        s_round2int(NPC[A].Location.Height),
-                        GFXNPC[NPC[A].Type], 0, NPC[A].Frame * s_round2int(NPC[A].Location.Height), cn);
-                }
-                else
-                {
-                    XRender::renderTextureBasic(num_t::floor(camX + NPC[A].Location.X + NPC[A].Location.Width / 2) + NPC[A]->FrameOffsetX - NPC[A]->WidthGFX / 2,
-                        num_t::floor(camY + NPC[A].Location.Y + NPC[A].Location.Height) + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX,
-                        NPC[A]->WidthGFX, NPC[A]->HeightGFX,
-                        GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->HeightGFX, cn);
-                }
-
-                if(NPC[A].Effect3 != 0 && NPC[A].Special5 <= 66)
-                {
-                    int i = (NPC[A].Special5 - 1) / 22 + 1;
-                    XRender::renderTextureBasic((int)num_t::floor(camX + NPC[A].Location.X + NPC[A].Location.Width / 2) - GFX.Font1[i].w / 2,
-                        (int)num_t::floor(camY + NPC[A].Location.Y + NPC[A].Location.Height / 2) - GFX.Font1[i].h / 2,
-                        GFX.Font1[i]);
-                }
+                DrawNPC(camX, camY, A);
             }
         }
 

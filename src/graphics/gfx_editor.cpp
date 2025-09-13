@@ -238,7 +238,7 @@ void s_drawPlayer(int Z, int A, num_t sceneX, num_t sceneY)
 void DrawEditorLevel(int Z)
 {
     int A = 0;
-    int B = 0;
+    // int B = 0;
     int S = curSection; // Level section to display
 
     // camera offsets to add to all object positions before drawing
@@ -431,51 +431,7 @@ void DrawEditorLevel(int Z)
             e.NPC = NPC[0];
             auto &n = e.NPC;
 
-            int sX = num_t::floor(camX + n.Location.X);
-            int sY = num_t::floor(camY + n.Location.Y);
-
-            if(n->WidthGFX == 0)
-            {
-                XRender::renderTextureBasic(sX + n->FrameOffsetX,
-                                      sY + n->FrameOffsetY,
-                                      (int)n.Location.Width,
-                                      (int)n.Location.Height,
-                                      GFXNPC[n.Type], 0, n.Frame * (int)n.Location.Height);
-            }
-            else
-            {
-                if(n.Type == NPCID_ITEM_BUBBLE && n.Special > 0)
-                {
-                    int dW, dH;
-                    if(NPCWidthGFX(n.Special) == 0)
-                    {
-                        dW = NPCWidth(n.Special);
-                        dH = NPCHeight(n.Special);
-                    }
-                    else
-                    {
-                        dW = NPCWidthGFX(n.Special);
-                        dH = NPCHeightGFX(n.Special);
-                    }
-
-                    int cont_sX = num_t::floor(camX + n.Location.X + n.Location.Width / 2) - dW / 2;
-                    int cont_sY = num_t::floor(camY + n.Location.Y + n.Location.Height / 2) - dH / 2;
-                    B = EditorNPCFrame(NPCID(n.Special), n.Direction);
-
-                    XRender::renderTextureBasic(cont_sX + n->FrameOffsetX,
-                                          cont_sY,
-                                          dW, dH,
-                                          GFXNPC[n.Special], 0, B * dH);
-                }
-
-                XRender::renderTextureBasic(num_t::floor(camX + n.Location.X + n.Location.Width / 2) + n->FrameOffsetX - n->WidthGFX / 2,
-                                      num_t::floor(camY + n.Location.Y + n.Location.Height) + n->FrameOffsetY - n->HeightGFX,
-                                      n->WidthGFX, n->HeightGFX, GFXNPC[n.Type],
-                                      0, n.Frame * n->HeightGFX);
-            }
-
-            if(e.NPC.Wings)
-                DrawNPCWings(e.NPC, sX, sY, XTColor());
+            DrawNPC(camX, camY, 0);
 
             s_drawNpcExtra(Z, camX, camY, n);
         }

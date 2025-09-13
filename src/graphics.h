@@ -259,6 +259,10 @@ void ScreenShot();
 void DrawFrozenNPC(num_t camX, num_t camY, int A);
 // NEW: draw wings for an NPC at a particular location
 void DrawNPCWings(const NPC_t& n, int sX, int sY, XTColor cn);
+// NEW: draw NPC held by player
+void DrawNPCHeld(int Z, num_t camX, num_t camY, int A);
+// NEW: draw NPC (generic routine)
+void DrawNPC(num_t camX, num_t camY, int A);
 
 // NEW: draw the backdrop texture behind the vScreens
 void DrawBackdrop(const Screen_t& screen);
