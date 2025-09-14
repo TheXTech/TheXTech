@@ -817,11 +817,15 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 icon = Icon::ud;
             else if(EditorCursor.NPC.Wings == WING_CHASE)
                 icon = Icon::target;
+            else if(EditorCursor.NPC.Wings == WING_FLEE)
+                icon = Icon::hide;
 
             if(UpdateButton(mode, e_ScreenW - 200 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.DefaultWings != WING_NONE, 0, 32 * icon, 32, 32))
             {
-                if(EditorCursor.NPC.DefaultWings >= WING_CHASE)
+                if(EditorCursor.NPC.DefaultWings >= WING_FLEE)
                     EditorCursor.NPC.DefaultWings = WING_NONE;
+                else if(EditorCursor.NPC.DefaultWings >= WING_CHASE)
+                    EditorCursor.NPC.DefaultWings = WING_FLEE;
                 else
                     EditorCursor.NPC.DefaultWings = (WingBehaviors)((int)EditorCursor.NPC.DefaultWings + 1);
 
