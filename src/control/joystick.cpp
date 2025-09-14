@@ -59,7 +59,6 @@ static const char* s_alt_guids_16[] =
     "7e05000069200000", // Switch 2 Pro Controller
     "d620000013a70000", // PowerA Switch 1 Controller
     "d620000011a70000", // PowerA Core Plus Switch 1 Controller
-    "5769696d6f746520", // Wii U Pro Controller (alt GUID)
     "4c69632050726f20", // Switch 1 Pro Controller (alt GUID)
 #ifdef __WIIU__ // Special GUIDs on Wii U
     "5769692055204761", // Wii U GamePad (on Wii U)
@@ -71,14 +70,72 @@ static const char* s_alt_guids_16[] =
 #endif
 };
 
+static const char* s_alt_guids_32[] =
+{
+    "050000005769696d6f74652028313800", // Wii U Pro Controller (alt GUID)
+};
+
+// hardcoded list of Wii Remote GUIDs for special layout -- middle 16 bytes only
+static const char *s_wii_remote_guids_32[] =
+{
+    "050000005769696d6f74652028303000",
+    "050000007e0500000603000000060000",
+#ifdef __WIIU__
+    "000000005769692052656d6f74650000", // Wii Remote (on Wii U)
+#endif
+};
+
+static const char *s_wii_nunchack_guids_32[] =
+{
+#ifdef __WIIU__
+    "00000000576969204e756e6368756b00", // Wii Remote + Nunchack (on Wii U)
+    "0000bce1576969204e756e6368756b00", // Wii Remote + Nunchack (on Wii U)
+#endif
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", // Dummy, remove if any non-Wii-U entries will be added
+};
+
 static bool s_AltControlsDefault(const std::string& guid)
 {
     if(guid.size() != 32)
         return false;
 
+    for(size_t i = 0; i < sizeof(s_alt_guids_32) / sizeof(const char*); i++)
+    {
+        if(SDL_memcmp(guid.c_str(), s_alt_guids_32[i], 32) == 0)
+            return true;
+    }
+
     for(size_t i = 0; i < sizeof(s_alt_guids_16) / sizeof(const char*); i++)
     {
         if(SDL_memcmp(guid.c_str() + 8, s_alt_guids_16[i], 16) == 0)
+            return true;
+    }
+
+    return false;
+}
+
+static bool s_WiiRemoteControlsDefault(const std::string& guid)
+{
+    if(guid.size() != 32)
+        return false;
+
+    for(size_t i = 0; i < sizeof(s_wii_remote_guids_32) / sizeof(const char*); i++)
+    {
+        if(SDL_memcmp(guid.c_str(), s_wii_remote_guids_32[i], 32) == 0)
+            return true;
+    }
+
+    return false;
+}
+
+static bool s_WiiRemoteNunchackControlsDefault(const std::string& guid)
+{
+    if(guid.size() != 32)
+        return false;
+
+    for(size_t i = 0; i < sizeof(s_wii_nunchack_guids_32) / sizeof(const char*); i++)
+    {
+        if(SDL_memcmp(guid.c_str(), s_wii_nunchack_guids_32[i], 32) == 0)
             return true;
     }
 
@@ -748,7 +805,7 @@ StatusInfo InputMethod_Joystick::GetStatus()
 // the job of this function is to initialize the class in a consistent state
 InputMethodProfile_Joystick::InputMethodProfile_Joystick()
 {
-    this->InitAsController(false);
+    this->InitAsController(INIT_AS_DEFAULT);
     this->m_showPowerStatus = false;
 }
 
@@ -804,7 +861,7 @@ void InputMethodProfile_Joystick::InitAsJoystick()
     this->m_cursor_keys[CursorControls::Buttons::Secondary].assign(KM_Key::JoyAxis, 5, 1);
 }
 
-void InputMethodProfile_Joystick::InitAsController(bool use_alt_controls)
+void InputMethodProfile_Joystick::InitAsController(InitAs init_as)
 {
     this->m_controllerProfile = true;
 
@@ -813,13 +870,27 @@ void InputMethodProfile_Joystick::InitAsController(bool use_alt_controls)
     this->m_keys[PlayerControls::Buttons::Left].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_DPAD_LEFT, 1);
     this->m_keys[PlayerControls::Buttons::Right].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_DPAD_RIGHT, 1);
 
-    if(use_alt_controls)
+    if(init_as == INIT_AS_ALT)
     {
         this->m_keys[PlayerControls::Buttons::Jump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_B, 1);
         this->m_keys[PlayerControls::Buttons::AltJump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_A, 1);
         this->m_keys[PlayerControls::Buttons::Run].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_Y, 1);
         this->m_keys[PlayerControls::Buttons::AltRun].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_X, 1);
         this->m_altMenuControls = true;
+    }
+    else if(init_as == INIT_AS_WII_REMOTE)
+    {
+        this->m_keys[PlayerControls::Buttons::Jump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_X, 1);
+        this->m_keys[PlayerControls::Buttons::AltJump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_A, 1);
+        this->m_keys[PlayerControls::Buttons::Run].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_Y, 1);
+        this->m_keys[PlayerControls::Buttons::AltRun].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_B, 1);
+    }
+    else if(init_as == INIT_AS_WII_REMOTE_WITH_NUNCHACK)
+    {
+        this->m_keys[PlayerControls::Buttons::Jump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_A, 1);
+        this->m_keys[PlayerControls::Buttons::AltJump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_X, 1);
+        this->m_keys[PlayerControls::Buttons::Run].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_B, 1);
+        this->m_keys[PlayerControls::Buttons::AltRun].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_Y, 1);
     }
     else
     {
@@ -837,8 +908,28 @@ void InputMethodProfile_Joystick::InitAsController(bool use_alt_controls)
 #endif
     }
 
+    const char *init_as_str;
+    switch(init_as)
+    {
+    default:
+        init_as_str = "Standard";
+        break;
+
+    case INIT_AS_ALT:
+        init_as_str = "Alt";
+        break;
+
+    case INIT_AS_WII_REMOTE:
+        init_as_str = "Wii Remote";
+        break;
+
+    case INIT_AS_WII_REMOTE_WITH_NUNCHACK:
+        init_as_str = "Wii Remote + Nunchuk";
+        break;
+    }
+
     pLogDebug("Initializing controller with mode: [%s] controls and [%s] menus.",
-        use_alt_controls ? "Alt" : "Standard",
+        init_as_str,
         this->m_altMenuControls ? "Alt" : "Standard");
 
     this->m_keys[PlayerControls::Buttons::Drop].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_BACK, 1);
@@ -852,8 +943,17 @@ void InputMethodProfile_Joystick::InitAsController(bool use_alt_controls)
     this->m_keys2[PlayerControls::Buttons::Down].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTY, 1);
     this->m_keys2[PlayerControls::Buttons::Left].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTX, -1);
     this->m_keys2[PlayerControls::Buttons::Right].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTX, 1);
-    this->m_keys2[PlayerControls::Buttons::AltRun].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_LEFTSHOULDER, 1);
-    this->m_keys2[PlayerControls::Buttons::AltJump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, 1);
+
+    if(init_as == INIT_AS_WII_REMOTE_WITH_NUNCHACK)
+    {
+        this->m_keys2[PlayerControls::Buttons::AltRun].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, 1);
+        this->m_keys2[PlayerControls::Buttons::AltJump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_LEFTSHOULDER, 1);
+    }
+    else
+    {
+        this->m_keys2[PlayerControls::Buttons::AltRun].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_LEFTSHOULDER, 1);
+        this->m_keys2[PlayerControls::Buttons::AltJump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, 1);
+    }
 
     // clear all of the non-standard controls, then fill in some of them
     for(size_t i = 0; i < CursorControls::n_buttons; i++)
@@ -1540,6 +1640,44 @@ InputMethodType_Joystick::InputMethodType_Joystick()
 
     SDL_JoystickEventState(SDL_ENABLE);
 
+#ifdef __WIIU__
+    // Wii Remote
+    SDL_GameControllerAddMapping("000000005769692052656d6f74650000,"
+                                 "Wii Remote,"
+                                 "crc:1d69,"
+                                 "x:b7,y:b6,"
+                                 "a:b0,b:b1,"
+                                 "back:b11,start:b10,"
+                                 "dpdown:b12,dpleft:b13,dpright:b15,dpup:b14,");
+
+    // Wii Remote + Nunchack
+    SDL_GameControllerAddMapping("00000000576969204e756e6368756b00,"
+                                 "Wii Remote + Nunchuk,"
+                                 "crc:bce1,"
+                                 "a:b0,b:b1,"
+                                 "x:b6,y:b7,"
+                                 "leftshoulder:b2,rightshoulder:b3,"
+                                 "lefttrigger:b8,righttrigger:b9,"
+                                 "back:b11,start:b10,"
+                                 "dpdown:b15,dpleft:b12,dpright:b14,dpup:b13,"
+                                 "leftstick:b4,rightstick:b5,"
+                                 "leftx:a0,lefty:a1,"
+                                 "rightx:a2,righty:a3,");
+
+    SDL_GameControllerAddMapping("0000bce1576969204e756e6368756b00,"
+                                 "Wii Remote + Nunchuk,"
+                                 "crc:bce1,"
+                                 "a:b0,b:b1,"
+                                 "x:b6,y:b7,"
+                                 "leftshoulder:b2,rightshoulder:b3,"
+                                 "lefttrigger:b8,righttrigger:b9,"
+                                 "back:b11,start:b10,"
+                                 "dpdown:b15,dpleft:b12,dpright:b14,dpup:b13,"
+                                 "leftstick:b4,rightstick:b5,"
+                                 "leftx:a0,lefty:a1,"
+                                 "rightx:a2,righty:a3,");
+#endif
+
 #ifdef __SWITCH__
     // Sets the correct mapping for Switch controllers
     SDL_GameControllerAddMapping("000038f853776974636820436f6e7400,"
@@ -1809,7 +1947,23 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
 
                 auto* p = dynamic_cast<InputMethodProfile_Joystick*>(method->Profile);
                 if(p)
-                    p->InitAsController(true);
+                    p->InitAsController(InputMethodProfile_Joystick::INIT_AS_ALT);
+            }
+            else if(s_WiiRemoteControlsDefault(active_joystick->guid))
+            {
+                pLogInfo("New controller profile will use Wii Remote controls layout [Controller GUID: %s]", active_joystick->guid.c_str());
+
+                auto* p = dynamic_cast<InputMethodProfile_Joystick*>(method->Profile);
+                if(p)
+                    p->InitAsController(InputMethodProfile_Joystick::INIT_AS_WII_REMOTE);
+            }
+            else if(s_WiiRemoteNunchackControlsDefault(active_joystick->guid))
+            {
+                pLogInfo("New controller profile will use Wii Remote with Nunchuk controls layout [Controller GUID: %s]", active_joystick->guid.c_str());
+
+                auto* p = dynamic_cast<InputMethodProfile_Joystick*>(method->Profile);
+                if(p)
+                    p->InitAsController(InputMethodProfile_Joystick::INIT_AS_WII_REMOTE_WITH_NUNCHACK);
             }
             else
                 pLogDebug("New controller profile will use standard menu controls layout [Controller GUID: %s]", active_joystick->guid.c_str());

@@ -133,8 +133,16 @@ public:
 
     InputMethodProfile_Joystick();
 
+    enum InitAs
+    {
+        INIT_AS_DEFAULT = 0,
+        INIT_AS_ALT,
+        INIT_AS_WII_REMOTE,
+        INIT_AS_WII_REMOTE_WITH_NUNCHACK,
+    };
+
     void InitAsJoystick();
-    void InitAsController(bool use_alt_controls);
+    void InitAsController(InitAs init_as);
     void SaveConfig_Legacy(IniProcessing *ctl);
     void LoadConfig_Legacy(IniProcessing *ctl);
 
