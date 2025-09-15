@@ -738,7 +738,7 @@ void NPCMovementLogic_Wings(int A, const num_t speedVar)
             }
 
             num_t factor = (NPC[A].Wet == 2) ? 0.025_n : 0.05_n;
-            if(behavior == WING_FLEE && (min_dist < 122500_n || (!g_config.fix_multiplayer_targeting && min_dist < 350_n)))
+            if(behavior == WING_FLEE && min_dist < (g_config.fix_multiplayer_targeting ? 122500_n : 350_n))
                 factor = -factor;
 
             NPC[A].Location.SpeedX += factor * E;
