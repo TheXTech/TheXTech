@@ -10,4 +10,8 @@
     <string name="speedRunMode0">オフ</string>
     <string name="speedRunMode1">モード1(TheXTech ネイティブ)</string>
     <string name="touchPadStyle2">PSスタイル(‪✕‬/〇/□/△)</string>
+    <string name="speedRunMode2">モード2(時間短縮機能が無効)</string>
+    <string name="speedRunMode3">モード3(すべてのバグが有効。完全なSMBX 1.3)</string>
+    <string name="touchPadStyle0">ゲーム内操作</string>
+    <string name="touchPadStyle1">ニンテンドー/Xboxスタイル</string>
 </resources>
