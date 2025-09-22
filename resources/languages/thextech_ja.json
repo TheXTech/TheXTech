@@ -662,29 +662,29 @@
                 "phraseAllSections": ""
             },
             "label": {
-                "next": "",
-                "layerClear": "",
-                "destroy": "",
-                "death": "",
+                "next": "次の",
+                "layerClear": "レイヤークリア時",
+                "destroy": "破壊時",
+                "death": "やられ時",
                 "activate": "有効化",
-                "hit": "",
-                "enter": "",
-                "talk": ""
+                "hit": "ヒット時",
+                "enter": "入場時",
+                "talk": "会話時"
             },
             "letter": {
                 "enter": "",
-                "activate": "",
+                "activate": "A:",
                 "talk": "",
-                "death": "",
+                "death": "D:",
                 "hit": "",
                 "layerClear": "",
                 "destroy": ""
             },
             "layers": {
-                "headerShow": "",
-                "headerHide": "",
-                "headerMove": "",
-                "headerToggle": ""
+                "headerShow": "表示:",
+                "headerHide": "隠す:",
+                "headerMove": "移動:",
+                "headerToggle": "きりかえ:"
             },
             "desc": {
                 "activate": "NPCが画面に入ったとき",
@@ -695,7 +695,7 @@
                 "phraseTriggersAfterTemplate": "",
                 "death": "NPCがやられたとき",
                 "phraseTriggersWhenTemplate": "",
-                "talk": ""
+                "talk": "プレイヤーがNPCに話しかけたとき"
             },
             "promptEventText": "",
             "props": {
@@ -705,14 +705,14 @@
                 "autostart": "",
                 "sound": ""
             },
-            "itemNewEvent": "",
+            "itemNewEvent": "<あたらしい イベント>",
             "bounds": {
                 "changeAllSectionBoundsToCurrent": "",
                 "changeSectionBoundsToCurrent": "",
                 "shouldEvent": ""
             },
             "promptEventName": "",
-            "headerTriggerEvent": "",
+            "headerTriggerEvent": "トリガー:",
             "header": "",
             "deletion": {
                 "confirm": "はい:イベントを さくじょする",
