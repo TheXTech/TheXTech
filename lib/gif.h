@@ -101,7 +101,7 @@ static const int colorDimScales[3] = {14, 20, 17};
 // Takes as in/out parameters the current best color and its error -
 // only changes them if it finds a better color in its subtree.
 // this is the major hotspot in the code at the moment.
-static void GifGetClosestPaletteColor(GifPalette* pPal, int r, int g, int b, int& bestInd, int& bestDiff, int treeRoot = 1)
+static void GifGetClosestPaletteColor(GifPalette* pPal, int r, int g, int b, int32_t& bestInd, int32_t& bestDiff, int treeRoot = 1)
 {
     // base case, reached the bottom of the tree
     if(treeRoot > (1<<pPal->bitDepth)-1)
