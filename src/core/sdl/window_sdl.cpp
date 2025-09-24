@@ -570,6 +570,8 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
     SDL_SetWindowMinimumSize(m_window, 200, 150);
 #elif defined(VITA)
     SDL_SetWindowSize(m_window, 960, 544);
+#elif defined(__PSP__)
+    SDL_SetWindowSize(m_window, 480, 272);
 #else
     if(g_config.scale_mode == Config_t::SCALE_FIXED_05X)
         SDL_SetWindowSize(m_window, XRender::TargetW / 2, XRender::TargetH / 2);
