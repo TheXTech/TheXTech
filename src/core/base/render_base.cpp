@@ -503,7 +503,7 @@ void AbstractRender_t::loadTexture(StdPicture &target, uint32_t width, uint32_t 
 
 void AbstractRender_t::lazyLoad(StdPicture &target)
 {
-    if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
+    if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture() || target.l.raw.empty())
         return;
 
     bool is_qoi = false;
@@ -520,6 +520,8 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
     if(!sourceImage)
     {
+        target.l.raw.clearData();
+        target.l.rawMask.clearData();
         pLogCritical("Lazy-decompress has failed: invalid image data");
         return;
     }
@@ -644,7 +646,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         if(wLimitExcited || hLimitExcited)
         {
             pLogWarning("Texture is too big for a given hardware limit (%dx%d). "
-                        "Shrinking texture to %dx%d, quality may be distorted!",
+                        "Shrinking texture to %" PRIu32 "x%" PRIu32 ", quality may be distorted!",
                         m_maxTextureWidth, m_maxTextureHeight,
                         w, h);
         }
