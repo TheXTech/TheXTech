@@ -148,6 +148,7 @@ bool RenderSDL::initRender(SDL_Window *window)
     m_window = window;
 
     Uint32 renderFlags = 0;
+    int ret_w = -1, ret_h = -1;
 
     int numRenders = SDL_GetNumRenderDrivers();
     SDL_RendererInfo info;
@@ -241,6 +242,14 @@ bool RenderSDL::initRender(SDL_Window *window)
         pLogDebug("Render SDL: Continue without of render to texture. The ability to resize the window will be disabled.");
         SDL_SetWindowResizable(window, SDL_FALSE);
         m_tBufferDisabled = true;
+    }
+
+    if(SDL_GetRendererOutputSize(m_gRenderer, &ret_w, &ret_h) == 0)
+    {
+        pLogDebug("Initialized render \"%s\" of the size: %d x %d (XRender::Target = %d x %d)",
+                    ri.name,
+                    ret_w, ret_h,
+                    XRender::TargetW, XRender::TargetH);
     }
 
     // Clean-up from a possible start-up junk
