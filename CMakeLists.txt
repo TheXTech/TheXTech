@@ -1987,3 +1987,13 @@ else()
         install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/thextech RENAME License.TheXTech.txt)
     endif()
 endif()
+
+# ================== Clean-up ==================
+add_custom_target(clean_external)
+add_custom_command(
+    TARGET clean_external
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/external/"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/output/include"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/output/lib"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/output/share"
+)
