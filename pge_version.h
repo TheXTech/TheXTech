@@ -137,6 +137,8 @@
 #   define OPERATION_SYSTEM "3DS System"
 #elif defined __SWITCH__
 #   define OPERATION_SYSTEM "Nintendo Switch"
+#elif defined __PSP__
+#   define OPERATION_SYSTEM "XrossMediaBar (PSP)"
 #elif defined __vita__
 #   define OPERATION_SYSTEM "Live Area (PS Vita)"
 #else
@@ -184,7 +186,7 @@
 #   else
 #       define FILE_CPU "ARM (Unknown)"
 #   endif
-#elif defined(__mips__) || defined(__mips) || defined(__MIPS__)
+#elif defined(mips) || defined(__mips__) || defined(__mips) || defined(__MIPS__)
 #   define FILE_CPU "MIPS"
 #elif defined(__ppc__) || defined(__ppc) || defined(__powerpc__) \
    || defined(_ARCH_COM) || defined(_ARCH_PWR) || defined(_ARCH_PPC)  \
