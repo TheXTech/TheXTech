@@ -249,9 +249,17 @@ void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
     target.origPath = path;
 #endif
 
+#ifdef THEXTECH_LAZYLOAD_FROM_DISK
+    target.l.path = path;
+#else
     target.l.raw = Files::load_file(path);
+#endif
 
+#ifdef THEXTECH_LAZYLOAD_FROM_DISK
+    if(!GraphicsHelps::getImageMetrics(target.l.path, &tSize))
+#else
     if(!GraphicsHelps::getImageMetrics(target.l.raw, &tSize))
+#endif
     {
         pLogWarning("Error loading of image file:\n"
                     "%s\n"
@@ -269,14 +277,22 @@ void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
     //Apply Alpha mask
     if(!maskPath.empty())
     {
+#ifdef THEXTECH_LAZYLOAD_FROM_DISK
+        target.l.pathMask = maskPath;
+#else
         target.l.rawMask = Files::load_file(maskPath);
+#endif
         target.l.isMaskPng = false; //-V1048
     }
 
     // try loading from fallback path if needed
     if(target.l.rawMask.empty() && !maskFallbackPath.empty())
     {
+#ifdef THEXTECH_LAZYLOAD_FROM_DISK
+        target.l.pathMask = maskFallbackPath;
+#else
         target.l.rawMask = Files::load_file(maskFallbackPath);
+#endif
         target.l.isMaskPng = true;
     }
 
@@ -507,9 +523,18 @@ void AbstractRender_t::loadTexture(StdPicture &target, uint32_t width, uint32_t 
 
 void AbstractRender_t::lazyLoad(StdPicture &target)
 {
-    if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture() || target.l.raw.empty())
+    if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
         return;
 
+#ifdef THEXTECH_LAZYLOAD_FROM_DISK
+    if(target.l.path.empty())
+        return;
+#else
+    if(target.l.raw.empty())
+        return;
+#endif
+
+#ifndef THEXTECH_LAZYLOAD_FROM_DISK
     bool is_qoi = false;
     bool qoi_depth_test_supported = false;
 
@@ -521,20 +546,37 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         is_qoi = true;
     else
         sourceImage = GraphicsHelps::loadImage(target.l.raw);
+#else
+    FIBITMAP *sourceImage = GraphicsHelps::loadImage(target.l.path);
+#endif
 
     if(!sourceImage)
     {
+#ifdef THEXTECH_LAZYLOAD_FROM_DISK
+        pLogCritical("Lazy-decompress has failed: invalid image file %s", target.l.path.c_str());
+        target.l.path.clear();
+        target.l.pathMask.clear();
+#else
         target.l.raw.clearData();
         target.l.rawMask.clearData();
         pLogCritical("Lazy-decompress has failed: invalid image data");
+#endif
         return;
     }
 
     FIBITMAP *maskImage = nullptr;
+#ifdef THEXTECH_LAZYLOAD_FROM_DISK
+    if(!target.l.pathMask.empty())
+#else
     if(!target.l.rawMask.empty())
+#endif
     {
         // load mask
+#ifdef THEXTECH_LAZYLOAD_FROM_DISK
+        maskImage = GraphicsHelps::loadMask(target.l.pathMask, target.l.isMaskPng);
+#else
         maskImage = GraphicsHelps::loadMask(target.l.rawMask, target.l.isMaskPng);
+#endif
 
         if(!maskImage)
             pLogWarning("lazyLoad: failed to load mask image for texture at address %p [%s]", static_cast<void*>(&target), StdPictureGetOrigPath(target).c_str());
@@ -572,8 +614,15 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     }
 
     m_lazyLoadedBytes += (w * h * 4);
+
+#ifdef THEXTECH_LAZYLOAD_FROM_DISK
+    if(!target.l.pathMask.empty())
+#else
     if(!target.l.rawMask.empty())
+#endif
+    {
         m_lazyLoadedBytes += (w * h * 4);
+    }
 
     if(target.l.colorKey) // Apply transparent color for key pixels
     {
@@ -586,8 +635,13 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         GraphicsHelps::replaceColor(sourceImage, colSrc, colDst);
     }
 
+#ifndef THEXTECH_LAZYLOAD_FROM_DISK
     if(!is_qoi)
         FreeImage_FlipVertical(sourceImage);
+#else
+    FreeImage_FlipVertical(sourceImage);
+#endif
+
     if(maskImage)
         FreeImage_FlipVertical(maskImage);
 
@@ -616,14 +670,22 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         // only do it if the texture isn't already downscaled
         shrink2x = (w >= Uint32(target.w) && h >= Uint32(target.h));
         break;
+
     case Config_t::SCALE_DOWN_SAFE:
         // only do it if the texture isn't already downscaled, and wasn't already testing during QOI conversion
-        shrink2x = (w >= Uint32(target.w) && h >= Uint32(target.h) && !is_qoi);
+        shrink2x = w >= Uint32(target.w) && h >= Uint32(target.h);
+#ifndef THEXTECH_LAZYLOAD_FROM_DISK
+        shrink2x &= !is_qoi;
+#endif
+
         if(shrink2x)
             shrink2x = GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target));
+
         if(maskImage && shrink2x)
             shrink2x = GraphicsHelps::validateFor2xScaleDown(maskImage, StdPictureGetOrigPath(target));
+
         break;
+
     case Config_t::SCALE_DOWN_NONE:
     default:
         shrink2x = false;
@@ -674,12 +736,19 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         }
     }
 
+#ifdef THEXTECH_LAZYLOAD_FROM_DISK
+    if(!g_render->depthTestSupported()
+        || maskImage
+        || !GraphicsHelps::validateForDepthTest(sourceImage, StdPictureGetOrigPath(target))
+    )
+#else
     if(!g_render->depthTestSupported()
         || maskImage
         || ((is_qoi)
             ? !qoi_depth_test_supported
             : !GraphicsHelps::validateForDepthTest(sourceImage, StdPictureGetOrigPath(target)))
-        )
+    )
+#endif
     {
         target.d.invalidateDepthTest();
     }
