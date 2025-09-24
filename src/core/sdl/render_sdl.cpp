@@ -57,7 +57,7 @@
 #define SDL_RenderCopyExF SDL_RenderCopyEx
 #endif
 
-static inline uint32_t pow2roundup(uint32_t x)
+static inline unsigned pow2roundup(unsigned x)
 {
     if(x == 0)
         return 0;
@@ -71,7 +71,35 @@ static inline uint32_t pow2roundup(uint32_t x)
     return x + 1;
 }
 
-static inline int32_t pow2roundup(int32_t x)
+static inline unsigned long pow2roundup(unsigned long x)
+{
+    if(x == 0)
+        return 0;
+
+    --x;
+    x |= x >> 1;
+    x |= x >> 2;
+    x |= x >> 4;
+    x |= x >> 8;
+    x |= x >> 16;
+    return x + 1;
+}
+
+static inline int pow2roundup(int x)
+{
+    if(x < 0)
+        return 0;
+
+    --x;
+    x |= x >> 1;
+    x |= x >> 2;
+    x |= x >> 4;
+    x |= x >> 8;
+    x |= x >> 16;
+    return x + 1;
+}
+
+static inline long pow2roundup(long x)
 {
     if(x < 0)
         return 0;
@@ -126,7 +154,7 @@ bool RenderSDL::initRender(SDL_Window *window)
     for(int i = 0; i < numRenders; ++i)
     {
         SDL_GetRenderDriverInfo(i, &info);
-        pLogDebug("Render SDL: Render device: %s, flags: %u, max-w: %u, max-h: %u",
+        pLogDebug("Render SDL: Render device: %s, flags: %" PRIu32 ", max-w: %d, max-h: %d",
                   info.name,
                   info.flags,
                   info.max_texture_width,
@@ -563,7 +591,7 @@ textureTryAgain:
 
             if(newW != width || newH != height)
             {
-                pLogDebug("Render SDL: Converting surface into Power-2 (Orig: %u x %u, P2: %u x %u)...", width, height, newW, newH);
+                pLogDebug("Render SDL: Converting surface into Power-2 (Orig: %" PRIu32 " x %" PRIu32 ", P2: %" PRIu32 " x %" PRIu32 ")...", width, height, newW, newH);
                 SDL_Surface *newSurface = SDL_CreateRGBSurfaceWithFormat(0, newW, newH, 32, DEFAULT_PIXEL_COLOUR_FORMAT);
                 if(newSurface)
                 {
