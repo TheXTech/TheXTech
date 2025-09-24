@@ -110,7 +110,7 @@ void UpdateInternalRes()
     int req_w = g_config.internal_res.m_value.first;
     int req_h = g_config.internal_res.m_value.second;
 
-#ifndef PGE_MIN_PORT
+#if !defined(PGE_MIN_PORT) && !defined(__PSP__)
     if(l_screen->Type == ScreenTypes::Quad && g_config.internal_res_4p.m_value.first != 0)
     {
         req_w = g_config.internal_res_4p.m_value.first;
@@ -270,8 +270,13 @@ void UpdateInternalRes()
 
         if(XRender::TargetH == 0)
         {
+#if defined(__PSP__)
+            XRender::TargetW = 480;
+            XRender::TargetH = 272;
+#else
             XRender::TargetW = 1280;
             XRender::TargetH = 720;
+#endif
         }
     }
 

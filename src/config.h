@@ -549,11 +549,16 @@ public:
             {SCALE_DOWN_SAFE, "safe", "Safe", "Checks if images are in 2x format"},
             {SCALE_DOWN_ALL, "all", "All", "Less loading stutter than 'Safe'"},
         },
-        defaults(SCALE_DOWN_SAFE), {}, Scope::Config,
+#if defined(__PSP__)
+        defaults(SCALE_DOWN_ALL),
+#else
+        defaults(SCALE_DOWN_SAFE),
+#endif
+        {}, Scope::Config,
         "scale-down-textures", "Scale down images", "Store images as 1x to save memory"};
 #endif
 
-#ifndef PGE_MIN_PORT
+#if !defined(PGE_MIN_PORT) && !defined(__PSP__)
     opt_enum<std::pair<int, int>> internal_res_4p{this,
         {
             {{0, 0}, "default", "Default"},
