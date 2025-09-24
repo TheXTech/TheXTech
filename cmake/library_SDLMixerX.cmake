@@ -35,7 +35,7 @@ set(MIXER_USE_OGG_VORBIS_STB ON)
 set(MIXER_USE_OGG_VORBIS_TREMOR OFF)
 set(AUDIOCODECS_OGG_UNSAFE_DISABLE_CRC OFF)
 
-if(NINTENDO_3DS)
+if(NINTENDO_3DS OR PSP)
     set(MIXER_USE_OGG_VORBIS_STB OFF)
     set(MIXER_USE_OGG_VORBIS_TREMOR ON)
     set(AUDIOCODECS_OGG_UNSAFE_DISABLE_CRC ON)
@@ -160,6 +160,49 @@ if(WIN32)
     )
     list(APPEND XTECH_PLATFORM_MIXERX_CMAKE_FLAGS
         -DCMAKE_SHARED_LIBRARY_PREFIX=""
+    )
+endif()
+
+if(PSP)
+    list(APPEND XTECH_PLATFORM_AUDIOCODECS_CMAKE_FLAGS
+        "-DBUILD_OGG_VORBIS=ON"
+        "-DBUILD_FLAC=OFF"
+        "-DBUILD_OPUS=ON"
+    )
+
+    list(APPEND XTECH_PLATFORM_MIXERX_CMAKE_FLAGS
+        "-DUSE_OGG_VORBIS_TREMOR=ON"
+        "-DUSE_SYSTEM_AUDIO_LIBRARIES_DEFAULT=ON"
+        "-DSDL_MIXER_X_SHARED=OFF"
+        "-DFLAC_LIBRARIES=FLAC"
+        "-DOGG_LIBRARIES=ogg"
+        "-DLIBOPUSFILE_LIB=opusfile"
+        "-DLIBOPUS_LIB=opus"
+        "-DCMAKE_C_FLAGS=-I$ENV{VITASDK}/arm-vita-eabi/include/opus"
+        "-DLIBVORBISIDEC_LIB=vorbisidec"
+        "-DLIBVORBIS_LIB=vorbis"
+        "-DLIBVORBISFILE_LIB=vorbisfile"
+    )
+
+    # Minimal list of libraries to link
+    set(MixerX_CodecLibs "${AC_FLUIDLITE}")
+
+    if(MIXERX_ENABLE_WAVPACK)
+        list(append MixerX_CodecLibs "${AC_WAVPACK}")
+    endif()
+
+    list(APPEND MixerX_CodecLibs
+        "${AC_ADLMIDI}"
+        "${AC_OPNMIDI}"
+        "${AC_EDMIDI}"
+        "${AC_TIMIDITYSDL}"
+        "${AC_GME}"
+        "${AC_LIBXMP}"
+        "${AC_MODPLUG}"
+        "${AC_OPUSFILE}"
+        "${AC_OPUS}"
+        "${AC_VORBISIDEC}"
+        "${AC_OGG}"
     )
 endif()
 
