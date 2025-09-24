@@ -34,7 +34,7 @@ set(MIXER_USE_OGG_VORBIS_STB ON)
 set(MIXER_USE_OGG_VORBIS_TREMOR OFF)
 set(AUDIOCODECS_OGG_UNSAFE_DISABLE_CRC OFF)
 
-if(NINTENDO_3DS)
+if(NINTENDO_3DS OR PSP)
     set(MIXER_USE_OGG_VORBIS_STB OFF)
     set(MIXER_USE_OGG_VORBIS_TREMOR ON)
     set(AUDIOCODECS_OGG_UNSAFE_DISABLE_CRC ON)
@@ -146,6 +146,49 @@ list(APPEND MixerX_CodecLibs
     "${AC_MODPLUG}"
 )
 
+if(PSP)
+    set(PSP_AUDIOCODECS_CMAKE_FLAGS
+        "-DBUILD_OGG_VORBIS=ON"
+        "-DBUILD_FLAC=OFF"
+        "-DBUILD_OPUS=ON"
+    )
+
+    set(PSP_MIXERX_CMAKE_FLAGS
+        "-DUSE_OGG_VORBIS_TREMOR=ON"
+        "-DUSE_SYSTEM_AUDIO_LIBRARIES_DEFAULT=ON"
+        "-DSDL_MIXER_X_SHARED=OFF"
+        "-DFLAC_LIBRARIES=FLAC"
+        "-DOGG_LIBRARIES=ogg"
+        "-DLIBOPUSFILE_LIB=opusfile"
+        "-DLIBOPUS_LIB=opus"
+        "-DCMAKE_C_FLAGS=-I$ENV{VITASDK}/arm-vita-eabi/include/opus"
+        "-DLIBVORBISIDEC_LIB=vorbisidec"
+        "-DLIBVORBIS_LIB=vorbis"
+        "-DLIBVORBISFILE_LIB=vorbisfile"
+    )
+
+    # Minimal list of libraries to link
+    set(MixerX_CodecLibs "${AC_FLUIDLITE}")
+
+    if(MIXERX_ENABLE_WAVPACK)
+        list(append MixerX_CodecLibs "${AC_WAVPACK}")
+    endif()
+
+    list(APPEND MixerX_CodecLibs
+        "${AC_ADLMIDI}"
+        "${AC_OPNMIDI}"
+        "${AC_EDMIDI}"
+        "${AC_TIMIDITYSDL}"
+        "${AC_GME}"
+        "${AC_LIBXMP}"
+        "${AC_MODPLUG}"
+        "${AC_OPUSFILE}"
+        "${AC_OPUS}"
+        "${AC_VORBISIDEC}"
+        "${AC_OGG}"
+    )
+endif()
+
 if(VITA)
     set(VITA_AUDIOCODECS_CMAKE_FLAGS
         "-DBUILD_OGG_VORBIS=OFF"
@@ -237,6 +280,7 @@ list(APPEND AUDIO_CODECS_BUILD_ARGS
     "-DUSE_LOCAL_SDL2=${USE_LOCAL_SDL2}"
     "-DBUILD_SDL2_SHARED=${PGE_SHARED_SDLMIXER}"
     "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
+    ${PSP_AUDIOCODECS_CMAKE_FLAGS}
     ${ANDROID_CMAKE_FLAGS}
     ${VITA_CMAKE_FLAGS}
     ${VITA_AUDIOCODECS_CMAKE_FLAGS}
@@ -338,6 +382,7 @@ if(NOT THEXTECH_NO_MIXER_X)
             ${ANDROID_CMAKE_FLAGS}
             ${VITA_CMAKE_FLAGS}
             ${VITA_MIXERX_CMAKE_FLAGS}
+            ${PSP_MIXERX_CMAKE_FLAGS}
             $<$<BOOL:APPLE>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
             $<$<BOOL:APPLE>:-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}>
             $<$<BOOL:WIN32>:-DCMAKE_SHARED_LIBRARY_PREFIX="">
