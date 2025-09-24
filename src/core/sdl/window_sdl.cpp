@@ -513,6 +513,9 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
     SDL_GetDisplayMode(0, 0, &mode);
     const auto initWindowW = mode.w;
     const auto initWindowH = mode.h;
+#elif defined(__PSP__) /* On PSP, expect the initial size 480x272 */
+    const int initWindowW = 480;
+    const int initWindowH = 272;
 #else
     const auto initWindowW = XRender::TargetW;
     const auto initWindowH = XRender::TargetH;
