@@ -506,6 +506,9 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
 #if defined(__SWITCH__) /* On Switch, expect the initial size 1920x1080 */
     const int initWindowW = 1920;
     const int initWindowH = 1080;
+#elif defined(__PSP__) /* On PSP, expect the initial size 480x272 */
+    const int initWindowW = 480;
+    const int initWindowH = 272;
 #else
     const auto initWindowW = XRender::TargetW;
     const auto initWindowH = XRender::TargetH;
