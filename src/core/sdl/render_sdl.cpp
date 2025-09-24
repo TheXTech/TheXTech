@@ -210,7 +210,21 @@ bool RenderSDL::initRender(SDL_Window *window)
     m_maxTextureWidth = ri.max_texture_width;
     m_maxTextureHeight = ri.max_texture_height;
 
-    m_tBuffer = SDL_CreateTexture(m_gRenderer, m_bestFormat,
+    // Don't create renderer surface larget than texture size!
+    if(ScaleWidth > m_maxTextureWidth)
+    {
+        ScaleWidth = m_maxTextureWidth;
+        XRender::TargetW = m_maxTextureWidth;
+    }
+
+    if(ScaleHeight > m_maxTextureHeight)
+    {
+        ScaleHeight = m_maxTextureHeight;
+        XRender::TargetH = m_maxTextureHeight;
+    }
+
+    m_tBuffer = SDL_CreateTexture(m_gRenderer,
+                                  m_bestFormat,
                                   SDL_TEXTUREACCESS_TARGET,
                                   ScaleWidth, ScaleHeight);
 
@@ -350,6 +364,12 @@ void RenderSDL::updateViewport()
     XWindow::getWindowSize(&window_w, &window_h);
     m_hidpi_x = (float)render_w / (float)window_w;
     m_hidpi_y = (float)render_h / (float)window_h;
+
+    if(XRender::TargetW > m_maxTextureWidth)
+        XRender::TargetW = m_maxTextureWidth;
+
+    if(XRender::TargetH > m_maxTextureHeight)
+        XRender::TargetH = m_maxTextureHeight;
 
     float scale_x = (float)render_w / XRender::TargetW;
     float scale_y = (float)render_h / XRender::TargetH;
@@ -609,7 +629,7 @@ textureTryAgain:
 
         if(!m_pow2 && !texture) // Try to re-make texture again
         {
-            pLogWarning("Render SDL: Failed to load texture (%s), trying to turn on the Power-2 mode...", SDL_GetError());
+            pLogWarning("Render SDL: Failed to load texture of %" PRIu32 "x%" PRIu32 " size (%s), trying to turn on the Power-2 mode...", width, height, SDL_GetError());
             m_pow2 = true;
             goto textureTryAgain;
         }
@@ -619,7 +639,7 @@ textureTryAgain:
 
     if(!texture)
     {
-        pLogWarning("Render SDL: Failed to load texture! (%s)", SDL_GetError());
+        pLogWarning("Render SDL: Failed to load texture of %" PRIu32 "x%" PRIu32 "! (%s)", width, height, SDL_GetError());
         target.inited = false;
         return;
     }
