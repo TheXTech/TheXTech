@@ -471,8 +471,10 @@ void RenderSDL::resetViewport()
     // FIXME: Clarify the version of SDL2 with the buggy viewport
 //#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 22)
     // set to an alt viewport as a workaround for SDL bug (doesn't allow resizing viewport without changing position)
+#ifndef __PSP__
     SDL_Rect altViewport = {m_viewport_x + 1, m_viewport_y + 1, 1, 1};
     SDL_RenderSetViewport(m_gRenderer, &altViewport);
+#endif
 //#endif
 
     SDL_RenderSetViewport(m_gRenderer, nullptr);
@@ -495,12 +497,16 @@ void RenderSDL::setViewport(int x, int y, int w, int h)
     // FIXME: Clarify the version of SDL2 with the buggy viewport
 //#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 22)
     // set to an alt viewport as a workaround for SDL bug (doesn't allow resizing viewport without changing position)
+#ifndef __PSP__
     topLeftViewport = {m_viewport_x + 1, m_viewport_y + 1, 1, 1};
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
+#endif
 //#endif
 
     topLeftViewport = {x, y, w, h};
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
+
+    // pLogDebug("TRACE: Viewport Set: x=%d, y=%d, w=%d, h=%d", x, y, w, h);
 
     m_viewport_x = x;
     m_viewport_y = y;
