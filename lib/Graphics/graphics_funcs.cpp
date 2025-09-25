@@ -130,6 +130,9 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
     SetRWopsIO(&io);
     SDL_RWops *handle = Files::open_file(file, "rb");
 
+    if(!handle)
+        return nullptr; // Failed to open
+
     FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromHandle(&io, (fi_handle)handle);
 
     if(formato == FIF_UNKNOWN)
