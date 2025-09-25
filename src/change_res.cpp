@@ -33,6 +33,10 @@
 #ifdef __EMSCRIPTEN__
 #include "core/events.h"
 #endif
+// #define DEBUG_RES
+#ifdef DEBUG_RES
+#   include <Logger/logger.h>
+#endif
 
 void SyncSysCursorDisplay()
 {
@@ -167,8 +171,13 @@ void UpdateInternalRes()
         }
 
         // minimum height constraint
+#if defined(__PSP__)
+        if(int_h < 272)
+            int_h = 272;
+#else
         if(int_h < 320)
             int_h = 320;
+#endif
 
         // maximum height constraint
         if(int_h > 720 && req_h <= 720)
@@ -257,8 +266,20 @@ void UpdateInternalRes()
         int_w -= int_w & 1;
         int_h -= int_h & 1;
 
+#if defined(__PSP__)
+         // Limitation of texture size for the frame buffer
+        if(int_w > 512)
+            int_w = 512;
+
+        if(int_h > 512)
+            int_h = 512;
+#endif
+
         XRender::TargetW = int_w;
         XRender::TargetH = int_h;
+#ifdef DEBUG_RES
+        pLogDebug("TRACE: Target Render set to w=%d and h=%d (Renderer works)", XRender::TargetW, XRender::TargetH);
+#endif
     }
     else
     {
@@ -278,12 +299,18 @@ void UpdateInternalRes()
             XRender::TargetH = 720;
 #endif
         }
+#ifdef DEBUG_RES
+        pLogDebug("TRACE: Target Render set to w=%d and h=%d (Renderer not initialized)", XRender::TargetW, XRender::TargetH);
+#endif
     }
 
     if(LevelEditor || MagicHand)
     {
         XRender::TargetW = SDL_max(XRender::TargetW, 640);
         XRender::TargetH = SDL_max(XRender::TargetH, 480);
+#ifdef DEBUG_RES
+        pLogDebug("TRACE: Target Render set to w=%d and h=%d (Editor/MagicHand)", XRender::TargetW, XRender::TargetH);
+#endif
     }
 
 #ifdef __3DS__
@@ -299,6 +326,9 @@ void UpdateInternalRes()
         XRender::TargetH = SDL_max(XRender::TargetH, canon_h);
         new_ScreenW = canon_w;
         new_ScreenH = canon_h;
+#ifdef DEBUG_RES
+        pLogDebug("TRACE: Target Render set to w=%d and h=%d (Canonical tweak)", XRender::TargetW, XRender::TargetH);
+#endif
     }
     else if(ignore_compat || (g_config.allow_multires && g_config.dynamic_camera_logic))
     {
