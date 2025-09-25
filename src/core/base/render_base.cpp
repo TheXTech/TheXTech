@@ -695,6 +695,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
     if(wLimitExcited || hLimitExcited || shrink2x)
     {
+        uint32_t old_w = w, old_h = h;
         // WORKAROUND: down-scale too big textures
         if(wLimitExcited)
             w = Uint32(m_maxTextureWidth);
@@ -703,8 +704,9 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
         if(wLimitExcited || hLimitExcited)
         {
-            pLogWarning("Texture is too big for a given hardware limit (%dx%d). "
+            pLogWarning("Texture of size %" PRIu32 "x%" PRIu32 " is too big for a given hardware limit (%dx%d). "
                         "Shrinking texture to %" PRIu32 "x%" PRIu32 ", quality may be distorted!",
+                        old_w, old_h,
                         m_maxTextureWidth, m_maxTextureHeight,
                         w, h);
         }
