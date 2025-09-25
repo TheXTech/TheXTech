@@ -25,8 +25,8 @@
             "openFileFailed": "\"{0}\"をひらけませんでした。\nファイルが存在しないか、こわれています。",
             "errorNoStartPoint": "利用可能なスタートポイント、または入口ワープがセットされていないため、コースを開始できませんでした。\n\nファイルパス:{0}",
             "errorTooOldGameAssets": "",
-            "openIPCDataFailed": "",
-            "IPCTimeOut": "エディターからの反応がありませんでした。ゲームを終了します。",
+            "openIPCDataFailed": "データが破損しているか、何らかの不具合があるため、受信したデータを処理できません。",
+            "IPCTimeOut": "エディターが応答しませんでした。ゲームを終了します。",
             "errorTooOldEngine": ""
         },
         "hint": {
@@ -60,9 +60,9 @@
         },
         "screenPaused": "ポーズちゅう",
         "msgbox": {
-            "sysInfoWarning": "",
-            "sysInfoTitle": "",
-            "sysInfoError": ""
+            "sysInfoWarning": "注意！",
+            "sysInfoTitle": "情報",
+            "sysInfoError": "エラー！"
         },
         "loader": {
             "statusLoadData": "データを読み込み中...",
@@ -70,14 +70,15 @@
             "statusLoadFile": "ロード:{0}",
             "statusFinishing": "完了中です...",
             "statusAssetPacks": "アセットパック",
-            "statusTranslations": "翻訳"
+            "statusTranslations": "翻訳",
+            "loading": "ロード中..."
         },
         "ipcStatus": {
             "loadingdone": "完了しました。ゲームを開始中です...",
-            "dataAccepted": "",
-            "dataTransferStarted": "",
+            "dataAccepted": "データを受信しました。解析中です...",
+            "dataTransferStarted": "データの移行を開始中...",
             "errorTimeout": "エラー:タイムアウトしました。",
-            "dataValid": "",
+            "dataValid": "受け取ったデータは有効です",
             "waitingInput": "入力データをまっています..."
         }
     },
@@ -135,7 +136,8 @@
                 "batteryStatus": "バッテリー状態",
                 "maxPlayers": "最大人数",
                 "rumble": "振動",
-                "textEntryStyle": "テキスト入力方法"
+                "textEntryStyle": "テキスト入力方法",
+                "altMenuControls": "メニューそうさのボタンを反転する"
             },
             "joystickSimpleEditor": "シンプルな エディター操作",
             "phraseNewProfOldJoy": "古いジョイスティック向けプロファイルをつくる",
@@ -180,14 +182,14 @@
                     "interfaceStyle": "インターフェース スタイル",
                     "layoutStyle": "レイアウト スタイル",
                     "resetLayout": "レイアウトを リセット",
-                    "sStartSpacing": "S-Start Spacing",
+                    "sStartSpacing": "スタート・セレクトボタンの幅",
                     "scaleButtons": "ボタンの大きさをかえる",
                     "scaleDPad": "十字キーの大きさをかえる",
                     "scaleFactor": "拡大係数",
-                    "showCodeButton": "コード入力ボタン"
+                    "showCodeButton": "コード入力ボタンを表示する"
                 },
                 "style": {
-                    "actions": "アクション",
+                    "actions": "アクションを表示",
                     "XODA": "XODA",
                     "ABXY": "ABXY"
                 }
@@ -236,17 +238,17 @@
             "wordButtons": "ボタン",
             "wordProfiles": "プロファイル",
             "editor": {
-                "modeSelect": "",
-                "scrollUp": "",
-                "prevSection": "",
-                "scrollRight": "",
-                "switchScreens": "",
-                "modeErase": "",
-                "nextSection": "",
-                "fastScroll": "",
-                "scrollLeft": "",
-                "testPlay": "",
-                "scrollDown": ""
+                "modeSelect": "モードせんたく",
+                "scrollUp": "上にスクロール",
+                "prevSection": "まえの領域",
+                "scrollRight": "右にスクロール",
+                "switchScreens": "パネルを表示",
+                "modeErase": "さくじょモード",
+                "nextSection": "つぎの領域",
+                "fastScroll": "スクロール速度アップ",
+                "scrollLeft": "左にスクロール",
+                "testPlay": "テストプレイ",
+                "scrollDown": "下にスクロール"
             },
             "controlsDeleteKey2": "(オルトダッシュで削除)"
         },
@@ -254,14 +256,14 @@
             "gameBattleRandom": "ランダムコース",
             "gameCopySave": "セーブをコピーする",
             "gameEraseSave": "セーブをけす",
-            "gameEraseSlot": "削除するスロットを選択してください。",
+            "gameEraseSlot": "削除するスロットを 選択してください",
             "gameNoBattleLevels": "<バトルコースがありません>",
             "gameNoEpisodesToPlay": "<エピソードがありません>",
             "warnEpCompat": "このエピソードはほかのSMBXバージョン向けにつくられているため うまく遊べないかもしれません。",
             "gameSlotContinue": "スロット {0} ... {1}%",
             "gameSlotNew": "スロット {0} ... NEW GAME",
-            "gameSourceSlot": "コピーするセーブをえらんでください。",
-            "gameTargetSlot": "どこにコピーする？",
+            "gameSourceSlot": "コピーするセーブを えらんでください",
+            "gameTargetSlot": "どこに コピーする？",
             "phraseScore": "スコア: {0}",
             "phraseTime": "プレイ時間: {0}"
         },
@@ -354,19 +356,19 @@
                     "_name": "フルスクリーンタイプ",
                     "auto": "自動",
                     "desktop": "デスクトップ",
-                    "desktop-tip": "現在の画面解像度を保持します。",
-                    "exclusive": "限定的",
-                    "exclusive-tip": "物理的に画面解像度を変更します。"
+                    "desktop-tip": "現在の画面解像度を保持します。いわゆる｢ボーダーレス｣です。",
+                    "exclusive": "占有モード",
+                    "exclusive-tip": "物理的に画面解像度を変更します。よくあるフルスクリーンです。"
                 },
                 "fullscreen-depth": {
                     "auto": "自動",
-                    "16": "",
-                    "_name": "",
-                    "32": ""
+                    "16": "16ビット",
+                    "_name": "占有モード時の色深度",
+                    "32": "32ビット"
                 },
-                "choose-assets-on-launch": "",
-                "use-native-osk": "",
-                "fullscreen-res": ""
+                "choose-assets-on-launch": "起動時に ゲームをえらぶ",
+                "use-native-osk": "内部キーボードを優先する",
+                "fullscreen-res": "占有モード時の解像度"
             },
             "audio": {
                 "_header": "音声",
@@ -427,7 +429,7 @@
                 },
                 "unlimited-framerate": "フレームレートのせいげんを解除",
                 "vsync": "垂直同期",
-                "discord-rpc": ""
+                "discord-rpc": "Discordに表示"
             },
             "video": {
                 "_header": "映像",
@@ -516,7 +518,7 @@
                 }
             },
             "compatibility": {
-                "_header": "",
+                "_header": "セッションの調整",
                 "reset-all": "",
                 "autocode": "",
                 "_tooltip": "",
@@ -539,11 +541,11 @@
             "selectCharacter": "{0}のゲーム"
         },
         "editor": {
-            "makeFor": "",
-            "newWorld": "",
-            "errorMissingResources": "",
-            "promptNewWorldName": "",
-            "battles": ""
+            "makeFor": "ワールドスタイル:",
+            "newWorld": "<あたらしいワールドを つくる>",
+            "errorMissingResources": "ざんねん！ゲーム内エディターに必要な {0}が見つかりませんでした。",
+            "promptNewWorldName": "あたらしいワールドの名前",
+            "battles": "<バトル コース>"
         }
     },
     "outro": {
@@ -554,7 +556,7 @@
         "levelDesign": "レベルデザイン",
         "nameVitalyNovichkov": "ノヴィチコーフ・ヴィターリ",
         "originalBy": "オリジナル VB6コード",
-        "psVitaPortBy": "PSVita移植",
+        "psVitaPortBy": "PSVita 移植",
         "qualityControl": "品質管理",
         "specialThanks": "スペシャルサンクス",
         "nameAndrewSpinks": "アンドリュー・スピンクス"
