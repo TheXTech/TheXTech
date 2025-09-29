@@ -194,6 +194,14 @@ public:
     static constexpr bool fullscreen = true;
 #endif
 
+#ifndef RENDER_HALFPIXEL_ALWAYS
+    opt<bool> half_pixel_mode{this, defaults(false), {}, Scope::Config,
+        "halfpixel", "Half-pixel mode", nullptr,
+        config_halfpixel_set};
+#else
+    static constexpr bool half_pixel_mode = true;
+#endif
+
     opt_enum<std::pair<int, int>> internal_res{this,
         {
             {{480, 320}, "gba", "480x320 (GBA)"},
