@@ -96,6 +96,16 @@ public:
      */
     virtual int setFullScreen(bool fs) = 0;
 
+    /*!
+     * \brief Change between normal and 2pix shrinked modes
+     * \param pixHalf 2pix shrink enabled
+     *
+     * Once enabling this mode, all the sizes and coordinates will be reported like it being 2x larger,
+     * but de-facto drawn on 2x smaller canvas. On some devices such render mode is enforced because of
+     * too small screen resolution.
+     */
+    virtual void setHalfPixMode(bool pixHalf) = 0;
+
     enum FullScreenType
     {
         FULLSCREEN_TYPE_AUTO = 0,
