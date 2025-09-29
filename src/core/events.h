@@ -47,6 +47,22 @@ extern void quit();
 
 #endif
 
+#ifdef RENDER_CUSTOM
+
+constexpr bool is_nullptr()
+{
+    return false;
+}
+
+#else
+
+SDL_FORCE_INLINE bool is_nullptr()
+{
+    return !g_events;
+}
+
+#endif
+
 /*!
  * \brief Process events
  */

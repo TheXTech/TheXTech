@@ -40,6 +40,7 @@ struct CmdLineSetup_t;
 class AbstractRender_t
 {
     friend class FrmMain;
+    friend class AbstractWindow_t;
 
     static size_t m_lazyLoadedBytes;
 
@@ -62,7 +63,12 @@ protected:
 
     static void dumpFullFile(std::vector<char> &dst, const std::string &path);
 
+
 public:
+    //! The half-pixel mode: once it gets set, the renderer will be initialized with the half-sized texture, and all input will be divided by two and outputs will be multipled by 2.
+    static bool m_halfPixelMode;
+
+
     AbstractRender_t();
     virtual ~AbstractRender_t();
 
@@ -191,6 +197,18 @@ public:
      */
     virtual void setDrawPlane(uint8_t plane) = 0;
 
+    /*!
+     * \brief Change between normal and 2pix shrinked modes
+     * \param pixHalf 2pix shrink enabled
+     * \return 1 when enabling 2x shrinking of render result, 0 is normal render mode
+     *
+     * Once enabling this mode, all the sizes and coordinates will be reported like it being 2x larger,
+     * but de-facto drawn on 2x smaller canvas. On some devices such render mode is enforced because of
+     * too small screen resolution.
+     *
+     * NOTE: This function supposed to be called from inside the XWindow, don't call it directly!
+     */
+    virtual void setHalfPixMode(bool pixHalf);
 
 
 
