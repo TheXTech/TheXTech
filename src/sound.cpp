@@ -99,7 +99,7 @@ const AudioDefaults_t g_audioDefaults =
 };
 #elif defined(__PSP__)
 {
-    22050,
+    8000,
     2,
     1024,
     (int)AUDIO_S16SYS
@@ -217,7 +217,7 @@ static const int maxSfxChannels = 91;
 #if defined(LOW_MEM)
 static const double c_max_chunk_duration = 1.25; // max length of an in-memory chunk in seconds
 #elif defined(__PSP__)
-static const double c_max_chunk_duration = 0.4; // max length of an in-memory chunk in seconds
+static const double c_max_chunk_duration = 20.0; // max length of an in-memory chunk in seconds
 #else
 static const double c_max_chunk_duration = 5.0;  // max length of an in-memory chunk in seconds
 #endif
