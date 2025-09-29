@@ -123,6 +123,15 @@ void UpdateInternalRes()
     }
 #endif
 
+#if defined(__PSP__)
+    // Limitation of texture size for the frame buffer (de-facto 512x512, with half-pixel mode is 1024x1024)
+    if(req_w > 1024)
+        req_w = 1024;
+
+    if(req_h > 1024)
+        req_h = 1024;
+#endif
+
     // use the correct canonical screen's resolution here
     int canon_w = l_screen->canonical_screen().W;
     int canon_h = l_screen->canonical_screen().H;
@@ -267,12 +276,12 @@ void UpdateInternalRes()
         int_h -= int_h & 1;
 
 #if defined(__PSP__)
-         // Limitation of texture size for the frame buffer
-        if(int_w > 512)
-            int_w = 512;
+         // Limitation of half texture size for the frame buffer
+        if(int_w > 1024)
+            int_w = 1024;
 
-        if(int_h > 512)
-            int_h = 512;
+        if(int_h > 1024)
+            int_h = 1024;
 #endif
 
         XRender::TargetW = int_w;
@@ -292,8 +301,8 @@ void UpdateInternalRes()
         if(XRender::TargetH == 0)
         {
 #if defined(__PSP__)
-            XRender::TargetW = 480;
-            XRender::TargetH = 272;
+            XRender::TargetW = 480 * 2;
+            XRender::TargetH = 272 * 2;
 #else
             XRender::TargetW = 1280;
             XRender::TargetH = 720;

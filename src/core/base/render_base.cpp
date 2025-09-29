@@ -80,6 +80,8 @@ int    AbstractRender_t::m_maxTextureHeight = 0;
 int    AbstractRender_t::ScaleWidth = 0;
 int    AbstractRender_t::ScaleHeight = 0;
 
+bool   AbstractRender_t::m_halfPixelMode = false;
+
 #ifdef USE_RENDER_BLOCKING
 bool   AbstractRender_t::m_blockRender = false;
 #endif
@@ -153,6 +155,12 @@ bool AbstractRender_t::init()
     ScaleWidth = XRender::TargetW;
     ScaleHeight = XRender::TargetH;
 
+    if(m_halfPixelMode)
+    {
+        ScaleWidth >>= 1;
+        ScaleHeight >>= 1;
+    }
+
 #ifdef PGE_ENABLE_VIDEO_REC
     m_gif->init(this);
 #endif
@@ -188,6 +196,13 @@ void AbstractRender_t::dumpFullFile(std::vector<char> &dst, const std::string &p
         pLogWarning("Failed to dump file on read operation: %s", path.c_str());
 
     SDL_RWclose(f);
+}
+
+void AbstractRender_t::setHalfPixMode(bool pixHalf)
+{
+    m_halfPixelMode = pixHalf;
+    if(isWorking())
+        updateViewport();
 }
 
 void AbstractRender_t::loadTextureMask(StdPicture &target,

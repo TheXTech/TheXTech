@@ -223,6 +223,10 @@ else()
     option(THEXTECH_FORCE_FULLSCREEN "Force the game to only use fullscreen mode" OFF)
 endif()
 
+if(PSP)
+    set(THEXTECH_FORCE_HALFPIXEL_MODE ON)
+endif()
+
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" AND "${TARGET_PROCESSOR}" MATCHES "arm.*")
     message("-- Desktop OpenGL build will be disabled on unsupported platform (${CMAKE_SYSTEM_NAME} on ${TARGET_PROCESSOR})")
     set(THEXTECH_BUILD_GL_DESKTOP_DEFAULT OFF)
@@ -1889,6 +1893,12 @@ if(THEXTECH_FORCE_FULLSCREEN)
     else()
         target_compile_definitions(thextech PRIVATE -DNO_WINDOW_FOCUS_TRACKING) # Don't track for window focus
     endif()
+endif()
+
+if(THEXTECH_FORCE_HALFPIXEL_MODE)
+    target_compile_definitions(thextech PRIVATE
+        -DRENDER_HALFPIXEL_ALWAYS
+    )
 endif()
 
 # ==============================================================================
