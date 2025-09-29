@@ -27,6 +27,9 @@ void config_asset_pack_set();
 void config_language_set();
 void config_rendermode_set();
 void config_fullscreen_set();
+#ifndef RENDER_HALFPIXEL_ALWAYS
+void config_halfpixel_set();
+#endif
 #ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
 void config_video_mode_set();
 void config_fullscreen_type_set();

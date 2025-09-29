@@ -113,6 +113,22 @@ static inline long pow2roundup(long x)
     return x + 1;
 }
 
+static inline void rectMul2(SDL_Rect &rect)
+{
+    rect.x <<= 1;
+    rect.y <<= 1;
+    rect.w <<= 1;
+    rect.h <<= 1;
+}
+
+static inline void rectDiv2(SDL_Rect &rect)
+{
+    rect.x >>= 1;
+    rect.y >>= 1;
+    rect.w >>= 1;
+    rect.h >>= 1;
+}
+
 RenderSDL::RenderSDL() :
     AbstractRender_t()
 {}
@@ -211,13 +227,13 @@ bool RenderSDL::initRender(SDL_Window *window)
     if(ScaleWidth > m_maxTextureWidth)
     {
         ScaleWidth = m_maxTextureWidth;
-        XRender::TargetW = m_maxTextureWidth;
+        XRender::TargetW = m_halfPixelMode ? m_maxTextureWidth << 1 : m_maxTextureWidth;
     }
 
     if(ScaleHeight > m_maxTextureHeight)
     {
         ScaleHeight = m_maxTextureHeight;
-        XRender::TargetH = m_maxTextureHeight;
+        XRender::TargetH = m_halfPixelMode ? m_maxTextureHeight << 1 : m_maxTextureHeight;
     }
 
     m_tBuffer = SDL_CreateTexture(m_gRenderer,
@@ -251,6 +267,9 @@ bool RenderSDL::initRender(SDL_Window *window)
                     ret_w, ret_h,
                     XRender::TargetW, XRender::TargetH);
     }
+
+    if(m_halfPixelMode)
+        pLogDebug("Render initialized with the half-Pixel mode enabled");
 
     // Clean-up from a possible start-up junk
     clearBuffer();
@@ -332,6 +351,12 @@ void RenderSDL::repaint()
     wDst = int(m_scale_x * ScaleWidth);
     hDst = int(m_scale_y * ScaleHeight);
 
+    if(m_halfPixelMode)
+    {
+        wDst >>= 1;
+        hDst >>= 1;
+    }
+
     // Align the rendering scene to the center of screen
     off_x = (w - wDst) / 2;
     off_y = (h - hDst) / 2;
@@ -359,8 +384,9 @@ void RenderSDL::updateViewport()
 {
     flushRenderQueue();
 
-    int   render_w, render_h;
+    int targetW = XRender::TargetW, targetH = XRender::TargetH;
 
+    int render_w, render_h;
     getRenderSize(&render_w, &render_h);
 
     D_pLogDebug("Updated render size: %d x %d", render_w, render_h);
@@ -368,17 +394,32 @@ void RenderSDL::updateViewport()
     // quickly update the HiDPI scaling factor
     int window_w, window_h;
     XWindow::getWindowSize(&window_w, &window_h);
+
+    if(m_halfPixelMode)
+    {
+        targetW >>= 1;
+        targetH >>= 1;
+    }
+
     m_hidpi_x = (float)render_w / (float)window_w;
     m_hidpi_y = (float)render_h / (float)window_h;
 
-    if(XRender::TargetW > m_maxTextureWidth)
-        XRender::TargetW = m_maxTextureWidth;
+    if(!m_tBufferDisabled)
+    {
+        if(targetW > m_maxTextureWidth)
+            targetW = m_maxTextureWidth;
 
-    if(XRender::TargetH > m_maxTextureHeight)
-        XRender::TargetH = m_maxTextureHeight;
+        if(targetH > m_maxTextureHeight)
+            targetH = m_maxTextureHeight;
 
-    float scale_x = (float)render_w / XRender::TargetW;
-    float scale_y = (float)render_h / XRender::TargetH;
+        pLogDebug("Target render size: %d x %d (Max frame buffer size %d x %d)", targetW, targetH, m_maxTextureWidth, m_maxTextureHeight);
+    }
+    else
+        pLogDebug("Target render size: %d x %d (direct render)", targetW, targetH);
+
+
+    float scale_x = (float)render_w / targetW;
+    float scale_y = (float)render_h / targetH;
 
     float scale = SDL_min(scale_x, scale_y);
 
@@ -393,8 +434,8 @@ void RenderSDL::updateViewport()
     if(g_config.scale_mode == Config_t::SCALE_FIXED_3X && scale > 3.f)
         scale = 3.f;
 
-    int game_w = scale * XRender::TargetW;
-    int game_h = scale * XRender::TargetH;
+    int game_w = scale * targetW;
+    int game_h = scale * targetH;
 
     m_scale_x = scale;
     m_scale_y = scale;
@@ -412,11 +453,11 @@ void RenderSDL::updateViewport()
 
     m_viewport_x = 0;
     m_viewport_y = 0;
-    m_viewport_w = XRender::TargetW;
-    m_viewport_h = XRender::TargetH;
+    m_viewport_w = targetW;
+    m_viewport_h = targetW;
 
     // update render targets
-    if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || m_current_scale_mode != g_config.scale_mode)
+    if(ScaleWidth != targetW || ScaleHeight != targetH || m_current_scale_mode != g_config.scale_mode)
     {
 #ifdef PGE_ENABLE_VIDEO_REC
         // invalidates GIF recorder handle
@@ -434,8 +475,8 @@ void RenderSDL::updateViewport()
 
         if(m_pow2)
         {
-            powUpdateNeeded |= pow2roundup(XRender::TargetW) != ScaleWidth;
-            powUpdateNeeded |= pow2roundup(XRender::TargetH) != ScaleHeight;
+            powUpdateNeeded |= pow2roundup(targetW) != ScaleWidth;
+            powUpdateNeeded |= pow2roundup(targetH) != ScaleHeight;
         }
 
         if(!m_tBufferDisabled && powUpdateNeeded)
@@ -443,27 +484,47 @@ void RenderSDL::updateViewport()
             SDL_DestroyTexture(m_tBuffer);
 
             m_tBuffer = SDL_CreateTexture(m_gRenderer, DEFAULT_PIXEL_COLOUR_FORMAT, SDL_TEXTUREACCESS_TARGET,
-                                          m_pow2 ? pow2roundup(XRender::TargetW) : XRender::TargetW,
-                                          m_pow2 ? pow2roundup(XRender::TargetH) : XRender::TargetH);
+                                          m_pow2 ? pow2roundup(targetW) : targetW,
+                                          m_pow2 ? pow2roundup(targetH) : targetH);
             SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
+            pLogDebug("Updated render buffer to: %d x %d",
+                m_pow2 ? pow2roundup(targetW) : targetW,
+                m_pow2 ? pow2roundup(targetH) : targetH);
         }
 
         // reset scaling setting for images loaded later
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
-        ScaleWidth = XRender::TargetW;
-        ScaleHeight = XRender::TargetH;
+        ScaleWidth = targetW;
+        ScaleHeight = targetH;
         m_current_scale_mode = g_config.scale_mode;
     }
 
 #if SDL_COMPILEDVERSION >= SDL_VERSIONNUM(2, 0, 18)
     SDL_RenderSetVSync(m_gRenderer, g_config.render_vsync);
 #endif
+
+    if(m_halfPixelMode)
+    {
+        targetW <<= 1;
+        targetH <<= 1;
+    }
+
+    XRender::TargetW = targetW;
+    XRender::TargetH = targetH;
 }
 
 void RenderSDL::resetViewport()
 {
-    if(m_viewport_x == 0 && m_viewport_y == 0 && m_viewport_w == XRender::TargetW && m_viewport_h == XRender::TargetH)
+    int targetW = XRender::TargetW, targetH = XRender::TargetH;
+
+    if(m_halfPixelMode)
+    {
+        targetW >>= 1;
+        targetH >>= 1;
+    }
+
+    if(m_viewport_x == 0 && m_viewport_y == 0 && m_viewport_w == targetW && m_viewport_h == targetH)
         return;
 
     flushRenderQueue();
@@ -481,12 +542,20 @@ void RenderSDL::resetViewport()
 
     m_viewport_x = 0;
     m_viewport_y = 0;
-    m_viewport_w = XRender::TargetW;
-    m_viewport_h = XRender::TargetH;
+    m_viewport_w = targetW;
+    m_viewport_h = targetH;
 }
 
 void RenderSDL::setViewport(int x, int y, int w, int h)
 {
+    if(m_halfPixelMode)
+    {
+        x >>= 1;
+        y >>= 1;
+        w >>= 1;
+        h >>= 1;
+    }
+
     if(m_viewport_x == x && m_viewport_y == y && m_viewport_w == w && m_viewport_h == h)
         return;
 
@@ -516,6 +585,12 @@ void RenderSDL::setViewport(int x, int y, int w, int h)
 
 void RenderSDL::offsetViewport(int x, int y)
 {
+    if(m_halfPixelMode)
+    {
+        x >>= 1;
+        y >>= 1;
+    }
+
     if(m_viewport_offset_x != x || m_viewport_offset_y != y)
     {
         m_viewport_offset_x_cur = x;
@@ -532,6 +607,7 @@ void RenderSDL::offsetViewportIgnore(bool en)
         m_viewport_offset_x = en ? 0 : m_viewport_offset_x_cur;
         m_viewport_offset_y = en ? 0 : m_viewport_offset_y_cur;
     }
+
     m_viewport_offset_ignore = en;
 }
 
@@ -539,6 +615,7 @@ void RenderSDL::getRenderSize(int* w, int* h)
 {
     // make sure we're operating on default target (same as SDL)
     SDL_Texture* saved_target = SDL_GetRenderTarget(m_gRenderer);
+
     if(saved_target)
         SDL_SetRenderTarget(m_gRenderer, NULL);
 
@@ -553,8 +630,13 @@ void RenderSDL::getRenderSize(int* w, int* h)
             *h = 600;
         }
     }
+    else if(m_halfPixelMode)
+    {
+        *w <<= 1;
+        *h <<= 1;
+    }
 
-    if (saved_target)
+    if(saved_target)
         SDL_SetRenderTarget(m_gRenderer, saved_target);
 }
 
@@ -759,13 +841,13 @@ void RenderSDL::execute(const XRenderOp& op)
     case XRenderOp::Type::circle:
     {
         int radius = op.radius();
-
         SDL_SetRenderDrawColor(m_gRenderer, op.color.r, op.color.g, op.color.b, op.color.a);
 
         int dy = 1;
         do //for(double dy = 1; dy <= radius; dy += 1.0)
         {
             int dx = std::floor(std::sqrt((2 * radius * dy) - (dy * dy)));
+
             SDL_RenderDrawLine(m_gRenderer,
                                int(op.xDst - dx),
                                int(op.yDst + dy - radius),
@@ -992,6 +1074,14 @@ void RenderSDL::renderRect(int x, int y, int w, int h, XTColor color, bool fille
 {
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
+    if(m_halfPixelMode)
+    {
+        x >>= 1;
+        y >>= 1;
+        w >>= 1;
+        h >>= 1;
+    }
+
     op.type = XRenderOp::Type::rect;
     op.xDst = x + m_viewport_offset_x;
     op.yDst = y + m_viewport_offset_y;
@@ -1010,6 +1100,14 @@ void RenderSDL::renderRectBR(int _left, int _top, int _right, int _bottom, XTCol
 {
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
+    if(m_halfPixelMode)
+    {
+        _left >>= 1;
+        _top >>= 1;
+        _right >>= 1;
+        _bottom >>= 1;
+    }
+
     op.type = XRenderOp::Type::rect;
     op.xDst = _left + m_viewport_offset_x;
     op.yDst = _top + m_viewport_offset_y;
@@ -1025,6 +1123,13 @@ void RenderSDL::renderCircle(int cx, int cy, int radius, XTColor color, bool fil
 {
     if(radius <= 0)
         return; // Nothing to draw
+
+    if(m_halfPixelMode)
+    {
+        cx >>= 1;
+        cy  >>= 1;
+        radius >>= 1;
+    }
 
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
@@ -1045,6 +1150,13 @@ void RenderSDL::renderCircleHole(int cx, int cy, int radius, XTColor color)
 {
     if(radius <= 0)
         return; // Nothing to draw
+
+    if(m_halfPixelMode)
+    {
+        cx >>= 1;
+        cy  >>= 1;
+        radius >>= 1;
+    }
 
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
@@ -1110,6 +1222,13 @@ void RenderSDL::renderTextureScaleEx(int xDst, int yDst, int wDst, int hDst,
             return;
     }
 
+    if(m_halfPixelMode)
+    {
+        xDst >>= 1;
+        yDst >>= 1;
+        wDst >>= 1;
+        hDst >>= 1;
+    }
 
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
@@ -1139,8 +1258,8 @@ void RenderSDL::renderTextureScaleEx(int xDst, int yDst, int wDst, int hDst,
         // calculate new offset now
         if(center)
         {
-            double orig_offsetX = wDst / 2 - center->x;
-            double orig_offsetY = hDst / 2 - center->y;
+            double orig_offsetX = wDst / 2 - m_halfPixelMode ? center->x >> 1 : center->x;
+            double orig_offsetY = hDst / 2 - m_halfPixelMode ? center->y >> 1 : center->y;
             double sin_theta = -sin(rotateAngle * (M_PI / 180.));
             double cos_theta = cos(rotateAngle * (M_PI / 180.));
 
@@ -1172,10 +1291,18 @@ void RenderSDL::renderTextureScale(int xDst, int yDst, int wDst, int hDst,
         return;
     }
 
+    if(m_halfPixelMode)
+    {
+        xDst >>= 1;
+        yDst >>= 1;
+        wDst >>= 1;
+        hDst >>= 1;
+    }
+
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
     op.type = XRenderOp::Type::texture;
-    op.traits = (m_pow2) ? XRenderOp::Traits::src_rect : 0;
+    op.traits = m_pow2 || m_halfPixelMode ? XRenderOp::Traits::src_rect : 0;
 
     op.texture = &tx;
 
@@ -1227,7 +1354,6 @@ void RenderSDL::renderTexture(int xDst, int yDst, int wDst, int hDst,
             return;
     }
 
-
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
     op.type = XRenderOp::Type::texture;
@@ -1235,15 +1361,32 @@ void RenderSDL::renderTexture(int xDst, int yDst, int wDst, int hDst,
 
     op.texture = &tx;
 
+    if(m_halfPixelMode)
+    {
+        xDst >>= 1;
+        yDst >>= 1;
+        wDst >>= 1;
+        hDst >>= 1;
+    }
+
     op.xDst = xDst + m_viewport_offset_x;
     op.yDst = yDst + m_viewport_offset_y;
     op.wDst = wDst;
     op.hDst = hDst;
 
-    op.xSrc = xSrc;
-    op.ySrc = ySrc;
-    op.wSrc = wDst;
-    op.hSrc = hDst;
+    op.xSrc = tx.d.w_scale * xSrc;
+    op.ySrc = tx.d.h_scale * ySrc;
+
+    if(m_halfPixelMode)
+    {
+        op.wSrc = tx.d.w_scale * (wDst << 1);
+        op.hSrc = tx.d.h_scale * (hDst << 1);
+    }
+    else
+    {
+        op.wSrc = tx.d.w_scale * wDst;
+        op.hSrc = tx.d.h_scale * hDst;
+    }
 
     op.color = color;
 }
@@ -1284,8 +1427,14 @@ void RenderSDL::renderTexture(int xDst, int yDst,
 
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
+    if(m_halfPixelMode)
+    {
+        xDst >>= 1;
+        yDst >>= 1;
+    }
+
     op.type = XRenderOp::Type::texture;
-    op.traits = (m_pow2) ? XRenderOp::Traits::src_rect : 0;
+    op.traits = m_pow2 || m_halfPixelMode ? XRenderOp::Traits::src_rect : 0;
 
     op.texture = &tx;
 
@@ -1300,6 +1449,18 @@ void RenderSDL::renderTexture(int xDst, int yDst,
         op.ySrc = 0;
         op.wSrc = tx.w;
         op.hSrc = tx.h;
+    }
+
+    if(m_halfPixelMode)
+    {
+        if(!m_pow2)
+        {
+            op.wSrc = tx.w;
+            op.hSrc = tx.h;
+        }
+
+        op.wDst >>= 1;
+        op.hDst >>= 1;
     }
 
     op.color = color;
@@ -1349,6 +1510,7 @@ int RenderSDL::getPixelDataSize(const StdPicture &tx)
 {
     if(!tx.d.texture)
         return 0;
+
     return (tx.w * tx.h * 4);
 }
 

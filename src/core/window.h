@@ -169,6 +169,24 @@ E_INLINE int setFullScreen(bool fs) TAIL
 #endif
 
 
+/*!
+ * \brief Change between normal and 2pix shrinked modes
+ * \param pixHalf 2pix shrink enabled
+ * \return 1 when enabling 2x shrinking of render result, 0 is normal render mode
+ *
+ * Once enabling this mode, all the sizes and coordinates will be reported like it being 2x larger,
+ * but de-facto drawn on 2x smaller canvas. On some devices such render mode is enforced because of
+ * too small screen resolution.
+ */
+E_INLINE void setHalfPixMode(bool pixHalf) TAIL
+#ifndef WINDOW_CUSTOM
+{
+    g_window->setHalfPixMode(pixHalf);
+}
+#endif
+
+
+
 #ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
 
 /*!

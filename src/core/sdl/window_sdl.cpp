@@ -35,6 +35,7 @@
 #include "main/game_info.h"
 #include "window_sdl.h"
 #include "../render.h"
+#include "../events.h"
 #include "config.h"
 #include "../version.h"
 
@@ -567,6 +568,8 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
 
     SDL_SetWindowMinimumSize(m_window, 240, 160);
 
+    AbstractRender_t::m_halfPixelMode = g_config.half_pixel_mode;
+
 #ifdef __EMSCRIPTEN__ // Set canvas be 1/2 size for a faster rendering
     SDL_SetWindowSize(m_window, XRender::TargetW / 2, XRender::TargetH / 2);
 #elif defined(__ANDROID__) || defined(__SWITCH__) // Set as small as possible
@@ -734,7 +737,7 @@ void WindowSDL::placeCursor(int window_x, int window_y)
     XRender::mapToScreen(old_window_x, old_window_y, &o_sx, &o_sy);
     XRender::mapToScreen(window_x, window_y, &n_sx, &n_sy);
 
-    if(n_sx - o_sx < -2 || n_sx - o_sx > 2 || n_sy - o_sy < -2 || n_sy - o_sy > 2)
+    if((n_sx - o_sx < -2) || (n_sx - o_sx > 2) || (n_sy - o_sy < -2) || (n_sy - o_sy > 2))
     {
         int window_w, window_h;
         this->getWindowSize(&window_w, &window_h);
@@ -805,6 +808,20 @@ int WindowSDL::setFullScreen(bool fs)
     }
 
     return 0;
+}
+
+void WindowSDL::setHalfPixMode(bool pixHalf)
+{
+    m_halfPixelMode = pixHalf;
+
+    // Apply changes to the render too
+    if(!XRender::is_nullptr())
+        g_render->setHalfPixMode(pixHalf);
+    else
+        AbstractRender_t::m_halfPixelMode = pixHalf;
+
+    if(!XEvents::is_nullptr())
+        XEvents::eventResize();
 }
 
 
