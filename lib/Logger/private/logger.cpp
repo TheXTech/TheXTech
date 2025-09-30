@@ -22,7 +22,15 @@
 #include "logger_sets.h"
 
 #ifndef NO_FILE_LOGGING
-#   include <chrono>  // chrono::system_clock
+#   if !defined(PGE_MIN_PORT) && !defined(__PSP__)
+#       define LOGGER_HAS_CHRONO
+#       include <chrono>  // chrono::system_clock
+#   endif
+
+#   ifdef __PSP__
+#       include <psprtc.h>
+#   endif
+
 #   include <ctime>   // localtime
 #   include <DirManager/dirman.h>
 #   include <Utils/files.h>
@@ -70,12 +78,28 @@ static std::string getRunTimeString()
 }
 
 #if !defined(NO_FILE_LOGGING)
+#   if defined(__PSP__)
 static std::string return_current_time_and_date()
 {
+    ScePspDateTime now;
+    char out[24];
+
+    sceRtcGetCurrentClockLocalTime(&now);
+    SDL_memset(out, 0, sizeof(out));
+    if(SDL_snprintf(out, 24, "%04u_%02u_%02u_%02u_%02u_%02u", now.year, now.month, now.day, now.hour, now.minute, now.second) > 0)
+        return std::string(out);
+    else
+        return "0000_00_00_00_00_00";
+}
+
+#   else // Generic way
+static std::string return_current_time_and_date()
+{
+#if defined(LOGGER_HAS_CHRONO)
     auto now = std::chrono::system_clock::now();
     auto in_time_t = std::chrono::system_clock::to_time_t(now);
-
-#ifdef PGE_MIN_PORT
+#else
+    time_t in_time_t;
     // chrono doesn't work reliably here
     time(&in_time_t);
 #endif
@@ -87,6 +111,7 @@ static std::string return_current_time_and_date()
     else
         return "0000_00_00_00_00_00";
 }
+#   endif
 
 static void cleanUpLogs(const std::string &logsPath, int maxLogs)
 {
