@@ -32,7 +32,7 @@
         "hint": {
             "pound-altrun": "オルトダッシュで ヒップドロップだ！",
             "pound-down": "下を押して ヒップドロップだ！",
-            "no-lives-new": "コインがなくなった? まえがりに なるよ！ スコアにきをつけて...",
+            "no-lives-new": "コインがなくなった？ まえがりに なるよ！ スコアにきをつけて...",
             "no-lives-old": "気を付けて...もうすぐ ゲームオーバーだぞ！",
             "rainbow-surf": "つかんで、はしって、下に入力して コウラをはなせば サーフィンだ！",
             "char5-bombs": "ダッシュボタンで バクダンを回収できる。オルトダッシュで はっしゃだ！",
@@ -67,7 +67,7 @@
         "loader": {
             "statusLoadData": "データを読み込み中...",
             "statusGameInfo": "ゲーム情報",
-            "statusLoadFile": "ロード:{0}",
+            "statusLoadFile": "ロード中:{0}",
             "statusFinishing": "完了中です...",
             "statusAssetPacks": "アセットパック",
             "statusTranslations": "翻訳",
