@@ -131,14 +131,18 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
     SDL_RWops *handle = Files::open_file(file, "rb");
 
     if(!handle)
+    {
+        pLogWarning("GraphicsHelps::loadImage: Failed to open file [%s]", file.c_str());
         return nullptr; // Failed to open
+    }
 
     FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromHandle(&io, (fi_handle)handle);
 
     if(formato == FIF_UNKNOWN)
     {
+        pLogWarning("GraphicsHelps::loadImage: Format of [%s] is unknown", file.c_str());
         SDL_RWclose(handle);
-        return NULL;
+        return nullptr;
     }
 
     FIBITMAP *img = FreeImage_LoadFromHandle(formato, &io, (fi_handle)handle);
@@ -146,7 +150,10 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
     SDL_RWclose(handle);
 
     if(!img)
-        return NULL;
+    {
+        pLogWarning("GraphicsHelps::loadImage: Failed to load the image [%s] from handler", file.c_str());
+        return nullptr;
+    }
 
 #endif
 #ifdef DEBUG_BUILD
@@ -171,7 +178,10 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
         FreeImage_Unload(img);
 
         if(!temp)
+        {
+            pLogWarning("GraphicsHelps::loadImage: Failed to convert the image [%s] to 32-bit", file.c_str());
             return nullptr;
+        }
 
         img = temp;
 #ifdef DEBUG_BUILD
@@ -194,13 +204,19 @@ FIBITMAP *GraphicsHelps::loadImage(const Files::Data &raw, bool convertTo32bit)
     FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromMemory(imgMEM);
 
     if(formato  == FIF_UNKNOWN)
+    {
+        pLogWarning("GraphicsHelps::loadImage: Format of data of size %zu is unknown", raw.size());
         return nullptr;
+    }
 
     FIBITMAP *img = FreeImage_LoadFromMemory(formato, imgMEM, 0);
     FreeImage_CloseMemory(imgMEM);
 
     if(!img)
+    {
+        pLogWarning("GraphicsHelps::loadImage: Failed to open image data of size %zu", raw.size());
         return nullptr;
+    }
 
     if(convertTo32bit && (FreeImage_GetBPP(img) != 32))
     {
@@ -216,7 +232,11 @@ FIBITMAP *GraphicsHelps::loadImage(const Files::Data &raw, bool convertTo32bit)
         FreeImage_Unload(img);
 
         if(!temp)
+        {
+            pLogWarning("GraphicsHelps::loadImage: Failed to convert the image data of size %zu to 32-bit", raw.size());
             return nullptr;
+        }
+
         img = temp;
     }
 
@@ -229,6 +249,7 @@ FIBITMAP *GraphicsHelps::loadMask(const std::string &file, bool maskIsPng, bool 
 
     if(file.empty())
         return nullptr; //Nothing to do
+
     mask = loadImage(file, convertTo32bit);
 
     if(!mask)
@@ -247,6 +268,7 @@ FIBITMAP *GraphicsHelps::loadMask(const Files::Data &raw, bool maskIsPng, bool c
 
     if(raw.empty())
         return nullptr; //Nothing to do
+
     mask = loadImage(raw, convertTo32bit);
 
     if(!mask)
