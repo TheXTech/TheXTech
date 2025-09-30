@@ -40,7 +40,13 @@
 #include <fmt_time_ne.h>
 #include <fmt_format_ne.h>
 
-#include <chrono>
+#if !defined(PGE_MIN_PORT) && !defined(__PSP__)
+#   SHOOT_HAS_CHRONO
+#   include <chrono>
+#endif
+#ifdef __PSP__
+#   include <psprtc.h>
+#endif
 
 #include "core/base/render_base.h"
 #include "core/render.h"
@@ -973,9 +979,28 @@ void AbstractRender_t::setBlockRender(bool b)
 
 static std::string shoot_getTimedString(const std::string &path, const char *ext = "png")
 {
+    std::tm t;
+#ifdef SHOOT_HAS_CHRONO
     auto now = std::chrono::system_clock::now();
     std::time_t in_time_t = std::chrono::system_clock::to_time_t(now);
-    std::tm t = fmt::localtime_ne(in_time_t);
+#elif defined(__PSP__)
+    ScePspDateTime now;
+    sceRtcGetCurrentClockLocalTime(&now);
+    t.tm_year = now.year - 1900;
+    t.tm_mon = now.month;
+    t.tm_mday = now.day;
+    t.tm_hour = now.hour;
+    t.tm_min = now.minute;
+    t.tm_sec = now.second;
+#else
+    time_t in_time_t;
+    // chrono doesn't work reliably here
+    time(&in_time_t);
+#endif
+
+#if !defined(__PSP__)
+    t = fmt::localtime_ne(in_time_t);
+#endif
     static int prevSec = 0;
     static int prevSecCounter = 0;
 
