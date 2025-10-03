@@ -1474,11 +1474,17 @@ void RenderSDL::getScreenPixels(int x, int y, int w, int h, unsigned char *pixel
 #ifndef XTECH_SDL_NO_RECTF_SUPPORT
     SDL_RenderFlush(m_gRenderer);
 #endif
-    SDL_RenderReadPixels(m_gRenderer,
-                         &rect,
-                         SDL_PIXELFORMAT_BGR24,
-                         pixels,
-                         w * 3 + (w % 4));
+    int ret = SDL_RenderReadPixels(m_gRenderer,
+                                   &rect,
+                                   SDL_PIXELFORMAT_BGR24,
+                                   pixels,
+                                   w * 3 + (w % 4));
+
+    if(ret < 0)
+    {
+        pLogWarning("RenderSDL: Failed to read BGR24 pixels: %s", SDL_GetError());
+        SDL_memset(pixels, 0, (w * 3 + (w % 4)) * h); // Fill by black
+    }
 }
 
 void RenderSDL::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels)
@@ -1494,11 +1500,17 @@ void RenderSDL::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *p
 #ifndef XTECH_SDL_NO_RECTF_SUPPORT
     SDL_RenderFlush(m_gRenderer);
 #endif
-    SDL_RenderReadPixels(m_gRenderer,
-                         &rect,
-                         SDL_PIXELFORMAT_ABGR8888,
-                         pixels,
-                         w * 4);
+    int ret = SDL_RenderReadPixels(m_gRenderer,
+                                   &rect,
+                                   SDL_PIXELFORMAT_ABGR8888,
+                                   pixels,
+                                   w * 4);
+
+    if(ret < 0)
+    {
+        pLogWarning("RenderSDL: Failed to read RGBA pixels: %s", SDL_GetError());
+        SDL_memset(pixels, 0xFF, (w * 4) * h); // Fill by white
+    }
 }
 
 int RenderSDL::getPixelDataSize(const StdPicture &tx)
