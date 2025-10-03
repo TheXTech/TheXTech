@@ -1720,7 +1720,7 @@ void CheckSection(const int A)
 
         ClearBuffer = true;
 
-#ifdef PGE_MIN_PORT
+#if defined(PGE_MIN_PORT) || defined(__PSP__)
         // unload old background when changing sections (this helps prevent texture memory exhaustion)
         if(numPlayers == 1 && oldSection >= 0 && Background2[oldSection] != Background2[B])
         {
