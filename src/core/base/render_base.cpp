@@ -41,7 +41,7 @@
 #include <fmt_format_ne.h>
 
 #if !defined(PGE_MIN_PORT) && !defined(__PSP__)
-#   SHOOT_HAS_CHRONO
+#   define SHOOT_HAS_CHRONO
 #   include <chrono>
 #endif
 #ifdef __PSP__
