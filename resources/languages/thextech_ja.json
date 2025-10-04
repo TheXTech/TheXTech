@@ -32,7 +32,7 @@
         "hint": {
             "pound-altrun": "オルトダッシュで ヒップドロップだ！",
             "pound-down": "下を押して ヒップドロップだ！",
-            "no-lives-new": "コインがなくなった？ まえがりに なるよ！ スコアにきをつけて...",
+            "no-lives-new": "ライフがもうない？ まえがりに なるよ！ スコアに きをつけて...",
             "no-lives-old": "気を付けて...もうすぐ ゲームオーバーだぞ！",
             "rainbow-surf": "つかんで、はしって、下に入力して コウラをはなせば サーフィンだ！",
             "char5-bombs": "ダッシュボタンで バクダンを回収できる。オルトダッシュで はっしゃだ！",
@@ -626,61 +626,61 @@
         "letterRight": "",
         "wordHeight": "",
         "file": {
-            "commandSave": "",
+            "commandSave": "保存",
             "convert": {
-                "descNew": ""
+                "descNew": "ファイル拡張子は変更されますが、ふるいファイルは削除されません。\n\n保存した後、消えた機能がないか確認してください。"
             },
-            "formatLegacy": "",
-            "commandOpen": "",
-            "labelFormat": "",
-            "actionOpen": "",
-            "optionCancelAction": "",
-            "commandSaveAs": "",
-            "actionRevert": "",
-            "optionYesSaveThenAction": "",
-            "optionActionWithoutSave": "",
-            "confirmConvertFormatTo": "",
-            "sectionWorld": "",
-            "commandNew": "",
-            "actionClearWorld": "",
-            "optionProceedWithConversion": "",
-            "confirmConfirmAction": "",
-            "confirmSaveBeforeAction": "",
-            "optionCancelConversion": "",
-            "actionClearLevel": "",
-            "actionExit": "",
-            "sectionLevel": "",
-            "labelCurrentFile": "",
-            "formatModern": ""
+            "formatLegacy": "レガシー",
+            "commandOpen": "開く...",
+            "labelFormat": "形式:",
+            "actionOpen": "ひらく",
+            "optionCancelAction": "キャンセル:{0}しない",
+            "commandSaveAs": "名前をつけて保存...",
+            "actionRevert": "もとにもどす",
+            "optionYesSaveThenAction": "はい:セーブして {0}",
+            "optionActionWithoutSave": "セーブしないで {0}",
+            "confirmConvertFormatTo": "形式を {0}にへんこうする？",
+            "sectionWorld": "ワールド",
+            "commandNew": "新規",
+            "actionClearWorld": "ワールドをリセット",
+            "optionProceedWithConversion": "変換する",
+            "confirmConfirmAction": "ほんとうに {0}？",
+            "confirmSaveBeforeAction": "{0}前に セーブする？",
+            "optionCancelConversion": "変換をやめる",
+            "actionClearLevel": "コースをリセット",
+            "actionExit": "やめる",
+            "sectionLevel": "コース",
+            "labelCurrentFile": "げんざいのファイル:",
+            "formatModern": "モダン"
         },
         "events": {
             "sections": {
-                "propBounds": "",
-                "propMusic": "",
-                "propBackground": "",
-                "actionKeep": "",
-                "actionReset": "",
-                "actionSet": "",
-                "phraseAllSections": ""
+                "propBounds": "境界",
+                "propMusic": "おんがく",
+                "propBackground": "背景",
+                "actionKeep": "そのまま",
+                "actionReset": "リセット",
+                "actionSet": "セット",
+                "phraseAllSections": "すべてのセクション"
             },
             "label": {
-                "next": "次の",
-                "layerClear": "レイヤークリア時",
-                "destroy": "破壊時",
-                "death": "やられ時",
+                "next": "次",
+                "layerClear": "レイヤークリア",
+                "destroy": "破壊",
+                "death": "やられ",
                 "activate": "有効化",
-                "hit": "ヒット時",
-                "enter": "入場時",
-                "talk": "会話時"
+                "hit": "ヒット",
+                "enter": "入場",
+                "talk": "会話"
             },
             "letter": {
-                "enter": "",
-                "activate": "A:",
-                "talk": "",
-                "death": "D:",
-                "hit": "",
-                "layerClear": "",
-                "destroy": ""
+                "enter": "入:",
+                "activate": "き:",
+                "talk": "会:",
+                "death": "や:",
+                "hit": "ヒ:",
+                "layerClear": "レ:",
+                "destroy": "破:"
             },
             "layers": {
                 "headerShow": "表示:",
@@ -692,37 +692,37 @@
                 "activate": "NPCが画面に入ったとき",
                 "destroy": "ブロックが破壊されたとき",
                 "hit": "ブロックにヒットしたとき",
-                "layerClear": "",
+                "layerClear": "オブジェクトレイヤーから すべてがなくなったとき",
                 "enter": "ワープに入ったとき",
-                "phraseTriggersAfterTemplate": "",
+                "phraseTriggersAfterTemplate": "{0}が イベント{2}の発生後 {1}ミリ秒で はっせいする",
                 "death": "NPCがやられたとき",
-                "phraseTriggersWhenTemplate": "",
+                "phraseTriggersWhenTemplate": "{0} は {1} のときにはっせいする",
                 "talk": "プレイヤーがNPCに話しかけたとき"
             },
-            "promptEventText": "",
+            "promptEventText": "イベント文",
             "props": {
-                "layerSmoke": "",
-                "endGame": "",
-                "controls": "",
-                "autostart": "",
-                "sound": ""
+                "layerSmoke": "スモーク",
+                "endGame": "エピソードを終える",
+                "controls": "そうさ",
+                "autostart": "自動スタート",
+                "sound": "効果音"
             },
             "itemNewEvent": "<あたらしい イベント>",
             "bounds": {
-                "changeAllSectionBoundsToCurrent": "",
-                "changeSectionBoundsToCurrent": "",
-                "shouldEvent": ""
+                "changeAllSectionBoundsToCurrent": "すべてのセクション領域の現在に変更しますか？",
+                "changeSectionBoundsToCurrent": "{0}のセクション境界の現在に変更しますか？",
+                "shouldEvent": "イベント {0}を"
             },
-            "promptEventName": "",
+            "promptEventName": "イベント名",
             "headerTriggerEvent": "トリガー:",
-            "header": "",
+            "header": "イベント:",
             "deletion": {
                 "confirm": "はい:イベントを さくじょする",
                 "cancel": "いいえ:イベントを さくじょしない",
                 "deletingEvent": "イベント {0}をさくじょ中..."
             },
-            "controlsForEventN": "",
-            "settingsForEvent": ""
+            "controlsForEventN": "イベント {0}を操作:",
+            "settingsForEvent": "イベント {0}の せってい"
         },
         "wordWidth": "",
         "select": {
@@ -865,12 +865,12 @@
         "phraseRadiusIndex": "",
         "pageBlankOfBlank": "",
         "phraseWarpIndex": "",
-        "labelSortLayer": "",
+        "labelSortLayer": "レイヤーソート:",
         "phraseAreYouSure": "",
         "toggleMagicBlock": "",
         "phraseDelayIsMs": "",
         "letterCoordY": "",
         "wordText": "",
-        "labelSortOffset": ""
+        "labelSortOffset": "ソート補正:"
     }
 }
