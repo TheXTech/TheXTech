@@ -60,7 +60,6 @@ RangeArrI<eventindex_t, 1, maxEvents, EVENT_NONE> NewEvent;
 RangeArrI<vbint_t, 1, maxEvents, 0> newEventDelay;
 RangeArrI<uint8_t, 1, maxEvents, 0> newEventPlayer;
 int newEventNum = 0;
-bool g_eventsAutoRunMode = false;
 
 layerindex_t LAYER_USED_P_SWITCH = LAYER_NONE;
 static std::set<eventindex_t> recentlyTriggeredEvents;
