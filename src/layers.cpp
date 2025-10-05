@@ -1302,10 +1302,10 @@ eventindex_t ProcEvent_Safe(bool is_resume, eventindex_t index, int whichPlayer,
                 bool set_qScreen_i = false;
 
                 // start the modern qScreen animation
-                if(!equalCase(evt.Name.c_str(), "Level - Start") && g_config.modern_section_change)
+                if(!equalCase(evt.Name.c_str(), "Level - Start") && !evt.AutoStart && g_config.modern_section_change)
                     set_qScreen_i = s_initModernQScreen(screen, B, tempLevel, newLevel, onscreen_plr, warped_plr, is_reset);
                 // legacy qScreen animation
-                else if(!equalCase(evt.Name.c_str(), "Level - Start"))
+                else if(!equalCase(evt.Name.c_str(), "Level - Start") && !evt.AutoStart)
                     set_qScreen_i = s_initLegacyQScreen(screen, B, tempLevel, newLevel, onscreen_plr);
 
                 if(set_qScreen_i)
