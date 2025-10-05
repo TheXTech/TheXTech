@@ -22,6 +22,7 @@ Changelog for 1.3.7.2-dev
 -Fix v1.3.7.1 Modern/Classic bug where it was not safe to run on a series of fall blocks with gaps between them, caused by the downward clip fix introduced in v1.3.7.1 (@ds-sloth, thanks to @Liebning for the report)
 -Vanilla mode: reset score between gameplay sessions, like SMBX 1.3 (@ds-sloth)
 -Desktop: fix a minor cosmetic bug where the screen could flicker when resizing the window (@ds-sloth)
+-Fixed the dead lock of moving screen caused by section resize triggered by non-first event (other than "Level - Start") marked as autostart (@Wohlstand)
 
 Changelog for 1.3.7.1
 -Add GameCube controller support for Wii (@ds-sloth)
