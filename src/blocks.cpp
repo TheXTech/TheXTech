@@ -1608,7 +1608,7 @@ void PSwitch(bool enabled)
             }
         }
 
-        ProcEvent(EVENT_PSWITCH_START, 0, true);
+        ProcEvent(EVENT_PSWITCH_START, 0, EventContext::CoinSwitch);
     }
     else
     {
@@ -1705,7 +1705,7 @@ void PSwitch(bool enabled)
             }
         }
 
-        ProcEvent(EVENT_PSWITCH_END, 0, true);
+        ProcEvent(EVENT_PSWITCH_END, 0, EventContext::CoinSwitch);
     }
 
     // qSortBlocksX(1, numBlock);

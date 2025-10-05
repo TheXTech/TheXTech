@@ -57,7 +57,6 @@ RangeArrI<eventindex_t, 1, maxEvents, EVENT_NONE> NewEvent;
 RangeArrI<vbint_t, 1, maxEvents, 0> newEventDelay;
 RangeArrI<uint8_t, 1, maxEvents, 0> newEventPlayer;
 int newEventNum = 0;
-bool g_eventsAutoRunMode = false;
 
 layerindex_t LAYER_USED_P_SWITCH = LAYER_NONE;
 static std::set<eventindex_t> recentlyTriggeredEvents;
@@ -1222,7 +1221,7 @@ static inline bool s_initLegacyQScreen(Screen_t& screen, const int B, const Spee
 
 // Old functions:
 
-void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
+void ProcEvent(eventindex_t index, int whichPlayer, EventContext context)
 {
     if(index == EVENT_NONE || LevelEditor)
         return;
@@ -1313,16 +1312,33 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                 int warped_plr = 0;
 
                 // warp other players to resized section, if not a reset or level start
-                bool do_warp = !is_reset && !g_eventsAutoRunMode;
+                bool do_warp = !is_reset && (index != EVENT_LEVEL_START);
+                // modern/classic logic: don't warp if it's the auto-run event loop
+                if(g_config.modern_section_change)
+                    do_warp &= (context != EventContext::InitSetup);
+                // vanilla logic: don't warp on any Autostart event (even if it isn't the first frame of the level)
+                else
+                    do_warp &= !evt.AutoStart;
+
                 s_testPlayersInSection(screen, B, do_warp, onscreen_plr, warped_plr);
 
                 bool set_qScreen_i = false;
 
+                // modern/classic: don't start any qScreen during initial setup frame
+                if(g_config.modern_section_change && context == EventContext::InitSetup)
+                {
+                    // do nothing
+                }
+                // don't start any qScreen for "Level - Start" event, on any frame (vanilla logic)
+                else if(index == EVENT_LEVEL_START)
+                {
+                    // do nothing
+                }
                 // start the modern qScreen animation
-                if(!g_eventsAutoRunMode && g_config.modern_section_change)
+                else if(g_config.modern_section_change)
                     set_qScreen_i = s_initModernQScreen(screen, B, tempLevel, newLevel, onscreen_plr, warped_plr, is_reset);
                 // legacy qScreen animation
-                else if(!g_eventsAutoRunMode && !evt.AutoStart)
+                else
                     set_qScreen_i = s_initLegacyQScreen(screen, B, tempLevel, newLevel, onscreen_plr);
 
                 if(set_qScreen_i)
@@ -1341,10 +1357,10 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
     }
 
     for(auto &l : evt.HideLayer)
-        HideLayer(l, NoEffect ? true : evt.LayerSmoke);
+        HideLayer(l, (context != EventContext::Normal) ? (true) : evt.LayerSmoke);
 
     for(auto &l : evt.ShowLayer)
-        ShowLayer(l, NoEffect ? true : evt.LayerSmoke);
+        ShowLayer(l, (context != EventContext::Normal) ? (true) : evt.LayerSmoke);
 
     for(auto &l : evt.ToggleLayer)
     {
@@ -1463,7 +1479,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
             // here tempBool prevented any order-2 circles from occurring
             // if(!tempBool)
             if(Events[evt.TriggerEvent].TriggerEvent != index)
-                ProcEvent(evt.TriggerEvent, whichPlayer);
+                ProcEvent(evt.TriggerEvent, whichPlayer, context);
         }
         else if(newEventNum < maxEvents)
         {

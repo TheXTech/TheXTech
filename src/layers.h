@@ -35,6 +35,17 @@
 // also defined in "globals.h"
 extern const std::string g_emptyString;
 
+enum class EventContext
+{
+    // proceed as usual
+    Normal = 0,
+    // don't show layer smoke
+    NoEffect,
+    CoinSwitch = NoEffect,
+    // NoEffect, plus don't trigger player warp or screen pan (Modern/Classic mode)
+    InitSetup,
+};
+
 //Public Type Layer
 struct Layer_t
 {
@@ -176,8 +187,6 @@ extern RangeArrI<vbint_t, 1, maxEvents, 0> newEventDelay;
 extern RangeArrI<uint8_t, 1, maxEvents, 0> newEventPlayer;
 //Public newEventNum As Integer
 extern int newEventNum;
-// Set it to "true" to mean all the events triggered during autostart process
-extern bool g_eventsAutoRunMode;
 
 
 // utilities for layerindex_t and eventindex_t
@@ -266,8 +275,9 @@ void ClearTriggeredEvents();
 
 // Public Sub ProcEvent(EventName As String, Optional NoEffect As Boolean = False)
 void ProcEvent(eventindex_t, bool) = delete; // old signature
+void ProcEvent(eventindex_t, EventContext) = delete; // old signature
 // NEW: added WhichPlayer, 0 by default, to indicate which player triggered the event
-void ProcEvent(eventindex_t index, int WhichPlayer, bool NoEffect = false);
+void ProcEvent(eventindex_t index, int WhichPlayer, EventContext context = EventContext::Normal);
 
 // NEW: safe call that adds event to the end of the events queue for the current frame
 void TriggerEvent(eventindex_t index, int WhichPlayer);
