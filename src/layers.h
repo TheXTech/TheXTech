@@ -198,6 +198,8 @@ extern RangeArrI<vbint_t, 1, maxEvents, 0> newEventDelay;
 extern RangeArrI<uint8_t, 1, maxEvents, 0> newEventPlayer;
 //Public newEventNum As Integer
 extern int newEventNum;
+// Set it to "true" to mean all the events triggered during autostart process
+extern bool g_eventsAutoRunMode;
 
 
 // utilities for layerindex_t and eventindex_t
