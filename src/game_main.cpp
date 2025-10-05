@@ -1168,16 +1168,12 @@ int GameMain(const CmdLineSetup_t &setup)
 
             delayedMusicStart(); // Allow music being started
 
-            g_eventsAutoRunMode = true;
-
-            ProcEvent(EVENT_LEVEL_START, 0, true);
+            ProcEvent(EVENT_LEVEL_START, 0, EventContext::InitSetup);
             For(A, 2, maxEvents)
             {
                 if(Events[A].AutoStart)
-                    ProcEvent(A, 0, true);
+                    ProcEvent(A, 0, EventContext::InitSetup);
             }
-
-            g_eventsAutoRunMode = false;
 
             // Main menu loop
             runFrameLoop(&MenuLoop, nullptr, []()->bool{ return GameMenu;});

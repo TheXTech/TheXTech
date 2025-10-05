@@ -1833,7 +1833,7 @@ bool PSwitch(bool enabled)
             }
         }
 
-        resume_index = ProcEvent_Safe(false, EVENT_PSWITCH_START, 0, true);
+        resume_index = ProcEvent_Safe(false, EVENT_PSWITCH_START, 0, EventContext::CoinSwitch);
     }
     else
     {
@@ -1942,7 +1942,7 @@ resume_KillBlock:
             }
         }
 
-        resume_index = ProcEvent_Safe(false, EVENT_PSWITCH_END, 0, true);
+        resume_index = ProcEvent_Safe(false, EVENT_PSWITCH_END, 0, EventContext::CoinSwitch);
     }
 
     while(resume_index != EVENT_NONE)
@@ -1955,7 +1955,7 @@ resume_ProcEvent:
         resume_index = g_gameLoopInterrupt.C;
         g_gameLoopInterrupt.site = GameLoopInterrupt::None;
 
-        resume_index = ProcEvent_Safe(true, resume_index, 0, true);
+        resume_index = ProcEvent_Safe(true, resume_index, 0, EventContext::CoinSwitch);
     }
 
     // qSortBlocksX(1, numBlock);
