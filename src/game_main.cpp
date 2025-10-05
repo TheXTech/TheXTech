@@ -1119,12 +1119,16 @@ int GameMain(const CmdLineSetup_t &setup)
 
             delayedMusicStart(); // Allow music being started
 
+            g_eventsAutoRunMode = true;
+
             ProcEvent(EVENT_LEVEL_START, 0, true);
             For(A, 2, maxEvents)
             {
                 if(Events[A].AutoStart)
                     ProcEvent(A, 0, true);
             }
+
+            g_eventsAutoRunMode = false;
 
             // Main menu loop
             runFrameLoop(&MenuLoop, nullptr, []()->bool{ return GameMenu;});
@@ -1504,12 +1508,16 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 delayedMusicStart(); // Allow music being started
 
+                g_eventsAutoRunMode = true;
+
                 ProcEvent(EVENT_LEVEL_START, 0, true);
                 for(int A = 2; A <= maxEvents; ++A)
                 {
                     if(Events[A].AutoStart)
                         ProcEvent(A, 0, true);
                 }
+
+                g_eventsAutoRunMode = false;
 
                 // MAIN GAME LOOP
                 runFrameLoop(nullptr, &GameLoop,
