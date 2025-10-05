@@ -194,6 +194,9 @@ void GameLoop()
     if(g_gameLoopInterrupt.process_intro_events)
     {
         int A;
+
+        g_eventsAutoRunMode = true;
+
         for(A = 0; A <= maxEvents; ++A)
         {
             // excluded in SMBX 1.3
@@ -220,6 +223,8 @@ resume_IntroEvents:
                 }
             }
         }
+
+        g_eventsAutoRunMode = false;
 
         g_gameLoopInterrupt.process_intro_events = false;
     }

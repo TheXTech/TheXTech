@@ -60,6 +60,7 @@ RangeArrI<eventindex_t, 1, maxEvents, EVENT_NONE> NewEvent;
 RangeArrI<vbint_t, 1, maxEvents, 0> newEventDelay;
 RangeArrI<uint8_t, 1, maxEvents, 0> newEventPlayer;
 int newEventNum = 0;
+bool g_eventsAutoRunMode = false;
 
 layerindex_t LAYER_USED_P_SWITCH = LAYER_NONE;
 static std::set<eventindex_t> recentlyTriggeredEvents;
@@ -1296,16 +1297,16 @@ eventindex_t ProcEvent_Safe(bool is_resume, eventindex_t index, int whichPlayer,
                 int warped_plr = 0;
 
                 // warp other players to resized section, if not a reset or level start
-                bool do_warp = !is_reset && !evt.AutoStart && !equalCase(evt.Name.c_str(), "Level - Start");
+                bool do_warp = !is_reset && !g_eventsAutoRunMode;
                 s_testPlayersInSection(screen, B, do_warp, onscreen_plr, warped_plr);
 
                 bool set_qScreen_i = false;
 
                 // start the modern qScreen animation
-                if(!equalCase(evt.Name.c_str(), "Level - Start") && !evt.AutoStart && g_config.modern_section_change)
+                if(!g_eventsAutoRunMode && g_config.modern_section_change)
                     set_qScreen_i = s_initModernQScreen(screen, B, tempLevel, newLevel, onscreen_plr, warped_plr, is_reset);
                 // legacy qScreen animation
-                else if(!equalCase(evt.Name.c_str(), "Level - Start") && !evt.AutoStart)
+                else if(!g_eventsAutoRunMode && !evt.AutoStart)
                     set_qScreen_i = s_initLegacyQScreen(screen, B, tempLevel, newLevel, onscreen_plr);
 
                 if(set_qScreen_i)
