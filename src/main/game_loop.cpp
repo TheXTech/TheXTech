@@ -223,8 +223,6 @@ resume_IntroEvents:
             }
         }
 
-        g_eventsAutoRunMode = false;
-
         g_gameLoopInterrupt.process_intro_events = false;
     }
 

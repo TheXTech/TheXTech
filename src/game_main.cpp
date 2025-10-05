@@ -1177,8 +1177,6 @@ int GameMain(const CmdLineSetup_t &setup)
                     ProcEvent(A, 0, EventContext::InitSetup);
             }
 
-            g_eventsAutoRunMode = false;
-
             // Main menu loop
             runFrameLoop(&MenuLoop, nullptr, []()->bool{ return GameMenu;});
             if(!GameIsActive)
