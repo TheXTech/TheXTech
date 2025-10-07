@@ -1308,6 +1308,9 @@ if(ANDROID)
     add_library(thextech SHARED ${THEXTECH_SRC} ${LIB_SRC})
     target_compile_options(thextech PRIVATE -fPIC)
 
+    target_link_options(thextech PUBLIC "-Wl,-z,max-page-size=16384")
+    target_link_options(thextech PUBLIC "-Wl,-z,common-page-size=16384")
+
     # Include own-built libraries into the APK
     set(APK_PACK_LIBS ${CMAKE_SOURCE_DIR}/android-project/thextech/jniLibs/${CMAKE_BUILD_TYPE_LOWER}/${ANDROID_ABI})
     add_custom_target(SDL_ApkPackLibs_makeDir ALL COMMAND ${CMAKE_COMMAND} -E make_directory "${APK_PACK_LIBS}")
