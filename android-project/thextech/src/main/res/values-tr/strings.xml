@@ -40,5 +40,4 @@
     <string name="cheat_dialog_ok">Çalıştır</string>
     <string name="setup_renderer_label">Render sistemi</string>
     <string name="launcher_openfile_indirectly">Açılan dosyalar için dizindeki kaynaklara ulaşılamadı. Bu nedenle oyun var olan kaynaklarla açılacaktır. Fazladan kaynaklar (custom grafikler, müzikler, ayarlar, scriptler vb.) yüklenememektedir. Oyunu başlatmak istediğinize emin misiniz?</string>
-    <string name="app_name" translatable="false"/>
 </resources>
