@@ -28,6 +28,12 @@
 #include "sdl_proxy/sdl_assert.h"
 #endif
 
+#if defined(__GNUC__) || defined(__clang__)
+#   define RANGE_ARR_UNREACHABLE() __builtin_unreachable()
+#else
+#   define RANGE_ARR_UNREACHABLE()
+#endif
+
 #define For(A, From, To) for(int A = From; A <= To; ++A)
 
 template <class T, long begin, long end>
@@ -109,7 +115,10 @@ public:
         SDL_assert_release(array); // When array won't initialize
 #   endif
         if(index > end || index < begin)
+        {
             SDL_assert_release(false && "RangeArray out of range");
+            RANGE_ARR_UNREACHABLE();
+        }
 
         return *(array + index + offset);
     }
@@ -120,7 +129,10 @@ public:
         SDL_assert_release(array); // When array won't initialize
 #   endif
         if(index > end || index < begin)
+        {
             SDL_assert_release(false && "RangeArray out of range");
+            RANGE_ARR_UNREACHABLE();
+        }
 
         return *(array + index + offset);
     }
@@ -208,7 +220,10 @@ public:
         SDL_assert_release(array); // When array won't initialize
 #   endif
         if(index > end || index < begin)
+        {
             SDL_assert_release(false && "RangeArray out of range");
+            RANGE_ARR_UNREACHABLE();
+        }
 
         return *(array + index + offset);
     }
@@ -219,7 +234,10 @@ public:
         SDL_assert_release(array); // When array won't initialize
 #   endif
         if(index > end || index < begin)
+        {
             SDL_assert_release(false && "RangeArray out of range");
+            RANGE_ARR_UNREACHABLE();
+        }
 
         return *(array + index + offset);
     }
