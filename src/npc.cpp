@@ -37,7 +37,6 @@
 #include "eff_id.h"
 #include "npc_traits.h"
 #include "layers.h"
-#include <Logger/logger.h>
 
 #include "npc/npc_queues.h"
 #include "npc/npc_activation.h"
