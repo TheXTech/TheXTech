@@ -1,2 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="setup_general_cat">一般</string>
+    <string name="setup_feedback">振動</string>
+    <string name="start_game_button">ゲームをはじめる</string>
+    <string name="settings_enable_frameskip">フレームスキップを有効にする</string>
+    <string name="setup_max_framerate_mode">最大フレームレートモード</string>
+    <string name="title_activity_game_settings">ゲーム設定</string>
+    <string name="setup_touchscreen_controller_enable">タッチスクリーンコントローラーを使用する</string>
+    <string name="cheat_dialog_ok">実行</string>
+    <string name="launcher_gameSelect_clearList">リストを全削除する</string>
+    <string name="launcher_gameselect_toast_selected">ゲームを%sにへんこうしました</string>
+    <string name="setup_feedback_vibration_strength">振動の強さ</string>
+    <string name="setup_renderer_label">描画システム</string>
+    <string name="touchscreen_vibration_test_label">振動をテスト</string>
+    <string name="setup_speedrunner">スピードランナー</string>
+    <string name="setup_touchpad_style">コントローラースタイル</string>
+    <string name="setup_sr_speedrunMode">スピードランモード</string>
+    <string name="launcher_openfile_indirectly">ファイルの絶対パスを取得できないため、ゲームは内部ストレージにコピーされました。\n追加リソース（カスタムグラフィック、音楽、設定、スクリプトなど）を読み込むことができませんが、それでもゲームを起動しますか？</string>
+    <string name="setup_show_framerate">FPSを表示する</string>
+    <string name="managePermExplainTitle">すべてのファイルへのアクセス権限が必要です</string>
+    <string name="setup_feedback_enable_vibration">振動を有効にする</string>
+    <string name="setup_disable_sound">音声を無効にする</string>
+    <string name="cheat_dialog_cancel">キャンセル</string>
+    <string name="launcher_no_resources_question">このゲームの動作にはリソースパッケージが必須です。ゲームリソースをダウンロードし、任意の場所に解凍してください。解凍済みのフォルダーを指定しますか？</string>
+    <string name="launcher_gameselect_clearlist_question">ほんとうにゲームリストを全削除しますか？</string>
+    <string name="setup_show_battery_status_label">デバイスのバッテリー状態</string>
+    <string name="settings_button">設定</string>
+    <string name="setup_touchscreen_alwaysshow">開始時にタッチスクリーンコントローラーを表示</string>
+    <string name="setup_control_cat">タッチスクリーン コントローラー</string>
+    <string name="setup_touchscreen_mode">コントローラーモード</string>
+    <string name="launcher_gameselect_toast_listclean">ゲームリストは空になりました。</string>
+    <string name="setup_assets_path_label">リソースの絶対パスを変更</string>
+    <string name="setup_show_controller_state_label">コントローラーの操作状態を表示する</string>
+    <string name="setup_display_cat">ディスプレイ</string>
+    <string name="launcher_gameselect_clearlist_title">ゲームリストを全削除する</string>
+    <string name="launcher_gameSelect_pickTheDir">場所をえらんでください...</string>
+    <string name="cheat_dialog_title">コマンドを入力:</string>
+    <string name="game_logo_label">ゲームロゴ</string>
+    <string name="setup_feedback_vibration_length">振動のつよさ</string>
+    <string name="setup_sr_stopwatchSemiTransparent">ストップウォッチを半透明にする</string>
+    <string name="managePermExplainText">このゲームは、この端末に保存したローカルファイルを読み込んでいます。そのおかげで、プレイヤーはPC版と同じように様々なコンテンツを独自の方法で改変・拡張することができるのです。しかし、Android 11以降では、ファイルの読み取り権限を個々のファイルや一部のディレクトリのみに付与することができなくなりました。そのため、このゲームを実行するためにはすべてのファイルへのアクセス許可が必要となっています。</string>
+</resources>

@@ -21,7 +21,7 @@
     <string name="managePermExplainTitle">Se requiere acceso total al almacenamiento</string>
     <string name="managePermExplainText">Este juego utiliza recursos (como niveles, episodios, gráficos, música, sonidos, configuraciones, etc.) que el usuario colocó directamente en la tienda local. Este concepto permite a los usuarios modificar y ampliar el contenido para sus propios fines, como se hizo en la versión de escritorio de este juego. Desafortunadamente, Android 11+ no permite otorgar permiso de lectura individual para el directorio especificado en lugar de para un solo archivo. Para ejecutar este juego, debes otorgar acceso a todos los archivos del juego por razones explicadas.</string>
     <string name="setup_assets_path_label">Cambiar la ruta de los recursos</string>
-    <string name="launcher_no_resources_question">El juego requiere un paquete de recursos para el trabajo. Por favor descargue los recursos y descomprimirlos en cualquier directorio conveniente. ¿Desea seleccionar una carpeta ya descomprimida\?</string>
+    <string name="launcher_no_resources_question">El juego requiere un paquete de recursos para el trabajo. Por favor descargue los recursos y descomprimirlos en cualquier directorio conveniente. ¿Desea seleccionar una carpeta ya descomprimida?</string>
     <string name="setup_feedback_enable_vibration">Activar la vibración</string>
     <string name="setup_feedback_vibration_strength">Fuerza de vibración</string>
     <string name="cheat_dialog_cancel">Cancelar</string>
@@ -37,7 +37,7 @@
     <string name="launcher_gameselect_toast_selected">Cambió el juego: %s</string>
     <string name="launcher_gameSelect_pickTheDir">Seleccionar directorio...</string>
     <string name="launcher_gameselect_toast_listclean">La lista de juegos fue limpiada.</string>
-    <string name="launcher_gameselect_clearlist_question">¿Desea limpiar la lista de juegos\?</string>
+    <string name="launcher_gameselect_clearlist_question">¿Desea limpiar la lista de juegos?</string>
     <string name="setup_renderer_label">Sistema de renderizado</string>
     <string name="launcher_openfile_indirectly">No se puede recuperar una ruta directa para el archivo abierto y, por lo tanto, se guardó en el almacenamiento interno del juego. No se pueden cargar los recursos adicionales (como gráficos personalizados, música, configuraciones, scripts, etc.). ¿Quieres iniciar el juego de igual manera?</string>
 </resources>

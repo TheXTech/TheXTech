@@ -7,7 +7,11 @@
     <string name="touchPadStyle0">Azioni in gioco</string>
     <string name="touchPadStyle1">Stile Nintendo/Xbox (A/B/X/Y)</string>
     <string name="touchPadStyle2">Stile PlayStation (X/O/D/A)</string>
-    <string name="batteryStatusShow0">Non mostrare</string>
+    <string name="batteryStatusShow0">Non mostrare mai</string>
     <string name="batteryStatusShow1">Mostra quando la batteria è scarica</string>
     <string name="batteryStatusShow2">Mostra sempre</string>
+    <string name="touchscreenControllerType0">Sempre attivo</string>
+    <string name="touchscreenControllerType1">Disabilita quando la tastiera hardware è collegata</string>
+    <string name="touchscreenControllerType2">Sempre disattivato</string>
+    <string name="speedRunMode2">Modalitò 2 (Disabilita le funzioni di time-winning)</string>
 </resources>

@@ -1,2 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="touchscreenControllerType0">つねに有効にする</string>
+    <string name="batteryStatusShow0">表示しない</string>
+    <string name="batteryStatusShow1">残量低下時に表示</string>
+    <string name="batteryStatusShow2">つねに表示</string>
+    <string name="rendererDefault">デフォルト</string>
+    <string name="touchscreenControllerType1">ハードウェアキーボードが接続されている時は無効にする</string>
+    <string name="touchscreenControllerType2">つねに無効にする</string>
+    <string name="speedRunMode0">オフ</string>
+    <string name="speedRunMode1">モード1(TheXTech ネイティブ)</string>
+    <string name="touchPadStyle2">PSスタイル(‪✕‬/〇/□/△)</string>
+    <string name="speedRunMode2">モード2(時間短縮機能が無効)</string>
+    <string name="speedRunMode3">モード3(すべてのバグが有効。完全なSMBX 1.3)</string>
+    <string name="touchPadStyle0">ゲーム内操作</string>
+    <string name="touchPadStyle1">ニンテンドー/Xboxスタイル</string>
+</resources>
