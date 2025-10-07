@@ -13,8 +13,22 @@ fi
 
 git clone https://github.com/TheXTech/TheXTech.git --depth 1 -b ${STABLE_BRANCH} build-git
 
+# General engine translations
 cp -av resources/languages/* build-git/resources/languages/
 
+# Android launcher translations
+cd android-project/thextech/src/main/res
+for q in values values-*; do
+    if [[ -f "$q/strings.xml" ]]; then
+        cp -v "$q/strings.xml" "${GIT_ROOT}/android-project/thextech/src/main/res/${q}/strings.xml"
+    fi
+    if [[ -f "$q/arrays.xml" ]]; then
+        cp -v "$q/arrays.xml" "${GIT_ROOT}/android-project/thextech/src/main/res/${q}/arrays.xml"
+    fi
+done
+cd "$OLD"
+
+# Commit all changes that was done
 cd build-git
 if [[ ! -z $(git status -s) ]]; then
     echo "-- Found updated languages, commiting..."
