@@ -11,6 +11,10 @@ on:
       - .github/ci-helper/translate_update.sh
       - .github/ci-helper/translate_patcher.py
       - resources/languages/**.json
+      - android-project/thextech/src/main/res/values/strings.xml
+      - android-project/thextech/src/main/res/values/arrays.xml
+      - android-project/thextech/src/main/res/values-**/strings.xml
+      - android-project/thextech/src/main/res/values-**/arrays.xml
   workflow_dispatch:
 
 concurrency:
