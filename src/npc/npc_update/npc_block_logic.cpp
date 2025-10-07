@@ -178,10 +178,13 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                BlockSlope[bt] == SLOPE_FLOOR && BlockSlope2[bt] == SLOPE_CEILING &&
                                                !BlockOnlyHitspot1[bt] && !BlockIsSizable[bt])
                                             {
-                                                if(npcHasFloor(NPC[A]))
+                                                if(npcHasFloor(NPC[A]) || NPC[A].Wet > 0)
                                                 {
                                                     SkullRideDone(A, Block[B].Location);
-                                                    NPC[A].Special = 3; // 3 - watcher, 2 - waiter
+                                                    NPC[A].Special = 3; // 3 - dry watcher, 2 - waiter
+
+                                                    if(NPC[A].Wet > 0)
+                                                        NPC[A].Special = 4; // 4 - wet watcher
                                                 }
                                             }
                                         }
