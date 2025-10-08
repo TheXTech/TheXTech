@@ -34,6 +34,7 @@ public:
 #ifndef THEXTECH_NO_SDL_BUILD
     static void logAssertInfo(const void *data);
 #endif
+    static void logAssertInfo(const char *condition, const char *file, const char *func, int line_number);
 };
 
 #endif // CRASHHANDLER_H
