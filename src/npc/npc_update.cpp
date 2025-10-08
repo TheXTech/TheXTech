@@ -1089,10 +1089,16 @@ interrupt_Activation:
                     NPC[A].Location.SpeedY = 3;
                 else if(NPC[A].Location.SpeedY < -3)
                     NPC[A].Location.SpeedY = -3;
+
+                if(NPC[A].Type == NPCID_RAFT)
+                    NPC[A].Special2 = 10; // Set a counter of being dry while floating on water top
             }
             // as far as I'm aware it would make absolutely no difference if this did not happen for NPCID_RAFT
             else if(NPC[A].Type == NPCID_RAFT || NPC[A]->IsFish)
             {
+                if(NPC[A].Type == NPCID_RAFT && NPC[A].Special2 > 0)
+                    --NPC[A].Special2; // Once it's dry, count down
+
                 // detect if fish is out of water for an extended period so that it can clip through walls
                 NPC[A].WallDeath += 2;
 
