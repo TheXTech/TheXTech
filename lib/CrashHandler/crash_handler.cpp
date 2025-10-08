@@ -835,7 +835,12 @@ static SDL_AssertState custom_sdl_handler(const SDL_AssertData *data, void *user
 void CrashHandler::logAssertInfo(const void* data_p)
 {
     const SDL_AssertData *data = reinterpret_cast<const SDL_AssertData*>(data_p);
+    CrashHandler::logAssertInfo(data->condition, data->filename, data->function, data->linenum);
+}
+#endif // #ifndef THEXTECH_NO_SDL_BUILD
 
+void CrashHandler::logAssertInfo(const char *condition, const char *file, const char *func, int line_number)
+{
     std::string stack = getStacktrace();
     pLogFatal("<Assertion condition has failed>:" OS_NEWLINE
               "---------------------------------------------------------" OS_NEWLINE
@@ -844,16 +849,15 @@ void CrashHandler::logAssertInfo(const void* data_p)
               "Condition: %s" OS_NEWLINE
               "---------------------------------------------------------" OS_NEWLINE
               STACK_FORMAT,
-              data->filename, data->linenum,
-              data->function,
-              data->condition,
+              file, line_number,
+              func,
+              condition,
               stack.c_str(),
               g_messageToUser);
 
     // Finalize logger
     CloseLog();
 }
-#endif // #ifndef THEXTECH_NO_SDL_BUILD
 
 #if defined(HAS_SIG_INFO)
 static struct sigaction act;
