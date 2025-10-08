@@ -19,6 +19,7 @@
  */
 
 #include <cstdlib>
+#include <cstring>
 #include <algorithm>
 
 #include <windows.h>
