@@ -1163,9 +1163,15 @@ void UpdateNPCs()
 
                 if(NPC[A].Location.SpeedY < -3)
                     NPC[A].Location.SpeedY = -3;
+
+                if(NPC[A].Type == NPCID_RAFT)
+                    NPC[A].Special2 = 10; // Set a counter of being dry while floating on water top
             }
-            else if(!(NPC[A].Type != NPCID_RAFT && !NPC[A]->IsFish))
+            else if(NPC[A].Type == NPCID_RAFT || NPC[A]->IsFish)
             {
+                if(NPC[A].Type == NPCID_RAFT && NPC[A].Special2 > 0)
+                    --NPC[A].Special2; // Once it's dry, count down
+
                 NPC[A].WallDeath += 2;
 
                 if(NPC[A].WallDeath >= 10)
