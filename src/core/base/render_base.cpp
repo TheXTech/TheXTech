@@ -717,9 +717,12 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     if(wLimitExcited || hLimitExcited || shrink2x)
     {
         uint32_t old_w = w, old_h = h;
+        bool succ = true;
+
         // WORKAROUND: down-scale too big textures
         if(wLimitExcited)
             w = Uint32(m_maxTextureWidth);
+
         if(hLimitExcited)
             h = Uint32(m_maxTextureHeight);
 
@@ -738,9 +741,17 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
             GraphicsHelps::closeImage(sourceImage);
             sourceImage = d;
             pitch = FreeImage_GetPitch(d);
+            succ = true;
+        }
+        else
+        {
+            succ = false;
+            pLogWarning("Failed to scale down the front texture of size %" PRIu32 "x%" PRIu32 " to %" PRIu32 "x%" PRIu32 ", keeping original image.", old_w, old_h, w, h);
+            w = old_w;
+            h = old_h;
         }
 
-        if(maskImage)
+        if(succ && maskImage)
         {
             d = (wLimitExcited || hLimitExcited) ? FreeImage_Rescale(maskImage, int(w), int(h), FILTER_BOX) : GraphicsHelps::fast2xScaleDown(maskImage);
             if(d)
@@ -748,6 +759,8 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
                 GraphicsHelps::closeImage(maskImage);
                 maskImage = d;
             }
+            else
+                pLogWarning("Failed to scale down the mask texture of size %" PRIu32 "x%" PRIu32 " to %" PRIu32 "x%" PRIu32 ", keeping original mask. Result will be SERIOUSLY distorted.", old_w, old_h, w, h);
         }
     }
 
