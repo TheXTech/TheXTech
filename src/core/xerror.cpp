@@ -21,6 +21,9 @@
 #include "xerror.h"
 #include "sdl_proxy/sdl_stdinc.h"
 #include "sdl_proxy/sdl_assert.h"
+#ifdef SDLRPOXY_NULL
+#   include <CrashHandler/crash_handler.h>
+#endif
 
 void fatal_assert_rangearr_real(long r_low, long r_high, long index, const char *file, const char *func, int line_number)
 {
@@ -40,7 +43,8 @@ void fatal_assert_rangearr_real(long r_low, long r_high, long index, const char 
     );
 
 #ifdef SDLRPOXY_NULL
-    __assert_func(file, line_number, func, assertion_message);
+    CrashHandler::logAssertInfo(assertion_message, file, func, line_number);
+    abort();
 #else
     sdl_assert_data.condition = assertion_message;
     sdl_assert_data.filename = file;
