@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
 #include "xerror.h"
 #include "sdl_proxy/sdl_stdinc.h"
 #include "sdl_proxy/sdl_assert.h"
