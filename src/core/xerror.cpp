@@ -52,7 +52,7 @@ void fatal_assert_rangearr_real(long r_low, long r_high, long index, const char 
     sdl_assert_data.function = func;
     sdl_assert_data.linenum = line_number;
 
-    sdl_assert_state = SDL_ReportAssertion(&sdl_assert_data, SDL_FUNCTION, SDL_FILE, SDL_LINE);
+    sdl_assert_state = SDL_ReportAssertion(&sdl_assert_data, func, file, line_number);
 
     if(sdl_assert_state == SDL_ASSERTION_BREAK)
         SDL_TriggerBreakpoint();
