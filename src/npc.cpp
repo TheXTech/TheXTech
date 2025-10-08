@@ -3282,13 +3282,13 @@ void NPCSpecial(int A)
 
         // the following is all new code!
 
-        if((npc.Special == 2 || npc.Special == 3 || NPC[A].Special == 4) && (npc.SpecialX != 0))
+        if((npc.Special == 2 || npc.Special == 3) && (npc.SpecialX != 0))
         {
             npc.Location.X = npc.SpecialX; // Finish alignment
             npc.SpecialX = 0;
         }
 
-        if(npc.Special == 3 || NPC[A].Special == 4) // Watch for wall collisions. If one got dissappear (hidden layer, toggled switch), resume a ride
+        if(npc.Special == 3) // Watch for wall collisions. If one got dissappear (hidden layer, toggled switch), resume a ride
         {
             auto loc = npc.Location;
             loc.X += 1 * npc.Direction;
@@ -3319,7 +3319,7 @@ void NPCSpecial(int A)
                     stillCollide = true;
             }
 
-            if((!npcHasFloor(npc) && NPC[A].Special != 4) || !stillCollide)
+            if((!npcHasFloor(npc) && NPC[A].Special2 == 0) || !stillCollide)
             {
                 npc.Special = 2;
                 SkullRide(A, true);
