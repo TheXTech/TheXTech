@@ -65,6 +65,12 @@
 
 #define UNUSED(x) (void)x
 
+#if defined(__GNUC__)
+#   define ATTRIB_UNUSED    __attribute__((unused))
+#else
+#   define ATTRIB_UNUSED
+#endif
+
 #define IF_OUTRANGE(x, l, r)  ((x) < (l) || (x) > (r))
 #define IF_INRANGE(x, l, r)  ((x) >= (l) && (x) <= (r))
 
