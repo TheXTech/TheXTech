@@ -66,7 +66,7 @@ static SDL_INLINE bool equalCase(const std::string &x, const std::string &y)
     return (SDL_strcasecmp(x.c_str(), y.c_str()) == 0);
 }
 
-static SDL_INLINE bool equalCase(const char *x, const char *y)
+static SDL_INLINE ATTRIB_UNUSED bool equalCase(const char *x, const char *y)
 {
     return (SDL_strcasecmp(x, y) == 0);
 }

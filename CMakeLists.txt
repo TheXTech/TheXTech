@@ -809,6 +809,7 @@ set(THEXTECH_SRC
     src/graphics/gfx_marquee.cpp
     src/control/duplicate.cpp
     src/control/controls.cpp
+    src/core/xerror.cpp
     src/script/msg_preprocessor.cpp
     src/script/msg_macros.cpp
     src/logic/object_graph.cpp
