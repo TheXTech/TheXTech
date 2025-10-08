@@ -240,6 +240,32 @@ static const char *audio_format_to_string(SDL_AudioFormat f)
     }
 }
 
+static void clear_sfx(SFX_t &s)
+{
+    if(s.chunk)
+        Mix_FreeChunk(s.chunk);
+
+    s.chunk = nullptr;
+
+    if(s.chunkOrig)
+        Mix_FreeChunk(s.chunkOrig);
+
+    s.chunkOrig = nullptr;
+
+    if(s.music)
+    {
+        Mix_HaltMusicStream(s.music);
+        Mix_FreeMusic(s.music);
+    }
+
+    s.music = nullptr;
+
+    if(s.musicOrig)
+        Mix_FreeMusic(s.musicOrig);
+
+    s.musicOrig = nullptr;
+}
+
 
 int CustomWorldMusicId()
 {
@@ -402,24 +428,12 @@ void QuitMixerX()
         Mix_FreeMusic(g_curMusic);
 
     g_curMusic = nullptr;
+    g_reservedChannels = 0;
 
     for(auto & it : sound)
     {
         auto &s = it.second;
-        if(s.chunk)
-            Mix_FreeChunk(s.chunk);
-
-        if(s.chunkOrig)
-            Mix_FreeChunk(s.chunkOrig);
-
-        if(s.music)
-        {
-            Mix_HaltMusicStream(s.music);
-            Mix_FreeMusic(s.music);
-        }
-
-        if(s.musicOrig)
-            Mix_FreeMusic(s.musicOrig);
+        clear_sfx(s);
     }
 
     sound.clear();
@@ -568,6 +582,7 @@ static void AddSfx(SoundScope root,
                     {
                         if(backup_chunk)
                             Mix_FreeChunk(backup_chunk);
+
                         if(backup_music)
                             Mix_FreeMusic(backup_music);
                     }
@@ -623,7 +638,16 @@ static void AddSfx(SoundScope root,
                 ini.read("single-channel", isSingleChannel, false);
                 if(isSingleChannel && m.chunk)
                     m.channel = g_reservedChannels++;
-                sound.insert({alias, m});
+
+                auto se = sound.find(alias);
+                if(se != sound.end()) // Avoid memory leaks
+                {
+                    auto &s = se->second;
+                    clear_sfx(s);
+                    s = std::move(m);
+                }
+                else
+                    sound.insert({alias, m});
             }
             else
             {
@@ -1386,23 +1410,14 @@ void UnloadSound()
 
     if(g_curMusic)
         Mix_FreeMusic(g_curMusic);
+
     g_curMusic = nullptr;
     g_reservedChannels = 0;
 
     for(auto & it : sound)
     {
         auto &s = it.second;
-        if(s.chunk)
-            Mix_FreeChunk(s.chunk);
-        if(s.chunkOrig)
-            Mix_FreeChunk(s.chunkOrig);
-        if(s.music)
-        {
-            Mix_HaltMusicStream(s.music);
-            Mix_FreeMusic(s.music);
-        }
-        if(s.musicOrig)
-            Mix_FreeMusic(s.musicOrig);
+        clear_sfx(s);
     }
 
     sound.clear();
