@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cstring>
 #include "language_private.h"
 #include "globals.h"
 
@@ -29,7 +30,7 @@
 
 void XLanguagePriv::detectOSLanguage()
 {
-    Sint32 language = SCE_SYSTEM_PARAM_LANG_ENGLISH_GB;
+    int32_t language = SCE_SYSTEM_PARAM_LANG_ENGLISH_GB;
     SceAppUtilInitParam initParam;
     SceAppUtilBootParam bootParam;
     std::memset(&initParam, 0, sizeof(SceAppUtilInitParam));
