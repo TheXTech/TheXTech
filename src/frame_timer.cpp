@@ -36,6 +36,12 @@
 
 #include "npc/npc_queues.h"
 
+#if defined(__PSP__)
+#   define STATS_SHOW_RAM
+#   include <malloc.h>
+#   include <pspsysmem.h>
+#endif
+
 // heap info for min console ports
 #if defined(__16M__) || defined(__3DS__) // || defined(__WII__)
     #define STATS_SHOW_RAM
@@ -61,6 +67,10 @@
     extern u8 __Arena1Lo[], __Arena1Hi[];
     extern u8 __Arena2Lo[], __Arena2Hi[];
     static const uint32_t s_heap_size = (__Arena2Hi - __Arena2Lo) + (__Arena1Hi - __Arena1Lo);
+#elif defined(STATS_SHOW_RAM) && defined(__PSP__)
+    static u8 *s_heap_start = (u8*)sceKernelGetBlockHeadAddr(PSP_SMEM_Low);
+    static u8 *s_heap_end = (u8*)sceKernelGetBlockHeadAddr(PSP_SMEM_High);
+    static const size_t s_heap_size = (s_heap_end - s_heap_start);
 // heap size for other homebrew
 #elif defined(STATS_SHOW_RAM)
     extern u8 *fake_heap_start;
@@ -197,6 +207,9 @@ static void s_print_ram(int x, int y)
                3, x + 4, YLINE);
     SuperPrint(fmt::sprintf_ne("VRAM: %4" PRIu32 "/%4d kb", XRender::s_loadedVRAM / 1024, 512),
                3, x + 4, YLINE, XTColorF(0.5_n, 1.0_n, 0.5_n));
+#   elif defined __PSP__
+    SuperPrint(fmt::sprintf_ne(" RAM: %5zu / %5zu kb", m.uordblks / 1024, s_heap_size / 1024),
+               3, x + 4, YLINE);
 #   else
     SuperPrint(fmt::sprintf_ne(" RAM: %5zu / %5" PRIu32 " kb", m.uordblks / 1024, s_heap_size / 1024),
                3, x + 4, YLINE);
