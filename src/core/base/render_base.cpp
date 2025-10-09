@@ -720,11 +720,36 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         bool succ = true;
 
         // WORKAROUND: down-scale too big textures
+#ifdef __PSP__
+        int divX = shrink2x ? 2 : 1, divY = shrink2x ? 2 : 1;
+        if(wLimitExcited)
+        {
+            if(shrink2x)
+                w *= 2;
+
+            while((w / divX) > Uint32(m_maxTextureWidth))
+                divX *= 2;
+
+            w /= divX;
+        }
+
+        if(hLimitExcited)
+        {
+            if(shrink2x)
+                h *= 2;
+
+            while((h / divY) > Uint32(m_maxTextureHeight))
+                divY *= 2;
+
+            h /= divY;
+        }
+#else
         if(wLimitExcited)
             w = Uint32(m_maxTextureWidth);
 
         if(hLimitExcited)
             h = Uint32(m_maxTextureHeight);
+#endif
 
         if(wLimitExcited || hLimitExcited)
         {
@@ -735,7 +760,11 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
                         w, h);
         }
 
+#ifdef __PSP__
+        FIBITMAP *d = (wLimitExcited || hLimitExcited) ? GraphicsHelps::fastIntScaleDown(sourceImage, divX, divY) : GraphicsHelps::fast2xScaleDown(sourceImage);
+#else
         FIBITMAP *d = (wLimitExcited || hLimitExcited) ? FreeImage_Rescale(sourceImage, int(w), int(h), FILTER_BOX) : GraphicsHelps::fast2xScaleDown(sourceImage);
+#endif
         if(d)
         {
             GraphicsHelps::closeImage(sourceImage);
