@@ -113,10 +113,12 @@ static inline long pow2roundup(long x)
     return x + 1;
 }
 
-static inline int div2ceil(int x)
-{
-    return (x >> 1) + (x & 0x01);
-}
+// static inline int div2ceil(int x)
+// {
+//     return (x >> 1) + (x & 0x01);
+// }
+
+#define div2floor(x) ((x) >> 1)
 
 static inline void rectMul2(SDL_Rect &rect)
 {
@@ -129,10 +131,10 @@ static inline void rectMul2(SDL_Rect &rect)
 static inline void rectDiv2(SDL_Rect &rect)
 {
     int xDiv, yDiv;
-    xDiv = div2ceil(rect.x);
-    yDiv = div2ceil(rect.y);
-    rect.w = div2ceil(rect.w + rect.x) - xDiv;
-    rect.h = div2ceil(rect.h + rect.y) - yDiv;
+    xDiv = div2floor(rect.x);
+    yDiv = div2floor(rect.y);
+    rect.w = div2floor(rect.w + rect.x) - xDiv;
+    rect.h = div2floor(rect.h + rect.y) - yDiv;
     rect.x = xDiv;
     rect.y = yDiv;
 }
@@ -141,12 +143,12 @@ static inline void rectDiv2(int &x, int &y, int &w, int &h)
 {
     int xDiv, yDiv;
 
-    xDiv = div2ceil(x);
-    w = div2ceil(w + x) - xDiv;
+    xDiv = div2floor(x);
+    w = div2floor(w + x) - xDiv;
     x = xDiv;
 
-    yDiv = div2ceil(y);
-    h = div2ceil(h + y) - yDiv;
+    yDiv = div2floor(y);
+    h = div2floor(h + y) - yDiv;
     y = yDiv;
 }
 
@@ -374,8 +376,8 @@ void RenderSDL::repaint()
 
     if(m_halfPixelMode)
     {
-        wDst = div2ceil(wDst);
-        hDst = div2ceil(hDst);
+        wDst = div2floor(wDst);
+        hDst = div2floor(hDst);
     }
 
     // Align the rendering scene to the center of screen
@@ -603,8 +605,8 @@ void RenderSDL::offsetViewport(int x, int y)
 {
     if(m_halfPixelMode)
     {
-        x = div2ceil(x);
-        y = div2ceil(y);
+        x = div2floor(x);
+        y = div2floor(y);
     }
 
     if(m_viewport_offset_x != x || m_viewport_offset_y != y)
@@ -1113,10 +1115,10 @@ void RenderSDL::renderRectBR(int _left, int _top, int _right, int _bottom, XTCol
 
     if(m_halfPixelMode)
     {
-        _left = div2ceil(_left);
-        _top = div2ceil(_top);
-        _right = div2ceil(_right);
-        _bottom = div2ceil(_bottom);
+        _left = div2floor(_left);
+        _top = div2floor(_top);
+        _right = div2floor(_right);
+        _bottom = div2floor(_bottom);
     }
 
     op.type = XRenderOp::Type::rect;
@@ -1265,8 +1267,8 @@ void RenderSDL::renderTextureScaleEx(int xDst, int yDst, int wDst, int hDst,
         // calculate new offset now
         if(center)
         {
-            double orig_offsetX = wDst / 2 - (m_halfPixelMode ? div2ceil(center->x) : center->x);
-            double orig_offsetY = hDst / 2 - (m_halfPixelMode ? div2ceil(center->y) : center->y);
+            double orig_offsetX = wDst / 2 - (m_halfPixelMode ? div2floor(center->x) : center->x);
+            double orig_offsetY = hDst / 2 - (m_halfPixelMode ? div2floor(center->y) : center->y);
             double sin_theta = -sin(rotateAngle * (M_PI / 180.));
             double cos_theta = cos(rotateAngle * (M_PI / 180.));
 
@@ -1431,8 +1433,8 @@ void RenderSDL::renderTexture(int xDst, int yDst,
     {
         xDstOrig = xDst;
         yDstOrig = yDst;
-        xDst = div2ceil(xDst);
-        yDst = div2ceil(yDst);
+        xDst = div2floor(xDst);
+        yDst = div2floor(yDst);
     }
 
     op.type = XRenderOp::Type::texture;
@@ -1461,8 +1463,8 @@ void RenderSDL::renderTexture(int xDst, int yDst,
             op.hSrc = tx.h;
         }
 
-        op.wDst = div2ceil(op.wDst + xDstOrig) - xDst;
-        op.hDst = div2ceil(op.hDst + yDstOrig) - yDst;
+        op.wDst = div2floor(op.wDst + xDstOrig) - xDst;
+        op.hDst = div2floor(op.hDst + yDstOrig) - yDst;
     }
 
     op.color = color;
