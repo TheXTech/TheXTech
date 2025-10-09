@@ -168,7 +168,7 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
 #endif
         FIBITMAP *temp = nullptr;
 
-#ifdef THEXTECH_WIP_FEATURES
+#if defined(THEXTECH_WIP_FEATURES) || defined(__PSP__)
         temp = fastConvertTo32Bit(img);
 #endif
 
@@ -222,7 +222,7 @@ FIBITMAP *GraphicsHelps::loadImage(const Files::Data &raw, bool convertTo32bit)
     {
         FIBITMAP *temp = nullptr;
 
-#ifdef THEXTECH_WIP_FEATURES
+#if defined(THEXTECH_WIP_FEATURES) || defined(__PSP__)
         temp = fastConvertTo32Bit(img);
 #endif
 
@@ -661,6 +661,41 @@ FIBITMAP *GraphicsHelps::fast2xScaleDown(FIBITMAP *image)
     return dest;
 }
 
+FIBITMAP *GraphicsHelps::fastIntScaleDown(FIBITMAP *image, int divX, int divY)
+{
+    if(!image)
+        return nullptr;
+
+    if(FreeImage_GetBPP(image) != 32)
+        return nullptr;
+
+    auto src_w = static_cast<uint32_t>(FreeImage_GetWidth(image));
+    auto src_h = static_cast<uint32_t>(FreeImage_GetHeight(image));
+    const uint32_t *src_pixels  = reinterpret_cast<uint32_t*>(FreeImage_GetBits(image));
+    auto src_pitch_px = static_cast<uint32_t>(FreeImage_GetPitch(image)) / 4;
+
+    auto dest_w = src_w / divX;
+    auto dest_h = src_h / divY;
+
+    FIBITMAP *dest = FreeImage_Allocate(dest_w, dest_h, 32);
+
+    if(!dest)
+        return nullptr;
+
+    uint32_t *dest_pixels  = reinterpret_cast<uint32_t*>(FreeImage_GetBits(dest));
+    auto dest_pitch_px = static_cast<uint32_t>(FreeImage_GetPitch(dest)) / 4;
+
+    for(uint32_t src_y = 0, dest_y = 0; dest_y < dest_h; src_y += divY, dest_y += 1)
+    {
+        for(uint32_t src_x = 0, dest_x = 0; dest_x < dest_w; src_x += divX, dest_x += 1)
+        {
+            dest_pixels[dest_y * dest_pitch_px + dest_x] = src_pixels[src_y * src_pitch_px + src_x];
+        }
+    }
+
+    return dest;
+}
+
 FIBITMAP *GraphicsHelps::fastConvertTo32Bit(FIBITMAP *image)
 {
     // two kilobytes of stack isn't affordable? make these static, then.
@@ -671,12 +706,19 @@ FIBITMAP *GraphicsHelps::fastConvertTo32Bit(FIBITMAP *image)
     // palette for low nybble (ignores high nybble)
     std::array<uint32_t, 256> palette_low;
 
-
     if(!image)
+    {
+        pLogWarning("GraphicsHelps::fastConvertTo32Bit: Null image");
         return nullptr;
+    }
 
-    if(FreeImage_GetBPP(image) != 1 && FreeImage_GetBPP(image) != 4 && FreeImage_GetBPP(image) != 8)
+    const unsigned src_bpp = FreeImage_GetBPP(image);
+
+    if(src_bpp != 1 && src_bpp != 4 && src_bpp != 8 && src_bpp != 24)
+    {
+        pLogWarning("GraphicsHelps::fastConvertTo32Bit: Incompatible BPP=%u", src_bpp);
         return nullptr;
+    }
 
     auto src_w = static_cast<uint32_t>(FreeImage_GetWidth(image));
     auto src_h = static_cast<uint32_t>(FreeImage_GetHeight(image));
@@ -688,13 +730,16 @@ FIBITMAP *GraphicsHelps::fastConvertTo32Bit(FIBITMAP *image)
     FIBITMAP *dest = FreeImage_Allocate(src_w, src_h, 32);
 
     if(!dest)
+    {
+        pLogWarning("GraphicsHelps::fastConvertTo32Bit: Possibly out of memory, can't allocate %" PRIu32 "x%" PRIu32 " x 32", src_w, src_h);
         return nullptr;
+    }
 
     uint32_t *dest_pixels  = reinterpret_cast<uint32_t*>(FreeImage_GetBits(dest));
     auto dest_pitch_px = static_cast<uint32_t>(FreeImage_GetPitch(dest)) / 4;
 
     // special logic for 1 BPP
-    if(FreeImage_GetBPP(image) == 1)
+    if(src_bpp == 1)
     {
         // fill first two entries
         for(int i = 0; i < 2; i++)
@@ -721,7 +766,7 @@ FIBITMAP *GraphicsHelps::fastConvertTo32Bit(FIBITMAP *image)
         return dest;
     }
 
-    if(FreeImage_GetBPP(image) == 8)
+    if(src_bpp == 8)
     {
         for(int i = 0; i < 256; i++)
         {
@@ -738,6 +783,24 @@ FIBITMAP *GraphicsHelps::fastConvertTo32Bit(FIBITMAP *image)
             for(uint32_t x = 0; x < src_w; x++)
             {
                 dest_pixels[y * dest_pitch_px + x] = palette_high[src_pixels[y * src_pitch + x]];
+            }
+        }
+    }
+    else if(src_bpp == 24)
+    {
+        for(uint32_t y = 0; y < src_h; ++y)
+        {
+            const uint8_t *line_src = src_pixels + y * src_pitch;
+            uint32_t *line_dst = dest_pixels + y * dest_pitch_px;
+
+            for(uint32_t x = 0; x < src_w; ++x, ++line_dst)
+            {
+                // FIXME: Verify on big endian targets
+                uint32_t pix = 0xFF000000;
+                pix |= (*line_src++) << 0;
+                pix |= ((*line_src++) << 8);
+                pix |= ((*line_src++) << 16);
+                *line_dst = pix;
             }
         }
     }
