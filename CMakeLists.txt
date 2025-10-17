@@ -878,6 +878,7 @@ set(THEXTECH_SRC
     src/graphics/gfx_draw_player.cpp
     src/graphics/gfx_special_frames.cpp
     src/graphics/gfx_screen.cpp
+    src/graphics/ghost_mode.cpp
     src/graphics/gfx_keyhole.cpp
     src/graphics/gfx_marquee.cpp
     src/control/duplicate.cpp
