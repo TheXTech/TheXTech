@@ -29,6 +29,7 @@
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
 
+#include "global_dirs.h"
 #include "main/asset_pack.h"
 #include "main/translate.h"
 #include "core/render.h"
@@ -611,6 +612,9 @@ bool ReloadAssetsFrom(const AssetPack_t& pack)
 
         return false;
     }
+
+    g_dirEpisode.invalidate();
+    g_dirCustom.invalidate();
 
     ConfigReloadRecentEpisodes();
 
