@@ -1893,7 +1893,7 @@ endif()
 # ================== Clean-up ==================
 add_custom_target(clean_external)
 add_custom_command(
-    TARGET clean_external
+    TARGET clean_external POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/external/"
     COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/output/include"
     COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/output/lib"
