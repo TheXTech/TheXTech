@@ -51,6 +51,12 @@ public:
     std::string resolveDirCase(const std::string &name);
 
     void rescan();
+
+    inline void invalidate()
+    {
+        m_curDir.clear();
+        rescan();
+    }
 };
 
 #endif // DIRLISTCI_H

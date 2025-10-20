@@ -186,18 +186,13 @@ void getRenderSize(int* w, int* h)
 
 static inline int FLOORDIV2(int x)
 {
-    return (x < 0) ? (x - 1) / 2 : x / 2;
+    static_assert(((-1) >> 1) == -1 && (1 >> 1) == 0 && (2 >> 1) == 1 && (-2 >> 1) == -1, "Signed right shift must have floor semantics");
+    return (x >> 1);
 }
 
-static inline float FLOORDIV2(float x)
-{
-    return std::floor((x + 0.5f) / 2.0f);
-}
+static inline float FLOORDIV2(float x) = delete;
 
-static inline double FLOORDIV2(double x)
-{
-    return std::floor((x + 0.5) / 2.0);
-}
+static inline double FLOORDIV2(double x) = delete;
 
 #ifndef __WII__
 static void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, XTColor color)
