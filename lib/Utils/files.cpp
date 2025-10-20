@@ -184,6 +184,7 @@ SDL_RWops *Files::open_file(const char *filePath, const char *modes)
         if(modes[0] != 'r' || (modes[1] != 'b' && modes[1] != '\0'))
             return nullptr;
 
+        SDL_ClearError(); // Just in a case
         return Archives::open_file(filePath);
     }
 

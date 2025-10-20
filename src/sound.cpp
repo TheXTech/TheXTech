@@ -1692,10 +1692,18 @@ void PreloadExtSound(const std::string& path)
     auto f = extSfx.find(path);
     if(f == extSfx.end())
     {
-        auto *ch = Mix_LoadWAV(path.c_str());
+        pLogDebug("Preloading custom sound [%s]...", path.c_str());
+        SDL_RWops *f = Files::open_file(path, "rb");
+        if(!f)
+        {
+            pLogWarning("Custom sound preload: Can't acquire a file handle for [%s]: %s", path.c_str(), SDL_GetError());
+            return;
+        }
+
+        auto *ch = Mix_LoadWAV_RW(f, 1);
         if(!ch)
         {
-            pLogWarning("Can't load custom sound [%s]: %s", path.c_str(), Mix_GetError());
+            pLogWarning("Custom sound preload: Can't load custom sound [%s]: %s", path.c_str(), Mix_GetError());
             return;
         }
         extSfx.insert({path, ch});
