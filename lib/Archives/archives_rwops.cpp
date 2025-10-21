@@ -93,10 +93,7 @@ static int s_file_close_decref(SDL_RWops* stream)
 SDL_RWops* open_file(const char* name)
 {
     if(!is_prefix(name[0]))
-    {
-        SDL_SetError("Archives: Unsupported prefix at path [%s]", name);
         return nullptr;
-    }
 
     bool has_temp_ref = false;
     mbediso_file* f = nullptr;
@@ -112,10 +109,7 @@ SDL_RWops* open_file(const char* name)
             ++archive_path_end;
 
         if(archive_path_end == archive_path_start || *archive_path_end == '\0')
-        {
-            SDL_SetError("Archives: Path is not found [%s]", name);
             return nullptr;
-        }
 
         ptrdiff_t archive_path_size = archive_path_end - archive_path_start;
 
@@ -124,15 +118,10 @@ SDL_RWops* open_file(const char* name)
         archive_path[archive_path_size] = '\0';
 
         bool mounted = mount_temp(archive_path);
+        free(archive_path);
 
         if(!mounted || !temp_mount)
-        {
-            SDL_SetError("Archives: Failed to mount path [%s]", archive_path);
-            free(archive_path);
             return nullptr;
-        }
-
-        free(archive_path);
 
         const char* file_path_begin = archive_path_end + 1;
 
@@ -148,12 +137,10 @@ SDL_RWops* open_file(const char* name)
     }
 
     if(!f)
-    {
-        SDL_SetError("Archives: File [%s] doesn't exists", name);
         return nullptr;
-    }
 
     SDL_RWops* ret = SDL_AllocRW();
+
     if(!ret)
     {
         mbediso_fclose(f);
