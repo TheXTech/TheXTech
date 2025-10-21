@@ -85,6 +85,11 @@ inline uint32_t SDL_SwapBE32(uint32_t x)
 #endif
 
 
+extern const char *SDL_GetError();
+extern void SDL_ClearError();
+extern void SDL_SetError(const char *fmt, ...);
+
+
 template<class value_t>
 inline value_t SDL_min(value_t x, value_t y)
 {

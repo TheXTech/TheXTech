@@ -1079,6 +1079,7 @@ elseif(THEXTECH_NO_SDL_BUILD)
         src/core/null/window_null.cpp
         src/core/null/msgbox_null.cpp
         src/core/null/events_null.cpp
+        src/core/null/sdl_error_null.cpp
         src/core/power/power_null.cpp
     )
 elseif(THEXTECH_CLI_BUILD)
