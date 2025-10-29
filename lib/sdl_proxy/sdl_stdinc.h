@@ -85,9 +85,9 @@ inline uint32_t SDL_SwapBE32(uint32_t x)
 #endif
 
 
-extern const char *SDL_GetError();
-extern void SDL_ClearError();
-extern void SDL_SetError(const char *fmt, ...);
+#define SDL_GetError() "<SDL Error API is unavailable>"
+#define SDL_ClearError() (void)0
+inline void SDL_SetError(const char *fmt, ...) { (void)fmt; /* Do Nothing!*/ }
 
 
 template<class value_t>

@@ -201,7 +201,9 @@ static std::unordered_map<int, SFX_t>           sound;
 static SDL_atomic_t                                extSfxBusy;
 static std::unordered_map<std::string, Mix_Chunk*> extSfx;
 static std::unordered_map<int, std::string>        extSfxPlaying;
+#ifndef THEXTECH_NO_SDL_BUILD
 static void extSfxStopCallback(int channel);
+#endif
 
 static const int maxSfxChannels = 91;
 
@@ -211,6 +213,7 @@ static const double c_max_chunk_duration = 1.25; // max length of an in-memory c
 static const double c_max_chunk_duration = 5.0;  // max length of an in-memory chunk in seconds
 #endif
 
+#ifndef THEXTECH_NO_SDL_BUILD
 static const char *audio_format_to_string(SDL_AudioFormat f)
 {
     switch(f)
@@ -239,6 +242,7 @@ static const char *audio_format_to_string(SDL_AudioFormat f)
         return "F32-BE";
     }
 }
+#endif
 
 static void clear_sfx(SFX_t &s)
 {
@@ -1696,7 +1700,7 @@ void PreloadExtSound(const std::string& path)
         SDL_RWops *f = Files::open_file(path, "rb");
         if(!f)
         {
-            pLogWarning("Custom sound preload: Can't acquire a file handle for [%s]: %s", path.c_str(), SDL_GetError());
+            pLogWarning("Custom sound preload: Can't acquire a file handle for [%s] (SDL Error: %s)", path.c_str(), SDL_GetError());
             return;
         }
 
@@ -1761,6 +1765,7 @@ void PlayExtSound(const std::string &path, int loops, int volume)
         pLogWarning("Can't play custom sound %s: %s", path.c_str(), Mix_GetError());
 }
 
+#ifndef THEXTECH_NO_SDL_BUILD
 static void extSfxStopCallback(int channel)
 {
     if(SDL_AtomicGet(&extSfxBusy) == 1)
@@ -1770,6 +1775,7 @@ static void extSfxStopCallback(int channel)
     if(i != extSfxPlaying.end())
         extSfxPlaying.erase(i);
 }
+#endif
 
 void StopExtSound(const std::string& path)
 {
