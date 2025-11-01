@@ -36,12 +36,12 @@
             },
             "letter": {
                 "enter": "இ:",
-                "hit": "H:",
+                "hit": "எச்:",
                 "activate": "அ:",
-                "death": "D:",
-                "destroy": "D:",
+                "death": "ம:",
+                "destroy": "ஒ:",
                 "layerClear": "எல்:",
-                "talk": "டி:"
+                "talk": "பே:"
             },
             "promptEventName": "நிகழ்வு பெயர்",
             "promptEventText": "நிகழ்வு உரை",
@@ -215,7 +215,7 @@
         },
         "warp": {
             "cannonExit": "பீரங்கி வெளியேறுதல்",
-            "dir": "Dir.",
+            "dir": "இயக்குனர்",
             "item": "உருப்படி",
             "lvlWarp": "எல்விஎல் வார்ப்",
             "showStartScene": "தொடக்க காட்சியைக் காட்டு",
@@ -278,7 +278,7 @@
         },
         "mapPos": "வரைபடம் போச்:",
         "letterLeft": "எல்",
-        "letterRight": "R",
+        "letterRight": "ஆர்",
         "letterUp": "உ",
         "pageBlankOfBlank": "{1} இன் பக்கம் {0}",
         "phraseAreYouSure": "நீங்கள் உறுதியாக இருக்கிறீர்களா?",
@@ -335,10 +335,10 @@
             "errorInvalidEnterWarp": "தவறான நுழைவு வார்ப் {1} குறிப்பிடப்பட்டதால் மட்டத்தைத் தொடங்க முடியாது.\n மொத்த வார்ப் உள்ளீடுகள்: {2}\n\n கோப்பு: {0}",
             "openFileFailed": "\"{0}\" ஐ திறக்க முடியாது: கோப்பு இல்லை அல்லது சிதைக்கப்படவில்லை.",
             "warpNeedStarCount": "நுழைய உங்களுக்கு {0} {1} தேவை.",
-            "errorTooOldGameAssets": "",
-            "openIPCDataFailed": "",
-            "IPCTimeOut": "",
-            "errorTooOldEngine": ""
+            "errorTooOldGameAssets": "உள்ளடக்கத்திற்கு தற்போதைய சொத்து தொகுப்பை ({1}) விட புதிய சொத்து தொகுப்பு அம்ச நிலை ({0}) தேவை. உங்கள் கேம் அசெட் பேக்கை மேம்படுத்தவும்.",
+            "openIPCDataFailed": "ஊழல் அல்லது பிற பிழைகள் காரணமாக பெறப்பட்ட கோப்புத் தரவைத் தொடர முடியாது.",
+            "IPCTimeOut": "இணைக்கப்பட்ட எடிட்டரிடமிருந்து பதில் இல்லை. விளையாட்டு மூடப்படும்.",
+            "errorTooOldEngine": "உள்ளடக்கத்திற்கு தற்போதைய பதிப்பை ({1}) விட புதிய எஞ்சின் அம்ச நிலை ({0}) தேவை. தயவுசெய்து TheXTech ஐப் புதுப்பிக்கவும்."
         },
         "message": {
             "scanningLevels": "அளவை ச்கேனிங் ..."
@@ -376,20 +376,21 @@
         },
         "screenPaused": "இடைநிறுத்தப்பட்டது",
         "loader": {
-            "statusLoadData": "",
-            "statusGameInfo": "",
-            "statusLoadFile": "",
-            "statusFinishing": "",
-            "statusAssetPacks": "",
-            "statusTranslations": ""
+            "statusLoadData": "தரவை ஏற்றுகிறது...",
+            "statusGameInfo": "விளையாட்டு செய்தி",
+            "statusLoadFile": "ஏற்ற: {0}",
+            "statusFinishing": "முடிக்கிறது...",
+            "statusAssetPacks": "சொத்து தொகுப்புகள்",
+            "statusTranslations": "மொழிபெயர்ப்புகள்",
+            "loading": "ஏற்றுகிறது..."
         },
         "ipcStatus": {
-            "loadingdone": "",
-            "dataAccepted": "",
-            "dataTransferStarted": "",
-            "errorTimeout": "",
-            "dataValid": "",
-            "waitingInput": ""
+            "loadingdone": "முடிந்தது. ஆட்டம் தொடங்குகிறது...",
+            "dataAccepted": "தரவு ஏற்றுக்கொள்ளப்பட்டது, பாகுபடுத்தல் தொடங்கியது...",
+            "dataTransferStarted": "தரவு பரிமாற்றத்தைத் தொடங்கு...",
+            "errorTimeout": "பிழை: நேரம் முடிந்தது.",
+            "dataValid": "ஏற்றுக்கொள்ளப்பட்ட தரவு செல்லுபடியாகும்",
+            "waitingInput": "உள்ளீட்டு தரவுக்காக காத்திருக்கிறது..."
         }
     },
     "menu": {
@@ -422,16 +423,17 @@
                 "batteryStatus": "பேட்டர் நிலை",
                 "maxPlayers": "எம்எக்ச் பிளேயர்",
                 "rumble": "ரம்பிள்",
-                "textEntryStyle": "உரை நுழைவு நடை"
+                "textEntryStyle": "உரை நுழைவு நடை",
+                "altMenuControls": "மாற்று பட்டியல் கட்டுப்பாடுகள்"
             },
             "tDS": {
-                "buttonR": "R",
+                "buttonR": "ஆர்",
                 "buttonSelect": "தேர்ந்தெடு",
                 "buttonStart": "தொடங்கு",
                 "buttonZR": "Zr",
                 "cStick": "சி-ச்டிக்",
-                "buttonA": "A",
-                "buttonB": "B",
+                "buttonA": "ஏ",
+                "buttonB": "பி",
                 "buttonL": "எல்",
                 "buttonX": "ஃச்",
                 "buttonY": "ஒய்",
@@ -484,24 +486,24 @@
                 "phraseNewNunchuck": "புதிய நன்சக் சுயவிவரம்",
                 "typeClassic": "கிளாசிக்",
                 "wiimote": {
-                    "buttonB": "B",
+                    "buttonB": "பி",
                     "buttonHome": "வீடு",
                     "buttonMinus": "-",
                     "buttonPlus": "+",
                     "button1": "1",
                     "button2": "2",
-                    "buttonA": "A",
+                    "buttonA": "ஏ",
                     "caseIR": "(மற்றும்)",
                     "dPad": "டி-பேட்",
                     "shake": "குலுக்கல்"
                 },
                 "nunchuck": {
-                    "buttonC": "C",
+                    "buttonC": "சி",
                     "buttonZ": "சட்",
-                    "prefixN": "N"
+                    "prefixN": "என்"
                 },
                 "typeNunchuck": "சங்கிலித் தண்டுகள்",
-                "typeWiimote": "Wiimote",
+                "typeWiimote": "வைமோட்",
                 "typeGamecube": "கேம்க்யூப்"
             },
             "caseInvalid": "(தவறானது)",

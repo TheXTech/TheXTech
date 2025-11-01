@@ -85,6 +85,11 @@ inline uint32_t SDL_SwapBE32(uint32_t x)
 #endif
 
 
+#define SDL_GetError() "<SDL Error API is unavailable>"
+#define SDL_ClearError() (void)0
+inline void SDL_SetError(const char *fmt, ...) { (void)fmt; /* Do Nothing!*/ }
+
+
 template<class value_t>
 inline value_t SDL_min(value_t x, value_t y)
 {
