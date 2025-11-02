@@ -26,8 +26,11 @@
 
 namespace XPower
 {
-
-static uint32_t s_last_power_check = -10000;
+//! Power check cool-down interval, prevents slowdown on some systems caused by hang of some OS's power API
+static const uint32_t s_power_check_interval = 1000;
+//! Initial value should cause result of the substraction at least value of power check interval
+static uint32_t s_last_power_check = (0x100000000ul - s_power_check_interval) & 0xFFFFFFFF;
+//! Cached device power status state
 static StatusInfo s_recent_status;
 
 static StatusInfo s_devicePowerStatus_REAL()
@@ -70,7 +73,7 @@ StatusInfo devicePowerStatus()
 {
     uint32_t ticks = SDL_GetTicks();
 
-    if(ticks - s_last_power_check > 10000)
+    if(ticks - s_last_power_check > s_power_check_interval)
     {
         s_last_power_check = ticks;
         s_recent_status = s_devicePowerStatus_REAL();
