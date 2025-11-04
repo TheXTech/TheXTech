@@ -39,12 +39,12 @@ Changelog for 1.3.7.2-dev
 -Visuals: fix v1.3.7.1 bug where there was a black frame during the transition from the main menu to the asset pack select screen (@ds-sloth)
 -Fonts: Fixed the incorrect vertical alignment of some TTF glyph. (@Wohlstand)
 -Fix v1.3.7.1 bug where npc-300.txt was not loaded properly - fixes spinning platforms in Lowser's Conquest (@ds-sloth, @Wohlstand)
--Fix v1.3.7.1 bug where backup player masks were not loaded (@ds-sloth)
+-Fix v1.3.7.1 bug where default masks/outlines were not loaded for custom GIF player sprites, resulting in black boxes (@ds-sloth)
 -Fix v1.3.7.1 Modern/Classic bug where it was not safe to run on a series of fall blocks with gaps between them, caused by the downward clip fix introduced in v1.3.7.1 (@ds-sloth, thanks to @Liebning for the report)
 -Vanilla mode: reset score between gameplay sessions, like SMBX 1.3 (@ds-sloth)
 -Desktop: fix a minor cosmetic bug where the screen could flicker when resizing the window (@ds-sloth)
 -Fixed the SMBX 1.3 bug where the engine would appear to break if an AutoStart event (other than "Level - Start") changed section bounds, guarded by compat flag "modern-section-change" [Modern/Classic Mode] (@Wohlstand)
--Fided the v1.3.6 bug where skull raft with modern logic enabled will glitch when impacts a barrier being in a water (@Wohlstand)
+-Fixed the v1.3.6 bug where skull raft with modern logic enabled will glitch when impacts a barrier being in a water (@Wohlstand)
 
 Changelog for 1.3.7.1
 -Add GameCube controller support for Wii (@ds-sloth)
