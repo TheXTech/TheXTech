@@ -33,7 +33,11 @@ void PlayerMovementX(int A, float& cursed_value_C)
     float speedVar = 1; // Speed var is a percentage of the player's speed
     if(Player[A].Slope > 0)
     {
-        if(
+        if(Block[Player[A].Slope].Location.Width == 0)
+        {
+            // SMBX 1.3 would have crashed here
+        }
+        else if(
                 (Player[A].Location.SpeedX > 0 && BlockSlope[Block[Player[A].Slope].Type] == -1) ||
                 (Player[A].Location.SpeedX < 0 && BlockSlope[Block[Player[A].Slope].Type] == 1)
                 )
@@ -396,15 +400,22 @@ void PlayerSlideMovementX(int A)
 {
     if(Player[A].Slope > 0)
     {
-        double Angle = 1 / (Block[Player[A].Slope].Location.Width / static_cast<double>(Block[Player[A].Slope].Location.Height));
-        double slideSpeed = 0.1 * Angle * BlockSlope[Block[Player[A].Slope].Type];
-
-        if(slideSpeed > 0 && Player[A].Location.SpeedX < 0)
-            Player[A].Location.SpeedX += slideSpeed * 2;
-        else if(slideSpeed < 0 && Player[A].Location.SpeedX > 0)
-            Player[A].Location.SpeedX += slideSpeed * 2;
+        if(Block[Player[A].Slope].Location.Width == 0)
+        {
+            // SMBX 1.3 would have crashed here
+        }
         else
-            Player[A].Location.SpeedX += slideSpeed;
+        {
+            double Angle = 1 / (Block[Player[A].Slope].Location.Width / static_cast<double>(Block[Player[A].Slope].Location.Height));
+            double slideSpeed = 0.1 * Angle * BlockSlope[Block[Player[A].Slope].Type];
+
+            if(slideSpeed > 0 && Player[A].Location.SpeedX < 0)
+                Player[A].Location.SpeedX += slideSpeed * 2;
+            else if(slideSpeed < 0 && Player[A].Location.SpeedX > 0)
+                Player[A].Location.SpeedX += slideSpeed * 2;
+            else
+                Player[A].Location.SpeedX += slideSpeed;
+        }
     }
     else if(Player[A].Location.SpeedY == 0.0 || Player[A].StandingOnNPC != 0)
     {
