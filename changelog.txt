@@ -24,6 +24,7 @@ Changelog for 1.3.7.2-dev
 -Desktop: fix a minor cosmetic bug where the screen could flicker when resizing the window (@ds-sloth)
 -Fixed the SMBX 1.3 bug where the engine would appear to break if an AutoStart event (other than "Level - Start") changed section bounds, guarded by compat flag "modern-section-change" [Modern/Classic Mode] (@Wohlstand)
 -Fixed the v1.3.6 bug where skull raft with modern logic enabled will glitch when impacts a barrier being in a water (@Wohlstand)
+-Fix v1.3.1 inaccuracy where NPCs 69 and 70 were one pixel shorter than they are in SMBX 1.3 (@ds-sloth, thanks to @Liebning for the report)
 
 Changelog for 1.3.7.1
 -Add GameCube controller support for Wii (@ds-sloth)

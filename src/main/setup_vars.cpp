@@ -802,10 +802,10 @@ void SetupVars()
     NPCTraits[68].THeight = 32;
     NPCTraits[68].NoYoshi = true;
     NPCTraits[69].TWidth = 32; // grey pipe y
-    NPCTraits[69].THeight = 127;//.9; [IDK WY REDIGIT SET THESE!!!]
+    NPCTraits[69].THeight = 128; // NOTE: was set to 127 until v1.3.7.2, due to different semantics for the implicit cast of 127.9 to int between VB6 and C++
     NPCTraits[69].NoYoshi = true;
     NPCTraits[70].TWidth = 32; // big grey pipe y
-    NPCTraits[70].THeight = 255;//.9;
+    NPCTraits[70].THeight = 256; // NOTE: was set to 255 until v1.3.7.2, due to different semantics for the implicit cast of 127.9 to int between VB6 and C++
     NPCTraits[70].NoYoshi = true;
     NPCTraits[71].TWidth = 48; // giant goomba
     NPCTraits[71].THeight = 46;
