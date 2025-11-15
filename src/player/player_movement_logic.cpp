@@ -40,7 +40,11 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
     tempf_t speedVar = 1; // Speed var is a percentage of the player's speed
     if(Player[A].Slope > 0)
     {
-        if(
+        if(Block[Player[A].Slope].Location.Width == 0)
+        {
+            // SMBX 1.3 would have crashed here
+        }
+        else if(
                 (Player[A].Location.SpeedX > 0 && BlockSlope[Block[Player[A].Slope].Type] == -1) ||
                 (Player[A].Location.SpeedX < 0 && BlockSlope[Block[Player[A].Slope].Type] == 1)
                 )
@@ -452,6 +456,12 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
 
 void s_playerSlopeMomentum(int A)
 {
+    if(Block[Player[A].Slope].Location.Width == 0)
+    {
+        // SMBX 1.3 would have crashed here
+        return;
+    }
+
     // Angle = 1 / (Block[Player[A].Slope].Location.Width / Block[Player[A].Slope].Location.Height);
     num_t Angle = Block[Player[A].Slope].Location.Height / (int_ok)Block[Player[A].Slope].Location.Width;
     num_t slideSpeed = Angle * BlockSlope[Block[Player[A].Slope].Type] / 10;

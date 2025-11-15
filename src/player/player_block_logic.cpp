@@ -647,18 +647,25 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                             {
                                 if(oldSlope > 0)
                                 {
-                                    Player[A].Location.Y = Block[B].Location.Y + Block[B].Location.Height + 0.01_n;
-                                    num_t PlrMid = Player[A].Location.Y + Player[A].Location.Height;
-                                    num_t Slope = 1 - (PlrMid - Block[oldSlope].Location.Y) / (int_ok)Block[oldSlope].Location.Height;
-                                    if(Slope < 0)
-                                        Slope = 0;
-                                    if(Slope > 1)
-                                        Slope = 1;
-                                    if(BlockSlope[Block[oldSlope].Type] > 0)
-                                        Player[A].Location.X = Block[oldSlope].Location.X + Block[oldSlope].Location.Width - ((int_ok)Block[oldSlope].Location.Width * Slope);
+                                    if(Block[oldSlope].Location.Height == 0)
+                                    {
+                                        // SMBX 1.3 would have crashed here
+                                    }
                                     else
-                                        Player[A].Location.X = Block[oldSlope].Location.X + ((int_ok)Block[oldSlope].Location.Width * Slope) - Player[A].Location.Width;
-                                    Player[A].Location.SpeedX = 0;
+                                    {
+                                        Player[A].Location.Y = Block[B].Location.Y + Block[B].Location.Height + 0.01_n;
+                                        num_t PlrMid = Player[A].Location.Y + Player[A].Location.Height;
+                                        num_t Slope = 1 - (PlrMid - Block[oldSlope].Location.Y) / (int_ok)Block[oldSlope].Location.Height;
+                                        if(Slope < 0)
+                                            Slope = 0;
+                                        if(Slope > 1)
+                                            Slope = 1;
+                                        if(BlockSlope[Block[oldSlope].Type] > 0)
+                                            Player[A].Location.X = Block[oldSlope].Location.X + Block[oldSlope].Location.Width - ((int_ok)Block[oldSlope].Location.Width * Slope);
+                                        else
+                                            Player[A].Location.X = Block[oldSlope].Location.X + ((int_ok)Block[oldSlope].Location.Width * Slope) - Player[A].Location.Width;
+                                        Player[A].Location.SpeedX = 0;
+                                    }
                                 }
                                 else
                                 {
@@ -756,7 +763,11 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
     // helps the player run down slopes at different angles
     if(Player[A].Slope == 0 && oldSlope > 0 && Player[A].Mount != 1 && Player[A].Mount != 2 && !Player[A].Slide)
     {
-        if(Player[A].Location.SpeedY > 0)
+        if(Block[oldSlope].Location.Width == 0)
+        {
+            // SMBX 1.3 would have crashed here
+        }
+        else if(Player[A].Location.SpeedY > 0)
         {
             tempf_t C = (tempf_t)(Player[A].Location.SpeedX * (int_ok)Block[oldSlope].Location.Height / (int_ok)Block[oldSlope].Location.Width * BlockSlope[Block[oldSlope].Type]);
             if(C > 0)
