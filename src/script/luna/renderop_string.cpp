@@ -65,8 +65,8 @@ void RenderStringOp::Draw(Renderer *renderer)
 
     if(sceneCoords)
     {
-        x -= vScreen[renderer->GetCameraIdx()].CameraAddX();
-        y -= vScreen[renderer->GetCameraIdx()].CameraAddY();
+        x -= vScreen[renderer->GetCameraIdx()].CameraAddX_i();
+        y -= vScreen[renderer->GetCameraIdx()].CameraAddY_i();
     }
     else
     {

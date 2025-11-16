@@ -36,15 +36,6 @@ static inline int s_round2int(num_t d)
     return num_t::floor(d + 0.5_n);
 }
 
-static inline int s_round2int_plr(num_t d)
-{
-#ifdef PGE_MIN_PORT
-    return (int)(num_t::floor(d / 2 + 0.5_n)) * 2;
-#else
-    return num_t::floor(d + 0.5_n);
-#endif
-}
-
 //! Get left pixel at the player sprite
 int pfrX(const StdPicture& tx, const Player_t& p)
 {
@@ -386,8 +377,8 @@ void DrawPlayer(const int A, const int Z, XTColor color)
 
 void DrawPlayer(Player_t &p, const int Z, XTColor color)
 {
-    int camX = vScreen[Z].CameraAddX();
-    int camY = vScreen[Z].CameraAddY();
+    num_t camX = vScreen[Z].CameraAddX();
+    num_t camY = vScreen[Z].CameraAddY();
 
     int B = 0;
     // double C = 0;
@@ -414,8 +405,8 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
 
     //auto &p = Player[A];
 
-    int sX = camX + s_round2int_plr(p.Location.X);
-    int sY = camY + s_round2int_plr(p.Location.Y);
+    int sX = num_t::floor(camX + p.Location.X);
+    int sY = num_t::floor(camY + p.Location.Y);
     int w = s_round2int(p.Location.Width);
     int h = s_round2int(p.Location.Height);
 
@@ -435,8 +426,8 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                     else
                         C = -16;
 
-                    RenderTexturePlayer(Z, camX + s_round2int_plr(p.YoshiTongue.X) - C - 1,
-                                          camY + s_round2int_plr(p.YoshiTongue.Y),
+                    RenderTexturePlayer(Z, num_t::floor(camX + p.YoshiTongue.X) - C - 1,
+                                          num_t::floor(camY + p.YoshiTongue.Y),
                                           p.YoshiTongueLength + 2,
                                           16,
                                           GFX.Tongue[2],
@@ -447,8 +438,8 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                     if(p.Direction == 1)
                         C = 0;
 
-                    RenderTexturePlayer(Z, camX + s_round2int_plr(p.YoshiTongue.X),
-                                          camY + s_round2int_plr(p.YoshiTongue.Y),
+                    RenderTexturePlayer(Z, num_t::floor(camX + p.YoshiTongue.X),
+                                          num_t::floor(camY + p.YoshiTongue.Y),
                                           16, 16,
                                           GFX.Tongue[1],
                                           0,
@@ -580,8 +571,8 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                      !Player[NPC[p.HoldingNPC].HoldingPlayer].Dead
                     )
                     {
-                        int npc_sX = camX + s_round2int_plr(NPC[p.HoldingNPC].Location.X);
-                        int npc_sY = camY + s_round2int_plr(NPC[p.HoldingNPC].Location.Y);
+                        int npc_sX = num_t::floor(camX + NPC[p.HoldingNPC].Location.X);
+                        int npc_sY = num_t::floor(camY + NPC[p.HoldingNPC].Location.Y);
                         int npc_w = s_round2int(NPC[p.HoldingNPC].Location.Width);
                         int npc_h = s_round2int(NPC[p.HoldingNPC].Location.Height);
 

@@ -490,13 +490,13 @@ static inline void s_get_NPC_tint(int A, XTColor& cn)
 }
 
 // draws a warning icon for offscreen active NPC A on vScreen Z
-void DrawWarningNPC(int Z, int camX, int camY, int A)
+void DrawWarningNPC(int Z, num_t camX, num_t camY, int A)
 {
     XTColor cn;
     s_get_NPC_tint(A, cn);
 
-    int scr_x = camX + s_round2int(NPC[A].Location.X) + NPC[A]->FrameOffsetX;
-    int scr_y = camY + s_round2int(NPC[A].Location.Y) + NPC[A]->FrameOffsetY;
+    int scr_x = num_t::floor(camX + NPC[A].Location.X) + NPC[A]->FrameOffsetX;
+    int scr_y = num_t::floor(camY + NPC[A].Location.Y) + NPC[A]->FrameOffsetY;
     int w = s_round2int(NPC[A].Location.Width);
     int h = s_round2int(NPC[A].Location.Height);
     int frame_h = NPC[A]->THeight;
@@ -1979,41 +1979,43 @@ void UpdateGraphicsScreen(Screen_t& screen)
         s_shakeScreen[(g_config.fix_npc_camera_logic) ? Z : 0].apply();
 
         // camera offsets to add to all object positions before drawing
-        int camX = vScreen[Z].CameraAddX();
-        int camY = vScreen[Z].CameraAddY();
+        num_t camX = vScreen[Z].CameraAddX();
+        num_t camY = vScreen[Z].CameraAddY();
+        int camX_i = num_t::floor(camX);
+        int camY_i = num_t::floor(camY);
 
         DrawBackground(S, Z);
 
 #ifdef THEXTECH_BUILD_GL_MODERN
         if(SectionParticlesBG[S])
-            XRender::renderParticleSystem(**SectionParticlesBG[S], camX, camY);
+            XRender::renderParticleSystem(**SectionParticlesBG[S], camX_i, camY_i);
 #endif
 
         // don't show background outside of the current section!
         if(LevelEditor)
         {
-            if(camX + LevelREAL[S].X > 0)
+            if(camX_i + LevelREAL[S].X > 0)
             {
                 XRender::renderRect(0, 0,
-                                    camX + LevelREAL[S].X - XRender::TargetOverscanX, screen.H, {63, 63, 63}, true);
+                                    camX_i + LevelREAL[S].X - XRender::TargetOverscanX, screen.H, {63, 63, 63}, true);
             }
 
-            if(screen.W > LevelREAL[S].Width + camX)
+            if(screen.W > LevelREAL[S].Width + camX_i)
             {
-                XRender::renderRect(LevelREAL[S].Width + camX + XRender::TargetOverscanX, 0,
-                                    screen.W - (LevelREAL[S].Width + camX), screen.H, {63, 63, 63}, true);
+                XRender::renderRect(LevelREAL[S].Width + camX_i + XRender::TargetOverscanX, 0,
+                                    screen.W - (LevelREAL[S].Width + camX_i), screen.H, {63, 63, 63}, true);
             }
 
-            if(camY + LevelREAL[S].Y > 0)
+            if(camY_i + LevelREAL[S].Y > 0)
             {
                 XRender::renderRect(0, 0,
-                                    screen.W, camY + LevelREAL[S].Y, {63, 63, 63}, true);
+                                    screen.W, camY_i + LevelREAL[S].Y, {63, 63, 63}, true);
             }
 
-            if(screen.H > LevelREAL[S].Height + camY)
+            if(screen.H > LevelREAL[S].Height + camY_i)
             {
-                XRender::renderRect(0, LevelREAL[S].Height + camY,
-                                    screen.W, screen.H - (LevelREAL[S].Height + camY), {63, 63, 63}, true);
+                XRender::renderRect(0, LevelREAL[S].Height + camY_i,
+                                    screen.W, screen.H - (LevelREAL[S].Height + camY_i), {63, 63, 63}, true);
             }
         }
 
@@ -2057,8 +2059,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
                     const vbint_t bgoFrame = BackgroundFrame[bgo.Type];
 
-                    XRender::renderTextureBasic(camX + s_round2int(bgo.Location.X),
-                                          camY + s_round2int(bgo.Location.Y),
+                    XRender::renderTextureBasic(num_t::floor(camX + bgo.Location.X),
+                                          num_t::floor(camY + bgo.Location.Y),
                                           bgoGfx.w,
                                           bgoHeight,
                                           bgoGfx, 0,
@@ -2079,11 +2081,11 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(bgo.Hidden)
                     continue;
 
-                int sX = camX + s_round2int(bgo.Location.X);
+                int sX = num_t::floor(camX + bgo.Location.X);
                 if(sX > vScreen[Z].Width)
                     continue;
 
-                int sY = camY + s_round2int(bgo.Location.Y);
+                int sY = num_t::floor(camY + bgo.Location.Y);
                 if(sY > vScreen[Z].Height)
                     continue;
 
@@ -2112,11 +2114,11 @@ void UpdateGraphicsScreen(Screen_t& screen)
             g_stats.checkedBlocks++;
             if(/*BlockIsSizable[b.Type] &&*/ (!b.Invis || LevelEditor))
             {
-                int bLeftOnscreen = camX + s_round2int(b.Location.X);
+                int bLeftOnscreen = num_t::floor(camX + b.Location.X);
                 if(bLeftOnscreen > vScreen[Z].Width)
                     continue;
 
-                int bTopOnscreen = camY + s_round2int(b.Location.Y);
+                int bTopOnscreen = num_t::floor(camY + b.Location.Y);
                 if(bTopOnscreen > vScreen[Z].Height)
                     continue;
 
@@ -2150,8 +2152,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
                     const vbint_t bgoFrame = BackgroundFrame[bgo.Type];
 
-                    XRender::renderTextureBasic(camX + s_round2int(bgo.Location.X),
-                                          camY + s_round2int(bgo.Location.Y),
+                    XRender::renderTextureBasic(num_t::floor(camX + bgo.Location.X),
+                                          num_t::floor(camY + bgo.Location.Y),
                                           bgoGfx.w,
                                           bgoHeight,
                                           bgoGfx, 0,
@@ -2171,11 +2173,11 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(bgo.Hidden)
                     continue;
 
-                int sX = camX + s_round2int(bgo.Location.X);
+                int sX = num_t::floor(camX + bgo.Location.X);
                 if(sX > vScreen[Z].Width)
                     continue;
 
-                int sY = camY + s_round2int(bgo.Location.Y);
+                int sY = num_t::floor(camY + bgo.Location.Y);
                 if(sY > vScreen[Z].Height)
                     continue;
 
@@ -2208,11 +2210,11 @@ void UpdateGraphicsScreen(Screen_t& screen)
             if(bgo.Hidden || !(bgo.Type == 98 || bgo.Type == 160))
                 continue;
 
-            int sX = camX + s_round2int(bgo.Location.X);
+            int sX = num_t::floor(camX + bgo.Location.X);
             if(sX > vScreen[Z].Width)
                 continue;
 
-            int sY = camY + s_round2int(bgo.Location.Y);
+            int sY = num_t::floor(camY + bgo.Location.Y);
             if(sY > vScreen[Z].Height)
                 continue;
 
@@ -2245,8 +2247,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
             XTColor cn;
             s_get_NPC_tint(A, cn);
 
-            int sX = camX + s_round2int(NPC[A].Location.X);
-            int sY = camY + s_round2int(NPC[A].Location.Y);
+            int sX = num_t::floor(camX + NPC[A].Location.X);
+            int sY = num_t::floor(camY + NPC[A].Location.Y);
             int drawX = sX + NPC[A]->FrameOffsetX;
             int drawY = sY + NPC[A]->FrameOffsetY;
             int w = s_round2int(NPC[A].Location.Width);
@@ -2376,8 +2378,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
                             int frame_height = (hNpc->HeightGFX != 0 || hNpc->WidthGFX != 0) ? hNpc->HeightGFX : hNpc->THeight;
 
-                            XRender::renderTextureBasic(camX + drawLoc.X,
-                                                  camY + drawLoc.Y,
+                            XRender::renderTextureBasic(camX_i + drawLoc.X,
+                                                  camY_i + drawLoc.Y,
                                                   drawLoc.Width,
                                                   drawLoc.Height,
                                                   GFXNPC[hNpc.Type],
@@ -2419,8 +2421,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
                             PlayerWarpGFX(A, drawLoc, src_x, src_y);
 
-                            XRender::renderTextureBasic(camX + drawLoc.X,
-                                                  camY + drawLoc.Y,
+                            XRender::renderTextureBasic(camX_i + drawLoc.X,
+                                                  camY_i + drawLoc.Y,
                                                   drawLoc.Width,
                                                   drawLoc.Height,
                                                   GFXYoshiB[B],
@@ -2439,8 +2441,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
                             PlayerWarpGFX(A, drawLoc, src_x, src_y);
 
-                            XRender::renderTextureBasic(camX + drawLoc.X,
-                                                  camY + drawLoc.Y,
+                            XRender::renderTextureBasic(camX_i + drawLoc.X,
+                                                  camY_i + drawLoc.Y,
                                                   drawLoc.Width,
                                                   drawLoc.Height,
                                                   GFXYoshiT[B],
@@ -2487,8 +2489,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
                             int src_y = 0;
 
                             PlayerWarpGFX(A, drawLoc, src_x, src_y);
-                            XRender::renderTextureBasic(camX + drawLoc.X,
-                                                  camY + drawLoc.Y,
+                            XRender::renderTextureBasic(camX_i + drawLoc.X,
+                                                  camY_i + drawLoc.Y,
                                                   drawLoc.Width,
                                                   drawLoc.Height,
                                                   tx,
@@ -2506,8 +2508,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
                             src_y = 0;
 
                             PlayerWarpGFX(A, drawLoc, src_x, src_y);
-                            XRender::renderTextureBasic(camX + drawLoc.X,
-                                                  camY + drawLoc.Y,
+                            XRender::renderTextureBasic(camX_i + drawLoc.X,
+                                                  camY_i + drawLoc.Y,
                                                   drawLoc.Width,
                                                   drawLoc.Height,
                                                   GFX.Boot[p.MountType],
@@ -2528,8 +2530,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
                             int src_y = 0;
 
                             PlayerWarpGFX(A, drawLoc, src_x, src_y);
-                            XRender::renderTextureBasic(camX + drawLoc.X,
-                                                  camY + drawLoc.Y,
+                            XRender::renderTextureBasic(camX_i + drawLoc.X,
+                                                  camY_i + drawLoc.Y,
                                                   drawLoc.Width,
                                                   drawLoc.Height,
                                                   tx,
@@ -2539,7 +2541,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                         }
 
                         if(p.State == PLR_STATE_CYCLONE)
-                            DrawCycloneAccessory(Z, p, camX + pX + pW / 2, camY + pY, plr_shade);
+                            DrawCycloneAccessory(Z, p, camX_i + pX + pW / 2, camY_i + pY, plr_shade);
                     }
                 }
             }
@@ -2556,11 +2558,11 @@ void UpdateGraphicsScreen(Screen_t& screen)
             if(/*!BlockIsSizable[block.Type] &&*/ (!block.Invis || (LevelEditor && (CommonFrame % 46) <= 30)) /*&& block.Type != 0 && !BlockKills[block.Type]*/)
             {
                 // Don't show a visual difference of hit-resized block in a comparison to original state
-                int sX = (block.getShrinkResized()) ? (camX + s_round2int(block.Location.X - 0.05_n)) : (camX + s_round2int(block.Location.X));
+                int sX = (block.getShrinkResized()) ? (num_t::floor(camX + block.Location.X - 0.05_n)) : (num_t::floor(camX + block.Location.X));
                 if(sX > vScreen[Z].Width)
                     continue;
 
-                int sY = camY + s_round2int(block.Location.Y);
+                int sY = num_t::floor(camY + block.Location.Y);
                 if(sY > vScreen[Z].Height)
                     continue;
 
@@ -2606,11 +2608,11 @@ void UpdateGraphicsScreen(Screen_t& screen)
                Effect[A].Type == EFFID_SPINBLOCK || Effect[A].Type == EFFID_BIG_DOOR_OPEN || Effect[A].Type == EFFID_LAVA_MONSTER_LOOK ||
                Effect[A].Type == EFFID_WATER_SPLASH || Effect[A].Type == EFFID_TIME_SWITCH_PRESS || Effect[A].Type == EFFID_TNT_PRESS)
             {
-                int sX = (camX + s_round2int(Effect[A].Location.X));
+                int sX = (num_t::floor(camX + Effect[A].Location.X));
                 if(sX > vScreen[Z].Width)
                     continue;
 
-                int sY = camY + s_round2int(Effect[A].Location.Y);
+                int sY = num_t::floor(camY + Effect[A].Location.Y);
                 if(sY > vScreen[Z].Height)
                     continue;
 
@@ -2642,8 +2644,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
             if(NPC[A].Type == NPCID_MEDAL && g_curLevelMedals.gotten(NPC[A].Variant - 1))
                 cn.a /= 2;
 
-            int drawX_no_offset = camX + s_round2int(NPC[A].Location.X);
-            int sY = camY + s_round2int(NPC[A].Location.Y);
+            int drawX_no_offset = num_t::floor(camX + NPC[A].Location.X);
+            int sY = num_t::floor(camY + NPC[A].Location.Y);
             int drawY = sY + NPC[A]->FrameOffsetY;
             int w = s_round2int(NPC[A].Location.Width);
             int h = s_round2int(NPC[A].Location.Height);
@@ -2691,8 +2693,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
             XTColor cn;
             s_get_NPC_tint(A, cn);
 
-            int sX = camX + s_round2int(NPC[A].Location.X);
-            int sY = camY + s_round2int(NPC[A].Location.Y);
+            int sX = num_t::floor(camX + NPC[A].Location.X);
+            int sY = num_t::floor(camY + NPC[A].Location.Y);
             int w = s_round2int(NPC[A].Location.Width);
             int h = s_round2int(NPC[A].Location.Height);
 
@@ -2869,8 +2871,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
             if(B < 0)
                 B = 0;
 
-            XRender::renderTextureBasic(camX + s_round2int(NPC[A].Location.X) + s_round2int(NPC[A].Location.Width) / 2 - GFX.Chat.w / 2,
-                camY + s_round2int(NPC[A].Location.Y) - 30 - B,
+            XRender::renderTextureBasic((int)num_t::floor(camX + NPC[A].Location.X) + s_round2int(NPC[A].Location.Width) / 2 - GFX.Chat.w / 2,
+                (int)num_t::floor(camY + NPC[A].Location.Y) - 30 - B,
                 GFX.Chat);
         }
 
@@ -2927,8 +2929,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     break;
                 }
 
-                int sX = camX + s_round2int_plr(Player[A].Location.X);
-                int sY = camY + s_round2int_plr(Player[A].Location.Y);
+                int sX = num_t::floor(camX + Player[A].Location.X);
+                int sY = num_t::floor(camY + Player[A].Location.Y);
                 int pW = s_round2int(Player[A].Location.Width);
                 int pH = s_round2int(Player[A].Location.Height);
 
@@ -2971,8 +2973,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
             }
             else if(!NPCIsYoshi(NPC[A]) && NPC[A].Type > 0)
             {
-                int sX = camX + s_round2int_plr(NPC[A].Location.X);
-                int sY = camY + s_round2int_plr(NPC[A].Location.Y);
+                int sX = num_t::floor(camX + NPC[A].Location.X);
+                int sY = num_t::floor(camY + NPC[A].Location.Y);
                 int w = s_round2int(NPC[A].Location.Width);
                 int h = s_round2int(NPC[A].Location.Height);
 
@@ -3038,8 +3040,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
                     const vbint_t bgoFrame = BackgroundFrame[bgo.Type];
                     g_stats.renderedBGOs++;
-                    XRender::renderTextureBasic(camX + s_round2int(bgo.Location.X),
-                                          camY + s_round2int(bgo.Location.Y),
+                    XRender::renderTextureBasic(num_t::floor(camX + bgo.Location.X),
+                                          num_t::floor(camY + bgo.Location.Y),
                                           bgoGfx.w,
                                           bgoHeight,
                                           bgoGfx, 0,
@@ -3059,11 +3061,11 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(bgo.Hidden)
                     continue;
 
-                int sX = camX + s_round2int(bgo.Location.X);
+                int sX = num_t::floor(camX + bgo.Location.X);
                 if(sX > vScreen[Z].Width)
                     continue;
 
-                int sY = camY + s_round2int(bgo.Location.Y);
+                int sY = num_t::floor(camY + bgo.Location.Y);
                 if(sY > vScreen[Z].Height)
                     continue;
 
@@ -3093,8 +3095,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
             XTColor cn;
             s_get_NPC_tint(A, cn);
 
-            int sX = camX + s_round2int(NPC[A].Location.X);
-            int sY = camY + s_round2int(NPC[A].Location.Y);
+            int sX = num_t::floor(camX + NPC[A].Location.X);
+            int sY = num_t::floor(camY + NPC[A].Location.Y);
 
             if(NPC[A]->WidthGFX == 0)
             {
@@ -3106,8 +3108,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
             }
             else
             {
-                XRender::renderTextureBasic(camX + s_round2int(NPC[A].Location.X + NPC[A].Location.Width / 2) + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2,
-                    camY + s_round2int(NPC[A].Location.Y + NPC[A].Location.Height) + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX,
+                XRender::renderTextureBasic(num_t::floor(camX + NPC[A].Location.X + NPC[A].Location.Width / 2) + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2,
+                    num_t::floor(camY + NPC[A].Location.Y + NPC[A].Location.Height) + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX,
                     NPC[A]->WidthGFX,
                     NPC[A]->HeightGFX,
                     GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->HeightGFX, cn);
@@ -3130,11 +3132,11 @@ void UpdateGraphicsScreen(Screen_t& screen)
             // if(vScreenCollision(Z, block.Location) /*&& !block.Hidden*/)
 
             // Don't show a visual difference of hit-resized block in a comparison to original state
-            int sX = (block.getShrinkResized()) ? (camX + s_round2int(block.Location.X - 0.05_n)) : (camX + s_round2int(block.Location.X));
+            int sX = (block.getShrinkResized()) ? (num_t::floor(camX + block.Location.X - 0.05_n)) : (num_t::floor(camX + block.Location.X));
             if(sX > vScreen[Z].Width)
                 continue;
 
-            int sY = camY + s_round2int(block.Location.Y);
+            int sY = num_t::floor(camY + block.Location.Y);
             if(sY > vScreen[Z].Height)
                 continue;
 
@@ -3165,11 +3167,11 @@ void UpdateGraphicsScreen(Screen_t& screen)
                e.Type != EFFID_PLR_FIREBALL_TRAIL && e.Type != EFFID_COIN_SWITCH_PRESS && e.Type != EFFID_SPINBLOCK && e.Type != EFFID_BIG_DOOR_OPEN &&
                e.Type != EFFID_LAVA_MONSTER_LOOK && e.Type != EFFID_WATER_SPLASH && e.Type != EFFID_TIME_SWITCH_PRESS && e.Type != EFFID_TNT_PRESS)
             {
-                int sX = (camX + s_round2int(Effect[A].Location.X));
+                int sX = (num_t::floor(camX + Effect[A].Location.X));
                 if(sX > vScreen[Z].Width)
                     continue;
 
-                int sY = camY + s_round2int(Effect[A].Location.Y);
+                int sY = num_t::floor(camY + Effect[A].Location.Y);
                 if(sY > vScreen[Z].Height)
                     continue;
 
@@ -3213,18 +3215,18 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 {
                     vScreen_t& c_vscreen = c_screen.vScreen(c_vscreen_Z);
 
-                    int c_vscreen_X = c_vscreen.CameraAddX();
-                    int c_vscreen_Y = c_vscreen.CameraAddY();
+                    int c_vscreen_X = num_t::floor(camX - c_vscreen.X);
+                    int c_vscreen_Y = num_t::floor(camY - c_vscreen.Y);
 
-                    XRender::renderRect(camX - c_vscreen_X, camY - c_vscreen_Y, c_vscreen.Width, c_vscreen.Height,
+                    XRender::renderRect(c_vscreen_X, c_vscreen_Y, c_vscreen.Width, c_vscreen.Height,
                         {  0,   0,   0}, false);
-                    XRender::renderRect(camX - c_vscreen_X + 1, camY - c_vscreen_Y + 1, c_vscreen.Width - 2, c_vscreen.Height - 2,
+                    XRender::renderRect(c_vscreen_X + 1, c_vscreen_Y + 1, c_vscreen.Width - 2, c_vscreen.Height - 2,
                         {  0,   0,   0}, false);
-                    XRender::renderRect(camX - c_vscreen_X + 2, camY - c_vscreen_Y + 2, c_vscreen.Width - 4, c_vscreen.Height - 4,
+                    XRender::renderRect(c_vscreen_X + 2, c_vscreen_Y + 2, c_vscreen.Width - 4, c_vscreen.Height - 4,
                         {255, 255, 255}, false);
-                    XRender::renderRect(camX - c_vscreen_X + 3, camY - c_vscreen_Y + 3, c_vscreen.Width - 6, c_vscreen.Height - 6,
+                    XRender::renderRect(c_vscreen_X + 3, c_vscreen_Y + 3, c_vscreen.Width - 6, c_vscreen.Height - 6,
                         {255, 255, 255}, false);
-                    SuperPrint(std::to_string(c_vscreen_Z), 1, camX - c_vscreen_X + 4, camY - c_vscreen_Y + 4);
+                    SuperPrint(std::to_string(c_vscreen_Z), 1, c_vscreen_X + 4, c_vscreen_Y + 4);
                 }
             }
 
@@ -3240,8 +3242,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 {
                     const auto &w = Warp[Player[A].ShowWarp];
 
-                    int p_center_x = camX + s_round2int_plr(Player[A].Location.X) + s_round2int(Player[A].Location.Width) / 2;
-                    int info_y = s_round2int_plr(Player[A].Location.Y) + s_round2int(Player[A].Location.Height) - 96 + camY;
+                    int p_center_x = num_t::floor(camX + Player[A].Location.X) + s_round2int(Player[A].Location.Width) / 2;
+                    int info_y = num_t::floor(camY + Player[A].Location.Y) + s_round2int(Player[A].Location.Height) - 96;
 
                     if(!w.noPrintStars && w.save_info().inited() && w.save_info().max_stars > 0)
                     {
@@ -3271,7 +3273,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
 #ifdef THEXTECH_BUILD_GL_MODERN
         if(SectionParticlesFG[S])
-            XRender::renderParticleSystem(**SectionParticlesFG[S], camX, camY);
+            XRender::renderParticleSystem(**SectionParticlesFG[S], camX_i, camY_i);
 
         XRender::setupLighting(SectionLighting[S]);
 
@@ -3318,16 +3320,16 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
                 if(NPC[A]->WidthGFX == 0)
                 {
-                    XRender::renderTextureBasic(camX + s_round2int(NPC[A].Location.X) + NPC[A]->FrameOffsetX,
-                        camY + s_round2int(NPC[A].Location.Y) + NPC[A]->FrameOffsetY,
+                    XRender::renderTextureBasic(num_t::floor(camX + NPC[A].Location.X) + NPC[A]->FrameOffsetX,
+                        num_t::floor(camY + NPC[A].Location.Y) + NPC[A]->FrameOffsetY,
                         s_round2int(NPC[A].Location.Width),
                         s_round2int(NPC[A].Location.Height),
                         GFXNPC[NPC[A].Type], 0, NPC[A].Frame * s_round2int(NPC[A].Location.Height), cn);
                 }
                 else
                 {
-                    XRender::renderTextureBasic(camX + s_round2int(NPC[A].Location.X + NPC[A].Location.Width / 2) + NPC[A]->FrameOffsetX - NPC[A]->WidthGFX / 2,
-                        camY + s_round2int(NPC[A].Location.Y + NPC[A].Location.Height) + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX,
+                    XRender::renderTextureBasic(num_t::floor(camX + NPC[A].Location.X + NPC[A].Location.Width / 2) + NPC[A]->FrameOffsetX - NPC[A]->WidthGFX / 2,
+                        num_t::floor(camY + NPC[A].Location.Y + NPC[A].Location.Height) + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX,
                         NPC[A]->WidthGFX, NPC[A]->HeightGFX,
                         GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->HeightGFX, cn);
                 }
@@ -3335,8 +3337,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(NPC[A].Effect3 != 0 && NPC[A].Special5 <= 66)
                 {
                     int i = (NPC[A].Special5 - 1) / 22 + 1;
-                    XRender::renderTextureBasic(camX + s_round2int(NPC[A].Location.X + NPC[A].Location.Width / 2) - GFX.Font1[i].w / 2,
-                        camY + s_round2int(NPC[A].Location.Y + NPC[A].Location.Height / 2) - GFX.Font1[i].h / 2,
+                    XRender::renderTextureBasic((int)num_t::floor(camX + NPC[A].Location.X + NPC[A].Location.Width / 2) - GFX.Font1[i].w / 2,
+                        (int)num_t::floor(camY + NPC[A].Location.Y + NPC[A].Location.Height / 2) - GFX.Font1[i].h / 2,
                         GFX.Font1[i]);
                 }
             }

@@ -877,20 +877,14 @@ void ScreenShot()
     TakeScreen = false;
 }
 
-void DrawFrozenNPC(int camX, int camY, int A)
+void DrawFrozenNPC(num_t camX, num_t camY, int A)
 {
     auto &n = NPC[A];
 
-    int sX = camX + s_round2int(NPC[A].Location.X);
-    int sY = camY + s_round2int(NPC[A].Location.Y);
+    int sX = num_t::floor(camX + NPC[A].Location.X);
+    int sY = num_t::floor(camY + NPC[A].Location.Y);
     int w = s_round2int(NPC[A].Location.Width);
     int h = s_round2int(NPC[A].Location.Height);
-
-    if(NPC[A].HoldingPlayer != 0)
-    {
-        sX = camX + s_round2int_plr(NPC[A].Location.X);
-        sY = camY + s_round2int_plr(NPC[A].Location.Y);
-    }
 
     // collision already checked elsewhere
     // if((vScreenCollision(Z, n.Location) ||

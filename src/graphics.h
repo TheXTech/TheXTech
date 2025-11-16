@@ -252,7 +252,7 @@ void DrawCycloneAccessory(int Z, const Player_t& p, int cX, int tY, XTColor c);
 // Public Sub ScreenShot()
 void ScreenShot();
 // Public Sub DrawFrozenNPC(Z As Integer, A As Integer)
-void DrawFrozenNPC(int camX, int camY, int A);
+void DrawFrozenNPC(num_t camX, num_t camY, int A);
 // NEW: draw wings for an NPC at a particular location
 void DrawNPCWings(const NPC_t& n, int sX, int sY, XTColor cn);
 

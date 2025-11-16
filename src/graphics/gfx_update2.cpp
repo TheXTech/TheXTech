@@ -251,8 +251,8 @@ void UpdateGraphics2(bool skipRepaint)
 
     XRender::setViewport(vScreen[Z].TargetX() - XRender::TargetOverscanX, vScreen[Z].TargetY(), vScreen[Z].Width + 2 * XRender::TargetOverscanX, vScreen[Z].Height);
 
-    int camX = vScreen[Z].CameraAddX() + XRender::TargetOverscanX;
-    int camY = vScreen[Z].CameraAddY();
+    int camX = vScreen[Z].CameraAddX_i() + XRender::TargetOverscanX;
+    int camY = vScreen[Z].CameraAddY_i();
 
     int sLeft = -camX - 2 * XRender::TargetOverscanX;
     int sTop = -camY;

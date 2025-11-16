@@ -48,7 +48,7 @@ static inline int s_round2int(num_t d)
     return num_t::floor(d + 0.5_n);
 }
 
-void s_drawBlockExtra(int Z, int camX, int camY, const Block_t& b)
+void s_drawBlockExtra(int Z, num_t camX, num_t camY, const Block_t& b)
 {
     if(b.Special > 0 && !b.Hidden)
     {
@@ -75,13 +75,13 @@ void s_drawBlockExtra(int Z, int camX, int camY, const Block_t& b)
                 dW = NPCWidthGFX(C);
             }
 
-            int sX = s_round2int(b.Location.X + b.Location.Width / 2) - dW / 2;
-            int sY = s_round2int(b.Location.Y + b.Location.Height / 2) - dH / 2;
+            int sX = num_t::floor(camX + b.Location.X + b.Location.Width / 2) - dW / 2;
+            int sY = num_t::floor(camY + b.Location.Y + b.Location.Height / 2) - dH / 2;
 
             vbint_t tempDirection = -1;
 
-            XRender::renderTextureBasic(camX + sX + NPCFrameOffsetX(C),
-                camY + sY + NPCFrameOffsetY(C),
+            XRender::renderTextureBasic(sX + NPCFrameOffsetX(C),
+                sY + NPCFrameOffsetY(C),
                 dW, dH,
                 GFXNPC[C], 0, EditorNPCFrame(C, tempDirection) * dH);
         }
@@ -92,15 +92,15 @@ void s_drawBlockExtra(int Z, int camX, int camY, const Block_t& b)
     {
         if(vScreenCollision(Z, b.Location))
         {
-            int sX = s_round2int(b.Location.X + b.Location.Width / 2) - GFX.Chat.w / 2;
-            int sY = s_round2int(b.Location.Y) - GFX.Chat.h - 8;
+            int sX = num_t::floor(camX + b.Location.X + b.Location.Width / 2) - GFX.Chat.w / 2;
+            int sY = num_t::floor(camY + b.Location.Y) - GFX.Chat.h - 8;
 
-            XRender::renderTextureBasic(camX + sX, camY + sY, GFX.Chat, XTColorF(1.0_n, 0.0_n, 0.0_n, 0.7_n));
+            XRender::renderTextureBasic(sX, sY, GFX.Chat, XTColorF(1.0_n, 0.0_n, 0.0_n, 0.7_n));
         }
     }
 }
 
-void s_drawNpcExtra(int Z, int camX, int camY, const NPC_t& n)
+void s_drawNpcExtra(int Z, num_t camX, num_t camY, const NPC_t& n)
 {
     if(!n.Hidden && NPCIsContainer(n) && n.Type != NPCID_ITEM_BUBBLE && (n.Special > 0))
     {
@@ -122,16 +122,16 @@ void s_drawNpcExtra(int Z, int camX, int camY, const NPC_t& n)
 
             int sY;
             if(n.Type == NPCID_ITEM_POD)
-                sY = s_round2int(n.Location.Y + n.Location.Height) - dH;
+                sY = num_t::floor(camY + n.Location.Y + n.Location.Height) - dH;
             else
-                sY = s_round2int(n.Location.Y);
+                sY = num_t::floor(camY + n.Location.Y);
 
-            int sX = s_round2int(n.Location.X + n.Location.Width / 2) - dW / 2;
+            int sX = num_t::floor(camX + n.Location.X + n.Location.Width / 2) - dW / 2;
 
             vbint_t tempDirection = -1;
 
-            XRender::renderTextureBasic(camX + sX + NPCFrameOffsetX(C),
-                camY + sY + NPCFrameOffsetY(C),
+            XRender::renderTextureBasic(sX + NPCFrameOffsetX(C),
+                sY + NPCFrameOffsetY(C),
                 dW, dH,
                 GFXNPC[C], 0, EditorNPCFrame(C, tempDirection) * dH);
         }
@@ -142,15 +142,15 @@ void s_drawNpcExtra(int Z, int camX, int camY, const NPC_t& n)
     {
         if(vScreenCollision(Z, n.Location))
         {
-            int sX = s_round2int(n.Location.X + n.Location.Width / 2);
+            int sX = num_t::floor(camX + n.Location.X + n.Location.Width / 2);
             if(n.Text == STRINGINDEX_NONE)
                 sX -= GFX.Chat.w / 2;
             else
                 sX -= 4 + GFX.Chat.w;
 
-            int sY = s_round2int(n.Location.Y) - GFX.Chat.h - 8;
+            int sY = num_t::floor(camY + n.Location.Y) - GFX.Chat.h - 8;
 
-            XRender::renderTextureBasic(camX + sX, camY + sY, GFX.Chat, XTColorF(1.0_n, 0.0_n, 0.0_n, 0.7_n));
+            XRender::renderTextureBasic(sX, sY, GFX.Chat, XTColorF(1.0_n, 0.0_n, 0.0_n, 0.7_n));
         }
     }
 
@@ -159,22 +159,22 @@ void s_drawNpcExtra(int Z, int camX, int camY, const NPC_t& n)
     {
         if(vScreenCollision(Z, n.Location))
         {
-            int sX = s_round2int(n.Location.X + n.Location.Width / 2);
+            int sX = num_t::floor(camX + n.Location.X + n.Location.Width / 2);
             if(!(n.TriggerActivate != EVENT_NONE || n.TriggerTalk != EVENT_NONE || n.TriggerDeath != EVENT_NONE || n.TriggerLast != EVENT_NONE))
                 sX -= GFX.Chat.w / 2;
             else
                 sX += 4;
 
-            int sY = s_round2int(n.Location.Y) - GFX.Chat.h - 8;
+            int sY = num_t::floor(camY + n.Location.Y) - GFX.Chat.h - 8;
 
-            XRender::renderTextureBasic(camX + sX, camY + sY, GFX.Chat, XTColorF(1.0_n, 1.0_n, 1.0_n, 0.7_n));
+            XRender::renderTextureBasic(sX, sY, GFX.Chat, XTColorF(1.0_n, 1.0_n, 1.0_n, 0.7_n));
         }
     }
 }
 
-void s_drawWaterBox(int camX, int camY, const Water_t& w)
+void s_drawWaterBox(num_t camX, num_t camY, const Water_t& w)
 {
-    XRender::renderRect(camX + s_round2int(w.Location.X), camY + s_round2int(w.Location.Y), (int)(w.Location.Width), (int)(w.Location.Height),
+    XRender::renderRect(num_t::floor(camX + w.Location.X), num_t::floor(camY + w.Location.Y), num_t::floor(w.Location.Width), num_t::floor(w.Location.Height),
         (w.Type == PHYSID_QUICKSAND) ? XTColor{255, 255, 0} :
         (w.Type == PHYSID_MAZE) ? XTColor{192, 192, 255} :
         XTColor{0, 255, 255},
@@ -242,8 +242,10 @@ void DrawEditorLevel(int Z)
     int S = curSection; // Level section to display
 
     // camera offsets to add to all object positions before drawing
-    int camX = vScreen[Z].CameraAddX();
-    int camY = vScreen[Z].CameraAddY();
+    num_t camX = vScreen[Z].CameraAddX();
+    num_t camY = vScreen[Z].CameraAddY();
+    int camX_i = num_t::floor(camX);
+    int camY_i = num_t::floor(camY);
 
 #ifdef __3DS__
     XRender::setTargetLayer(2);
@@ -288,17 +290,17 @@ void DrawEditorLevel(int Z)
 
                 if(Warp[A].PlacedEnt)
                 {
-                    XRender::renderRect(camX + s_round2int(Warp[A].Entrance.X), camY + s_round2int(Warp[A].Entrance.Y), 32, 32,
+                    XRender::renderRect(num_t::floor(camX + Warp[A].Entrance.X), num_t::floor(camY + Warp[A].Entrance.Y), 32, 32,
                         color, false);
-                    SuperPrint(std::to_string(A), 1, camX + s_round2int(Warp[A].Entrance.X) + 2, camY + s_round2int(Warp[A].Entrance.Y) + 2);
+                    SuperPrint(std::to_string(A), 1, num_t::floor(camX + Warp[A].Entrance.X) + 2, num_t::floor(camY + Warp[A].Entrance.Y) + 2);
                 }
 
                 if(Warp[A].PlacedExit)
                 {
-                    XRender::renderRect(camX + s_round2int(Warp[A].Exit.X), camY + s_round2int(Warp[A].Exit.Y), 32, 32,
+                    XRender::renderRect(num_t::floor(camX + Warp[A].Exit.X), num_t::floor(camY + Warp[A].Exit.Y), 32, 32,
                         color, false);
-                    SuperPrint(std::to_string(A), 1, camX + s_round2int(Warp[A].Exit.X + Warp[A].Exit.Width) - 16 - 2,
-                        camY + s_round2int(Warp[A].Exit.Y + Warp[A].Exit.Height) - 14 - 2);
+                    SuperPrint(std::to_string(A), 1, num_t::floor(camX + Warp[A].Exit.X + Warp[A].Exit.Width) - 16 - 2,
+                        num_t::floor(camY + Warp[A].Exit.Y + Warp[A].Exit.Height) - 14 - 2);
                 }
             }
         }
@@ -312,10 +314,10 @@ void DrawEditorLevel(int Z)
                 continue;
 
             XTColor ev_color = {uint8_t(64 + 128 * (A & 1)), uint8_t(64 + 64 * (A & 2)), uint8_t(64 + 32 * (A & 4))};
-            DrawSimpleFrame(camX + sectPos.X, camY + sectPos.Y, sectPos.Width - sectPos.X, sectPos.Height - sectPos.Y, {0, 0, 0}, ev_color, {0, 0, 0, 0});
-            SuperPrint(g_editorStrings.wordEvent, 3, camX + sectPos.X + 8, camY + sectPos.Y + 8);
-            SuperPrint(e.Name, 3, camX + sectPos.X + 8, camY + sectPos.Y + 28, ev_color);
-            SuperPrint(g_editorStrings.eventsCaseBounds, 3, camX + sectPos.X + 8, camY + sectPos.Y + 48);
+            DrawSimpleFrame(camX_i + sectPos.X, camY_i + sectPos.Y, sectPos.Width - sectPos.X, sectPos.Height - sectPos.Y, {0, 0, 0}, ev_color, {0, 0, 0, 0});
+            SuperPrint(g_editorStrings.wordEvent, 3, camX_i + sectPos.X + 8, camY_i + sectPos.Y + 8);
+            SuperPrint(e.Name, 3, camX_i + sectPos.X + 8, camY_i + sectPos.Y + 28, ev_color);
+            SuperPrint(g_editorStrings.eventsCaseBounds, 3, camX_i + sectPos.X + 8, camY_i + sectPos.Y + 48);
         }
     }
 
@@ -326,28 +328,28 @@ void DrawEditorLevel(int Z)
     // render section boundary
     if(LevelEditor)
     {
-        if(camX + LevelREAL[S].X > 0)
+        if(camX_i + LevelREAL[S].X > 0)
         {
             XRender::renderRect(0, 0,
-                               camX + LevelREAL[S].X, XRender::TargetH, {63, 63, 63, 192}, true);
+                               camX_i + LevelREAL[S].X, XRender::TargetH, {63, 63, 63, 192}, true);
         }
 
-        if(XRender::TargetW > LevelREAL[S].Width + camX)
+        if(XRender::TargetW > LevelREAL[S].Width + camX_i)
         {
-            XRender::renderRect(LevelREAL[S].Width + camX, 0,
-                               XRender::TargetW - (LevelREAL[S].Width + camX), XRender::TargetH, {63, 63, 63, 192}, true);
+            XRender::renderRect(LevelREAL[S].Width + camX_i, 0,
+                               XRender::TargetW - (LevelREAL[S].Width + camX_i), XRender::TargetH, {63, 63, 63, 192}, true);
         }
 
-        if(camY + LevelREAL[S].Y > 0)
+        if(camY_i + LevelREAL[S].Y > 0)
         {
-            XRender::renderRect(camX + LevelREAL[S].X, 0,
-                               LevelREAL[S].Width - LevelREAL[S].X, camY + LevelREAL[S].Y, {63, 63, 63, 192}, true);
+            XRender::renderRect(camX_i + LevelREAL[S].X, 0,
+                               LevelREAL[S].Width - LevelREAL[S].X, camY_i + LevelREAL[S].Y, {63, 63, 63, 192}, true);
         }
 
-        if(XRender::TargetH > LevelREAL[S].Height + camY)
+        if(XRender::TargetH > LevelREAL[S].Height + camY_i)
         {
-            XRender::renderRect(camX + LevelREAL[S].X, LevelREAL[S].Height + camY,
-                               LevelREAL[S].Width - LevelREAL[S].X, XRender::TargetH - (LevelREAL[S].Height + camY), {63, 63, 63, 192}, true);
+            XRender::renderRect(camX_i + LevelREAL[S].X, LevelREAL[S].Height + camY_i,
+                               LevelREAL[S].Width - LevelREAL[S].X, XRender::TargetH - (LevelREAL[S].Height + camY_i), {63, 63, 63, 192}, true);
         }
     }
 
@@ -381,14 +383,14 @@ void DrawEditorLevel(int Z)
             if(BlockIsSizable[b.Type])
             {
                 if(vScreenCollision(Z, b.Location))
-                    XRender::renderSizableBlock(camX + s_round2int(b.Location.X), camY + s_round2int(b.Location.Y), (int)(b.Location.Width), (int)(b.Location.Height), GFXBlockBMP[b.Type]);
+                    XRender::renderSizableBlock(num_t::floor(camX + b.Location.X), num_t::floor(camY + b.Location.Y), (int)(b.Location.Width), (int)(b.Location.Height), GFXBlockBMP[b.Type]);
             }
             else
             {
                 if(vScreenCollision(Z, b.Location))
                 {
-                    XRender::renderTextureBasic(camX + s_round2int(b.Location.X),
-                                          camY + s_round2int(b.Location.Y) + b.ShakeOffset,
+                    XRender::renderTextureBasic(num_t::floor(camX + b.Location.X),
+                                          num_t::floor(camY + b.Location.Y) + b.ShakeOffset,
                                           (int)(b.Location.Width),
                                           (int)(b.Location.Height),
                                           GFXBlock[b.Type], 0, BlockFrame[b.Type] * 32);
@@ -411,8 +413,8 @@ void DrawEditorLevel(int Z)
             auto &b = e.Background;
             if(vScreenCollision(Z, b.Location))
             {
-                XRender::renderTextureBasic(camX + s_round2int(b.Location.X),
-                                      camY + s_round2int(b.Location.Y),
+                XRender::renderTextureBasic(num_t::floor(camX + b.Location.X),
+                                      num_t::floor(camY + b.Location.Y),
                                       BackgroundWidth[b.Type],
                                       BackgroundHeight[b.Type],
                                       GFXBackground[b.Type], 0,
@@ -429,8 +431,8 @@ void DrawEditorLevel(int Z)
             e.NPC = NPC[0];
             auto &n = e.NPC;
 
-            int sX = camX + s_round2int(n.Location.X);
-            int sY = camY + s_round2int(n.Location.Y);
+            int sX = num_t::floor(camX + n.Location.X);
+            int sY = num_t::floor(camY + n.Location.Y);
 
             if(n->WidthGFX == 0)
             {
@@ -456,8 +458,8 @@ void DrawEditorLevel(int Z)
                         dH = NPCHeightGFX(n.Special);
                     }
 
-                    int cont_sX = camX + s_round2int(n.Location.X + n.Location.Width / 2) - dW / 2;
-                    int cont_sY = camY + s_round2int(n.Location.Y + n.Location.Height / 2) - dH / 2;
+                    int cont_sX = num_t::floor(camX + n.Location.X + n.Location.Width / 2) - dW / 2;
+                    int cont_sY = num_t::floor(camY + n.Location.Y + n.Location.Height / 2) - dH / 2;
                     B = EditorNPCFrame(NPCID(n.Special), n.Direction);
 
                     XRender::renderTextureBasic(cont_sX + n->FrameOffsetX,
@@ -466,8 +468,8 @@ void DrawEditorLevel(int Z)
                                           GFXNPC[n.Special], 0, B * dH);
                 }
 
-                XRender::renderTextureBasic(camX + s_round2int(n.Location.X + n.Location.Width / 2) + n->FrameOffsetX - n->WidthGFX / 2,
-                                      camY + s_round2int(n.Location.Y + n.Location.Height) + n->FrameOffsetY - n->HeightGFX,
+                XRender::renderTextureBasic(num_t::floor(camX + n.Location.X + n.Location.Width / 2) + n->FrameOffsetX - n->WidthGFX / 2,
+                                      num_t::floor(camY + n.Location.Y + n.Location.Height) + n->FrameOffsetY - n->HeightGFX,
                                       n->WidthGFX, n->HeightGFX, GFXNPC[n.Type],
                                       0, n.Frame * n->HeightGFX);
             }
@@ -481,7 +483,7 @@ void DrawEditorLevel(int Z)
             s_drawWaterBox(camX, camY, EditorCursor.Water);
         else if(EditorCursor.Mode == OptCursor_t::LVL_WARPS)
         {
-            XRender::renderRect(camX + s_round2int(EditorCursor.Location.X), camY + s_round2int(EditorCursor.Location.Y), (int)EditorCursor.Location.Width, (int)EditorCursor.Location.Height,
+            XRender::renderRect(num_t::floor(camX + EditorCursor.Location.X), num_t::floor(camY + EditorCursor.Location.Y), (int)EditorCursor.Location.Width, (int)EditorCursor.Location.Height,
                 XTColorF(1.0_n, 0.0_n, 0.0_n, 1.0_n), false);
         }
 
@@ -581,8 +583,8 @@ void DrawEditorWorld()
 {
     int Z = 1;
 
-    int camX = vScreen[Z].CameraAddX() + XRender::TargetOverscanX;
-    int camY = vScreen[Z].CameraAddY();
+    int camX = vScreen[Z].CameraAddX_i() + XRender::TargetOverscanX;
+    int camY = vScreen[Z].CameraAddY_i();
 
 #ifdef __3DS__
     // disable cursor rendering on inactive screen of 3DS
