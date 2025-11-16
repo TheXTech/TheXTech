@@ -334,7 +334,7 @@ void DrawCycloneAccessory(int Z, const Player_t& p, int cX, int tY, XTColor c)
     offsetX += extra_offX * p.Direction;
     offsetY += extra_offY;
 
-    RenderTexturePlayer(Z,
+    RenderTexturePlayer(Z, p,
         cX + offsetX,
         tY + offsetY,
         32,
@@ -426,7 +426,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                     else
                         C = -16;
 
-                    RenderTexturePlayer(Z, num_t::floor(camX + p.YoshiTongue.X) - C - 1,
+                    RenderTexturePlayer(Z, p, num_t::floor(camX + p.YoshiTongue.X) - C - 1,
                                           num_t::floor(camY + p.YoshiTongue.Y),
                                           p.YoshiTongueLength + 2,
                                           16,
@@ -438,7 +438,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                     if(p.Direction == 1)
                         C = 0;
 
-                    RenderTexturePlayer(Z, num_t::floor(camX + p.YoshiTongue.X),
+                    RenderTexturePlayer(Z, p, num_t::floor(camX + p.YoshiTongue.X),
                                           num_t::floor(camY + p.YoshiTongue.Y),
                                           16, 16,
                                           GFX.Tongue[1],
@@ -448,13 +448,13 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                 }
 
                 // Yoshi's Body
-                RenderTexturePlayer(Z, sX + p.YoshiBX,
+                RenderTexturePlayer(Z, p, sX + p.YoshiBX,
                                       sY + p.YoshiBY,
                                       32, 32,
                                       GFXYoshiB[B], 0, 32 * p.YoshiBFrame, s);
 
                 // Yoshi's Head
-                RenderTexturePlayer(Z, sX + p.YoshiTX,
+                RenderTexturePlayer(Z, p, sX + p.YoshiTX,
                                       sY + p.YoshiTY,
                                       32, 32,
                                       GFXYoshiT[B], 0, 32 * p.YoshiTFrame, s);
@@ -466,7 +466,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
 
                 //if(!p.Immune2) // Always true because of covered condition above
                 {
-                    RenderTexturePlayer(Z, sX - 5,
+                    RenderTexturePlayer(Z, p, sX - 5,
                                           sY - 2,
                                           32, 32,
                                           GFXNPC[NPCID_FLY_POWER],
@@ -491,7 +491,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
 
                 if(p.Mount == 0)
                 {
-                    RenderTexturePlayer(Z,
+                    RenderTexturePlayer(Z, p,
                                 sX + offX,
                                 sY + offY,
                                 pfrW(tx, p),
@@ -515,7 +515,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                             ? -2
                             : 0;
 
-                        RenderTexturePlayer(Z,
+                        RenderTexturePlayer(Z, p,
                                     sX + offX,
                                     small_toad_oy_corr + sY + offY,
                                     pfrW(tx, p),
@@ -526,7 +526,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                                     s);
                     }
 
-                    RenderTexturePlayer(Z, sX + w / 2 - 16,
+                    RenderTexturePlayer(Z, p, sX + w / 2 - 16,
                                           sY + h - 30,
                                           32, 32,
                                           GFX.Boot[p.MountType],
@@ -536,7 +536,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                 }
                 else if(p.Mount == 3)
                 {
-                    RenderTexturePlayer(Z, sX + offX,
+                    RenderTexturePlayer(Z, p, sX + offX,
                                           sY + offY + p.MountOffsetY,
                                           pfrW(tx, p),
                                           pfrH(tx, p),
@@ -550,8 +550,9 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                     DrawCycloneAccessory(Z, p, sX + w / 2, sY, s);
             }
 
-        // peach/toad held npcs
-            if((p.Character == 3 || p.Character == 4) && p.HoldingNPC > 0 && p.Effect != PLREFF_WARP_DOOR)
+            // peach/toad held npcs
+            // NEW: also, all players' held NPCs during warp
+            if((p.Character == 3 || p.Character == 4 || (p.Effect == PLREFF_WARP_PIPE && p.Frame == 15)) && p.HoldingNPC > 0 && p.Effect != PLREFF_WARP_DOOR)
             {
                 if(NPC[p.HoldingNPC].Type != NPCID_ICE_CUBE)
                 {
@@ -559,8 +560,8 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                         (
                             (
                                  (
-                                        NPC[p.HoldingNPC].HoldingPlayer > 0 &&
-                                        Player[NPC[p.HoldingNPC].HoldingPlayer].Effect != PLREFF_WARP_PIPE
+                                        NPC[p.HoldingNPC].HoldingPlayer > 0
+                                        // && Player[NPC[p.HoldingNPC].HoldingPlayer].Effect != PLREFF_WARP_PIPE
                                   ) ||
                                  (NPC[p.HoldingNPC].Type == NPCID_TOOTHY && NPC[p.HoldingNPC].vehiclePlr == 0) ||
                                  (NPC[p.HoldingNPC].Type == NPCID_BULLET && NPC[p.HoldingNPC].CantHurt > 0)
@@ -580,7 +581,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                         {
                             if(NPC[p.HoldingNPC]->WidthGFX == 0)
                             {
-                                RenderTexturePlayer(Z, npc_sX + NPC[p.HoldingNPC]->FrameOffsetX,
+                                RenderTexturePlayer(Z, p, npc_sX + NPC[p.HoldingNPC]->FrameOffsetX,
                                                       npc_sY + NPC[p.HoldingNPC]->FrameOffsetY,
                                                       npc_w,
                                                       npc_h,
@@ -590,7 +591,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                             }
                             else
                             {
-                                RenderTexturePlayer(Z, npc_sX + (NPC[p.HoldingNPC]->FrameOffsetX * -NPC[p.HoldingNPC].Direction) - NPC[p.HoldingNPC]->WidthGFX / 2 + npc_w / 2,
+                                RenderTexturePlayer(Z, p, npc_sX + (NPC[p.HoldingNPC]->FrameOffsetX * -NPC[p.HoldingNPC].Direction) - NPC[p.HoldingNPC]->WidthGFX / 2 + npc_w / 2,
                                                       npc_sY + NPC[p.HoldingNPC]->FrameOffsetY - NPC[p.HoldingNPC]->HeightGFX + npc_h,
                                                       NPC[p.HoldingNPC]->WidthGFX,
                                                       NPC[p.HoldingNPC]->HeightGFX,
@@ -613,13 +614,13 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                 {
                     if(p.Direction == 1)
                     {
-                        RenderTexturePlayer(Z, sX + p.YoshiBX - 12,
+                        RenderTexturePlayer(Z, p, sX + p.YoshiBX - 12,
                                               sY + p.YoshiBY - 16,
                                               32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s);
                     }
                     else
                     {
-                        RenderTexturePlayer(Z, sX + p.YoshiBX + 12,
+                        RenderTexturePlayer(Z, p, sX + p.YoshiBX + 12,
                                               sY + p.YoshiBY - 16,
                                               32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s);
                     }
@@ -628,13 +629,13 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                 {
                     if(p.Direction == 1)
                     {
-                        RenderTexturePlayer(Z, sX - 24,
+                        RenderTexturePlayer(Z, p, sX - 24,
                                               sY + h - 40,
                                               32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s);
                     }
                     else
                     {
-                        RenderTexturePlayer(Z, sX + 16,
+                        RenderTexturePlayer(Z, p, sX + 16,
                                               sY + h - 40,
                                               32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s);
                     }

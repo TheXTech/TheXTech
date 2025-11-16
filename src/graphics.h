@@ -156,10 +156,14 @@ void UpdateGraphicsFatalAssert();
 // Public Sub DrawBackground(S As Integer, Z As Integer) 'draws the background to the screen
 // draws the background to the screen
 void DrawBackground(int S, int Z);
+
+// these were removed, and their logic is now incorporated into RenderTexturePlayer.
+
 // Public Sub PlayerWarpGFX(A As Integer, tempLocation As Location, X2 As Single, Y2 As Single)
-void PlayerWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2);
+// void PlayerWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2);
 // Public Sub NPCWarpGFX(A As Integer, tempLocation As Location, X2 As Single, Y2 As Single)
-void NPCWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2);
+// void NPCWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2);
+
 // Public Sub ChangeScreen() 'change from fullscreen to windowed mode
 // change from fullscreen to windowed mode
 void ChangeScreen();

@@ -50,7 +50,7 @@ void RenderKeyhole(int Z)
 
     num_t keyholeBottom = (realKeyholeBottom * (128 - keyholeGrowthCoord) + idealKeyholeBottom * keyholeGrowthCoord) / 128;
 
-    RenderTexturePlayerScale(Z,
+    RenderTexturePlayerScale(Z, Player[0],
         num_t::round(vScreen[Z].X + keyhole.Location.X + keyhole.Location.Width / 2 - keyhole.Location.Width * keyholeScale / 256),
         num_t::round(vScreen[Z].Y + keyholeBottom - 24 * keyholeScale / 128),
         (int)(keyhole.Location.Width) * keyholeScale / 128,
@@ -66,15 +66,91 @@ void RenderKeyhole(int Z)
         keyhole.Hidden = true;
 }
 
-void RenderTexturePlayerScale(int Z, int dst_x, int dst_y, int dst_w, int dst_h,
-                         StdPicture& tex,
-                         int src_x, int src_y, int src_w, int src_h,
-                         XTColor color)
+// WARP LOGIC: moved from PlayerWarpGFX (graphics.cpp)
+static inline bool s_warp_gfx(int Z, const Player_t& p,
+                         int& dst_x, int& dst_y, int& dst_w, int& dst_h,
+                         int& src_x, int& src_y)
+{
+    // .Effect = 3      -- Warp Pipe
+    // .Effect2 = 0     -- Entering
+    // .Effect2 = 1     -- Move to next spot
+    // .Effect2 => 100  -- Delay at next spot
+    // .Effect2 = 2     -- Exiting
+    // .Effect2 = 3     -- Done
+
+    if(p.Effect2 == 1 || p.Effect2 >= 100)
+        return true;
+
+    if(p.Effect2 == 0 || p.Effect2 == 2)
+    {
+        num_t camX = vScreen[Z].CameraAddX();
+        num_t camY = vScreen[Z].CameraAddY();
+
+        bool use_exit = (p.WarpBackward) == (p.Effect2 == 0);
+        const Warp_t& warp = Warp[p.Warp];
+        const SpeedlessLocation_t& warp_loc = (use_exit) ? warp.Exit : warp.Entrance;
+        auto warp_dir = (use_exit) ? warp.Direction2 : warp.Direction;
+
+        int warp_l = num_t::floor(warp_loc.X + camX);
+        int warp_r = warp_l + num_t::floor(warp_loc.Width);
+        int warp_t = num_t::floor(warp_loc.Y + camY);
+        int warp_b = warp_t + num_t::floor(warp_loc.Height);
+
+        if(warp_dir == 3) // warp below player
+        {
+            if(dst_h > warp_b - dst_y)
+                dst_h = warp_b - dst_y;
+        }
+        else if(warp_dir == 1) // warp above player
+        {
+            if(dst_y < warp_t)
+            {
+                src_y += (warp_t - dst_y);
+                dst_h -= (warp_t - dst_y);
+                dst_y = warp_t;
+            }
+        }
+        else if(warp_dir == 4) // warp to right of player
+        {
+            if(dst_w > warp_r - dst_x)
+                dst_w = warp_r - dst_x;
+        }
+        else if(warp_dir == 2) // warp to left of player
+        {
+            if(dst_x < warp_l)
+            {
+                src_x += (warp_l - dst_x);
+                dst_w -= (warp_l - dst_x);
+                dst_x = warp_l;
+            }
+        }
+
+        if(dst_w < 0 || dst_h < 0)
+            return true;
+    }
+
+    return false;
+}
+
+void RenderTexturePlayerScale(int Z, const Player_t& p,
+                              int dst_x, int dst_y, int dst_w, int dst_h,
+                              StdPicture& tex,
+                              int src_x, int src_y, int src_w, int src_h,
+                              XTColor color)
 {
     if(LevelMacro != LEVELMACRO_KEYHOLE_EXIT || LevelMacroWhich == 0)
     {
         if(src_w == -1 || src_h == -1)
+        {
+            if(p.Effect == PLREFF_WARP_PIPE)
+            {
+                // apply warp to bounding box and return if sprite should not be drawn
+                if(s_warp_gfx(Z, p, dst_x, dst_y, dst_w, dst_h, src_x, src_y))
+                    return;
+            }
+
             return XRender::renderTextureBasic(dst_x, dst_y, dst_w, dst_h, tex, src_x, src_y, color);
+        }
         else
             return XRender::renderTextureScaleEx(dst_x, dst_y, dst_w, dst_h, tex, src_x, src_y, src_w, src_h, 0, nullptr, X_FLIP_NONE, color);
     }
@@ -110,11 +186,13 @@ void RenderTexturePlayerScale(int Z, int dst_x, int dst_y, int dst_w, int dst_h,
                 color);
 }
 
-void RenderTexturePlayer(int Z, int dst_x, int dst_y, int dst_w, int dst_h,
+void RenderTexturePlayer(int Z, const Player_t& p,
+                         int dst_x, int dst_y, int dst_w, int dst_h,
                          StdPicture& tex,
                          int src_x, int src_y, XTColor color)
 {
-    RenderTexturePlayerScale(Z, dst_x, dst_y, dst_w, dst_h,
+    RenderTexturePlayerScale(Z, p,
+        dst_x, dst_y, dst_w, dst_h,
         tex,
         src_x, src_y, -1, -1,
         color);
