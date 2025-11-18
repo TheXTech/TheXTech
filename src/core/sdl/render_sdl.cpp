@@ -418,14 +418,19 @@ void RenderSDL::updateViewport()
     int window_w, window_h;
     XWindow::getWindowSize(&window_w, &window_h);
 
+    m_hidpi_x = (float)render_w / (float)window_w;
+    m_hidpi_y = (float)render_h / (float)window_h;
+
+    m_mouse_x = 1;
+    m_mouse_y = 1;
+
     if(m_halfPixelMode)
     {
         targetW >>= 1;
         targetH >>= 1;
+        m_mouse_x = 2;
+        m_mouse_y = 2;
     }
-
-    m_hidpi_x = (float)render_w / (float)window_w;
-    m_hidpi_y = (float)render_h / (float)window_h;
 
     if(!m_tBufferDisabled)
     {
@@ -660,14 +665,14 @@ void RenderSDL::getRenderSize(int* w, int* h)
 
 void RenderSDL::mapToScreen(int x, int y, int *dx, int *dy)
 {
-    *dx = static_cast<int>((static_cast<float>(x) * m_hidpi_x - m_offset_x) / m_viewport_scale_x);
-    *dy = static_cast<int>((static_cast<float>(y) * m_hidpi_y - m_offset_y) / m_viewport_scale_y);
+    *dx = static_cast<int>((static_cast<float>(x) * m_hidpi_x - m_offset_x) / m_viewport_scale_x) * m_mouse_x;
+    *dy = static_cast<int>((static_cast<float>(y) * m_hidpi_y - m_offset_y) / m_viewport_scale_y) * m_mouse_x;
 }
 
 void RenderSDL::mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
 {
-    *window_x = ((float)scr_x * m_viewport_scale_x + m_offset_x) / m_hidpi_x;
-    *window_y = ((float)scr_y * m_viewport_scale_y + m_offset_y) / m_hidpi_y;
+    *window_x = (((float)scr_x / m_mouse_x) * m_viewport_scale_x + m_offset_x) / m_hidpi_x;
+    *window_y = (((float)scr_y / m_mouse_y) * m_viewport_scale_y + m_offset_y) / m_hidpi_y;
 }
 
 void RenderSDL::setTargetTexture()
