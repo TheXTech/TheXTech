@@ -1219,9 +1219,9 @@ void AbstractRender_t::toggleGifRecorder()
             DirMan::mkAbsPath(outDir);
 
         PGE_VideoSpec spec;
-        spec.frame_w = XRender::TargetW;
-        spec.frame_h = XRender::TargetH;
-        spec.frame_pitch = XRender::TargetW * 4;
+        spec.frame_w = m_halfPixelMode ? XRender::TargetW >> 1 : XRender::TargetW;
+        spec.frame_h = m_halfPixelMode ? XRender::TargetH >> 1 : XRender::TargetH;
+        spec.frame_pitch = spec.frame_w * 4;
 
         std::unique_ptr<PGE_VideoRecording> recording;
 
@@ -1308,7 +1308,8 @@ void AbstractRender_t::processRecorder()
         return;
     }
 
-    const int w = XRender::TargetW, h = XRender::TargetH;
+    const int w = m_halfPixelMode ? XRender::TargetW >> 1 : XRender::TargetW,
+              h = m_halfPixelMode ? XRender::TargetH >> 1 : XRender::TargetH;
 
     PGE_VideoFrame shoot;
     shoot.pixels.resize(4 * w * h);
