@@ -156,10 +156,14 @@ void UpdateGraphicsFatalAssert();
 // Public Sub DrawBackground(S As Integer, Z As Integer) 'draws the background to the screen
 // draws the background to the screen
 void DrawBackground(int S, int Z);
+
+// these were removed, and their logic is now incorporated into RenderTexturePlayer.
+
 // Public Sub PlayerWarpGFX(A As Integer, tempLocation As Location, X2 As Single, Y2 As Single)
-void PlayerWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2);
+// void PlayerWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2);
 // Public Sub NPCWarpGFX(A As Integer, tempLocation As Location, X2 As Single, Y2 As Single)
-void NPCWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2);
+// void NPCWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2);
+
 // Public Sub ChangeScreen() 'change from fullscreen to windowed mode
 // change from fullscreen to windowed mode
 void ChangeScreen();
@@ -252,7 +256,7 @@ void DrawCycloneAccessory(int Z, const Player_t& p, int cX, int tY, XTColor c);
 // Public Sub ScreenShot()
 void ScreenShot();
 // Public Sub DrawFrozenNPC(Z As Integer, A As Integer)
-void DrawFrozenNPC(int camX, int camY, int A);
+void DrawFrozenNPC(num_t camX, num_t camY, int A);
 // NEW: draw wings for an NPC at a particular location
 void DrawNPCWings(const NPC_t& n, int sX, int sY, XTColor cn);
 

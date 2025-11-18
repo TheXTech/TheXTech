@@ -955,7 +955,7 @@ void RenderSDL::execute(const XRenderOp& op)
 
         if(op.traits & XRenderOp::Traits::src_rect)
         {
-            sourceRect = {op.xSrc, op.ySrc, op.wSrc, op.hSrc};
+            sourceRect = {(int)(op.xSrc * tx.d.w_scale), (int)(op.ySrc * tx.d.h_scale), (int)(op.wSrc * tx.d.w_scale), (int)(op.hSrc * tx.d.h_scale)};
             sourceRectPtr = &sourceRect;
         }
 
@@ -974,6 +974,108 @@ void RenderSDL::execute(const XRenderOp& op)
         }
         else
         {
+            // special logic to allow half-pixel draws of downscaled images
+            if(sourceRectPtr && tx.d.w_scale == 0.5f && op.wSrc == op.wDst)
+            {
+                SDL_Rect sourceRect2;
+                SDL_Rect destRect2;
+
+                bool lStrip = (op.xSrc & 1);
+                bool tStrip = (op.ySrc & 1);
+                bool rStrip = lStrip != (op.wSrc & 1);
+                bool bStrip = tStrip != (op.hSrc & 1);
+
+                if(lStrip && tStrip)
+                {
+                    sourceRect2 = {sourceRect.x, sourceRect.y, 1, 1};
+                    destRect2 = {destRect.x, destRect.y, 1, 1};
+                    SDL_RenderCopy(m_gRenderer, tx.d.texture, &sourceRect2, &destRect2);
+                }
+
+                if(lStrip)
+                {
+                    sourceRect2 = {sourceRect.x, sourceRect.y, 1, sourceRect.h};
+                    destRect2 = {destRect.x, destRect.y, 1, destRect.h};
+                    if(tStrip)
+                    {
+                        sourceRect2.y += 1;
+                        if(bStrip)
+                            sourceRect2.h -= 1;
+
+                        destRect2.y += 1;
+                        destRect2.h -= 1;
+                    }
+
+                    if(bStrip)
+                        destRect2.h -= 1;
+
+                    SDL_RenderCopy(m_gRenderer, tx.d.texture, &sourceRect2, &destRect2);
+
+                    sourceRect.x += 1;
+                    sourceRect.w = (int)((op.wSrc - 1) * tx.d.w_scale);
+                    destRect.x += 1;
+                    destRect.w -= 1;
+                }
+
+                if(tStrip)
+                {
+                    sourceRect2 = {sourceRect.x, sourceRect.y, sourceRect.w, 1};
+                    destRect2 = {destRect.x, destRect.y, destRect.w, 1};
+
+                    if(rStrip)
+                        destRect2.w -= 1;
+
+                    SDL_RenderCopy(m_gRenderer, tx.d.texture, &sourceRect2, &destRect2);
+
+                    sourceRect.y += 1;
+                    sourceRect.h = (int)((op.hSrc - 1) * tx.d.h_scale);
+                    destRect.y += 1;
+                    destRect.h -= 1;
+                }
+
+                if(rStrip)
+                {
+                    destRect.w -= 1;
+                    sourceRect2 = {sourceRect.x + sourceRect.w, sourceRect.y, 1, sourceRect.h};
+                    destRect2 = {destRect.x + destRect.w, destRect.y, 1, destRect.h};
+
+                    if(bStrip)
+                        destRect2.h -= 1;
+
+                    SDL_RenderCopy(m_gRenderer, tx.d.texture, &sourceRect2, &destRect2);
+                }
+
+                if(bStrip)
+                {
+                    destRect.h -= 1;
+                    sourceRect2 = {sourceRect.x, sourceRect.y + sourceRect.h, sourceRect.w, 1};
+                    destRect2 = {destRect.x, destRect.y + destRect.h, destRect.w, 1};
+
+                    SDL_RenderCopy(m_gRenderer, tx.d.texture, &sourceRect2, &destRect2);
+                }
+
+                if(lStrip && bStrip)
+                {
+                    sourceRect2 = {sourceRect.x - 1, sourceRect.y + sourceRect.h, 1, 1};
+                    destRect2 = {destRect.x - 1, destRect.y + destRect.h, 1, 1};
+                    SDL_RenderCopy(m_gRenderer, tx.d.texture, &sourceRect2, &destRect2);
+                }
+
+                if(rStrip && tStrip)
+                {
+                    sourceRect2 = {sourceRect.x + sourceRect.w, sourceRect.y - 1, 1, 1};
+                    destRect2 = {destRect.x + destRect.w, destRect.y - 1, 1, 1};
+                    SDL_RenderCopy(m_gRenderer, tx.d.texture, &sourceRect2, &destRect2);
+                }
+
+                if(rStrip && bStrip)
+                {
+                    sourceRect2 = {sourceRect.x + sourceRect.w, sourceRect.y + sourceRect.h, 1, 1};
+                    destRect2 = {destRect.x + destRect.w, destRect.y + destRect.h, 1, 1};
+                    SDL_RenderCopy(m_gRenderer, tx.d.texture, &sourceRect2, &destRect2);
+                }
+            }
+
             SDL_RenderCopy(m_gRenderer, tx.d.texture, sourceRectPtr, &destRect);
         }
 
@@ -1147,10 +1249,10 @@ void RenderSDL::renderTextureScaleEx(int xDst, int yDst, int wDst, int hDst,
     op.wDst = wDst;
     op.hDst = hDst;
 
-    op.xSrc = tx.d.w_scale * xSrc;
-    op.ySrc = tx.d.h_scale * ySrc;
-    op.wSrc = tx.d.w_scale * wSrc;
-    op.hSrc = tx.d.h_scale * hSrc;
+    op.xSrc = xSrc;
+    op.ySrc = ySrc;
+    op.wSrc = wSrc;
+    op.hSrc = hSrc;
 
     op.color = color;
 
@@ -1204,7 +1306,7 @@ void RenderSDL::renderTextureScale(int xDst, int yDst, int wDst, int hDst,
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
     op.type = XRenderOp::Type::texture;
-    op.traits = m_pow2 || m_halfPixelMode ? XRenderOp::Traits::src_rect : 0;
+    op.traits = (m_pow2 || m_halfPixelMode) ? XRenderOp::Traits::src_rect : 0;
 
     op.texture = &tx;
 
@@ -1217,8 +1319,8 @@ void RenderSDL::renderTextureScale(int xDst, int yDst, int wDst, int hDst,
     {
         op.xSrc = 0;
         op.ySrc = 0;
-        op.wSrc = tx.d.w_scale * tx.w;
-        op.hSrc = tx.d.h_scale * tx.h;
+        op.wSrc = tx.w;
+        op.hSrc = tx.h;
     }
 
     op.color = color;
@@ -1336,7 +1438,7 @@ void RenderSDL::renderTexture(int xDst, int yDst,
     }
 
     op.type = XRenderOp::Type::texture;
-    op.traits = m_pow2 || m_halfPixelMode ? XRenderOp::Traits::src_rect : 0;
+    op.traits = (m_pow2 || m_halfPixelMode) ? XRenderOp::Traits::src_rect : 0;
 
     op.texture = &tx;
 
@@ -1349,8 +1451,8 @@ void RenderSDL::renderTexture(int xDst, int yDst,
     {
         op.xSrc = 0;
         op.ySrc = 0;
-        op.wSrc = tx.d.w_scale * tx.w;
-        op.hSrc = tx.d.h_scale * tx.h;
+        op.wSrc = tx.w;
+        op.hSrc = tx.h;
     }
 
     if(m_halfPixelMode)

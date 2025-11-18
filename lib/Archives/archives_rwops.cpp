@@ -31,6 +31,13 @@
 #include "archives.h"
 #include "archives_priv.h"
 
+// define specific warnings here until we have full specific warning support via CMake
+#ifdef __PSP__
+#    define archives_pLogWarning pLogWarning
+#else
+#    define archives_pLogWarning D_pLogWarning
+#endif
+
 namespace Archives
 {
 
@@ -96,7 +103,7 @@ SDL_RWops* open_file(const char* name)
 {
     if(!is_prefix(name[0]))
     {
-        pLogWarning("Archives: Unsupported prefix at path [%s]", name);
+        archives_pLogWarning("Archives: Unsupported prefix at path [%s]", name);
         return nullptr;
     }
 
@@ -115,7 +122,7 @@ SDL_RWops* open_file(const char* name)
 
         if(archive_path_end == archive_path_start || *archive_path_end == '\0')
         {
-            pLogWarning("Archives: Path is not found [%s]", name);
+            archives_pLogWarning("Archives: invalid composite path [%s]", name);
             return nullptr;
         }
 
@@ -129,7 +136,7 @@ SDL_RWops* open_file(const char* name)
 
         if(!mounted || !temp_mount)
         {
-            pLogWarning("Archives: Failed to mount path [%s]", archive_path);
+            archives_pLogWarning("Archives: Failed to mount archive [%s]", archive_path);
             free(archive_path);
             return nullptr;
         }
@@ -151,7 +158,7 @@ SDL_RWops* open_file(const char* name)
 
     if(!f)
     {
-        pLogWarning("Archives: File [%s] doesn't exists", name);
+        archives_pLogWarning("Archives: File [%s] doesn't exists", name);
         return nullptr;
     }
 
@@ -160,7 +167,7 @@ SDL_RWops* open_file(const char* name)
     if(!ret)
     {
         mbediso_fclose(f);
-        pLogWarning("Archives: Failed attempt to open [%s]: SDL_RWops error: %s", name, SDL_GetError());
+        archives_pLogWarning("Archives: Failed attempt to open [%s]: SDL_RWops error: %s", name, SDL_GetError());
         return nullptr;
     }
 

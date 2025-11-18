@@ -325,8 +325,8 @@ void Renderer::DrawOp(RenderOp &op)
 
 bool Render::IsOnScreen(int x, int y, int w, int h)
 {
-    int cam_x = vScreen[1].CameraAddX();
-    int cam_y = vScreen[1].CameraAddY();
+    int cam_x = vScreen[1].CameraAddX_i();
+    int cam_y = vScreen[1].CameraAddY_i();
     int cam_w = vScreen[1].Width;
     int cam_h = vScreen[1].Height;
 

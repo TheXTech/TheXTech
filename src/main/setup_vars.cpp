@@ -802,10 +802,10 @@ void SetupVars()
     NPCTraits[NPCID_HPIPE_LONG].THeight = 32;
     NPCTraits[NPCID_HPIPE_LONG].NoYoshi = true;
     NPCTraits[NPCID_VPIPE_SHORT].TWidth = 32; // grey pipe y
-    NPCTraits[NPCID_VPIPE_SHORT].THeight = 127; // FIXME: was set to 127.9 in VB6, which has round semantics for implicit casts
+    NPCTraits[NPCID_VPIPE_SHORT].THeight = 128; // NOTE: was set to 127 until v1.3.7.2, due to different semantics for the implicit cast of 127.9 to int between VB6 and C++
     NPCTraits[NPCID_VPIPE_SHORT].NoYoshi = true;
     NPCTraits[NPCID_VPIPE_LONG].TWidth = 32; // big grey pipe y
-    NPCTraits[NPCID_VPIPE_LONG].THeight = 255; // FIXME: was set to 255.9 in VB6
+    NPCTraits[NPCID_VPIPE_LONG].THeight = 256; // NOTE: was set to 255 until v1.3.7.2, due to different semantics for the implicit cast of 127.9 to int between VB6 and C++
     NPCTraits[NPCID_VPIPE_LONG].NoYoshi = true;
     NPCTraits[NPCID_BIG_FODDER].TWidth = 48; // giant goomba
     NPCTraits[NPCID_BIG_FODDER].THeight = 46;

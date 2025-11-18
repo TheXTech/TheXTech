@@ -40,8 +40,8 @@ void RenderBitmapOp::Draw(Renderer *renderer)
 
     if(sceneCoords)
     {
-        screenX -= vScreen[renderer->GetCameraIdx()].CameraAddX();
-        screenY -= vScreen[renderer->GetCameraIdx()].CameraAddY();
+        screenX -= vScreen[renderer->GetCameraIdx()].CameraAddX_i();
+        screenY -= vScreen[renderer->GetCameraIdx()].CameraAddY_i();
     }
     else
     {

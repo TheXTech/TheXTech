@@ -542,195 +542,6 @@ static inline int s_round2int(num_t d)
     return num_t::floor(d + 0.5_n);
 }
 
-static inline int s_round2int_plr(num_t d)
-{
-#ifdef PGE_MIN_PORT
-    return (int)(num_t::floor(d / 2 + 0.5_n)) * 2;
-#else
-    return num_t::floor(d + 0.5_n);
-#endif
-}
-
-static inline IntegerLocation_t s_round2int_plr(const SpeedlessLocation_t& d)
-{
-    IntegerLocation_t ret;
-    ret.X = s_round2int_plr(d.X);
-    ret.Y = s_round2int_plr(d.Y);
-    ret.Width = s_round2int_plr(d.Width);
-    ret.Height = s_round2int_plr(d.Height);
-    return ret;
-}
-
-void PlayerWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2)
-{
-    auto &player = Player[A];
-    bool backward = player.WarpBackward;
-    auto &warp = Warp[player.Warp];
-    const SpeedlessLocation_t &_warp_enter = backward ? warp.Exit : warp.Entrance;
-    const SpeedlessLocation_t &_warp_exit = backward ? warp.Entrance : warp.Exit;
-    auto &warp_dir_enter = backward ? warp.Direction2 : warp.Direction;
-    auto &warp_dir_exit = backward ? warp.Direction : warp.Direction2;
-
-    IntegerLocation_t warp_enter = s_round2int_plr(_warp_enter);
-    IntegerLocation_t warp_exit = s_round2int_plr(_warp_exit);
-
-    // .Effect = 3      -- Warp Pipe
-    // .Effect2 = 0     -- Entering
-    // .Effect2 = 1     -- Move to next spot
-    // .Effect2 => 100  -- Delay at next spot
-    // .Effect2 = 2     -- Exiting
-    // .Effect2 = 3     -- Done
-    if(player.Effect2 == 0)
-    {
-        if(warp_dir_enter == 3) // Moving down
-        {
-            if(tempLocation.Height > (warp_enter.Y + warp_enter.Height) - (tempLocation.Y))
-                tempLocation.Height = (warp_enter.Y + warp_enter.Height) - (tempLocation.Y);
-        }
-        else if(warp_dir_enter == 1) // Moving up
-        {
-            if(warp_enter.Y > tempLocation.Y)
-            {
-                Y2 = warp_enter.Y - tempLocation.Y;
-                tempLocation.Y = warp_enter.Y;
-                tempLocation.Height += -Y2;
-            }
-        }
-        else if(warp_dir_enter == 4) // Moving right
-            tempLocation.Width = (warp_enter.X + warp_enter.Width) - (tempLocation.X);
-        else if(warp_dir_enter == 2) // Moving left
-        {
-            X2 = warp_enter.X - tempLocation.X;
-            if(X2 < 0)
-                X2 = 0;
-            else
-                tempLocation.X = warp_enter.X;
-        }
-    }
-    else if(player.Effect2 == 2)
-    {
-        if(warp_dir_exit == 3) // Moving up
-        {
-            if(tempLocation.Height > (warp_exit.Y + warp_exit.Height) - (tempLocation.Y))
-                tempLocation.Height = (warp_exit.Y + warp_exit.Height) - (tempLocation.Y);
-        }
-        else if(warp_dir_exit == 1) // Moving down
-        {
-            if(warp_exit.Y > tempLocation.Y)
-            {
-                Y2 = warp_exit.Y - tempLocation.Y;
-                tempLocation.Y = warp_exit.Y;
-                tempLocation.Height += -Y2;
-            }
-        }
-        else if(warp_dir_exit == 4) // Moving left
-            tempLocation.Width = (warp_exit.X + warp_exit.Width) - (tempLocation.X);
-        else if(warp_dir_exit == 2) // Moving right
-        {
-            X2 = warp_exit.X - tempLocation.X;
-            if(X2 < 0)
-                X2 = 0;
-            else
-                tempLocation.X = warp_exit.X;
-        }
-    }
-
-    if(player.Effect2 == 1 || player.Effect2 >= 100)
-        tempLocation.Height = 0;
-
-    if(tempLocation.Height < 0)
-    {
-        tempLocation.Height = 0;
-        tempLocation.Width = 0;
-    }
-
-    tempLocation.Width -= X2;
-}
-
-void NPCWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2)
-{
-    auto &player = Player[A];
-    bool backward = player.WarpBackward;
-    auto &warp = Warp[player.Warp];
-    const SpeedlessLocation_t &_warp_enter = backward ? warp.Exit : warp.Entrance;
-    const SpeedlessLocation_t &_warp_exit = backward ? warp.Entrance : warp.Exit;
-    auto &warp_dir_enter = backward ? warp.Direction2 : warp.Direction;
-    auto &warp_dir_exit = backward ? warp.Direction : warp.Direction2;
-
-    IntegerLocation_t warp_enter = s_round2int_plr(_warp_enter);
-    IntegerLocation_t warp_exit = s_round2int_plr(_warp_exit);
-
-    // player(a).effect = 3      -- Warp Pipe
-    // player(a).effect2 = 0     -- Entering
-    // player(a).effect2 = 1     -- Move to next spot
-    // player(a).effect2 => 100  -- Delay at next spot
-    // player(a).effect2 = 2     -- Exiting
-    // player(a).effect2 = 3     -- Done
-    if(player.Effect2 == 0)
-    {
-        if(warp_dir_enter == 3) // Moving down
-        {
-            if(tempLocation.Height > (warp_enter.Y + warp_enter.Height) - (tempLocation.Y))
-                tempLocation.Height = (warp_enter.Y + warp_enter.Height) - (tempLocation.Y);
-        }
-        else if(warp_dir_enter == 1) // Moving up
-        {
-            if(warp_enter.Y > tempLocation.Y)
-            {
-                Y2 = warp_enter.Y - tempLocation.Y;
-                tempLocation.Y = warp_enter.Y;
-                tempLocation.Height += -Y2;
-            }
-        }
-        else if(warp_dir_enter == 4) // Moving right
-            tempLocation.Width = (warp_enter.X + warp_enter.Width) - (tempLocation.X);
-        else if(warp_dir_enter == 2) // Moving left
-        {
-            X2 = warp_enter.X - tempLocation.X;
-            if(X2 < 0)
-                X2 = 0;
-            else
-                tempLocation.X = warp_enter.X;
-        }
-    }
-    else if(player.Effect2 == 2)
-    {
-        if(warp_dir_exit == 3) // Moving up
-        {
-            if(tempLocation.Height > (warp_exit.Y + warp_exit.Height) - (tempLocation.Y))
-                tempLocation.Height = (warp_exit.Y + warp_exit.Height) - (tempLocation.Y);
-        }
-        else if(warp_dir_exit == 1) // Moving down
-        {
-            if(warp_exit.Y > tempLocation.Y)
-            {
-                Y2 = warp_exit.Y - tempLocation.Y;
-                tempLocation.Y = warp_exit.Y;
-                tempLocation.Height += -Y2;
-            }
-        }
-        else if(warp_dir_exit == 4) // Moving left
-            tempLocation.Width = (warp_exit.X + warp_exit.Width) - (tempLocation.X);
-        else if(warp_dir_exit == 2) // Moving right
-        {
-            X2 = warp_exit.X - tempLocation.X;
-            if(X2 < 0)
-                X2 = 0;
-            else
-                tempLocation.X = warp_exit.X;
-        }
-    }
-
-    if(player.Effect2 == 1 || player.Effect2 >= 100)
-        tempLocation.Height = 0;
-
-    if(tempLocation.Height < 0)
-    {
-        tempLocation.Height = 0;
-        tempLocation.Width = 0;
-    }
-}
-
 // change from fullscreen to windowed mode
 void ChangeScreen()
 {
@@ -877,20 +688,14 @@ void ScreenShot()
     TakeScreen = false;
 }
 
-void DrawFrozenNPC(int camX, int camY, int A)
+void DrawFrozenNPC(num_t camX, num_t camY, int A)
 {
     auto &n = NPC[A];
 
-    int sX = camX + s_round2int(NPC[A].Location.X);
-    int sY = camY + s_round2int(NPC[A].Location.Y);
+    int sX = num_t::floor(camX + NPC[A].Location.X);
+    int sY = num_t::floor(camY + NPC[A].Location.Y);
     int w = s_round2int(NPC[A].Location.Width);
     int h = s_round2int(NPC[A].Location.Height);
-
-    if(NPC[A].HoldingPlayer != 0)
-    {
-        sX = camX + s_round2int_plr(NPC[A].Location.X);
-        sY = camY + s_round2int_plr(NPC[A].Location.Y);
-    }
 
     // collision already checked elsewhere
     // if((vScreenCollision(Z, n.Location) ||

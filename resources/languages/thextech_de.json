@@ -87,8 +87,8 @@
             "invis": "N. Sicht",
             "pickContents": "Wähle Block Inhalt",
             "slick": "Glatt",
-            "letterHeight": "",
-            "letterWidth": ""
+            "letterHeight": "H ",
+            "letterWidth": "B "
         },
         "layers": {
             "promptLayerName": "",

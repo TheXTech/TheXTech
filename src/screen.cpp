@@ -45,22 +45,50 @@ int vScreen_t::TargetY() const
     return Screens[screen_ref].TargetY() + ScreenTop;
 }
 
-int vScreen_t::CameraAddX() const
+num_t vScreen_t::CameraAddX() const
 {
 #ifdef PGE_MIN_PORT
-    return (int)(num_t::ceil(X / 2 - 0.5_n)) * 2;
+    if(!Player[this->player].StandingOnNPC)
+        return num_t::ceil(X / 2 - 0.5_n) * 2 + 1.0_n;
+
+    return X + 1.0_n;
 #else
-    return num_t::ceil(X - 0.5_n);
+    // this will be added to numeric object coordinates and then the floor will be taken.
+
+    // the logic here is that if the player is not on a moving NPC / layer,
+    //   use whole-number world coordinates to keep static objects from jittering, then round all positions
+    // when the player *is* on a moving NPC / layer,
+    //   use player-centric numeric coordinates to keep nearby objects from jittering, then round all positions
+    if(!Player[this->player].StandingOnNPC)
+        return num_t::ceil(X - 0.5_n) + 0.5_n;
+
+    return X + 0.5_n;
 #endif
 }
 
-int vScreen_t::CameraAddY() const
+num_t vScreen_t::CameraAddY() const
 {
 #ifdef PGE_MIN_PORT
-    return (int)(num_t::ceil(Y / 2 - 0.5_n)) * 2;
+    if(!Player[this->player].StandingOnNPC)
+        return num_t::ceil(Y / 2 - 0.5_n) * 2 + 1.0_n;
+
+    return Y + 1.0_n;
 #else
-    return num_t::ceil(Y - 0.5_n);
+    if(!Player[this->player].StandingOnNPC)
+        return num_t::ceil(Y - 0.5_n) + 0.5_n;
+
+    return Y + 0.5_n;
 #endif
+}
+
+int vScreen_t::CameraAddX_i() const
+{
+    return num_t::floor(CameraAddX());
+}
+
+int vScreen_t::CameraAddY_i() const
+{
+    return num_t::floor(CameraAddY());
 }
 
 Screen_t& Screen_t::canonical_screen()
