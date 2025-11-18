@@ -795,7 +795,7 @@ void RenderSDL::execute(const XRenderOp& op)
 
         if(op.traits & XRenderOp::Traits::src_rect)
         {
-            sourceRect = {op.xSrc, op.ySrc, op.wSrc, op.hSrc};
+            sourceRect = {(int)(op.xSrc * tx.d.w_scale), (int)(op.ySrc * tx.d.h_scale), (int)(op.wSrc * tx.d.w_scale), (int)(op.hSrc * tx.d.h_scale)};
             sourceRectPtr = &sourceRect;
         }
 
@@ -959,10 +959,10 @@ void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, d
     op.wDst = Maths::iRound(wDstD);
     op.hDst = Maths::iRound(hDstD);
 
-    op.xSrc = tx.d.w_scale * xSrc;
-    op.ySrc = tx.d.h_scale * ySrc;
-    op.wSrc = tx.d.w_scale * wSrc;
-    op.hSrc = tx.d.h_scale * hSrc;
+    op.xSrc = xSrc;
+    op.ySrc = ySrc;
+    op.wSrc = wSrc;
+    op.hSrc = hSrc;
 
     op.color = color;
 
@@ -1013,7 +1013,7 @@ void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
     op.type = XRenderOp::Type::texture;
-    op.traits = m_pow2 ? XRenderOp::Traits::src_rect : 0;
+    op.traits = (m_pow2) ? XRenderOp::Traits::src_rect : 0;
 
     op.texture = &tx;
 
@@ -1026,8 +1026,8 @@ void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double
     {
         op.xSrc = 0;
         op.ySrc = 0;
-        op.wSrc = tx.d.w_scale * tx.w;
-        op.hSrc = tx.d.h_scale * tx.h;
+        op.wSrc = tx.w;
+        op.hSrc = tx.h;
     }
 
     op.color = color;
@@ -1081,10 +1081,10 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
     op.wDst = wDst;
     op.hDst = hDst;
 
-    op.xSrc = tx.d.w_scale * xSrc;
-    op.ySrc = tx.d.h_scale * ySrc;
-    op.wSrc = tx.d.w_scale * wDst;
-    op.hSrc = tx.d.h_scale * hDst;
+    op.xSrc = xSrc;
+    op.ySrc = ySrc;
+    op.wSrc = wDst;
+    op.hSrc = hDst;
 
     op.color = color;
 }
@@ -1126,7 +1126,7 @@ void RenderSDL::renderTexture(float xDst, float yDst,
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
     op.type = XRenderOp::Type::texture;
-    op.traits = m_pow2 ? XRenderOp::Traits::src_rect : 0;
+    op.traits = (m_pow2) ? XRenderOp::Traits::src_rect : 0;
 
     op.texture = &tx;
 
@@ -1139,8 +1139,8 @@ void RenderSDL::renderTexture(float xDst, float yDst,
     {
         op.xSrc = 0;
         op.ySrc = 0;
-        op.wSrc = tx.d.w_scale * tx.w;
-        op.hSrc = tx.d.h_scale * tx.h;
+        op.wSrc = tx.w;
+        op.hSrc = tx.h;
     }
 
     op.color = color;
