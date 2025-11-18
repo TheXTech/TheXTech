@@ -83,6 +83,10 @@ class RenderSDL final : public AbstractRender_t
     float m_hidpi_x = 1.0f;
     float m_hidpi_y = 1.0f;
 
+    // Mouse position scale
+    int m_mouse_x = 1;
+    int m_mouse_y = 1;
+
     static void txColorMod(StdPictureData &tx, XTColor color);
 
 protected:
