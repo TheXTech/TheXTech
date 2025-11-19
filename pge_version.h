@@ -195,9 +195,9 @@
 #       define FILE_CPU "PowerPC (32-bit)"
 #   endif
 #elif defined(__riscv) // FIXME: Adjust if any extra macros needed
-#   if defined(__riscv64)
+#   if __riscv_xlen == 64
 #       define FILE_CPU "RISC-V (64-bit)"
-#   elif defined(__riscv32)
+#   elif __riscv_xlen == 32
 #       define FILE_CPU "RISC-V (32-bit)"
 #   endif
 #elif defined(__loongarch64)
