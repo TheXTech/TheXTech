@@ -125,6 +125,22 @@ E_INLINE  bool hasFrameBuffer() TAIL
 #endif
 
 /*!
+ * \brief Identify whether render engine is in half-pixel mode
+ * \return true if render is in half-pixel mode
+ */
+#ifndef RENDER_CUSTOM
+SDL_FORCE_INLINE bool isHalfPixel()
+{
+    return g_render->isHalfPixel();
+}
+#else
+static constexpr bool isHalfPixel()
+{
+    return true;
+}
+#endif
+
+/*!
  * \brief Call the repaint
  */
 E_INLINE void repaint() TAIL
