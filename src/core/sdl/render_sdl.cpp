@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cmath>
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_opengl.h>
@@ -56,6 +57,13 @@
 #define SDL_RenderCopyF SDL_RenderCopy
 #define SDL_RenderCopyExF SDL_RenderCopyEx
 #endif
+
+inline bool fEqual(float a, float b)
+{
+    int64_t ai = int64_t(std::round(a * 10000.0f));
+    int64_t bi = int64_t(std::round(b * 10000.0f));
+    return ai == bi;
+}
 
 static inline unsigned pow2roundup(unsigned x)
 {
@@ -995,7 +1003,7 @@ void RenderSDL::execute(const XRenderOp& op)
         else
         {
             // special logic to allow half-pixel draws of downscaled images
-            if(sourceRectPtr && tx.d.w_scale == 0.5f && op.wSrc == op.wDst && !m_halfPixelMode)
+            if(sourceRectPtr && fEqual(tx.d.w_scale, 0.5f) && op.wSrc == op.wDst && !m_halfPixelMode)
             {
                 SDL_Rect sourceRect2;
                 SDL_Rect destRect2;
