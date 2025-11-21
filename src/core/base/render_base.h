@@ -92,6 +92,15 @@ public:
      */
     virtual bool hasFrameBuffer() = 0;
 
+    /*!
+     * \brief Identify whether render engine is in half-pixel mode
+     * \return true if render is in half-pixel mode
+     */
+    inline static bool isHalfPixel()
+    {
+        return m_halfPixelMode;
+    }
+
     virtual bool initRender(SDL_Window *window) = 0;
 
     /*!
