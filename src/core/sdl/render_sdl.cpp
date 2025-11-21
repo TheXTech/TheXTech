@@ -968,6 +968,14 @@ void RenderSDL::execute(const XRenderOp& op)
                 (int)(op.xSrc * scale.x), (int)(op.ySrc * scale.y),
                 (int)(op.wSrc * scale.x), (int)(op.hSrc * scale.y)
             };
+
+            // adjust draw size based on inputs
+            if(m_halfPixelMode && op.wDst == op.wSrc)
+                sourceRect.w = (int)(destRect.w * 2 * scale.x);
+
+            if(m_halfPixelMode && op.hDst == op.hSrc)
+                sourceRect.h = (int)(destRect.h * 2 * scale.y);
+
             sourceRectPtr = &sourceRect;
         }
 
@@ -987,7 +995,7 @@ void RenderSDL::execute(const XRenderOp& op)
         else
         {
             // special logic to allow half-pixel draws of downscaled images
-            if(sourceRectPtr && tx.d.w_scale == 0.5f && op.wSrc == op.wDst)
+            if(sourceRectPtr && tx.d.w_scale == 0.5f && op.wSrc == op.wDst && !m_halfPixelMode)
             {
                 SDL_Rect sourceRect2;
                 SDL_Rect destRect2;
