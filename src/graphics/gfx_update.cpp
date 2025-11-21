@@ -3062,6 +3062,18 @@ void UpdateGraphicsScreen(Screen_t& screen)
         XRender::splitFrame();
         XRender::offsetViewportIgnore(true);
 
+        // vScreen fader (for within-level warps). Always draw for single-player and forced shared screen
+        // And don't draw when many players at the same screen (might be leaving / joining the dynamic shared screen)
+        if(screen.player_count == 1 || numScreens != 1 || screen.Type == ScreenTypes::SharedScreen)
+        {
+            if(g_levelVScreenFader[Z].isVisible())
+            {
+                XRender::setDrawPlane(PLANE_LVL_HUD - 1);
+                g_levelVScreenFader[Z].draw(false);
+                XRender::splitFrame();
+            }
+        }
+
 #ifdef __3DS__
         if(GamePaused != PauseCode::Options && !(GameMenu && MenuMode == MENU_NEW_OPTIONS))
             XRender::setTargetLayer(3);
@@ -3121,11 +3133,6 @@ void UpdateGraphicsScreen(Screen_t& screen)
         }
 
         XRender::setDrawPlane(PLANE_LVL_META);
-
-        // Always draw for single-player and forced shared screen
-        // And don't draw when many players at the same screen (might be leaving / joining the dynamic shared screen)
-        if(screen.player_count == 1 || numScreens != 1 || screen.Type == ScreenTypes::SharedScreen)
-            g_levelVScreenFader[Z].draw(false);
 
         if((LevelEditor || MagicHand))
         {
