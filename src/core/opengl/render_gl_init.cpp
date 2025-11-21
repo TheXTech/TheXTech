@@ -770,6 +770,11 @@ bool RenderGL::initFramebuffers()
     if(!m_has_fbo)
         return true;
 
+    if(m_halfPixelMode)
+        m_render_scale_factor = 0.5f;
+    else
+        m_render_scale_factor = 1.0f;
+
     // try to allocate each texture / framebuffer that would be useful
     for(int i = BUFFER_GAME; i < BUFFER_MAX; i++)
     {
