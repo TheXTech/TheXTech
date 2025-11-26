@@ -79,7 +79,7 @@ jobs:
             -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=i386 -DCPACK_DEBIAN_PACKAGE_DEPENDS=\"\" \
             -DCPACK_DEBIAN_PACKAGE_DESCRIPTION=\"TheXTech - the modern C++ port and successor of the SMBX engine\"",
 
-            deps_cmdline: "echo 'Ubuntu 14 x86_32, everything pre-installed'",
+            deps_cmdline: "echo 'Ubuntu 14 x86_32, everything pre-installed'; ln -sf /usr/bin/i686-linux-gnu-gcc-8 /usr/bin/gcc; ln -sf /usr/bin/i686-linux-gnu-g++-8 /usr/bin/g++;",
 
             executable_name: "thextech",
             generator: "Ninja",
