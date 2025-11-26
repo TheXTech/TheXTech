@@ -1416,6 +1416,5 @@ namespace Fixed64
 
 
     #undef FP_ASSERT
-};
+}
 #endif // __FIXED64_H
-

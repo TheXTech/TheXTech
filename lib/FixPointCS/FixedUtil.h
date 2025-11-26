@@ -632,6 +632,5 @@ namespace FixedUtil
 
 
     #undef FP_ASSERT
-};
+}
 #endif // __FIXEDUTIL_H
-
