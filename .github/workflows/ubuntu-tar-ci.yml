@@ -89,8 +89,8 @@ jobs:
             -DPGE_SHARED_SDLMIXER=OFF \
             -DTHEXTECH_BUILD_GL_ES_LEGACY=OFF \
             -DTHEXTECH_USE_ANGLE_TRANSLATOR=OFF \
-            -DCMAKE_C_COMPILER=gcc-8 \
-            -DCMAKE_CXX_COMPILER=g++-8",
+            -DCMAKE_C_COMPILER=/usr/bin/i686-linux-gnu-gcc-8 \
+            -DCMAKE_CXX_COMPILER=/usr/bin/i686-linux-gnu-g++-8",
 
             deps_cmdline: "echo 'Ubuntu 14 x86_32, everything pre-installed'",
 

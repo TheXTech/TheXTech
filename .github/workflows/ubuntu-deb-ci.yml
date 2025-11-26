@@ -71,8 +71,8 @@ jobs:
             -DTHEXTECH_PACKAGE_NAME=\"thextech-bin\" \
             -DTHEXTECH_INSTALLER_PACKAGE_NAME=\"thextech-bin\" \
             -DTHEXTECH_USE_ANGLE_TRANSLATOR=OFF \
-            -DCMAKE_C_COMPILER=gcc-8 \
-            -DCMAKE_CXX_COMPILER=g++-8 \
+            -DCMAKE_C_COMPILER=/usr/bin/i686-linux-gnu-gcc-8 \
+            -DCMAKE_CXX_COMPILER=/usr/bin/i686-linux-gnu-g++-8 \
             -DCPACK_GENERATOR=DEB \
             -DCPACK_DEBIAN_PACKAGE_HOMEPAGE=\"https://wohlsoft.ru\" \
             -DCPACK_DEBIAN_PACKAGE_RELEASE=${GITHUB_RUN_NUMBER} \
