@@ -18,12 +18,35 @@
  */
 
 #include <Foundation/Foundation.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <SDL2/SDL_error.h>
 #include <SDL2/SDL_filesystem.h>
 
 #include "app_path_macos_dirs.h"
+
+char *getHomeDir(void)
+{
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    NSString *str;
+    char *retval = NULL;
+    const char *base;
+
+    str = NSHomeDirectory();
+    base = [str fileSystemRepresentation];
+
+    if(base)
+    {
+        const size_t len = SDL_strlen(base) + 4;
+        retval = (char *)SDL_malloc(len);
+
+        if(retval == NULL)
+            SDL_OutOfMemory();
+        else
+            SDL_snprintf(retval, len, "%s", base);
+    }
+
+    [pool drain];
+    return retval;
+}
 
 char * getAppSupportDir(void)
 {
