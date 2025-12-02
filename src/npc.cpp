@@ -2678,10 +2678,10 @@ void NPCSpecial(int A)
             }
 
             // NEW: add a terminal velocity for the platforms in modern mode
-            if(npc.SpecialY > 16)
+            if(npc.SpecialY > 40)
             {
                 if(g_config.fix_platforms_acceleration)
-                    npc.SpecialY = 16;
+                    npc.SpecialY = 40;
 
                 // in either mode, try to "cancel" the NPC once it has fallen below everything
                 // fixes some serious memory exhaustion bugs
