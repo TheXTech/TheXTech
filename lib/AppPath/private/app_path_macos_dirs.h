@@ -25,6 +25,7 @@ extern "C"
 {
 #endif
 
+char * getHomeDir(void);
 char * getAppSupportDir(void);
 char * getScreenCaptureDir(void);
 

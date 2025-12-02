@@ -36,6 +36,16 @@ static std::string s_screenshotsPath;
 static std::string s_gifRecordPath;
 //! The name of application bundle to be re-used as the user directory name
 static std::string s_bundleName;
+static std::string s_sysHomeDir;
+
+static void decodeHome(std::string &path)
+{
+    if(!s_sysHomeDir.empty() && !path.empty() && path[0] == '~')
+    {
+        path.erase(path.begin());
+        path = s_sysHomeDir + path;
+    }
+}
 
 
 void AppPathP::initDefaultPaths(const std::string &userDirName)
@@ -94,6 +104,19 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
 
     // Initialize the user directory
     {
+        const char *homeDir;
+        char *home_dir = getHomeDir();
+
+        if(home_dir)
+        {
+            s_sysHomeDir = home_dir;
+            SDL_free(home_dir);
+            homeDir = s_sysHomeDir.c_str();
+        }
+        else
+            homeDir = SDL_getenv("HOME");
+
+
         std::string appSupport;
 
         char *base_path = getAppSupportDir();
@@ -111,7 +134,6 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         if(!appSupport.empty() && appSupport.back() != '/')
             appSupport.push_back('/');
 
-        const char *homeDir = SDL_getenv("HOME");
         if(homeDir)
         {
             // Current TheXTech distribution: per-bundle directories
@@ -145,6 +167,8 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
             path = base_path;
             SDL_free(base_path);
         }
+
+        decodeHome(path);
 
         s_screenshotsPath = path + "/TheXTech Game Screenshots/";
         s_gifRecordPath = path + "/TheXTech Game Screenshots/gif-recordings/";
