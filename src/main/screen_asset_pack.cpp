@@ -398,12 +398,10 @@ bool Logic()
             if(!ReloadAssetsFrom(GetAssetPacks()[cur_idx]))
             {
                 s_cur_idx = -1;
+                s_target_idx = -1;
 
-                // stay in the asset pack screen if we haven't loaded any assets yet
-                if(!g_AssetsLoaded)
-                    return false;
-
-                s_AnimatingBack = true;
+                // stay in the asset pack screen
+                return false;
             }
             else
             {
