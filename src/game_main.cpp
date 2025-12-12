@@ -516,12 +516,7 @@ int GameMain(const CmdLineSetup_t &setup)
     bool init_failure = !InitUIAssetsFrom(setup.assetPack);
 
     if(init_failure)
-    {
-        if(!setup.assetPack.empty())
-            return 1;
-
         FontManager::initFallback();
-    }
 
 //    If LevelEditor = False Then
 //        frmMain.Show // Show window a bit later
@@ -629,6 +624,12 @@ int GameMain(const CmdLineSetup_t &setup)
                 MessageText += "assets/<pack-id>/";
             else if(i.second == AssetsPathType::Multiple)
                 MessageText += "<pack-id>/";
+        }
+
+        if(!setup.assetPack.empty())
+        {
+            MessageText = "Could not load cmdline-requested assets: ";
+            MessageText += setup.assetPack;
         }
 
         PauseGame(PauseCode::Message);
