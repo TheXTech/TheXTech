@@ -29,6 +29,7 @@ Changelog for 1.3.7.2-dev
 -Logic change: when modern (LVLX) autoscroll hits the end of the section, it now keeps the current camera size instead of resetting the camera to 800x800 as in SMBX 1.3 (@ds-sloth)
 -Logic change: the terminal velocity for rail platforms has been increased from 16 to 40 to address compatibility issues at some levels where falling speed is not enough to beat the challenge. (@Wohlstand)
 -Fixed an inability to auto-create the screenshots directory on macOS (@Wohlstand)
+-Fix v1.3.7 bug where the engine would fail to load if the first encountered asset pack was invalid (@ds-sloth)
 
 Changelog for 1.3.7.1
 -Add GameCube controller support for Wii (@ds-sloth)
