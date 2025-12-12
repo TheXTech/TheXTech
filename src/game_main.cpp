@@ -120,6 +120,7 @@ static int loadingThread(void *waiter_ptr)
     LoaderUpdateDebugString(g_gameStrings.loaderStatusGameInfo);
     initGameInfo();
     cheats_reset();
+    ConfigReloadRecentEpisodes();
 
     LoaderUpdateDebugString(g_gameStrings.loaderStatusTranslations);
     XLanguage::findLanguages(); // find present translations

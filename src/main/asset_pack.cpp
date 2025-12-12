@@ -455,8 +455,6 @@ bool ReloadAssetsFrom(const AssetPack_t& pack)
         return false;
     }
 
-    ConfigReloadRecentEpisodes();
-
     pLogDebug("Successfully loaded UI assets; now loading all other assets from [%s]", AppPath.c_str());
 
     MainLoadAll();
@@ -533,8 +531,6 @@ bool InitUIAssetsFrom(const std::string& id, bool skip_gfx)
 
     if(!skip_gfx && !GFX.load())
         return false;
-
-    ConfigReloadRecentEpisodes();
 
     return true;
 }
