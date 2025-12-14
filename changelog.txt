@@ -21,7 +21,7 @@ Changelog for 1.3.8-dev
 -Add experimental support for attaching wings to NPCs to the game and editor (@ds-sloth)
 -Switch the engine to fixed point arithmetic for performance and reproducibility (@ds-sloth)
 -Tweak camera logic to reduce jitter when standing on a group of NPCs (@ds-sloth)
--Battle mode: char 5's shield now blocks and cancels char 5's stab movement, creating an opening for attack (@ds-sloth)
+-Battle mode: char 5's shield now blocks and cancels another char 5 player's stab, creating an opening for attack (@ds-sloth)
 
 Changelog for 1.3.7.2-dev
 -i18n: Added support for the localisation of the loading screen (@Wohlstand)
