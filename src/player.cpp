@@ -3159,6 +3159,27 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                             if(p.Controls.Jump || p.Controls.AltJump)
                                 p.Jump = 10;
                         }
+                        // NEW LOGIC: Char5 shield block -- the logic for Player[A] is based on Char5 shield logic in SpecialNPC
+                        else if(StabDir == 0 && Player[A].Character == 5 && Player[A].Direction != p.Direction
+                            && Player[A].Effect == PLREFF_NORMAL && Player[A].SwordPoke == 0 && !Player[A].Fairy)
+                        {
+                            num_t shield_t = Player[A].Location.Y + Player[A].Location.Height;
+                            shield_t -= (Player[A].Duck) ? 28 : 52;
+
+                            num_t shield_b = shield_t + 24;
+
+                            // Player[A]'s shield blocks attack and cancels p's SwordPoke, making p vulnerable for up to 20 frames total
+                            if(tailLoc.Y <= shield_b && tailLoc.Y + tailLoc.Height >= shield_t)
+                            {
+                                PlaySoundSpatial(SFX_HeroShield, tailLoc);
+
+                                UnDuck(p);
+                                p.SwordPoke = -11 - (9 - p.SwordPoke);
+                                p.FireBallCD = -p.SwordPoke;
+
+                                continue;
+                            }
+                        }
 
                         PlayerHurt(A);
                         PlaySoundSpatial(SFX_HeroHit, Player[A].Location);
