@@ -353,6 +353,9 @@ bool Logic()
     }
     else if(menuControls.Do)
     {
+        MenuCursorCanMove = false;
+        MenuMouseRelease = false;
+
         // check if we are still on the same asset pack
         int cur_idx = s_cur_idx;
         s_cur_idx = -1;
@@ -394,8 +397,6 @@ bool Logic()
         g_LoopActive = false;
         GameMenu = true;
         MenuCursor = 0;
-        MenuCursorCanMove = false;
-        MenuMouseRelease = false;
         return true;
     }
     else if(menuControls.Back && g_AssetsLoaded)
