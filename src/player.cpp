@@ -3168,31 +3168,21 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
 
                             num_t shield_b = shield_t + 24;
 
-                            // Player[A]'s shield blocks attack and pushes p away, canceling p's SwordPoke if there isn't space
+                            // Player[A]'s shield blocks attack and pushes p away, canceling p's SwordPoke and creating an opening for attack
                             if(tailLoc.Y <= shield_b && tailLoc.Y + tailLoc.Height >= shield_t)
                             {
                                 PlaySoundSpatial(SFX_HeroShield, tailLoc);
 
-                                const int stabwidth = 38;
-                                if(p.Direction > 0)
-                                    p.Location.X = Player[A].Location.X - p.Location.Width - (stabwidth + 1);
-                                else
-                                    p.Location.X = Player[A].Location.X + Player[A].Location.Width + (stabwidth + 1);
-
+                                // knock p and Player[A] back a bit
                                 p.Location.SpeedX = Player[A].Location.SpeedX - p.Direction;
                                 Player[A].Location.SpeedX += p.Direction;
                                 p.Location.Y -= 2_n;
                                 p.Location.SpeedY -= 2_n;
 
-                                // if player is against a wall, cancel stab
-                                num_t plocx = p.Location.X;
-                                PlayerPush(plr, (p.Direction > 0) ? 4 : 5); // 5 is a non-bugged 2
-                                if(p.Location.X != plocx)
-                                {
-                                    UnDuck(p);
-                                    p.SwordPoke = -11 - (9 - p.SwordPoke);
-                                    p.FireBallCD = -p.SwordPoke;
-                                }
+                                // cancel stab
+                                UnDuck(p);
+                                p.SwordPoke = -11 - (9 - p.SwordPoke);
+                                p.FireBallCD = -p.SwordPoke;
 
                                 continue;
                             }
