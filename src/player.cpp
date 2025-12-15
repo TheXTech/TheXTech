@@ -3174,16 +3174,13 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                                 PlaySoundSpatial(SFX_HeroShield, tailLoc);
 
                                 // knock p and Player[A] back a bit
-                                p.Location.SpeedX = Player[A].Location.SpeedX - p.Direction;
+                                p.Location.SpeedX = Player[A].Location.SpeedX - 2 * p.Direction;
                                 Player[A].Location.SpeedX += p.Direction;
-                                p.Location.Y -= 2_n;
-                                p.Location.SpeedY -= 2_n;
+                                p.Location.Y -= 1.5_n;
+                                p.Location.SpeedY -= 1.5_n;
 
                                 // cancel stab
-                                UnDuck(p);
-                                p.SwordPoke = -11 - (9 - p.SwordPoke);
-                                p.FireBallCD = -p.SwordPoke;
-
+                                p.SwordPoke |= 32;
                                 continue;
                             }
                         }
