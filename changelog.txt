@@ -31,6 +31,7 @@ Changelog for 1.3.7.2-dev
 -Fixed an inability to auto-create the screenshots directory on macOS (@Wohlstand)
 -Fix v1.3.7 bug where the engine would fail to load if the first encountered asset pack was invalid (@ds-sloth)
 -Fix v1.3.6 inaccuracy where warp-spawned NPCs would fail to be hidden if their layer was hidden immediately following spawn (their layer is set to "Spawned NPCs" when warp is complete) (@ds-sloth)
+-Fix v1.3.7.1 bug where static NPCs spawned by a generator could despawn while onscreen (@ds-sloth)
 
 Changelog for 1.3.7.1
 -Add GameCube controller support for Wii (@ds-sloth)
