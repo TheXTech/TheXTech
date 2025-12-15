@@ -507,12 +507,11 @@ void UpdateNPCs()
                             NPC[numNPCs].TriggerLast = NPC[A].TriggerLast;
                             NPC[numNPCs].TriggerTalk = NPC[A].TriggerTalk;
                             CheckSectionNPC(numNPCs);
+                            syncLayers_NPC(numNPCs);
                             if(NPC[numNPCs].TriggerActivate != EVENT_NONE)
                                 ProcEvent(NPC[numNPCs].TriggerActivate, 0);
                             if(NPC[numNPCs].Type == NPCID_RANDOM_POWER)
                                 NPC[numNPCs].Type = RandomBonus();
-                            syncLayers_NPC(numNPCs);
-                            CheckNPCWidth(NPC[numNPCs]);
                         }
                     }
                 }
