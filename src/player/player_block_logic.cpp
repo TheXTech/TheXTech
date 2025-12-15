@@ -33,6 +33,7 @@
 #include "blk_id.h"
 #include "npc_traits.h"
 #include "config.h"
+#include "phys_env.h"
 
 #include "main/trees.h"
 
@@ -875,6 +876,10 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
         {
             Player[A].Location.Y = floorLocation.Y - Player[A].Location.Height;
 
+            // NEW: move aquatic swimming player away from the floor -- helps with spikes
+            if(Player[A].AquaticSwim)
+                Player[A].Location.Y -= 0.01_n;
+
             if(!hitWall && Player[A].StandingOnNPC != 0)
             {
                 if(NPC[Player[A].StandingOnNPC].Location.Y <= floorLocation.Y && Player[A].StandingOnNPC != Player[A].HoldingNPC)
@@ -1048,7 +1053,14 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
     if(ceilingBlock > 0)
     {
-        PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
+        // NEW: bounce an aquatic-swimming player off the ceiling if it has an item
+        if(Player[A].AquaticSwim && Block[ceilingBlock].Special)
+            Player[A].SwimCount = MAZE_DIR_DOWN * 16 + 2;
+
+        // play ceiling hit sound if player is not aquatic swimming (normal) or if the ceiling block has an item
+        if(!Player[A].AquaticSwim || Block[ceilingBlock].Special)
+            PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
+
         Player[A].Jump = 0;
         Player[A].Location.Y = Block[ceilingBlock].Location.Y + Block[ceilingBlock].Location.Height + 0.01_n;
         Player[A].Location.SpeedY = -0.01_n + Block[ceilingBlock].Location.SpeedY;
@@ -1058,12 +1070,6 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
         if(Player[A].Fairy || Player[A].Mount == 2 || Player[A].CanFly2)
             Player[A].Location.SpeedY = 2;
-
-        if(Player[A].AquaticSwim)
-        {
-            Player[A].SwimCount = 0;
-            Player[A].Location.SpeedY = 0.5_n;
-        }
 
         if(Player[A].Mount != 2) // Tell the block it was hit
             BlockHit(ceilingBlock, false, A);
