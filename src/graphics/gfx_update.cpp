@@ -1880,6 +1880,11 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
     qScreen_canonical = continue_qScreen_canonical;
 }
 
+static bool s_should_draw_player(const Player_t& p)
+{
+    bool player_door_scroll = (p.Effect == PLREFF_WARP_DOOR && p.Effect2 >= 128);
+    return (!p.Dead && p.TimeToLive == 0 && !(p.Effect == (PLREFF_TURN_TO_STATE + PLR_STATE_LEAF) || p.Effect == PLREFF_WAITING || p.Effect == PLREFF_PET_INSIDE || player_door_scroll));
+}
 
 void UpdateGraphicsDraw(bool skipRepaint)
 {
@@ -2788,9 +2793,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
         for(int A = numPlayers; A >= 1; A--)
         {
             Player_t& p = Player[A];
-            bool player_door_scroll = (p.Effect == PLREFF_WARP_DOOR && p.Effect2 >= 128);
 
-            if(!p.Dead && p.TimeToLive == 0 && p.CurMazeZone == 0 && !(p.Effect == PLREFF_WARP_PIPE || p.Effect == (PLREFF_TURN_TO_STATE + PLR_STATE_LEAF) || p.Effect == PLREFF_WAITING || p.Effect == PLREFF_PET_INSIDE || player_door_scroll) && p.Mount != 2)
+            if(p.CurMazeZone == 0 && p.Effect != PLREFF_WARP_PIPE && p.Mount != 2 && s_should_draw_player(p))
                 DrawPlayer(p, Z);
         }
         //'normal player end
@@ -3010,16 +3014,41 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
             // moved condition past the splitFrame() call (always draw section effects)
             // if(!GameMenu && !GameOutro)
+
+            // figure out whether to show names over players
+            bool char_rep = false;
+            if(numPlayers > 5)
+                char_rep = true;
+            else
+            {
+                for(int A = 1; A < numPlayers; A++)
+                {
+                    for(int B = A + 1; B <= numPlayers; B++)
+                        char_rep |= (Player[A].Character == Player[B].Character);
+                }
+            }
+
+            if(g_ClonedPlayerMode || GameMenu)
+                char_rep = false;
+
             For(A, 1, numPlayers)
             {
+                int p_center_x = num_t::floor(camX + Player[A].Location.X) + s_round2int(Player[A].Location.Width) / 2;
+                int info_y = num_t::floor(camY + Player[A].Location.Y) + s_round2int(Player[A].Location.Height) - 96;
+
+                if(char_rep && s_should_draw_player(Player[A]))
+                {
+                    char pname[2] = {'P', '0'};
+                    pname[1] = '0' + A;
+                    SuperPrintCenter(2, pname, 3, p_center_x, info_y + 12);
+                    info_y -= 16;
+                }
+
                 if(Player[A].Effect == PLREFF_COOP_WINGS)
                     DrawPlayer(Player[A], Z, XTColor(192, 192, 192, 192));
                 else if(Player[A].ShowWarp > 0 && Player[A].Mount != 2)
                 {
                     const auto &w = Warp[Player[A].ShowWarp];
-
-                    int p_center_x = num_t::floor(camX + Player[A].Location.X) + s_round2int(Player[A].Location.Width) / 2;
-                    int info_y = num_t::floor(camY + Player[A].Location.Y) + s_round2int(Player[A].Location.Height) - 96;
 
                     if(!w.noPrintStars && w.save_info().inited() && w.save_info().max_stars > 0)
                     {
