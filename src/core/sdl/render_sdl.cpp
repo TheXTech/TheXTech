@@ -175,11 +175,14 @@ bool RenderSDL::initRender(SDL_Window *window)
 
     SDL_RendererInfo ri;
     SDL_GetRendererInfo(m_gRenderer, &ri);
+    if (ri.num_texture_formats > 0)
+        m_bestFormat = ri.texture_formats[0];
+    else
+        m_bestFormat = DEFAULT_PIXEL_COLOUR_FORMAT;
     m_maxTextureWidth = ri.max_texture_width;
     m_maxTextureHeight = ri.max_texture_height;
 
-    m_tBuffer = SDL_CreateTexture(m_gRenderer,
-                                  DEFAULT_PIXEL_COLOUR_FORMAT,
+    m_tBuffer = SDL_CreateTexture(m_gRenderer, m_bestFormat,
                                   SDL_TEXTUREACCESS_TARGET,
                                   ScaleWidth, ScaleHeight);
 
@@ -187,8 +190,7 @@ bool RenderSDL::initRender(SDL_Window *window)
     {
         pLogWarning("Render SDL: Failed to create the normal texture render buffer: %s, trying to create a power-2 texture...", SDL_GetError());
         m_pow2 = true;
-        m_tBuffer = SDL_CreateTexture(m_gRenderer,
-                                      DEFAULT_PIXEL_COLOUR_FORMAT,
+        m_tBuffer = SDL_CreateTexture(m_gRenderer, m_bestFormat,
                                       SDL_TEXTUREACCESS_TARGET,
                                       pow2roundup(ScaleWidth), pow2roundup(ScaleHeight));
     }
@@ -386,7 +388,7 @@ void RenderSDL::updateViewport()
         {
             SDL_DestroyTexture(m_tBuffer);
 
-            m_tBuffer = SDL_CreateTexture(m_gRenderer, DEFAULT_PIXEL_COLOUR_FORMAT, SDL_TEXTUREACCESS_TARGET,
+            m_tBuffer = SDL_CreateTexture(m_gRenderer, m_bestFormat, SDL_TEXTUREACCESS_TARGET,
                                           m_pow2 ? pow2roundup(XRender::TargetW) : XRender::TargetW,
                                           m_pow2 ? pow2roundup(XRender::TargetH) : XRender::TargetH);
             SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
