@@ -109,7 +109,8 @@ def verNum = [
 ]
 
 parseVersion(verNum)
-def xTechBranch = getGitBranch().replace('.', '').replace('-', '')
+def xTechBranchOrig = getGitBranch()
+def xTechBranch = xTechBranchOrig.replace('.', '').replace('-', '')
 def xTechVersionString = cmakeToVersionCode(verNum)
 def xTechVersionStringClear = cmakeToClearVersionCode(verNum)
 def xTechVersionType = verNum[5]
@@ -175,8 +176,10 @@ android {
             if(xTechVersionType == "-dev") {
                 applicationIdSuffix = '.dev.' + xTechBranch
                 android.sourceSets.release.res.srcDirs += project.projectDir.toString() + '/icon/devel'
+                manifestPlaceholders.dstAppName = "TheXTech DEV [" + xTechBranchOrig + "]"
             } else {
                 android.sourceSets.release.res.srcDirs += project.projectDir.toString() + '/icon/main'
+                manifestPlaceholders.dstAppName = "@string/app_name"
             }
         }
         releaseci {
@@ -189,13 +192,16 @@ android {
             if(xTechVersionType == "-dev") {
                 applicationIdSuffix = '.dev.' + xTechBranch
                 android.sourceSets.releaseci.res.srcDirs += project.projectDir.toString() + '/icon/devel'
+                manifestPlaceholders.dstAppName = "TheXTech DEV [" + xTechBranchOrig + "]"
             } else {
                 android.sourceSets.releaseci.res.srcDirs += project.projectDir.toString() + '/icon/main'
+                manifestPlaceholders.dstAppName = "@string/app_name"
             }
         }
         debug {
             applicationIdSuffix '.debug'
             versionNameSuffix '-DEVDEBUG'
+            manifestPlaceholders.dstAppName = "TheXTech [DEBUG]"
             debuggable true
             android.sourceSets.debug.res.srcDirs += project.projectDir.toString() + '/icon/debug'
         }
