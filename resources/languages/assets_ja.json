@@ -468,10 +468,10 @@
         }
     },
     "objects": {
-        "wordStarAccusativeSingular": "",
-        "wordStarAccusativeDualOrCounter": "",
-        "wordFails": "",
-        "wordStarAccusativePlural": ""
+        "wordStarAccusativeSingular": "スター",
+        "wordStarAccusativeDualOrCounter": "スター",
+        "wordFails": "ミス数",
+        "wordStarAccusativePlural": "スター"
     },
     "languageName": "日本語"
 }
