@@ -1316,11 +1316,11 @@ void NPCHit(int A, int B, int C)
                 NPC[numNPCs].Location.SpeedY = 0;
                 NPC[numNPCs].Location.SpeedX = Physics.NPCShellSpeed * NPC[numNPCs].Direction;
                 NPC[numNPCs].Location.X += -16 + NPC[numNPCs].Location.SpeedX;
-                CheckSectionNPC(numNPCs);
                 NPC[numNPCs].CantHurtPlayer = C;
                 NPC[numNPCs].CantHurt = 6;
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].TimeLeft = 100;
+                CheckSectionNPC(numNPCs);
                 syncLayers_NPC(numNPCs);
                 NPC[A].Type = NPCID(NPC[A].Type + 4);
             }
@@ -1394,12 +1394,12 @@ void NPCHit(int A, int B, int C)
                 NPC[numNPCs].Direction = Player[C].Direction;
                 NPC[numNPCs].Location.SpeedY = 0;
                 NPC[numNPCs].Location.SpeedX = Physics.NPCShellSpeed * NPC[numNPCs].Direction;
-                NPC[numNPCs].Location.X += -(16 + 32 * NPC[numNPCs].Direction);
-                CheckSectionNPC(numNPCs);
+                NPC[numNPCs].Location.X += -16 + 32 * NPC[numNPCs].Direction;
                 NPC[numNPCs].CantHurtPlayer = C;
                 NPC[numNPCs].CantHurt = 6;
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].TimeLeft = 100;
+                CheckSectionNPC(numNPCs);
                 syncLayers_NPC(numNPCs);
             }
 
