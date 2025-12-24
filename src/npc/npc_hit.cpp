@@ -2317,14 +2317,16 @@ void NPCHit(int A, int B, int C)
     }
 
     // lose wings and get an extra hit if not a boss
-    if(B == 1 && NPC[A].Wings && NPC[A].Damage == 0)
+    if(NPC[A].Wings && NPC[A].Damage == 0 && (B == 1 || B == 2 || B == 7))
     {
-        if(NPC[A].Location.SpeedY < 0)
+        if(B == 1 && NPC[A].Location.SpeedY < 0)
             NPC[A].Location.SpeedY = 0;
 
-        PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
+        PlaySoundSpatial((B == 1) ? SFX_Stomp : SFX_ShellHit, NPC[A].Location);
+
         NPC[A].Killed = 0;
-        NPC[A].Immune = 4;
+        if(!NPC[A].Immune)
+            NPC[A].Immune = 4;
         NPC[A].Wings = WING_NONE;
     }
 
