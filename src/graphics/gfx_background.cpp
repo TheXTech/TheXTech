@@ -590,7 +590,8 @@ void DrawBackground(int S, int Z)
 
         if(sect.Width - sect.X > GFXBackground2[A].w)
         {
-            off_x = (-camX - sect.X - vScreen[Z].Left) * (GFXBackground2[A].w - 800) / (sect.Width - sect.X - 800) + vScreen[Z].Left;
+            int32_t sect_off_x = sect.Width - sect.X - 800;
+            off_x = (sect_off_x == 0 ? 0 : (-camX - sect.X - vScreen[Z].Left) * (GFXBackground2[A].w - 800) / sect_off_x) + vScreen[Z].Left;
             off_x = -off_x;
         }
 

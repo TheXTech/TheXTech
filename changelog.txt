@@ -57,6 +57,7 @@ Changelog for 1.3.7.2-dev
 -Fix v1.3.6 inaccuracy where warp-spawned NPCs would fail to be hidden if their layer was hidden immediately following spawn (their layer is set to "Spawned NPCs" when warp is complete) (@ds-sloth)
 -Fix v1.3.7.1 bug where static NPCs spawned by a generator could despawn while onscreen (@ds-sloth)
 -Fix v1.3.1 bug where whipping a turtle (with leaf power) would kill the turtle as well as releasing it from its shell (@ds-sloth, bug caught by @Wohlstand)
+-Fixed vanilla crash bug caused by division by zero on rendering of Background2-25 with a texture width smaller than 800 and when the section has an exact width of 800 (@Wohlstand)
 
 Changelog for 1.3.7.1
 -Add GameCube controller support for Wii (@ds-sloth)
