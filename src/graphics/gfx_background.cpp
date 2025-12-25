@@ -587,7 +587,8 @@ void DrawBackground(int S, int Z)
             {
                 // .X = (-vScreenX(Z) - level(S).X) / (level(S).Width - level(S).X - 800) * (GFXBackground2Width(A) - 800)
                 // note: fixed the left alignment to match the vanilla game
-                tempLocation.X = (-camX - level[S].X - vScreen[Z].Left) / (level[S].Width - level[S].X - 800) * (GFXBackground2Width[A] - 800) + vScreen[Z].Left;
+                double sect_off_x = level[S].Width - level[S].X - 800;
+                tempLocation.X = (sect_off_x == 0 ? 0.0 : ((-camX - level[S].X - vScreen[Z].Left) / sect_off_x) * (GFXBackground2Width[A] - 800)) + vScreen[Z].Left;
                 tempLocation.X = -camX - tempLocation.X;
             }
             else
