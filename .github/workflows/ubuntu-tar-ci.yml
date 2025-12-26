@@ -47,7 +47,7 @@ jobs:
             build_type: "MinSizeRel",
             executable_name_suffix: "",
             package_filename_suffix: "ubuntu-14-04-amd64",
-            upload_directory: "www/ubuntu-1-04/"
+            upload_directory: "www/ubuntu-14-04/"
           }
         - {
             name: "TAR Ubuntu 14.04 x86_64 (legacy floats)",
