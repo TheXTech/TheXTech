@@ -333,7 +333,7 @@ void PlayerEffectWarpPipe(int A)
             }
 
             if(p.Mount == 0)
-                p.Frame = p.Character == 5 ? 1 : 15;
+                p.Frame = 15;
 
             if(p.HoldingNPC > 0)
             {
@@ -362,9 +362,8 @@ void PlayerEffectWarpPipe(int A)
                 NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
                 NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
             }
-
             if(p.Mount == 0)
-                p.Frame = p.Character == 5 ? 1 : 15;
+                p.Frame = 15;
         }
         else if(warp_dir_enter == 2)
         {
@@ -510,7 +509,7 @@ void PlayerEffectWarpPipe(int A)
             p.Location.Y = warp_exit.Y - p.Location.Height - 8;
 
             if(p.Mount == 0)
-                p.Frame = p.Character == 5 ? 1 : 15;
+                p.Frame = 15;
 
             if(p.HoldingNPC > 0)
             {
@@ -524,7 +523,7 @@ void PlayerEffectWarpPipe(int A)
             p.Location.Y = warp_exit.Y + warp_exit.Height + 8;
 
             if(p.Mount == 0)
-                p.Frame = p.Character == 5 ? 1 : 15;
+                p.Frame = 15;
 
             if(p.HoldingNPC > 0)
             {
@@ -783,7 +782,7 @@ void PlayerEffectWarpPipe(int A)
             }
 
             if(p.Mount == 0)
-                p.Frame = p.Character == 5 ? 1 : 15;
+                p.Frame = 15;
         }
         else if(warp_dir_exit == LevelDoor::EXIT_UP)
         {
@@ -799,7 +798,7 @@ void PlayerEffectWarpPipe(int A)
             }
 
             if(p.Mount == 0)
-                p.Frame = p.Character == 5 ? 1 : 15;
+                p.Frame = 15;
 
             // make players less likely to collide chaotically out of UP exits
             if(is_shared_screen || (numPlayers > 2 && !g_ClonedPlayerMode))
