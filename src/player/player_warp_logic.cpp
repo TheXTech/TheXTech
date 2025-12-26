@@ -336,7 +336,7 @@ void PlayerEffectWarpPipe(int A)
             p.Location.X = warp_enter.X + (warp_enter.Width - p.Location.Width) / 2;
 
             if(p.Mount == 0)
-                p.Frame = p.Character == 5 ? 1 : 15;
+                p.Frame = 15;
 
             if(p.HoldingNPC > 0)
             {
@@ -470,7 +470,7 @@ void PlayerEffectWarpPipe(int A)
             p.Location.X = warp_exit.X + (warp_exit.Width - p.Location.Width) / 2;
 
             if(p.Mount == 0)
-                p.Frame = p.Character == 5 ? 1 : 15;
+                p.Frame = 15;
 
             if(p.HoldingNPC > 0)
             {
@@ -719,7 +719,7 @@ void PlayerEffectWarpPipe(int A)
             }
 
             if(p.Mount == 0)
-                p.Frame = p.Character == 5 ? 1 : 15;
+                p.Frame = 15;
         }
         else if(warp_dir_exit == LevelDoor::EXIT_LEFT || warp_dir_exit == LevelDoor::EXIT_RIGHT)
         {
