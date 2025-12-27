@@ -114,6 +114,7 @@ void PlayerChar5Logic(int A)
     }
     else if(Player[A].SwordPoke > 0)
     {
+        // NEW LOGIC: bit 6 (32) of SwordPoke is a cancel flag
         if(Player[A].SwordPoke == 1)
         {
             TailSwipe(A, true, true);
@@ -123,22 +124,19 @@ void PlayerChar5Logic(int A)
             if((Player[A].State == 3 || Player[A].State == 7 || Player[A].State == 6 || Player[A].State == PLR_STATE_POLAR) && Player[A].FireBallCD2 == 0)
                 PlayerShootChar5Beam(A);
         }
-        else
+        else if((Player[A].SwordPoke & 32) == 0)
             TailSwipe(A, false, true);
 
         Player[A].SwordPoke += 1;
 
-        if(Player[A].Duck)
+        if((Player[A].SwordPoke & 31) >= 10)
         {
-            if(Player[A].SwordPoke >= 10)
+            if(Player[A].Duck)
             {
                 Player[A].SwordPoke = 0;
                 Player[A].FireBallCD = 7;
             }
-        }
-        else
-        {
-            if(Player[A].SwordPoke >= 10)
+            else
             {
                 Player[A].SwordPoke = -11;
                 Player[A].FireBallCD = 0;

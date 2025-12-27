@@ -19,6 +19,13 @@ def getGitHash() {
     return gitExec.trim()
 }
 
+def getGitBranch() {
+    def gitExec = providers.exec {
+        commandLine('git', 'rev-parse', '--abbrev-ref', 'HEAD')
+    }.standardOutput.asText.get()
+    return gitExec.trim()
+}
+
 def parseVersion(verNum) {
     def cmakeVersion = file('../../version.cmake')
 
@@ -102,8 +109,11 @@ def verNum = [
 ]
 
 parseVersion(verNum)
+def xTechBranchOrig = getGitBranch()
+def xTechBranch = xTechBranchOrig.replace('.', '').replace('-', '')
 def xTechVersionString = cmakeToVersionCode(verNum)
 def xTechVersionStringClear = cmakeToClearVersionCode(verNum)
+def xTechVersionType = verNum[5]
 def xTechVersionNumber = (verNum[0] * 1000000) + (verNum[1] * 10000) + (verNum[2] * 100) + verNum[3]
 
 println "Project version: " + xTechVersionString + " (Clear version: " + xTechVersionStringClear + ", version code: " + xTechVersionNumber.toString()
@@ -162,6 +172,15 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            if(xTechVersionType == "-dev") {
+                applicationIdSuffix = '.dev.' + xTechBranch
+                android.sourceSets.release.res.srcDirs += project.projectDir.toString() + '/icon/devel'
+                manifestPlaceholders.dstAppName = "TheXTech DEV [" + xTechBranchOrig + "]"
+            } else {
+                android.sourceSets.release.res.srcDirs += project.projectDir.toString() + '/icon/main'
+                manifestPlaceholders.dstAppName = "@string/app_name"
+            }
         }
         releaseci {
             minifyEnabled false
@@ -169,11 +188,22 @@ android {
             buildConfigField "String", "PIN_ALIAS", "\"$pin_alias\""
             buildConfigField "String", "DB_PASS_ALIAS", "\"$db_pass_alias\""
             signingConfig = signingConfigs.releaseci
+
+            if(xTechVersionType == "-dev") {
+                applicationIdSuffix = '.dev.' + xTechBranch
+                android.sourceSets.releaseci.res.srcDirs += project.projectDir.toString() + '/icon/devel'
+                manifestPlaceholders.dstAppName = "TheXTech DEV [" + xTechBranchOrig + "]"
+            } else {
+                android.sourceSets.releaseci.res.srcDirs += project.projectDir.toString() + '/icon/main'
+                manifestPlaceholders.dstAppName = "@string/app_name"
+            }
         }
         debug {
             applicationIdSuffix '.debug'
             versionNameSuffix '-DEVDEBUG'
+            manifestPlaceholders.dstAppName = "TheXTech [DEBUG]"
             debuggable true
+            android.sourceSets.debug.res.srcDirs += project.projectDir.toString() + '/icon/debug'
         }
     }
 
@@ -200,6 +230,12 @@ android {
             }
         }
     }
+
+    println "Resource paths per config:"
+    println "Main: " + android.sourceSets.main.res.srcDirs
+    println "Debug: " + android.sourceSets.debug.res.srcDirs
+    println "Release: " + android.sourceSets.release.res.srcDirs
+    println "Release-CI: " + android.sourceSets.releaseci.res.srcDirs
 
     lint {
         abortOnError = false

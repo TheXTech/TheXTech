@@ -50,7 +50,8 @@ bool NPCGeneratorLogic(int A)
 #endif
 
     // increase activation timer if not ready yet
-    if(NPC[A].GeneratorTime() * 10 < NPC[A].GeneratorTimeMax() * 65)
+    // (Note: the + 1 tests whether the NPC would have exceeded the limit *after* adding 1, matching the original logic. It's immaterial whether the final += 1 ever occurs.)
+    if((NPC[A].GeneratorTime() + 1) * 10 < NPC[A].GeneratorTimeMax() * 65)
         NPC[A].GeneratorTime() += 1;
     // if ready and onscreen, try to activate!
     else if(NPC[A].GeneratorActive)

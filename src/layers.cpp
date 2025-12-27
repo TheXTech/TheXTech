@@ -1615,26 +1615,41 @@ resume:
             level[A].Width += (num_t)AutoX[A];
             level[A].Y += (num_t)AutoY[A];
             level[A].Height += (num_t)AutoY[A];
+
+            int cam_w = num_t::round(level[A].Width - level[A].X);
+            int cam_h = num_t::round(level[A].Height - level[A].Y);
+
+            // SMBX 1.3 forces 800x800 camera at end of autoscroll (vanilla bug)
+            if(!AutoUseModern)
+            {
+                cam_w = 800;
+                cam_h = 800;
+            }
+
             if(level[A].Width > LevelREAL[A].Width)
             {
                 level[A].Width = LevelREAL[A].Width;
-                level[A].X = LevelREAL[A].Width - 800;
+                level[A].X = LevelREAL[A].Width - cam_w;
             }
+
             if(level[A].X < LevelREAL[A].X)
             {
-                level[A].Width = LevelREAL[A].X + 800;
+                level[A].Width = LevelREAL[A].X + cam_w;
                 level[A].X = LevelREAL[A].X;
             }
+
             if(level[A].Height > LevelREAL[A].Height)
             {
                 level[A].Height = LevelREAL[A].Height;
-                level[A].Y = LevelREAL[A].Height - 800;
+                level[A].Y = LevelREAL[A].Height - cam_h;
             }
+
             if(level[A].Y < LevelREAL[A].Y)
             {
-                level[A].Height = LevelREAL[A].Y + 800;
+                level[A].Height = LevelREAL[A].Y + cam_h;
                 level[A].Y = LevelREAL[A].Y;
             }
+
             UpdateSectionOverlaps(A);
         }
     }

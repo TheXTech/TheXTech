@@ -375,6 +375,9 @@ bool Logic()
     }
     else if(menuControls.Do)
     {
+        MenuCursorCanMove = false;
+        MenuMouseRelease = false;
+
         // check if we are still on the same asset pack
         int cur_idx = s_cur_idx;
         s_cur_idx = -1;
@@ -398,12 +401,10 @@ bool Logic()
             if(!ReloadAssetsFrom(GetAssetPacks()[cur_idx]))
             {
                 s_cur_idx = -1;
+                s_target_idx = -1;
 
-                // stay in the asset pack screen if we haven't loaded any assets yet
-                if(!g_AssetsLoaded)
-                    return false;
-
-                s_AnimatingBack = true;
+                // stay in the asset pack screen
+                return false;
             }
             else
             {
@@ -418,8 +419,6 @@ bool Logic()
         g_LoopActive = false;
         GameMenu = true;
         MenuCursor = 0;
-        MenuCursorCanMove = false;
-        MenuMouseRelease = false;
         return true;
     }
     else if(menuControls.Back && g_AssetsLoaded)

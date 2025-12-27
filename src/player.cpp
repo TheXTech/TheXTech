@@ -3159,6 +3159,31 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                             if(p.Controls.Jump || p.Controls.AltJump)
                                 p.Jump = 10;
                         }
+                        // NEW LOGIC: Char5 shield block -- the logic for Player[A] is based on Char5 shield logic in SpecialNPC
+                        else if(StabDir == 0 && Player[A].Character == 5 && Player[A].Direction != p.Direction
+                            && Player[A].Effect == PLREFF_NORMAL && Player[A].SwordPoke == 0 && !Player[A].Fairy)
+                        {
+                            num_t shield_t = Player[A].Location.Y + Player[A].Location.Height;
+                            shield_t -= (Player[A].Duck) ? 28 : 52;
+
+                            num_t shield_b = shield_t + 24;
+
+                            // Player[A]'s shield blocks attack and pushes p away, canceling p's SwordPoke and creating an opening for attack
+                            if(tailLoc.Y <= shield_b && tailLoc.Y + tailLoc.Height >= shield_t)
+                            {
+                                PlaySoundSpatial(SFX_HeroShield, tailLoc);
+
+                                // knock p and Player[A] back a bit
+                                p.Location.SpeedX = Player[A].Location.SpeedX - 2 * p.Direction;
+                                Player[A].Location.SpeedX += p.Direction;
+                                p.Location.Y -= 1.5_n;
+                                p.Location.SpeedY -= 1.5_n;
+
+                                // cancel stab
+                                p.SwordPoke |= 32;
+                                continue;
+                            }
+                        }
 
                         PlayerHurt(A);
                         PlaySoundSpatial(SFX_HeroHit, Player[A].Location);
@@ -3771,6 +3796,8 @@ void PlayerPush(const int A, int HitSpot)
                         p.Location.X = b.Location.X + b.Location.Width + 0.01_n;
                     else if(HitSpot == 1) // new-added
                         p.Location.Y = b.Location.Y - p.Location.Height - 0.01_n;
+                    else if(HitSpot == 5) // non-bugged 2
+                        p.Location.X = b.Location.X - p.Location.Width - 0.01_n;
 
                     q.update(p.Location, it);
                 }

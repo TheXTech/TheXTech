@@ -527,6 +527,8 @@ void PlayerBox::Init()
     else
     {
         l_screen->charSelect[p] = s_recent_char[p];
+        if(l_screen->charSelect[p] == 0)
+            l_screen->charSelect[p] = p + 1;
         ValidateChar(true);
     }
 }
@@ -555,7 +557,7 @@ bool PlayerBox::CharAvailable(int c, bool ghost_mode)
         if(i == p)
             continue;
 
-        if(l_screen->charSelect[i] == c)
+        if(l_screen->charSelect[i] == c && !(s_context == Context::MainMenu && MenuMode == MENU_CHARACTER_SELECT_NEW_BM) && !g_forceCharacter)
             return false;
     }
 

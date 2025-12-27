@@ -414,6 +414,10 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
     {
         if(vScreenCollision(Z, p.Location))
         {
+            // was previously in UpdateGraphicsDraw for pipe-warping players -- think about whether to move these to UpdateGraphicsLogic
+            if(p.Character == 5 && p.Effect == PLREFF_WARP_PIPE && p.Frame > 5)
+                p.Frame = 1;
+
             if(p.Mount == 3 && !p.Fairy)
             {
                 B = p.MountType;
