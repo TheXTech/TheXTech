@@ -17,6 +17,7 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
+#include <inttypes.h>
 #include <array>
 
 #include <SDL2/SDL_video.h>

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <inttypes.h>
 #include <SDL2/SDL_thread.h>
 #include <SDL2/SDL_power.h>
 #include <SDL2/SDL_rwops.h>
