@@ -48,6 +48,8 @@ TheXTech is based on the [SMBX64](https://wohlsoft.ru/pgewiki/SMBX64) standard, 
 
 Related comments will also be marked as "off-topic". Related conversations of partial issues and PR's will be locked as "off-topic".
 
+Please remember: **TheXTech** engine is powered for **SMBX 1.3 Players**, instead of **Level/Episode Makers (Creators)**.
+
 ## A note on "bugfixes"
 
 TheXTech is a faithful reproduction of the SMBX 1.3 engine, so a number of things that may appear to be bugs to a user or contributor may actually be TheXTech reproducing SMBX 1.3 logic intended. Please see [Types of Bugs](https://github.com/TheXTech/TheXTech/wiki/Types-of-bugs) for a categorization of types of bugs.
