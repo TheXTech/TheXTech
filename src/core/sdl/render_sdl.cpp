@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <inttypes.h>
 #include <cmath>
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_render.h>
@@ -56,6 +57,13 @@
 #define XTECH_SDL_NO_RECTF_SUPPORT
 #define SDL_RenderCopyF SDL_RenderCopy
 #define SDL_RenderCopyExF SDL_RenderCopyEx
+struct X_FPoint
+{
+    float x;
+    float y;
+};
+#else
+typedef SDL_FPoint X_FPoint;
 #endif
 
 inline bool fEqual(float a, float b)
@@ -964,7 +972,7 @@ void RenderSDL::execute(const XRenderOp& op)
         SDL_Rect destRect = {op.xDst, op.yDst, op.wDst, op.hDst};
         SDL_Rect sourceRect;
         SDL_Rect* sourceRectPtr = nullptr;
-        SDL_FPoint scale = {tx.d.w_scale, tx.d.h_scale};
+        X_FPoint scale = {tx.d.w_scale, tx.d.h_scale};
 
         if(m_halfPixelMode)
             rectDiv2(destRect);
