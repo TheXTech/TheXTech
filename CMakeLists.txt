@@ -182,7 +182,7 @@ else()
     option(THEXTECH_FORCE_FULLSCREEN "Force the game to only use fullscreen mode" OFF)
 endif()
 
-if(PSP)
+if(PSP OR NINTENDO_3DS OR NINTENDO_DS)
     set(THEXTECH_FORCE_HALFPIXEL_MODE ON)
 endif()
 
