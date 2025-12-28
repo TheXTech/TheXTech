@@ -33,6 +33,10 @@
 #ifdef __EMSCRIPTEN__
 #include "core/events.h"
 #endif
+// #define DEBUG_RES
+#ifdef DEBUG_RES
+#   include <Logger/logger.h>
+#endif
 
 void SyncSysCursorDisplay()
 {
@@ -110,13 +114,22 @@ void UpdateInternalRes()
     int req_w = g_config.internal_res.m_value.first;
     int req_h = g_config.internal_res.m_value.second;
 
-#ifndef PGE_MIN_PORT
+#if !defined(PGE_MIN_PORT) && !defined(__PSP__)
     if(l_screen->Type == ScreenTypes::Quad && g_config.internal_res_4p.m_value.first != 0)
     {
         req_w = g_config.internal_res_4p.m_value.first;
         req_h = g_config.internal_res_4p.m_value.second;
         ignore_compat = true;
     }
+#endif
+
+#if defined(__PSP__)
+    // Limitation of texture size for the frame buffer (de-facto 512x512, with half-pixel mode is 1024x1024)
+    if(req_w > 1024)
+        req_w = 1024;
+
+    if(req_h > 1024)
+        req_h = 1024;
 #endif
 
     // use the correct canonical screen's resolution here
@@ -167,8 +180,13 @@ void UpdateInternalRes()
         }
 
         // minimum height constraint
+#if defined(__PSP__)
+        if(int_h < 272)
+            int_h = 272;
+#else
         if(int_h < 320)
             int_h = 320;
+#endif
 
         // maximum height constraint
         if(int_h > 720 && req_h <= 720)
@@ -257,8 +275,20 @@ void UpdateInternalRes()
         int_w -= int_w & 1;
         int_h -= int_h & 1;
 
+#if defined(__PSP__)
+         // Limitation of half texture size for the frame buffer
+        if(int_w > 1024)
+            int_w = 1024;
+
+        if(int_h > 1024)
+            int_h = 1024;
+#endif
+
         XRender::TargetW = int_w;
         XRender::TargetH = int_h;
+#ifdef DEBUG_RES
+        pLogDebug("TRACE: Target Render set to w=%d and h=%d (Renderer works)", XRender::TargetW, XRender::TargetH);
+#endif
     }
     else
     {
@@ -270,15 +300,26 @@ void UpdateInternalRes()
 
         if(XRender::TargetH == 0)
         {
+#if defined(__PSP__)
+            XRender::TargetW = 480 * 2;
+            XRender::TargetH = 272 * 2;
+#else
             XRender::TargetW = 1280;
             XRender::TargetH = 720;
+#endif
         }
+#ifdef DEBUG_RES
+        pLogDebug("TRACE: Target Render set to w=%d and h=%d (Renderer not initialized)", XRender::TargetW, XRender::TargetH);
+#endif
     }
 
     if(LevelEditor || MagicHand)
     {
         XRender::TargetW = SDL_max(XRender::TargetW, 640);
         XRender::TargetH = SDL_max(XRender::TargetH, 480);
+#ifdef DEBUG_RES
+        pLogDebug("TRACE: Target Render set to w=%d and h=%d (Editor/MagicHand)", XRender::TargetW, XRender::TargetH);
+#endif
     }
 
 #ifdef __3DS__
@@ -294,6 +335,9 @@ void UpdateInternalRes()
         XRender::TargetH = SDL_max(XRender::TargetH, canon_h);
         new_ScreenW = canon_w;
         new_ScreenH = canon_h;
+#ifdef DEBUG_RES
+        pLogDebug("TRACE: Target Render set to w=%d and h=%d (Canonical tweak)", XRender::TargetW, XRender::TargetH);
+#endif
     }
     else if(ignore_compat || (g_config.allow_multires && g_config.dynamic_camera_logic))
     {

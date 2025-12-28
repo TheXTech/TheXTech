@@ -70,6 +70,12 @@ StdPicture* s_sparkle = nullptr;
 
 #define F_TO_B(color) {color.r, color.g, color.b, color.a}
 
+inline bool fEqual(float a, float b)
+{
+    int64_t ai = int64_t(std::round(a * 10000.0f));
+    int64_t bi = int64_t(std::round(b * 10000.0f));
+    return ai == bi;
+}
 
 RenderGL::RenderGL() :
     AbstractRender_t()
@@ -572,11 +578,12 @@ void RenderGL::applyViewport()
 
     if(m_use_shaders)
     {
+        // small added epsilon in half-pixel mode makes sure that coordinate rounding occurs correctly
         m_transform_matrix = {
             2.0f / (float)viewport.w, 0.0f, 0.0f, 0.0f,
             0.0f, y_sign * 2.0f / (float)viewport.h, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f / (float)(1 << 15), 0.0f,
-            -(float)(viewport.w + off.x + off.x) / (viewport.w), -y_sign * (float)(viewport.h + off.y + off.y) / (viewport.h), 0.0f, 1.0f,
+            -(float)(viewport.w + off.x + off.x + 0.1f * m_halfPixelMode) / (viewport.w), -y_sign * (float)(viewport.h + off.y + off.y + 0.1f * m_halfPixelMode) / (viewport.h), 0.0f, 1.0f,
         };
 
         m_shader_read_viewport = {
@@ -641,10 +648,12 @@ void RenderGL::updateViewport()
 
     resetViewport();
 
-    if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || m_current_scale_mode != g_config.scale_mode)
+    bool is_cur_halfpixel = fEqual(m_render_scale_factor, 0.5f);
+
+    if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || m_current_scale_mode != g_config.scale_mode || is_cur_halfpixel != m_halfPixelMode)
     {
         // update render targets
-        if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH)
+        if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || is_cur_halfpixel != m_halfPixelMode)
         {
 #ifdef PGE_ENABLE_VIDEO_REC
             // invalidates GIF recorder handle

@@ -17,6 +17,7 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
+#include <inttypes.h>
 #include <array>
 
 #include <SDL2/SDL_video.h>
@@ -130,12 +131,19 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
     SetRWopsIO(&io);
     SDL_RWops *handle = Files::open_file(file, "rb");
 
+    if(!handle)
+    {
+        pLogWarning("GraphicsHelps::loadImage: Failed to open file [%s]", file.c_str());
+        return nullptr; // Failed to open
+    }
+
     FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromHandle(&io, (fi_handle)handle);
 
     if(formato == FIF_UNKNOWN)
     {
+        pLogWarning("GraphicsHelps::loadImage: Format of [%s] is unknown", file.c_str());
         SDL_RWclose(handle);
-        return NULL;
+        return nullptr;
     }
 
     FIBITMAP *img = FreeImage_LoadFromHandle(formato, &io, (fi_handle)handle);
@@ -143,7 +151,10 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
     SDL_RWclose(handle);
 
     if(!img)
-        return NULL;
+    {
+        pLogWarning("GraphicsHelps::loadImage: Failed to load the image [%s] from handler", file.c_str());
+        return nullptr;
+    }
 
 #endif
 #ifdef DEBUG_BUILD
@@ -158,7 +169,7 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
 #endif
         FIBITMAP *temp = nullptr;
 
-#ifdef THEXTECH_WIP_FEATURES
+#if defined(THEXTECH_WIP_FEATURES) || defined(__PSP__)
         temp = fastConvertTo32Bit(img);
 #endif
 
@@ -168,7 +179,10 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
         FreeImage_Unload(img);
 
         if(!temp)
+        {
+            pLogWarning("GraphicsHelps::loadImage: Failed to convert the image [%s] to 32-bit", file.c_str());
             return nullptr;
+        }
 
         img = temp;
 #ifdef DEBUG_BUILD
@@ -191,19 +205,25 @@ FIBITMAP *GraphicsHelps::loadImage(const Files::Data &raw, bool convertTo32bit)
     FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromMemory(imgMEM);
 
     if(formato  == FIF_UNKNOWN)
+    {
+        pLogWarning("GraphicsHelps::loadImage: Format of data of size %zu is unknown", raw.size());
         return nullptr;
+    }
 
     FIBITMAP *img = FreeImage_LoadFromMemory(formato, imgMEM, 0);
     FreeImage_CloseMemory(imgMEM);
 
     if(!img)
+    {
+        pLogWarning("GraphicsHelps::loadImage: Failed to open image data of size %zu", raw.size());
         return nullptr;
+    }
 
     if(convertTo32bit && (FreeImage_GetBPP(img) != 32))
     {
         FIBITMAP *temp = nullptr;
 
-#ifdef THEXTECH_WIP_FEATURES
+#if defined(THEXTECH_WIP_FEATURES) || defined(__PSP__)
         temp = fastConvertTo32Bit(img);
 #endif
 
@@ -213,7 +233,11 @@ FIBITMAP *GraphicsHelps::loadImage(const Files::Data &raw, bool convertTo32bit)
         FreeImage_Unload(img);
 
         if(!temp)
+        {
+            pLogWarning("GraphicsHelps::loadImage: Failed to convert the image data of size %zu to 32-bit", raw.size());
             return nullptr;
+        }
+
         img = temp;
     }
 
@@ -226,6 +250,7 @@ FIBITMAP *GraphicsHelps::loadMask(const std::string &file, bool maskIsPng, bool 
 
     if(file.empty())
         return nullptr; //Nothing to do
+
     mask = loadImage(file, convertTo32bit);
 
     if(!mask)
@@ -244,6 +269,7 @@ FIBITMAP *GraphicsHelps::loadMask(const Files::Data &raw, bool maskIsPng, bool c
 
     if(raw.empty())
         return nullptr; //Nothing to do
+
     mask = loadImage(raw, convertTo32bit);
 
     if(!mask)
@@ -636,6 +662,41 @@ FIBITMAP *GraphicsHelps::fast2xScaleDown(FIBITMAP *image)
     return dest;
 }
 
+FIBITMAP *GraphicsHelps::fastIntScaleDown(FIBITMAP *image, int divX, int divY)
+{
+    if(!image)
+        return nullptr;
+
+    if(FreeImage_GetBPP(image) != 32)
+        return nullptr;
+
+    auto src_w = static_cast<uint32_t>(FreeImage_GetWidth(image));
+    auto src_h = static_cast<uint32_t>(FreeImage_GetHeight(image));
+    const uint32_t *src_pixels  = reinterpret_cast<uint32_t*>(FreeImage_GetBits(image));
+    auto src_pitch_px = static_cast<uint32_t>(FreeImage_GetPitch(image)) / 4;
+
+    auto dest_w = src_w / divX;
+    auto dest_h = src_h / divY;
+
+    FIBITMAP *dest = FreeImage_Allocate(dest_w, dest_h, 32);
+
+    if(!dest)
+        return nullptr;
+
+    uint32_t *dest_pixels  = reinterpret_cast<uint32_t*>(FreeImage_GetBits(dest));
+    auto dest_pitch_px = static_cast<uint32_t>(FreeImage_GetPitch(dest)) / 4;
+
+    for(uint32_t src_y = 0, dest_y = 0; dest_y < dest_h; src_y += divY, dest_y += 1)
+    {
+        for(uint32_t src_x = 0, dest_x = 0; dest_x < dest_w; src_x += divX, dest_x += 1)
+        {
+            dest_pixels[dest_y * dest_pitch_px + dest_x] = src_pixels[src_y * src_pitch_px + src_x];
+        }
+    }
+
+    return dest;
+}
+
 FIBITMAP *GraphicsHelps::fastConvertTo32Bit(FIBITMAP *image)
 {
     // two kilobytes of stack isn't affordable? make these static, then.
@@ -646,12 +707,19 @@ FIBITMAP *GraphicsHelps::fastConvertTo32Bit(FIBITMAP *image)
     // palette for low nybble (ignores high nybble)
     std::array<uint32_t, 256> palette_low;
 
-
     if(!image)
+    {
+        pLogWarning("GraphicsHelps::fastConvertTo32Bit: Null image");
         return nullptr;
+    }
 
-    if(FreeImage_GetBPP(image) != 1 && FreeImage_GetBPP(image) != 4 && FreeImage_GetBPP(image) != 8)
+    const unsigned src_bpp = FreeImage_GetBPP(image);
+
+    if(src_bpp != 1 && src_bpp != 4 && src_bpp != 8 && src_bpp != 24)
+    {
+        pLogWarning("GraphicsHelps::fastConvertTo32Bit: Incompatible BPP=%u", src_bpp);
         return nullptr;
+    }
 
     auto src_w = static_cast<uint32_t>(FreeImage_GetWidth(image));
     auto src_h = static_cast<uint32_t>(FreeImage_GetHeight(image));
@@ -663,13 +731,16 @@ FIBITMAP *GraphicsHelps::fastConvertTo32Bit(FIBITMAP *image)
     FIBITMAP *dest = FreeImage_Allocate(src_w, src_h, 32);
 
     if(!dest)
+    {
+        pLogWarning("GraphicsHelps::fastConvertTo32Bit: Possibly out of memory, can't allocate %" PRIu32 "x%" PRIu32 " x 32", src_w, src_h);
         return nullptr;
+    }
 
     uint32_t *dest_pixels  = reinterpret_cast<uint32_t*>(FreeImage_GetBits(dest));
     auto dest_pitch_px = static_cast<uint32_t>(FreeImage_GetPitch(dest)) / 4;
 
     // special logic for 1 BPP
-    if(FreeImage_GetBPP(image) == 1)
+    if(src_bpp == 1)
     {
         // fill first two entries
         for(int i = 0; i < 2; i++)
@@ -696,7 +767,7 @@ FIBITMAP *GraphicsHelps::fastConvertTo32Bit(FIBITMAP *image)
         return dest;
     }
 
-    if(FreeImage_GetBPP(image) == 8)
+    if(src_bpp == 8)
     {
         for(int i = 0; i < 256; i++)
         {
@@ -713,6 +784,24 @@ FIBITMAP *GraphicsHelps::fastConvertTo32Bit(FIBITMAP *image)
             for(uint32_t x = 0; x < src_w; x++)
             {
                 dest_pixels[y * dest_pitch_px + x] = palette_high[src_pixels[y * src_pitch + x]];
+            }
+        }
+    }
+    else if(src_bpp == 24)
+    {
+        for(uint32_t y = 0; y < src_h; ++y)
+        {
+            const uint8_t *line_src = src_pixels + y * src_pitch;
+            uint32_t *line_dst = dest_pixels + y * dest_pitch_px;
+
+            for(uint32_t x = 0; x < src_w; ++x, ++line_dst)
+            {
+                // FIXME: Verify on big endian targets
+                uint32_t pix = 0xFF000000;
+                pix |= (*line_src++) << 0;
+                pix |= ((*line_src++) << 8);
+                pix |= ((*line_src++) << 16);
+                *line_dst = pix;
             }
         }
     }

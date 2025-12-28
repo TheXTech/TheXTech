@@ -74,12 +74,14 @@
     && !defined(__WII__) \
     && !defined(__WIIU__) \
     && !defined(__SWITCH__) \
-    && !defined(VITA)
+    && !defined(VITA) \
+    && !defined(__PSP__)
 #   define HAS_SIG_INFO
 #endif
 
 // Exclude personal data removal from platforms where API doesn't allows to recognise the user and/or home directory
 #if    !defined(VITA) \
+    && !defined(__PSP__) \
     && !defined(__16M__) \
     && !defined(__3DS__) \
     && !defined(__WII__) \

@@ -56,6 +56,8 @@ public:
 
         void init_from_mem(const unsigned char* data, size_t size);
 
+        void clearData();
+
         inline void take_ownership_of_mem(const unsigned char* data, size_t size)
         {
             init_from_mem(data, size);

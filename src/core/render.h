@@ -125,6 +125,22 @@ E_INLINE  bool hasFrameBuffer() TAIL
 #endif
 
 /*!
+ * \brief Identify whether render engine is in half-pixel mode
+ * \return true if render is in half-pixel mode
+ */
+#ifndef RENDER_CUSTOM
+SDL_FORCE_INLINE bool isHalfPixel()
+{
+    return g_render->isHalfPixel();
+}
+#else
+static constexpr bool isHalfPixel()
+{
+    return true;
+}
+#endif
+
+/*!
  * \brief Call the repaint
  */
 E_INLINE void repaint() TAIL
@@ -295,6 +311,26 @@ E_INLINE void setDrawPlane(uint8_t plane) TAIL
     return g_render->setDrawPlane(plane);
 }
 #endif
+
+/*!
+ * \brief Change between normal and 2pix shrinked modes
+ * \param pixHalf 2pix shrink enabled
+ * \return 1 when enabling 2x shrinking of render result, 0 is normal render mode
+ *
+ * Once enabling this mode, all the sizes and coordinates will be reported like it being 2x larger,
+ * but de-facto drawn on 2x smaller canvas. On some devices such render mode is enforced because of
+ * too small screen resolution.
+ *
+ * NOTE: This function supposed to be called from inside the XWindow, don't call it directly!
+ * From anywhere also, do call XWindow::setHalfPixMode(bool) instead of THIS function.
+ */
+E_INLINE void setHalfPixMode(bool pixHalf) TAIL
+#ifndef RENDER_CUSTOM
+{
+    return g_render->setHalfPixMode(pixHalf);
+}
+#endif
+
 
 /*!
  * \brief Reports whether the *currently-active* renderer supports loading GLSL ES shaders
