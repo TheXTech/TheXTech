@@ -46,6 +46,7 @@ WindowCursor_t getCursor() { return CURSOR_NONE; }
 void placeCursor(int /*window_x*/, int /*window_y*/) {}
 bool isFullScreen() { return true; }
 int setFullScreen(bool /*fs*/) { return 1; }
+void setHalfPixMode(bool /*pixHalf*/) {}
 void restoreWindow() {}
 void setWindowSize(int /*w*/, int /*h*/) {}
 
