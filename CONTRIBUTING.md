@@ -65,4 +65,4 @@ We are being very careful in how we create the TheXTech standard, and we are gen
 
 We maintain ports for a wide variety of systems, and you should take care when developing new features to ensure that the appropriate ports of the game will continue to run with our minimum system requirements (16 MB of RAM and 200 MHz CPU).
 
-If you are interested in contributing new ports to any such systems, please see [[Porting]].
+If you are interested in contributing new ports to any such systems, please see [Porting](PORTING.md).
