@@ -48,8 +48,6 @@ TheXTech is based on the [SMBX64](https://wohlsoft.ru/pgewiki/SMBX64) standard, 
 
 Related comments will also be marked as "off-topic". Related conversations of partial issues and PR's will be locked as "off-topic".
 
-Please remember: **TheXTech** engine is a preservation project of SMBX 1.3 that powered for **Players**, instead of **Level/Episode Makers (Creators)**.
-
 ## A note on "bugfixes"
 
 TheXTech is a faithful reproduction of the SMBX 1.3 engine, so a number of things that may appear to be bugs to a user or contributor may actually be TheXTech reproducing SMBX 1.3 logic intended. Please see [Types of Bugs](https://github.com/TheXTech/TheXTech/wiki/Types-of-bugs) for a categorization of types of bugs.
@@ -68,11 +66,3 @@ We are being very careful in how we create the TheXTech standard, and we are gen
 We maintain ports for a wide variety of systems, and you should take care when developing new features to ensure that the appropriate ports of the game will continue to run with our minimum system requirements (16 MB of RAM and 200 MHz CPU).
 
 If you are interested in contributing new ports to any such systems, please see [[Porting]].
-
-# Nostalgic Paradise related
-
-Since 2025-7-15, None of **Nostalgic Paradise**-related contents are allowed to be posted, either in issue, PR, discussion, or the comments.
-
-Since it's a separate project that to be based on TheXTech, features that only belong to that will be out-of-scope as well.
-
-Use the correspond repo instead: https://github.com/Nostalgic-Paradise-Dev-Team/NsPr-Discussion
