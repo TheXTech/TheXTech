@@ -543,7 +543,6 @@ public:
         config_rendermode_set};
 #endif
 
-#ifndef PGE_MIN_PORT
     enum ScaleDownTextures
     {
         SCALE_DOWN_NONE = 0,
@@ -551,19 +550,18 @@ public:
         SCALE_DOWN_ALL = 2,
     };
 
+#if !defined(PGE_MIN_PORT) && !defined(RENDER_HALFPIXEL_ALWAYS)
     opt_enum<int> scale_down_textures{this,
         {
             {SCALE_DOWN_NONE, "none", "None", "Least loading stutter"},
             {SCALE_DOWN_SAFE, "safe", "Safe", "Checks if images are in 2x format"},
             {SCALE_DOWN_ALL, "all", "All", "Less loading stutter than 'Safe'"},
         },
-#if defined(__PSP__)
-        defaults(SCALE_DOWN_ALL),
-#else
         defaults(SCALE_DOWN_SAFE),
-#endif
         {}, Scope::Config,
         "scale-down-textures", "Scale down images", "Store images as 1x to save memory"};
+#else
+    static constexpr int scale_down_textures = SCALE_DOWN_ALL;
 #endif
 
 #if !defined(PGE_MIN_PORT) && !defined(__PSP__)
