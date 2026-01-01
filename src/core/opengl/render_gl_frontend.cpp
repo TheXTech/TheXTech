@@ -70,12 +70,6 @@ StdPicture* s_sparkle = nullptr;
 
 #define F_TO_B(color) {color.r, color.g, color.b, color.a}
 
-inline bool fEqual(float a, float b)
-{
-    int64_t ai = int64_t(std::round(a * 10000.0f));
-    int64_t bi = int64_t(std::round(b * 10000.0f));
-    return ai == bi;
-}
 
 RenderGL::RenderGL() :
     AbstractRender_t()
@@ -648,7 +642,8 @@ void RenderGL::updateViewport()
 
     resetViewport();
 
-    bool is_cur_halfpixel = fEqual(m_render_scale_factor, 0.5f);
+    // floating point comparison is safe because m_render_scale_factor is explicitly set to a constant (and, 0.5f can be represented precisely)
+    bool is_cur_halfpixel = (m_render_scale_factor == 0.5f);
 
     if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || m_current_scale_mode != g_config.scale_mode || is_cur_halfpixel != m_halfPixelMode)
     {
