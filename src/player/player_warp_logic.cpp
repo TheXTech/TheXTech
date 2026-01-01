@@ -1345,7 +1345,7 @@ void PlayerEffectWarpWait(int A)
         {
             if(w.MapWarp)
             {
-                LevelBeatCode = 6;
+                LevelBeatCode = BEATCODE_WARP;
 
                 if(!(w.MapX == -1 && w.MapY == -1))
                 {

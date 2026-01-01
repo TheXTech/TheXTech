@@ -190,7 +190,7 @@ void GameLoop()
     {
         EndLevel = true;
         ErrorQuit = false;
-        LevelBeatCode = -1;
+        LevelBeatCode = BEATCODE_QUIT;
         pLogWarning("Quit level because of an error");
         XRender::clearBuffer();
     }
