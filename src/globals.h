@@ -2024,7 +2024,17 @@ extern RangeArr<SaveSlotInfo_t, 1, maxSaveSlots> SaveSlotInfo;
 //Public BeltDirection As Integer 'direction of the converyer belt blocks
 extern int BeltDirection;
 //Public BeatTheGame As Boolean 'true if the game has been beaten
-extern bool BeatTheGame;
+//extern bool BeatTheGame;
+enum BeatGameStatus_t
+{
+    //! Beat game status is unset
+    BEAT_GAME_NONE      = 0x00,
+    //! Game beated and status is saved
+    BEAT_GAME_SAVED     = 0x01,
+    //! Normal beat game triggered (MUST BE CLEAR ON CONSUMATION!)
+    BEAT_GAME_TRIGGERED = 0x02,
+};
+extern uint32_t BeatTheGame;
 // 'for frameskip
 //Public cycleCount As Integer
 //extern int cycleCount;

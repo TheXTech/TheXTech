@@ -311,7 +311,7 @@ void SaveGame()
     sav.last_hub_level_file = FileRecentSubHubLevel;
 
     // ABOVE GETS SKIPPED BY FINDSAVES
-    sav.gameCompleted = BeatTheGame; // Can only get 99% until you finish the game;
+    sav.gameCompleted = (BeatTheGame & BEAT_GAME_SAVED) != 0; // Can only get 99% until you finish the game;
 
     for(A = 1; A <= numWorldLevels; A++)
         sav.visibleLevels.emplace_back(A, WorldLevel[A].Active);
@@ -388,7 +388,7 @@ void LoadGame()
     g_100s = (sav.hundreds == 0) ? sav.lives : ((sav.hundreds > 0) ? sav.hundreds - 1 : sav.hundreds);
     Coins = int(sav.coins);
     Score = int(sav.points);
-    BeatTheGame = sav.gameCompleted;
+    BeatTheGame = sav.gameCompleted ? BEAT_GAME_SAVED : BEAT_GAME_NONE;
     WorldPlayer[1].Location.X = double(sav.worldPosX);
     WorldPlayer[1].Location.Y = double(sav.worldPosY);
 
