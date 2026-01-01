@@ -540,14 +540,6 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
         return;
 
-#ifdef THEXTECH_LAZYLOAD_FROM_DISK
-    if(target.l.path.empty())
-        return;
-#else
-    if(target.l.raw.empty())
-        return;
-#endif
-
 #ifndef THEXTECH_LAZYLOAD_FROM_DISK
     bool is_qoi = false;
     bool qoi_depth_test_supported = false;
@@ -568,13 +560,10 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     {
 #ifdef THEXTECH_LAZYLOAD_FROM_DISK
         pLogCritical("Lazy-decompress has failed: invalid image file %s", target.l.path.c_str());
-        target.l.path.clear();
-        target.l.pathMask.clear();
 #else
-        target.l.raw.clearData();
-        target.l.rawMask.clearData();
         pLogCritical("Lazy-decompress has failed: invalid image data");
 #endif
+        target.inited = false;
         return;
     }
 
