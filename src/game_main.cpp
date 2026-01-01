@@ -1585,13 +1585,13 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             // store to level save info if level won
-            if(LevelBeatCode > 0 || !GoToLevel.empty())
+            if((LevelBeatCode > 0 && LevelBeatCode != BEATCODE_GAME_COMPLETE) || !GoToLevel.empty())
             {
                 CommitBeatCode(LevelBeatCode);
                 g_curLevelMedals.commit();
             }
             // otherwise, reset the medal count
-            else
+            else if(LevelBeatCode != BEATCODE_GAME_COMPLETE)
                 g_curLevelMedals.on_all_dead();
 
             Record::EndRecording();
