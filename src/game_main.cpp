@@ -1095,7 +1095,7 @@ int GameMain(const CmdLineSetup_t &setup)
             auto introPath = findIntroLevel();
             if(introPath.empty())
             {
-                pLogFatal("Can't find any intro level files to start the main menu, the game will be closed.");
+                D_pLogFatal("Can't find any intro level files to start the main menu, the game will be closed.");
                 XMsgBox::errorMsgBox("Fatal error",
                                      "Can't find any intro level file to start the main menu.\n"
                                      "The game will be closed.\n"
