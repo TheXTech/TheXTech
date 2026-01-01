@@ -36,6 +36,9 @@
 // #define DEBUG_RES
 #ifdef DEBUG_RES
 #   include <Logger/logger.h>
+#   define DR_(x) x
+#else
+#    define DR_(x) (void)(0)
 #endif
 
 void SyncSysCursorDisplay()
@@ -286,9 +289,7 @@ void UpdateInternalRes()
 
         XRender::TargetW = int_w;
         XRender::TargetH = int_h;
-#ifdef DEBUG_RES
-        pLogDebug("TRACE: Target Render set to w=%d and h=%d (Renderer works)", XRender::TargetW, XRender::TargetH);
-#endif
+        DR_(pLogDebug("TRACE: Target Render set to w=%d and h=%d (Renderer works)", XRender::TargetW, XRender::TargetH));
     }
     else
     {
@@ -308,18 +309,14 @@ void UpdateInternalRes()
             XRender::TargetH = 720;
 #endif
         }
-#ifdef DEBUG_RES
-        pLogDebug("TRACE: Target Render set to w=%d and h=%d (Renderer not initialized)", XRender::TargetW, XRender::TargetH);
-#endif
+        DR_(pLogDebug("TRACE: Target Render set to w=%d and h=%d (Renderer not initialized)", XRender::TargetW, XRender::TargetH));
     }
 
     if(LevelEditor || MagicHand)
     {
         XRender::TargetW = SDL_max(XRender::TargetW, 640);
         XRender::TargetH = SDL_max(XRender::TargetH, 480);
-#ifdef DEBUG_RES
-        pLogDebug("TRACE: Target Render set to w=%d and h=%d (Editor/MagicHand)", XRender::TargetW, XRender::TargetH);
-#endif
+        DR_(pLogDebug("TRACE: Target Render set to w=%d and h=%d (Editor/MagicHand)", XRender::TargetW, XRender::TargetH));
     }
 
 #ifdef __3DS__
@@ -335,9 +332,7 @@ void UpdateInternalRes()
         XRender::TargetH = SDL_max(XRender::TargetH, canon_h);
         new_ScreenW = canon_w;
         new_ScreenH = canon_h;
-#ifdef DEBUG_RES
-        pLogDebug("TRACE: Target Render set to w=%d and h=%d (Canonical tweak)", XRender::TargetW, XRender::TargetH);
-#endif
+        DR_(pLogDebug("TRACE: Target Render set to w=%d and h=%d (Canonical tweak)", XRender::TargetW, XRender::TargetH));
     }
     else if(ignore_compat || (g_config.allow_multires && g_config.dynamic_camera_logic))
     {
