@@ -1393,9 +1393,9 @@ void InitSound()
     {
         XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR,
                               "Sounds loading error",
-                              fmt::format_ne("Failed to load some SFX assets (totally {0}). "
-                                             "Look at the log file to get more details:\n{1}",
-                                             g_errorsSfx, getLogFilePath()));
+                              fmt::sprintf_ne("Failed to load some SFX assets (totally %d). "
+                                             "Look at the log file to get more details:\n%s",
+                                             (int)g_errorsSfx, getLogFilePath().c_str()));
         g_errorsSfx = 0;
     }
 
