@@ -554,6 +554,8 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         sourceImage = GraphicsHelps::loadImage(target.l.raw);
 #else
     FIBITMAP *sourceImage = GraphicsHelps::loadImage(target.l.path);
+    constexpr bool is_qoi = false;
+    constexpr bool qoi_depth_test_supported = false;
 #endif
 
     if(!sourceImage)
@@ -638,12 +640,8 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         GraphicsHelps::replaceColor(sourceImage, colSrc, colDst);
     }
 
-#ifndef THEXTECH_LAZYLOAD_FROM_DISK
     if(!is_qoi)
         FreeImage_FlipVertical(sourceImage);
-#else
-    FreeImage_FlipVertical(sourceImage);
-#endif
 
     if(maskImage)
         FreeImage_FlipVertical(maskImage);
@@ -676,10 +674,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
     case Config_t::SCALE_DOWN_SAFE:
         // only do it if the texture isn't already downscaled, and wasn't already testing during QOI conversion
-        shrink2x = w >= Uint32(target.w) && h >= Uint32(target.h);
-#ifndef THEXTECH_LAZYLOAD_FROM_DISK
-        shrink2x &= !is_qoi;
-#endif
+        shrink2x = w >= Uint32(target.w) && h >= Uint32(target.h) && !is_qoi;
 
         if(shrink2x)
             shrink2x = GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target));
@@ -783,19 +778,12 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         }
     }
 
-#ifdef THEXTECH_LAZYLOAD_FROM_DISK
-    if(!g_render->depthTestSupported()
-        || maskImage
-        || !GraphicsHelps::validateForDepthTest(sourceImage, StdPictureGetOrigPath(target))
-    )
-#else
     if(!g_render->depthTestSupported()
         || maskImage
         || ((is_qoi)
             ? !qoi_depth_test_supported
             : !GraphicsHelps::validateForDepthTest(sourceImage, StdPictureGetOrigPath(target)))
     )
-#endif
     {
         target.d.invalidateDepthTest();
     }
