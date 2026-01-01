@@ -126,15 +126,6 @@ void UpdateInternalRes()
     }
 #endif
 
-#if defined(__PSP__)
-    // Limitation of texture size for the frame buffer (de-facto 512x512, with half-pixel mode is 1024x1024)
-    if(req_w > 1024)
-        req_w = 1024;
-
-    if(req_h > 1024)
-        req_h = 1024;
-#endif
-
     // use the correct canonical screen's resolution here
     int canon_w = l_screen->canonical_screen().W;
     int canon_h = l_screen->canonical_screen().H;
@@ -183,13 +174,8 @@ void UpdateInternalRes()
         }
 
         // minimum height constraint
-#if defined(__PSP__)
-        if(int_h < 272)
-            int_h = 272;
-#else
         if(int_h < 320)
             int_h = 320;
-#endif
 
         // maximum height constraint
         if(int_h > 720 && req_h <= 720)
@@ -278,15 +264,6 @@ void UpdateInternalRes()
         int_w -= int_w & 1;
         int_h -= int_h & 1;
 
-#if defined(__PSP__)
-         // Limitation of half texture size for the frame buffer
-        if(int_w > 1024)
-            int_w = 1024;
-
-        if(int_h > 1024)
-            int_h = 1024;
-#endif
-
         XRender::TargetW = int_w;
         XRender::TargetH = int_h;
         DR_(pLogDebug("TRACE: Target Render set to w=%d and h=%d (Renderer works)", XRender::TargetW, XRender::TargetH));
@@ -301,13 +278,8 @@ void UpdateInternalRes()
 
         if(XRender::TargetH == 0)
         {
-#if defined(__PSP__)
-            XRender::TargetW = 480 * 2;
-            XRender::TargetH = 272 * 2;
-#else
             XRender::TargetW = 1280;
             XRender::TargetH = 720;
-#endif
         }
         DR_(pLogDebug("TRACE: Target Render set to w=%d and h=%d (Renderer not initialized)", XRender::TargetW, XRender::TargetH));
     }
