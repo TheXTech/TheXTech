@@ -17,6 +17,13 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
+// #define DEBUG_GFX_FUNCS
+#ifdef DEBUG_GFX_FUNCS
+#    define DG_(x) x
+#else
+#    define DG_(x) (void)(0)
+#endif
+
 #include <inttypes.h>
 #include <array>
 
@@ -131,17 +138,19 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
     SetRWopsIO(&io);
     SDL_RWops *handle = Files::open_file(file, "rb");
 
+#ifndef NDEBUG // it's fine to pass a nullptr to FreeImage_GetFileTypeFromHandle, so this is just for debugging
     if(!handle)
     {
         pLogWarning("GraphicsHelps::loadImage: Failed to open file [%s]", file.c_str());
         return nullptr; // Failed to open
     }
+#endif
 
     FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromHandle(&io, (fi_handle)handle);
 
     if(formato == FIF_UNKNOWN)
     {
-        pLogWarning("GraphicsHelps::loadImage: Format of [%s] is unknown", file.c_str());
+        DG_(pLogWarning("GraphicsHelps::loadImage: Format of [%s] is unknown", file.c_str()));
         SDL_RWclose(handle);
         return nullptr;
     }
@@ -152,7 +161,7 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
 
     if(!img)
     {
-        pLogWarning("GraphicsHelps::loadImage: Failed to load the image [%s] from handler", file.c_str());
+        DG_(pLogWarning("GraphicsHelps::loadImage: Failed to load the image [%s] from handler", file.c_str()));
         return nullptr;
     }
 
@@ -180,7 +189,7 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
 
         if(!temp)
         {
-            pLogWarning("GraphicsHelps::loadImage: Failed to convert the image [%s] to 32-bit", file.c_str());
+            DG_(pLogWarning("GraphicsHelps::loadImage: Failed to convert the image [%s] to 32-bit", file.c_str()));
             return nullptr;
         }
 
@@ -206,7 +215,7 @@ FIBITMAP *GraphicsHelps::loadImage(const Files::Data &raw, bool convertTo32bit)
 
     if(formato  == FIF_UNKNOWN)
     {
-        pLogWarning("GraphicsHelps::loadImage: Format of data of size %zu is unknown", raw.size());
+        DG_(pLogWarning("GraphicsHelps::loadImage: Format of data of size %zu is unknown", raw.size()));
         return nullptr;
     }
 
@@ -215,7 +224,7 @@ FIBITMAP *GraphicsHelps::loadImage(const Files::Data &raw, bool convertTo32bit)
 
     if(!img)
     {
-        pLogWarning("GraphicsHelps::loadImage: Failed to open image data of size %zu", raw.size());
+        DG_(pLogWarning("GraphicsHelps::loadImage: Failed to open image data of size %zu", raw.size()));
         return nullptr;
     }
 
@@ -234,7 +243,7 @@ FIBITMAP *GraphicsHelps::loadImage(const Files::Data &raw, bool convertTo32bit)
 
         if(!temp)
         {
-            pLogWarning("GraphicsHelps::loadImage: Failed to convert the image data of size %zu to 32-bit", raw.size());
+            DG_(pLogWarning("GraphicsHelps::loadImage: Failed to convert the image data of size %zu to 32-bit", raw.size()));
             return nullptr;
         }
 
@@ -605,7 +614,7 @@ bool GraphicsHelps::validateFor2xScaleDown(FIBITMAP *image, const std::string &o
 
     if(w % 2 || h % 2)
     {
-        D_pLogWarning("Texture can't be shrank, non-multiple size: %" PRIu32 " x %" PRIu32 " (%s)", w, h, origPath.c_str());
+        DG_(pLogWarning("Texture can't be shrank, non-multiple size: %" PRIu32 " x %" PRIu32 " (%s)", w, h, origPath.c_str()));
         return false; // Not multiple two!
     }
 
@@ -617,13 +626,13 @@ bool GraphicsHelps::validateFor2xScaleDown(FIBITMAP *image, const std::string &o
                 || img_pixels[y * pitch_px + x] != img_pixels[(y + 1) * pitch_px + x]
                 || img_pixels[y * pitch_px + x] != img_pixels[(y + 1) * pitch_px + (x + 1)])
             {
-                D_pLogWarning("Texture can't be shrank: Pixel colors at the %" PRIu32 " x %" PRIu32 " sector (2x2 square) aren't equal (%s)", x, y, origPath.c_str());
+                DG_(pLogWarning("Texture can't be shrank: Pixel colors at the %" PRIu32 " x %" PRIu32 " sector (2x2 square) aren't equal (%s)", x, y, origPath.c_str()));
                 return false;
             }
         }
     }
 
-    D_pLogDebug("Texture CAN be shrank (%s)", origPath.c_str());
+    DG_(pLogDebug("Texture CAN be shrank (%s)", origPath.c_str()));
     return true;
 }
 
@@ -709,7 +718,7 @@ FIBITMAP *GraphicsHelps::fastConvertTo32Bit(FIBITMAP *image)
 
     if(!image)
     {
-        pLogWarning("GraphicsHelps::fastConvertTo32Bit: Null image");
+        DG_(pLogWarning("GraphicsHelps::fastConvertTo32Bit: Null image"));
         return nullptr;
     }
 
@@ -717,7 +726,7 @@ FIBITMAP *GraphicsHelps::fastConvertTo32Bit(FIBITMAP *image)
 
     if(src_bpp != 1 && src_bpp != 4 && src_bpp != 8 && src_bpp != 24)
     {
-        pLogWarning("GraphicsHelps::fastConvertTo32Bit: Incompatible BPP=%u", src_bpp);
+        DG_(pLogWarning("GraphicsHelps::fastConvertTo32Bit: Incompatible BPP=%u", src_bpp));
         return nullptr;
     }
 
@@ -732,7 +741,7 @@ FIBITMAP *GraphicsHelps::fastConvertTo32Bit(FIBITMAP *image)
 
     if(!dest)
     {
-        pLogWarning("GraphicsHelps::fastConvertTo32Bit: Possibly out of memory, can't allocate %" PRIu32 "x%" PRIu32 " x 32", src_w, src_h);
+        DG_(pLogWarning("GraphicsHelps::fastConvertTo32Bit: Possibly out of memory, can't allocate %" PRIu32 "x%" PRIu32 " x 32", src_w, src_h));
         return nullptr;
     }
 
