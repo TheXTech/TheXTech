@@ -336,8 +336,7 @@ int PSwitchPlayer = 0;
 RangeArr<SaveSlotInfo_t, 1, maxSaveSlots> SaveSlotInfo;
 
 int BeltDirection = 0;
-//bool BeatTheGame = false;
-uint32_t BeatTheGame = BEAT_GAME_NONE;
+bool BeatTheGame = false;
 //int cycleCount = 0;
 //double fpsTime = 0.0;
 //double fpsCount = 0.0;

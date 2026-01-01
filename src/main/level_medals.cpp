@@ -222,23 +222,6 @@ void CommitBeatCode(int beat_code)
     }
 }
 
-void CommitBeatGame()
-{
-    LevelSaveInfo_t* info = s_findSaveInfo();
-    if(!info)
-        return;
-
-    info->exits_got = 0xFFFF; /* When game is completed, just set all the bits */
-
-    // copy this to any other world levels with the same filename
-    while(LevelSaveInfo_t* next = s_nextSaveInfo(info))
-    {
-        *next = *info;
-        info = next;
-    }
-}
-
-
 void OrderMedals()
 {
     using dist_and_hit_index = std::pair<uint16_t, int16_t>;
