@@ -1321,7 +1321,7 @@ void NPCHit(int A, int B, int C)
                 NPC[numNPCs].Location.SpeedY = 0;
                 NPC[numNPCs].Location.SpeedX = Physics.NPCShellSpeed * NPC[numNPCs].Direction;
                 // logic to prevent double-hitting is different in stomp and whip cases
-                NPC[numNPCs].Location.X += -16 + (B == 1) ? NPC[numNPCs].Location.SpeedX : (32 * NPC[numNPCs].Direction);
+                NPC[numNPCs].Location.X += -16 + (B == 1 ? NPC[numNPCs].Location.SpeedX : (32 * NPC[numNPCs].Direction));
                 NPC[numNPCs].CantHurtPlayer = C;
                 NPC[numNPCs].CantHurt = 6;
                 NPC[numNPCs].Active = true;
