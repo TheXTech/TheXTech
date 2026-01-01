@@ -59,7 +59,6 @@ void textInputStop() {}
 void textInputSetRect(int, int, int, int) {}
 bool isFullScreen() { return true; }
 int setFullScreen(bool /*fs*/) { return 1; }
-void setHalfPixMode(bool /*pixHalf*/) {}
 void restoreWindow() {}
 void setWindowSize(int /*w*/, int /*h*/) {}
 
