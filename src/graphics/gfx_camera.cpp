@@ -104,10 +104,7 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
                 vscreen.small_screen_features.offset_x -= rateX;
         }
 
-        if(XRender::isHalfPixel())
-            vscreen.X -= (int)(rate * vscreen.small_screen_features.offset_x / 4) * 2;
-        else
-            vscreen.X -= (int)(rate * vscreen.small_screen_features.offset_x / 2);
+        vscreen.X -= (int)(rate * vscreen.small_screen_features.offset_x / 2);
     }
 
     if(g_config.small_screen_cam && screen.H < c_screen.H)
@@ -195,10 +192,7 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
         fix_default_offset *= (c_screen.H - screen.H) - std::abs(lookY) * 2;
         fix_default_offset /= (c_screen.H - screen.H);
 
-        if(XRender::isHalfPixel())
-            vscreen.Y += (int)(rate * (lookY + fix_default_offset) / 2) * 2;
-        else
-            vscreen.Y += (int)(rate * (lookY + fix_default_offset));
+        vscreen.Y += (int)(rate * (lookY + fix_default_offset));
     }
 }
 
