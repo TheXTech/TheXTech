@@ -45,10 +45,6 @@ namespace XEvents
 extern bool init();
 extern void quit();
 
-#endif
-
-#ifdef RENDER_CUSTOM
-
 constexpr bool is_nullptr()
 {
     return false;
