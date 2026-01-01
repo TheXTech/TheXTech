@@ -128,11 +128,6 @@ void OrderMedals();
  */
 void CommitBeatCode(int beat_code);
 
-/**
- * \brief Save an obtained game beat status to the current level's LevelSaveInfo entries
- */
-void CommitBeatGame();
-
 extern CurLevelMedals_t g_curLevelMedals;
 
 #endif // #ifndef LEVEL_MEDALS_H

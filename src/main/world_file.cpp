@@ -632,7 +632,7 @@ void ClearWorld(bool quick)
     WldxCustomParams.clear();
     SubHubLevels.clear();
     StartLevel.clear();
-    BeatTheGame = BEAT_GAME_NONE;
+    BeatTheGame = false;
     numWorldCredits = 0;
     // Clear custom outro if that was presented
     g_recentWorldOutro.clear();

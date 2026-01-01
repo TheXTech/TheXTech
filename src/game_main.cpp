@@ -1006,7 +1006,7 @@ int GameMain(const CmdLineSetup_t &setup)
             MultiHop = false;
             SuperSpeed = false;
             FlyForever = false;
-            BeatTheGame = BEAT_GAME_NONE;
+            BeatTheGame = false;
             g_ForceBitmaskMerge = false;
 #ifdef __3DS__
             g_ForceBitmaskMerge = g_config.inaccurate_gifs;
@@ -1537,9 +1537,6 @@ int GameMain(const CmdLineSetup_t &setup)
                 CommitBeatCode(LevelBeatCode);
                 g_curLevelMedals.commit();
             }
-            // do nothing as this was been already commited
-            else if((BeatTheGame & BEAT_GAME_TRIGGERED) != 0)
-                BeatTheGame &= ~BEAT_GAME_TRIGGERED;
             // otherwise, reset the medal count
             else
                 g_curLevelMedals.on_all_dead();
@@ -2025,8 +2022,9 @@ void UpdateMacro()
             LevelMacroCounter = 0;
             if(!TestLevel)
             {
-                BeatTheGame = BEAT_GAME_SAVED|BEAT_GAME_TRIGGERED;
-                CommitBeatGame();
+                BeatTheGame = true;
+                // new level beat code 15: beat the game (exclusive to new level save info -- does not open any exits)
+                CommitBeatCode(15);
                 g_curLevelMedals.commit();
                 SaveGame();
                 GameOutro = true;
