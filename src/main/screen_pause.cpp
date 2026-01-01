@@ -110,7 +110,7 @@ static bool s_RestartLevel()
     XRender::clearBuffer();
     XRender::repaint();
     EndLevel = true;
-    LevelBeatCode = -2;
+    LevelBeatCode = BEATCODE_RESTART;
     StopMusic();
     XEvents::doEvents();
     return true;
@@ -201,7 +201,7 @@ static bool s_QuitTesting()
     XRender::clearBuffer();
     XRender::repaint();
     EndLevel = true;
-    LevelBeatCode = -1;
+    LevelBeatCode = BEATCODE_QUIT;
     StopMusic();
     XEvents::doEvents();
 
@@ -313,8 +313,8 @@ void Init(int plr, bool LegacyPause)
     // level test
     if(s_pause_type == PauseType::Testing)
     {
-        bool inter_screen = (LevelBeatCode <= -2);
-        bool start_screen = (LevelBeatCode == -3);
+        bool inter_screen = (LevelBeatCode <= BEATCODE_RESTART);
+        bool start_screen = (LevelBeatCode == BEATCODE_SETUP);
         bool editor_test = !Backup_FullFileName.empty();
 
         if(!inter_screen)

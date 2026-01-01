@@ -2555,10 +2555,10 @@ void zTestLevel(bool magicHand, bool interProcess)
         for(int i = 1; i <= maxLocalPlayers; i++)
             Player[i].Location.X = -20000;
 
-        LevelBeatCode = -3;
+        LevelBeatCode = BEATCODE_SETUP;
         QuickReconnectScreen::g_active = true;
         PauseGame(PauseCode::PauseScreen);
-        LevelBeatCode = 0;
+        LevelBeatCode = BEATCODE_NONE;
     }
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED

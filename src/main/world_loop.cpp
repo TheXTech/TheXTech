@@ -309,9 +309,11 @@ void WorldLoop()
             }
 
             SaveGame();
-            LevelBeatCode = 0;
+            LevelBeatCode = BEATCODE_NONE;
         }
-        else if(LevelBeatCode == -1)
+        // case where the player manually quit or there was an error
+        // (these should probably be split up -- the error logic is from SMBX 1.3 and should be preserved)
+        else if(LevelBeatCode == BEATCODE_QUIT)
         {
             s_worldUpdateMusic(WorldPlayer[1].Location);
             worldResetSection();
@@ -331,11 +333,11 @@ void WorldLoop()
                 LevelPath(WorldLevel[curWorldLevel], 5);
 
             SaveGame();
-            LevelBeatCode = 0;
+            LevelBeatCode = BEATCODE_NONE;
         }
     }
     else
-        LevelBeatCode = 0;
+        LevelBeatCode = BEATCODE_NONE;
 
     for(int A = 1; A <= numPlayers; A++)
     {
@@ -725,7 +727,7 @@ resume_from_pause:
 
                         worldResetSection();
 
-                        LevelBeatCode = 6;
+                        LevelBeatCode = BEATCODE_WARP;
 
                         //for(B = 1; B <= numWorldLevels; B++)
                         for(WorldLevelRef_t t2 : treeWorldLevelQuery(WorldPlayer[1].Location, SORTMODE_ID))

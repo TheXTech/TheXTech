@@ -1899,9 +1899,10 @@ enum LevelMacro_t
     LEVELMACRO_STAR_EXIT = 6,
     LEVELMACRO_GOAL_TAPE_EXIT = 7,
     LEVELMACRO_FLAG_EXIT = 8,
+    LEVELMACRO_ALT_FLAG_EXIT = 9, // reserved
 };
 //Public LevelMacro As Integer 'Shows a level outro when beat
-extern int LevelMacro;
+extern LevelMacro_t LevelMacro;
 
 //Public LevelMacroCounter As Integer
 extern int LevelMacroCounter;
@@ -1960,8 +1961,32 @@ extern bool LevelSelect;
 extern bool LevelRestartRequested;
 //Public WorldPlayer(1) As WorldPlayer
 extern RangeArr<WorldPlayer_t, 0, 1> WorldPlayer;
+
+// unsafe to reorder these -- they are used in the WLD format and also included in the save file
+enum LevelBeatCode_t
+{
+    BEATCODE_SETUP = -3,
+    BEATCODE_RESTART = -2,
+    BEATCODE_QUIT = -1,
+    BEATCODE_NONE = 0,
+    BEATCODE_CARD_ROULETTE = 1,
+    BEATCODE_QUESTION_SPHERE = 2,
+    BEATCODE_OFFSCREEN = 3,
+    BEATCODE_KEYHOLE = 4,
+    BEATCODE_CRYSTAL_BALL = 5,
+    BEATCODE_WARP = 6,
+    BEATCODE_STAR = 7,
+    BEATCODE_GOAL_TAPE = 8,
+    BEATCODE_FLAG = 9,      // new
+    BEATCODE_ALT_FLAG = 10, // new, not yet implemented
+    BEATCODE_RESERVED_1 = 11,    // new, reserved for scripting
+    BEATCODE_RESERVED_2 = 12,    // new, reserved for scripting
+    BEATCODE_RESERVED_3 = 13,    // new, reserved for scripting
+    BEATCODE_RESERVED_4 = 14,    // new, reserved for scripting
+    BEATCODE_GAME_COMPLETE = 15, // new, used to mark the game as completed from this level
+};
 //Public LevelBeatCode As Integer ' code for the way the plauer beat the level
-extern int LevelBeatCode;
+extern LevelBeatCode_t LevelBeatCode;
 //Public curWorldLevel As Integer
 extern int curWorldLevel;
 //Public curWorldMusic As Integer

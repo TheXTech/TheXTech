@@ -338,7 +338,7 @@ static void read_header()
 
 static void write_end()
 {
-    fprintf(record_file, " %" PRId64 " \r\nEnd\r\nLevelBeatCode %d\r\n", frame_no+1, LevelBeatCode);
+    fprintf(record_file, " %" PRId64 " \r\nEnd\r\nLevelBeatCode %d\r\n", frame_no+1, (int)LevelBeatCode);
 }
 
 static void read_end()

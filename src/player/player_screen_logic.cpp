@@ -469,7 +469,7 @@ void PlayerOffscreenExitCheck(int A)
             ReturnWarpSaved = 0;
         }
 
-        LevelBeatCode = 3;
+        LevelBeatCode = BEATCODE_OFFSCREEN;
         EndLevel = true;
         LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;

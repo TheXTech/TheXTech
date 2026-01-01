@@ -1400,7 +1400,7 @@ static void getMeOuttaHere()
     if(LevelMacro != LEVELMACRO_OFF && !possible_softlock)
         return;
 
-    LevelBeatCode = 0;
+    LevelBeatCode = BEATCODE_NONE;
     LevelMacro = LEVELMACRO_OFF;
     LevelMacroCounter = 0;
     EndLevel = true;
