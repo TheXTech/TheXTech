@@ -41,6 +41,7 @@
 #include <fmt_time_ne.h>
 #include <fmt_format_ne.h>
 
+// FIXME: platform-dependent timestamp logic should be moved to its own XChrono namespace in the core directory (and this should apply to the Logger also)
 #if !defined(PGE_MIN_PORT) && !defined(__PSP__)
 #   define SHOOT_HAS_CHRONO
 #   include <chrono>
