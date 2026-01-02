@@ -642,13 +642,10 @@ void RenderGL::updateViewport()
 
     resetViewport();
 
-    // floating point comparison is safe because m_render_scale_factor is explicitly set to a constant (and, 0.5f can be represented precisely)
-    bool is_cur_halfpixel = (m_render_scale_factor == 0.5f);
-
-    if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || m_current_scale_mode != g_config.scale_mode || is_cur_halfpixel != m_halfPixelMode)
+    if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || m_current_scale_mode != g_config.scale_mode || m_is_cur_halfpixel != m_halfPixelMode)
     {
         // update render targets
-        if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || is_cur_halfpixel != m_halfPixelMode)
+        if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || m_is_cur_halfpixel != m_halfPixelMode)
         {
 #ifdef PGE_ENABLE_VIDEO_REC
             // invalidates GIF recorder handle
