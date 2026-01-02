@@ -138,7 +138,7 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
     SetRWopsIO(&io);
     SDL_RWops *handle = Files::open_file(file, "rb");
 
-#ifndef NDEBUG // it's fine to pass a nullptr to FreeImage_GetFileTypeFromHandle, so this is just for debugging
+#ifdef DEBUG_BUILD// it's fine to pass a nullptr to FreeImage_GetFileTypeFromHandle, so this is just for debugging
     if(!handle)
     {
         pLogWarning("GraphicsHelps::loadImage: Failed to open file [%s]", file.c_str());
