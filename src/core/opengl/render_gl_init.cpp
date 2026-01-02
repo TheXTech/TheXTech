@@ -770,6 +770,8 @@ bool RenderGL::initFramebuffers()
     if(!m_has_fbo)
         return true;
 
+    m_is_cur_halfpixel = m_halfPixelMode;
+
     if(m_halfPixelMode)
         m_render_scale_factor = 0.5f;
     else
