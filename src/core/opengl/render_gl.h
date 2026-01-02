@@ -286,6 +286,7 @@ private:
 
     float m_render_scale_factor = 1.0f;
     float m_lighting_scale_factor = 0.5f;
+    bool m_is_cur_halfpixel = false;
 
 
 
