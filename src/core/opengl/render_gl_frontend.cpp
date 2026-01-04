@@ -1850,10 +1850,16 @@ void RenderGL::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pi
 
     if(direct_screenshot)
     {
-        phys_x = x * m_render_scale_factor;
-        phys_y = y * m_render_scale_factor;
-        phys_w = w * m_render_scale_factor;
-        phys_h = h * m_render_scale_factor;
+        float sf = m_render_scale_factor;
+
+        // callsite knows about scaling in this case
+        if(m_halfPixelMode && m_is_cur_halfpixel)
+            sf = 1.0f;
+
+        phys_x = x * sf;
+        phys_y = y * sf;
+        phys_w = w * sf;
+        phys_h = h * sf;
 
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prev_fb);
         glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
