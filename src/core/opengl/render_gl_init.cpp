@@ -777,6 +777,13 @@ bool RenderGL::initFramebuffers()
     else
         m_render_scale_factor = 1.0f;
 
+    // safety: limit TargetW based on texture size constraints
+    if(XRender::TargetW > m_maxTextureWidth / m_render_scale_factor)
+        XRender::TargetW = m_maxTextureWidth / m_render_scale_factor;
+
+    if(XRender::TargetH > m_maxTextureHeight / m_render_scale_factor)
+        XRender::TargetH = m_maxTextureHeight / m_render_scale_factor;
+
     // try to allocate each texture / framebuffer that would be useful
     for(int i = BUFFER_GAME; i < BUFFER_MAX; i++)
     {
