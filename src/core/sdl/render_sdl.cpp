@@ -387,14 +387,8 @@ void RenderSDL::repaint()
     flushRenderQueue();
 
     // Calculate the size difference factor
-    wDst = int(m_scale_x * ScaleWidth);
-    hDst = int(m_scale_y * ScaleHeight);
-
-    if(m_halfPixelMode)
-    {
-        wDst = div2floor(wDst);
-        hDst = div2floor(hDst);
-    }
+    wDst = int(m_scale_x * XRender::TargetW);
+    hDst = int(m_scale_y * XRender::TargetH);
 
     // Align the rendering scene to the center of screen
     off_x = (w - wDst) / 2;
@@ -437,15 +431,10 @@ void RenderSDL::updateViewport()
     m_hidpi_x = (float)render_w / (float)window_w;
     m_hidpi_y = (float)render_h / (float)window_h;
 
-    m_mouse_x = 1;
-    m_mouse_y = 1;
-
     if(m_halfPixelMode)
     {
         targetW >>= 1;
         targetH >>= 1;
-        m_mouse_x = 2;
-        m_mouse_y = 2;
     }
 
     if(!m_tBufferDisabled)
@@ -468,24 +457,27 @@ void RenderSDL::updateViewport()
         pLogDebug("Target render size: %d x %d (direct render)", targetW, targetH);
 
 
-    float scale_x = (float)render_w / targetW;
-    float scale_y = (float)render_h / targetH;
+    float scale_x = (float)render_w / XRender::TargetW;
+    float scale_y = (float)render_h / XRender::TargetH;
 
     float scale = SDL_min(scale_x, scale_y);
 
+    if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER && scale > 0.5f && m_halfPixelMode)
+        scale = std::floor(scale * 2) / 2;
+    else if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER && scale > 1.0f)
+        scale = std::floor(scale);
+
     if(g_config.scale_mode == Config_t::SCALE_FIXED_05X && scale > 0.5f)
         scale = 0.5f;
-    if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER && scale > 1.f)
-        scale = std::floor(scale);
-    if(g_config.scale_mode == Config_t::SCALE_FIXED_1X && scale > 1.f)
-        scale = 1.f;
-    if(g_config.scale_mode == Config_t::SCALE_FIXED_2X && scale > 2.f)
-        scale = 2.f;
-    if(g_config.scale_mode == Config_t::SCALE_FIXED_3X && scale > 3.f)
-        scale = 3.f;
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_1X && scale > 1.0f)
+        scale = 1.0f;
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_2X && scale > 2.0f)
+        scale = 2.0f;
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_3X && scale > 3.0f)
+        scale = 3.0f;
 
-    int game_w = scale * targetW;
-    int game_h = scale * targetH;
+    int game_w = scale * XRender::TargetW;
+    int game_h = scale * XRender::TargetH;
 
     m_scale_x = scale;
     m_scale_y = scale;
@@ -553,15 +545,6 @@ void RenderSDL::updateViewport()
 #if SDL_COMPILEDVERSION >= SDL_VERSIONNUM(2, 0, 18)
     SDL_RenderSetVSync(m_gRenderer, g_config.render_vsync);
 #endif
-
-    if(m_halfPixelMode)
-    {
-        targetW <<= 1;
-        targetH <<= 1;
-    }
-
-    XRender::TargetW = targetW;
-    XRender::TargetH = targetH;
 }
 
 void RenderSDL::resetViewport()
@@ -675,11 +658,6 @@ void RenderSDL::getRenderSize(int* w, int* h)
             *h = 600;
         }
     }
-    else if(m_halfPixelMode)
-    {
-        *w <<= 1;
-        *h <<= 1;
-    }
 
     if(saved_target)
         SDL_SetRenderTarget(m_gRenderer, saved_target);
@@ -687,14 +665,14 @@ void RenderSDL::getRenderSize(int* w, int* h)
 
 void RenderSDL::mapToScreen(int x, int y, int *dx, int *dy)
 {
-    *dx = static_cast<int>((static_cast<float>(x) * m_hidpi_x - m_offset_x) / m_viewport_scale_x) * m_mouse_x;
-    *dy = static_cast<int>((static_cast<float>(y) * m_hidpi_y - m_offset_y) / m_viewport_scale_y) * m_mouse_x;
+    *dx = static_cast<int>((static_cast<float>(x) * m_hidpi_x - m_offset_x) / m_viewport_scale_x);
+    *dy = static_cast<int>((static_cast<float>(y) * m_hidpi_y - m_offset_y) / m_viewport_scale_y);
 }
 
 void RenderSDL::mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
 {
-    *window_x = (((float)scr_x / m_mouse_x) * m_viewport_scale_x + m_offset_x) / m_hidpi_x;
-    *window_y = (((float)scr_y / m_mouse_y) * m_viewport_scale_y + m_offset_y) / m_hidpi_y;
+    *window_x = ((float)scr_x * m_viewport_scale_x + m_offset_x) / m_hidpi_x;
+    *window_y = ((float)scr_y * m_viewport_scale_y + m_offset_y) / m_hidpi_y;
 }
 
 void RenderSDL::setTargetTexture()
