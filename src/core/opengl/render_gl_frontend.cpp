@@ -607,40 +607,7 @@ void RenderGL::updateViewport()
 {
     flushDrawQueues();
 
-    int hardware_w, hardware_h;
-    getRenderSize(&hardware_w, &hardware_h);
-
-    // quickly update the HiDPI scaling factor
-    int window_w, window_h;
-    XWindow::getWindowSize(&window_w, &window_h);
-    m_hidpi_x = (float)hardware_w / (float)window_w;
-    m_hidpi_y = (float)hardware_h / (float)window_h;
-
-    float scale_x = (float)hardware_w / XRender::TargetW;
-    float scale_y = (float)hardware_h / XRender::TargetH;
-
-    float scale = SDL_min(scale_x, scale_y);
-
-    if(g_config.scale_mode == Config_t::SCALE_FIXED_05X && scale > 0.5f)
-        scale = 0.5f;
-    if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER && scale > 1.f)
-        scale = std::floor(scale);
-    if(g_config.scale_mode == Config_t::SCALE_FIXED_1X && scale > 1.f)
-        scale = 1.f;
-    if(g_config.scale_mode == Config_t::SCALE_FIXED_2X && scale > 2.f)
-        scale = 2.f;
-    if(g_config.scale_mode == Config_t::SCALE_FIXED_3X && scale > 3.f)
-        scale = 3.f;
-
-    m_phys_w = XRender::TargetW * scale;
-    m_phys_h = XRender::TargetH * scale;
-
-    pLogDebug("Window resolution is %d x %d; physical draw screen is %d x %d", hardware_w, hardware_h, m_phys_w, m_phys_h);
-
-    m_phys_x = hardware_w / 2 - m_phys_w / 2;
-    m_phys_y = hardware_h / 2 - m_phys_h / 2;
-
-    resetViewport();
+    bool update_texture_scale = false;
 
     if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || m_current_scale_mode != g_config.scale_mode || m_is_cur_halfpixel != m_halfPixelMode)
     {
@@ -659,6 +626,49 @@ void RenderGL::updateViewport()
             ScaleHeight = XRender::TargetH;
         }
 
+        update_texture_scale = true;
+    }
+
+    int hardware_w, hardware_h;
+    getRenderSize(&hardware_w, &hardware_h);
+
+    // quickly update the HiDPI scaling factor
+    int window_w, window_h;
+    XWindow::getWindowSize(&window_w, &window_h);
+    m_hidpi_x = (float)hardware_w / (float)window_w;
+    m_hidpi_y = (float)hardware_h / (float)window_h;
+
+    float scale_x = (float)hardware_w / XRender::TargetW;
+    float scale_y = (float)hardware_h / XRender::TargetH;
+
+    float scale = SDL_min(scale_x, scale_y);
+
+    if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER && scale > 0.5f && m_halfPixelMode)
+        scale = std::floor(scale * 2) / 2;
+    else if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER && scale > 1.f)
+        scale = std::floor(scale);
+
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_05X && scale > 0.5f)
+        scale = 0.5f;
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_1X && scale > 1.f)
+        scale = 1.f;
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_2X && scale > 2.f)
+        scale = 2.f;
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_3X && scale > 3.f)
+        scale = 3.f;
+
+    m_phys_w = XRender::TargetW * scale;
+    m_phys_h = XRender::TargetH * scale;
+
+    pLogDebug("Window resolution is %d x %d; physical draw screen is %d x %d", hardware_w, hardware_h, m_phys_w, m_phys_h);
+
+    m_phys_x = hardware_w / 2 - m_phys_w / 2;
+    m_phys_y = hardware_h / 2 - m_phys_h / 2;
+
+    resetViewport();
+
+    if(update_texture_scale)
+    {
         // update render texture scaling mode
         bool use_linear = (g_config.scale_mode == Config_t::SCALE_DYNAMIC_LINEAR || scale < 0.5f);
 
