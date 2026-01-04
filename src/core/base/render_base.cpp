@@ -1059,7 +1059,8 @@ void AbstractRender_t::makeShot()
     if(!XRender::isWorking())
         return;
 
-    const int w = ScaleWidth, h = ScaleHeight;
+    const int w = m_halfPixelMode ? XRender::TargetW >> 1 : XRender::TargetW,
+              h = m_halfPixelMode ? XRender::TargetH >> 1 : XRender::TargetH;
     uint8_t *pixels = new uint8_t[size_t(4 * w * h)];
     g_render->getScreenPixelsRGBA(0, 0, w, h, pixels);
     PGE_GL_shoot *shoot = new PGE_GL_shoot();
