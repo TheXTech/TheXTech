@@ -41,6 +41,15 @@
 #    define DR_(x) (void)(0)
 #endif
 
+#if defined(__PSP__)
+static const int c_min_res_h = 272;
+#else
+static const int c_min_res_h = 320;
+#endif
+
+static const int c_max_res_h = 720;
+
+
 void SyncSysCursorDisplay()
 {
     bool hide_cursor = false;
@@ -144,6 +153,13 @@ void UpdateInternalRes()
         int int_w, int_h, orig_int_h;
 
         XRender::getRenderSize(&int_w, &int_h);
+
+// Render resolution must be double-sized when window is a hardware screen and double-pixel render is enforced
+#if defined(RENDER_FULLSCREEN_ALWAYS) && defined(RENDER_HALFPIXEL_ALWAYS)
+        int_w <<= 1;
+        int_h <<= 1;
+#endif
+
         orig_int_h = int_h;
 
         // set internal height first
@@ -174,12 +190,12 @@ void UpdateInternalRes()
         }
 
         // minimum height constraint
-        if(int_h < 320)
-            int_h = 320;
+        if(int_h < c_min_res_h)
+            int_h = c_min_res_h;
 
         // maximum height constraint
-        if(int_h > 720 && req_h <= 720)
-            int_h = 720;
+        if(int_h > c_max_res_h && req_h <= c_max_res_h)
+            int_h = c_max_res_h;
 
         // now, set width based on height and scaling mode
         if(g_config.scale_mode == Config_t::SCALE_FIXED_05X)
