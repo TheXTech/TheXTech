@@ -338,15 +338,24 @@ void UpdateInternalRes()
         new_ScreenH = canon_h;
     }
 
+    if(XRender::is_nullptr() || !GameIsActive)
+        XRender::updateViewport();
+
+    // If target is smaller than requested size, set it as a maximum
+    if(XRender::TargetW < new_ScreenW)
+        new_ScreenW = XRender::TargetW;
+
+    if(XRender::TargetH < new_ScreenH)
+        new_ScreenH = XRender::TargetH;
+
     if(l_screen->W != new_ScreenW)
         XMessage::PushMessage({XMessage::Type::screen_w, (uint8_t)(new_ScreenW / 256), (uint8_t)(new_ScreenW % 256)});
+
     if(l_screen->H != new_ScreenH)
         XMessage::PushMessage({XMessage::Type::screen_h, (uint8_t)(new_ScreenH / 256), (uint8_t)(new_ScreenH % 256)});
 
     if(XRender::is_nullptr() || !GameIsActive)
         return;
-
-    XRender::updateViewport();
 
     // recenter the game menu graphics
     if(GameMenu && (l_screen->W != new_ScreenW || l_screen->H != new_ScreenH))
