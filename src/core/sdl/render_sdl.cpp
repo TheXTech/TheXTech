@@ -262,7 +262,7 @@ bool RenderSDL::initRender(SDL_Window *window)
     m_maxTextureWidth = ri.max_texture_width;
     m_maxTextureHeight = ri.max_texture_height;
 
-    // Don't create renderer surface larget than texture size!
+    // Don't create renderer surface larger than texture size!
     if(ScaleWidth > m_maxTextureWidth)
     {
         ScaleWidth = m_maxTextureWidth;
@@ -451,10 +451,16 @@ void RenderSDL::updateViewport()
     if(!m_tBufferDisabled)
     {
         if(targetW > m_maxTextureWidth)
+        {
             targetW = m_maxTextureWidth;
+            XRender::TargetW = m_halfPixelMode ? m_maxTextureWidth << 1 : m_maxTextureWidth;
+        }
 
         if(targetH > m_maxTextureHeight)
+        {
             targetH = m_maxTextureHeight;
+            XRender::TargetH = m_halfPixelMode ? m_maxTextureHeight << 1 : m_maxTextureHeight;
+        }
 
         pLogDebug("Target render size: %d x %d (Max frame buffer size %d x %d)", targetW, targetH, m_maxTextureWidth, m_maxTextureHeight);
     }
