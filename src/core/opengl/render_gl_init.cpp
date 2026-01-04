@@ -766,9 +766,20 @@ void RenderGL::destroyFramebuffer(BufferIndex_t buffer)
 
 bool RenderGL::initFramebuffers()
 {
+#ifndef RENDERGL_HAS_FBO
+    // half-pixel mode is meaningless if FBOs do not exist
+    m_halfPixelMode = false;
+    m_is_cur_halfpixel = false;
+#endif
+
 #ifdef RENDERGL_HAS_FBO
     if(!m_has_fbo)
+    {
+        // half-pixel mode is unsupported if FBOs can't be used
+        m_halfPixelMode = false;
+        m_is_cur_halfpixel = false;
         return true;
+    }
 
     m_is_cur_halfpixel = m_halfPixelMode;
 
