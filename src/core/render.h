@@ -245,6 +245,30 @@ E_INLINE void getRenderSize(int *w, int *h) TAIL
 #endif
 
 /*!
+ * \brief Get the current virtual size of the window in render pixels (Once half-pixel mode is enabled, the size will be twice larger than the physical size of the canvas)
+ * \param w Width
+ * \param h Height
+ */
+E_INLINE void getLogicRenderSize(int *w, int *h) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->getLogicRenderSize(w, h);
+}
+#endif
+
+/*!
+ * \brief Get the maximum available virtual canvas size that depends on the maximum size of the frame buffer.
+ * \param w Width
+ * \param h Height
+ */
+E_INLINE void getMaxLogicSize(int *w, int *h) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->getMaxLogicSize(w, h);
+}
+#endif
+
+/*!
  * \brief Map absolute point coordinate into screen relative
  * \param x Window X position
  * \param y Window Y position

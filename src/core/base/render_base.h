@@ -172,6 +172,20 @@ public:
     virtual void getRenderSize(int *w, int *h) = 0;
 
     /*!
+     * \brief Get the current virtual size of the window in render pixels (Once half-pixel mode is enabled, the size will be twice larger than the physical size of the canvas)
+     * \param w Width
+     * \param h Height
+     */
+    virtual void getLogicRenderSize(int *w, int *h);
+
+    /*!
+     * \brief Get the maximum available virtual canvas size that depends on the maximum size of the frame buffer
+     * \param w Width
+     * \param h Height
+     */
+    virtual void getMaxLogicSize(int *w, int *h);
+
+    /*!
      * \brief Map cursor point coordinate into screen relative
      * \param x Window X position
      * \param y Window Y position

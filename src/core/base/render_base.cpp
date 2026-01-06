@@ -52,6 +52,7 @@
 
 #include "core/base/render_base.h"
 #include "core/render.h"
+#include "core/window.h"
 
 #include "main/cheat_code.h"
 
@@ -174,6 +175,23 @@ void AbstractRender_t::close()
 #ifdef PGE_ENABLE_VIDEO_REC
     m_gif->quit();
 #endif
+}
+
+void AbstractRender_t::getLogicRenderSize(int *w, int *h)
+{
+    getRenderSize(w, h);
+
+    if(m_halfPixelMode && XWindow::isFullScreen())
+    {
+        *w <<= 1;
+        *h <<= 1;
+    }
+}
+
+void AbstractRender_t::getMaxLogicSize(int *w, int *h)
+{
+    *w = m_halfPixelMode ? m_maxTextureWidth << 1 : m_maxTextureWidth;
+    *h = m_halfPixelMode ? m_maxTextureHeight << 1 : m_maxTextureHeight;
 }
 
 void AbstractRender_t::dumpFullFile(std::vector<char> &dst, const std::string &path)
