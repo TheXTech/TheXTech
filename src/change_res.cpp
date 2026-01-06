@@ -123,8 +123,12 @@ void UpdateInternalRes()
     // bool ignore_compat = LevelEditor || (GameMenu && g_config.speedrun_mode.m_set < ConfigSetLevel::cmdline);
     bool ignore_compat = LevelEditor;
 
+    int max_w = 0, max_h = 0;
     int req_w = g_config.internal_res.m_value.first;
     int req_h = g_config.internal_res.m_value.second;
+
+    if(!XRender::is_nullptr())
+        XRender::getMaxLogicSize(&max_w, &max_h);
 
 #if !defined(PGE_MIN_PORT) && !defined(__PSP__)
     if(l_screen->Type == ScreenTypes::Quad && g_config.internal_res_4p.m_value.first != 0)
@@ -152,13 +156,7 @@ void UpdateInternalRes()
     {
         int int_w, int_h, orig_int_h;
 
-        XRender::getRenderSize(&int_w, &int_h);
-
-// Render resolution must be double-sized when window is a hardware screen and double-pixel render is enforced
-#if defined(RENDER_FULLSCREEN_ALWAYS) && defined(RENDER_HALFPIXEL_ALWAYS)
-        int_w <<= 1;
-        int_h <<= 1;
-#endif
+        XRender::getLogicRenderSize(&int_w, &int_h);
 
         orig_int_h = int_h;
 
@@ -297,6 +295,7 @@ void UpdateInternalRes()
             XRender::TargetW = 1280;
             XRender::TargetH = 720;
         }
+
         DR_(pLogDebug("TRACE: Target Render set to w=%d and h=%d (Renderer not initialized)", XRender::TargetW, XRender::TargetH));
     }
 
@@ -306,6 +305,13 @@ void UpdateInternalRes()
         XRender::TargetH = SDL_max(XRender::TargetH, 480);
         DR_(pLogDebug("TRACE: Target Render set to w=%d and h=%d (Editor/MagicHand)", XRender::TargetW, XRender::TargetH));
     }
+
+    // If size is more than maximum possible, clamp it!
+    if(max_w > 0 && XRender::TargetW > max_w)
+        XRender::TargetW = max_w;
+
+    if(max_h > 0 && XRender::TargetH > max_h)
+        XRender::TargetH = max_h;
 
 #ifdef __3DS__
     if(g_config.allow_multires || ignore_compat)
@@ -338,16 +344,6 @@ void UpdateInternalRes()
         new_ScreenH = canon_h;
     }
 
-    if(XRender::is_nullptr() || !GameIsActive)
-        XRender::updateViewport();
-
-    // If target is smaller than requested size, set it as a maximum
-    if(XRender::TargetW < new_ScreenW)
-        new_ScreenW = XRender::TargetW;
-
-    if(XRender::TargetH < new_ScreenH)
-        new_ScreenH = XRender::TargetH;
-
     if(l_screen->W != new_ScreenW)
         XMessage::PushMessage({XMessage::Type::screen_w, (uint8_t)(new_ScreenW / 256), (uint8_t)(new_ScreenW % 256)});
 
@@ -356,6 +352,8 @@ void UpdateInternalRes()
 
     if(XRender::is_nullptr() || !GameIsActive)
         return;
+
+    XRender::updateViewport();
 
     // recenter the game menu graphics
     if(GameMenu && (l_screen->W != new_ScreenW || l_screen->H != new_ScreenH))
