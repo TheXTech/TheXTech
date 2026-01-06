@@ -808,6 +808,12 @@ void repaint()
     C3D_FrameEnd(0);
 }
 
+void getMaxLogicSize(int *w, int *h)
+{
+    *w = 2048;
+    *h = 2048;
+}
+
 void mapToScreen(int x, int y, int* dx, int* dy)
 {
     // lower screen to upper screen conversion
