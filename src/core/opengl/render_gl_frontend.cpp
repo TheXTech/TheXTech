@@ -841,7 +841,7 @@ void RenderGL::getRenderSize(int *w, int *h)
     *h = get_canvas_height();
 }
 
-#else
+#else // __EMSCRIPTEN__
 
 void RenderGL::getRenderSize(int *w, int *h)
 {
@@ -861,7 +861,7 @@ void RenderGL::getRenderSize(int *w, int *h)
     }
 }
 
-#endif
+#endif // __EMSCRIPTEN__
 
 void RenderGL::setTargetTexture()
 {
