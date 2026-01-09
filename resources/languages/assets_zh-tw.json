@@ -193,7 +193,7 @@
                 "music50": "洞窟"
             },
             "fam-fight": {
-                "header": "戰鬥類",
+                "header": "任鬥",
                 "music19": "蒸汽機",
                 "music39": "寺廟",
                 "music40": "騎士",
@@ -201,7 +201,7 @@
                 "music53": "彈珠台"
             },
             "fam-misc": {
-                "header": "其他類",
+                "header": "其他",
                 "music13": "新大陸",
                 "music18": "沙灘",
                 "music20": "融合反應堆",
@@ -209,11 +209,11 @@
                 "music37": "冰山",
                 "music38": "叢林村莊",
                 "music55": "標題畫面",
-                "music56": "跳躍比賽",
+                "music56": "蘑菇峽谷",
                 "music8": "絕境！"
             },
             "fam-rpg": {
-                "header": "角色扮演類",
+                "header": "RPG",
                 "music16": "森林",
                 "music21": "戰鬥",
                 "music30": "小屋",
@@ -247,7 +247,7 @@
                 "music6": "戰鬥"
             },
             "fam-space": {
-                "header": "太空類",
+                "header": "超銀",
                 "music11": "紅色沼澤地",
                 "music12": "火山口",
                 "music22": "太空任務",

@@ -5,7 +5,7 @@
     <string name="settings_button">设置</string>
     <string name="setup_speedrunner">秒表计时</string>
     <string name="setup_sr_stopwatchSemiTransparent">半透明秒表计时器</string>
-    <string name="setup_sr_speedrunMode">秒表计时模式</string>
+    <string name="setup_sr_speedrunMode">速通模式</string>
     <string name="setup_touchscreen_mode">按键模式</string>
     <string name="setup_max_framerate_mode">禁用锁帧</string>
     <string name="setup_show_framerate">显示帧数</string>
