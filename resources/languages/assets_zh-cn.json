@@ -183,7 +183,7 @@
                 "music24": "自定义"
             },
             "fam-64": {
-                "header": "64",
+                "header": "SM64",
                 "music14": "沙漠",
                 "music26": "城堡",
                 "music27": "主题曲",
@@ -193,27 +193,27 @@
                 "music50": "洞窟"
             },
             "fam-fight": {
-                "header": "战斗类",
+                "header": "任斗",
                 "music19": "蒸汽机",
                 "music39": "寺庙",
-                "music40": "骑士",
+                "music40": "梅塔骑士的逆袭",
                 "music52": "地下",
-                "music53": "弹珠台"
+                "music53": "瓦路易吉弹珠台"
             },
             "fam-misc": {
-                "header": "其他类",
+                "header": "其他",
                 "music13": "新大陆",
                 "music18": "沙滩",
-                "music20": "融合反应堆",
+                "music20": "酷霸王的要塞",
                 "music23": "勇气森林",
                 "music37": "冰山",
                 "music38": "丛林村庄",
                 "music55": "标题画面",
-                "music56": "跳跃比赛",
-                "music8": "绝境！"
+                "music56": "蘑菇峡谷",
+                "music8": "克尼利亚"
             },
             "fam-rpg": {
-                "header": "角色扮演类",
+                "header": "SMRPG",
                 "music16": "森林",
                 "music21": "战斗",
                 "music30": "小屋",
@@ -223,21 +223,21 @@
                 "music34": "小镇"
             },
             "fam-set1": {
-                "header": "第一组",
+                "header": "SMB1",
                 "music42": "城堡",
                 "music46": "水下",
                 "music7": "地下",
                 "music9": "地面"
             },
             "fam-set2": {
-                "header": "第二组",
+                "header": "SMBUSA",
                 "music15": "战斗",
                 "music25": "地下",
                 "music43": "决战",
                 "music5": "地面"
             },
             "fam-set3": {
-                "header": "第三组",
+                "header": "SMB3",
                 "music1": "地面",
                 "music2": "天空",
                 "music3": "城堡",
@@ -247,15 +247,15 @@
                 "music6": "战斗"
             },
             "fam-space": {
-                "header": "太空类",
-                "music11": "红色沼泽地",
+                "header": "密特罗德",
+                "music11": "布林斯塔地下",
                 "music12": "火山口",
-                "music22": "太空任务",
+                "music22": "布林斯塔",
                 "music44": "道具室",
-                "music45": "决战"
+                "music45": "母脑"
             },
             "fam-world": {
-                "header": "世界",
+                "header": "SMW",
                 "music10": "地面",
                 "music17": "幽灵屋",
                 "music28": "天空",
