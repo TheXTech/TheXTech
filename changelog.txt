@@ -26,6 +26,7 @@ Changelog for 1.3.8-dev
 
 Changelog for 1.3.7.3-dev
 -Fixed an inability to save the state of the collected medals on triggering the game beat (@Wohlstand, thanks to @Liebning for the report)
+-Fixed a TTF text print bug from the version 1.3.7.2 that caused missing vertical offset on line breaking (@Wohlstand, thanks to 呜哩哇啦 for the report)
 
 Changelog for 1.3.7.2
 -i18n: Added support for the localisation of the loading screen (@Wohlstand)
