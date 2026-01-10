@@ -128,7 +128,10 @@ public:
 protected:
     // optional function allowing developer to associate device information with profile, etc
     // if developer wants to forbid assignment, return false
-    bool SetProfile_Custom(InputMethod *method, int player_no, InputMethodProfile *profile, const std::vector<InputMethod *> &active_methods);
+    bool SetProfile_Custom(InputMethod *method, int player_no, InputMethodProfile *profile, const std::vector<InputMethod *> &active_methods) override;
+    // unregisters any references to the profile before final deallocation
+    // returns false to prevent deletion if this is impossible
+    bool DeleteProfile_Custom(InputMethodProfile *profile, const std::vector<InputMethod *> &active_methods) override;
 
 public:
     bool ConsumeEvent(const SDL_Event *ev);
