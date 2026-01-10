@@ -496,7 +496,7 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
                 {
                     font->drawGlyphB(&cx,
                                     x + static_cast<int32_t>(offsetX + m_glyphOffsetX),
-                                    y + baseline + y_offset,
+                                    y + baseline + y_offset + static_cast<int32_t>(offsetY),
                                     font_size_use,
                                     (doublePixel ? 2.0 : 1.0),
                                     m_ttfOutlines,
