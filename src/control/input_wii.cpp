@@ -1515,6 +1515,26 @@ bool InputMethodType_Wii::SetProfile_Custom(InputMethod* method, int player_no, 
     return true;
 }
 
+// unregisters any references to the profile before final deallocation
+// returns false to prevent deletion if this is impossible
+bool InputMethodType_Wii::DeleteProfile_Custom(InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods)
+{
+    UNUSED(active_methods);
+
+    for(auto it = m_lastProfileByPlayerAndExp.begin(); it != m_lastProfileByPlayerAndExp.end();)
+    {
+        if(it->second == profile)
+        {
+            pLogDebug("Unsetting default profile for index '%x' on deletion of '%s'.", (unsigned int)it->first, profile->Name.c_str());
+            it = m_lastProfileByPlayerAndExp.erase(it);
+        }
+        else
+            ++it;
+    }
+
+    return true;
+}
+
 // How many per-type special options are there?
 size_t InputMethodType_Wii::GetOptionCount()
 {
