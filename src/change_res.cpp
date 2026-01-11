@@ -33,6 +33,22 @@
 #ifdef __EMSCRIPTEN__
 #include "core/events.h"
 #endif
+// #define DEBUG_RES
+#ifdef DEBUG_RES
+#   include <Logger/logger.h>
+#   define DR_(x) x
+#else
+#    define DR_(x) (void)(0)
+#endif
+
+#if defined(__PSP__)
+static const int c_min_res_h = 272;
+#else
+static const int c_min_res_h = 320;
+#endif
+
+static const int c_max_res_h = 720;
+
 
 void SyncSysCursorDisplay()
 {
@@ -107,10 +123,14 @@ void UpdateInternalRes()
     // bool ignore_compat = LevelEditor || (GameMenu && g_config.speedrun_mode.m_set < ConfigSetLevel::cmdline);
     bool ignore_compat = LevelEditor;
 
+    int max_w = 0, max_h = 0;
     int req_w = g_config.internal_res.m_value.first;
     int req_h = g_config.internal_res.m_value.second;
 
-#ifndef PGE_MIN_PORT
+    if(!XRender::is_nullptr())
+        XRender::getMaxLogicSize(&max_w, &max_h);
+
+#if !defined(PGE_MIN_PORT) && !defined(__PSP__)
     if(l_screen->Type == ScreenTypes::Quad && g_config.internal_res_4p.m_value.first != 0)
     {
         req_w = g_config.internal_res_4p.m_value.first;
@@ -136,7 +156,8 @@ void UpdateInternalRes()
     {
         int int_w, int_h, orig_int_h;
 
-        XRender::getRenderSize(&int_w, &int_h);
+        XRender::getLogicRenderSize(&int_w, &int_h);
+
         orig_int_h = int_h;
 
         // set internal height first
@@ -167,12 +188,12 @@ void UpdateInternalRes()
         }
 
         // minimum height constraint
-        if(int_h < 320)
-            int_h = 320;
+        if(int_h < c_min_res_h)
+            int_h = c_min_res_h;
 
         // maximum height constraint
-        if(int_h > 720 && req_h <= 720)
-            int_h = 720;
+        if(int_h > c_max_res_h && req_h <= c_max_res_h)
+            int_h = c_max_res_h;
 
         // now, set width based on height and scaling mode
         if(g_config.scale_mode == Config_t::SCALE_FIXED_05X)
@@ -259,6 +280,7 @@ void UpdateInternalRes()
 
         XRender::TargetW = int_w;
         XRender::TargetH = int_h;
+        DR_(pLogDebug("TRACE: Target Render set to w=%d and h=%d (Renderer works)", XRender::TargetW, XRender::TargetH));
     }
     else
     {
@@ -273,13 +295,23 @@ void UpdateInternalRes()
             XRender::TargetW = 1280;
             XRender::TargetH = 720;
         }
+
+        DR_(pLogDebug("TRACE: Target Render set to w=%d and h=%d (Renderer not initialized)", XRender::TargetW, XRender::TargetH));
     }
 
     if(LevelEditor || MagicHand)
     {
         XRender::TargetW = SDL_max(XRender::TargetW, 640);
         XRender::TargetH = SDL_max(XRender::TargetH, 480);
+        DR_(pLogDebug("TRACE: Target Render set to w=%d and h=%d (Editor/MagicHand)", XRender::TargetW, XRender::TargetH));
     }
+
+    // If size is more than maximum possible, clamp it!
+    if(max_w > 0 && XRender::TargetW > max_w)
+        XRender::TargetW = max_w;
+
+    if(max_h > 0 && XRender::TargetH > max_h)
+        XRender::TargetH = max_h;
 
 #ifdef __3DS__
     if(g_config.allow_multires || ignore_compat)
@@ -294,6 +326,7 @@ void UpdateInternalRes()
         XRender::TargetH = SDL_max(XRender::TargetH, canon_h);
         new_ScreenW = canon_w;
         new_ScreenH = canon_h;
+        DR_(pLogDebug("TRACE: Target Render set to w=%d and h=%d (Canonical tweak)", XRender::TargetW, XRender::TargetH));
     }
     else if(ignore_compat || (g_config.allow_multires && g_config.dynamic_camera_logic))
     {
@@ -313,6 +346,7 @@ void UpdateInternalRes()
 
     if(l_screen->W != new_ScreenW)
         XMessage::PushMessage({XMessage::Type::screen_w, (uint8_t)(new_ScreenW / 256), (uint8_t)(new_ScreenW % 256)});
+
     if(l_screen->H != new_ScreenH)
         XMessage::PushMessage({XMessage::Type::screen_h, (uint8_t)(new_ScreenH / 256), (uint8_t)(new_ScreenH % 256)});
 

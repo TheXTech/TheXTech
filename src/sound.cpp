@@ -97,6 +97,13 @@ const AudioDefaults_t g_audioDefaults =
     1024,
     (int)AUDIO_S16SYS
 };
+#elif defined(__PSP__)
+{
+    8000,
+    2,
+    1024,
+    (int)AUDIO_S16SYS
+};
 #else /* Defaults for all other platforms */
 {
     44100,
@@ -207,8 +214,10 @@ static void extSfxStopCallback(int channel);
 
 static const int maxSfxChannels = 91;
 
-#ifdef LOW_MEM
+#if defined(LOW_MEM)
 static const double c_max_chunk_duration = 1.25; // max length of an in-memory chunk in seconds
+#elif defined(__PSP__)
+static const double c_max_chunk_duration = 20.0; // max length of an in-memory chunk in seconds
 #else
 static const double c_max_chunk_duration = 5.0;  // max length of an in-memory chunk in seconds
 #endif
@@ -367,7 +376,7 @@ void InitMixerX()
                       ob.samples);
         }
 
-#if defined(__3DS__)
+#if defined(__3DS__) || defined(__PSP__)
         // Set fastest emulators to be default
         Mix_OPNMIDI_setEmulator(OPNMIDI_OPN2_EMU_GENS);
         Mix_OPNMIDI_setChannelAllocMode(MIX_CHIP_CHANALLOC_SameInst);
@@ -1384,7 +1393,9 @@ void InitSound()
     {
         XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR,
                               "Sounds loading error",
-                              fmt::format_ne("Failed to load some SFX assets. Loo a log file to get more details:\n{0}", getLogFilePath()));
+                              fmt::sprintf_ne("Failed to load some SFX assets (totally %d). "
+                                             "Look at the log file to get more details:\n%s",
+                                             (int)g_errorsSfx, getLogFilePath().c_str()));
         g_errorsSfx = 0;
     }
 

@@ -184,6 +184,11 @@ void getRenderSize(int* w, int* h)
 #endif
 }
 
+void getLogicRenderSize(int* w, int* h)
+{
+    getRenderSize(w, h);
+}
+
 static inline int FLOORDIV2(int x)
 {
     static_assert(((-1) >> 1) == -1 && (1 >> 1) == 0 && (2 >> 1) == 1 && (-2 >> 1) == -1, "Signed right shift must have floor semantics");
