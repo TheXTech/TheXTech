@@ -51,10 +51,10 @@ for q in \
     "git@gitea.wohlsoft.ru:Games-for-TheXTech/thextech-lowser-s-conquest-beta.git" \
     "git@gitea.wohlsoft.ru:Games-for-TheXTech/thextech-sarasaland-adventure-v1-2.git" \
     "git@gitea.wohlsoft.ru:Games-for-TheXTech/thextech-sarasaland-adventure-2.git" \
+    "git@gitea.wohlsoft.ru:Games-for-TheXTech/thextech-sarasaland-adventure-v4-0.git" \
     "git@gitea.wohlsoft.ru:Games-for-TheXTech/thextech-smbx-nes.git" \
     "git@gitea.wohlsoft.ru:Games-for-TheXTech/thextech-smbx-nostalgic.git" \
     "git@gitea.wohlsoft.ru:Games-for-TheXTech/thextech-super-talking-time-bros-1n2-v1-5.git" \
-    "git@gitea.wohlsoft.ru:Games-for-TheXTech/thextech-super-talking-time-bros-2-5-v1-2.git" \
     ;
 do
     update_repo "$q"
