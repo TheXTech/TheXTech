@@ -83,7 +83,9 @@ int    AbstractRender_t::m_maxTextureHeight = 0;
 int    AbstractRender_t::ScaleWidth = 0;
 int    AbstractRender_t::ScaleHeight = 0;
 
+#ifndef RENDER_HALFPIXEL_ALWAYS
 bool   AbstractRender_t::m_halfPixelMode = false;
+#endif
 
 #ifdef USE_RENDER_BLOCKING
 bool   AbstractRender_t::m_blockRender = false;
@@ -220,9 +222,13 @@ void AbstractRender_t::dumpFullFile(std::vector<char> &dst, const std::string &p
 
 void AbstractRender_t::setHalfPixMode(bool pixHalf)
 {
+#ifndef RENDER_HALFPIXEL_ALWAYS
     m_halfPixelMode = pixHalf;
     if(isWorking())
         updateViewport();
+#else
+    UNUSED(pixHalf);
+#endif
 }
 
 void AbstractRender_t::loadTextureMask(StdPicture &target,
