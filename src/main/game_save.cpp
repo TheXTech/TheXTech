@@ -18,7 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <inttypes.h>
 #include "../globals.h"
 #include "../game_main.h"
 #include "config.h"
@@ -38,7 +37,6 @@
 #include <SDL2/SDL_rwops.h>
 #include <script/luna/lunacounter.h>
 #include <Logger/logger.h>
-#include <Utils/elapsed_timer.h>
 
 #include "main/game_save.h"
 #include "main/level_save_info.h"
@@ -272,16 +270,11 @@ void FindSaves()
 void SaveGame()
 {
     int A = 0;
-    ElapsedTimer meter;
-    PGE_FileFormats_misc::TextFileOutput out_file;
-    int64_t time_prepare, time_open, time_write, time_clean_up, time_save_stats;
 
     if(Cheater || !selSave)
         return;
 
     meter.start();
-
-    CloseSave();
 
     for(A = numPlayers; A >= 1; A--)
         SavedChar[Player[A].Character] = Player[A];
@@ -382,22 +375,10 @@ void SaveGame()
     time_prepare = meter.nanoelapsed();
     meter.start();
 
-    FILE *gamesave = Files::utf8_fopen(savePath.c_str(), "w+");
-
-    if(!gamesave)
-    {
-        sav.meta.ERROR_info = "Failed to open file for write";
-        return; // Failed to open for wrtie!
-    }
-
     time_open = meter.nanoelapsed();
     meter.start();
 
-    PGE_FileFormats_misc::TextFileOutput output(gamesave);
-    FileFormats::WriteExtendedSaveFile(output, sav);
-
-    s_open_gamesave = SDL_RWFromFP(gamesave, SDL_TRUE);
-    Files::flush_file(s_open_gamesave);
+    FileFormats::WriteExtendedSaveFileF(savePath, sav);
 
     time_write = meter.nanoelapsed();
     meter.start();
@@ -405,17 +386,8 @@ void SaveGame()
     if(Files::fileExists(legacyGamesaveLocker))
         Files::deleteFile(legacyGamesaveLocker); // Remove the gamesave locker of legacy file
 
-    time_clean_up = meter.nanoelapsed();
-    meter.start();
-
     // Also, save the speed-running states
     speedRun_saveStats();
-
-    time_save_stats = meter.nanoelapsed();
-
-    pLogDebug("Gamesave write measures: prepare=%" PRId64 ", open=%" PRId64 ", write=%" PRId64 ", clean-legacy-locker=%" PRId64 ", save-stats=%" PRId64 "",
-        time_prepare, time_open, time_write, time_clean_up, time_save_stats
-    );
 
     AppPathManager::syncFs();
 }
