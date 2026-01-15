@@ -183,7 +183,15 @@ void AbstractRender_t::getLogicRenderSize(int *w, int *h)
 {
     getRenderSize(w, h);
 
-    if(m_halfPixelMode && XWindow::isFullScreen())
+#ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+    const bool doubleSize = m_halfPixelMode && XWindow::isFullScreen() && XWindow::getFullScreenType() == AbstractWindow_t::FULLSCREEN_TYPE_REAL;
+#elif defined(RENDER_FULLSCREEN_ALWAYS) && defined(RENDER_HALFPIXEL_ALWAYS)
+    constexpr bool doubleSize = m_halfPixelMode;
+#else
+    constexpr bool doubleSize = false;
+#endif
+
+    if(doubleSize)
     {
         *w <<= 1;
         *h <<= 1;
