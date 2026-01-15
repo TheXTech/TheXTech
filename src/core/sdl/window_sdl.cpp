@@ -568,7 +568,9 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
 
     SDL_SetWindowMinimumSize(m_window, 240, 160);
 
+#ifndef RENDER_HALFPIXEL_ALWAYS
     AbstractRender_t::m_halfPixelMode = g_config.half_pixel_mode;
+#endif
 
 #ifdef __EMSCRIPTEN__ // Set canvas be 1/2 size for a faster rendering
     SDL_SetWindowSize(m_window, XRender::TargetW / 2, XRender::TargetH / 2);
@@ -812,6 +814,7 @@ int WindowSDL::setFullScreen(bool fs)
 
 void WindowSDL::setHalfPixMode(bool pixHalf)
 {
+#ifndef RENDER_HALFPIXEL_ALWAYS
     m_halfPixelMode = pixHalf;
 
     // Apply changes to the render too
@@ -822,6 +825,9 @@ void WindowSDL::setHalfPixMode(bool pixHalf)
 
     if(!XEvents::is_nullptr())
         XEvents::eventResize();
+#else
+    UNUSED(pixHalf);
+#endif
 }
 
 
