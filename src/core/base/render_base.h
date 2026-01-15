@@ -65,8 +65,12 @@ protected:
 
 
 public:
+#ifndef RENDER_HALFPIXEL_ALWAYS
     //! The half-pixel mode: once it gets set, the renderer will be initialized with the half-sized texture, and all input will be divided by two and outputs will be multipled by 2.
     static bool m_halfPixelMode;
+#else
+    static constexpr bool m_halfPixelMode = true;
+#endif
 
 
     AbstractRender_t();
