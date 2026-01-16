@@ -572,11 +572,12 @@ void RenderGL::applyViewport()
 
     if(m_use_shaders)
     {
+        // small added epsilon in half-pixel mode makes sure that coordinate rounding occurs correctly
         m_transform_matrix = {
             2.0f / (float)viewport.w, 0.0f, 0.0f, 0.0f,
             0.0f, y_sign * 2.0f / (float)viewport.h, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f / (float)(1 << 15), 0.0f,
-            -(float)(viewport.w + off.x + off.x) / (viewport.w), -y_sign * (float)(viewport.h + off.y + off.y) / (viewport.h), 0.0f, 1.0f,
+            -(float)(viewport.w + off.x + off.x + 0.1f * m_halfPixelMode) / (viewport.w), -y_sign * (float)(viewport.h + off.y + off.y + 0.1f * m_halfPixelMode) / (viewport.h), 0.0f, 1.0f,
         };
 
         m_shader_read_viewport = {
@@ -606,6 +607,28 @@ void RenderGL::updateViewport()
 {
     flushDrawQueues();
 
+    bool update_texture_scale = false;
+
+    if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || m_current_scale_mode != g_config.scale_mode || m_is_cur_halfpixel != m_halfPixelMode)
+    {
+        // update render targets
+        if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || m_is_cur_halfpixel != m_halfPixelMode)
+        {
+#ifdef PGE_ENABLE_VIDEO_REC
+            // invalidates GIF recorder handle
+            if(recordInProcess())
+                toggleGifRecorder();
+#endif
+
+            initFramebuffers();
+
+            ScaleWidth = XRender::TargetW;
+            ScaleHeight = XRender::TargetH;
+        }
+
+        update_texture_scale = true;
+    }
+
     int hardware_w, hardware_h;
     getRenderSize(&hardware_w, &hardware_h);
 
@@ -620,10 +643,13 @@ void RenderGL::updateViewport()
 
     float scale = SDL_min(scale_x, scale_y);
 
+    if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER && scale > 0.5f && m_halfPixelMode)
+        scale = std::floor(scale * 2) / 2;
+    else if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER && scale > 1.f)
+        scale = std::floor(scale);
+
     if(g_config.scale_mode == Config_t::SCALE_FIXED_05X && scale > 0.5f)
         scale = 0.5f;
-    if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER && scale > 1.f)
-        scale = std::floor(scale);
     if(g_config.scale_mode == Config_t::SCALE_FIXED_1X && scale > 1.f)
         scale = 1.f;
     if(g_config.scale_mode == Config_t::SCALE_FIXED_2X && scale > 2.f)
@@ -641,23 +667,8 @@ void RenderGL::updateViewport()
 
     resetViewport();
 
-    if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || m_current_scale_mode != g_config.scale_mode)
+    if(update_texture_scale)
     {
-        // update render targets
-        if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH)
-        {
-#ifdef PGE_ENABLE_VIDEO_REC
-            // invalidates GIF recorder handle
-            if(recordInProcess())
-                toggleGifRecorder();
-#endif
-
-            initFramebuffers();
-
-            ScaleWidth = XRender::TargetW;
-            ScaleHeight = XRender::TargetH;
-        }
-
         // update render texture scaling mode
         bool use_linear = (g_config.scale_mode == Config_t::SCALE_DYNAMIC_LINEAR || scale < 0.5f);
 
@@ -760,7 +771,7 @@ void RenderGL::getRenderSize(int *w, int *h)
     *h = get_canvas_height();
 }
 
-#else
+#else // __EMSCRIPTEN__
 
 void RenderGL::getRenderSize(int *w, int *h)
 {
@@ -780,7 +791,7 @@ void RenderGL::getRenderSize(int *w, int *h)
     }
 }
 
-#endif
+#endif // __EMSCRIPTEN__
 
 void RenderGL::setTargetTexture()
 {
@@ -1839,10 +1850,16 @@ void RenderGL::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pi
 
     if(direct_screenshot)
     {
-        phys_x = x * m_render_scale_factor;
-        phys_y = y * m_render_scale_factor;
-        phys_w = w * m_render_scale_factor;
-        phys_h = h * m_render_scale_factor;
+        float sf = m_render_scale_factor;
+
+        // callsite knows about scaling in this case
+        if(m_halfPixelMode && m_is_cur_halfpixel)
+            sf = 1.0f;
+
+        phys_x = x * sf;
+        phys_y = y * sf;
+        phys_w = w * sf;
+        phys_h = h * sf;
 
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prev_fb);
         glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
