@@ -304,6 +304,12 @@ void SetupVars()
     // NEW: reset all variables to their original values (it will be nice to convert all NPC traits to a single struct)
     NPCTraits.fill(NPCTraits_t());
 
+    // clear fields that were incorrectly initialized for NPCTraits[0] between v1.3.7 and v1.3.7.3 (caused a bug where popping an empty bubble could harm the player)
+    NPCTraits[NPCID_NULL].Speedvar = 0;
+    NPCTraits[NPCID_NULL].TWidth = 0;
+    NPCTraits[NPCID_NULL].THeight = 0;
+    NPCTraits[NPCID_NULL].Score = 0;
+
     // SMBX64 logic:
     // now included as part of default NPCTraits_t initializer
     // for(int A = 1; A <= maxNPCType; ++A)
