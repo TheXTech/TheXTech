@@ -144,6 +144,43 @@ void Handle(const Message& m)
         SetupScreens();
         PlayersEnsureNearby(screen);
     }
+#ifdef THEXTECH_ENABLE_SDL_NET
+    else if(m.type == Type::add_client)
+    {
+        Screen_t& screen = Screens[m.message];
+
+        // add player if there isn't any
+        if(screen.player_count == 0)
+            AddPlayer((m.message % 5) + 1, screen);
+
+        SetupScreens();
+    }
+    else if(m.type == Type::drop_client)
+    {
+        Screen_t& screen = Screens[m.message];
+
+        // reset screen parameters
+        screen.W = 800;
+        screen.H = 600;
+        screen.two_screen_pref = MultiplayerPrefs::Dynamic;
+        screen.four_screen_pref = MultiplayerPrefs::Shared;
+        screen.canonical_screen().two_screen_pref = screen.two_screen_pref;
+        screen.canonical_screen().four_screen_pref = screen.four_screen_pref;
+
+        // drop players other than the last player
+        for(int p = screen.player_count - 1; p >= 0; p--)
+        {
+            // reassign last player to Screen 0
+            if(numPlayers == 1)
+            {
+                Screens_DropPlayer(1);
+                Screens_AssignPlayer(1, Screens[0]);
+            }
+            else
+                DropPlayer(screen.players[p]);
+        }
+    }
+#endif // #ifdef THEXTECH_ENABLE_SDL_NET
 }
 
 void Tick()

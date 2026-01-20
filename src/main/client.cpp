@@ -213,28 +213,15 @@ void NetworkClient::WaitAndFill()
             pLogInfo("Added P%d on tick %d", buffer[1] + 1, tick);
 
             {
-                Screen_t& screen = Screens[buffer[1]];
-                screen.W = 800;
-                screen.H = 600;
-                screen.two_screen_pref = MultiplayerPrefs::Dynamic;
-                screen.four_screen_pref = MultiplayerPrefs::Shared;
-                screen.canonical_screen().two_screen_pref = screen.two_screen_pref;
-                screen.canonical_screen().four_screen_pref = screen.four_screen_pref;
+                XMessage::Message got;
+                got.type = XMessage::Type::add_client;
+                got.screen = 0;
+                got.player = 0;
+                got.message = buffer[1];
 
-                // move last remaining player to new screen upon connection resumption
-                if(screen.player_count == 0 && numPlayers == 1 && num_clients == 0)
-                {
-                    Screens_DropPlayer(1);
-                    Screens_AssignPlayer(1, screen);
-                    SwapCharacter(1, (buffer[1] % 5) + 1);
-                }
-                else if(Screens[buffer[1]].player_count == 0)
-                    AddPlayer((buffer[1] % 5) + 1, screen);
-
-                SetupScreens();
+                XMessage::PushMessage_Direct(got);
             }
 
-            num_clients++;
             ShiftBuffer(2);
             break;
 
@@ -242,15 +229,16 @@ void NetworkClient::WaitAndFill()
             if(!FillBufferTo(2))
                 return;
 
-            for(int p = Screens[buffer[1]].player_count - 1; p >= 0; p--)
             {
-                if(numPlayers == 1)
-                    break;
+                XMessage::Message got;
+                got.type = XMessage::Type::drop_client;
+                got.screen = 0;
+                got.player = 0;
+                got.message = buffer[1];
 
-                DropPlayer(Screens[buffer[1]].players[p]);
+                XMessage::PushMessage_Direct(got);
             }
 
-            num_clients--;
             ShiftBuffer(2);
             break;
 

@@ -52,6 +52,10 @@ enum class Type : uint8_t
     screen_w,
     screen_h,
     multiplayer_prefs,
+#ifdef THEXTECH_ENABLE_SDL_NET
+    add_client,
+    drop_client,
+#endif // #ifdef THEXTECH_ENABLE_SDL_NET
 };
 
 struct Message
