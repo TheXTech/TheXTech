@@ -290,40 +290,6 @@ void NetworkClient::WaitAndFill()
 
             return;
 
-        case(HEADER_YOU_ARE):
-            if(!FillBufferTo(2))
-                return;
-
-            l_screen = &Screens[buffer[1]];
-            ShiftBuffer(2);
-
-            break;
-
-        case(HEADER_RAND_SEED):
-            if(!FillBufferTo(4))
-                return;
-
-            int rand_seed;
-            rand_seed = ((int)buffer[1] << 16) | ((int)buffer[2] << 8) | ((int)buffer[3] << 0);
-
-            seedRandom(rand_seed);
-
-            ShiftBuffer(4);
-
-            break;
-
-        case(HEADER_TIME_IS):
-            if(!FillBufferTo(4))
-                return;
-
-            frame_no = ((int)buffer[1] << 16) | ((int)buffer[2] << 8) | ((int)buffer[3] << 0);
-
-            ShiftBuffer(4);
-
-            fast_forward_to = frame_no;
-            start_fast_forward = SDL_GetTicks();
-            break;
-
         case(HEADER_LEFT_ROOM):
             ShiftBuffer(1);
 
@@ -404,12 +370,19 @@ void NetworkClient::_FinishJoinRoom()
         return;
     }
 
-    if(!FillBufferTo(5))
+    if(!FillBufferTo(12))
         return;
 
     room_key = ((uint32_t)buffer[1] << 24) | ((uint32_t)buffer[2] << 16) | ((uint32_t)buffer[3] << 8) | ((uint32_t)buffer[4] << 0);
 
-    ShiftBuffer(5);
+    you_are = buffer[5];
+
+    rand_seed = ((uint32_t)buffer[6] << 16) | ((uint32_t)buffer[7] << 8) | ((uint32_t)buffer[8] << 0);
+
+    fast_forward_to = ((int)buffer[9] << 16) | ((int)buffer[10] << 8) | ((int)buffer[11] << 0);
+    start_fast_forward = SDL_GetTicks();
+
+    ShiftBuffer(12);
 
     if(requested_join_room_key && room_key != requested_join_room_key)
     {

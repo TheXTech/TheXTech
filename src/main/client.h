@@ -44,9 +44,9 @@ enum NetworkHeader
     HEADER_CLIENT_LOSS = 2,
     HEADER_TEXT_EVENT = 3,
     HEADER_FRAME_COMPLETE = 4,
-    HEADER_YOU_ARE = 5,
-    HEADER_RAND_SEED = 6,
-    HEADER_TIME_IS = 7,
+    // HEADER_YOU_ARE = 5,
+    // HEADER_RAND_SEED = 6,
+    // HEADER_TIME_IS = 7,
     HEADER_LEFT_ROOM = 8,
 
     HEADER_ROOM_KEY = 9,
@@ -68,6 +68,9 @@ struct NetworkClient
 
     uint32_t room_key = 0;
     uint32_t requested_join_room_key = 0;
+
+    uint8_t you_are = 0;
+    uint32_t rand_seed = 0;
 
     RoomInfo* queried_room_info = nullptr;
 

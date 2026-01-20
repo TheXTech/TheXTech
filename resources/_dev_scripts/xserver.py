@@ -28,9 +28,9 @@ HEADER_CLIENT_JOIN = 1
 HEADER_CLIENT_LOSS = 2
 HEADER_TEXT_EVENT = 3
 HEADER_FRAME_COMPLETE = 4
-HEADER_YOU_ARE = 5
-HEADER_RAND_SEED = 6
-HEADER_TIME_IS = 7
+# HEADER_YOU_ARE = 5
+# HEADER_RAND_SEED = 6
+# HEADER_TIME_IS = 7
 HEADER_LEFT_ROOM = 8
 
 HEADER_ROOM_KEY = 9
@@ -124,7 +124,7 @@ class Connection:
 
             room = self.server.load_room(room_key)
             if not room:
-                self.conn.sendall(bytes([HEADER_ROOM_KEY]) + b'\0\0\0\0')
+                self.conn.sendall(bytes([HEADER_ROOM_KEY]) + b'\0' * 11)
                 return
 
             self.server.unregister(self)
@@ -134,7 +134,7 @@ class Connection:
 
             room = self.server.create_room(room_info)
             if not room:
-                self.conn.sendall(bytes([HEADER_ROOM_KEY]) + b'\0\0\0\0')
+                self.conn.sendall(bytes([HEADER_ROOM_KEY]) + b'\0' * 11)
                 return
 
             self.server.unregister(self)
@@ -164,7 +164,8 @@ class Room:
 
         # room state
         self.frame_no = 0
-        self.sent_history = bytes([HEADER_RAND_SEED, random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)])
+        self.rand_seed = bytes([random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)])
+        self.sent_history = bytes()
 
         # this is a list of clients added by the main thread
         self.added_clients = []
@@ -245,8 +246,9 @@ class Room:
         # tell the client who they are, what the current time is, and the room's key (may throw)
         client.conn.sendall(bytes([
             HEADER_ROOM_KEY, self.room_key[0], self.room_key[1], self.room_key[2], self.room_key[3],
-            HEADER_YOU_ARE, new_id,
-            HEADER_TIME_IS, self.frame_no // (256 * 256), (self.frame_no // 256) % 256, self.frame_no % 256,
+            new_id,
+            self.rand_seed[0], self.rand_seed[1], self.rand_seed[2],
+            self.frame_no // (256 * 256), (self.frame_no // 256) % 256, self.frame_no % 256,
             ]))
         client.sent_to = 0
 

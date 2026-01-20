@@ -85,6 +85,8 @@ void JoinNewRoom(const RoomInfo& room_info)
 void JoinRoom(uint32_t room_key)
 {
     s_network_client.JoinRoom(room_key);
+    l_screen = &Screens[s_network_client.you_are];
+    seedRandom(s_network_client.rand_seed);
 }
 
 uint32_t CurrentRoom()

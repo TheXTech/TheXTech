@@ -277,14 +277,14 @@ static void s_StartEpisodeOnline()
         l_screen->charSelect[p] = 0;
 
     // find character for P1 (player on episode start)
-    l_screen->charSelect[0] = 1;
+    Screens[0].charSelect[0] = 1;
 
     for(int A = 1; A <= numCharacters; A++)
     {
         if(blockCharacter[A])
             continue;
 
-        l_screen->charSelect[0] = A;
+        Screens[0].charSelect[0] = A;
         break;
     }
 
