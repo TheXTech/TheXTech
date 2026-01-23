@@ -2517,8 +2517,6 @@ void zTestLevel(bool magicHand, bool interProcess)
     LevelEditor = false;
     TestLevel = true;
 
-    UpdateInternalRes();
-
     // assign players to screens
     InitScreens();
     for(A = 1; A <= numPlayers; A++)
@@ -2527,6 +2525,9 @@ void zTestLevel(bool magicHand, bool interProcess)
         if(g_ClonedPlayerMode)
             break;
     }
+
+    UpdateInternalRes();
+    XMessage::PushMessage({XMessage::Type::multiplayer_prefs, (uint8_t)g_config.two_screen_mode.m_value, (uint8_t)g_config.four_screen_mode.m_value});
 
     SetupPlayers();
     MagicHand = magicHand;

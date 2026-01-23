@@ -794,9 +794,9 @@ int GameMain(const CmdLineSetup_t &setup)
             SetupEditorGraphics(); //Set up the editor graphics
 
             g_VanillaCam = false;
-            UpdateInternalRes();
 
             InitScreens();
+            UpdateInternalRes();
 
             for(int i = 0; i < maxLocalPlayers; i++)
                 Screens_AssignPlayer(i + 1, *l_screen);
@@ -1069,8 +1069,6 @@ int GameMain(const CmdLineSetup_t &setup)
             Controls::RemoveNullInputMethods();
             QuickReconnectScreen::Deactivate();
 
-            UpdateInternalRes();
-
             // reset l_screen to index 0
             Screens[0] = *l_screen;
             l_screen = &Screens[0];
@@ -1081,6 +1079,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
             // reinitialize the screens (resets multiplayer preferences and restores state disrupted by reassigning Screens[0])
             InitScreens();
+            UpdateInternalRes();
 
             for(int i = 0; i < maxLocalPlayers; i++)
                 Screens_AssignPlayer(i + 1, *l_screen);
@@ -2482,7 +2481,11 @@ void StartEpisode()
     LevelSelect = true;
     GameMenu = false;
     g_ShortDelay = false;
+
+    // Update local screen size and multiplayer prefs
     UpdateInternalRes();
+    XMessage::PushMessage({XMessage::Type::multiplayer_prefs, (uint8_t)g_config.two_screen_mode.m_value, (uint8_t)g_config.four_screen_mode.m_value});
+
     XRender::setTargetTexture();
     XRender::clearBuffer();
     XRender::repaint();

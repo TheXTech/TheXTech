@@ -184,9 +184,15 @@ int Screen_t::TargetY() const
 
 void InitScreens()
 {
-    // assign vScreens to screens
     for(int s = 0; s < c_screenCount; s++)
     {
+        // reset screen size and prefs
+        Screens[s].W = 800;
+        Screens[s].H = 600;
+        Screens[s].two_screen_pref = MultiplayerPrefs::Dynamic;
+        Screens[s].four_screen_pref = MultiplayerPrefs::Shared;
+
+        // assign vScreens to screens
         for(int v = 0; v < maxLocalPlayers; v++)
         {
             Screens[s].vScreen_refs[v] = s * maxLocalPlayers + v + 1;
