@@ -102,7 +102,8 @@ void levelWaitForFade(int waitTicks)
         {
             computeFrameTime1();
             Controls::Update(false);
-            UpdateGraphicsDraw();
+            if(XMessage::GetStatus() != XMessage::Status::replay)
+                UpdateGraphicsDraw();
             UpdateSound();
             XEvents::doEvents();
             computeFrameTime2();
