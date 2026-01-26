@@ -962,6 +962,10 @@ void WindowSDL::restoreWindow()
 
 void WindowSDL::setWindowSize(int w, int h)
 {
+#ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+    if(getFullScreenType() == FULLSCREEN_TYPE_REAL)
+        return; // Disallow window size changes when exclusive full-screen mode is set
+#endif
     // doesn't make sense on Emscripten, actually causes crashes on Wii U
 #if !defined(__EMSCRIPTEN__) && !defined(__WIIU__) && !defined(__PSP__)
     // try to figure out whether requested size is bigger than the screen
