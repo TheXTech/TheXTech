@@ -83,6 +83,9 @@ void DropBonus(int A)
         return;
     }
 
+    if(g_config.alt_powerdown)
+        return;
+
     // drop the bonus!
     PlaySoundSpatial(SFX_DropItem, plr.Location);
     numNPCs++;

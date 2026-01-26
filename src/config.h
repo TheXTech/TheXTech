@@ -813,6 +813,9 @@ public:
     opt<bool> no_shell_grab_top{this, defaults(false), {CompatClass::critical_update, false}, Scope::CreatorEpisode,
         "no-shell-grab-top", "No shell grab from top", nullptr};
 
+    opt<bool> alt_powerdown{this, defaults(false), {CompatClass::critical_update, false}, Scope::CreatorEpisode,
+        "alt-powerdown", "Alt powerdown (chars 1+2)", nullptr};
+
     /* ---- Compatibility - Autocode ----*/
     subsection compat_autocode{this, "autocode", "Autocode"};
 

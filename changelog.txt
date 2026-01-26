@@ -23,6 +23,7 @@ Changelog for 1.3.8-dev
 -Tweak camera logic to reduce jitter when standing on a group of NPCs (@ds-sloth)
 -Battle mode: char 5's shield now blocks and cancels another char 5 player's stab, creating an opening for attack (@ds-sloth)
 -Battle mode: allow multiple players to choose the same character (@ds-sloth)
+-For creators: add compat flag "alt-powerdown" which makes Chars 1 and 2 go to Big after being hit with a stronger powerup, and disables the item box (@ds-sloth)
 
 Changelog for 1.3.7.3-dev
 -Fixed an inability to save the state of the collected medals on triggering the game beat (@Wohlstand, thanks to @Liebning for the report)

@@ -1084,6 +1084,12 @@ void PlayerHurt(const int A)
                     PlaySoundSpatial(SFX_PlayerShrink, p.Location);
                     p.StateNPC = NPCID_NULL;
                     p.Effect = PLREFF_TURN_SMALL;
+
+                    if(p.State > 2 && g_config.alt_powerdown)
+                    {
+                        p.Effect = (PlayerEffect)(PLREFF_STATE_TO_BIG + p.State);
+                        p.Effect2 = 0;
+                    }
                 }
                 else
                 {

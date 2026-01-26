@@ -96,6 +96,8 @@ void DrawInterface(int Z, int numScreens)
             XRender::renderTextureBasic(plr_center - heart_2_gfx.w / 2               , ScreenTop + 16, heart_2_gfx);
             XRender::renderTextureBasic(plr_center - heart_3_gfx.w / 2 + heart_offset, ScreenTop + 16, heart_3_gfx);
         }
+        // show nothing
+        else if(g_config.alt_powerdown) {}
         // show held bonus (item box)
         else
         {

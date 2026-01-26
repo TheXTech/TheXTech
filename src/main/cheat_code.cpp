@@ -431,7 +431,7 @@ static void grantPowerup(NPCID npcid, PlayerState state)
     {
         Player[B].HeldBonus = npcid;
 
-        if(Player[B].Character >= 3 && Player[B].State != state)
+        if((Player[B].Character >= 3 || g_config.alt_powerdown) && Player[B].State != state)
         {
             PlaySound(SFX_Transform);
             Player[B].Immune = 30;
