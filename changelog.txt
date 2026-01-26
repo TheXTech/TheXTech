@@ -5,6 +5,7 @@ Changelog for 1.3.7.3-dev
 -Fixed a TTF text print bug from the version 1.3.7.2 that caused missing vertical offset on line breaking (@Wohlstand, thanks to 呜哩哇啦 for the report)
 -Wii: fix v1.3.7.2 bug where deleting an in-use controls profile could lead to a crash (@ds-sloth)
 -Fix TheXTech v1.3.7 bug where popping an empty bubble (ID 283) could harm the player (@ds-sloth, thanks to @Liebning for the report)
+-Fix SMBX 1.3 peculiarity where frozen NPCs would sometimes be rendered incorrectly, guarded by compat flag "fix-visual-bugs" [Modern Mode] (@ds-sloth)
 
 Changelog for 1.3.7.2
 -i18n: Added support for the localisation of the loading screen (@Wohlstand)

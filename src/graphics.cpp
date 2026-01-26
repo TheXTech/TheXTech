@@ -730,12 +730,30 @@ void DrawFrozenNPC(int Z, int A)
         // Draw frozen NPC body in only condition the content value is valid
         if(content > 0 && content <= maxNPCType)
         {
+            int frame_h = NPCWidth(content);
+            int srcX_off = 0;
+            int srcY_off = 0;
+
+            // Fix vanilla bug where these NPCs would be rendered incorrectly
+            if(NPCWidthGFX(NPC[A].Special) != 0 && g_config.fix_visual_bugs)
+            {
+                frame_h = NPCHeightGFX(content);
+
+                // computations as though the NPC were rendered normally
+                int contents_sX = sX + w / 2 - NPCWidthGFX(content) / 2 + (NPCTraits[content].FrameOffsetX * -NPC[A].Direction);
+                int contents_sY = sY + h - NPCHeightGFX(content) + NPCTraits[content].FrameOffsetY;
+
+                // get offsets
+                srcX_off = sX - contents_sX;
+                srcY_off = sY - contents_sY;
+            }
+
              XRender::renderTextureBasic(sX + 2,
                                     sY + 2,
                                     w - 4,
                                     h - 4,
                                     GFXNPCBMP[content],
-                                    2, 2 + contentFrame * NPCHeight(content),
+                                    2 + srcX_off, 2 + srcY_off + contentFrame * frame_h,
                                     c);
         }
 
