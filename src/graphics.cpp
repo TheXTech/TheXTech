@@ -714,7 +714,7 @@ void DrawFrozenNPC(num_t camX, num_t camY, int A)
         if(content > 0 && content <= maxNPCType)
         {
             int frame_h = NPCHeight(content);
-            int srcX_off = 0;
+            int srcX_off = NPC[A].GFXSlot * NPCWidth(content);
             int srcY_off = 0;
 
             // Fix vanilla bug where these NPCs would be rendered incorrectly
@@ -729,9 +729,11 @@ void DrawFrozenNPC(num_t camX, num_t camY, int A)
                 // get offsets
                 srcX_off = sX - contents_sX;
                 srcY_off = sY - contents_sY;
+
+                srcX_off += NPC[A].GFXSlot * NPCWidthGFX(content);
             }
 
-             XRender::renderTextureBasic(sX + 2,
+            XRender::renderTextureBasic(sX + 2,
                                     sY + 2,
                                     w - 4,
                                     h - 4,

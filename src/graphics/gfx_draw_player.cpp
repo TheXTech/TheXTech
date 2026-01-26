@@ -641,7 +641,7 @@ void DrawNPCHeld(int Z, num_t camX, num_t camY, int A)
                 w,
                 h,
                 GFXNPC[NPC[A].Type],
-                0, NPC[A].Frame * h,
+                NPC[A].GFXSlot * NPC[A]->TWidth, NPC[A].Frame * h,
                 cn);
         }
         else
@@ -652,7 +652,7 @@ void DrawNPCHeld(int Z, num_t camX, num_t camY, int A)
                 NPC[A]->WidthGFX,
                 NPC[A]->HeightGFX,
                 GFXNPC[NPC[A].Type],
-                0, NPC[A].Frame * NPC[A]->HeightGFX,
+                NPC[A].GFXSlot * NPC[A]->WidthGFX, NPC[A].Frame * NPC[A]->HeightGFX,
                 cn);
         }
 

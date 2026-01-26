@@ -644,6 +644,8 @@ void DrawNPC(num_t camX, num_t camY, int A)
     int w = s_round2int(NPC[A].Location.Width);
     int h = s_round2int(NPC[A].Location.Height);
 
+    int src_x = NPC[A].GFXSlot * ((NPC[A]->WidthGFX != 0) ? NPC[A]->WidthGFX : NPC[A]->TWidth);
+
     if(NPC[A].Type == NPCID_MEDAL && g_curLevelMedals.gotten(NPC[A].Variant - 1))
         cn.a /= 2;
 
@@ -659,7 +661,7 @@ void DrawNPC(num_t camX, num_t camY, int A)
 
         XRender::renderTextureBasic(drawX, drawY, w, h,
             GFXNPC[NPC[A].Type],
-            x_off, y_off,
+            src_x + x_off, y_off,
             cn);
     }
     else if(NPC[A].Type == NPCID_ICE_CUBE)
@@ -752,14 +754,14 @@ void DrawNPC(num_t camX, num_t camY, int A)
         {
             XRender::renderTextureBasic(sX + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2 + w / 2, drawY, NPC[A]->WidthGFX, h,
                 GFXNPC[NPC[A].Type],
-                0, NPC[A].Frame * NPC[A]->HeightGFX,
+                src_x, NPC[A].Frame * NPC[A]->HeightGFX,
                 cn);
         }
         else
         {
             XRender::renderTextureBasic(drawX, drawY, w, h,
                 GFXNPC[NPC[A].Type],
-                0, NPC[A].Frame * NPC[A]->THeight,
+                src_x, NPC[A].Frame * NPC[A]->THeight,
                 cn);
         }
     }
@@ -770,7 +772,7 @@ void DrawNPC(num_t camX, num_t camY, int A)
             w,
             h,
             GFXNPC[NPC[A].Type],
-            0, NPC[A].Frame * h,
+            src_x, NPC[A].Frame * h,
             cn);
     }
     else
@@ -793,16 +795,18 @@ void DrawNPC(num_t camX, num_t camY, int A)
             int contents_sX = sX + w / 2 - contents_w / 2;
             int contents_sY = sY + h / 2 - contents_h / 2;
 
-            int B = EditorNPCFrame((NPCID)(NPC[A].Special), NPC[A].Direction);
+            int contents_frame = EditorNPCFrame((NPCID)(NPC[A].Special), NPC[A].Direction);
 
             // note: using NPC[A]->FrameOffsetX here doesn't really make sense, but it's the SMBX 1.3 logic
             XRender::renderTextureBasic(contents_sX + NPC[A]->FrameOffsetX, contents_sY, contents_w, contents_h,
                 GFXNPC[NPC[A].Special],
-                0, B * contents_h,
+                NPC[A].GFXSlot * contents_w, contents_frame * contents_h,
                 cn);
 
             if(NPC[A].DefaultWings)
                 DrawNPCWings(NPC[A], sX, sY, cn);
+
+            src_x = 0;
         }
 
         // WARNING: the BG case previously didn't have -NPC[A].Direction here.
@@ -814,7 +818,7 @@ void DrawNPC(num_t camX, num_t camY, int A)
             NPC[A]->WidthGFX,
             NPC[A]->HeightGFX,
             GFXNPC[NPC[A].Type],
-            0,
+            src_x,
             NPC[A].Frame * NPC[A]->HeightGFX,
             cn);
     }
