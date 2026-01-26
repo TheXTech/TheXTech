@@ -730,12 +730,12 @@ void DrawFrozenNPC(int Z, int A)
         // Draw frozen NPC body in only condition the content value is valid
         if(content > 0 && content <= maxNPCType)
         {
-            int frame_h = NPCWidth(content);
+            int frame_h = NPCHeight(content);
             int srcX_off = 0;
             int srcY_off = 0;
 
             // Fix vanilla bug where these NPCs would be rendered incorrectly
-            if(NPCWidthGFX(NPC[A].Special) != 0 && g_config.fix_visual_bugs)
+            if(NPCWidthGFX(content) != 0 && g_config.fix_visual_bugs)
             {
                 frame_h = NPCHeightGFX(content);
 
