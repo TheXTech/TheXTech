@@ -229,13 +229,6 @@ static void illParkWhereIWant()
  *------------------------------------*/
 
 
-static void needAShell()
-{
-    PlaySound(SFX_GotItem);
-    for(int B = 1; B <= numPlayers; B++)
-        Player[B].HeldBonus = NPCID_GRN_SHELL_S4;
-}
-
 static void fairyMagic()
 {
     if(Player[1].Fairy)
@@ -430,41 +423,6 @@ static void wetWater()
     }
 }
 
-static void needARedShell()
-{
-    PlaySound(SFX_GotItem);
-    for(int B = 1; B <= numPlayers; B++)
-        Player[B].HeldBonus = NPCID_RED_SHELL_S4;
-}
-
-static void needABlueShell()
-{
-    PlaySound(SFX_GotItem);
-    for(int B = 1; B <= numPlayers; B++)
-        Player[B].HeldBonus = NPCID_BLU_SHELL_S4;
-}
-
-static void needAYellowShell()
-{
-    PlaySound(SFX_GotItem);
-    for(int B = 1; B <= numPlayers; B++)
-        Player[B].HeldBonus = NPCID_YEL_SHELL_S4;
-}
-
-static void needATurnip()
-{
-    PlaySound(SFX_GotItem);
-    for(int B = 1; B <= numPlayers; B++)
-        Player[B].HeldBonus = NPCID_VEGGIE_1;
-}
-
-static void needA1Up()
-{
-    PlaySound(SFX_GotItem);
-    for(int B = 1; B <= numPlayers; B++)
-        Player[B].HeldBonus = NPCID_LIFE_S3;
-}
-
 static void grantPowerup(NPCID npcid, PlayerState state)
 {
     PlaySound(SFX_GotItem);
@@ -563,6 +521,36 @@ static void grantItemBox(NPCID npcid)
     PlaySound(SFX_GotItem);
     for(int B = 1; B <= numPlayers; B++)
         Player[B].HeldBonus = npcid;
+}
+
+static void needAShell()
+{
+    grantItemBox(NPCID_GRN_SHELL_S4);
+}
+
+static void needARedShell()
+{
+    grantItemBox(NPCID_RED_SHELL_S4);
+}
+
+static void needABlueShell()
+{
+    grantItemBox(NPCID_BLU_SHELL_S4);
+}
+
+static void needAYellowShell()
+{
+    grantItemBox(NPCID_YEL_SHELL_S4);
+}
+
+static void needATurnip()
+{
+    grantItemBox(NPCID_VEGGIE_1);
+}
+
+static void needA1Up()
+{
+    grantItemBox(NPCID_LIFE_S3);
 }
 
 static void needANegg()
