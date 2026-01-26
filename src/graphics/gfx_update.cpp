@@ -647,36 +647,20 @@ void DrawNPC(num_t camX, num_t camY, int A)
     if(NPC[A].Type == NPCID_MEDAL && g_curLevelMedals.gotten(NPC[A].Variant - 1))
         cn.a /= 2;
 
-    if(NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_FIRE_PLANT || NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_JUMP_PLANT)
+    if(NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_FIRE_PLANT || NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_JUMP_PLANT || NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == NPCID_SIDE_PLANT)
     {
+        int x_off = 0;
+        if(NPC[A].Type == NPCID_SIDE_PLANT && NPC[A].Direction != -1)
+            x_off = NPC[A]->TWidth - w;
+
+        int y_off = NPC[A].Frame * NPC[A]->THeight;
+        if(NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_LONG_PLANT_DOWN)
+            y_off += NPC[A]->THeight - h;
+
         XRender::renderTextureBasic(drawX, drawY, w, h,
             GFXNPC[NPC[A].Type],
-            0, NPC[A].Frame * NPC[A]->THeight,
+            x_off, y_off,
             cn);
-    }
-    else if(NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_LONG_PLANT_DOWN)
-    {
-        XRender::renderTextureBasic(drawX, drawY, w, h,
-            GFXNPC[NPC[A].Type],
-            0, NPC[A].Frame * NPC[A]->THeight + NPC[A]->THeight - h,
-            cn);
-    }
-    else if(NPC[A].Type == NPCID_SIDE_PLANT)
-    {
-        if(NPC[A].Direction == -1)
-        {
-            XRender::renderTextureBasic(drawX, drawY, w, h,
-                GFXNPC[NPC[A].Type],
-                0, NPC[A].Frame * NPC[A]->THeight,
-                cn);
-        }
-        else
-        {
-            XRender::renderTextureBasic(drawX, drawY, w, h,
-                GFXNPC[NPC[A].Type],
-                NPC[A]->TWidth - w, NPC[A].Frame * NPC[A]->THeight,
-                cn);
-        }
     }
     else if(NPC[A].Type == NPCID_ICE_CUBE)
         DrawFrozenNPC(camX, camY, A);
@@ -706,7 +690,7 @@ void DrawNPC(num_t camX, num_t camY, int A)
         int YoshiTX = 20;
         int YoshiTY = -32;
         int YoshiTFrame = 0;
-        int YoshiBFrame = 6;
+        int YoshiBFrame = 0;
 
         // there was "special" logic affecting FrameCount and Special2, moved to logic side
         if(NPC[A].Special == 0)
@@ -717,47 +701,31 @@ void DrawNPC(num_t camX, num_t camY, int A)
             }
             else if(NPC[A].FrameCount >= 50)
                 YoshiTFrame = 3;
+
+            YoshiBFrame = 6;
+            YoshiBY += 10;
+            YoshiTY += 10;
         }
         else
         {
-            if(NPC[A].FrameCount > 8)
-            {
-                YoshiBFrame = 0;
-            }
-            else if(NPC[A].FrameCount > 6)
-            {
-                YoshiBFrame = 1;
-                YoshiTX -= 1;
-                YoshiTY += 2;
-                YoshiBY += 1;
-            }
-            else if(NPC[A].FrameCount > 4)
+            // FrameCount > 8 remapped to FrameCount = 0 in PetFrameLogic
+            if(NPC[A].FrameCount > 4 && NPC[A].FrameCount < 6) // previously > 4
             {
                 YoshiBFrame = 2;
                 YoshiTX -= 2;
                 YoshiTY += 4;
                 YoshiBY += 2;
             }
-            else if(NPC[A].FrameCount > 2)
+            else if(NPC[A].FrameCount > 2) // previously > 6 or > 2
             {
                 YoshiBFrame = 1;
                 YoshiTX -= 1;
                 YoshiTY += 2;
                 YoshiBY += 1;
             }
-            else
-                YoshiBFrame = 0;
 
-            if(NPC[A].Special2 > 30)
-                YoshiTFrame = 0;
-            else if(NPC[A].Special2 > 10)
+            if(NPC[A].Special2 > 10 && NPC[A].Special2 <= 30)
                 YoshiTFrame = 2;
-        }
-
-        if(YoshiBFrame == 6)
-        {
-            YoshiBY += 10;
-            YoshiTY += 10;
         }
 
         if(NPC[A].Direction == 1)
