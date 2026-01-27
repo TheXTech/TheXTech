@@ -20,7 +20,6 @@
 
 #include <pge_inttypes.h>
 #include <SDL2/SDL_stdinc.h>
-
 #include <Logger/logger.h>
 
 #include "events_sdl.h"
