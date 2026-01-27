@@ -259,12 +259,23 @@ bool RenderSDL::initRender(SDL_Window *window)
 
     SDL_RendererInfo ri;
     SDL_GetRendererInfo(m_gRenderer, &ri);
+
     if (ri.num_texture_formats > 0)
         m_bestFormat = ri.texture_formats[0];
     else
         m_bestFormat = DEFAULT_PIXEL_COLOUR_FORMAT;
-    m_maxTextureWidth = ri.max_texture_width;
-    m_maxTextureHeight = ri.max_texture_height;
+
+    if(g_config.render_mode.obtained == Config_t::RENDER_SOFTWARE)
+    {
+        // Software render always returns 0 as a maximum, lets use PNG's maximum texture size for the reference
+        m_maxTextureWidth = 32768;
+        m_maxTextureHeight = 32768;
+    }
+    else
+    {
+        m_maxTextureWidth = ri.max_texture_width;
+        m_maxTextureHeight = ri.max_texture_height;
+    }
 
     // Don't create renderer surface larger than texture size!
     if(ScaleWidth > m_maxTextureWidth)
@@ -279,6 +290,7 @@ bool RenderSDL::initRender(SDL_Window *window)
         XRender::TargetH = m_halfPixelMode ? m_maxTextureHeight << 1 : m_maxTextureHeight;
     }
 
+    m_tBufferDisabled = false;
     m_tBuffer = SDL_CreateTexture(m_gRenderer,
                                   m_bestFormat,
                                   SDL_TEXTUREACCESS_TARGET,
