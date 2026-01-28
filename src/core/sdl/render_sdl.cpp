@@ -278,13 +278,13 @@ bool RenderSDL::initRender(SDL_Window *window)
     }
 
     // Don't create renderer surface larger than texture size!
-    if(ScaleWidth > m_maxTextureWidth)
+    if(m_maxTextureWidth > 0 && ScaleWidth > m_maxTextureWidth)
     {
         ScaleWidth = m_maxTextureWidth;
         XRender::TargetW = m_halfPixelMode ? m_maxTextureWidth << 1 : m_maxTextureWidth;
     }
 
-    if(ScaleHeight > m_maxTextureHeight)
+    if(m_maxTextureHeight > 0 && ScaleHeight > m_maxTextureHeight)
     {
         ScaleHeight = m_maxTextureHeight;
         XRender::TargetH = m_halfPixelMode ? m_maxTextureHeight << 1 : m_maxTextureHeight;
@@ -454,13 +454,13 @@ void RenderSDL::updateViewport()
 
     if(!m_tBufferDisabled)
     {
-        if(targetW > m_maxTextureWidth)
+        if(m_maxTextureWidth > 0 && targetW > m_maxTextureWidth)
         {
             targetW = m_maxTextureWidth;
             XRender::TargetW = m_halfPixelMode ? m_maxTextureWidth << 1 : m_maxTextureWidth;
         }
 
-        if(targetH > m_maxTextureHeight)
+        if(m_maxTextureHeight > 0 && targetH > m_maxTextureHeight)
         {
             targetH = m_maxTextureHeight;
             XRender::TargetH = m_halfPixelMode ? m_maxTextureHeight << 1 : m_maxTextureHeight;
