@@ -200,8 +200,15 @@ void AbstractRender_t::getLogicRenderSize(int *w, int *h)
 
 void AbstractRender_t::getMaxLogicSize(int *w, int *h)
 {
-    *w = m_halfPixelMode ? m_maxTextureWidth << 1 : m_maxTextureWidth;
-    *h = m_halfPixelMode ? m_maxTextureHeight << 1 : m_maxTextureHeight;
+    if(m_maxTextureWidth > 0)
+        *w = m_halfPixelMode ? m_maxTextureWidth << 1 : m_maxTextureWidth;
+    else
+        *w = m_halfPixelMode ? 4096 << 1 : 4096;
+
+    if(m_maxTextureHeight > 0)
+        *h = m_halfPixelMode ? m_maxTextureHeight << 1 : m_maxTextureHeight;
+    else
+        *h = m_halfPixelMode ? 4096 << 1 : 4096;
 }
 
 void AbstractRender_t::dumpFullFile(std::vector<char> &dst, const std::string &path)
