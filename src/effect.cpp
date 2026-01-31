@@ -861,7 +861,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
     if(numEffects >= maxEffects - 4)
         return;
 
-    if(A == 1 || A == 21 || A == 30 || A == 51 || A == 100 || A == 135) // Block break effect
+    if(A == EFFID_BLOCK_SMASH || A == EFFID_BLU_BLOCK_SMASH || A == EFFID_SLIDE_BLOCK_SMASH || A == EFFID_BLOCK_S1_SMASH || A == EFFID_GRY_BLOCK_SMASH || A == EFFID_DIRT_BLOCK_SMASH) // Block break effect
     {
         for(B = 1; B <= 4; B++)
         {
@@ -903,7 +903,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             }
         }
     }
-    else if(A == 140) // larry shell
+    else if(A == EFFID_MAGIC_BOSS_DIE) // larry shell
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -921,13 +921,13 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
         PlaySoundSpatial(SFX_MagicBossKilled, Location);
     }
-    else if(A == 104) // Blaarg eyes
+    else if(A == EFFID_LAVA_MONSTER_LOOK) // Blaarg eyes
     {
         numEffects++;
         auto &ne = Effect[numEffects];
         ne.NewNpc = NewNpc;
         ne.Shadow = Shadow;
-        if(ne.NewNpc == 96)
+        if(ne.NewNpc == NPCID_ITEM_POD)
             ne.NewNpc = 0;
         if(Direction == -1)
             ne.Location.X = Location.X + Location.Width / 2 + 16 + 48 * Direction;
@@ -944,14 +944,14 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 10;
         ne.Type = A;
     }
-    else if(A == 56 || A == 58) // Egg break / Yoshi grow
+    else if(A == EFFID_ITEM_POD_OPEN || A == EFFID_PET_BIRTH) // Egg break / Yoshi grow
     {
         numEffects++;
         auto &ne = Effect[numEffects];
         ne.Shadow = Shadow;
         ne.NewNpc = NewNpc;
         ne.NewNpcSpecial = newNpcSpecial;
-        if(ne.NewNpc == 96)
+        if(ne.NewNpc == NPCID_ITEM_POD)
             ne.NewNpc = 0;
         ne.Location.X = Location.X;
         ne.Location.Y = Location.Y;
@@ -964,17 +964,17 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 100;
         ne.Type = A;
 
-        if(A == 56)
+        if(A == EFFID_ITEM_POD_OPEN)
         {
-            if(ne.NewNpc != 0 /*&& ne.NewNpc != 96*/) // never 96, because of condition above that replaces 96 with zero
+            if(ne.NewNpc != 0 /*&& ne.NewNpc != NPCID_ITEM_POD*/) // never 96, because of condition above that replaces 96 with zero
                 PlaySoundSpatial(SFX_PetBirth, Location);
             else
                 PlaySoundSpatial(SFX_Smash, Location);
         }
-        else if(A == 58)
+        else if(A == EFFID_PET_BIRTH)
             PlaySoundSpatial(SFX_Pet, Location);
     }
-    else if(A == 136) // Roto Disk
+    else if(A == EFFID_FIRE_DISK_DIE) // Roto Disk
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -991,7 +991,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Type = A;
 
     }
-    else if(A == 125) // pow
+    else if(A == EFFID_EARTHQUAKE_BLOCK_HIT) // pow
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1008,7 +1008,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 100;
         ne.Type = A;
     }
-    else if(A == 107) // Metroid Block
+    else if(A == EFFID_SPACE_BLOCK_SMASH) // Metroid Block
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1025,7 +1025,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 100;
         ne.Type = A;
     }
-    else if(A == 57) // Egg shells
+    else if(A == EFFID_ITEM_POD_BREAK) // Egg shells
     {
         for(B = 1; B <= 4; B++)
         {
@@ -1082,7 +1082,11 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             }
         }
     }
-    else if(A == 2 || A == 6 || A == 23 || A == 35 || A == 37 || A == 39 || A == 41 || A == 43 || A == 45 || A == 52 || A == 62 || A == 84 || A == 126) // Goomba smash effect
+    else if(A == EFFID_FODDER_S3_SQUISH || A == EFFID_RED_FODDER_SQUISH || A == EFFID_UNDER_FODDER_SQUISH
+        || A == EFFID_EXT_TURTLE_SQUISH || A == EFFID_YELSWITCH_FODDER_SQUISH || A == EFFID_BLUSWITCH_FODDER_SQUISH
+        || A == EFFID_GRNSWITCH_FODDER_SQUISH || A == EFFID_REDSWITCH_FODDER_SQUISH || A == EFFID_BIG_FODDER_SQUISH
+        || A == EFFID_FODDER_S1_SQUISH || A == EFFID_HIT_TURTLE_S4_SQUISH || A == EFFID_BRUTE_SQUISH
+        || A == EFFID_FODDER_S5_SQUISH) // Goomba smash effect
     {
         PlaySoundSpatial(SFX_Stomp, Location); // Stomp sound
         numEffects++;
@@ -1098,19 +1102,19 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 20;
         ne.Type = A;
 
-        if(A == 45)
+        if(A == EFFID_BIG_FODDER_SQUISH)
         {
             ne.Location.Height = 46;
             ne.Location.Width = 48;
         }
 
-        if(A == 84)
+        if(A == EFFID_BRUTE_SQUISH)
         {
             if(Direction == 1)
                 ne.Frame = 1;
         }
     }
-    else if(A == 81 || A == 123 || A == 124) // P Switch
+    else if(A == EFFID_COIN_SWITCH_PRESS || A == EFFID_TIME_SWITCH_PRESS || A == EFFID_TNT_PRESS) // P Switch
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1125,7 +1129,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 120;
         ne.Type = A;
     }
-    else if(A == 113 || A == 114) // Water Bubble / Splash
+    else if(A == EFFID_AIR_BUBBLE || A == EFFID_WATER_SPLASH) // Water Bubble / Splash
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1138,7 +1142,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         tempBool = false;
 
-        if(A == 114) // Change height for the background
+        if(A == EFFID_WATER_SPLASH) // Change height for the background
         {
             for(const Background_t& b : treeBackgroundQuery(ne.Location, SORTMODE_ID))
             {
@@ -1172,10 +1176,10 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.NewNpc = NewNpc;
         ne.Type = A;
 
-        if(!tempBool && A == 114)
+        if(!tempBool && A == EFFID_WATER_SPLASH)
             numEffects -= 1;
     }
-    else if(A == 109) // Spike Top
+    else if(A == EFFID_WALL_TURTLE_DIE) // Spike Top
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1190,7 +1194,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 120;
         ne.Type = A;
     }
-    else if(A == 108) // Metroid
+    else if(A == EFFID_BOSS_FRAGILE_EXPLODE) // Metroid
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1205,7 +1209,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 200;
         ne.Type = A;
     }
-    else if(A == 82) // Block Spin
+    else if(A == EFFID_SPINBLOCK) // Block Spin
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1221,7 +1225,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 300;
         ne.Type = A;
     }
-    else if(A == 3 || A == 5 || A == 129 || A == 130 || A == 134) // Mario & Luigi died effect
+    else if(A == EFFID_CHAR1_DIE || A == EFFID_CHAR2_DIE || A == EFFID_CHAR3_DIE || A == EFFID_CHAR4_DIE || A == EFFID_CHAR5_DIE) // Mario & Luigi died effect
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1233,7 +1237,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Location.SpeedY = -11;
         ne.Location.SpeedX = 0;
         ne.Frame = 0;
-        if(A == 134)
+        if(A == EFFID_CHAR5_DIE)
         {
             if(Direction == 1)
                 ne.Frame = 1;
@@ -1241,7 +1245,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 150;
         ne.Type = A;
     }
-    else if(A == 79) // Score
+    else if(A == EFFID_SCORE) // Score
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1258,7 +1262,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Frame = 0;
         ne.Life = 60;
     }
-    else if(A == 76) // SMW Smashed
+    else if(A == EFFID_BOOT_STOMP) // SMW Smashed
     {
         for(B = 1; B <= 4; B++)
         {
@@ -1288,7 +1292,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             }
         }
     }
-    else if(A == 133) // stomp star part 2
+    else if(A == EFFID_STOMP_STAR) // stomp star part 2
     {
         for(B = 1; B <= 4; B++)
         {
@@ -1315,7 +1319,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             }
         }
     }
-    else if(A == 70) // SMB3 Bomb Part 1
+    else if(A == EFFID_BOMB_S3_EXPLODE_SEED) // SMB3 Bomb Part 1
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1331,7 +1335,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Type = A;
 
     }
-    else if(A == 148) // Heart Bomb
+    else if(A == EFFID_CHAR3_HEAVY_EXPLODE) // Heart Bomb
     {
         for(B = 1; B <= 6; B++)
         {
@@ -1382,7 +1386,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
 
 
     }
-    else if(A == 71) // SMB3 Bomb Part 2
+    else if(A == EFFID_BOMB_S3_EXPLODE) // SMB3 Bomb Part 2
     {
         for(B = 1; B <= 6; B++)
         {
@@ -1427,7 +1431,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             }
         }
     }
-    else if(A == 54 || A == 55 || A == 59 || A == 103) // Door Effect
+    else if(A == EFFID_DOOR_S2_OPEN || A == EFFID_DOOR_DOUBLE_S3_OPEN
+        || A == EFFID_DOOR_SIDE_S3_OPEN || A == EFFID_BIG_DOOR_OPEN) // Door Effect
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1442,14 +1447,15 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 150;
         ne.Type = A;
     }
-    else if(A == 4 || A == 7 || A == 8 || A == 9 || A == 19 || A == 22 ||
-            A == 26 || A == 101 || A == 102 ||
-            A == 27 || A == 146 || A == 28 || A == 29 || A == 31 ||
-            A == 32 || A == 145 || A == 33 || A == 34 ||
-            A == 36 || A == 38 || A == 40 || A == 42 ||
-            A == 44 || A == 46 || A == 47 || A == 53 || A == 60 ||
-            A == 6 || A == 95 || A == 96 || A == 110 ||
-            A == 117 || A == 121 || A == 127 || A == 142) // Flying goomba / turtle shell / hard thing shell /*A == 9 || - duplicated*/
+    else if(A == EFFID_FODDER_S3_DIE || A == EFFID_RED_FODDER_DIE || A == EFFID_GRN_SHELL_S3_DIE || A == EFFID_RED_SHELL_S3_DIE || A == EFFID_GLASS_SHELL_DIE
+        || A == EFFID_UNDER_FODDER_DIE || A == EFFID_GRN_BOOT_DIE || A == EFFID_RED_BOOT_DIE || A == EFFID_BLU_BOOT_DIE
+        || A == EFFID_SPIKY_S3_DIE || A == EFFID_SPIKY_S4_DIE || A == EFFID_SPIT_BOSS_BALL_DIE || A == EFFID_SPIT_BOSS_DIE
+        || A == EFFID_SPIKY_BALL_S3_DIE || A == EFFID_SPIKY_THROWER_DIE || A == EFFID_ITEM_THROWER_DIE || A == EFFID_CRAB_DIE
+        || A == EFFID_FLY_DIE || A == EFFID_EXT_TURTLE_DIE || A == EFFID_YELSWITCH_FODDER_DIE || A == EFFID_BLUSWITCH_FODDER_DIE
+        || A == EFFID_GRNSWITCH_FODDER_DIE || A == EFFID_REDSWITCH_FODDER_DIE || A == EFFID_BIG_FODDER_DIE || A == EFFID_BIG_SHELL_DIE
+        || A == EFFID_FODDER_S1_DIE || A == EFFID_SHELL_S4_DIE  /* || A == EFFID_RED_FODDER_SQUISH -- mistake, repeated case from above */
+        || A == EFFID_GRN_SHELL_S1_DIE || A == EFFID_RED_SHELL_S1_DIE || A == EFFID_WALL_SPARK_DIE || A == EFFID_SQUID_S3_DIE
+        || A == EFFID_SQUID_S1_DIE || A == EFFID_FODDER_S5_DIE || A == EFFID_VINE_BUG_DIE) // Flying goomba / turtle shell / hard thing shell /*A == 9 || - duplicated*/
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1486,7 +1492,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         if(ne.Type == EFFID_EXT_TURTLE_DIE && Direction == 1)
             ne.Frame = 1;
     }
-    else if(A == 78) // Coins
+    else if(A == EFFID_COIN_COLLECT) // Coins
     {
         for(B = 1; B <= 4; B++)
         {
@@ -1512,7 +1518,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             ne.Type = A;
         }
     }
-    else if(A == EFFID_SMOKE_S3_CENTER || A == EFFID_SMOKE_S3 || A == EFFID_WHIP || A == EFFID_SKID_DUST || A == EFFID_WHACK || A == EFFID_SMOKE_S4 || A == EFFID_STOMP_INIT || A == EFFID_SMOKE_S2) // Puff of smoke
+    else if(A == EFFID_SMOKE_S3_CENTER || A == EFFID_SMOKE_S3 || A == EFFID_WHIP || A == EFFID_SKID_DUST
+        || A == EFFID_WHACK || A == EFFID_SMOKE_S4 || A == EFFID_STOMP_INIT || A == EFFID_SMOKE_S2) // Puff of smoke
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1552,7 +1559,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             ne.Location.Y += dRand() * 4 - 2;
         }
     }
-    else if(A == 144) // bubble pop
+    else if(A == EFFID_BUBBLE_POP) // bubble pop
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1567,7 +1574,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 6;
         ne.Type = A;
     }
-    else if(A == 63) // Zelda Style Smoke
+    else if(A == EFFID_SMOKE_S5) // Zelda Style Smoke
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1582,7 +1589,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 100;
         ne.Type = A;
     }
-    else if(A == 11) // Coin hit out of block
+    else if(A == EFFID_COIN_BLOCK_S3) // Coin hit out of block
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1597,7 +1604,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 46;
         ne.Type = A;
     }
-    else if(A == 12) // Big Fireball Tail
+    else if(A == EFFID_BIG_FIREBALL_TAIL) // Big Fireball Tail
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1612,7 +1619,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 12;
         ne.Type = A;
     }
-    else if(A == 111) // Glass Shatter
+    else if(A == EFFID_BOSS_CASE_BREAK) // Glass Shatter
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1630,7 +1637,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 300;
         ne.Type = A;
     }
-    else if(A == 112) // Mother Brain
+    else if(A == EFFID_BOSS_FRAGILE_DIE) // Mother Brain
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1647,7 +1654,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 360;
         ne.Type = A;
     }
-    else if(A == 77 || A == 139) // Small Fireball Tail
+    else if(A == EFFID_PLR_FIREBALL_TRAIL || A == EFFID_PLR_ICEBALL_TRAIL) // Small Fireball Tail
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1672,7 +1679,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 60;
         ne.Type = A;
     }
-    else if(A == 80) // Twinkle
+    else if(A == EFFID_SPARKLE) // Twinkle
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1687,7 +1694,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 60;
         ne.Type = A;
     }
-    else if(A == 13) // Lava Splash
+    else if(A == EFFID_LAVA_SPLASH) // Lava Splash
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1702,7 +1709,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 100;
         ne.Type = A;
     }
-    else if(A == 14) // Dead Big Koopa
+    else if(A == EFFID_MINIBOSS_DIE) // Dead Big Koopa
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1718,7 +1725,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 120;
         ne.Type = A;
     }
-    else if(A == 15 || A == 68) // Dead Bullet Bill
+    else if(A == EFFID_BULLET_DIE || A == EFFID_SPIT_GUY_BALL_DIE) // Dead Bullet Bill
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1733,12 +1740,12 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             ne.Frame = 0;
         else
             ne.Frame = 1;
-        if(A == 68)
+        if(A == EFFID_SPIT_GUY_BALL_DIE)
             ne.Frame = 0;
         ne.Life = 120;
         ne.Type = A;
     }
-    else if(A == 61) // Flying Beach Koopa
+    else if(A == EFFID_HIT_TURTLE_S4_DIE) // Flying Beach Koopa
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1752,7 +1759,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 120;
         ne.Type = A;
     }
-    else if(A == 48) // Dead toad
+    else if(A == EFFID_POWER_S3_DIE) // Dead toad
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1772,7 +1779,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 120;
         ne.Type = A;
     }
-    else if(A == 16) // Dead Giant Bullet Bill
+    else if(A == EFFID_BIG_BULLET_DIE) // Dead Giant Bullet Bill
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1790,14 +1797,14 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             ne.Frame = 1;
 
 #if 0 // FIXME: This condition never works [PVS Studio]
-        if(A == 48)
+        if(A == EFFID_POWER_S3_DIE)
             ne.Location.SpeedY = -8;
 #endif
 
         ne.Life = 120;
         ne.Type = A;
     }
-    else if(A == 69) // Bomb
+    else if(A == EFFID_BOMB_S2_EXPLODE) // Bomb
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1811,7 +1818,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 60;
         ne.Type = A;
     }
-    else if(A == 128) // pokey
+    else if(A == EFFID_STACKER_DIE) // pokey
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1827,9 +1834,11 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Frame = 5;
 
     }
-    else if(A == 17 || A == 18 || A == 20 || A == 24 || (A >= 64 && A <= 67) ||
-            A == 83 || A == 85 || A == 86 || A == 87 || A == 88 || A == 97 || A == 115 ||
-            A == 122 || A == 116 || A == 118 || A == 119 || A == 120 || A == 137) // Shy guy / Star Thing /Red Jumping Fish
+    else if(A == EFFID_RED_GUY_DIE || A == EFFID_BLU_GUY_DIE || A == EFFID_JUMPER_S3_DIE || A == EFFID_RED_FISH_S1_DIE
+            || (A >= EFFID_BIRD_DIE && A <= EFFID_GRY_SPIT_GUY_DIE) || A == EFFID_CARRY_BUDDY_DIE || A == EFFID_BRUTE_SQUISHED_DIE
+            || A == EFFID_BRUTE_DIE || A == EFFID_BIG_GUY_DIE || A == EFFID_CARRY_FODDER_DIE || A == EFFID_SKELETON_DIE
+            || A == EFFID_GRN_FISH_S3_DIE || A == EFFID_YEL_FISH_S4_DIE || A == EFFID_RED_FISH_S3_DIE || A == EFFID_GRN_FISH_S4_DIE
+            || A == EFFID_GRN_FISH_S1_DIE || A == EFFID_BONE_FISH_DIE || A == EFFID_WALK_PLANT_DIE) // Shy guy / Star Thing /Red Jumping Fish
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1840,7 +1849,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
         ne.Frame = 0;
 
-        if(A != 24 && A != 115 && A != 116)
+        if(A != EFFID_RED_FISH_S1_DIE && A != EFFID_GRN_FISH_S3_DIE && A != EFFID_RED_FISH_S3_DIE)
             ne.Location.SpeedY = -11;
         else
             ne.Location.SpeedY = Location.SpeedY;
@@ -1854,17 +1863,23 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
 
         if(int(Direction) == -1)
         {
-            if(A == 85 || A == 86 || A == 87 || A == 88 || A == 97 || A == 115 ||
-               A == 116 || A == 118 || A == 119 || A == 120 || A == 122 || A == 137)
+            if(A == EFFID_BRUTE_SQUISHED_DIE || A == EFFID_BRUTE_DIE || A == EFFID_BIG_GUY_DIE || A == EFFID_CARRY_FODDER_DIE
+                || A == EFFID_SKELETON_DIE || A == EFFID_GRN_FISH_S3_DIE || A == EFFID_RED_FISH_S3_DIE || A == EFFID_GRN_FISH_S4_DIE
+                || A == EFFID_GRN_FISH_S1_DIE || A == EFFID_BONE_FISH_DIE || A == EFFID_YEL_FISH_S4_DIE || A == EFFID_WALK_PLANT_DIE)
+            {
                 ne.Frame = 0;
+            }
             else
                 ne.Frame = 4;
         }
         else
         {
-            if(A == 85 || A == 86 || A == 87 || A == 88 || A == 97 || A == 115 ||
-               A == 116 || A == 118 || A == 119 || A == 120 || A == 122 || A == 137)
+            if(A == EFFID_BRUTE_SQUISHED_DIE || A == EFFID_BRUTE_DIE || A == EFFID_BIG_GUY_DIE || A == EFFID_CARRY_FODDER_DIE
+                || A == EFFID_SKELETON_DIE || A == EFFID_GRN_FISH_S3_DIE || A == EFFID_RED_FISH_S3_DIE || A == EFFID_GRN_FISH_S4_DIE
+                || A == EFFID_GRN_FISH_S1_DIE || A == EFFID_BONE_FISH_DIE || A == EFFID_YEL_FISH_S4_DIE || A == EFFID_WALK_PLANT_DIE)
+            {
                 ne.Frame = 2;
+            }
             else
                 ne.Frame = 6;
         }
@@ -1872,7 +1887,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 120;
         ne.Type = A;
     }
-    else if(A == 90 || A == 91 || A == 92 || A == 93 || A == 94 || A == 98 || A == 99) // Boo / thwomps
+    else if(A == EFFID_STONE_S3_DIE || A == EFFID_BIG_GHOST_DIE || A == EFFID_GHOST_S4_DIE || A == EFFID_GHOST_FAST_DIE
+        || A == EFFID_GHOST_S3_DIE || A == EFFID_STONE_S4_DIE || A == EFFID_SAW_DIE) // Boo / thwomps
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1884,7 +1900,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Location.SpeedY = Location.SpeedY;
         ne.Location.SpeedX = -Location.SpeedX;
 
-        if(A == 91)
+        if(A == EFFID_BIG_GHOST_DIE)
         {
             ne.Location.set_width_center(EffectWidth[A]);
             ne.Location.set_height_center(EffectHeight[A]);
@@ -1896,12 +1912,14 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             ne.Frame = 0;
         else
             ne.Frame = 2;
-        if(A == 90 || A == 98 || A == 99)
+        if(A == EFFID_STONE_S3_DIE || A == EFFID_STONE_S4_DIE || A == EFFID_SAW_DIE)
             ne.Frame = 0;
         ne.Life = 120;
         ne.Type = A;
     }
-    else if(A == 25 || A == 49 || A == 50 || A == 72 || A == 89 || A == 105 || A == 106 || A == 138 || A == 141) // Hammer Bro
+    else if(A == EFFID_HEAVY_THROWER_DIE || A == EFFID_JUMPER_S4_DIE || A == EFFID_VILLAIN_S3_DIE || A == EFFID_WALK_BOMB_S3_DIE
+        || A == EFFID_CHASER_DIE || A == EFFID_VILLAIN_S1_DIE || A == EFFID_SICK_BOSS_DIE || A == EFFID_BOMBER_BOSS_DIE
+        || A == EFFID_BAT_DIE) // Hammer Bro
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1929,7 +1947,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Life = 120;
         ne.Type = A;
     }
-    else if(A == 143) // ludwig dead
+    else if(A == EFFID_FIRE_BOSS_DIE) // ludwig dead
     {
         numEffects++;
         auto &ne = Effect[numEffects];
