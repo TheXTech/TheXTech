@@ -653,7 +653,7 @@ resume_TriggerLast:
         {
             if(B == 1)
             {
-                NewEffect(NPC[A].Type - NPCID_YELSWITCH_FODDER + EFFID_YELSWITCH_FODDER_SQUISH, NPC[A].Location);
+                NewEffect((EFFID)((NPC[A].Type - NPCID_YELSWITCH_FODDER) + EFFID_YELSWITCH_FODDER_SQUISH), NPC[A].Location);
             }
             else if(B == 6)
             {
@@ -670,7 +670,7 @@ resume_TriggerLast:
             else
             {
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
-                NewEffect(NPC[A].Type - NPCID_YELSWITCH_FODDER + EFFID_YELSWITCH_FODDER_DIE, NPC[A].Location);
+                NewEffect((EFFID)((NPC[A].Type - NPCID_YELSWITCH_FODDER) + EFFID_YELSWITCH_FODDER_DIE), NPC[A].Location);
             }
         }
         else if(NPC[A].Type == NPCID_MAGIC_BOSS || NPC[A].Type == NPCID_MAGIC_BOSS_SHELL || NPC[A].Type == NPCID_FIRE_BOSS || NPC[A].Type == NPCID_FIRE_BOSS_SHELL) // larry koopa
@@ -1422,7 +1422,7 @@ resume_TriggerLast:
             else
             {
                 if(NPC[A].Type >= NPCID_BIRD && NPC[A].Type <= NPCID_GRY_SPIT_GUY)
-                    NewEffect(NPC[A].Type - NPCID_BIRD + EFFID_BIRD_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect((EFFID)((NPC[A].Type - NPCID_BIRD) + EFFID_BIRD_DIE), NPC[A].Location, NPC[A].Direction);
                 else if(NPC[A].Type == NPCID_BLU_GUY)
                     NewEffect(EFFID_RED_GUY_DIE, NPC[A].Location, NPC[A].Direction);
                 else if(NPC[A].Type == NPCID_RED_GUY)

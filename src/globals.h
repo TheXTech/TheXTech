@@ -36,6 +36,7 @@
 #include "rand.h"
 #include "npc_id.h"
 #include "phys_id.h"
+#include "eff_id.h"
 #include "npc_effect.h"
 #include "player/player_effect.h"
 
@@ -1001,7 +1002,7 @@ struct Effect_t
 //    Location As Location
     Location_t Location;
 //    Type As Integer
-    vbint_t Type = 0;
+    EFFID Type = EFFID(0);
 //    Frame As Integer
     vbint_t Frame = 0;
 //    FrameCount As Single

@@ -848,7 +848,7 @@ void UpdateEffects()
     }
 }
 
-void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, bool Shadow, uint8_t newNpcSpecial)
+void NewEffect(EFFID A, const Location_t &Location, int Direction, int NewNpc, bool Shadow, uint8_t newNpcSpecial)
 {
 // this sub creates effects
 // please reference the /graphics/effect folder to see what the effects are
@@ -1988,6 +1988,6 @@ void KillEffect(int A)
     e.Frame = 0;
     e.FrameCount = 0;
     e.Life = 0;
-    e.Type = 0;
+    e.Type = EFFID(0);
     numEffects -= 1;
 }

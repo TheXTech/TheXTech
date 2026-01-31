@@ -23,7 +23,9 @@
 #ifndef ENUMEFFID_HHH
 #define ENUMEFFID_HHH
 
-enum EFFID
+#include "global_constants.h"
+
+enum EFFID : vbint_t
 {
     EFFID_SMOKE_S3_CENTER = -10,
     EFFID_BLOCK_SMASH = 1,
