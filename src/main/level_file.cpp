@@ -1006,6 +1006,9 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
                 npc.Variant = 0;
         }
 
+        // NEW: GFX expansion
+        npc.GFXSlot = (uint8_t)n.gfx_dx;
+
         npc.Generator = n.generator;
         if(npc.Generator)
         {

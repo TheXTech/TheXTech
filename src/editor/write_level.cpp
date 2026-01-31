@@ -278,6 +278,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         npc.nomove = n.Stuck;
         npc.is_boss = n.Legacy;
         npc.wings_type = (int)n.DefaultWings;
+        npc.gfx_dx = n.GFXSlot;
 
         npc.layer = GetL(n.Layer);
 
