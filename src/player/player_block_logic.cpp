@@ -842,6 +842,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                     Block[floorBlock].Layer = LAYER_DESTROYED_BLOCKS;
                     syncLayersTrees_Block(floorBlock);
                     NewEffect(EFFID_SMOKE_S3, Block[floorBlock].Location);
+                    // NOTE: SpeedY was not doubled for EFFID_SMOKE_S3 in SMBX 1.3
                     Effect[numEffects].Location.SpeedY = -2;
                     Player[A].GrabTime = 0;
                 }

@@ -3048,6 +3048,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                                 block.Layer = LAYER_DESTROYED_BLOCKS;
                                 syncLayersTrees_Block(A);
                                 NewEffect(EFFID_SMOKE_S3, block.Location);
+                                // SpeedY didn't get doubled for SMOKE_S3 in SMBX 1.3
                                 Effect[numEffects].Location.SpeedY = -2;
                             }
 
@@ -3564,10 +3565,12 @@ void YoshiPound(const int A, int mount, bool BreakBlocks)
         tempLocation.Y = p.Location.Y + p.Location.Height - 16;
         tempLocation.X = p.Location.X + p.Location.Width / 2 - 16 - 16;
         NewEffect(EFFID_SMOKE_S3, tempLocation);
-        Effect[numEffects].Location.SpeedX = -2;
+        // in SMBX 1.3, this was -2, and then SpeedX was doubled for EFFID_SMOKE_S3
+        Effect[numEffects].Location.SpeedX = -4;
         tempLocation.X = p.Location.X + p.Location.Width / 2 - 16 + 16;
         NewEffect(EFFID_SMOKE_S3, tempLocation);
-        Effect[numEffects].Location.SpeedX = 2;
+        // in SMBX 1.3, this was -2, and then SpeedX was doubled for EFFID_SMOKE_S3
+        Effect[numEffects].Location.SpeedX = 4;
         PlaySoundSpatial(SFX_Stone, p.Location);
         if(BreakBlocks && g_config.extra_screen_shake)
             doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 4, 200, p.Location);

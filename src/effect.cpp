@@ -303,7 +303,10 @@ void UpdateEffects()
         }
         else if(e.Type == EFFID_SMOKE_S3 || e.Type == EFFID_SMOKE_S4) // SMW / SMB3 Puff of smoke
         {
-            e.Location.X += e.Location.SpeedX;
+            // no longer double SpeedX for SMOKE_S3 or SMOKE_S4
+            // multiplied SpeedX constants by 2 elsewhere.
+
+            // e.Location.X += e.Location.SpeedX;
             e.FrameCount += 1;
             if(e.FrameCount >= 3)
             {
@@ -315,7 +318,9 @@ void UpdateEffects()
         }
         else if(e.Type == EFFID_SMOKE_S2) // SMB2 Puff of smoke
         {
-            e.Location.X += e.Location.SpeedX;
+            // this did nothing in SMBX 1.3 because SpeedX was always 0
+            // e.Location.X += e.Location.SpeedX;
+
             e.FrameCount += 1;
             if(e.FrameCount >= 6)
             {
@@ -384,8 +389,9 @@ void UpdateEffects()
         }
         else if(e.Type == EFFID_BOOT_STOMP)
         {
-            e.Location.X += e.Location.SpeedX;
-            e.Location.Y += e.Location.SpeedY;
+            // doubled speed in NewEffect
+            // e.Location.X += e.Location.SpeedX;
+            // e.Location.Y += e.Location.SpeedY;
         }
         else if(e.Type == EFFID_COIN_SWITCH_PRESS || e.Type == EFFID_TIME_SWITCH_PRESS || e.Type == EFFID_TNT_PRESS) // P Switch
         {
@@ -406,7 +412,8 @@ void UpdateEffects()
         }
         else if(e.Type == EFFID_SMOKE_S5) // Zelda Smoke
         {
-            e.Location.X += e.Location.SpeedX;
+            // this had no effect because SpeedX/SpeedY was always zero for EFFID_SMOKE_S5 in SMBX 1.3
+            // e.Location.X += e.Location.SpeedX;
             e.FrameCount += 1;
             if(e.FrameCount >= 4)
             {
@@ -1256,8 +1263,8 @@ void NewEffect(EFFID A, const Location_t &Location, int Direction, int NewNpc, b
                 // ne.Location.SpeedX = 0; // Assigned below
                 ne.Life = 15;
 
-                ne.Location.SpeedX = 2.4_n; // 3 * 0.8;
-                ne.Location.SpeedY = 1.2_n; // 1.5 * 0.8;
+                ne.Location.SpeedX = 4.8_n; // 3 * 0.8; * 2 because SpeedX got applied twice for EFFID_BOOT_STOMP in SMBX 1.3
+                ne.Location.SpeedY = 2.4_n; // 1.5 * 0.8; * 2 because SpeedY got applied twice for EFFID_BOOT_STOMP in SMBX 1.3
 
                 if(B == 1 || B == 2)
                     ne.Location.SpeedY = -ne.Location.SpeedY;

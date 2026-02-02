@@ -5057,12 +5057,14 @@ void SpecialNPC(int A)
 //                    tempLocation.X = NPC[A].Location.X;
                     tempLocation.X = (NPC[A].Location.X + NPC[A].Location.Width / 8);
                     NewEffect(EFFID_SMOKE_S3, tempLocation);
-                    Effect[numEffects].Location.SpeedX = -1.5_n;
+                    // in SMBX 1.3, this was 1.5_n and SpeedX was doubled for EFFID_SMOKE_S3.
+                    Effect[numEffects].Location.SpeedX = -3;
 
 //                    tempLocation.X += tempLocation.Width - EffectWidth[EFFID_SMOKE_S3];
                     tempLocation.X = (NPC[A].Location.X + NPC[A].Location.Width - EffectWidth[EFFID_SMOKE_S3]) - (NPC[A].Location.Width / 8);
                     NewEffect(EFFID_SMOKE_S3, tempLocation);
-                    Effect[numEffects].Location.SpeedX = 1.5_n;
+                    // in SMBX 1.3, this was 1.5_n and SpeedX was doubled for EFFID_SMOKE_S3.
+                    Effect[numEffects].Location.SpeedX = 3;
                 }
                 NPC[A].Location.SpeedY = 0;
                 if(NPC[A].Slope > 0)
