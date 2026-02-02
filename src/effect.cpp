@@ -401,7 +401,6 @@ void UpdateEffects()
         else if(e.Type == EFFID_SKID_DUST) // Slide Smoke
         {
             e.FrameCount += 1;
-            e.Location.Y -= 0.1_n;
             if(e.FrameCount >= 4)
             {
                 e.Frame += 1;
@@ -1540,6 +1539,9 @@ void NewEffect(EFFID A, const Location_t &Location, int Direction, int NewNpc, b
         {
             ne.Location.X += dRand() * 4 - 2;
             ne.Location.Y += dRand() * 4 - 2;
+
+            // moved from UpdateEffects
+            ne.Location.SpeedY = -0.1_n;
         }
     }
     else if(A == EFFID_BUBBLE_POP) // bubble pop
