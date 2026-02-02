@@ -124,19 +124,25 @@ void UpdateEffects()
                     e.Frame = 0;
             }
         }
-        else if(e.Type == EFFID_BLOCK_SMASH || e.Type == EFFID_BLU_BLOCK_SMASH || e.Type == EFFID_SLIDE_BLOCK_SMASH || e.Type == EFFID_BLOCK_S1_SMASH || e.Type == EFFID_GRY_BLOCK_SMASH || e.Type == EFFID_DIRT_BLOCK_SMASH) // Block break
+        else if(e.Type == EFFID_BLOCK_SMASH || e.Type == EFFID_BLU_BLOCK_SMASH || e.Type == EFFID_SLIDE_BLOCK_SMASH
+            || e.Type == EFFID_BLOCK_S1_SMASH || e.Type == EFFID_GRY_BLOCK_SMASH || e.Type == EFFID_DIRT_BLOCK_SMASH
+            || e.Type == EFFID_ITEM_POD_BREAK) // Block break
         {
             e.Location.SpeedY += 0.6_n;
             e.Location.SpeedX = e.Location.SpeedX * 0.99_r;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
-            e.FrameCount += 1;
-            if(e.FrameCount >= 3)
+
+            if(e.Type != EFFID_ITEM_POD_BREAK)
             {
+                e.FrameCount += 1;
+                if(e.FrameCount >= 3)
+                {
                 e.FrameCount = 0;
                 e.Frame += 1;
                 if(e.Frame == 4)
-                    e.Frame = 0;
+                        e.Frame = 0;
+                }
             }
         }
         else if(e.Type == EFFID_MAGIC_BOSS_DIE) // larry shell
@@ -171,22 +177,15 @@ void UpdateEffects()
         else if(e.Type == EFFID_WATER_SPLASH) // Splash
         {
             e.FrameCount += 1;
-            if(e.FrameCount < 8)
-                e.Frame = 0;
-            else if(e.FrameCount < 16)
-                e.Frame = 1;
-            else if(e.FrameCount < 24)
-                e.Frame = 2;
-            else if(e.FrameCount < 32)
-                e.Frame = 3;
-            else if(e.FrameCount < 40)
-                e.Frame = 4;
+
+            // simplified logic
+            if(e.FrameCount < 40)
+                e.Frame = e.FrameCount / 8;
             else
                 e.Life = 0;
+
             if(e.FrameCount % 3 == 0)
-            {
                 e.Frame = 5;
-            }
         }
         else if(e.Type == EFFID_AIR_BUBBLE) // Water Bubbles
         {
@@ -217,13 +216,6 @@ void UpdateEffects()
             }
             e.Location.Y -= 2;
             e.Location.X += dRand() * 2 - 1;
-        }
-        else if(e.Type == EFFID_ITEM_POD_BREAK) // egg shells
-        {
-            e.Location.SpeedY += 0.6_n;
-            e.Location.SpeedX = e.Location.SpeedX * 0.99_r;
-            if(e.Location.SpeedY >= 10)
-                e.Location.SpeedY = 10;
         }
         else if(e.Type == EFFID_CHAR1_DIE || e.Type == EFFID_CHAR2_DIE || e.Type == EFFID_CHAR3_DIE || e.Type == EFFID_CHAR4_DIE || e.Type == EFFID_CHAR5_DIE) // Mario & Luigi death
             e.Location.SpeedY += 0.25_n;
@@ -279,7 +271,19 @@ void UpdateEffects()
             else if(e.FrameCount == 8)
                 e.Frame += 1;
         }
-        else if(e.Type == EFFID_GRN_SHELL_S3_DIE || e.Type == EFFID_RED_SHELL_S3_DIE || e.Type == EFFID_BULLET_DIE || e.Type == EFFID_BIG_BULLET_DIE || e.Type == EFFID_GLASS_SHELL_DIE || e.Type == EFFID_SPIKY_S3_DIE || e.Type == EFFID_SPIKY_S4_DIE || e.Type == EFFID_SPIT_BOSS_BALL_DIE || e.Type == EFFID_SPIT_BOSS_DIE || e.Type == EFFID_SPIKY_THROWER_DIE || e.Type == EFFID_EXT_TURTLE_DIE || e.Type == EFFID_BIG_SHELL_DIE || e.Type == EFFID_SHELL_S4_DIE || e.Type == EFFID_GRN_SHELL_S1_DIE || e.Type == EFFID_RED_SHELL_S1_DIE || e.Type == EFFID_WALL_TURTLE_DIE) // Flying turtle shell / Bullet bill /hard thing
+        // these are non-animated standard death effects
+        else if(e.Type == EFFID_GRN_SHELL_S3_DIE || e.Type == EFFID_RED_SHELL_S3_DIE || e.Type == EFFID_BULLET_DIE
+            || e.Type == EFFID_BIG_BULLET_DIE || e.Type == EFFID_GLASS_SHELL_DIE || e.Type == EFFID_SPIKY_S3_DIE
+            || e.Type == EFFID_SPIKY_S4_DIE || e.Type == EFFID_SPIT_BOSS_BALL_DIE || e.Type == EFFID_SPIT_BOSS_DIE
+            || e.Type == EFFID_SPIKY_THROWER_DIE || e.Type == EFFID_EXT_TURTLE_DIE || e.Type == EFFID_BIG_SHELL_DIE
+            || e.Type == EFFID_SHELL_S4_DIE || e.Type == EFFID_GRN_SHELL_S1_DIE || e.Type == EFFID_RED_SHELL_S1_DIE
+            || e.Type == EFFID_WALL_TURTLE_DIE || e.Type == EFFID_HEAVY_THROWER_DIE || e.Type == EFFID_POWER_S3_DIE
+            || e.Type == EFFID_JUMPER_S4_DIE || e.Type == EFFID_VILLAIN_S3_DIE || e.Type == EFFID_SPIT_GUY_BALL_DIE
+            || e.Type == EFFID_WALK_BOMB_S3_DIE || e.Type == EFFID_CHASER_DIE || e.Type == EFFID_STONE_S3_DIE
+            || e.Type == EFFID_BIG_GHOST_DIE || e.Type == EFFID_GHOST_S4_DIE || e.Type == EFFID_GHOST_FAST_DIE
+            || e.Type == EFFID_GHOST_S3_DIE || e.Type == EFFID_STONE_S4_DIE || e.Type == EFFID_SAW_DIE
+            || e.Type == EFFID_VILLAIN_S1_DIE || e.Type == EFFID_BOMBER_BOSS_DIE || e.Type == EFFID_SICK_BOSS_DIE
+            || e.Type == EFFID_BAT_DIE) // Flying turtle shell / Bullet bill /hard thing, combined with section with comment "Bullet Bill / Hammer Bro"
         {
             e.Location.SpeedY += 0.5_n;
             if(e.Location.SpeedY >= 10)
@@ -422,21 +426,12 @@ void UpdateEffects()
                 MoreScore(CoinCount, e.Location);
             }
 
-            if(e.Life <= 2)
+            // simplified logic
+            if(e.Life <= 6)
             {
-                e.Frame = 6;
-                // NOTE: The same behavior at VB6 code: just checks the boolean expression and writes 0 or -1
-                e.Location.SpeedY = (e.Location.SpeedY == 0) ? 0 : -1;
-            }
-            else if(e.Life <= 4)
-            {
-                e.Frame = 5;
-                // NOTE: The same behavior at VB6 code: just checks the boolean expression and writes 0 or -1
-                e.Location.SpeedY = (e.Location.SpeedY == 0) ? 0 : -1;
-            }
-            else if(e.Life <= 6)
-            {
-                e.Frame = 4;
+                // NOTE: 4, 5, 6 are valid frames.
+                // This sets Frame to 7 on the frame when Life is 0.
+                e.Frame = 4 + (6 - e.Life) / 2;
                 // NOTE: The same behavior at VB6 code: just checks the boolean expression and writes 0 or -1
                 e.Location.SpeedY = (e.Location.SpeedY == 0) ? 0 : -1;
             }
@@ -651,12 +646,6 @@ void UpdateEffects()
             else if(e.FrameCount > 5)
                 e.Frame = 1;
         }
-        else if(e.Type == EFFID_BULLET_DIE || e.Type == EFFID_BIG_BULLET_DIE || e.Type == EFFID_HEAVY_THROWER_DIE || e.Type == EFFID_POWER_S3_DIE || e.Type == EFFID_JUMPER_S4_DIE || e.Type == EFFID_VILLAIN_S3_DIE || e.Type == EFFID_SPIT_GUY_BALL_DIE || e.Type == EFFID_WALK_BOMB_S3_DIE || e.Type == EFFID_CHASER_DIE || e.Type == EFFID_STONE_S3_DIE || e.Type == EFFID_BIG_GHOST_DIE || e.Type == EFFID_GHOST_S4_DIE || e.Type == EFFID_GHOST_FAST_DIE || e.Type == EFFID_GHOST_S3_DIE || e.Type == EFFID_STONE_S4_DIE || e.Type == EFFID_SAW_DIE || e.Type == EFFID_VILLAIN_S1_DIE || e.Type == EFFID_BOMBER_BOSS_DIE || e.Type == EFFID_SICK_BOSS_DIE || e.Type == EFFID_BAT_DIE) // Bullet Bill / Hammer Bro
-        {
-            e.Location.SpeedY += 0.5_n;
-            if(e.Location.SpeedY >= 10)
-                e.Location.SpeedY = 10;
-        }
         else if(e.Type == EFFID_STACKER_DIE)
         {
             e.Location.SpeedY += 0.5_n;
@@ -671,8 +660,18 @@ void UpdateEffects()
             }
             else if(e.FrameCount > 8)
                 e.Frame = 4;
+
+            // don't combine with below, because it's lopsided: 9 final values (0-8) use Frame 5, and 7 final values (9-15) use Frame 4
         }
-        else if(e.Type == EFFID_RED_GUY_DIE || e.Type == EFFID_BLU_GUY_DIE || e.Type == EFFID_JUMPER_S3_DIE || e.Type == EFFID_RED_FISH_S1_DIE || (e.Type >= EFFID_BIRD_DIE && e.Type <= EFFID_GRY_SPIT_GUY_DIE) || e.Type == EFFID_CARRY_BUDDY_DIE) // Shy guy free falling
+        else if(e.Type == EFFID_RED_GUY_DIE || e.Type == EFFID_BLU_GUY_DIE || e.Type == EFFID_JUMPER_S3_DIE
+            || e.Type == EFFID_RED_FISH_S1_DIE || (e.Type >= EFFID_BIRD_DIE && e.Type <= EFFID_GRY_SPIT_GUY_DIE)
+            || e.Type == EFFID_CARRY_BUDDY_DIE // Shy guy free falling (uses frames 4-7)
+            || e.Type == EFFID_BRUTE_SQUISHED_DIE || e.Type == EFFID_BRUTE_DIE || e.Type == EFFID_BIG_GUY_DIE
+            || e.Type == EFFID_CARRY_FODDER_DIE || e.Type == EFFID_SKELETON_DIE || e.Type == EFFID_GRN_FISH_S3_DIE
+            || e.Type == EFFID_YEL_FISH_S4_DIE || e.Type == EFFID_RED_FISH_S3_DIE || e.Type == EFFID_GRN_FISH_S4_DIE
+            || e.Type == EFFID_GRN_FISH_S1_DIE || e.Type == EFFID_BONE_FISH_DIE || e.Type == EFFID_SQUID_S1_DIE
+            || e.Type == EFFID_WALK_PLANT_DIE // Rex / mega mole / smw goomba free falling
+            )
         {
             e.Location.SpeedY += 0.5_n;
             if(e.Location.SpeedY >= 10)
@@ -681,33 +680,8 @@ void UpdateEffects()
             if(e.FrameCount >= 8)
             {
                 e.FrameCount = 0;
-                if(e.Frame == 4)
-                    e.Frame = 5;
-                else if(e.Frame == 5)
-                    e.Frame = 4;
-                else if(e.Frame == 6)
-                    e.Frame = 7;
-                else
-                    e.Frame = 6;
-            }
-        }
-        else if(e.Type == EFFID_BRUTE_SQUISHED_DIE || e.Type == EFFID_BRUTE_DIE || e.Type == EFFID_BIG_GUY_DIE || e.Type == EFFID_CARRY_FODDER_DIE || e.Type == EFFID_SKELETON_DIE || e.Type == EFFID_GRN_FISH_S3_DIE || e.Type == EFFID_YEL_FISH_S4_DIE || e.Type == EFFID_RED_FISH_S3_DIE || e.Type == EFFID_GRN_FISH_S4_DIE || e.Type == EFFID_GRN_FISH_S1_DIE || e.Type == EFFID_BONE_FISH_DIE || e.Type == EFFID_SQUID_S1_DIE || e.Type == EFFID_WALK_PLANT_DIE) // Rex / mega mole / smw goomba free falling
-        {
-            e.Location.SpeedY += 0.5_n;
-            if(e.Location.SpeedY >= 10)
-                e.Location.SpeedY = 10;
-            e.FrameCount += 1;
-            if(e.FrameCount >= 8)
-            {
-                e.FrameCount = 0;
-                if(e.Frame == 0)
-                    e.Frame = 1;
-                else if(e.Frame == 1)
-                    e.Frame = 0;
-                else if(e.Frame == 2)
-                    e.Frame = 3;
-                else
-                    e.Frame = 2;
+                // flip least significant bit to switch frame while keeping same frame set
+                e.Frame ^= 1;
             }
         }
         else if(e.Type == EFFID_ITEM_POD_OPEN) // Egg
@@ -746,12 +720,14 @@ void UpdateEffects()
                         if(nn.Type == NPCID_LEAF_POWER)
                             nn.Location.SpeedY = -6;
 
+                        // this is new TheXTech logic
                         if(NPCTraits[e.NewNpc].IsFish || NPCIsAParaTroopa((NPCID)e.NewNpc) || e.NewNpc == NPCID_FIRE_CHAIN)
                         {
                             nn.Special = e.NewNpcSpecial;
                             nn.DefaultSpecial = e.NewNpcSpecial;
                         }
 
+                        // this is new TheXTech logic
                         if(e.NewNpc == NPCID_STAR_EXIT || e.NewNpc == NPCID_STAR_COLLECT || e.NewNpc == NPCID_MEDAL)
                             nn.Variant = e.NewNpcSpecial;
 
