@@ -1527,6 +1527,7 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
         ne.Location.Height = 8;
         ne.Location.X = Location.X + 4 + (dRand() * 12);
         ne.Location.Y = Location.Y + 40;
+        // DANGER: this is fully uninitialized (see #1101 on GitHub TheXTech/TheXTech)
         // .Location.SpeedY = -8
         ne.Location.SpeedX = 0;
         ne.Frame = 0;
