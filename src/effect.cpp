@@ -1640,7 +1640,7 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
         ne.Life = 120;
         ne.Type = A;
     }
-    else if(A == EFFID_BULLET_DIE || A == EFFID_SPIT_GUY_BALL_DIE) // Dead Bullet Bill
+    else if(A == EFFID_BULLET_DIE || A == EFFID_SPIT_GUY_BALL_DIE || A == EFFID_BIG_BULLET_DIE) // Dead Bullet Bill
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1651,12 +1651,17 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
         ne.Location.Y = Location.Y;
         ne.Location.SpeedY = Location.SpeedY;
         ne.Location.SpeedX = -Location.SpeedX;
+
         if(int(Direction) == -1)
             ne.Frame = 0;
         else
             ne.Frame = 1;
+
         if(A == EFFID_SPIT_GUY_BALL_DIE)
             ne.Frame = 0;
+        else if(A == EFFID_BIG_BULLET_DIE)
+            ne.Location.SpeedX = Location.SpeedX;
+
         ne.Life = 120;
         ne.Type = A;
     }
@@ -1692,31 +1697,6 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
         ne.Location.Height = 32;
         ne.Frame = 0;
         ne.Location.SpeedY = -8;
-        ne.Life = 120;
-        ne.Type = A;
-    }
-    else if(A == EFFID_BIG_BULLET_DIE) // Dead Giant Bullet Bill
-    {
-        numEffects++;
-        auto &ne = Effect[numEffects];
-        ne.Shadow = Shadow;
-        ne.Location.Width = Location.Width;
-        ne.Location.Height = Location.Height;
-        ne.Location.X = Location.X;
-        ne.Location.Y = Location.Y;
-        ne.Location.SpeedY = Location.SpeedY;
-        ne.Location.SpeedX = Location.SpeedX;
-
-        if(int(Direction) == -1)
-            ne.Frame = 0;
-        else
-            ne.Frame = 1;
-
-#if 0 // FIXME: This condition never works [PVS Studio]
-        if(A == EFFID_POWER_S3_DIE)
-            ne.Location.SpeedY = -8;
-#endif
-
         ne.Life = 120;
         ne.Type = A;
     }
