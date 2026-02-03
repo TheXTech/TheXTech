@@ -846,7 +846,7 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
     if(numEffects >= maxEffects - 4)
         return false;
 
-    if(A == EFFID_BLOCK_SMASH || A == EFFID_BLU_BLOCK_SMASH || A == EFFID_SLIDE_BLOCK_SMASH || A == EFFID_BLOCK_S1_SMASH || A == EFFID_GRY_BLOCK_SMASH || A == EFFID_DIRT_BLOCK_SMASH) // Block break effect
+    if(A == EFFID_BLOCK_SMASH || A == EFFID_BLU_BLOCK_SMASH || A == EFFID_SLIDE_BLOCK_SMASH || A == EFFID_BLOCK_S1_SMASH || A == EFFID_GRY_BLOCK_SMASH || A == EFFID_DIRT_BLOCK_SMASH || A == EFFID_ITEM_POD_BREAK) // Block break effect
     {
         for(B = 1; B <= 4; B++)
         {
@@ -870,13 +870,31 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
                 ne.Location.Y += Location.Height / 2;
             }
 
+            if(A == EFFID_ITEM_POD_BREAK)
+            {
+                if(B == 1 || B == 2)
+                    ne.Location.SpeedX = 2;
+                else
+                    ne.Location.SpeedX = 1.5_n;
+
+                if(B == 1)
+                    ne.Frame = 0;
+                else if(B == 2)
+                    ne.Frame = 1;
+                else if(B == 3)
+                    ne.Frame = 3;
+                else
+                    ne.Frame = 2;
+            }
+
             if(B == 1 || B == 3)
                 ne.Location.SpeedX = -ne.Location.SpeedX;
             else
                 ne.Location.X += Location.Width / 2;
 
-            ne.Location.SpeedX += dRand() * 2 - 1;
-            ne.Location.SpeedY += dRand() * 4 - 2;
+            auto rand_mul = (A == EFFID_ITEM_POD_BREAK) ? 0.25_rb : 1.0_rb;
+            ne.Location.SpeedX += (dRand() * 2 - 1) * rand_mul;
+            ne.Location.SpeedY += (dRand() * 4 - 2) * rand_mul;
         }
     }
     else if(A == EFFID_MAGIC_BOSS_DIE) // larry shell
@@ -1001,49 +1019,6 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
         ne.FrameCount = 0;
         ne.Life = 100;
         ne.Type = A;
-    }
-    else if(A == EFFID_ITEM_POD_BREAK) // Egg shells
-    {
-        for(B = 1; B <= 4; B++)
-        {
-            numEffects++;
-            auto &ne = Effect[numEffects];
-            ne.Shadow = Shadow;
-            ne.Location.Width = EffectWidth[A];
-            ne.Location.Height = EffectHeight[A];
-            ne.Type = A;
-            ne.Life = 200;
-
-            ne.Location.X = Location.X;
-            ne.Location.Y = Location.Y;
-            ne.Location.SpeedX = 2;
-
-            if(B == 1 || B == 2)
-                ne.Location.SpeedY = -11;
-            else
-            {
-                ne.Location.SpeedY = -7;
-                ne.Location.SpeedX = 1.5_n;
-                ne.Location.Y += Location.Height / 2;
-            }
-
-            if(B == 1 || B == 3)
-                ne.Location.SpeedX = -ne.Location.SpeedX;
-            else
-                ne.Location.X += Location.Width / 2;
-
-            ne.Location.SpeedX += (dRand() / 2 - 0.25_n);
-            ne.Location.SpeedY += (dRand() - 0.5_n);
-
-            if(B == 1)
-                ne.Frame = 0;
-            else if(B == 2)
-                ne.Frame = 1;
-            else if(B == 3)
-                ne.Frame = 3;
-            else
-                ne.Frame = 2;
-        }
     }
     else if(A == EFFID_FODDER_S3_SQUISH || A == EFFID_RED_FODDER_SQUISH || A == EFFID_UNDER_FODDER_SQUISH
         || A == EFFID_EXT_TURTLE_SQUISH || A == EFFID_YELSWITCH_FODDER_SQUISH || A == EFFID_BLUSWITCH_FODDER_SQUISH
