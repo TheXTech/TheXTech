@@ -832,7 +832,7 @@ void PlayerMovementY(int A)
                 Location_t tempLocation;
                 tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 2 + dRand().times(NPC[Player[A].StandingOnNPC].Location.Height - 8) + 4;
                 tempLocation.X = Player[A].Location.X - 4 + dRand() * ((int)Player[A].Location.Width - 8) + 4 - 8 * Player[A].Direction;
-                NewEffect(EFFID_SPARKLE, tempLocation, 1, 0, ShadowMode);
+                NewEffect(EFFID_SPARKLE, tempLocation, 1, ShadowMode);
                 Effect[numEffects].Frame = iRand(3);
                 Effect[numEffects].Location.SpeedY = (Player[A].Location.Y + Player[A].Location.Height + NPC[Player[A].StandingOnNPC].Location.Height / 32 - tempLocation.Y + 12) / 20;
             }

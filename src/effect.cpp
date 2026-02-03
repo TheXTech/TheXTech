@@ -138,9 +138,9 @@ void UpdateEffects()
                 e.FrameCount += 1;
                 if(e.FrameCount >= 3)
                 {
-                e.FrameCount = 0;
-                e.Frame += 1;
-                if(e.Frame == 4)
+                    e.FrameCount = 0;
+                    e.Frame += 1;
+                    if(e.Frame == 4)
                         e.Frame = 0;
                 }
             }
@@ -708,7 +708,10 @@ void UpdateEffects()
                 if(!LevelEditor && e.NewNpc != NPCID_ITEM_POD)
                 {
                     if(NPCIsYoshi((NPCID)e.NewNpc))
-                        NewEffect(EFFID_PET_BIRTH, e.Location, 1, e.NewNpc);
+                    {
+                        if(NewEffect(EFFID_PET_BIRTH, e.Location, 1))
+                            Effect[numEffects].NewNpc = e.NewNpc;
+                    }
                     else if(e.NewNpc > 0)
                     {
                         numNPCs++;
@@ -830,7 +833,7 @@ void UpdateEffects()
     }
 }
 
-void NewEffect(EFFID A, const Location_t &Location, int Direction, int NewNpc, bool Shadow, uint8_t newNpcSpecial)
+bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
 {
 // this sub creates effects
 // please reference the /graphics/effect folder to see what the effects are
@@ -841,7 +844,7 @@ void NewEffect(EFFID A, const Location_t &Location, int Direction, int NewNpc, b
     num_t tempDoub = 0;
 
     if(numEffects >= maxEffects - 4)
-        return;
+        return false;
 
     if(A == EFFID_BLOCK_SMASH || A == EFFID_BLU_BLOCK_SMASH || A == EFFID_SLIDE_BLOCK_SMASH || A == EFFID_BLOCK_S1_SMASH || A == EFFID_GRY_BLOCK_SMASH || A == EFFID_DIRT_BLOCK_SMASH) // Block break effect
     {
@@ -889,7 +892,7 @@ void NewEffect(EFFID A, const Location_t &Location, int Direction, int NewNpc, b
     {
         numEffects++;
         auto &ne = Effect[numEffects];
-        ne.NewNpc = NewNpc;
+        // ne.NewNpc = NewNpc; (unused)
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
@@ -907,7 +910,7 @@ void NewEffect(EFFID A, const Location_t &Location, int Direction, int NewNpc, b
     {
         numEffects++;
         auto &ne = Effect[numEffects];
-        ne.NewNpc = NewNpc;
+        // ne.NewNpc = NewNpc; (unused)
         ne.Shadow = Shadow;
         if(ne.NewNpc == NPCID_ITEM_POD)
             ne.NewNpc = 0;
@@ -931,10 +934,10 @@ void NewEffect(EFFID A, const Location_t &Location, int Direction, int NewNpc, b
         numEffects++;
         auto &ne = Effect[numEffects];
         ne.Shadow = Shadow;
-        ne.NewNpc = NewNpc;
-        ne.NewNpcSpecial = newNpcSpecial;
-        if(ne.NewNpc == NPCID_ITEM_POD)
-            ne.NewNpc = 0;
+        ne.NewNpc = 0; // NewNpc -- now gets set at callsite
+        ne.NewNpcSpecial = 0; // NewNpc -- now gets set at callsite
+        // if(ne.NewNpc == NPCID_ITEM_POD) (logic moved to callsite)
+        //     ne.NewNpc = 0;
         ne.Location.X = Location.X;
         ne.Location.Y = Location.Y;
         ne.Location.Width = 32;
@@ -948,10 +951,11 @@ void NewEffect(EFFID A, const Location_t &Location, int Direction, int NewNpc, b
 
         if(A == EFFID_ITEM_POD_OPEN)
         {
-            if(ne.NewNpc != 0 /*&& ne.NewNpc != NPCID_ITEM_POD*/) // never 96, because of condition above that replaces 96 with zero
-                PlaySoundSpatial(SFX_PetBirth, Location);
-            else
-                PlaySoundSpatial(SFX_Smash, Location);
+            // moved to callsite
+            // if(ne.NewNpc != 0 /*&& ne.NewNpc != NPCID_ITEM_POD*/) // never 96, because of condition above that replaces 96 with zero
+            //     PlaySoundSpatial(SFX_PetBirth, Location);
+            // else
+            //     PlaySoundSpatial(SFX_Smash, Location);
         }
         else if(A == EFFID_PET_BIRTH)
             PlaySoundSpatial(SFX_Pet, Location);
@@ -966,7 +970,7 @@ void NewEffect(EFFID A, const Location_t &Location, int Direction, int NewNpc, b
         ne.Location.SpeedX = Location.SpeedX;
         ne.Location.SpeedY = Location.SpeedY;
         ne.Location.Width = Location.Width;
-        ne.Location.Height = Location.Width;
+        ne.Location.Height = Location.Width; // this is a bug
         ne.Frame = 0;
         ne.FrameCount = 0;
         ne.Life = 10;
@@ -978,7 +982,7 @@ void NewEffect(EFFID A, const Location_t &Location, int Direction, int NewNpc, b
         numEffects++;
         auto &ne = Effect[numEffects];
         ne.Shadow = Shadow;
-        ne.NewNpc = NewNpc;
+        // ne.NewNpc = NewNpc; (unused)
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
         ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
@@ -995,7 +999,7 @@ void NewEffect(EFFID A, const Location_t &Location, int Direction, int NewNpc, b
         numEffects++;
         auto &ne = Effect[numEffects];
         ne.Shadow = Shadow;
-        ne.NewNpc = NewNpc;
+        // ne.NewNpc = NewNpc; (unused)
         ne.Location.X = Location.X;
         ne.Location.Y = Location.Y;
         ne.Location.Width = 32;
@@ -1155,7 +1159,7 @@ void NewEffect(EFFID A, const Location_t &Location, int Direction, int NewNpc, b
 
         ne.Frame = 0;
         ne.Life = 300;
-        ne.NewNpc = NewNpc;
+        ne.NewNpc = 0; // NewNpc -- now gets set at callsite
         ne.Type = A;
 
         if(!tempBool && A == EFFID_WATER_SPLASH)
@@ -1196,7 +1200,7 @@ void NewEffect(EFFID A, const Location_t &Location, int Direction, int NewNpc, b
         numEffects++;
         auto &ne = Effect[numEffects];
         ne.Shadow = Shadow;
-        ne.NewNpc = NewNpc;
+        ne.NewNpc = 0; // NewNpc -- now gets set at callsite
         ne.Location.Width = 32;
         ne.Location.Height = 32;
         ne.Location.X = Location.X;
@@ -1705,7 +1709,7 @@ void NewEffect(EFFID A, const Location_t &Location, int Direction, int NewNpc, b
         ne.Location.Y = Location.Y + 22;
         ne.Location.SpeedY = 0;
         ne.Location.SpeedX = 0;
-        ne.NewNpc = NewNpc;
+        ne.NewNpc = 0; // NewNpc -- now gets set at callsite
         ne.Frame = 0;
         ne.Life = 120;
         ne.Type = A;
@@ -1743,6 +1747,7 @@ void NewEffect(EFFID A, const Location_t &Location, int Direction, int NewNpc, b
         ne.Location.SpeedX = -Location.SpeedX;
         ne.Life = 120;
         ne.Type = A;
+        // NOTE: Frame set at callsite
     }
     else if(A == EFFID_POWER_S3_DIE) // Dead toad
     {
@@ -1949,6 +1954,8 @@ void NewEffect(EFFID A, const Location_t &Location, int Direction, int NewNpc, b
         ne.Type = A;
         PlaySoundSpatial(SFX_FireBossKilled, Location);
     }
+
+    return true;
 }
 
 void NewEffect_IceSparkle(const NPC_t& n, Location_t& tempLocation)
@@ -1959,7 +1966,7 @@ void NewEffect_IceSparkle(const NPC_t& n, Location_t& tempLocation)
     tempLocation.SpeedY = 0;
     tempLocation.X = n.Location.X - tempLocation.Width / 2 + dRand().times(n.Location.Width) - 4;
     tempLocation.Y = n.Location.Y - tempLocation.Height / 2 + dRand().times(n.Location.Height) - 4;
-    NewEffect(EFFID_SPARKLE, tempLocation, 1, 0, n.Shadow);
+    NewEffect(EFFID_SPARKLE, tempLocation, 1, n.Shadow);
 }
 
 // Remove the effect

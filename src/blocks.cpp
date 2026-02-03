@@ -1505,7 +1505,8 @@ resume_TriggerHit:
                 {
                     ib.Hidden = true;
                     invalidateDrawBlocks();
-                    NewEffect(EFFID_SPINBLOCK, ib.Location, 1, iBlock[A]);
+                    if(NewEffect(EFFID_SPINBLOCK, ib.Location, 1))
+                        Effect[numEffects].NewNpc = iBlock[A];
                     ib.ShakeCounter = 0;
                     ib.ShakeOffset = 0;
                 }

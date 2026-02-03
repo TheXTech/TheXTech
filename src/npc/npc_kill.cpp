@@ -830,7 +830,17 @@ resume_TriggerLast:
             CharStuff(A, true);
             if(NPC[A].Special == NPCID_RANDOM_POWER)
                 NPC[A].Special = RandomBonus();
-            NewEffect(EFFID_ITEM_POD_OPEN, NPC[A].Location, 1, NPC[A].Special, false, NPC[A].Variant);
+
+            if(NewEffect(EFFID_ITEM_POD_OPEN, NPC[A].Location, 1, false))
+            {
+                if(NPC[A].Special != NPCID_ITEM_POD)
+                    Effect[numEffects].NewNpc = NPC[A].Special;
+                Effect[numEffects].NewNpcSpecial = NPC[A].Variant;
+
+                // moved from NewEffect
+                PlaySoundSpatial((Effect[numEffects].NewNpc != 0) ? SFX_PetBirth : SFX_Smash, NPC[A].Location);
+            }
+
             if(C == 98)
                 Effect[numEffects].Frame += 3;
             else if(C == 99)
@@ -1306,7 +1316,7 @@ resume_TriggerLast:
                 NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_RED_SHELL_S3_DIE] * 0.5_n;
                 NPC[A].Location.Width = 32;
                 PlaySoundSpatial(SFX_Lava, NPC[A].Location);
-                NewEffect(EFFID_SMOKE_S3, NPC[A].Location, 1, 0, NPC[A].Shadow);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location, 1, NPC[A].Shadow);
                 NPC[A].Location.X += 2;
                 if(!NPC[A].NoLavaSplash)
                     NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
@@ -1316,17 +1326,17 @@ resume_TriggerLast:
                 for(C = 1; C <= 10; C++)
                 {
                     if(NPC[A].Type == NPCID_PLR_ICEBALL)
-                        NewEffect(EFFID_PLR_ICEBALL_TRAIL, NPC[A].Location, NPC[A].Special, 0, NPC[A].Shadow);
+                        NewEffect(EFFID_PLR_ICEBALL_TRAIL, NPC[A].Location, NPC[A].Special, NPC[A].Shadow);
                     else
-                        NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[A].Location, NPC[A].Special, 0, NPC[A].Shadow);
+                        NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[A].Location, NPC[A].Special, NPC[A].Shadow);
 
                     Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5_n + NPC[A].Location.SpeedX / 10;
                     Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5_n - NPC[A].Location.SpeedY / 10;
                 }
                 if((NPC[A].Type == NPCID_PLR_FIREBALL && NPC[A].Special == 5) || NPC[A].Type == NPCID_PET_FIRE)
-                    NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location, 1, 0, NPC[A].Shadow);
+                    NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location, 1, NPC[A].Shadow);
                 else
-                    NewEffect(EFFID_SMOKE_S4, NPC[A].Location, 1, 0, NPC[A].Shadow);
+                    NewEffect(EFFID_SMOKE_S4, NPC[A].Location, 1, NPC[A].Shadow);
             }
         }
         else if(NPC[A].Type == NPCID_MINIBOSS) // Big Koopa
@@ -1350,7 +1360,10 @@ resume_TriggerLast:
                     DontSpawnExit = true;
 
                 if(!DontSpawnExit)
-                    NewEffect(EFFID_MINIBOSS_DIE, NPC[A].Location, 1, NPCID_GOALORB_S3);
+                {
+                    if(NewEffect(EFFID_MINIBOSS_DIE, NPC[A].Location, 1))
+                        Effect[numEffects].NewNpc = NPCID_GOALORB_S3;
+                }
                 else
                 {
                     bool DontResetMusic = false;

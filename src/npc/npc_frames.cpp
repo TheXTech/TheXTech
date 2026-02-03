@@ -31,7 +31,7 @@
 
 static void s_makeHeavySparkle(const NPC_t& n, int offY)
 {
-    NewEffect(EFFID_SPARKLE, newLoc(n.Location.X + n.Location.Width / 2 - 4, n.Location.Y + n.Location.Height / 2 - offY), 1, 0, n.Shadow);
+    NewEffect(EFFID_SPARKLE, newLoc(n.Location.X + n.Location.Width / 2 - 4, n.Location.Y + n.Location.Height / 2 - offY), 1, n.Shadow);
     Effect[numEffects].Location.SpeedX = dRand() - 0.5_n;
     Effect[numEffects].Location.SpeedY = dRand() - 0.5_n;
 }
@@ -1644,9 +1644,16 @@ void NPCFrames(int A)
                 {
                     tempLocation = newLoc(NPC[A].Location.X + 4, NPC[A].Location.Y + 4, 8, 8);
                     if(!UnderWater[NPC[A].Section])
-                        NewEffect(EFFID_AIR_BUBBLE, tempLocation, 1, 0, NPC[A].Shadow);
+                    {
+                        // set NewNpc to 0 -- pop when no longer in water
+                        NewEffect(EFFID_AIR_BUBBLE, tempLocation, 1, NPC[A].Shadow);
+                    }
                     else
-                        NewEffect(EFFID_AIR_BUBBLE, tempLocation, 1, 1, NPC[A].Shadow);
+                    {
+                        // set NewNpc to 1 -- keep forever
+                        if(NewEffect(EFFID_AIR_BUBBLE, tempLocation, 1, NPC[A].Shadow))
+                            Effect[numEffects].NewNpc = 1;
+                    }
                 }
 
                 if(iRand(100) >= 85)
@@ -1661,7 +1668,7 @@ void NPCFrames(int A)
                 {
                     if(NPC[A].Special == 5)
                     {
-                        NewEffect(EFFID_PLR_ICEBALL_TRAIL, NPC[A].Location, 1, 0, NPC[A].Shadow);
+                        NewEffect(EFFID_PLR_ICEBALL_TRAIL, NPC[A].Location, 1, NPC[A].Shadow);
                         if(iRand(5) == 0)
                         {
                             tempLocation.Height = EffectHeight[EFFID_SPARKLE];
@@ -1685,7 +1692,7 @@ void NPCFrames(int A)
                     }
                 }
                 else
-                    NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[A].Location, NPC[A].Special, 0, NPC[A].Shadow);
+                    NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[A].Location, NPC[A].Special, NPC[A].Shadow);
             }
         }
 

@@ -1159,16 +1159,16 @@ void PlayerHurt(const int A)
 void PlayerDeathEffect(int A)
 {
     if(Player[A].Character == 1)
-        NewEffect(EFFID_CHAR1_DIE, Player[A].Location, 1, 0, ShadowMode);
+        NewEffect(EFFID_CHAR1_DIE, Player[A].Location, 1, ShadowMode);
     else if(Player[A].Character == 2)
-        NewEffect(EFFID_CHAR2_DIE, Player[A].Location, 1, 0, ShadowMode);
+        NewEffect(EFFID_CHAR2_DIE, Player[A].Location, 1, ShadowMode);
     else if(Player[A].Character == 3)
-        NewEffect(EFFID_CHAR3_DIE, Player[A].Location, 1, 0, ShadowMode);
+        NewEffect(EFFID_CHAR3_DIE, Player[A].Location, 1, ShadowMode);
     else if(Player[A].Character == 4)
-        NewEffect(EFFID_CHAR4_DIE, Player[A].Location, 1, 0, ShadowMode);
+        NewEffect(EFFID_CHAR4_DIE, Player[A].Location, 1, ShadowMode);
     else if(Player[A].Character == 5)
     {
-        NewEffect(EFFID_CHAR5_DIE, Player[A].Location, Player[A].Direction, 0, ShadowMode);
+        NewEffect(EFFID_CHAR5_DIE, Player[A].Location, Player[A].Direction, ShadowMode);
         Effect[numEffects].Location.SpeedX = 2 * -Player[A].Direction;
     }
 }
@@ -1769,7 +1769,7 @@ static void s_makeDust(Player_t& p, int dir_offset, Location_t& tempLocation)
             tempLocation.Y -= 4;
         }
 
-        NewEffect(effid, tempLocation, 1, 0, ShadowMode);
+        NewEffect(effid, tempLocation, 1, ShadowMode);
 
         p.SlideCounter = 2 + iRand_round(add_slide);
     }
@@ -1905,7 +1905,7 @@ void PlayerFrame(Player_t &p)
                     p.SlideCounter = 2 + iRand_round(2); // p(2) = 25%, p(3) = 50%, p(4) = 25%
                     tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                     tempLocation.X = p.Location.X + p.Location.Width / 2 - 4;
-                    NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
+                    NewEffect(EFFID_SKID_DUST, tempLocation, 1, ShadowMode);
                 }
             }
         }
@@ -1927,7 +1927,7 @@ void PlayerFrame(Player_t &p)
                         tempLocation.X = p.Location.X + p.Location.Width / 2 - 4 + 6;
                     else
                         tempLocation.X = p.Location.X + p.Location.Width / 2 - 4 - 6;
-                    NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
+                    NewEffect(EFFID_SKID_DUST, tempLocation, 1, ShadowMode);
                 }
             }
         }
@@ -3210,7 +3210,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
     {
         if(((p.TailCount) % 10 == 0 && !p.SpinJump) || ((p.TailCount) % 5 == 0 && p.SpinJump))
         {
-            NewEffect(EFFID_SPARKLE, newLoc(tailLoc.X + (dRand() * (int_ok)tailLoc.Width) - 4, tailLoc.Y + (dRand() * (int_ok)tailLoc.Height)), 1, 0, ShadowMode);
+            NewEffect(EFFID_SPARKLE, newLoc(tailLoc.X + (dRand() * (int_ok)tailLoc.Width) - 4, tailLoc.Y + (dRand() * (int_ok)tailLoc.Height)), 1, ShadowMode);
             Effect[numEffects].Location.SpeedX = (0.5_n + dRand()) * p.Direction;
             Effect[numEffects].Location.SpeedY = dRand() - 0.5_n;
         }
@@ -4749,13 +4749,18 @@ void WaterCheck(const int A)
                 {
                     if(CheckCollision(Water[B].Location, tempLocation))
                     {
-                        NewEffect(EFFID_AIR_BUBBLE, tempLocation, 1, 0, ShadowMode);
+                        // NewNpc set to 0 (pop it when it's no longer colliding with water)
+                        NewEffect(EFFID_AIR_BUBBLE, tempLocation, 1, ShadowMode);
                         break;
                     }
                 }
             }
             else
-                NewEffect(EFFID_AIR_BUBBLE, tempLocation, 1, 1, ShadowMode);
+            {
+                // NewNpc set to 1 (keep it on forever)
+                if(NewEffect(EFFID_AIR_BUBBLE, tempLocation, 1, ShadowMode))
+                    Effect[numEffects].NewNpc = 1;
+            }
         }
     }
 }
@@ -5520,7 +5525,7 @@ void LinkFrame(Player_t &p)
                     p.SlideCounter = 2 + iRand_round(2);
                     tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                     tempLocation.X = p.Location.X + p.Location.Width / 2 - 4;
-                    NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
+                    NewEffect(EFFID_SKID_DUST, tempLocation, 1, ShadowMode);
                 }
             }
         }
@@ -5662,7 +5667,7 @@ void LinkFrame(Player_t &p)
                 else
                     tempLocation.X = p.Location.X + p.Location.Width / 2 + 6 - 4;
 
-                NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
+                NewEffect(EFFID_SKID_DUST, tempLocation, 1, ShadowMode);
             }
         }
     }
@@ -6176,7 +6181,7 @@ void PlayerEffects(const int A)
             }
 
             p.State = target_state;
-            NewEffect(EFFID_SMOKE_S4, p.Location, 1, 0, ShadowMode);
+            NewEffect(EFFID_SMOKE_S4, p.Location, 1, ShadowMode);
         }
 
         p.Effect2 += 1;
@@ -6220,7 +6225,7 @@ void PlayerEffects(const int A)
             tempLocation.Height = 32;
             tempLocation.X = p.Location.X + (p.Location.Width - tempLocation.Width) / 2;
             tempLocation.Y = p.Location.Y + (p.Location.Height - tempLocation.Height) / 2;
-            NewEffect(EFFID_SMOKE_S4, tempLocation, 1, 0, ShadowMode);
+            NewEffect(EFFID_SMOKE_S4, tempLocation, 1, ShadowMode);
         }
 
         p.Effect2 += 1;
@@ -6264,7 +6269,7 @@ void PlayerEffects(const int A)
             tempLocation.Height = 32;
             tempLocation.X = p.Location.X + (p.Location.Width - tempLocation.Width) / 2;
             tempLocation.Y = p.Location.Y + (p.Location.Height - tempLocation.Height) / 2;
-            NewEffect(EFFID_SMOKE_S4, tempLocation, 1, 0, ShadowMode);
+            NewEffect(EFFID_SMOKE_S4, tempLocation, 1, ShadowMode);
         }
 
         p.Effect2 += 1;
@@ -6308,7 +6313,7 @@ void PlayerEffects(const int A)
             tempLocation.Height = 32;
             tempLocation.X = p.Location.X + (p.Location.Width - tempLocation.Width) / 2;
             tempLocation.Y = p.Location.Y + (p.Location.Height - tempLocation.Height) / 2;
-            NewEffect(EFFID_SMOKE_S4, tempLocation, 1, 0, ShadowMode);
+            NewEffect(EFFID_SMOKE_S4, tempLocation, 1, ShadowMode);
         }
 
         p.Effect2 += 1;
@@ -6328,7 +6333,7 @@ void PlayerEffects(const int A)
         for(B = 1; B <= 2; B++)
         {
             NewEffect(EFFID_SPARKLE, newLoc(p.Location.X + dRand() * ((int)p.Location.Width + 8) - 8,
-                                 p.Location.Y + dRand() * ((int)p.Location.Height + 8) - 4), 1, 0, ShadowMode);
+                                 p.Location.Y + dRand() * ((int)p.Location.Height + 8) - 4), 1, ShadowMode);
             Effect[numEffects].Location.SpeedX = dRand() * 2 - 1;
             Effect[numEffects].Location.SpeedY = dRand() * 2 - 1;
         }
@@ -6337,7 +6342,7 @@ void PlayerEffects(const int A)
         {
             UnDuck(Player[A]);
             PlaySoundSpatial(SFX_Transform, p.Location);
-            NewEffect(EFFID_SMOKE_S3_CENTER, p.Location, 1, 0, ShadowMode);
+            NewEffect(EFFID_SMOKE_S3_CENTER, p.Location, 1, ShadowMode);
 
             if(!p.Stoned)
             {

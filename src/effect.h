@@ -30,7 +30,8 @@
 void UpdateEffects();
 // Public Sub NewEffect(A As Integer, Location As Location, Optional Direction As Single = 1, Optional NewNpc As Integer = 0, Optional Shadow As Boolean = False)  'Create an effect
 // Create an effect
-void NewEffect(EFFID A, const Location_t &Location_t, int Direction = 1, int NewNpc = 0, bool Shadow = false, uint8_t newNpcSpecial = 0);
+bool NewEffect(EFFID A, const Location_t &Location_t, int Direction, int NewNpc, bool Shadow = false, uint8_t newNpcSpecial = 0) = delete;
+bool NewEffect(EFFID A, const Location_t &Location_t, int Direction = 1, bool Shadow = false);
 // Public Sub KillEffect(A As Integer) 'Remove the effect
 // Remove the effect
 void KillEffect(int A);

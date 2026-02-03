@@ -945,7 +945,7 @@ void NPCSpecial(int A)
 
             for(int i = 1; i <= 5; i++)
             {
-                NewEffect(EFFID_SPARKLE, newLoc(npc.Location.X + npc.Location.Width / 2 - 4, npc.Location.Y + npc.Location.Height / 2 - 6), 1, 0, npc.Shadow);
+                NewEffect(EFFID_SPARKLE, newLoc(npc.Location.X + npc.Location.Width / 2 - 4, npc.Location.Y + npc.Location.Height / 2 - 6), 1, npc.Shadow);
                 Effect[numEffects].Location.SpeedX = dRand() * 6 - 3;
                 Effect[numEffects].Location.SpeedY = dRand() * 6 - 3;
                 Effect[numEffects].Frame = iRand(3);
