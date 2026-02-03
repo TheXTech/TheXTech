@@ -46,7 +46,6 @@ void UpdateEffects()
     int B = 0;
 //    bool DontSpawnExit = false;
 //    bool DontResetMusic = false;
-    bool tempBool = false;
     int CoinCount = 0;
 
     if(FreezeNPCs)
@@ -191,7 +190,7 @@ void UpdateEffects()
         {
             if(e.NewNpc == 0)
             {
-                tempBool = false;
+                bool tempBool = false;
                 for(B = 1; B <= numWater; B++)
                 {
                     if(CheckCollision(e.Location, Water[B].Location) && !Water[B].Hidden)
@@ -483,7 +482,7 @@ void UpdateEffects()
             e.Frame = SpecialFrame[3];
             if(e.Life < 10)
             {
-                tempBool = false;
+                bool tempBool = false;
                 for(B = 1; B <= numPlayers; B++)
                 {
                     if(!Player[B].Dead && Player[B].TimeToLive == 0)
@@ -840,8 +839,6 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
 // A is the effect type
 
     int B = 0;
-    bool tempBool = false;
-    num_t tempDoub = 0;
 
     if(numEffects >= maxEffects - 4)
         return false;
@@ -1078,10 +1075,15 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
         ne.Location.SpeedY = 0;
         ne.Location.SpeedX = 0;
         ne.Shadow = Shadow;
-        tempBool = false;
+
+        ne.Frame = 0;
+        ne.Life = 300;
+        ne.NewNpc = 0; // NewNpc -- now gets set at callsite
+        ne.Type = A;
 
         if(A == EFFID_WATER_SPLASH) // Change height for the background
         {
+            bool tempBool = false;
             for(const Background_t& b : treeBackgroundQuery(ne.Location, SORTMODE_ID))
             {
                 if(b.Type == 82 || b.Type == 26 || b.Type == 65 || b.Type == 159 || b.Type == 166 || b.Type == 168)
@@ -1107,15 +1109,10 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
                     }
                 }
             }
+
+            if(!tempBool)
+                numEffects -= 1;
         }
-
-        ne.Frame = 0;
-        ne.Life = 300;
-        ne.NewNpc = 0; // NewNpc -- now gets set at callsite
-        ne.Type = A;
-
-        if(!tempBool && A == EFFID_WATER_SPLASH)
-            numEffects -= 1;
     }
     else if(A == EFFID_WALL_TURTLE_DIE) // Spike Top
     {
@@ -1268,15 +1265,15 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
                 numEffects++;
                 auto &ne = Effect[numEffects];
                 ne.Shadow = Shadow;
+
                 ne.Location.Width = EffectWidth[A];
                 ne.Location.Height = EffectHeight[A];
                 ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
                 ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
-                ne.Location.SpeedY = -0;
-                ne.Location.SpeedX = 0;
-                ne.Life = 10;
+
                 if(B == 1 || B == 3 || B == 4 || B == 6)
                 {
+                    ne.Life = 10;
                     ne.Location.SpeedY = 1.75_n; // 3.5 * 0.5
                     ne.Location.SpeedX = 1; // 2 * 0.5
                 }
@@ -1292,13 +1289,7 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
                 if(B == 1 || B == 6)
                     ne.Location.SpeedY = -ne.Location.SpeedY;
                 if(int(Direction) % 2 == 0)
-                {
-                    tempDoub = ne.Location.SpeedX;
-                    ne.Location.SpeedX = ne.Location.SpeedY;
-                    ne.Location.SpeedY = tempDoub;
-                }
-                // ne.Location.SpeedX = ne.Location.SpeedX * 0.5;
-                // ne.Location.SpeedY = ne.Location.SpeedY * 0.5;
+                    std::swap(ne.Location.SpeedX, ne.Location.SpeedY);
 
                 ne.Location.X += ne.Location.SpeedX * 3;
                 ne.Location.Y += ne.Location.SpeedY * 3;
@@ -1307,8 +1298,6 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
                 ne.Type = A;
             }
         }
-
-
     }
     else if(A == EFFID_BOMB_S3_EXPLODE) // SMB3 Bomb Part 2
     {
@@ -1319,13 +1308,12 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
                 numEffects++;
                 auto &ne = Effect[numEffects];
                 ne.Shadow = Shadow;
+
                 ne.Location.Width = 16;
                 ne.Location.Height = 16;
                 ne.Location.X = Location.X;
                 ne.Location.Y = Location.Y;
-                ne.Location.SpeedY = -0;
-                ne.Location.SpeedX = 0;
-                ne.Life = 13;
+
                 if(B == 1 || B == 3 || B == 4 || B == 6)
                 {
                     ne.Location.SpeedY = 4.5_n; // 3 * 1.5
@@ -1336,6 +1324,7 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
                 {
                     ne.Location.SpeedY = 0;
                     ne.Location.SpeedX = 6; // 4 * 1.5
+                    ne.Life = 13;
                 }
 
                 if(B <= 3)
@@ -1343,13 +1332,11 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
                 if(B == 1 || B == 6)
                     ne.Location.SpeedY = -ne.Location.SpeedY;
                 if(int(Direction) % 2 == 0)
-                {
-                    tempDoub = ne.Location.SpeedX;
-                    ne.Location.SpeedX = ne.Location.SpeedY;
-                    ne.Location.SpeedY = tempDoub;
-                }
+                    std::swap(ne.Location.SpeedX, ne.Location.SpeedY);
+
                 // ne.Location.SpeedX = ne.Location.SpeedX * 1.5;
                 // ne.Location.SpeedY = ne.Location.SpeedY * 1.5;
+
                 ne.Frame = Direction;
                 ne.Type = A;
             }
