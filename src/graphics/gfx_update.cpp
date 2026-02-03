@@ -2811,7 +2811,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         // effects on top
         For(A, 1, numEffects)
         {
-            auto &e = Effect[A];
+            const auto &e = Effect[A];
 
             if(e.Type != EFFID_BOSS_FRAGILE_DIE && e.Type != EFFID_DOOR_S2_OPEN && e.Type != EFFID_DOOR_DOUBLE_S3_OPEN && e.Type != EFFID_DOOR_SIDE_S3_OPEN &&
                e.Type != EFFID_PLR_FIREBALL_TRAIL && e.Type != EFFID_COIN_SWITCH_PRESS && e.Type != EFFID_SPINBLOCK && e.Type != EFFID_BIG_DOOR_OPEN &&
