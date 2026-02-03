@@ -856,36 +856,27 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
             ne.Location.Width = EffectWidth[A];
             ne.Location.Height = EffectHeight[A];
             ne.Type = A;
-            ne.Location.SpeedX = 3;
             ne.Life = 200;
-            if(B == 1 || B == 3)
-                ne.Location.SpeedX = -ne.Location.SpeedX;
+
+            ne.Location.X = Location.X;
+            ne.Location.Y = Location.Y;
+            ne.Location.SpeedX = 3;
+
             if(B == 1 || B == 2)
                 ne.Location.SpeedY = -11;
             else
+            {
                 ne.Location.SpeedY = -7;
+                ne.Location.Y += Location.Height / 2;
+            }
+
+            if(B == 1 || B == 3)
+                ne.Location.SpeedX = -ne.Location.SpeedX;
+            else
+                ne.Location.X += Location.Width / 2;
+
             ne.Location.SpeedX += dRand() * 2 - 1;
             ne.Location.SpeedY += dRand() * 4 - 2;
-            if(B == 1)
-            {
-                ne.Location.X = Location.X;
-                ne.Location.Y = Location.Y;
-            }
-            else if(B == 2)
-            {
-                ne.Location.X = Location.X + Location.Width / 2;
-                ne.Location.Y = Location.Y;
-            }
-            else if(B == 3)
-            {
-                ne.Location.X = Location.X;
-                ne.Location.Y = Location.Y + Location.Height / 2;
-            }
-            else
-            {
-                ne.Location.X = Location.X + Location.Width / 2;
-                ne.Location.Y = Location.Y + Location.Height / 2;
-            }
         }
     }
     else if(A == EFFID_MAGIC_BOSS_DIE) // larry shell
@@ -1021,20 +1012,29 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
             ne.Location.Width = EffectWidth[A];
             ne.Location.Height = EffectHeight[A];
             ne.Type = A;
-            ne.Location.SpeedX = 2;
             ne.Life = 200;
+
+            ne.Location.X = Location.X;
+            ne.Location.Y = Location.Y;
+            ne.Location.SpeedX = 2;
+
             if(B == 1 || B == 2)
                 ne.Location.SpeedY = -11;
             else
             {
                 ne.Location.SpeedY = -7;
                 ne.Location.SpeedX = 1.5_n;
+                ne.Location.Y += Location.Height / 2;
             }
 
             if(B == 1 || B == 3)
                 ne.Location.SpeedX = -ne.Location.SpeedX;
+            else
+                ne.Location.X += Location.Width / 2;
+
             ne.Location.SpeedX += (dRand() / 2 - 0.25_n);
             ne.Location.SpeedY += (dRand() - 0.5_n);
+
             if(B == 1)
                 ne.Frame = 0;
             else if(B == 2)
@@ -1043,29 +1043,6 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
                 ne.Frame = 3;
             else
                 ne.Frame = 2;
-
-            // .Location.SpeedX += Rnd * 2 - 1
-            // .Location.SpeedY += Rnd * 4 - 2
-            if(B == 1)
-            {
-                ne.Location.X = Location.X;
-                ne.Location.Y = Location.Y;
-            }
-            else if(B == 2)
-            {
-                ne.Location.X = Location.X + Location.Width / 2;
-                ne.Location.Y = Location.Y;
-            }
-            else if(B == 3)
-            {
-                ne.Location.X = Location.X;
-                ne.Location.Y = Location.Y + Location.Height / 2;
-            }
-            else
-            {
-                ne.Location.X = Location.X + Location.Width / 2;
-                ne.Location.Y = Location.Y + Location.Height / 2;
-            }
         }
     }
     else if(A == EFFID_FODDER_S3_SQUISH || A == EFFID_RED_FODDER_SQUISH || A == EFFID_UNDER_FODDER_SQUISH
@@ -1248,7 +1225,7 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
         ne.Frame = 0;
         ne.Life = 60;
     }
-    else if(A == EFFID_BOOT_STOMP) // SMW Smashed
+    else if(A == EFFID_BOOT_STOMP || A == EFFID_STOMP_STAR) // "SMW Smashed", combined with "stomp star part 2"
     {
         for(B = 1; B <= 4; B++)
         {
@@ -1262,45 +1239,31 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
                 ne.Location.Height = EffectHeight[A];
                 ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
                 ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
-                // ne.Location.SpeedY = -0; // Assigned below
-                // ne.Location.SpeedX = 0; // Assigned below
-                ne.Life = 15;
 
-                ne.Location.SpeedX = 4.8_n; // 3 * 0.8; * 2 because SpeedX got applied twice for EFFID_BOOT_STOMP in SMBX 1.3
-                ne.Location.SpeedY = 2.4_n; // 1.5 * 0.8; * 2 because SpeedY got applied twice for EFFID_BOOT_STOMP in SMBX 1.3
+                if(A == EFFID_BOOT_STOMP)
+                {
+                    ne.Life = 15;
+                    ne.Location.SpeedX = 4.8_n; // 3 * 0.8; * 2 because SpeedX got applied twice for EFFID_BOOT_STOMP in SMBX 1.3
+                    ne.Location.SpeedY = 2.4_n; // 1.5 * 0.8; * 2 because SpeedY got applied twice for EFFID_BOOT_STOMP in SMBX 1.3
+                }
+                else
+                {
+                    ne.Life = 8;
+                    ne.Location.SpeedX = 2;
+                    ne.Location.SpeedY = 2;
+                }
 
                 if(B == 1 || B == 2)
                     ne.Location.SpeedY = -ne.Location.SpeedY;
                 if(B == 1 || B == 3)
                     ne.Location.SpeedX = -ne.Location.SpeedX;
 
-                ne.Frame = 0;
-            }
-        }
-    }
-    else if(A == EFFID_STOMP_STAR) // stomp star part 2
-    {
-        for(B = 1; B <= 4; B++)
-        {
-            if(numEffects < maxEffects)
-            {
-                numEffects++;
-                auto &ne = Effect[numEffects];
-                ne.Shadow = Shadow;
-                ne.Type = A;
-                ne.Location.Width = EffectWidth[A];
-                ne.Location.Height = EffectHeight[A];
-                ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
-                ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
-                ne.Life = 8;
-                ne.Location.SpeedX = 2;
-                ne.Location.SpeedY = 2;
-                if(B == 1 || B == 2)
-                    ne.Location.SpeedY = -ne.Location.SpeedY;
-                if(B == 1 || B == 3)
-                    ne.Location.SpeedX = -ne.Location.SpeedX;
-                ne.Location.Y += ne.Location.SpeedY * 6;
-                ne.Location.X += ne.Location.SpeedX * 6;
+                if(A == EFFID_STOMP_STAR)
+                {
+                    ne.Location.Y += ne.Location.SpeedY * 6;
+                    ne.Location.X += ne.Location.SpeedX * 6;
+                }
+
                 ne.Frame = 0;
             }
         }
@@ -1851,28 +1814,17 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
             ne.Location.SpeedX = 0;
         }
 
-        if(int(Direction) == -1)
+        if(A == EFFID_BRUTE_SQUISHED_DIE || A == EFFID_BRUTE_DIE || A == EFFID_BIG_GUY_DIE || A == EFFID_CARRY_FODDER_DIE
+            || A == EFFID_SKELETON_DIE || A == EFFID_GRN_FISH_S3_DIE || A == EFFID_RED_FISH_S3_DIE || A == EFFID_GRN_FISH_S4_DIE
+            || A == EFFID_GRN_FISH_S1_DIE || A == EFFID_BONE_FISH_DIE || A == EFFID_YEL_FISH_S4_DIE || A == EFFID_WALK_PLANT_DIE)
         {
-            if(A == EFFID_BRUTE_SQUISHED_DIE || A == EFFID_BRUTE_DIE || A == EFFID_BIG_GUY_DIE || A == EFFID_CARRY_FODDER_DIE
-                || A == EFFID_SKELETON_DIE || A == EFFID_GRN_FISH_S3_DIE || A == EFFID_RED_FISH_S3_DIE || A == EFFID_GRN_FISH_S4_DIE
-                || A == EFFID_GRN_FISH_S1_DIE || A == EFFID_BONE_FISH_DIE || A == EFFID_YEL_FISH_S4_DIE || A == EFFID_WALK_PLANT_DIE)
-            {
-                ne.Frame = 0;
-            }
-            else
-                ne.Frame = 4;
+            ne.Frame = 0;
         }
         else
-        {
-            if(A == EFFID_BRUTE_SQUISHED_DIE || A == EFFID_BRUTE_DIE || A == EFFID_BIG_GUY_DIE || A == EFFID_CARRY_FODDER_DIE
-                || A == EFFID_SKELETON_DIE || A == EFFID_GRN_FISH_S3_DIE || A == EFFID_RED_FISH_S3_DIE || A == EFFID_GRN_FISH_S4_DIE
-                || A == EFFID_GRN_FISH_S1_DIE || A == EFFID_BONE_FISH_DIE || A == EFFID_YEL_FISH_S4_DIE || A == EFFID_WALK_PLANT_DIE)
-            {
-                ne.Frame = 2;
-            }
-            else
-                ne.Frame = 6;
-        }
+            ne.Frame = 4;
+
+        if(int(Direction) != -1)
+            ne.Frame += 2;
 
         ne.Life = 120;
         ne.Type = A;
@@ -1944,8 +1896,8 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
-        ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
+        // ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+        // ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
         ne.Location.X = Location.X;
         ne.Location.Y = Location.Y;
         ne.Location.SpeedY = -14;
