@@ -1773,15 +1773,21 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
         ne.Type = A;
     }
     else if(A == EFFID_STONE_S3_DIE || A == EFFID_BIG_GHOST_DIE || A == EFFID_GHOST_S4_DIE || A == EFFID_GHOST_FAST_DIE
-        || A == EFFID_GHOST_S3_DIE || A == EFFID_STONE_S4_DIE || A == EFFID_SAW_DIE) // Boo / thwomps
+        || A == EFFID_GHOST_S3_DIE || A == EFFID_STONE_S4_DIE || A == EFFID_SAW_DIE // Case commented "Boo / thwomps"
+        || A == EFFID_HEAVY_THROWER_DIE || A == EFFID_JUMPER_S4_DIE || A == EFFID_VILLAIN_S3_DIE || A == EFFID_WALK_BOMB_S3_DIE
+        || A == EFFID_CHASER_DIE || A == EFFID_VILLAIN_S1_DIE || A == EFFID_SICK_BOSS_DIE || A == EFFID_BOMBER_BOSS_DIE
+        || A == EFFID_BAT_DIE) // Case commented "Hammer Bro"
     {
         numEffects++;
         auto &ne = Effect[numEffects];
         ne.Shadow = Shadow;
+
         ne.Location.Width = Location.Width;
         ne.Location.Height = Location.Height;
+
         ne.Location.X = Location.X;
         ne.Location.Y = Location.Y;
+
         ne.Location.SpeedY = Location.SpeedY;
         ne.Location.SpeedX = -Location.SpeedX;
 
@@ -1793,41 +1799,23 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
 
         if(ne.Location.SpeedX != 0 && ne.Location.SpeedX > -2 && ne.Location.SpeedX < 2)
             ne.Location.SpeedX = 2 * -Direction;
+
         if(Direction == -1)
             ne.Frame = 0;
         else
             ne.Frame = 2;
+
         if(A == EFFID_STONE_S3_DIE || A == EFFID_STONE_S4_DIE || A == EFFID_SAW_DIE)
             ne.Frame = 0;
-        ne.Life = 120;
-        ne.Type = A;
-    }
-    else if(A == EFFID_HEAVY_THROWER_DIE || A == EFFID_JUMPER_S4_DIE || A == EFFID_VILLAIN_S3_DIE || A == EFFID_WALK_BOMB_S3_DIE
-        || A == EFFID_CHASER_DIE || A == EFFID_VILLAIN_S1_DIE || A == EFFID_SICK_BOSS_DIE || A == EFFID_BOMBER_BOSS_DIE
-        || A == EFFID_BAT_DIE) // Hammer Bro
-    {
-        numEffects++;
-        auto &ne = Effect[numEffects];
-        ne.Shadow = Shadow;
+        // combined case previously commented "Hammer Bro"
+        else if(A != EFFID_BIG_GHOST_DIE && A != EFFID_GHOST_S4_DIE && A != EFFID_GHOST_FAST_DIE && A != EFFID_GHOST_S3_DIE)
+        {
+            ne.Location.Width = EffectWidth[A];
+            ne.Location.Height = EffectHeight[A];
 
-        ne.Location.Width = EffectWidth[A];
-        ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
-        ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
-
-        ne.Location.X = Location.X;
-        ne.Location.Y = Location.Y;
-
-        ne.Location.SpeedY = Location.SpeedY;
-        ne.Location.SpeedX = -Location.SpeedX;
-
-        if(ne.Location.SpeedX != 0 && ne.Location.SpeedX > -2 && ne.Location.SpeedX < 2)
-            ne.Location.SpeedX = 2 * -Direction;
-
-        if(int(Direction) == -1)
-            ne.Frame = 0;
-        else
-            ne.Frame = 1;
+            if(ne.Frame == 2)
+                ne.Frame = 1;
+        }
 
         ne.Life = 120;
         ne.Type = A;
