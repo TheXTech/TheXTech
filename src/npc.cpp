@@ -3667,135 +3667,7 @@ void SpecialNPC(int A)
             PlaySoundSpatial(SFX_SpitBossBeat, NPC[A].Location);
         }
     }
-    // firespitting plant
-    else if(NPC[A].Type == NPCID_FIRE_PLANT)
-    {
-        int target_plr = NPCFaceNearestPlayer(NPC[A]);
-
-        if(target_plr != 0)
-            NPC[A].Special4 = target_plr;
-
-        if(NPC[A].Location.X != NPC[A].DefaultLocationX)
-        {
-            NPC[A].Killed = 2;
-            NPCQueues::Killed.push_back(A);
-            NPC[A].Location.Y += -NPC[A].Location.SpeedY;
-            // deferring tree update to end of the NPC physics update
-        }
-        else
-        {
-            if(NPC[A].Special2 == 0 && !NPC[A].Inert)
-            {
-                NPC[A].Location.Y += NPC[A]->THeight + 1.5_n;
-                NPC[A].Special2 = 4;
-                NPC[A].Special = 70;
-            }
-
-            if(NPC[A].Special2 == 1)
-            {
-                NPC[A].Special += 1;
-                NPC[A].Location.Y -= 1.5_n;
-
-                // NPC[A].Special >= NPC[A]->THeight * 0.65 + 1
-                if(NPC[A].Special * 100 >= NPC[A]->THeight * 65 + 100)
-                {
-                    NPC[A].Special2 = 2;
-                    NPC[A].Special = 0;
-                }
-            }
-            else if(NPC[A].Special2 == 2)
-            {
-                NPC[A].Special += 1;
-                if(NPC[A].Special >= 100)
-                {
-                    NPC[A].Special2 = 3;
-                    NPC[A].Special = 0;
-                }
-                else if(NPC[A].Special == 50)
-                {
-                    numNPCs++;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 100;
-                    NPC[numNPCs].Direction = NPC[A].Direction;
-                    NPC[numNPCs].Section = NPC[A].Section;
-                    NPC[numNPCs].Type = NPCID_PLANT_FIREBALL;
-                    NPC[numNPCs].Frame = 1;
-                    NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-                    NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-
-                    if(NPC[numNPCs]->TWidth == 16)
-                    {
-                        NPC[numNPCs].Location.X = NPC[A].Location.X + 8;
-                        NPC[numNPCs].Location.Y = NPC[A].Location.Y + 8;
-                    }
-                    else // modified fireball
-                    {
-                        NPC[numNPCs].Location.X = NPC[A].Location.X;
-                        NPC[numNPCs].Location.Y = NPC[A].Location.Y;
-                    }
-
-                    NPCSetSpeedTarget_FixedX(NPC[numNPCs], Player[NPC[A].Special4].Location, 3, 2);
-
-                    NPC[numNPCs].Location.X += NPC[numNPCs].Location.SpeedX * 4;
-                    NPC[numNPCs].Location.Y += NPC[numNPCs].Location.SpeedY * 4;
-
-                    syncLayers_NPC(numNPCs);
-                }
-            }
-            else if(NPC[A].Special2 == 3)
-            {
-                NPC[A].Special += 1;
-                NPC[A].Location.Y += 1.5_n;
-
-                // NPC[A].Special >= NPC[A]->THeight * 0.65 + 1
-                if(NPC[A].Special * 100 >= NPC[A]->THeight * 65 + 100)
-                    NPC[A].Special2 = 4;
-            }
-            else if(NPC[A].Special2 == 4)
-            {
-                NPC[A].Special += 1;
-                if(NPC[A].Special >= 150)
-                {
-                    bool tempTurn = true;
-                    if(!NPC[A].Inert)
-                    {
-                        for(int B = 1; B <= numPlayers; B++)
-                        {
-                            if(!Player[B].Dead && Player[B].TimeToLive == 0)
-                            {
-                                if(!CanComeOut(NPC[A].Location, Player[B].Location))
-                                {
-                                    tempTurn = false;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    if(tempTurn)
-                    {
-                        NPC[A].Special2 = 1;
-                        NPC[A].Special = 0;
-                    }
-                    else
-                        NPC[A].Special = 140;
-                }
-            }
-
-            NPC[A].Location.Height = NPC[A]->THeight - (NPC[A].Location.Y - NPC[A].DefaultLocationY);
-
-            if(NPC[A].Location.Height < 0)
-                NPC[A].Location.Height = 0;
-            // deferring tree update to end of the NPC physics update
-
-            if(NPC[A].Location.Height == 0)
-                NPC[A].Immune = 100;
-            else
-                NPC[A].Immune = 0;
-        }
-
     // jumping plant
-    }
     else if(NPC[A].Type == NPCID_JUMP_PLANT)
     {
         if(NPC[A].Projectile)
@@ -3895,13 +3767,21 @@ void SpecialNPC(int A)
             else
                 NPC[A].Immune = 0;
         }
-
-    // Piranha Plant code
     }
-    else if(NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_LONG_PLANT_UP)
+    // Piranha Plant code
+    else if(NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_PLANT_S1
+        || NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_FIRE_PLANT)
     {
         if(NPC[A].Special3 > 0)
             NPC[A].Special3 -= 1;
+
+        if(NPC[A].Type == NPCID_FIRE_PLANT)
+        {
+            int target_plr = NPCFaceNearestPlayer(NPC[A]);
+
+            if(target_plr != 0)
+                NPC[A].Special4 = target_plr;
+        }
 
         if(NPC[A].Location.X != NPC[A].DefaultLocationX)
         {
@@ -3942,10 +3822,43 @@ void SpecialNPC(int A)
             {
                 if(NPC[A].Type != NPCID_LONG_PLANT_UP)
                     NPC[A].Special += 1;
-                if(NPC[A].Special >= 50)
+
+                vbint_t pause_length = (NPC[A].Type == NPCID_FIRE_PLANT) ? 100 : 50;
+                if(NPC[A].Special >= pause_length)
                 {
                     NPC[A].Special2 = 3;
                     NPC[A].Special = 0;
+                }
+                // fire plant shoots fire at middle of pause
+                else if(NPC[A].Type == NPCID_FIRE_PLANT && NPC[A].Special == 50)
+                {
+                    numNPCs++;
+                    NPC[numNPCs].Active = true;
+                    NPC[numNPCs].TimeLeft = 100;
+                    NPC[numNPCs].Direction = NPC[A].Direction;
+                    NPC[numNPCs].Section = NPC[A].Section;
+                    NPC[numNPCs].Type = NPCID_PLANT_FIREBALL;
+                    NPC[numNPCs].Frame = 1;
+                    NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+                    NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+
+                    if(NPC[numNPCs]->TWidth == 16)
+                    {
+                        NPC[numNPCs].Location.X = NPC[A].Location.X + 8;
+                        NPC[numNPCs].Location.Y = NPC[A].Location.Y + 8;
+                    }
+                    else // modified fireball
+                    {
+                        NPC[numNPCs].Location.X = NPC[A].Location.X;
+                        NPC[numNPCs].Location.Y = NPC[A].Location.Y;
+                    }
+
+                    NPCSetSpeedTarget_FixedX(NPC[numNPCs], Player[NPC[A].Special4].Location, 3, 2);
+
+                    NPC[numNPCs].Location.X += NPC[numNPCs].Location.SpeedX * 4;
+                    NPC[numNPCs].Location.Y += NPC[numNPCs].Location.SpeedY * 4;
+
+                    syncLayers_NPC(numNPCs);
                 }
             }
             else if(NPC[A].Special2 == 3)
@@ -3964,7 +3877,9 @@ void SpecialNPC(int A)
             else if(NPC[A].Special2 == 4)
             {
                 NPC[A].Special += 1;
-                if(NPC[A].Special >= 75)
+
+                vbint_t hidden_length = (NPC[A].Type == NPCID_FIRE_PLANT) ? 150 : 75;
+                if(NPC[A].Special >= hidden_length)
                 {
                     bool tempTurn = true;
                     if(!NPC[A].Inert)
@@ -3981,8 +3896,7 @@ void SpecialNPC(int A)
                             }
                         }
                     }
-                    if(NPC[A].Type == NPCID_LONG_PLANT_UP)
-                        tempTurn = true;
+
                     if(tempTurn)
                     {
                         NPC[A].Special2 = 1;
@@ -3994,6 +3908,7 @@ void SpecialNPC(int A)
             }
 
             NPC[A].Location.Height = NPC[A]->THeight - (NPC[A].Location.Y - NPC[A].DefaultLocationY);
+
             if(NPC[A].Location.Height < 0)
                 NPC[A].Location.Height = 0;
             // deferring tree update to end of the NPC physics update
@@ -4003,8 +3918,8 @@ void SpecialNPC(int A)
             else
                 NPC[A].Immune = 0;
         }
-    // down piranha plant
     }
+    // down piranha plant
     else if(NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_LONG_PLANT_DOWN)
     {
         if(NPC[A].Special3 > 0)
