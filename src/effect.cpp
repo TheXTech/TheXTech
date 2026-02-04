@@ -843,6 +843,7 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
     if(numEffects >= maxEffects - 4)
         return false;
 
+    // cases where more than one Effect is spawned
     if(A == EFFID_BLOCK_SMASH || A == EFFID_BLU_BLOCK_SMASH || A == EFFID_SLIDE_BLOCK_SMASH || A == EFFID_BLOCK_S1_SMASH || A == EFFID_GRY_BLOCK_SMASH || A == EFFID_DIRT_BLOCK_SMASH || A == EFFID_ITEM_POD_BREAK) // Block break effect
     {
         for(B = 1; B <= 4; B++)
@@ -893,8 +894,175 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
             ne.Location.SpeedX += (dRand() * 2 - 1) * rand_mul;
             ne.Location.SpeedY += (dRand() * 4 - 2) * rand_mul;
         }
+
+        return true;
     }
-    else if(A == EFFID_MAGIC_BOSS_DIE) // larry shell
+    else if(A == EFFID_BOOT_STOMP || A == EFFID_STOMP_STAR) // "SMW Smashed", combined with "stomp star part 2"
+    {
+        for(B = 1; B <= 4; B++)
+        {
+            if(numEffects < maxEffects)
+            {
+                numEffects++;
+                auto &ne = Effect[numEffects];
+                ne.Shadow = Shadow;
+                ne.Type = A;
+                ne.Location.Width = EffectWidth[A];
+                ne.Location.Height = EffectHeight[A];
+                ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+                ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
+
+                if(A == EFFID_BOOT_STOMP)
+                {
+                    ne.Life = 15;
+                    ne.Location.SpeedX = 4.8_n; // 3 * 0.8; * 2 because SpeedX got applied twice for EFFID_BOOT_STOMP in SMBX 1.3
+                    ne.Location.SpeedY = 2.4_n; // 1.5 * 0.8; * 2 because SpeedY got applied twice for EFFID_BOOT_STOMP in SMBX 1.3
+                }
+                else
+                {
+                    ne.Life = 8;
+                    ne.Location.SpeedX = 2;
+                    ne.Location.SpeedY = 2;
+                }
+
+                if(B == 1 || B == 2)
+                    ne.Location.SpeedY = -ne.Location.SpeedY;
+                if(B == 1 || B == 3)
+                    ne.Location.SpeedX = -ne.Location.SpeedX;
+
+                if(A == EFFID_STOMP_STAR)
+                {
+                    ne.Location.Y += ne.Location.SpeedY * 6;
+                    ne.Location.X += ne.Location.SpeedX * 6;
+                }
+
+                ne.Frame = 0;
+            }
+        }
+
+        return true;
+    }
+    else if(A == EFFID_CHAR3_HEAVY_EXPLODE) // Heart Bomb
+    {
+        for(B = 1; B <= 6; B++)
+        {
+            if(numEffects < maxEffects)
+            {
+                numEffects++;
+                auto &ne = Effect[numEffects];
+                ne.Shadow = Shadow;
+
+                ne.Location.Width = EffectWidth[A];
+                ne.Location.Height = EffectHeight[A];
+                ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+                ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
+
+                if(B == 1 || B == 3 || B == 4 || B == 6)
+                {
+                    ne.Life = 10;
+                    ne.Location.SpeedY = 1.75_n; // 3.5 * 0.5
+                    ne.Location.SpeedX = 1; // 2 * 0.5
+                }
+                else
+                {
+                    ne.Life = 11;
+                    ne.Location.SpeedY = 0;
+                    ne.Location.SpeedX = 2; // 4 * 0.5
+                }
+
+                if(B <= 3)
+                    ne.Location.SpeedX = -ne.Location.SpeedX;
+                if(B == 1 || B == 6)
+                    ne.Location.SpeedY = -ne.Location.SpeedY;
+                if(int(Direction) % 2 == 0)
+                    std::swap(ne.Location.SpeedX, ne.Location.SpeedY);
+
+                ne.Location.X += ne.Location.SpeedX * 3;
+                ne.Location.Y += ne.Location.SpeedY * 3;
+
+                ne.Frame = iRand(4);
+                ne.Type = A;
+            }
+        }
+
+        return true;
+    }
+    else if(A == EFFID_BOMB_S3_EXPLODE) // SMB3 Bomb Part 2
+    {
+        for(B = 1; B <= 6; B++)
+        {
+            if(numEffects < maxEffects)
+            {
+                numEffects++;
+                auto &ne = Effect[numEffects];
+                ne.Shadow = Shadow;
+
+                ne.Location.Width = 16;
+                ne.Location.Height = 16;
+                ne.Location.X = Location.X;
+                ne.Location.Y = Location.Y;
+
+                if(B == 1 || B == 3 || B == 4 || B == 6)
+                {
+                    ne.Location.SpeedY = 4.5_n; // 3 * 1.5
+                    ne.Location.SpeedX = 3; // 2 * 1.5
+                    ne.Life = 14;
+                }
+                else
+                {
+                    ne.Location.SpeedY = 0;
+                    ne.Location.SpeedX = 6; // 4 * 1.5
+                    ne.Life = 13;
+                }
+
+                if(B <= 3)
+                    ne.Location.SpeedX = -ne.Location.SpeedX;
+                if(B == 1 || B == 6)
+                    ne.Location.SpeedY = -ne.Location.SpeedY;
+                if(int(Direction) % 2 == 0)
+                    std::swap(ne.Location.SpeedX, ne.Location.SpeedY);
+
+                // ne.Location.SpeedX = ne.Location.SpeedX * 1.5;
+                // ne.Location.SpeedY = ne.Location.SpeedY * 1.5;
+
+                ne.Frame = Direction;
+                ne.Type = A;
+            }
+        }
+
+        return true;
+    }
+    else if(A == EFFID_COIN_COLLECT) // Coins
+    {
+        for(B = 1; B <= 4; B++)
+        {
+            numEffects++;
+            auto &ne = Effect[numEffects];
+            ne.Shadow = Shadow;
+            ne.Location.Width = EffectWidth[A];
+            ne.Location.Height = EffectHeight[A];
+            ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+            ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
+            ne.Location.SpeedY = 0;
+            ne.Location.SpeedX = 0;
+            if(B == 1)
+                ne.Location.X -= 10;
+            if(B == 3)
+                ne.Location.X += 10;
+            if(B == 2)
+                ne.Location.Y += 16;
+            if(B == 4)
+                ne.Location.Y -= 16;
+            ne.Frame = 0 - B;
+            ne.Life = 20 * B;
+            ne.Type = A;
+        }
+
+        return true;
+    }
+
+
+    if(A == EFFID_MAGIC_BOSS_DIE) // larry shell
     {
         numEffects++;
         auto &ne = Effect[numEffects];
@@ -1197,49 +1365,6 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
         ne.Frame = 0;
         ne.Life = 60;
     }
-    else if(A == EFFID_BOOT_STOMP || A == EFFID_STOMP_STAR) // "SMW Smashed", combined with "stomp star part 2"
-    {
-        for(B = 1; B <= 4; B++)
-        {
-            if(numEffects < maxEffects)
-            {
-                numEffects++;
-                auto &ne = Effect[numEffects];
-                ne.Shadow = Shadow;
-                ne.Type = A;
-                ne.Location.Width = EffectWidth[A];
-                ne.Location.Height = EffectHeight[A];
-                ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
-                ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
-
-                if(A == EFFID_BOOT_STOMP)
-                {
-                    ne.Life = 15;
-                    ne.Location.SpeedX = 4.8_n; // 3 * 0.8; * 2 because SpeedX got applied twice for EFFID_BOOT_STOMP in SMBX 1.3
-                    ne.Location.SpeedY = 2.4_n; // 1.5 * 0.8; * 2 because SpeedY got applied twice for EFFID_BOOT_STOMP in SMBX 1.3
-                }
-                else
-                {
-                    ne.Life = 8;
-                    ne.Location.SpeedX = 2;
-                    ne.Location.SpeedY = 2;
-                }
-
-                if(B == 1 || B == 2)
-                    ne.Location.SpeedY = -ne.Location.SpeedY;
-                if(B == 1 || B == 3)
-                    ne.Location.SpeedX = -ne.Location.SpeedX;
-
-                if(A == EFFID_STOMP_STAR)
-                {
-                    ne.Location.Y += ne.Location.SpeedY * 6;
-                    ne.Location.X += ne.Location.SpeedX * 6;
-                }
-
-                ne.Frame = 0;
-            }
-        }
-    }
     else if(A == EFFID_BOMB_S3_EXPLODE_SEED) // SMB3 Bomb Part 1
     {
         numEffects++;
@@ -1254,93 +1379,6 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
         ne.Frame = 0;
         ne.Life = 46;
         ne.Type = A;
-
-    }
-    else if(A == EFFID_CHAR3_HEAVY_EXPLODE) // Heart Bomb
-    {
-        for(B = 1; B <= 6; B++)
-        {
-            if(numEffects < maxEffects)
-            {
-                numEffects++;
-                auto &ne = Effect[numEffects];
-                ne.Shadow = Shadow;
-
-                ne.Location.Width = EffectWidth[A];
-                ne.Location.Height = EffectHeight[A];
-                ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
-                ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
-
-                if(B == 1 || B == 3 || B == 4 || B == 6)
-                {
-                    ne.Life = 10;
-                    ne.Location.SpeedY = 1.75_n; // 3.5 * 0.5
-                    ne.Location.SpeedX = 1; // 2 * 0.5
-                }
-                else
-                {
-                    ne.Life = 11;
-                    ne.Location.SpeedY = 0;
-                    ne.Location.SpeedX = 2; // 4 * 0.5
-                }
-
-                if(B <= 3)
-                    ne.Location.SpeedX = -ne.Location.SpeedX;
-                if(B == 1 || B == 6)
-                    ne.Location.SpeedY = -ne.Location.SpeedY;
-                if(int(Direction) % 2 == 0)
-                    std::swap(ne.Location.SpeedX, ne.Location.SpeedY);
-
-                ne.Location.X += ne.Location.SpeedX * 3;
-                ne.Location.Y += ne.Location.SpeedY * 3;
-
-                ne.Frame = iRand(4);
-                ne.Type = A;
-            }
-        }
-    }
-    else if(A == EFFID_BOMB_S3_EXPLODE) // SMB3 Bomb Part 2
-    {
-        for(B = 1; B <= 6; B++)
-        {
-            if(numEffects < maxEffects)
-            {
-                numEffects++;
-                auto &ne = Effect[numEffects];
-                ne.Shadow = Shadow;
-
-                ne.Location.Width = 16;
-                ne.Location.Height = 16;
-                ne.Location.X = Location.X;
-                ne.Location.Y = Location.Y;
-
-                if(B == 1 || B == 3 || B == 4 || B == 6)
-                {
-                    ne.Location.SpeedY = 4.5_n; // 3 * 1.5
-                    ne.Location.SpeedX = 3; // 2 * 1.5
-                    ne.Life = 14;
-                }
-                else
-                {
-                    ne.Location.SpeedY = 0;
-                    ne.Location.SpeedX = 6; // 4 * 1.5
-                    ne.Life = 13;
-                }
-
-                if(B <= 3)
-                    ne.Location.SpeedX = -ne.Location.SpeedX;
-                if(B == 1 || B == 6)
-                    ne.Location.SpeedY = -ne.Location.SpeedY;
-                if(int(Direction) % 2 == 0)
-                    std::swap(ne.Location.SpeedX, ne.Location.SpeedY);
-
-                // ne.Location.SpeedX = ne.Location.SpeedX * 1.5;
-                // ne.Location.SpeedY = ne.Location.SpeedY * 1.5;
-
-                ne.Frame = Direction;
-                ne.Type = A;
-            }
-        }
     }
     else if(A == EFFID_DOOR_S2_OPEN || A == EFFID_DOOR_DOUBLE_S3_OPEN
         || A == EFFID_DOOR_SIDE_S3_OPEN || A == EFFID_BIG_DOOR_OPEN) // Door Effect
@@ -1402,32 +1440,6 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
             ne.Frame = 2;
         if(ne.Type == EFFID_EXT_TURTLE_DIE && Direction == 1)
             ne.Frame = 1;
-    }
-    else if(A == EFFID_COIN_COLLECT) // Coins
-    {
-        for(B = 1; B <= 4; B++)
-        {
-            numEffects++;
-            auto &ne = Effect[numEffects];
-            ne.Shadow = Shadow;
-            ne.Location.Width = EffectWidth[A];
-            ne.Location.Height = EffectHeight[A];
-            ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
-            ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
-            ne.Location.SpeedY = 0;
-            ne.Location.SpeedX = 0;
-            if(B == 1)
-                ne.Location.X -= 10;
-            if(B == 3)
-                ne.Location.X += 10;
-            if(B == 2)
-                ne.Location.Y += 16;
-            if(B == 4)
-                ne.Location.Y -= 16;
-            ne.Frame = 0 - B;
-            ne.Life = 20 * B;
-            ne.Type = A;
-        }
     }
     else if(A == EFFID_SMOKE_S3_CENTER || A == EFFID_SMOKE_S3 || A == EFFID_WHIP || A == EFFID_SKID_DUST
         || A == EFFID_WHACK || A == EFFID_SMOKE_S4 || A == EFFID_STOMP_INIT || A == EFFID_SMOKE_S2) // Puff of smoke
