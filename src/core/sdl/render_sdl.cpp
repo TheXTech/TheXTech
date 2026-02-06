@@ -475,7 +475,10 @@ void RenderSDL::updateViewport()
     else
     {
         int logicW = targetW, logicH = (int)(targetW * (float)window_h / (float)window_w);
+
+#if SDL_COMPILEDVERSION >= SDL_VERSIONNUM(2, 0, 22)
         SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_SCALING, "1");
+#endif
 
         if(SDL_RenderSetLogicalSize(m_gRenderer, logicW, logicH) < 0)
         {
