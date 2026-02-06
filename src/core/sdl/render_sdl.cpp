@@ -217,6 +217,8 @@ bool RenderSDL::initRender(SDL_Window *window)
                   info.max_texture_height);
     }
 
+    m_tBufferDisabled = false;
+
     switch(g_config.render_mode)
     {
     case Config_t::RENDER_ACCELERATED_SDL:
@@ -229,7 +231,8 @@ bool RenderSDL::initRender(SDL_Window *window)
             m_gRenderer = SDL_CreateRenderer(window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
             if(m_gRenderer)
                 break; // All okay
-            pLogWarning("Failed to initialize V-Synced renderer, trying to create accelerated renderer...");
+            pLogWarning("Failed to initialize V-Synced renderer (%s), trying to create accelerated renderer...", SDL_GetError());
+            SDL_ClearError();
         }
 
         // continue
@@ -240,7 +243,17 @@ bool RenderSDL::initRender(SDL_Window *window)
         m_gRenderer = SDL_CreateRenderer(window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
         if(m_gRenderer)
             break; // All okay
-        pLogWarning("Failed to initialize accelerated renderer, trying to create a software renderer...");
+
+        pLogWarning("Failed to initialize accelerated renderer with frame buffer (%s), trying to create without target texture...", SDL_GetError());
+        SDL_ClearError();
+
+        m_tBufferDisabled = true;
+        m_gRenderer = SDL_CreateRenderer(window, -1, renderFlags); // Try to make renderer
+        if(m_gRenderer)
+            break; // All okay
+
+        pLogWarning("Failed to initialize accelerated renderer (%s), trying to create a software renderer...", SDL_GetError());
+        SDL_ClearError();
 
         // fallthrough
     case Config_t::RENDER_SOFTWARE:
@@ -251,7 +264,8 @@ bool RenderSDL::initRender(SDL_Window *window)
         if(m_gRenderer)
             break; // All okay
 
-        pLogCritical("Render SDL: Unable to create renderer!");
+        pLogCritical("Render SDL: Unable to create renderer! (%s)", SDL_GetError());
+        SDL_ClearError();
         return false;
     }
 
@@ -275,29 +289,33 @@ bool RenderSDL::initRender(SDL_Window *window)
         XRender::TargetH = m_halfPixelMode ? m_maxTextureHeight << 1 : m_maxTextureHeight;
     }
 
-    m_tBufferDisabled = false;
-    m_tBuffer = SDL_CreateTexture(m_gRenderer,
-                                  DEFAULT_PIXEL_COLOUR_FORMAT,
-                                  SDL_TEXTUREACCESS_TARGET,
-                                  ScaleWidth, ScaleHeight);
-
-    if(!m_tBuffer)
+    if(!m_tBufferDisabled)
     {
-        pLogWarning("Render SDL: Failed to create the normal texture render buffer: %s, trying to create a power-2 texture...", SDL_GetError());
-        m_pow2 = true;
         m_tBuffer = SDL_CreateTexture(m_gRenderer,
                                       DEFAULT_PIXEL_COLOUR_FORMAT,
                                       SDL_TEXTUREACCESS_TARGET,
-                                      pow2roundup(ScaleWidth), pow2roundup(ScaleHeight));
-    }
+                                      ScaleWidth, ScaleHeight);
 
-    if(!m_tBuffer)
-    {
-        m_pow2 = false;
-        pLogWarning("Render SDL: Unable to create texture render buffer: %s", SDL_GetError());
-        pLogDebug("Render SDL: Continue without of render to texture. The ability to resize the window will be disabled.");
-        SDL_SetWindowResizable(window, SDL_FALSE);
-        m_tBufferDisabled = true;
+        if(!m_tBuffer)
+        {
+            pLogWarning("Render SDL: Failed to create the normal texture render buffer: %s, trying to create a power-2 texture...", SDL_GetError());
+            SDL_ClearError();
+            m_pow2 = true;
+            m_tBuffer = SDL_CreateTexture(m_gRenderer,
+                                          DEFAULT_PIXEL_COLOUR_FORMAT,
+                                          SDL_TEXTUREACCESS_TARGET,
+                                          pow2roundup(ScaleWidth), pow2roundup(ScaleHeight));
+        }
+
+        if(!m_tBuffer)
+        {
+            m_pow2 = false;
+            pLogWarning("Render SDL: Unable to create texture render buffer: %s", SDL_GetError());
+            pLogDebug("Render SDL: Continue without of render to texture. The ability to resize the window will be disabled.");
+            SDL_ClearError();
+            SDL_SetWindowResizable(window, SDL_FALSE);
+            m_tBufferDisabled = true;
+        }
     }
 
     if(SDL_GetRendererOutputSize(m_gRenderer, &ret_w, &ret_h) == 0)
@@ -455,7 +473,20 @@ void RenderSDL::updateViewport()
         pLogDebug("Target render size: %d x %d (Max frame buffer size %d x %d)", targetW, targetH, m_maxTextureWidth, m_maxTextureHeight);
     }
     else
+    {
+        int logicW = targetW, logicH = (int)(targetW * (float)window_h / (float)window_w);
+        SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_SCALING, "1");
+
+        if(SDL_RenderSetLogicalSize(m_gRenderer, logicW, logicH) < 0)
+        {
+            pLogWarning("Failed to set up the logical size (%d x %d): %s", logicW, logicH, SDL_GetError());
+            SDL_ClearError();
+        }
+        else
+            pLogDebug("Logic resolution: %d x %d", logicW, logicH);
+
         pLogDebug("Target render size: %d x %d (direct render)", targetW, targetH);
+    }
 
 
     float scale_x = (float)render_w / XRender::TargetW;
