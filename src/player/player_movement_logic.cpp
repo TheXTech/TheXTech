@@ -765,11 +765,11 @@ void PlayerMovementY(int A)
         Player[A].DoubleJump = false;
 
     // double jump code
-    if(Player[A].DoubleJump && Player[A].Jump == 0 && !is_supported && !Player[A].Fairy && !Player[A].CanFly2 && Player[A].JumpRelease)
+    if(Player[A].DoubleJump && Player[A].Jump == 0 && !is_supported && !Player[A].Fairy && !Player[A].CanFly2)
     {
-        if(Player[A].State == PLR_STATE_CYCLONE && (Player[A].Controls.Jump || Player[A].Controls.AltJump))
+        if(Player[A].State == PLR_STATE_CYCLONE)
         {
-            if(!Player[A].Mount)
+            if(!Player[A].Mount && Player[A].Controls.AltJump && Player[A].CanAltJump)
             {
                 PlaySoundSpatial(SFX_Whip, Player[A].Location);
                 Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
@@ -783,7 +783,7 @@ void PlayerMovementY(int A)
                 }
             }
         }
-        else if(Player[A].Controls.Jump)
+        else if(Player[A].Controls.Jump && Player[A].JumpRelease)
         {
             PlaySoundSpatial(SFX_Jump, Player[A].Location);
             Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
