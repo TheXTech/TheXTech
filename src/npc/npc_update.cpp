@@ -807,6 +807,8 @@ interrupt_Activation:
             // essential part of Deactivate(A);
             NPC[A].Location.X = NPC[A].DefaultLocationX;
             NPC[A].Location.Y = NPC[A].DefaultLocationY;
+            NPC[A].Location.SpeedX = 0;
+            NPC[A].Location.SpeedY = 0;
         }
     }
 
