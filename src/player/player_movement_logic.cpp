@@ -755,7 +755,7 @@ void PlayerMovementY(int A)
 
     bool is_supported = (Player[A].StandingOnNPC != 0 || Player[A].Slope != 0 || Player[A].Location.SpeedY == 0 || Player[A].Wet || Player[A].Vine || Player[A].WetFrame);
     // cyclone: allow double jump as save after falling off cliff
-    if(Player[A].State == PLR_STATE_CYCLONE && (!Player[A].SpinJump || Player[A].HoldingNPC))
+    if(Player[A].State == PLR_STATE_CYCLONE && !Player[A].SpinJump)
     {
         if(is_supported)
             Player[A].DoubleJump = true;
@@ -769,7 +769,7 @@ void PlayerMovementY(int A)
     {
         if(Player[A].State == PLR_STATE_CYCLONE && (Player[A].Controls.Jump || Player[A].Controls.AltJump))
         {
-            if(!Player[A].Mount && !Player[A].HoldingNPC)
+            if(!Player[A].Mount)
             {
                 PlaySoundSpatial(SFX_Whip, Player[A].Location);
                 Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
@@ -1025,7 +1025,7 @@ void PlayerMovementY(int A)
                 Player[A].Location.SpeedY += Physics.PlayerGravity;
 
             bool has_fly_block = (Player[A].HoldingNPC > 0) && (NPC[Player[A].HoldingNPC].Type == NPCID_FLY_BLOCK || NPC[Player[A].HoldingNPC].Type == NPCID_FLY_CANNON);
-            bool no_cyclone_glide = (Player[A].Location.SpeedY >= 0) && (Player[A].Mount || Player[A].HoldingNPC) && !Player[A].GroundPound; // glide down in cases where player can't cyclone
+            bool no_cyclone_glide = (Player[A].Location.SpeedY >= 0) && Player[A].Mount && !Player[A].GroundPound; // glide down in cases where player can't cyclone
 
             if(Player[A].State == PLR_STATE_CYCLONE && (!Player[A].DoubleJump || no_cyclone_glide))
             {
