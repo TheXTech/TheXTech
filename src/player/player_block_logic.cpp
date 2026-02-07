@@ -542,7 +542,27 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                     }
                                 }
 
-                                if(floorBlock == 0) // For walking
+                                bool player_drill = (Player[A].State == PLR_STATE_CYCLONE && !Player[A].DoubleJump && Player[A].Controls.Down && Player[A].Location.SpeedY > Physics.PlayerTerminalVelocity * 0.9_n);
+                                if(player_drill && BlockIsBreakable(Block[B]) && Block[B].Type != 90)
+                                {
+                                    BlockHitHard(B);
+                                }
+                                else if(player_drill)
+                                {
+                                    if(Block[B].Special)
+                                    {
+                                        BlockHit(B, true, A);
+                                        PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
+                                    }
+
+                                    player_drill = false;
+                                }
+
+                                if(player_drill)
+                                {
+                                    // just keep going down
+                                }
+                                else if(floorBlock == 0) // For walking
                                 {
                                     floorBlock = B;
                                     floorLocation = Block[B].Location;
