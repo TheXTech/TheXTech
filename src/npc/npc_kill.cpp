@@ -556,24 +556,7 @@ resume_TriggerLast:
         }
         else if(NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_STONE_S4) // thwomp
         {
-            if(B == 3 || B == 4 || B == 2)
-            {
-                PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
-                NPC[A].Location.SpeedY = -10;
-                if(NPC[A].Type == NPCID_STONE_S3)
-                    NewEffect(EFFID_STONE_S3_DIE, NPC[A].Location);
-                else if(NPC[A].Type == NPCID_SAW)
-                {
-                    NPC[A].Location.Width = 64;
-                    NPC[A].Location.Height = 64;
-                    NPC[A].Location.X -= 8;
-                    NPC[A].Location.Y -= 8;
-                    NewEffect(EFFID_SAW_DIE, NPC[A].Location);
-                }
-                else if(NPC[A].Type == NPCID_STONE_S4)
-                    NewEffect(EFFID_STONE_S4_DIE, NPC[A].Location);
-            }
-            else if(B == 6)
+            if(B == 6)
             {
                 NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
                 NPC[A].Location.Y = NPC_BottomY - 32;
@@ -593,6 +576,15 @@ resume_TriggerLast:
                 NPC[A].Location.X -= 8;
                 NPC[A].Location.Y -= 8;
                 NewEffect(EFFID_SAW_DIE, NPC[A].Location);
+            }
+            else if(B == 3 || B == 4 || B == 2)
+            {
+                PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
+                NPC[A].Location.SpeedY = -10;
+                if(NPC[A].Type == NPCID_STONE_S3)
+                    NewEffect(EFFID_STONE_S3_DIE, NPC[A].Location);
+                else if(NPC[A].Type == NPCID_STONE_S4)
+                    NewEffect(EFFID_STONE_S4_DIE, NPC[A].Location);
             }
         }
         else if(NPC[A].Type == NPCID_WALK_BOMB_S3 || NPC[A].Type == NPCID_LIT_BOMB_S3)
