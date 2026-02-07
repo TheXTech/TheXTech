@@ -320,23 +320,23 @@ resume_TriggerLast:
             if(B == 1 && NPC[A].Type != NPCID_GRN_FISH_S3 && NPC[A].Type != NPCID_YEL_FISH_S4 && NPC[A].Type != NPCID_RED_FISH_S3 && NPC[A].Type != NPCID_GRN_FISH_S4 && NPC[A].Type != NPCID_GRN_FISH_S1 && NPC[A].Type != NPCID_BONE_FISH)
             {
                 if(NPC[A].Type == NPCID_FODDER_S3)
-                    NewEffect(EFFID_FODDER_S3_SQUISH, NPC[A].Location);
+                    NewEffect_NpcSquish(EFFID_FODDER_S3_SQUISH, NPC[A]);
                 else if(NPC[A].Type == NPCID_FODDER_S5)
-                    NewEffect(EFFID_FODDER_S5_SQUISH, NPC[A].Location);
+                    NewEffect_NpcSquish(EFFID_FODDER_S5_SQUISH, NPC[A]);
                 else if(NPC[A].Type == NPCID_SQUID_S1 && g_config.fix_squid_stomp_effect)
                 {
                     NPC[A].Location.SpeedY = 0.123_n;
-                    NewEffect(EFFID_SQUID_S1_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_SQUID_S1_DIE, NPC[A]);
                     PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
                 }
                 else if(NPC[A].Type == NPCID_SQUID_S3 && g_config.fix_squid_stomp_effect)
                 {
                     NPC[A].Location.SpeedY = 0.123_n;
-                    NewEffect(EFFID_SQUID_S3_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_SQUID_S3_DIE, NPC[A]);
                     PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
                 }
                 else
-                    NewEffect(EFFID_BRUTE_SQUISH, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcSquish(EFFID_BRUTE_SQUISH, NPC[A]);
             }
             else if(B == 6)
             {
@@ -360,68 +360,69 @@ resume_TriggerLast:
                     PlaySoundSpatial(SFX_Icebreak, NPC[A].Location);
                 else
                     PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
+
                 if(NPC[A].Type == NPCID_FODDER_S3 || NPC[A].Type == NPCID_FLY_FODDER_S3)
-                    NewEffect(EFFID_FODDER_S3_DIE, NPC[A].Location);
+                    NewEffect_NpcDie(EFFID_FODDER_S3_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_FODDER_S5 || NPC[A].Type == NPCID_FLY_FODDER_S5)
-                    NewEffect(EFFID_FODDER_S5_DIE, NPC[A].Location);
+                    NewEffect_NpcDie(EFFID_FODDER_S5_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_SQUID_S3)
-                    NewEffect(EFFID_SQUID_S3_DIE, NPC[A].Location);
+                    NewEffect_NpcDie(EFFID_SQUID_S3_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_SQUID_S1)
-                    NewEffect(EFFID_SQUID_S1_DIE, NPC[A].Location);
+                    NewEffect_NpcDie(EFFID_SQUID_S1_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_BRUTE)
-                    NewEffect(EFFID_BRUTE_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_BRUTE_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_BIG_GUY)
-                    NewEffect(EFFID_BIG_GUY_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_BIG_GUY_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_BRUTE_SQUISHED)
-                    NewEffect(EFFID_BRUTE_SQUISHED_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_BRUTE_SQUISHED_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_GRN_FISH_S3)
                 {
                     NPC[A].Location.SpeedY = -11;
                     if(B == 1)
                         NPC[A].Location.SpeedY = -2;
-                    NewEffect(EFFID_GRN_FISH_S3_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_GRN_FISH_S3_DIE, NPC[A]);
                 }
                 else if(NPC[A].Type == NPCID_YEL_FISH_S4)
                 {
                     NPC[A].Location.SpeedY = -11;
                     if(B == 1)
                         NPC[A].Location.SpeedY = -2;
-                    NewEffect(EFFID_YEL_FISH_S4_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_YEL_FISH_S4_DIE, NPC[A]);
                 }
                 else if(NPC[A].Type == NPCID_RED_FISH_S3)
                 {
                     NPC[A].Location.SpeedY = -11;
                     if(B == 1)
                         NPC[A].Location.SpeedY = -2;
-                    NewEffect(EFFID_RED_FISH_S3_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_RED_FISH_S3_DIE, NPC[A]);
                 }
                 else if(NPC[A].Type == NPCID_GRN_FISH_S4)
                 {
                     NPC[A].Location.SpeedY = -11;
                     if(B == 1)
                         NPC[A].Location.SpeedY = -2;
-                    NewEffect(EFFID_GRN_FISH_S4_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_GRN_FISH_S4_DIE, NPC[A]);
                 }
                 else if(NPC[A].Type == NPCID_GRN_FISH_S1)
                 {
                     NPC[A].Location.SpeedY = -11;
                     if(B == 1)
                         NPC[A].Location.SpeedY = -2;
-                    NewEffect(EFFID_GRN_FISH_S1_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_GRN_FISH_S1_DIE, NPC[A]);
                 }
                 else if(NPC[A].Type == NPCID_BONE_FISH)
                 {
                     NPC[A].Location.SpeedY = -11;
                     if(B == 1)
                         NPC[A].Location.SpeedY = -2;
-                    NewEffect(EFFID_BONE_FISH_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_BONE_FISH_DIE, NPC[A]);
                 }
                 else if(NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_ICE_CUBE)
                 {
                     s_makeSparkles(NPC[A], 2, 3);
                 }
                 else
-                    NewEffect(EFFID_CARRY_FODDER_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_CARRY_FODDER_DIE, NPC[A]);
             }
         }
         else if(NPC[A].Type == NPCID_FLIER || NPC[A].Type == NPCID_ROCKET_FLIER || NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPCID_HOMING_BALL)
@@ -446,21 +447,21 @@ resume_TriggerLast:
             PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
             NPC[A].Location.SpeedY = -10;
             if(NPC[A].Type == NPCID_GHOST_S3)
-                NewEffect(EFFID_GHOST_S3_DIE, NPC[A].Location, NPC[A].Direction);
+                NewEffect_NpcDie(EFFID_GHOST_S3_DIE, NPC[A]);
             else if(NPC[A].Type == NPCID_GHOST_FAST)
-                NewEffect(EFFID_GHOST_FAST_DIE, NPC[A].Location, NPC[A].Direction);
+                NewEffect_NpcDie(EFFID_GHOST_FAST_DIE, NPC[A]);
             else if(NPC[A].Type == NPCID_GHOST_S4)
-                NewEffect(EFFID_GHOST_S4_DIE, NPC[A].Location, NPC[A].Direction);
+                NewEffect_NpcDie(EFFID_GHOST_S4_DIE, NPC[A]);
             else if(NPC[A].Type == NPCID_WALL_SPARK)
-                NewEffect(EFFID_WALL_SPARK_DIE, NPC[A].Location);
+                NewEffect_NpcDie(EFFID_WALL_SPARK_DIE, NPC[A]);
             else if(NPC[A].Type == NPCID_FIRE_DISK)
             {
-                NewEffect(EFFID_FIRE_DISK_DIE, NPC[A].Location);
+                NewEffect_NpcDie(EFFID_FIRE_DISK_DIE, NPC[A]);
                 Effect[numEffects].Frame = NPC[A].Frame;
                 Effect[numEffects].Life = 100;
             }
             else
-                NewEffect(EFFID_BIG_GHOST_DIE, NPC[A].Location, NPC[A].Direction);
+                NewEffect_NpcDie(EFFID_BIG_GHOST_DIE, NPC[A]);
         }
         else if(NPC[A].Type == NPCID_CHASER) // bully
         {
@@ -484,7 +485,7 @@ resume_TriggerLast:
             else
             {
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
-                NewEffect(EFFID_CHASER_DIE, NPC[A].Location, NPC[A].Direction);
+                NewEffect_NpcDie(EFFID_CHASER_DIE, NPC[A]);
             }
 
         }
@@ -575,16 +576,16 @@ resume_TriggerLast:
                 NPC[A].Location.Height = 64;
                 NPC[A].Location.X -= 8;
                 NPC[A].Location.Y -= 8;
-                NewEffect(EFFID_SAW_DIE, NPC[A].Location);
+                NewEffect_NpcDie(EFFID_SAW_DIE, NPC[A]);
             }
             else if(B == 3 || B == 4 || B == 2)
             {
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
                 NPC[A].Location.SpeedY = -10;
                 if(NPC[A].Type == NPCID_STONE_S3)
-                    NewEffect(EFFID_STONE_S3_DIE, NPC[A].Location);
+                    NewEffect_NpcDie(EFFID_STONE_S3_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_STONE_S4)
-                    NewEffect(EFFID_STONE_S4_DIE, NPC[A].Location);
+                    NewEffect_NpcDie(EFFID_STONE_S4_DIE, NPC[A]);
             }
         }
         else if(NPC[A].Type == NPCID_WALK_BOMB_S3 || NPC[A].Type == NPCID_LIT_BOMB_S3)
@@ -605,13 +606,13 @@ resume_TriggerLast:
             {
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
                 NPC[A].Location.SpeedY = -11;
-                NewEffect(EFFID_WALK_BOMB_S3_DIE, NPC[A].Location, NPC[A].Direction);
+                NewEffect_NpcDie(EFFID_WALK_BOMB_S3_DIE, NPC[A]);
             }
         }
         else if(NPC[A].Type == NPCID_FODDER_S1) // SMB1 Goomba
         {
             if(B == 1)
-                NewEffect(EFFID_FODDER_S1_SQUISH, NPC[A].Location);
+                NewEffect_NpcSquish(EFFID_FODDER_S1_SQUISH, NPC[A]);
             else if(B == 6)
             {
                 PlaySoundSpatial(SFX_Lava, NPC[A].Location);
@@ -627,7 +628,7 @@ resume_TriggerLast:
             else
             {
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
-                NewEffect(EFFID_FODDER_S1_DIE, NPC[A].Location);
+                NewEffect_NpcDie(EFFID_FODDER_S1_DIE, NPC[A]);
             }
         // Zelda NPCs
         }
@@ -645,7 +646,7 @@ resume_TriggerLast:
         {
             if(B == 1)
             {
-                NewEffect((EFFID)((NPC[A].Type - NPCID_YELSWITCH_FODDER) + EFFID_YELSWITCH_FODDER_SQUISH), NPC[A].Location);
+                NewEffect_NpcSquish((EFFID)((NPC[A].Type - NPCID_YELSWITCH_FODDER) + EFFID_YELSWITCH_FODDER_SQUISH), NPC[A]);
             }
             else if(B == 6)
             {
@@ -662,7 +663,7 @@ resume_TriggerLast:
             else
             {
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
-                NewEffect((EFFID)((NPC[A].Type - NPCID_YELSWITCH_FODDER) + EFFID_YELSWITCH_FODDER_DIE), NPC[A].Location);
+                NewEffect_NpcDie((EFFID)((NPC[A].Type - NPCID_YELSWITCH_FODDER) + EFFID_YELSWITCH_FODDER_DIE), NPC[A]);
             }
         }
         else if(NPC[A].Type == NPCID_MAGIC_BOSS || NPC[A].Type == NPCID_MAGIC_BOSS_SHELL || NPC[A].Type == NPCID_FIRE_BOSS || NPC[A].Type == NPCID_FIRE_BOSS_SHELL) // larry koopa
@@ -703,7 +704,7 @@ resume_TriggerLast:
                 NPC[A].Location.SpeedY = -7;
                 if(NPC[A].Type == NPCID_BOMBER_BOSS)
                 {
-                    NewEffect(EFFID_BOMBER_BOSS_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_BOMBER_BOSS_DIE, NPC[A]);
                     Effect[numEffects].Location.SpeedX = 0;
                     Effect[numEffects].Location.SpeedY = -8;
                 }
@@ -729,7 +730,7 @@ resume_TriggerLast:
             {
                 // .Location.Width += 2
                 // .Location.X += -1
-                NewEffect(EFFID_VILLAIN_S1_DIE, NPC[A].Location, NPC[A].Direction);
+                NewEffect_NpcDie(EFFID_VILLAIN_S1_DIE, NPC[A]);
             }
             PlaySoundSpatial(SFX_VillainKilled, NPC[A].Location);
         }
@@ -751,7 +752,7 @@ resume_TriggerLast:
             {
                 NPC[A].Location.Width += 2;
                 NPC[A].Location.X -= 1;
-                NewEffect(EFFID_VILLAIN_S3_DIE, NPC[A].Location, NPC[A].Direction);
+                NewEffect_NpcDie(EFFID_VILLAIN_S3_DIE, NPC[A]);
             }
             PlaySoundSpatial(SFX_VillainKilled, NPC[A].Location);
 
@@ -778,7 +779,7 @@ resume_TriggerLast:
         else if(NPC[A].Type == NPCID_RED_FODDER || NPC[A].Type == NPCID_RED_FLY_FODDER) // Red goomba
         {
             if(B == 1)
-                NewEffect(EFFID_RED_FODDER_SQUISH, NPC[A].Location);
+                NewEffect_NpcSquish(EFFID_RED_FODDER_SQUISH, NPC[A]);
             else if(B == 6)
             {
                 PlaySoundSpatial(SFX_Lava, NPC[A].Location);
@@ -794,7 +795,7 @@ resume_TriggerLast:
             else
             {
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
-                NewEffect(EFFID_RED_FODDER_DIE, NPC[A].Location);
+                NewEffect_NpcDie(EFFID_RED_FODDER_DIE, NPC[A]);
             }
         }
         else if(NPCIsToad(NPC[A])) // toad
@@ -851,7 +852,7 @@ resume_TriggerLast:
         else if(NPC[A].Type == NPCID_BIG_FODDER) // giagnormous goomba
         {
             if(B == 1)
-                NewEffect(EFFID_BIG_FODDER_SQUISH, NPC[A].Location);
+                NewEffect_NpcSquish(EFFID_BIG_FODDER_SQUISH, NPC[A]);
             else if(B == 6)
             {
                 NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_SMOKE_S3] / 2;
@@ -871,13 +872,13 @@ resume_TriggerLast:
             else
             {
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
-                NewEffect(EFFID_BIG_FODDER_DIE, NPC[A].Location);
+                NewEffect_NpcDie(EFFID_BIG_FODDER_DIE, NPC[A]);
             }
         }
         else if(NPC[A].Type == NPCID_UNDER_FODDER) // Grey goomba
         {
             if(B == 1)
-                NewEffect(EFFID_UNDER_FODDER_SQUISH, NPC[A].Location);
+                NewEffect_NpcSquish(EFFID_UNDER_FODDER_SQUISH, NPC[A]);
             else if(B == 6)
             {
                 PlaySoundSpatial(SFX_Lava, NPC[A].Location);
@@ -895,13 +896,13 @@ resume_TriggerLast:
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
                 if(B != 5)
                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
-                NewEffect(EFFID_UNDER_FODDER_DIE, NPC[A].Location);
+                NewEffect_NpcDie(EFFID_UNDER_FODDER_DIE, NPC[A]);
             }
         }
         else if(NPC[A].Type == NPCID_EXT_TURTLE) // nekkid koopa
         {
             if(B == 1)
-                NewEffect(EFFID_EXT_TURTLE_SQUISH, NPC[A].Location);
+                NewEffect_NpcSquish(EFFID_EXT_TURTLE_SQUISH, NPC[A]);
             else if(B == 6)
             {
                 PlaySoundSpatial(SFX_Lava, NPC[A].Location);
@@ -919,7 +920,7 @@ resume_TriggerLast:
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
                 if(B != 5)
                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
-                NewEffect(EFFID_EXT_TURTLE_DIE, NPC[A].Location, NPC[A].Direction);
+                NewEffect_NpcDie(EFFID_EXT_TURTLE_DIE, NPC[A]);
             }
         }
         else if(NPC[A].Type == NPCID_SKELETON) // Dry Bones
@@ -940,14 +941,14 @@ resume_TriggerLast:
                 NPC[A].Location.Width = 48;
                 NPC[A].Location.X -= 8;
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
-                NewEffect(EFFID_SKELETON_DIE, NPC[A].Location, NPC[A].Direction);
+                NewEffect_NpcDie(EFFID_SKELETON_DIE, NPC[A]);
             }
         }
         else if(NPC[A].Type >= NPCID_GRN_HIT_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_HIT_TURTLE_S4) // SMW Beach Koopas
         {
             if(B == 1)
             {
-                NewEffect(EFFID_HIT_TURTLE_S4_SQUISH, NPC[A].Location);
+                NewEffect_NpcSquish(EFFID_HIT_TURTLE_S4_SQUISH, NPC[A]);
                 Effect[numEffects].Frame = NPC[A].Type - NPCID_GRN_HIT_TURTLE_S4;
             }
             else if(B == 6)
@@ -967,7 +968,7 @@ resume_TriggerLast:
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
                 if(B != 5)
                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
-                NewEffect(EFFID_HIT_TURTLE_S4_DIE, NPC[A].Location, NPC[A].Direction);
+                NewEffect_NpcDie(EFFID_HIT_TURTLE_S4_DIE, NPC[A]);
                 Effect[numEffects].Frame = (NPC[A].Type - NPCID_GRN_HIT_TURTLE_S4) * 4;
                 if(NPC[A].Direction == 1)
                     Effect[numEffects].Frame += 2;
@@ -994,7 +995,7 @@ resume_TriggerLast:
             else
             {
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
-                NewEffect(EFFID_GRN_SHELL_S3_DIE, NPC[A].Location);
+                NewEffect_NpcDie(EFFID_GRN_SHELL_S3_DIE, NPC[A]);
             }
         }
         else if(NPC[A].Type == NPCID_WALL_TURTLE) // spike top
@@ -1040,7 +1041,7 @@ resume_TriggerLast:
             else
             {
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
-                NewEffect(EFFID_GRN_SHELL_S1_DIE, NPC[A].Location);
+                NewEffect_NpcDie(EFFID_GRN_SHELL_S1_DIE, NPC[A]);
             }
         }
         else if(NPC[A].Type == NPCID_RED_SHELL_S1 || NPC[A].Type == NPCID_RED_TURTLE_S1 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S1) // smb1 red Koopa
@@ -1064,7 +1065,7 @@ resume_TriggerLast:
             else
             {
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
-                NewEffect(EFFID_RED_SHELL_S1_DIE, NPC[A].Location);
+                NewEffect_NpcDie(EFFID_RED_SHELL_S1_DIE, NPC[A]);
             }
         }
         else if(NPC[A].Type == NPCID_EARTHQUAKE_BLOCK)
@@ -1104,7 +1105,7 @@ resume_TriggerLast:
                 NPC[A].Location.X = NPC_CenterX - EffectWidth[EFFID_GRN_SHELL_S3_DIE] * 0.5_n;
                 NPC[A].Location.Y = NPC_CenterY - EffectHeight[EFFID_GRN_SHELL_S3_DIE] * 0.5_n;
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
-                NewEffect(EFFID_BIG_SHELL_DIE, NPC[A].Location);
+                NewEffect_NpcDie(EFFID_BIG_SHELL_DIE, NPC[A]);
             }
         }
         else if(NPC[A].Type == NPCID_SPIT_BOSS) // Birdo
@@ -1162,13 +1163,13 @@ resume_TriggerLast:
 
             NPC[A].Location.Y += -NPC[A].Location.Height / 2 + 32;
             NPC[A].Location.X += -NPC[A].Location.Width / 2 + 20;
-            NewEffect(EFFID_SPIT_BOSS_DIE, NPC[A].Location, NPC[A].Direction);
+            NewEffect_NpcDie(EFFID_SPIT_BOSS_DIE, NPC[A]);
         }
         else if(NPC[A].Type == NPCID_SPIT_BOSS_BALL) // Egg
         {
             if(NPC[A].Special == 1)
                 NPC[A].Location.SpeedY = -5.1_n;
-            NewEffect(EFFID_SPIT_BOSS_BALL_DIE, NPC[A].Location);
+            NewEffect_NpcDie(EFFID_SPIT_BOSS_BALL_DIE, NPC[A]);
         }
         else if(NPC[A].Type == NPCID_RED_TURTLE_S3 || NPC[A].Type == NPCID_RED_SHELL_S3 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S3) // Red Koopa
         {
@@ -1191,7 +1192,7 @@ resume_TriggerLast:
             else
             {
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
-                NewEffect(EFFID_RED_SHELL_S3_DIE, NPC[A].Location);
+                NewEffect_NpcDie(EFFID_RED_SHELL_S3_DIE, NPC[A]);
             }
 
         }
@@ -1243,15 +1244,15 @@ resume_TriggerLast:
             {
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
                 if(NPC[A].Type == NPCID_SPIKY_S3)
-                    NewEffect(EFFID_SPIKY_S3_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_SPIKY_S3_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_SPIKY_S4 || NPC[A].Type == NPCID_SPIKY_BALL_S4)
-                    NewEffect(EFFID_SPIKY_S4_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_SPIKY_S4_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_CRAB)
-                    NewEffect(EFFID_CRAB_DIE, NPC[A].Location);
+                    NewEffect_NpcDie(EFFID_CRAB_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_FLY)
-                    NewEffect(EFFID_FLY_DIE, NPC[A].Location);
+                    NewEffect_NpcDie(EFFID_FLY_DIE, NPC[A]);
                 else
-                    NewEffect(EFFID_GLASS_SHELL_DIE, NPC[A].Location);
+                    NewEffect_NpcDie(EFFID_GLASS_SHELL_DIE, NPC[A]);
             }
         }
         else if(NPC[A].Type == NPCID_HEAVY_THROWN) // Hammer
@@ -1404,9 +1405,9 @@ resume_TriggerLast:
                 if(B == 3 || B == 2)
                     PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
                 if(NPC[A].Type == NPCID_BULLET)
-                    NewEffect(EFFID_BULLET_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_BULLET_DIE, NPC[A]);
                 else
-                    NewEffect(EFFID_BIG_BULLET_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_BIG_BULLET_DIE, NPC[A]);
             }
         }
         else if(NPC[A].Type == NPCID_STACKER || NPC[A].Type == NPCID_BLU_GUY || NPC[A].Type == NPCID_RED_GUY || NPC[A].Type == NPCID_JUMPER_S3 || NPC[A].Type == NPCID_RED_FISH_S1 || NPC[A].Type == NPCID_HEAVY_THROWER || NPC[A].Type == NPCID_SPIKY_THROWER || NPC[A].Type == NPCID_ITEM_THROWER || NPC[A].Type == NPCID_SPIKY_BALL_S3 || NPC[A].Type == NPCID_JUMPER_S4 || NPC[A].Type == NPCID_BAT || (NPC[A].Type >= NPCID_BIRD && NPC[A].Type <= NPCID_GRY_SPIT_GUY) || NPC[A].Type == NPCID_CARRY_BUDDY || NPC[A].Type == NPCID_WALK_PLANT || NPC[A].Type == NPCID_VINE_BUG) // Misc Things
@@ -1429,26 +1430,26 @@ resume_TriggerLast:
                 if(NPC[A].Type >= NPCID_BIRD && NPC[A].Type <= NPCID_GRY_SPIT_GUY)
                     NewEffect((EFFID)((NPC[A].Type - NPCID_BIRD) + EFFID_BIRD_DIE), NPC[A].Location, NPC[A].Direction);
                 else if(NPC[A].Type == NPCID_BLU_GUY)
-                    NewEffect(EFFID_RED_GUY_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_RED_GUY_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_RED_GUY)
-                    NewEffect(EFFID_BLU_GUY_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_BLU_GUY_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_WALK_PLANT)
-                    NewEffect(EFFID_WALK_PLANT_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_WALK_PLANT_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_JUMPER_S3)
-                    NewEffect(EFFID_JUMPER_S3_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_JUMPER_S3_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_RED_FISH_S1)
                 {
                     NPC[A].Location.SpeedY = -11;
                     if(NPC[A].Killed == 1)
                         NPC[A].Location.SpeedY = 0;
-                    NewEffect(EFFID_RED_FISH_S1_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_RED_FISH_S1_DIE, NPC[A]);
                 }
                 else if(NPC[A].Type == NPCID_CARRY_BUDDY)
-                    NewEffect(EFFID_CARRY_BUDDY_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_CARRY_BUDDY_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_STACKER)
-                    NewEffect(EFFID_STACKER_DIE, NPC[A].Location);
+                    NewEffect_NpcDie(EFFID_STACKER_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_VINE_BUG)
-                    NewEffect(EFFID_VINE_BUG_DIE, NPC[A].Location);
+                    NewEffect_NpcDie(EFFID_VINE_BUG_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_JUMPER_S4)
                 {
                     if(B == 1)
@@ -1463,7 +1464,7 @@ resume_TriggerLast:
                         PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
                     }
 
-                    NewEffect(EFFID_JUMPER_S4_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_JUMPER_S4_DIE, NPC[A]);
                 }
                 else if(NPC[A].Type == NPCID_BAT)
                 {
@@ -1478,7 +1479,7 @@ resume_TriggerLast:
                         PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
                     }
 
-                    NewEffect(EFFID_BAT_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_BAT_DIE, NPC[A]);
                 }
                 else if(NPC[A].Type == NPCID_HEAVY_THROWER)
                 {
@@ -1494,10 +1495,10 @@ resume_TriggerLast:
                         PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
                     }
 
-                    NewEffect(EFFID_HEAVY_THROWER_DIE, NPC[A].Location, NPC[A].Direction);
+                    NewEffect_NpcDie(EFFID_HEAVY_THROWER_DIE, NPC[A]);
                 }
                 else if(NPC[A].Type == NPCID_SPIKY_BALL_S3)
-                    NewEffect(EFFID_SPIKY_BALL_S3_DIE, NPC[A].Location);
+                    NewEffect_NpcDie(EFFID_SPIKY_BALL_S3_DIE, NPC[A]);
                 else if(NPC[A].Type == NPCID_SPIKY_THROWER || NPC[A].Type == NPCID_ITEM_THROWER)
                 {
                     if(NPC[A].Location.SpeedX > 4)
@@ -1518,11 +1519,11 @@ resume_TriggerLast:
                     }
 
                     if(NPC[A].Type == NPCID_ITEM_THROWER)
-                        NewEffect(EFFID_ITEM_THROWER_DIE, NPC[A].Location);
+                        NewEffect_NpcDie(EFFID_ITEM_THROWER_DIE, NPC[A]);
                     else
                     {
                         NPC[A].Location.Y -= 14;
-                        NewEffect(EFFID_SPIKY_THROWER_DIE, NPC[A].Location);
+                        NewEffect_NpcDie(EFFID_SPIKY_THROWER_DIE, NPC[A]);
                     }
                 }
 

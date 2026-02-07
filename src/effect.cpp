@@ -982,8 +982,10 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
                     ne.Location.SpeedX = -ne.Location.SpeedX;
                 if(B == 1 || B == 6)
                     ne.Location.SpeedY = -ne.Location.SpeedY;
-                if(int(Direction) % 2 == 0)
-                    std::swap(ne.Location.SpeedX, ne.Location.SpeedY);
+
+                // Note: Direction was always the default value of 1 in SMBX 1.3
+                // if(int(Direction) % 2 == 0)
+                //     std::swap(ne.Location.SpeedX, ne.Location.SpeedY);
 
                 ne.Location.X += ne.Location.SpeedX * 3;
                 ne.Location.Y += ne.Location.SpeedY * 3;
@@ -1027,8 +1029,10 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
                     ne.Location.SpeedX = -ne.Location.SpeedX;
                 if(B == 1 || B == 6)
                     ne.Location.SpeedY = -ne.Location.SpeedY;
-                if(int(Direction) % 2 == 0)
-                    std::swap(ne.Location.SpeedX, ne.Location.SpeedY);
+
+                // Note: Direction was always the default value of 1 in SMBX 1.3
+                // if(int(Direction) % 2 == 0)
+                //     std::swap(ne.Location.SpeedX, ne.Location.SpeedY);
 
                 // ne.Location.SpeedX = ne.Location.SpeedX * 1.5;
                 // ne.Location.SpeedY = ne.Location.SpeedY * 1.5;
@@ -1639,6 +1643,21 @@ void NewEffect_IceSparkle(const NPC_t& n, Location_t& tempLocation)
     tempLocation.X = n.Location.X - tempLocation.Width / 2 + dRand().times(n.Location.Width) - 4;
     tempLocation.Y = n.Location.Y - tempLocation.Height / 2 + dRand().times(n.Location.Height) - 4;
     NewEffect(EFFID_SPARKLE, tempLocation, 1, n.Shadow);
+}
+
+bool NewEffect_NpcDeath(EFFID legacy_effect, const NPC_t& n, EFFID generic_effect)
+{
+    return NewEffect(legacy_effect, n.Location, n.Direction, n.Shadow);
+}
+
+bool NewEffect_NpcDie(EFFID legacy_effect, const NPC_t& n)
+{
+    return NewEffect_NpcDeath(legacy_effect, n, EFFID_GENERIC_NPC_DIE);
+}
+
+bool NewEffect_NpcSquish(EFFID legacy_effect, const NPC_t& n)
+{
+    return NewEffect_NpcDeath(legacy_effect, n, EFFID_GENERIC_NPC_SQUISH);
 }
 
 // Remove the effect

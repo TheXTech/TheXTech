@@ -39,4 +39,12 @@ void KillEffect(int A);
 // new sub deduplicating old logic
 void NewEffect_IceSparkle(const NPC_t& n, Location_t& tempLocation);
 
+// new sub deduplicating old logic
+bool NewEffect_NpcDeath(EFFID legacy_effect, const NPC_t& n, EFFID generic_effect);
+
+// new sub deduplicating old logic
+bool NewEffect_NpcDie(EFFID legacy_effect, const NPC_t& n);
+// new sub deduplicating old logic
+bool NewEffect_NpcSquish(EFFID legacy_effect, const NPC_t& n);
+
 #endif // EFFECT_H
