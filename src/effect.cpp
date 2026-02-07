@@ -64,7 +64,11 @@ void UpdateEffects()
         e.Location.X += e.Location.SpeedX;
         e.Location.Y += e.Location.SpeedY;
 
-        if(e.Type == EFFID_FODDER_S3_SQUISH || e.Type == EFFID_FODDER_S5_SQUISH || e.Type == EFFID_RED_FODDER_SQUISH || e.Type == EFFID_UNDER_FODDER_SQUISH || e.Type == EFFID_EXT_TURTLE_SQUISH || e.Type == EFFID_YELSWITCH_FODDER_SQUISH || e.Type == EFFID_BLUSWITCH_FODDER_SQUISH || e.Type == EFFID_GRNSWITCH_FODDER_SQUISH || e.Type == EFFID_REDSWITCH_FODDER_SQUISH || e.Type == EFFID_BIG_FODDER_SQUISH || e.Type == EFFID_FODDER_S1_SQUISH || e.Type == EFFID_HIT_TURTLE_S4_SQUISH) // Stomped Goombas
+        if(e.Type == EFFID_FODDER_S3_SQUISH || e.Type == EFFID_FODDER_S5_SQUISH || e.Type == EFFID_RED_FODDER_SQUISH
+            || e.Type == EFFID_UNDER_FODDER_SQUISH || e.Type == EFFID_EXT_TURTLE_SQUISH || e.Type == EFFID_YELSWITCH_FODDER_SQUISH
+            || e.Type == EFFID_BLUSWITCH_FODDER_SQUISH || e.Type == EFFID_GRNSWITCH_FODDER_SQUISH || e.Type == EFFID_REDSWITCH_FODDER_SQUISH
+            || e.Type == EFFID_BIG_FODDER_SQUISH || e.Type == EFFID_FODDER_S1_SQUISH || e.Type == EFFID_HIT_TURTLE_S4_SQUISH
+            || e.Type == EFFID_GENERIC_NPC_SQUISH) // Stomped Goombas
         {
             e.Location.SpeedY = 0;
             e.Location.SpeedX = 0;
@@ -282,7 +286,7 @@ void UpdateEffects()
             || e.Type == EFFID_BIG_GHOST_DIE || e.Type == EFFID_GHOST_S4_DIE || e.Type == EFFID_GHOST_FAST_DIE
             || e.Type == EFFID_GHOST_S3_DIE || e.Type == EFFID_STONE_S4_DIE || e.Type == EFFID_SAW_DIE
             || e.Type == EFFID_VILLAIN_S1_DIE || e.Type == EFFID_BOMBER_BOSS_DIE || e.Type == EFFID_SICK_BOSS_DIE
-            || e.Type == EFFID_BAT_DIE) // Flying turtle shell / Bullet bill /hard thing, combined with section with comment "Bullet Bill / Hammer Bro"
+            || e.Type == EFFID_BAT_DIE || e.Type == EFFID_GENERIC_NPC_DIE) // Flying turtle shell / Bullet bill /hard thing, combined with section with comment "Bullet Bill / Hammer Bro"
         {
             e.Location.SpeedY += 0.5_n;
             if(e.Location.SpeedY >= 10)
@@ -1172,7 +1176,7 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
         || A == EFFID_EXT_TURTLE_SQUISH || A == EFFID_YELSWITCH_FODDER_SQUISH || A == EFFID_BLUSWITCH_FODDER_SQUISH
         || A == EFFID_GRNSWITCH_FODDER_SQUISH || A == EFFID_REDSWITCH_FODDER_SQUISH || A == EFFID_BIG_FODDER_SQUISH
         || A == EFFID_FODDER_S1_SQUISH || A == EFFID_HIT_TURTLE_S4_SQUISH || A == EFFID_BRUTE_SQUISH
-        || A == EFFID_FODDER_S5_SQUISH) // Goomba smash effect
+        || A == EFFID_FODDER_S5_SQUISH || A == EFFID_GENERIC_NPC_SQUISH) // Goomba smash effect
     {
         PlaySoundSpatial(SFX_Stomp, Location); // Stomp sound
 
@@ -1309,7 +1313,7 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
         || A == EFFID_GRNSWITCH_FODDER_DIE || A == EFFID_REDSWITCH_FODDER_DIE || A == EFFID_BIG_FODDER_DIE || A == EFFID_BIG_SHELL_DIE
         || A == EFFID_FODDER_S1_DIE || A == EFFID_SHELL_S4_DIE  /* || A == EFFID_RED_FODDER_SQUISH -- mistake, repeated case from above */
         || A == EFFID_GRN_SHELL_S1_DIE || A == EFFID_RED_SHELL_S1_DIE || A == EFFID_WALL_SPARK_DIE || A == EFFID_SQUID_S3_DIE
-        || A == EFFID_SQUID_S1_DIE || A == EFFID_FODDER_S5_DIE || A == EFFID_VINE_BUG_DIE) // Flying goomba / turtle shell / hard thing shell /*A == 9 || - duplicated*/
+        || A == EFFID_SQUID_S1_DIE || A == EFFID_FODDER_S5_DIE || A == EFFID_VINE_BUG_DIE || A == EFFID_GENERIC_NPC_DIE) // Flying goomba / turtle shell / hard thing shell /*A == 9 || - duplicated*/
     {
         pos_routine = NE_CENTER_X | NE_FLOOR_Y;
 
@@ -1647,6 +1651,32 @@ void NewEffect_IceSparkle(const NPC_t& n, Location_t& tempLocation)
 
 bool NewEffect_NpcDeath(EFFID legacy_effect, const NPC_t& n, EFFID generic_effect)
 {
+    if(n.GFXSlot != 0 && NewEffect(generic_effect, n.Location, n.Direction, n.Shadow))
+    {
+        auto& ne = Effect[numEffects];
+        if(n->WidthGFX)
+        {
+            ne.Location.Width = n->WidthGFX;
+            ne.Location.Height = n->HeightGFX;
+            ne.Location.X = n.Location.X + (n->FrameOffsetX * -n.Direction) - n->WidthGFX / 2 + n.Location.Width / 2;
+            ne.Location.Y = n.Location.Y + n->FrameOffsetY - n->HeightGFX + n.Location.Height;
+        }
+        else
+        {
+            ne.Location.Width = n->TWidth;
+            ne.Location.Height = n->THeight;
+            ne.Location.X = n.Location.X + n->FrameOffsetX;
+            ne.Location.Y = n.Location.Y + n->FrameOffsetY;
+        }
+
+        ne.NewNpc = n.Type;
+        ne.NewNpcSpecial = n.GFXSlot;
+        ne.Frame = n.Frame;
+        ne.FrameCount = 0;
+
+        return true;
+    }
+
     return NewEffect(legacy_effect, n.Location, n.Direction, n.Shadow);
 }
 
