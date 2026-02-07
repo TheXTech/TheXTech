@@ -122,14 +122,23 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
             Player[A].Rolling = true;
 
         // keep rolling
-        if(Player[A].Rolling && num_t::abs(Player[A].Location.SpeedX) > stop_speed)
+        if(Player[A].Rolling && (!is_grounded || num_t::abs(Player[A].Location.SpeedX) > stop_speed))
         {
-            Player[A].Direction = (Player[A].Location.SpeedX > 0) ? 1 : -1;
-
             if(!Player[A].Duck)
             {
                 Player[A].Duck = true;
                 SizeCheck(Player[A]);
+            }
+
+            Player[A].Direction = (Player[A].Location.SpeedX > 0) ? 1 : -1;
+
+            // necessarily in air in this case, use controls to pick direction if possible, otherwise don't change speed
+            if(Player[A].Location.SpeedX == 0)
+            {
+                if(Player[A].Controls.Right)
+                    Player[A].Direction = 1;
+                else if(!Player[A].Controls.Left)
+                    return;
             }
 
             if(Player[A].Slope)
@@ -1482,25 +1491,23 @@ void PlayerMazeZoneMovement(int A)
             PlayerPush(A, 1);
 
             // unduck the player now if they were on Mount 3, and then make sure they don't hit the top of the maze zone ceiling
-            if(Player[A].Duck && !Player[A].Controls.Down)
+            if(Player[A].Duck && !Player[A].Controls.Down && !Player[A].Rolling)
             {
                 UnDuck(Player[A]);
                 PlayerPush(A, 3);
             }
         }
         // help the player hit blocks above the maze zone
-        else if(Player[A].MazeZoneStatus % 4 == MAZE_DIR_UP)
+        else if(Player[A].MazeZoneStatus % 4 == MAZE_DIR_UP && !Player[A].Rolling)
         {
             Player[A].StandUp = true;
             Player[A].StandUp2 = true;
             Player[A].ForceHitSpot3 = true;
         }
+
         // don't allow jumping
-        else
-        {
-            Player[A].CanJump = false;
-            Player[A].CanAltJump = false;
-        }
+        Player[A].CanJump = false;
+        Player[A].CanAltJump = false;
 
         PlaySoundSpatial(SFX_HeroDash, Player[A].Location);
     }

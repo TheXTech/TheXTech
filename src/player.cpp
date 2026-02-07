@@ -4664,7 +4664,7 @@ void WaterCheck(const int A)
 
                     std::array<bool, 4> maze_controls = {Player[A].Controls.Left, Player[A].Controls.Up, Player[A].Controls.Right, Player[A].Controls.Down};
 
-                    if(maze_controls[p.MazeZoneStatus])
+                    if(maze_controls[p.MazeZoneStatus] || (p.Rolling && !maze_controls[0] && !maze_controls[1] && !maze_controls[2] && !maze_controls[3]))
                         PlaySoundSpatial(SFX_HeroDash, p.Location);
                     else
                         p.CurMazeZone = 0;
