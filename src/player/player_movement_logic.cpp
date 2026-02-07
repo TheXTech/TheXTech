@@ -773,7 +773,7 @@ void PlayerMovementY(int A)
             {
                 PlaySoundSpatial(SFX_Whip, Player[A].Location);
                 Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
-                Player[A].Jump = 16;
+                Player[A].Jump = 32;
                 Player[A].DoubleJump = false;
 
                 if(Player[A].Character != 5)
@@ -896,6 +896,9 @@ void PlayerMovementY(int A)
                 // just checked that Player[A].Duck wasn't true!
                 // if(Player[A].Duck)
                 //     UnDuck(Player[A]);
+
+                if(Player[A].State == PLR_STATE_CYCLONE)
+                    Player[A].Jump += 32;
 
                 if(Player[A].ShellSurf)
                 {
@@ -1024,7 +1027,19 @@ void PlayerMovementY(int A)
             bool has_fly_block = (Player[A].HoldingNPC > 0) && (NPC[Player[A].HoldingNPC].Type == NPCID_FLY_BLOCK || NPC[Player[A].HoldingNPC].Type == NPCID_FLY_CANNON);
             bool no_cyclone_glide = (Player[A].Location.SpeedY >= 0) && (Player[A].Mount || Player[A].HoldingNPC) && !Player[A].GroundPound; // glide down in cases where player can't cyclone
 
-            if(has_fly_block || (Player[A].State == PLR_STATE_CYCLONE && (!Player[A].DoubleJump || no_cyclone_glide)))
+            if(Player[A].State == PLR_STATE_CYCLONE && (!Player[A].DoubleJump || no_cyclone_glide))
+            {
+                if(Player[A].Controls.Down && Player[A].Location.SpeedY >= 0)
+                    Player[A].Location.SpeedY += Physics.PlayerGravity / 2;
+                else if(Player[A].Controls.Jump || Player[A].Controls.AltJump)
+                {
+                    Player[A].Location.SpeedY += -Physics.PlayerGravity / 2;
+
+                    if(Player[A].Location.SpeedY > Physics.PlayerTerminalVelocity * 0.5_n)
+                        Player[A].Location.SpeedY = Physics.PlayerTerminalVelocity * 0.5_n;
+                }
+            }
+            else if(has_fly_block)
             {
                 if(Player[A].Controls.Jump || Player[A].Controls.AltJump)
                 {
@@ -1036,7 +1051,7 @@ void PlayerMovementY(int A)
                     if(Player[A].Location.SpeedY > Physics.PlayerGravity * 3)
                         Player[A].Location.SpeedY = Physics.PlayerGravity * 3;
                 }
-                else if(has_fly_block)
+                else
                     NPC[Player[A].HoldingNPC].Special = 0;
             }
 
