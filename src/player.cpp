@@ -1808,6 +1808,9 @@ void PlayerFrame(Player_t &p)
     if(p.State == PLR_STATE_POLAR && !p.Mount && p.Slippy && p.Location.SpeedX)
         s_makeDust(p, 0, tempLocation);
 
+    if(p.State == PLR_STATE_CYCLONE && !p.DoubleJump && (p.Jump || (p.Controls.Down && p.Location.SpeedY > Physics.PlayerTerminalVelocity * 0.9_n)))
+        s_makeDust(p, 2, tempLocation);
+
 // find frames for link
     if(p.Character == 5)
     {
