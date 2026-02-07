@@ -844,6 +844,27 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         if(UpdateButton(mode, e_ScreenW - 120 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.Generator, 0, 32*Icon::subscreen, 32, 32))
             m_NPC_page = -2;
 
+        // GFX slot
+        if(FileFormat == FileFormats::LVL_PGEX)
+        {
+            int GFX_type = (EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE) ? EditorCursor.NPC.Special : (int)EditorCursor.NPC.Type;
+            int gw = NPCTraits[GFX_type].WidthGFX;
+            int gh = NPCTraits[GFX_type].HeightGFX;
+            if(gw == 0)
+            {
+                gw = NPCTraits[GFX_type].TWidth;
+                gh = NPCTraits[GFX_type].THeight;
+            }
+
+            int avail_slots = GFXNPC[GFX_type].w / gw;
+
+            if(avail_slots > 1 && UpdateButton(mode, e_ScreenW - 80 + 4, 180 + 4, GFXNPC[GFX_type], false, gw * EditorCursor.NPC.GFXSlot, 0, gw, gh))
+                EditorCursor.NPC.GFXSlot++;
+
+            if(EditorCursor.NPC.GFXSlot >= avail_slots)
+                EditorCursor.NPC.GFXSlot = 0;
+        }
+
         // Behavior
         if(NPCIsAParaTroopa(EditorCursor.NPC))
         {
