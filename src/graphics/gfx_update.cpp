@@ -2833,6 +2833,25 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     g_stats.renderedEffects++;
 
                     XTColor cn = e.Shadow ? XTColor(64, 64, 64) : XTColor();
+
+                    if(e.Type == EFFID_GENERIC_NPC_DIE || e.Type == EFFID_GENERIC_NPC_SQUISH)
+                    {
+                        auto flip = X_FLIP_NONE;
+                        auto draw_h = h;
+
+                        if(e.Type == EFFID_GENERIC_NPC_SQUISH)
+                            draw_h /= 2;
+                        else
+                            flip = X_FLIP_VERTICAL;
+
+                        XRender::renderTextureScaleEx(sX, sY + h - draw_h, w, draw_h,
+                            GFXNPCBMP[e.NewNpc],
+                            e.NewNpcSpecial * w, e.Frame * h, w, h,
+                            0, nullptr, flip, cn);
+
+                        continue;
+                    }
+
                     XRender::renderTextureBasic(sX, sY, w, h,
                         GFXEffectBMP[e.Type], 0, e.Frame * EffectHeight[e.Type], cn);
                 }
