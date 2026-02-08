@@ -645,6 +645,8 @@ void DrawNPC(num_t camX, num_t camY, int A)
     int h = s_round2int(NPC[A].Location.Height);
 
     int src_x = NPC[A].GFXSlot * ((NPC[A]->WidthGFX != 0) ? NPC[A]->WidthGFX : NPC[A]->TWidth);
+    if(src_x >= GFXNPCBMP[NPC[A].Type].w)
+        src_x = 0;
 
     if(NPC[A].Type == NPCID_MEDAL && g_curLevelMedals.gotten(NPC[A].Variant - 1))
         cn.a /= 2;

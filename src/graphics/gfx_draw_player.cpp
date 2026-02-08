@@ -635,24 +635,32 @@ void DrawNPCHeld(int Z, num_t camX, num_t camY, int A)
 
         if(NPC[A]->WidthGFX == 0)
         {
+            int src_x = NPC[A].GFXSlot * NPC[A]->TWidth;
+            if(src_x >= GFXNPC[NPC[A].Type].w)
+                src_x = 0;
+
             RenderTexturePlayer(Z, Player[NPC[A].HoldingPlayer],
                 sX + NPC[A]->FrameOffsetX,
                 sY + NPC[A]->FrameOffsetY,
                 w,
                 h,
                 GFXNPC[NPC[A].Type],
-                NPC[A].GFXSlot * NPC[A]->TWidth, NPC[A].Frame * h,
+                src_x, NPC[A].Frame * h,
                 cn);
         }
         else
         {
+            int src_x = NPC[A].GFXSlot * NPC[A]->WidthGFX;
+            if(src_x >= GFXNPC[NPC[A].Type].w)
+                src_x = 0;
+
             RenderTexturePlayer(Z, Player[NPC[A].HoldingPlayer],
                 sX + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2 + w / 2,
                 sY + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX + h,
                 NPC[A]->WidthGFX,
                 NPC[A]->HeightGFX,
                 GFXNPC[NPC[A].Type],
-                NPC[A].GFXSlot * NPC[A]->WidthGFX, NPC[A].Frame * NPC[A]->HeightGFX,
+                src_x, NPC[A].Frame * NPC[A]->HeightGFX,
                 cn);
         }
 

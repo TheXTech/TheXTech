@@ -715,6 +715,9 @@ void DrawFrozenNPC(num_t camX, num_t camY, int A)
         {
             int frame_h = NPCHeight(content);
             int srcX_off = NPC[A].GFXSlot * NPCWidth(content);
+            if(srcX_off >= GFXNPCBMP[content].w)
+                srcX_off = 0;
+
             int srcY_off = 0;
 
             // Fix vanilla bug where these NPCs would be rendered incorrectly
