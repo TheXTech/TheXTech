@@ -535,7 +535,7 @@ bool InitUIAssetsFrom(const std::string& cmdline_id, bool skip_gfx)
         {
             bool matched = false;
             if(round == 0)
-                matched = (!cmdline_id.empty() && it->path == cmdline_id);
+                matched = (!cmdline_id.empty() && it->path == id_as_path);
             else if(round == 1)
                 matched = (it->id == id && it->version == version);
             else if(round == 2 && (cmdline_id.empty() || slash_pos == std::string::npos))
