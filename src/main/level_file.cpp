@@ -1075,12 +1075,16 @@ bool OpenLevel_Warp(void* userdata, LevelDoor& w)
     {
         w.ix = w.ox;
         w.iy = w.oy;
+        w.length_i = w.length_o;
+        w.height_i = w.height_o;
     }
 
     if(!w.isSetOut && w.isSetIn)
     {
         w.ox = w.ix;
         w.oy = w.iy;
+        w.length_o = w.length_i;
+        w.height_o = w.height_i;
     }
 
     {
@@ -1143,10 +1147,10 @@ bool OpenLevel_Warp(void* userdata, LevelDoor& w)
         warp.stoodRequired = w.stood_state_required;
         warp.transitEffect = w.transition_effect;
 
-        warp.Entrance.Height = 32;
-        warp.Entrance.Width = 32;
-        warp.Exit.Height = 32;
-        warp.Exit.Width = 32;
+        warp.Entrance.Height = w.height_i;
+        warp.Entrance.Width = w.length_i;
+        warp.Exit.Height = w.height_o;
+        warp.Exit.Width = w.length_o;
 
         // FIXME: allow warp object to specify a transit effect name as a string
         if(warp.transitEffect >= ScreenFader::S_CUSTOM)

@@ -305,8 +305,12 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
 
         warp.ix = (int32_t)w.Entrance.X;
         warp.iy = (int32_t)w.Entrance.Y;
+        warp.length_i = (int32_t)w.Entrance.Width;
+        warp.height_i = (int32_t)w.Entrance.Height;
         warp.ox = (int32_t)w.Exit.X;
         warp.oy = (int32_t)w.Exit.Y;
+        warp.length_o = (int32_t)w.Exit.Width;
+        warp.height_o = (int32_t)w.Exit.Height;
         warp.isSetIn = w.PlacedEnt;
         warp.isSetOut = w.PlacedExit;
         warp.idirect = w.Direction;
