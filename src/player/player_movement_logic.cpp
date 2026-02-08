@@ -1031,12 +1031,12 @@ void PlayerMovementY(int A)
             {
                 if(Player[A].Controls.Down && Player[A].Location.SpeedY >= 0)
                     Player[A].Location.SpeedY += Physics.PlayerGravity / 2;
-                else if(Player[A].Controls.Jump || Player[A].Controls.AltJump)
+                else if((Player[A].Controls.Jump || Player[A].Controls.AltJump) && Player[A].Location.SpeedY >= 0)
                 {
-                    Player[A].Location.SpeedY += -Physics.PlayerGravity / 2;
+                    Player[A].Location.SpeedY += -Physics.PlayerGravity * 0.625_rb;
 
-                    if(Player[A].Location.SpeedY > Physics.PlayerTerminalVelocity * 0.5_n)
-                        Player[A].Location.SpeedY = Physics.PlayerTerminalVelocity * 0.5_n;
+                    if(Player[A].Location.SpeedY > Physics.PlayerTerminalVelocity * 0.375_n)
+                        Player[A].Location.SpeedY = Physics.PlayerTerminalVelocity * 0.375_n;
                 }
             }
             else if(has_fly_block)
