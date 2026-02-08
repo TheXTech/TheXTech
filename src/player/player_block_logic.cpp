@@ -99,6 +99,14 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
                             int HitSpot = FindRunningCollision(Player[A].Location, Block[B].Location, block_belt_speed); // this finds what part of the block the player collided
 
+                            // force hitspot 3 during cyclone jump (prevents catching on sides of ceiling blocks)
+                            if(Player[A].State == PLR_STATE_CYCLONE && !Player[A].DoubleJump && HitSpot != 1)
+                            {
+                                // cross-ref FindRunningCollision
+                                if(Player[A].Location.Y - Player[A].Location.SpeedY >= Block[B].Location.Y + Block[B].Location.Height - Block[B].Location.SpeedY)
+                                    HitSpot = 3;
+                            }
+
                             if(BlockNoClipping[Block[B].Type]) // blocks that the player can't touch are forced to hitspot 0 (which means no collision)
                                 HitSpot = 0;
 
@@ -109,14 +117,6 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
                                 if(Player[A].Mount == 2 || Player[A].StandingOnVehiclePlr != 0)
                                     HitSpot = 0;
-                            }
-
-                            // force hitspot 3 during cyclone jump (prevents catching on sides of ceiling blocks)
-                            if(Player[A].State == PLR_STATE_CYCLONE && !Player[A].DoubleJump && HitSpot != 1)
-                            {
-                                // cross-ref FindRunningCollision
-                                if(Player[A].Location.Y - Player[A].Location.SpeedY >= Block[B].Location.Y + Block[B].Location.Height - Block[B].Location.SpeedY)
-                                    HitSpot = 3;
                             }
 
                             // for blocks that hurt the player
