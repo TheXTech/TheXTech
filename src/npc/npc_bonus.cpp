@@ -311,6 +311,15 @@ void TouchBonus(int A, int B)
             std::swap(p_touched.Slope, p_target.Slope);
             std::swap(p_touched.StandingOnNPC, p_target.StandingOnNPC);
 
+            // FIXME: verify whether warps should also be swapped...
+
+            // BUGFIX: swap sections; fixes vanilla bug where both players could be killed / trapped
+            if(g_config.fix_multiplayer_targeting)
+            {
+                CheckSection(touched_power_i);
+                CheckSection(target_i);
+            }
+
             // make players immune
             if(p_touched.Immune < 10)
                 p_touched.Immune = 10;
