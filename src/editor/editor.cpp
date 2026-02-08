@@ -2128,6 +2128,10 @@ void SetCursor()
     {
 //        EditorCursor.Location.Height = frmWater::WaterH * 32;
 //        EditorCursor.Location.Width = frmWater::WaterW * 32;
+        if(EditorCursor.Water.Location.Width < 32)
+            EditorCursor.Water.Location.Width = 32;
+        if(EditorCursor.Water.Location.Height < 32)
+            EditorCursor.Water.Location.Height = 32;
         EditorCursor.Location.Height = EditorCursor.Water.Location.Height;
         EditorCursor.Location.Width = EditorCursor.Water.Location.Width;
         EditorCursor.Water.Location.X = EditorCursor.Location.X;
@@ -2256,8 +2260,10 @@ void SetCursor()
     else if(EditorCursor.Mode == OptCursor_t::LVL_WARPS) // Warps
     {
         EditorCursor.Warp.Layer = EditorCursor.Layer;
-        // EditorCursor.Location.Width = 32;
-        // EditorCursor.Location.Height = 32;
+        if(EditorCursor.Location.Width < 32)
+            EditorCursor.Location.Width = 32;
+        if(EditorCursor.Location.Height < 32)
+            EditorCursor.Location.Height = 32;
         // EditorCursor.Warp is now the canonical Warp object.
         // It stores the warp's entrance and exit until the warp is placed,
         // instead of finding and modifying an existing warp.
