@@ -240,7 +240,7 @@ static void s_WarpFaderLogic(bool is_reverse, int A, int transitEffect, const Lo
     }
 }
 
-void s_delay_pipe_exit(int A)
+static void s_delay_pipe_exit(int A)
 {
     Player_t& p = Player[A];
 
@@ -278,6 +278,35 @@ void s_delay_pipe_exit(int A)
     }
 }
 
+// important: each of these generalizes the cases in SMBX 1.3 and is fully compatible with SMBX 1.3 when entrance.Width is 32
+static num_t s_warp_offset_x(const Location_t& pLoc, const SpeedlessLocation_t& entrance, const SpeedlessLocation_t& exit)
+{
+    num_t ratio_x = 0.5_n;
+    if(entrance.Width > 32)
+        ratio_x = (pLoc.X + pLoc.Width / 2 - entrance.X - 16) / (int_ok)(entrance.Width - 32);
+
+    if(ratio_x < 0)
+        ratio_x = 0;
+    else if(ratio_x > 1)
+        ratio_x = 1;
+
+    return ratio_x * (int_ok)(exit.Width - 32) - pLoc.Width / 2 + 16;
+}
+
+static num_t s_warp_offset_y(const Location_t& pLoc, const SpeedlessLocation_t& entrance, const SpeedlessLocation_t& exit)
+{
+    num_t ratio_y = 1.0_n;
+    if(entrance.Height > 32)
+        ratio_y = (pLoc.Y + pLoc.Height - entrance.Y - 32) / (int_ok)(entrance.Height - 32);
+
+    if(ratio_y < 0)
+        ratio_y = 0;
+    else if(ratio_y > 1)
+        ratio_y = 1;
+
+    return ratio_y * (int_ok)(exit.Height - 32) - pLoc.Height + 32;
+}
+
 bool PlayerWaitingInWarp(const Player_t& p)
 {
     return (p.Effect == PLREFF_WARP_PIPE && p.Effect2 >= 2000)
@@ -300,8 +329,10 @@ void PlayerEffectWarpPipe(int A)
 
     bool backward = p.WarpBackward;
     const auto &warp = Warp[p.Warp];
-    Location_t warp_enter = static_cast<Location_t>(backward ? warp.Exit : warp.Entrance);
-    Location_t warp_exit = static_cast<Location_t>(backward ? warp.Entrance : warp.Exit);
+    SpeedlessLocation_t sl_warp_enter = (backward ? warp.Exit : warp.Entrance);
+    SpeedlessLocation_t sl_warp_exit = (backward ? warp.Entrance : warp.Exit);
+    Location_t warp_enter = static_cast<Location_t>(sl_warp_enter);
+    Location_t warp_exit = static_cast<Location_t>(sl_warp_exit);
     const auto &warp_dir_enter = backward ? warp.Direction2 : warp.Direction;
     const auto &warp_dir_exit = backward ? warp.Direction : warp.Direction2;
 
@@ -333,7 +364,7 @@ void PlayerEffectWarpPipe(int A)
                 leftToGoal = num_t::floor(p.Location.Y + p.Location.Height - warp_enter.Y);
             }
 
-            p.Location.X = warp_enter.X + (warp_enter.Width - p.Location.Width) / 2;
+            p.Location.X = warp_enter.X + s_warp_offset_x(p.Location, sl_warp_enter, sl_warp_enter);
 
             if(p.Mount == 0)
                 p.Frame = 15;
@@ -467,7 +498,7 @@ void PlayerEffectWarpPipe(int A)
             else
                 p.Location.Y = warp_exit.Y + warp_exit.Height + 8;
 
-            p.Location.X = warp_exit.X + (warp_exit.Width - p.Location.Width) / 2;
+            p.Location.X = warp_exit.X + s_warp_offset_x(p.Location, sl_warp_enter, sl_warp_exit);
 
             if(p.Mount == 0)
                 p.Frame = 15;
@@ -881,8 +912,10 @@ void PlayerEffectWarpDoor(int A)
 
     bool backward = p.WarpBackward;
     const Warp_t &warp = Warp[p.Warp];
-    const Location_t warp_enter = static_cast<Location_t>(backward ? warp.Exit : warp.Entrance);
-    const Location_t warp_exit = static_cast<Location_t>(backward ? warp.Entrance : warp.Exit);
+    SpeedlessLocation_t sl_warp_enter = (backward ? warp.Exit : warp.Entrance);
+    SpeedlessLocation_t sl_warp_exit = (backward ? warp.Entrance : warp.Exit);
+    Location_t warp_enter = static_cast<Location_t>(sl_warp_enter);
+    Location_t warp_exit = static_cast<Location_t>(sl_warp_exit);
 
     bool same_section = SectionCollision(p.Section, warp_exit);
     bool do_scroll = (warp.transitEffect == LevelDoor::TRANSIT_SCROLL) && same_section;
@@ -1009,7 +1042,7 @@ void PlayerEffectWarpDoor(int A)
             p.Frame = 1;
         }
 
-        p.Location.X = warp_exit.X + (warp_exit.Width - p.Location.Width) / 2;
+        p.Location.X = warp_exit.X + s_warp_offset_x(p.Location, sl_warp_enter, sl_warp_exit);
         p.Location.Y = warp_exit.Y + warp_exit.Height - p.Location.Height;
 
         // set any other players warping to the same door into the door holding pattern (needed to avoid splitting a shared screen)
@@ -1433,8 +1466,8 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 
         plr.WarpCD = (warp.Effect == 3) ? 10 : 50;
 
-        num_t off_x = (exit.Width - plr.Location.Width) / 2;
-        num_t off_y = exit.Height - plr.Location.Height - 0.1_n;
+        num_t off_x = s_warp_offset_x(plr.Location, entrance, exit);
+        num_t off_y = s_warp_offset_y(plr.Location, entrance, exit) - 0.1_n;
 
         // special logic to keep location correct in maze zones
         if(plr.CurMazeZone)
@@ -1538,7 +1571,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         plr.WarpBackward = backward;
 //                        if(nPlay.Online && A == nPlay.MySlot + 1)
 //                            Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1j" + std::to_string(A) + "|" + plr.Warp + LB;
-        plr.Location.X = entrance.X + (entrance.Width - plr.Location.Width) / 2;
+        plr.Location.X = entrance.X + s_warp_offset_x(plr.Location, entrance, entrance);
         plr.Location.Y = entrance.Y + entrance.Height - plr.Location.Height;
 
         bool same_section = SectionCollision(plr.Section, static_cast<Location_t>(exit));
