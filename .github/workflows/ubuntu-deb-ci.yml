@@ -356,10 +356,10 @@ jobs:
             -DCPACK_DEBIAN_PACKAGE_HOMEPAGE=\"https://wohlsoft.ru\" \
             -DCPACK_DEBIAN_PACKAGE_RELEASE=${GITHUB_RUN_NUMBER} \
             -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=amd64 \
-            -DCPACK_DEBIAN_PACKAGE_DEPENDS=\"libc6 (>= 2.38), libsdl2-2.0-0 (>= 2.30.0), libpng16-16 (>= 1.6.43), libjpeg-turbo8 (>= 2.1.5) | libturbojpeg0 (>= 2.1.5), libasound2 (>= 1.2.10), libpulse0\" \
+            -DCPACK_DEBIAN_PACKAGE_DEPENDS=\"libc6 (>= 2.38), libsdl2-2.0-0 (>= 2.30.0), libpng16-16 (>= 1.6.43), libjpeg-turbo8 (>= 2.1.5), libasound2 (>= 1.2.10), libpulse0\" \
             -DCPACK_DEBIAN_PACKAGE_DESCRIPTION=\"TheXTech - the modern C++ port and successor of the SMBX engine\"",
 
-            deps_cmdline: "echo 'Ubuntu 24 x86_32, everything pre-installed'",
+            deps_cmdline: "echo 'Ubuntu 24 x86_64, everything pre-installed'",
 
             executable_name: "thextech",
             generator: "Ninja",
@@ -367,6 +367,32 @@ jobs:
             executable_name_suffix: "",
             package_filename_suffix: "ubuntu-24-04-amd64",
             upload_directory: "www/ubuntu-24-04/"
+          }
+        - {
+            name: "DEB Debian 13 (Trixie) x86_64",
+            os: ubuntu-latest,
+            container: "ghcr.io/thextech/wohlnet-ci-debian13:latest",
+            cross: false,
+
+            extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=ON -DUSE_FREEIMAGE_SYSTEM_LIBS=ON \
+            -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel \
+            -DTHEXTECH_PACKAGE_NAME=\"thextech-bin\" \
+            -DTHEXTECH_INSTALLER_PACKAGE_NAME=\"thextech-bin\" \
+            -DCPACK_GENERATOR=DEB \
+            -DCPACK_DEBIAN_PACKAGE_HOMEPAGE=\"https://wohlsoft.ru\" \
+            -DCPACK_DEBIAN_PACKAGE_RELEASE=${GITHUB_RUN_NUMBER} \
+            -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=amd64 \
+            -DCPACK_DEBIAN_PACKAGE_DEPENDS=\"libc6 (>= 2.38), libsdl2-2.0-0 (>= 2.30.0), libpng16-16 (>= 1.6.43), libturbojpeg0 (>= 2.1.5), libasound2 (>= 1.2.10), libpulse0\" \
+            -DCPACK_DEBIAN_PACKAGE_DESCRIPTION=\"TheXTech - the modern C++ port and successor of the SMBX engine\"",
+
+            deps_cmdline: "echo 'Debian 13 (Trixie) x86_64, everything pre-installed'",
+
+            executable_name: "thextech",
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            executable_name_suffix: "",
+            package_filename_suffix: "debian-13-trixie-amd64",
+            upload_directory: "www/debian-13/"
           }
 
     steps:
