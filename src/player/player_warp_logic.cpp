@@ -1271,6 +1271,15 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
     if(!CheckCollision(plr.Location, entrance))
         return false; // continue
 
+    // moved from SuperWarp so that we can stop WarpCD for portal warps until collision is done
+    if(plr.WarpCD > 0)
+    {
+        if(warp.Effect == 3)
+            plr.WarpCD = 10;
+
+        return false;
+    }
+
     plr.ShowWarp = B;
 
     if(warp.LevelEnt)
@@ -1565,31 +1574,32 @@ void SuperWarp(const int A)
         g_gameLoopInterrupt.site = GameLoopInterrupt::None;
     }
 
-    if(plr.WarpCD <= 0 && plr.Mount != 2 /* && !plr.GroundPound && !plr.GroundPound2 */)
+    if(plr.Mount == 2)
+        return;
+
+    for(; B <= numWarps; B++)
     {
-        for(; B <= numWarps; B++)
+        auto &warp = Warp[B];
+
+        if(warp.Hidden)
+            continue;
+
+        // In normal mode, ignore pounds only for pipe / door warps. In compat mode, ignore pounds for all warps.
+        bool ground_pound = plr.GroundPound || plr.GroundPound2;
+        bool skip_pounds = !g_config.fix_pound_skip_warp || warp.Effect == 1 || warp.Effect == 2;
+        if(ground_pound && skip_pounds)
+            continue;
+
+        if(checkWarp(warp, B, plr, A, false))
+            break;
+
+        if(warp.twoWay) // Check the same warp again if two-way
         {
-            auto &warp = Warp[B];
-
-            if(warp.Hidden)
-                continue;
-
-            // In normal mode, ignore pounds only for pipe / door warps. In compat mode, ignore pounds for all warps.
-            bool ground_pound = plr.GroundPound || plr.GroundPound2;
-            bool skip_pounds = !g_config.fix_pound_skip_warp || warp.Effect == 1 || warp.Effect == 2;
-            if(ground_pound && skip_pounds)
-                continue;
-
-            if(checkWarp(warp, B, plr, A, false))
+            if(checkWarp(warp, B, plr, A, true))
                 break;
-
-            if(warp.twoWay) // Check the same warp again if two-way
-            {
-                if(checkWarp(warp, B, plr, A, true))
-                    break;
-            }
         }
     }
-    else if(plr.Mount != 2)
+
+    if(plr.WarpCD > 0)
         plr.WarpCD--;
 }
