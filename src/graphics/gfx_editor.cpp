@@ -290,14 +290,16 @@ void DrawEditorLevel(int Z)
 
                 if(Warp[A].PlacedEnt)
                 {
-                    XRender::renderRect(num_t::floor(camX + Warp[A].Entrance.X), num_t::floor(camY + Warp[A].Entrance.Y), 32, 32,
+                    XRender::renderRect(num_t::floor(camX + Warp[A].Entrance.X), num_t::floor(camY + Warp[A].Entrance.Y),
+                        num_t::floor(Warp[A].Entrance.Width), num_t::floor(Warp[A].Entrance.Height),
                         color, false);
                     SuperPrint(std::to_string(A), 1, num_t::floor(camX + Warp[A].Entrance.X) + 2, num_t::floor(camY + Warp[A].Entrance.Y) + 2);
                 }
 
                 if(Warp[A].PlacedExit)
                 {
-                    XRender::renderRect(num_t::floor(camX + Warp[A].Exit.X), num_t::floor(camY + Warp[A].Exit.Y), 32, 32,
+                    XRender::renderRect(num_t::floor(camX + Warp[A].Exit.X), num_t::floor(camY + Warp[A].Exit.Y),
+                        num_t::floor(Warp[A].Exit.Width), num_t::floor(Warp[A].Exit.Height),
                         color, false);
                     SuperPrint(std::to_string(A), 1, num_t::floor(camX + Warp[A].Exit.X + Warp[A].Exit.Width) - 16 - 2,
                         num_t::floor(camY + Warp[A].Exit.Y + Warp[A].Exit.Height) - 14 - 2);
