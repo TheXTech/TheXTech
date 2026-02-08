@@ -602,7 +602,7 @@ void UpdateEditor()
                     EditorCursor.Location.Y = Background[A].Location.Y;
                     SetCursor();
 
-                    Location_t loc = static_cast<Location_t>(Background[A].Location);
+                    Location_t loc = static_cast<Location_t>(Background[A].FullLocation());
                     int type = Background[A].Type;
 
                     Background[A] = Background[numBackground];
@@ -845,7 +845,7 @@ void UpdateEditor()
                 {
                     int A = EditorCursor.InteractIndex;
 
-                    Location_t loc = static_cast<Location_t>(Background[A].Location);
+                    Location_t loc = static_cast<Location_t>(Background[A].FullLocation());
                     int type = Background[A].Type;
 
                     NewEffect(EFFID_SMOKE_S3_CENTER, loc);
@@ -1201,7 +1201,7 @@ void UpdateEditor()
 
                     if(same_type)
                     {
-                        if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
+                        if(CursorCollision(EditorCursor.Location, Background[A].FullLocation()) && !Background[A].Hidden)
                         {
                             CanPlace = false;
                             break;
@@ -2195,10 +2195,12 @@ void SetCursor()
         EditorCursor.Background.Layer = EditorCursor.Layer;
         EditorCursor.Background.Location.X = EditorCursor.Location.X;
         EditorCursor.Background.Location.Y = EditorCursor.Location.Y;
-        EditorCursor.Background.Location.Width = BackgroundWidth[EditorCursor.Background.Type];
-        EditorCursor.Background.Location.Height = BackgroundHeight[EditorCursor.Background.Type];
-        EditorCursor.Location.Width = EditorCursor.Background.Location.Width;
-        EditorCursor.Location.Height = EditorCursor.Background.Location.Height;
+        // EditorCursor.Background.Location.Width = BackgroundWidth[EditorCursor.Background.Type];
+        // EditorCursor.Background.Location.Height = BackgroundHeight[EditorCursor.Background.Type];
+        // EditorCursor.Location.Width = EditorCursor.Background.Location.Width;
+        // EditorCursor.Location.Height = EditorCursor.Background.Location.Height;
+        EditorCursor.Location.Width = BackgroundWidth[EditorCursor.Background.Type];
+        EditorCursor.Location.Height = BackgroundHeight[EditorCursor.Background.Type];
     }
     else if(EditorCursor.Mode == OptCursor_t::LVL_NPCS) // NPCs
     {
@@ -2821,7 +2823,7 @@ void UpdateInteract()
             {
                 int A = *(--i);
 
-                if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
+                if(CursorCollision(EditorCursor.Location, Background[A].FullLocation()) && !Background[A].Hidden)
                 {
                     EditorCursor.InteractMode = OptCursor_t::LVL_BGOS;
                     EditorCursor.InteractFlags = 0;

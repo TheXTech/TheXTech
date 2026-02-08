@@ -1065,7 +1065,7 @@ void GraphicsLazyPreLoad()
         for(BackgroundRef_t bgo : s_drawBGOs[Z - 1])
         {
             Background_t& b = bgo;
-            if(vScreenCollision(Z, b.Location) && !b.Hidden && IF_INRANGE(b.Type, 1, maxBackgroundType))
+            if(!b.Hidden && IF_INRANGE(b.Type, 1, maxBackgroundType))
                 XRender::lazyPreLoad(GFXBackgroundBMP[b.Type]);
         }
 
@@ -2239,44 +2239,15 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         XRender::setDrawPlane(PLANE_LVL_BGO_LOW);
 
-        if(LevelEditor)
-        {
-            for(; nextBackground < (int)screenBackgrounds.size(); nextBackground++) // First backgrounds
-            {
-                int A = screenBackgrounds[nextBackground];
-                const auto &bgo = Background[A];
-
-                if(A > numBackground)
-                    break;
-
-                if(bgo.SortPriority >= Background_t::PRI_NORM_START)
-                    break;
-
-                g_stats.checkedBGOs++;
-                if(vScreenCollision(Z, bgo.Location) && !bgo.Hidden)
-                {
-                    g_stats.renderedBGOs++;
-
-                    auto &bgoGfx = GFXBackgroundBMP[bgo.Type];
-                    const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
-                    const vbint_t bgoFrame = BackgroundFrame[bgo.Type];
-
-                    XRender::renderTextureBasic(num_t::floor(camX + bgo.Location.X),
-                                          num_t::floor(camY + bgo.Location.Y),
-                                          bgoGfx.w,
-                                          bgoHeight,
-                                          bgoGfx, 0,
-                                          bgoHeight * bgoFrame);
-                }
-            }
-        }
-        else
         {
             // For A = 1 To MidBackground - 1 'First backgrounds
             for(; nextBackground < (int)screenBackgrounds.size() && (int)screenBackgrounds[nextBackground] < MidBackground; nextBackground++)  // First backgrounds
             {
                 int A = screenBackgrounds[nextBackground];
                 const auto &bgo = Background[A];
+
+                if(bgo.SortPriority >= Background_t::PRI_NORM_START)
+                    break;
 
                 g_stats.checkedBGOs++;
 
@@ -2332,43 +2303,15 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         XRender::setDrawPlane(PLANE_LVL_BGO_NORM);
 
-        if(LevelEditor)
-        {
-            for(; nextBackground < (int)screenBackgrounds.size(); nextBackground++)  // Second backgrounds
-            {
-                int A = screenBackgrounds[nextBackground];
-                const auto &bgo = Background[A];
-
-                if(A > numBackground)
-                    break;
-
-                if(bgo.SortPriority >= Background_t::PRI_FG_START)
-                    break;
-
-                g_stats.checkedBGOs++;
-                if(vScreenCollision(Z, bgo.Location) && !bgo.Hidden)
-                {
-                    g_stats.renderedBGOs++;
-
-                    auto &bgoGfx = GFXBackgroundBMP[bgo.Type];
-                    const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
-                    const vbint_t bgoFrame = BackgroundFrame[bgo.Type];
-
-                    XRender::renderTextureBasic(num_t::floor(camX + bgo.Location.X),
-                                          num_t::floor(camY + bgo.Location.Y),
-                                          bgoGfx.w,
-                                          bgoHeight,
-                                          bgoGfx, 0,
-                                          bgoHeight * bgoFrame);
-                }
-            }
-        }
-        else if(numBackground > 0)
+        if(numBackground > 0)
         {
             for(; nextBackground < (int)screenBackgrounds.size() && (int)screenBackgrounds[nextBackground] <= LastBackground; nextBackground++)  // Second backgrounds
             {
                 int A = screenBackgrounds[nextBackground];
                 const auto &bgo = Background[A];
+
+                if(bgo.SortPriority >= Background_t::PRI_FG_START)
+                    break;
 
                 g_stats.checkedBGOs++;
 
@@ -2383,12 +2326,12 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(sY > vScreen[Z].Height)
                     continue;
 
-                const vbint_t bgoWidth = BackgroundWidth[bgo.Type];
+                auto &bgoGfx = GFXBackgroundBMP[bgo.Type];
+                const vbint_t bgoWidth = bgoGfx.w;
                 const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
 
                 if(sX + bgoWidth >= 0 && sY + bgoHeight >= 0 /*&& !bgo.Hidden*/)
                 {
-                    auto &bgoGfx = GFXBackgroundBMP[bgo.Type];
                     const vbint_t bgoFrame = BackgroundFrame[bgo.Type];
 
                     g_stats.renderedBGOs++;
@@ -2710,15 +2653,18 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(A > numBackground)
                     continue;
 
+                auto sX = num_t::floor(camX + bgo.Location.X);
+                auto sY = num_t::floor(camY + bgo.Location.Y);
+                auto &bgoGfx = GFXBackgroundBMP[bgo.Type];
+                const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
+
                 g_stats.checkedBGOs++;
-                if(vScreenCollision(Z, bgo.Location) && !bgo.Hidden)
+                if(sX < vScreen[Z].Width && sY < vScreen[Z].Height && sX + bgoGfx.w > 0 && sY + bgoHeight > 0 && !bgo.Hidden)
                 {
-                    auto &bgoGfx = GFXBackgroundBMP[bgo.Type];
-                    const vbint_t bgoHeight = BackgroundHeight[bgo.Type];
                     const vbint_t bgoFrame = BackgroundFrame[bgo.Type];
                     g_stats.renderedBGOs++;
-                    XRender::renderTextureBasic(num_t::floor(camX + bgo.Location.X),
-                                          num_t::floor(camY + bgo.Location.Y),
+                    XRender::renderTextureBasic(sX,
+                                          sY,
                                           bgoGfx.w,
                                           bgoHeight,
                                           bgoGfx, 0,

@@ -300,7 +300,7 @@ static void s_ExpandSectionForMenu()
 
     for(int A : treeBackgroundQuery(tempLocation, SORTMODE_NONE))
     {
-        if(CheckCollision(Background[A].Location, tempLocation))
+        if(CheckCollision(Background[A].FullLocation(), tempLocation))
             return;
     }
 

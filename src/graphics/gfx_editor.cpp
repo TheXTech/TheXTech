@@ -411,11 +411,11 @@ void DrawEditorLevel(int Z)
         else if(e.Mode == OptCursor_t::LVL_BGOS) // BGOs
         {
             auto &b = e.Background;
-            if(vScreenCollision(Z, b.Location))
+            if(vScreenCollision(Z, b.FullLocation()))
             {
                 XRender::renderTextureBasic(num_t::floor(camX + b.Location.X),
                                       num_t::floor(camY + b.Location.Y),
-                                      BackgroundWidth[b.Type],
+                                      GFXBackground[b.Type].w,
                                       BackgroundHeight[b.Type],
                                       GFXBackground[b.Type], 0,
                                       BackgroundHeight[b.Type] * BackgroundFrame[b.Type]);

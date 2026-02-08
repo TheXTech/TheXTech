@@ -990,7 +990,7 @@ void NPCSpecial(int A)
                         continue;
 
                     Background_t &b = i;
-                    if(!b.Hidden && ((b.Type >= 174 && b.Type <= 186) || b.Type == 63) && CheckCollision(tempLocation, b.Location))
+                    if(!b.Hidden && ((b.Type >= 174 && b.Type <= 186) || b.Type == 63) && CheckCollision(tempLocation, b.FullLocation()))
                     {
                         tempBool = true;
                         break;
@@ -2564,7 +2564,7 @@ void NPCSpecial(int A)
                     // Not hidden
                     if(!Background[i].Hidden)
                     {
-                        if(CheckCollision(tempLocation, Background[i].Location))
+                        if(CheckCollision(tempLocation, Background[i].FullLocation()))
                         {
                             if(bgo_type > 0)
                             {
@@ -2591,7 +2591,7 @@ void NPCSpecial(int A)
                                     npc.Location.SpeedX = 0;
 
                                     if(centered)
-                                        speed_x = -(npc.Location.X + (npc.Location.Width / 2)) + (Background[i].Location.X + (Background[i].Location.Width / 2));
+                                        speed_x = -(npc.Location.X + (npc.Location.Width / 2)) + (Background[i].Location.X + (GFXBackgroundBMP[Background[i].Type].w / 2));
                                     else
                                         speed_x = -npc.Location.X + Background[i].Location.X - 32;
                                 }
@@ -2606,7 +2606,7 @@ void NPCSpecial(int A)
                                     npc.Location.SpeedY = 0;
 
                                     if(centered)
-                                        speed_y = -(npc.Location.Y + (npc.Location.Height / 2)) + (Background[i].Location.Y + (Background[i].Location.Height / 2));
+                                        speed_y = -(npc.Location.Y + (npc.Location.Height / 2)) + (Background[i].Location.Y + (BackgroundHeight[Background[i].Type] / 2));
                                     else
                                         speed_y = -npc.Location.Y + Background[i].Location.Y;
                                 }
