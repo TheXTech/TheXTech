@@ -498,7 +498,7 @@ void PlayerEffectWarpPipe(int A)
             else
                 p.Location.Y = warp_exit.Y + warp_exit.Height + 8;
 
-            p.Location.X = warp_exit.X + s_warp_offset_x(p.Location, sl_warp_enter, sl_warp_exit);
+            p.Location.X = warp_exit.X + s_warp_offset_x(p.Location, (do_scroll) ? sl_warp_exit : sl_warp_enter, sl_warp_exit);
 
             if(p.Mount == 0)
                 p.Frame = 15;
@@ -1042,7 +1042,7 @@ void PlayerEffectWarpDoor(int A)
             p.Frame = 1;
         }
 
-        p.Location.X = warp_exit.X + s_warp_offset_x(p.Location, sl_warp_enter, sl_warp_exit);
+        p.Location.X = warp_exit.X + s_warp_offset_x(p.Location, (do_scroll) ? sl_warp_exit : sl_warp_enter, sl_warp_exit);
         p.Location.Y = warp_exit.Y + warp_exit.Height - p.Location.Height;
 
         // set any other players warping to the same door into the door holding pattern (needed to avoid splitting a shared screen)
