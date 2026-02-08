@@ -320,6 +320,10 @@ void TouchBonus(int A, int B)
                 CheckSection(target_i);
             }
 
+            // NEW: swap status for maze zones
+            std::swap(p_touched.CurMazeZone, p_target.CurMazeZone);
+            std::swap(p_touched.MazeZoneStatus, p_target.MazeZoneStatus);
+
             // make players immune
             if(p_touched.Immune < 10)
                 p_touched.Immune = 10;
