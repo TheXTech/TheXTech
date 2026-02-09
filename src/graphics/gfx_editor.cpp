@@ -288,21 +288,33 @@ void DrawEditorLevel(int Z)
                 bool complete = Warp[A].PlacedEnt && Warp[A].PlacedExit;
                 XTColor color = complete ? XTColorF(1.0_n, 0.0_n, 1.0_n) : XTColorF(0.7_n, 0.3_n, 0.0_n);
 
-                if(Warp[A].PlacedEnt)
-                {
-                    XRender::renderRect(num_t::floor(camX + Warp[A].Entrance.X), num_t::floor(camY + Warp[A].Entrance.Y),
-                        num_t::floor(Warp[A].Entrance.Width), num_t::floor(Warp[A].Entrance.Height),
-                        color, false);
-                    SuperPrint(std::to_string(A), 1, num_t::floor(camX + Warp[A].Entrance.X) + 2, num_t::floor(camY + Warp[A].Entrance.Y) + 2);
-                }
+                const SpeedlessLocation_t* const locs[2] = {&Warp[A].Entrance, &Warp[A].Exit};
+                const bool enabled[2] = {Warp[A].PlacedEnt, Warp[A].PlacedExit};
+                const int direction[2] = {Warp[A].Direction, Warp[A].Direction2};
 
-                if(Warp[A].PlacedExit)
+                for(int i = 0; i < 2; i++)
                 {
-                    XRender::renderRect(num_t::floor(camX + Warp[A].Exit.X), num_t::floor(camY + Warp[A].Exit.Y),
-                        num_t::floor(Warp[A].Exit.Width), num_t::floor(Warp[A].Exit.Height),
-                        color, false);
-                    SuperPrint(std::to_string(A), 1, num_t::floor(camX + Warp[A].Exit.X + Warp[A].Exit.Width) - 16 - 2,
-                        num_t::floor(camY + Warp[A].Exit.Y + Warp[A].Exit.Height) - 14 - 2);
+                    if(!enabled[i])
+                        continue;
+
+                    int l = num_t::floor(camX + locs[i]->X);
+                    int t = num_t::floor(camY + locs[i]->Y);
+                    int w = num_t::floor(locs[i]->Width);
+                    int h = num_t::floor(locs[i]->Height);
+
+                    XRender::renderRect(l, t, w, h, color, false);
+
+                    if(Warp[A].Effect == 1 || Warp[A].Effect == 2)
+                    {
+                        if(direction[i] == 1 || direction[i] == 3)
+                            XRender::renderRect(l + 2, t + 2 + (h - 6) * (direction[i] == 3), w - 4, 2, XTColor(0, 255, 0), true);
+
+                        if(direction[i] == 2 || direction[i] == 4)
+                            XRender::renderRect(l + 2 + (w - 6) * (direction[i] == 4), t + 2, 2, h - 4, XTColor(0, 255, 0), true);
+                    }
+
+                    SuperPrint(std::to_string(A), 1, l + 2 + (w - 16 - 4) * i,
+                        t + 2 + (h - 14 - 4) * i);
                 }
             }
         }
