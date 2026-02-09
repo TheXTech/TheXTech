@@ -18,19 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <array>
+#include <vector>
+
 #include <Logger/logger.h>
 #include <SDL_net.h>
 
-#include "globals.h"
-#include "player.h"
-#include "graphics.h"
-#include "config.h"
-#include "change_res.h"
-#include "sound.h"
-
 #include "message.h"
 #include "main/client.h"
-#include "main/screen_progress.h"
 
 
 namespace XMessage
@@ -86,8 +81,8 @@ void NetworkClient::Disconnect(bool shutdown)
     if(shutdown)
         return;
 
-    UpdateConfig();
-    UpdateInternalRes();
+    // UpdateConfig();
+    // UpdateInternalRes();
 }
 
 bool NetworkClient::FillBuffer()
@@ -135,7 +130,7 @@ void NetworkClient::ShiftBuffer(size_t shift)
 
 bool NetworkClient::ParseMessage(int client_no, const uint8_t* message, size_t length)
 {
-    UNUSED(client_no);
+    (void)(client_no);
 
     if(length != 4)
         return false;
@@ -164,13 +159,6 @@ void NetworkClient::SendAll()
 {
     if(!socket)
         return;
-
-    // send some information about the local client once sync is complete
-    if(tick == fast_forward_to + 1)
-    {
-        UpdateInternalRes();
-        XMessage::PushMessage({XMessage::Type::multiplayer_prefs, (uint8_t)g_config.two_screen_mode.m_value, (uint8_t)g_config.four_screen_mode.m_value});
-    }
 
     // send everything
     std::vector<uint8_t> to_send;
@@ -283,10 +271,10 @@ void NetworkClient::WaitAndFill()
             tick++;
 
             // start playing music when no longer fast forwarding
-            if(tick == fast_forward_to)
-                UpdateMusicVolume();
-            else if(tick < fast_forward_to)
-                IndicateProgress(start_fast_forward, num_t(tick) / fast_forward_to, "Loading game history...");
+            // if(tick == fast_forward_to)
+            //     UpdateMusicVolume();
+            // else if(tick < fast_forward_to)
+            //     IndicateProgress(start_fast_forward, num_t(tick) / fast_forward_to, "Loading game history...");
 
             return;
 
