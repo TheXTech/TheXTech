@@ -1307,7 +1307,8 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
     // moved from SuperWarp so that we can stop WarpCD for portal warps until collision is done
     if(plr.WarpCD > 0)
     {
-        if(warp.Effect == 3)
+        // if a portal warp is the most recent warp used by player A, and they are still colliding with it, don't reset WarpCD until the collision is over.
+        if(warp.Effect == 3 && B == plr.Warp)
             plr.WarpCD = 10;
 
         return false;
@@ -1455,9 +1456,11 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 
     if(warp.Effect == 0 || warp.Effect == 3) // Instant / Portal
     {
+        if(warp.Effect == 3)
+            plr.Warp = B;
+
         if(warp.Effect == 3 && (warp.level != STRINGINDEX_NONE || warp.MapWarp))
         {
-            plr.Warp = B;
             plr.WarpBackward = backward;
             s_CheckWarpLevelExit(plr, warp, 2921, 2921);
 
