@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <inttypes.h>
+#include <cmath>
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_opengl.h>
@@ -55,9 +57,23 @@
 #define XTECH_SDL_NO_RECTF_SUPPORT
 #define SDL_RenderCopyF SDL_RenderCopy
 #define SDL_RenderCopyExF SDL_RenderCopyEx
+struct X_FPoint
+{
+    float x;
+    float y;
+};
+#else
+typedef SDL_FPoint X_FPoint;
 #endif
 
-static inline uint32_t pow2roundup(uint32_t x)
+inline bool fEqual(float a, float b)
+{
+    int64_t ai = int64_t(std::round(a * 10000.0f));
+    int64_t bi = int64_t(std::round(b * 10000.0f));
+    return ai == bi;
+}
+
+static inline unsigned pow2roundup(unsigned x)
 {
     if(x == 0)
         return 0;
@@ -71,7 +87,21 @@ static inline uint32_t pow2roundup(uint32_t x)
     return x + 1;
 }
 
-static inline int32_t pow2roundup(int32_t x)
+static inline unsigned long pow2roundup(unsigned long x)
+{
+    if(x == 0)
+        return 0;
+
+    --x;
+    x |= x >> 1;
+    x |= x >> 2;
+    x |= x >> 4;
+    x |= x >> 8;
+    x |= x >> 16;
+    return x + 1;
+}
+
+static inline int pow2roundup(int x)
 {
     if(x < 0)
         return 0;
@@ -83,6 +113,59 @@ static inline int32_t pow2roundup(int32_t x)
     x |= x >> 8;
     x |= x >> 16;
     return x + 1;
+}
+
+static inline long pow2roundup(long x)
+{
+    if(x < 0)
+        return 0;
+
+    --x;
+    x |= x >> 1;
+    x |= x >> 2;
+    x |= x >> 4;
+    x |= x >> 8;
+    x |= x >> 16;
+    return x + 1;
+}
+
+// static inline int div2ceil(int x)
+// {
+//     return (x >> 1) + (x & 0x01);
+// }
+
+#define div2floor(x) ((x) >> 1)
+
+static inline void rectMul2(SDL_Rect &rect)
+{
+    rect.x <<= 1;
+    rect.y <<= 1;
+    rect.w <<= 1;
+    rect.h <<= 1;
+}
+
+static inline void rectDiv2(SDL_Rect &rect)
+{
+    int xDiv, yDiv;
+    xDiv = div2floor(rect.x);
+    yDiv = div2floor(rect.y);
+    rect.w = div2floor(rect.w + rect.x) - xDiv;
+    rect.h = div2floor(rect.h + rect.y) - yDiv;
+    rect.x = xDiv;
+    rect.y = yDiv;
+}
+
+static inline void rectDiv2(int &x, int &y, int &w, int &h)
+{
+    int xDiv, yDiv;
+
+    xDiv = div2floor(x);
+    w = div2floor(w + x) - xDiv;
+    x = xDiv;
+
+    yDiv = div2floor(y);
+    h = div2floor(h + y) - yDiv;
+    y = yDiv;
 }
 
 RenderSDL::RenderSDL() :
@@ -120,18 +203,21 @@ bool RenderSDL::initRender(SDL_Window *window)
     m_window = window;
 
     Uint32 renderFlags = 0;
+    int ret_w = -1, ret_h = -1;
 
     int numRenders = SDL_GetNumRenderDrivers();
     SDL_RendererInfo info;
     for(int i = 0; i < numRenders; ++i)
     {
         SDL_GetRenderDriverInfo(i, &info);
-        pLogDebug("Render SDL: Render device: %s, flags: %u, max-w: %u, max-h: %u",
+        pLogDebug("Render SDL: Render device: %s, flags: %" PRIu32 ", max-w: %d, max-h: %d",
                   info.name,
                   info.flags,
                   info.max_texture_width,
                   info.max_texture_height);
     }
+
+    m_tBufferDisabled = false;
 
     switch(g_config.render_mode)
     {
@@ -145,7 +231,8 @@ bool RenderSDL::initRender(SDL_Window *window)
             m_gRenderer = SDL_CreateRenderer(window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
             if(m_gRenderer)
                 break; // All okay
-            pLogWarning("Failed to initialize V-Synced renderer, trying to create accelerated renderer...");
+            pLogWarning("Failed to initialize V-Synced renderer (%s), trying to create accelerated renderer...", SDL_GetError());
+            SDL_ClearError();
         }
 
         // continue
@@ -156,7 +243,17 @@ bool RenderSDL::initRender(SDL_Window *window)
         m_gRenderer = SDL_CreateRenderer(window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
         if(m_gRenderer)
             break; // All okay
-        pLogWarning("Failed to initialize accelerated renderer, trying to create a software renderer...");
+
+        pLogWarning("Failed to initialize accelerated renderer with frame buffer (%s), trying to create without target texture...", SDL_GetError());
+        SDL_ClearError();
+
+        m_tBufferDisabled = true;
+        m_gRenderer = SDL_CreateRenderer(window, -1, renderFlags); // Try to make renderer
+        if(m_gRenderer)
+            break; // All okay
+
+        pLogWarning("Failed to initialize accelerated renderer (%s), trying to create a software renderer...", SDL_GetError());
+        SDL_ClearError();
 
         // fallthrough
     case Config_t::RENDER_SOFTWARE:
@@ -167,7 +264,8 @@ bool RenderSDL::initRender(SDL_Window *window)
         if(m_gRenderer)
             break; // All okay
 
-        pLogCritical("Render SDL: Unable to create renderer!");
+        pLogCritical("Render SDL: Unable to create renderer! (%s)", SDL_GetError());
+        SDL_ClearError();
         return false;
     }
 
@@ -178,29 +276,58 @@ bool RenderSDL::initRender(SDL_Window *window)
     m_maxTextureWidth = ri.max_texture_width;
     m_maxTextureHeight = ri.max_texture_height;
 
-    m_tBuffer = SDL_CreateTexture(m_gRenderer,
-                                  DEFAULT_PIXEL_COLOUR_FORMAT,
-                                  SDL_TEXTUREACCESS_TARGET,
-                                  ScaleWidth, ScaleHeight);
-
-    if(!m_tBuffer)
+    // Don't create renderer surface larger than texture size!
+    if(m_maxTextureWidth > 0 && ScaleWidth > m_maxTextureWidth)
     {
-        pLogWarning("Render SDL: Failed to create the normal texture render buffer: %s, trying to create a power-2 texture...", SDL_GetError());
-        m_pow2 = true;
+        ScaleWidth = m_maxTextureWidth;
+        XRender::TargetW = m_halfPixelMode ? m_maxTextureWidth << 1 : m_maxTextureWidth;
+    }
+
+    if(m_maxTextureHeight > 0 && ScaleHeight > m_maxTextureHeight)
+    {
+        ScaleHeight = m_maxTextureHeight;
+        XRender::TargetH = m_halfPixelMode ? m_maxTextureHeight << 1 : m_maxTextureHeight;
+    }
+
+    if(!m_tBufferDisabled)
+    {
         m_tBuffer = SDL_CreateTexture(m_gRenderer,
                                       DEFAULT_PIXEL_COLOUR_FORMAT,
                                       SDL_TEXTUREACCESS_TARGET,
-                                      pow2roundup(ScaleWidth), pow2roundup(ScaleHeight));
+                                      ScaleWidth, ScaleHeight);
+
+        if(!m_tBuffer)
+        {
+            pLogWarning("Render SDL: Failed to create the normal texture render buffer: %s, trying to create a power-2 texture...", SDL_GetError());
+            SDL_ClearError();
+            m_pow2 = true;
+            m_tBuffer = SDL_CreateTexture(m_gRenderer,
+                                          DEFAULT_PIXEL_COLOUR_FORMAT,
+                                          SDL_TEXTUREACCESS_TARGET,
+                                          pow2roundup(ScaleWidth), pow2roundup(ScaleHeight));
+        }
+
+        if(!m_tBuffer)
+        {
+            m_pow2 = false;
+            pLogWarning("Render SDL: Unable to create texture render buffer: %s", SDL_GetError());
+            pLogDebug("Render SDL: Continue without of render to texture. The ability to resize the window will be disabled.");
+            SDL_ClearError();
+            SDL_SetWindowResizable(window, SDL_FALSE);
+            m_tBufferDisabled = true;
+        }
     }
 
-    if(!m_tBuffer)
+    if(SDL_GetRendererOutputSize(m_gRenderer, &ret_w, &ret_h) == 0)
     {
-        m_pow2 = false;
-        pLogWarning("Render SDL: Unable to create texture render buffer: %s", SDL_GetError());
-        pLogDebug("Render SDL: Continue without of render to texture. The ability to resize the window will be disabled.");
-        SDL_SetWindowResizable(window, SDL_FALSE);
-        m_tBufferDisabled = true;
+        pLogDebug("Initialized render \"%s\" of the size: %d x %d (XRender::Target = %d x %d)",
+                    ri.name,
+                    ret_w, ret_h,
+                    XRender::TargetW, XRender::TargetH);
     }
+
+    if(m_halfPixelMode)
+        pLogDebug("Render initialized with the half-Pixel mode enabled");
 
     // Clean-up from a possible start-up junk
     clearBuffer();
@@ -279,8 +406,8 @@ void RenderSDL::repaint()
     flushRenderQueue();
 
     // Calculate the size difference factor
-    wDst = int(m_scale_x * ScaleWidth);
-    hDst = int(m_scale_y * ScaleHeight);
+    wDst = int(m_scale_x * XRender::TargetW);
+    hDst = int(m_scale_y * XRender::TargetH);
 
     // Align the rendering scene to the center of screen
     off_x = (w - wDst) / 2;
@@ -309,8 +436,9 @@ void RenderSDL::updateViewport()
 {
     flushRenderQueue();
 
-    int   render_w, render_h;
+    int targetW = XRender::TargetW, targetH = XRender::TargetH;
 
+    int render_w, render_h;
     getRenderSize(&render_w, &render_h);
 
     D_pLogDebug("Updated render size: %d x %d", render_w, render_h);
@@ -318,24 +446,70 @@ void RenderSDL::updateViewport()
     // quickly update the HiDPI scaling factor
     int window_w, window_h;
     XWindow::getWindowSize(&window_w, &window_h);
+
     m_hidpi_x = (float)render_w / (float)window_w;
     m_hidpi_y = (float)render_h / (float)window_h;
+
+    if(m_halfPixelMode)
+    {
+        targetW >>= 1;
+        targetH >>= 1;
+    }
+
+    if(!m_tBufferDisabled)
+    {
+        if(m_maxTextureWidth > 0 && targetW > m_maxTextureWidth)
+        {
+            targetW = m_maxTextureWidth;
+            XRender::TargetW = m_halfPixelMode ? m_maxTextureWidth << 1 : m_maxTextureWidth;
+        }
+
+        if(m_maxTextureHeight > 0 && targetH > m_maxTextureHeight)
+        {
+            targetH = m_maxTextureHeight;
+            XRender::TargetH = m_halfPixelMode ? m_maxTextureHeight << 1 : m_maxTextureHeight;
+        }
+
+        pLogDebug("Target render size: %d x %d (Max frame buffer size %d x %d)", targetW, targetH, m_maxTextureWidth, m_maxTextureHeight);
+    }
+    else
+    {
+        int logicW = targetW, logicH = (int)(targetW * (float)window_h / (float)window_w);
+
+#if SDL_COMPILEDVERSION >= SDL_VERSIONNUM(2, 0, 22)
+        SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_SCALING, "1");
+#endif
+
+        if(SDL_RenderSetLogicalSize(m_gRenderer, logicW, logicH) < 0)
+        {
+            pLogWarning("Failed to set up the logical size (%d x %d): %s", logicW, logicH, SDL_GetError());
+            SDL_ClearError();
+        }
+        else
+            pLogDebug("Logic resolution: %d x %d", logicW, logicH);
+
+        pLogDebug("Target render size: %d x %d (direct render)", targetW, targetH);
+    }
+
 
     float scale_x = (float)render_w / XRender::TargetW;
     float scale_y = (float)render_h / XRender::TargetH;
 
     float scale = SDL_min(scale_x, scale_y);
 
+    if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER && scale > 0.5f && m_halfPixelMode)
+        scale = std::floor(scale * 2) / 2;
+    else if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER && scale > 1.0f)
+        scale = std::floor(scale);
+
     if(g_config.scale_mode == Config_t::SCALE_FIXED_05X && scale > 0.5f)
         scale = 0.5f;
-    if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER && scale > 1.f)
-        scale = std::floor(scale);
-    if(g_config.scale_mode == Config_t::SCALE_FIXED_1X && scale > 1.f)
-        scale = 1.f;
-    if(g_config.scale_mode == Config_t::SCALE_FIXED_2X && scale > 2.f)
-        scale = 2.f;
-    if(g_config.scale_mode == Config_t::SCALE_FIXED_3X && scale > 3.f)
-        scale = 3.f;
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_1X && scale > 1.0f)
+        scale = 1.0f;
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_2X && scale > 2.0f)
+        scale = 2.0f;
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_3X && scale > 3.0f)
+        scale = 3.0f;
 
     int game_w = scale * XRender::TargetW;
     int game_h = scale * XRender::TargetH;
@@ -356,11 +530,11 @@ void RenderSDL::updateViewport()
 
     m_viewport_x = 0;
     m_viewport_y = 0;
-    m_viewport_w = XRender::TargetW;
-    m_viewport_h = XRender::TargetH;
+    m_viewport_w = targetW;
+    m_viewport_h = targetW;
 
     // update render targets
-    if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || m_current_scale_mode != g_config.scale_mode)
+    if(ScaleWidth != targetW || ScaleHeight != targetH || m_current_scale_mode != g_config.scale_mode)
     {
 #ifdef PGE_ENABLE_VIDEO_REC
         // invalidates GIF recorder handle
@@ -378,8 +552,8 @@ void RenderSDL::updateViewport()
 
         if(m_pow2)
         {
-            powUpdateNeeded |= pow2roundup(XRender::TargetW) != ScaleWidth;
-            powUpdateNeeded |= pow2roundup(XRender::TargetH) != ScaleHeight;
+            powUpdateNeeded |= pow2roundup(targetW) != ScaleWidth;
+            powUpdateNeeded |= pow2roundup(targetH) != ScaleHeight;
         }
 
         if(!m_tBufferDisabled && powUpdateNeeded)
@@ -387,16 +561,19 @@ void RenderSDL::updateViewport()
             SDL_DestroyTexture(m_tBuffer);
 
             m_tBuffer = SDL_CreateTexture(m_gRenderer, DEFAULT_PIXEL_COLOUR_FORMAT, SDL_TEXTUREACCESS_TARGET,
-                                          m_pow2 ? pow2roundup(XRender::TargetW) : XRender::TargetW,
-                                          m_pow2 ? pow2roundup(XRender::TargetH) : XRender::TargetH);
+                                          m_pow2 ? pow2roundup(targetW) : targetW,
+                                          m_pow2 ? pow2roundup(targetH) : targetH);
             SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
+            pLogDebug("Updated render buffer to: %d x %d",
+                m_pow2 ? pow2roundup(targetW) : targetW,
+                m_pow2 ? pow2roundup(targetH) : targetH);
         }
 
         // reset scaling setting for images loaded later
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
-        ScaleWidth = XRender::TargetW;
-        ScaleHeight = XRender::TargetH;
+        ScaleWidth = targetW;
+        ScaleHeight = targetH;
         m_current_scale_mode = g_config.scale_mode;
     }
 
@@ -407,7 +584,15 @@ void RenderSDL::updateViewport()
 
 void RenderSDL::resetViewport()
 {
-    if(m_viewport_x == 0 && m_viewport_y == 0 && m_viewport_w == XRender::TargetW && m_viewport_h == XRender::TargetH)
+    int targetW = XRender::TargetW, targetH = XRender::TargetH;
+
+    if(m_halfPixelMode)
+    {
+        targetW >>= 1;
+        targetH >>= 1;
+    }
+
+    if(m_viewport_x == 0 && m_viewport_y == 0 && m_viewport_w == targetW && m_viewport_h == targetH)
         return;
 
     flushRenderQueue();
@@ -415,20 +600,25 @@ void RenderSDL::resetViewport()
     // FIXME: Clarify the version of SDL2 with the buggy viewport
 //#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 22)
     // set to an alt viewport as a workaround for SDL bug (doesn't allow resizing viewport without changing position)
+#ifndef __PSP__
     SDL_Rect altViewport = {m_viewport_x + 1, m_viewport_y + 1, 1, 1};
     SDL_RenderSetViewport(m_gRenderer, &altViewport);
+#endif
 //#endif
 
     SDL_RenderSetViewport(m_gRenderer, nullptr);
 
     m_viewport_x = 0;
     m_viewport_y = 0;
-    m_viewport_w = XRender::TargetW;
-    m_viewport_h = XRender::TargetH;
+    m_viewport_w = targetW;
+    m_viewport_h = targetH;
 }
 
 void RenderSDL::setViewport(int x, int y, int w, int h)
 {
+    if(m_halfPixelMode)
+        rectDiv2(x, y, w, h);
+
     if(m_viewport_x == x && m_viewport_y == y && m_viewport_w == w && m_viewport_h == h)
         return;
 
@@ -439,12 +629,16 @@ void RenderSDL::setViewport(int x, int y, int w, int h)
     // FIXME: Clarify the version of SDL2 with the buggy viewport
 //#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 22)
     // set to an alt viewport as a workaround for SDL bug (doesn't allow resizing viewport without changing position)
+#ifndef __PSP__
     topLeftViewport = {m_viewport_x + 1, m_viewport_y + 1, 1, 1};
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
+#endif
 //#endif
 
     topLeftViewport = {x, y, w, h};
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
+
+    // pLogDebug("TRACE: Viewport Set: x=%d, y=%d, w=%d, h=%d", x, y, w, h);
 
     m_viewport_x = x;
     m_viewport_y = y;
@@ -454,6 +648,12 @@ void RenderSDL::setViewport(int x, int y, int w, int h)
 
 void RenderSDL::offsetViewport(int x, int y)
 {
+    if(m_halfPixelMode)
+    {
+        x = div2floor(x);
+        y = div2floor(y);
+    }
+
     if(m_viewport_offset_x != x || m_viewport_offset_y != y)
     {
         m_viewport_offset_x_cur = x;
@@ -470,6 +670,7 @@ void RenderSDL::offsetViewportIgnore(bool en)
         m_viewport_offset_x = en ? 0 : m_viewport_offset_x_cur;
         m_viewport_offset_y = en ? 0 : m_viewport_offset_y_cur;
     }
+
     m_viewport_offset_ignore = en;
 }
 
@@ -477,6 +678,7 @@ void RenderSDL::getRenderSize(int* w, int* h)
 {
     // make sure we're operating on default target (same as SDL)
     SDL_Texture* saved_target = SDL_GetRenderTarget(m_gRenderer);
+
     if(saved_target)
         SDL_SetRenderTarget(m_gRenderer, NULL);
 
@@ -492,7 +694,7 @@ void RenderSDL::getRenderSize(int* w, int* h)
         }
     }
 
-    if (saved_target)
+    if(saved_target)
         SDL_SetRenderTarget(m_gRenderer, saved_target);
 }
 
@@ -563,7 +765,7 @@ textureTryAgain:
 
             if(newW != width || newH != height)
             {
-                pLogDebug("Render SDL: Converting surface into Power-2 (Orig: %u x %u, P2: %u x %u)...", width, height, newW, newH);
+                pLogDebug("Render SDL: Converting surface into Power-2 (Orig: %" PRIu32 " x %" PRIu32 ", P2: %" PRIu32 " x %" PRIu32 ")...", width, height, newW, newH);
                 SDL_Surface *newSurface = SDL_CreateRGBSurfaceWithFormat(0, newW, newH, 32, DEFAULT_PIXEL_COLOUR_FORMAT);
                 if(newSurface)
                 {
@@ -579,7 +781,7 @@ textureTryAgain:
 
         if(!m_pow2 && !texture) // Try to re-make texture again
         {
-            pLogWarning("Render SDL: Failed to load texture (%s), trying to turn on the Power-2 mode...", SDL_GetError());
+            pLogWarning("Render SDL: Failed to load texture of %" PRIu32 "x%" PRIu32 " size (%s), trying to turn on the Power-2 mode...", width, height, SDL_GetError());
             m_pow2 = true;
             goto textureTryAgain;
         }
@@ -589,7 +791,7 @@ textureTryAgain:
 
     if(!texture)
     {
-        pLogWarning("Render SDL: Failed to load texture! (%s)", SDL_GetError());
+        pLogWarning("Render SDL: Failed to load texture of %" PRIu32 "x%" PRIu32 "! (%s)", width, height, SDL_GetError());
         target.inited = false;
         return;
     }
@@ -697,13 +899,13 @@ void RenderSDL::execute(const XRenderOp& op)
     case XRenderOp::Type::circle:
     {
         int radius = op.radius();
-
         SDL_SetRenderDrawColor(m_gRenderer, op.color.r, op.color.g, op.color.b, op.color.a);
 
         int dy = 1;
         do //for(double dy = 1; dy <= radius; dy += 1.0)
         {
             int dx = std::floor(std::sqrt((2 * radius * dy) - (dy * dy)));
+
             SDL_RenderDrawLine(m_gRenderer,
                                int(op.xDst - dx),
                                int(op.yDst + dy - radius),
@@ -787,13 +989,28 @@ void RenderSDL::execute(const XRenderOp& op)
         SDL_assert_release(tx.d.texture);
 
         SDL_Rect destRect = {op.xDst, op.yDst, op.wDst, op.hDst};
-
         SDL_Rect sourceRect;
         SDL_Rect* sourceRectPtr = nullptr;
+        X_FPoint scale = {tx.d.w_scale, tx.d.h_scale};
+
+        if(m_halfPixelMode)
+            rectDiv2(destRect);
 
         if(op.traits & XRenderOp::Traits::src_rect)
         {
-            sourceRect = {(int)(op.xSrc * tx.d.w_scale), (int)(op.ySrc * tx.d.h_scale), (int)(op.wSrc * tx.d.w_scale), (int)(op.hSrc * tx.d.h_scale)};
+            sourceRect =
+            {
+                (int)(op.xSrc * scale.x), (int)(op.ySrc * scale.y),
+                (int)(op.wSrc * scale.x), (int)(op.hSrc * scale.y)
+            };
+
+            // adjust draw size based on inputs
+            if(m_halfPixelMode && op.wDst == op.wSrc)
+                sourceRect.w = (int)(destRect.w * 2 * scale.x);
+
+            if(m_halfPixelMode && op.hDst == op.hSrc)
+                sourceRect.h = (int)(destRect.h * 2 * scale.y);
+
             sourceRectPtr = &sourceRect;
         }
 
@@ -813,7 +1030,7 @@ void RenderSDL::execute(const XRenderOp& op)
         else
         {
             // special logic to allow half-pixel draws of downscaled images
-            if(sourceRectPtr && tx.d.w_scale == 0.5f && op.wSrc == op.wDst)
+            if(sourceRectPtr && fEqual(tx.d.w_scale, 0.5f) && op.wSrc == op.wDst && !m_halfPixelMode)
             {
                 SDL_Rect sourceRect2;
                 SDL_Rect destRect2;
@@ -930,6 +1147,9 @@ void RenderSDL::renderRect(int x, int y, int w, int h, XTColor color, bool fille
 {
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
+    if(m_halfPixelMode)
+        rectDiv2(x, y, w, h);
+
     op.type = XRenderOp::Type::rect;
     op.xDst = x + m_viewport_offset_x;
     op.yDst = y + m_viewport_offset_y;
@@ -948,6 +1168,14 @@ void RenderSDL::renderRectBR(int _left, int _top, int _right, int _bottom, XTCol
 {
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
+    if(m_halfPixelMode)
+    {
+        _left = div2floor(_left);
+        _top = div2floor(_top);
+        _right = div2floor(_right);
+        _bottom = div2floor(_bottom);
+    }
+
     op.type = XRenderOp::Type::rect;
     op.xDst = _left + m_viewport_offset_x;
     op.yDst = _top + m_viewport_offset_y;
@@ -963,6 +1191,13 @@ void RenderSDL::renderCircle(int cx, int cy, int radius, XTColor color, bool fil
 {
     if(radius <= 0)
         return; // Nothing to draw
+
+    if(m_halfPixelMode)
+    {
+        cx >>= 1;
+        cy  >>= 1;
+        radius >>= 1;
+    }
 
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
@@ -983,6 +1218,13 @@ void RenderSDL::renderCircleHole(int cx, int cy, int radius, XTColor color)
 {
     if(radius <= 0)
         return; // Nothing to draw
+
+    if(m_halfPixelMode)
+    {
+        cx >>= 1;
+        cy  >>= 1;
+        radius >>= 1;
+    }
 
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
@@ -1041,13 +1283,13 @@ void RenderSDL::renderTextureScaleEx(int xDst, int yDst, int wDst, int hDst,
         if(wSrc < 0)
             return;
     }
+
     if(ySrc + hSrc > tx.h)
     {
         hSrc = tx.h - ySrc;
         if(hSrc < 0)
             return;
     }
-
 
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
@@ -1113,7 +1355,7 @@ void RenderSDL::renderTextureScale(int xDst, int yDst, int wDst, int hDst,
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
     op.type = XRenderOp::Type::texture;
-    op.traits = (m_pow2) ? XRenderOp::Traits::src_rect : 0;
+    op.traits = m_pow2 || m_halfPixelMode ? XRenderOp::Traits::src_rect : 0;
 
     op.texture = &tx;
 
@@ -1122,7 +1364,7 @@ void RenderSDL::renderTextureScale(int xDst, int yDst, int wDst, int hDst,
     op.wDst = wDst;
     op.hDst = hDst;
 
-    if(m_pow2)
+    if(m_pow2 || m_halfPixelMode)
     {
         op.xSrc = 0;
         op.ySrc = 0;
@@ -1164,7 +1406,6 @@ void RenderSDL::renderTexture(int xDst, int yDst, int wDst, int hDst,
         if(hDst < 0)
             return;
     }
-
 
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
@@ -1223,7 +1464,7 @@ void RenderSDL::renderTexture(int xDst, int yDst,
     XRenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
     op.type = XRenderOp::Type::texture;
-    op.traits = (m_pow2) ? XRenderOp::Traits::src_rect : 0;
+    op.traits = m_pow2 || m_halfPixelMode ? XRenderOp::Traits::src_rect : 0;
 
     op.texture = &tx;
 
@@ -1232,7 +1473,7 @@ void RenderSDL::renderTexture(int xDst, int yDst,
     op.wDst = tx.w;
     op.hDst = tx.h;
 
-    if(m_pow2)
+    if(m_pow2 || m_halfPixelMode)
     {
         op.xSrc = 0;
         op.ySrc = 0;
@@ -1256,11 +1497,17 @@ void RenderSDL::getScreenPixels(int x, int y, int w, int h, unsigned char *pixel
 #ifndef XTECH_SDL_NO_RECTF_SUPPORT
     SDL_RenderFlush(m_gRenderer);
 #endif
-    SDL_RenderReadPixels(m_gRenderer,
-                         &rect,
-                         SDL_PIXELFORMAT_BGR24,
-                         pixels,
-                         w * 3 + (w % 4));
+    int ret = SDL_RenderReadPixels(m_gRenderer,
+                                   &rect,
+                                   SDL_PIXELFORMAT_BGR24,
+                                   pixels,
+                                   w * 3 + (w % 4));
+
+    if(ret < 0)
+    {
+        pLogWarning("RenderSDL: Failed to read BGR24 pixels: %s", SDL_GetError());
+        SDL_memset(pixels, 0, (w * 3 + (w % 4)) * h); // Fill by black
+    }
 }
 
 void RenderSDL::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels)
@@ -1276,17 +1523,24 @@ void RenderSDL::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *p
 #ifndef XTECH_SDL_NO_RECTF_SUPPORT
     SDL_RenderFlush(m_gRenderer);
 #endif
-    SDL_RenderReadPixels(m_gRenderer,
-                         &rect,
-                         SDL_PIXELFORMAT_ABGR8888,
-                         pixels,
-                         w * 4);
+    int ret = SDL_RenderReadPixels(m_gRenderer,
+                                   &rect,
+                                   SDL_PIXELFORMAT_ABGR8888,
+                                   pixels,
+                                   w * 4);
+
+    if(ret < 0)
+    {
+        pLogWarning("RenderSDL: Failed to read RGBA pixels: %s", SDL_GetError());
+        SDL_memset(pixels, 0xFF, (w * 4) * h); // Fill by white
+    }
 }
 
 int RenderSDL::getPixelDataSize(const StdPicture &tx)
 {
     if(!tx.d.texture)
         return 0;
+
     return (tx.w * tx.h * 4);
 }
 

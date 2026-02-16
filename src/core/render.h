@@ -125,6 +125,22 @@ E_INLINE  bool hasFrameBuffer() TAIL
 #endif
 
 /*!
+ * \brief Identify whether render engine is in half-pixel mode
+ * \return true if render is in half-pixel mode
+ */
+#ifndef RENDER_CUSTOM
+SDL_FORCE_INLINE bool isHalfPixel()
+{
+    return g_render->isHalfPixel();
+}
+#else
+static constexpr bool isHalfPixel()
+{
+    return true;
+}
+#endif
+
+/*!
  * \brief Call the repaint
  */
 E_INLINE void repaint() TAIL
@@ -229,6 +245,30 @@ E_INLINE void getRenderSize(int *w, int *h) TAIL
 #endif
 
 /*!
+ * \brief Get the current virtual size of the window in render pixels (Once half-pixel mode is enabled, the size will be twice larger than the physical size of the canvas)
+ * \param w Width
+ * \param h Height
+ */
+E_INLINE void getLogicRenderSize(int *w, int *h) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->getLogicRenderSize(w, h);
+}
+#endif
+
+/*!
+ * \brief Get the maximum available virtual canvas size that depends on the maximum size of the frame buffer.
+ * \param w Width
+ * \param h Height
+ */
+E_INLINE void getMaxLogicSize(int *w, int *h) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->getMaxLogicSize(w, h);
+}
+#endif
+
+/*!
  * \brief Map absolute point coordinate into screen relative
  * \param x Window X position
  * \param y Window Y position
@@ -295,6 +335,26 @@ E_INLINE void setDrawPlane(uint8_t plane) TAIL
     return g_render->setDrawPlane(plane);
 }
 #endif
+
+/*!
+ * \brief Change between normal and 2pix shrinked modes
+ * \param pixHalf 2pix shrink enabled
+ * \return 1 when enabling 2x shrinking of render result, 0 is normal render mode
+ *
+ * Once enabling this mode, all the sizes and coordinates will be reported like it being 2x larger,
+ * but de-facto drawn on 2x smaller canvas. On some devices such render mode is enforced because of
+ * too small screen resolution.
+ *
+ * NOTE: This function supposed to be called from inside the XWindow, don't call it directly!
+ * From anywhere also, do call XWindow::setHalfPixMode(bool) instead of THIS function.
+ */
+E_INLINE void setHalfPixMode(bool pixHalf) TAIL
+#ifndef RENDER_CUSTOM
+{
+    return g_render->setHalfPixMode(pixHalf);
+}
+#endif
+
 
 /*!
  * \brief Reports whether the *currently-active* renderer supports loading GLSL ES shaders

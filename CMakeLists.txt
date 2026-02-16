@@ -166,20 +166,24 @@ endif()
 option(USE_SYSTEM_LIBS "Use dependent libraries like SDL2, FreeImageLite and MixerX, installed in the system" ${USE_SYSTEM_LIBS_DEFAULT})
 option(USE_SYSTEM_SDL2 "Use SDL2 from a system even prefering system libraries" ${USE_SYSTEM_SDL2_DEFAULT})
 
-option(USE_STATIC_LIBC "Link libc and libstdc++ statically" OFF)
-
-if(NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_DS)
+if(PSP OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_DS)
     set(USE_STATIC_LIBC ON)
+else()
+    option(USE_STATIC_LIBC "Link libc and libstdc++ statically" OFF)
 endif()
 
 if(NINTENDO_3DS)
     option(THEXTECH_CUSTOM_AUDIO_LIBRARY "Use the custom audio library instead of MixerX" OFF)
 endif()
 
-if(ANDROID OR VITA OR NINTENDO_DS OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH OR PGE_MIN_PORT OR THEXTECH_NO_SDL_BUILD OR PORTMASTER)
+if(ANDROID OR VITA OR PSP OR NINTENDO_DS OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH OR PGE_MIN_PORT OR THEXTECH_NO_SDL_BUILD OR PORTMASTER)
     set(THEXTECH_FORCE_FULLSCREEN ON)
 else()
     option(THEXTECH_FORCE_FULLSCREEN "Force the game to only use fullscreen mode" OFF)
+endif()
+
+if(PSP OR NINTENDO_3DS OR NINTENDO_DS OR NINTENDO_WII)
+    set(THEXTECH_FORCE_HALFPIXEL_MODE ON)
 endif()
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" AND "${TARGET_PROCESSOR}" MATCHES "arm.*")
@@ -276,6 +280,14 @@ if(EMSCRIPTEN)
     string(CONFIGURE "${THEXTECH_MANIFEST_NAME}" THEXTECH_MANIFEST_NAME_OUT)
     string(CONFIGURE "${THEXTECH_MANIFEST_ID_V}"   THEXTECH_MANIFEST_ID_OUT)
     string(CONFIGURE "${THEXTECH_MANIFEST_DESC}" THEXTECH_MANIFEST_DESC_OUT)
+endif()
+
+if(PSP)
+    set(THEXTECH_NO_ARGV_HANDLING ON)
+    set(THEXTECH_BUILD_GL_DESKTOP_MODERN OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_ES_LEGACY OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_ES_MODERN OFF CACHE BOOL "" FORCE)
 endif()
 
 if(VITA)
@@ -442,7 +454,7 @@ include(lib/Allocator/pool-allocator.cmake)
 include(lib/pge_video_rec/pge-video-rec.cmake)
 include(3rdparty/DirManager/dirman.cmake)
 
-if(NOT VITA AND NOT NINTENDO_SWITCH AND NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT NINTENDO_DS)
+if(NOT VITA AND NOT PSP AND NOT NINTENDO_SWITCH AND NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT NINTENDO_DS)
     include(3rdparty/FileMapper/FileMapper.cmake)
 endif()
 
@@ -739,6 +751,7 @@ endif()
 if(NOT ANDROID
    AND NOT EMSCRIPTEN
    AND NOT VITA
+   AND NOT PSP
    AND NOT NINTENDO_3DS
    AND NOT NINTENDO_WII
    AND NOT NINTENDO_WIIU
@@ -775,7 +788,7 @@ if(THEXTECH_ENABLE_SDL_NET)
         src/main/client_methods.cpp)
 endif()
 
-if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT NINTENDO_SWITCH AND NOT VITA AND NOT PGE_MIN_PORT)
+if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT NINTENDO_SWITCH AND NOT VITA AND NOT PSP AND NOT PGE_MIN_PORT)
     list(APPEND LIB_SRC ${FILEMAPPER_SRCS})
     set(THEXTECH_FILEMAPPER_SUPPORTED ON)
 endif()
@@ -1189,6 +1202,9 @@ elseif(NINTENDO_SWITCH)
 elseif(VITA)
     add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)
     list(APPEND THEXTECH_SRC src/core/language/language_vita.cpp)
+elseif(PSP)
+    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)
+    list(APPEND THEXTECH_SRC src/core/language/language_psp.cpp)
 elseif(UNIX)
     list(APPEND THEXTECH_SRC src/core/language/language_unix.cpp)
 else()
@@ -1265,6 +1281,10 @@ set(THEXTECH_EXTRA_RESOURCES
     resources/vita/sce_sys/livearea/contents/startup.png
     resources/vita/sce_sys/livearea/contents/template.xml.in
     resources/nds/icon.bmp
+    resources/psp/background.png
+    resources/psp/game-beat.at3
+    resources/psp/icon.png
+    resources/psp/icon.xcf
     resources/switch/splash_logo.png
     resources/switch/thextech-logo.jpg
     resources/switch/thextech-logo.png
@@ -1445,6 +1465,10 @@ if(NINTENDO_SWITCH)
     target_compile_definitions(thextech PRIVATE -D__SWITCH__ -DNO_INTPTROC)
 endif()
 
+if(PSP)
+    target_compile_definitions(thextech PRIVATE -DNO_INTPTROC)
+endif()
+
 if(VITA)
     if(THEXTECH_BUILD_GL_ES_MODERN)
         target_link_libraries(A2XT_Int INTERFACE vitaGL vitashark)
@@ -1490,12 +1514,12 @@ elseif(PGE_MIN_PORT)
     target_compile_definitions(thextech PRIVATE -DLOW_MEM)
 endif()
 
-if(VITA OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH)
+if(VITA OR PSP OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH)
     # Run in-game message box to show assert failures on platforms without SDL's message box
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_ASSERTS_INGAME_MESSAGE)
 endif()
 
-if(VITA OR NINTENDO_DS OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_SWITCH OR ANDROID OR EMSCRIPTEN)
+if(VITA OR PSP OR NINTENDO_DS OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_SWITCH OR ANDROID OR EMSCRIPTEN)
     # Disable language tools at non-desktop platforms
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_DISABLE_LANG_TOOLS)
 endif()
@@ -1647,6 +1671,12 @@ if(THEXTECH_FORCE_FULLSCREEN)
     )
 endif()
 
+if(THEXTECH_FORCE_HALFPIXEL_MODE)
+    target_compile_definitions(thextech PRIVATE
+        -DRENDER_HALFPIXEL_ALWAYS
+    )
+endif()
+
 # ==============================================================================
 
 if(NOT USE_SYSTEM_LIBS AND A2XT_DEPS)
@@ -1734,6 +1764,8 @@ elseif(WIN32)
     install(FILES changelog.txt DESTINATION .)
     install(FILES README.md DESTINATION . RENAME ReadMe.txt)
     install(FILES LICENSE DESTINATION . RENAME License.TheXTech.txt)
+elseif(PSP)
+    include(cmake/package_psp.cmake)
 elseif(VITA)
     include(cmake/package_vita.cmake)
 elseif(NINTENDO_3DS)
