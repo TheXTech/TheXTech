@@ -22,6 +22,7 @@ else()
 endif()
 
 option(MIXERX_ENABLE_WAVPACK "Enable the WavPack codec support [Support is experimental, doesn't builds on some platforms]" OFF)
+option(AUDIOCODECS_DISABLE_ASM_OPTIMIZATIONS "Disable hardware optimizations for libopus and other AudioCodecs-built libraries" OFF)
 
 if(NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT XTECH_MACOSX_TIGER)
     option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
@@ -236,6 +237,13 @@ set(AUDIO_CODECS_BUILD_ARGS
     ${VITA_CMAKE_FLAGS}
     ${VITA_AUDIOCODECS_CMAKE_FLAGS}
 )
+
+if(AUDIOCODECS_DISABLE_ASM_OPTIMIZATIONS)
+    list(APPEND AUDIO_CODECS_BUILD_ARGS
+        "-DBUILD_OPUS_DISABLE_RTCD=ON"
+        "-DDISABLE_RTCD=ON"
+    )
+endif()
 
 if(VITA OR NINTENDO_DS OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH)
     list(APPEND AUDIO_CODECS_BUILD_ARGS
