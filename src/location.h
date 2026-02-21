@@ -130,6 +130,17 @@ struct IntegerLocation_t
     }
 };
 
+//NEW: 'Holds location information for an object whose size is set by its class
+struct Position_t
+{
+//    X As Double
+    num_t X = 0_n;
+//    Y As Double
+    num_t Y = 0_n;
+
+    inline Position_t() = default;
+};
+
 //NEW: 'Holds location information for an object without speed
 struct SpeedlessLocation_t
 {
