@@ -25,6 +25,7 @@
 #ifndef XCLIENT_METHODS_H
 #define XCLIENT_METHODS_H
 
+#include <deque>
 #include <cstdint>
 #include <string>
 
@@ -51,13 +52,36 @@ struct RoomName
     char room_name[8];
 };
 
+enum ClientState
+{
+    CLIENT_OFF = 0,
+    CLIENT_LOBBY = 1,
+    CLIENT_HOST_IDLE = 2,
+    CLIENT_HOST = 3,
+    CLIENT_HOST_SPECTATED = 4,
+    CLIENT_GUEST = 5,
+    CLIENT_SPECTATOR = 6,
+};
+
+struct ClientStatus
+{
+    ClientState client_state = CLIENT_OFF;
+    std::string server_address;
+    int server_port = 4305;
+    RoomInfo room_info;
+    int client_index = 0;
+    int rand_seed = 0;
+};
+
 void Connect(const char* host = nullptr);
-bool IsConnected();
 void Disconnect();
+const ClientStatus* GetClientStatus();
+bool CompleteRequest();
 
-void ClientFrameSync();
+void ClientFrameSync(std::deque<Message>& buffer);
 
-void RequestFillRoomInfo(RoomInfo& room_info);
+bool RequestFillRoomInfo(uint32_t room_key);
+const RoomInfo* GetRoomInfo();
 
 void JoinNewRoom(const RoomInfo& room_info);
 void JoinRoom(uint32_t room_key);

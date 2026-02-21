@@ -23,9 +23,11 @@
 #include "controls.h"
 #include "message.h"
 #include "globals.h"
+#include "sound.h"
 
 #include "main/client.h"
 #include "main/client_methods.h"
+#include "main/screen_progress.h"
 
 std::string g_netplayServer = "thextech.link";
 std::string g_netplayNickname;
@@ -35,29 +37,58 @@ namespace XMessage
 
 static NetworkClient s_network_client;
 
+bool in_fast_forward = false;
+uint32_t fast_forward_begin_ms = 0;
+uint32_t fast_forward_begin_frame = 0;
+
 void Connect(const char* host)
 {
-    if(host)
-        s_network_client.Connect(host, 4305);
-    else
-        s_network_client.Connect(g_netplayServer.c_str(), 4305);
-}
+    s_network_client.EnsureThread();
 
-bool IsConnected()
-{
-    return s_network_client.socket;
+    if(SDL_AtomicGet(&s_network_client.status_req_state) > REQUEST_IDLE)
+        return;
+
+    s_network_client.status_req = ClientStatus();
+    s_network_client.status_req.client_state = CLIENT_LOBBY;
+    s_network_client.status_req.server_address = (host) ? host : g_netplayServer;
+
+    SDL_AtomicSet(&s_network_client.status_req_state, REQUEST_SUBMIT);
 }
 
 void Disconnect()
 {
-    s_network_client.Disconnect();
+    if(SDL_AtomicGet(&s_network_client.status_req_state) > REQUEST_IDLE)
+        return;
+
+    s_network_client.status_req = ClientStatus();
+
+    SDL_AtomicSet(&s_network_client.status_req_state, REQUEST_SUBMIT);
+}
+
+const ClientStatus* GetClientStatus()
+{
+    if(SDL_AtomicGet(&s_network_client.status_req_state) > REQUEST_IDLE)
+        return nullptr;
+
+    return &s_network_client.status;
+}
+
+bool CompleteRequest()
+{
+    if(SDL_AtomicGet(&s_network_client.status_req_state) == REQUEST_COMPLETED)
+    {
+        SDL_AtomicSet(&s_network_client.status_req_state, REQUEST_IDLE);
+        return true;
+    }
+
+    return false;
 }
 
 Status GetStatus()
 {
     if(CurrentRoom())
     {
-        if(s_network_client.tick < s_network_client.fast_forward_to)
+        if(in_fast_forward)
             return Status::replay;
         else
             return Status::connected;
@@ -66,32 +97,95 @@ Status GetStatus()
         return Status::local;
 }
 
-void ClientFrameSync()
+void ClientFrameSync(std::deque<Message>& buffer)
 {
-    s_network_client.SendAll();
-    s_network_client.WaitAndFill();
+    bool start_fast_forward = (s_network_client.tick < s_network_client.fast_forward_to - 8);
+    bool end_fast_forward = (s_network_client.tick >= s_network_client.fast_forward_to);
+    if(!in_fast_forward && start_fast_forward)
+    {
+        in_fast_forward = true;
+        fast_forward_begin_ms = SDL_GetTicks();
+        fast_forward_begin_frame = s_network_client.tick;
+    }
+    else if(in_fast_forward)
+    {
+        IndicateProgress(fast_forward_begin_ms, num_t(s_network_client.tick - fast_forward_begin_frame) / (s_network_client.fast_forward_to - fast_forward_begin_frame), "Loading game history...");
+
+        if(end_fast_forward)
+        {
+            in_fast_forward = false;
+            // start playing music when no longer fast forwarding
+            UpdateMusicVolume();
+        }
+    }
+
+    while(SDL_AtomicGet(&s_network_client.message_buffer_state) != REQUEST_IDLE)
+    {
+        // fixme: wait on some cond here
+    }
+
+    std::swap(s_network_client.message_buffer, buffer);
+
+    SDL_AtomicSet(&s_network_client.message_buffer_state, REQUEST_SUBMIT);
+
+    while(SDL_AtomicGet(&s_network_client.message_buffer_state) != REQUEST_COMPLETED)
+    {
+        // fixme: wait on some cond here
+    }
+
+    std::swap(s_network_client.message_buffer, buffer);
+
+    SDL_AtomicSet(&s_network_client.message_buffer_state, REQUEST_IDLE);
 }
 
-void RequestFillRoomInfo(RoomInfo& room_info)
+bool RequestFillRoomInfo(uint32_t room_key)
 {
-    s_network_client.RequestFillRoomInfo(room_info);
+    if(SDL_AtomicGet(&s_network_client.status_req_state) > REQUEST_IDLE || s_network_client.status_req.client_state != CLIENT_LOBBY)
+        return false;
+
+    s_network_client.status_req.room_info.room_key = room_key;
+
+    SDL_AtomicSet(&s_network_client.status_req_state, REQUEST_SUBMIT);
+    return true;
 }
+
+const RoomInfo* GetRoomInfo()
+{
+    if(SDL_AtomicGet(&s_network_client.status_req_state) > REQUEST_IDLE)
+        return nullptr;
+
+    return &s_network_client.status.room_info;
+}
+
 
 void JoinNewRoom(const RoomInfo& room_info)
 {
-    s_network_client.JoinNewRoom(room_info);
+    if(SDL_AtomicGet(&s_network_client.status_req_state) > REQUEST_IDLE || s_network_client.status.client_state != CLIENT_LOBBY)
+        return;
+
+    s_network_client.status_req.client_state = CLIENT_HOST;
+    s_network_client.status_req.room_info = room_info;
+
+    SDL_AtomicSet(&s_network_client.status_req_state, REQUEST_SUBMIT);
 }
 
 void JoinRoom(uint32_t room_key)
 {
-    s_network_client.JoinRoom(room_key);
-    l_screen = &Screens[s_network_client.you_are];
-    seedRandom(s_network_client.rand_seed);
+    if(SDL_AtomicGet(&s_network_client.status_req_state) > REQUEST_IDLE || s_network_client.status.client_state != CLIENT_LOBBY)
+        return;
+
+    s_network_client.status_req.client_state = CLIENT_GUEST;
+    s_network_client.status_req.room_info.room_key = room_key;
+
+    SDL_AtomicSet(&s_network_client.status_req_state, REQUEST_SUBMIT);
 }
 
 uint32_t CurrentRoom()
 {
-    return s_network_client.room_key;
+    if(SDL_AtomicGet(&s_network_client.status_req_state) > REQUEST_IDLE || s_network_client.status.client_state == CLIENT_LOBBY)
+        return 0;
+
+    return s_network_client.status.room_info.room_key;
 }
 
 void LeaveRoom()

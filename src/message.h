@@ -52,9 +52,13 @@ enum class Type : uint8_t
     screen_w,
     screen_h,
     multiplayer_prefs,
+    frame_begin = 32, // meta-message: the following messages belong to the named frame
 #ifdef THEXTECH_ENABLE_SDL_NET
-    add_client,
-    drop_client,
+    // special server control messages
+    add_client = 33,
+    drop_client = 34,
+    frame_end = 35, // meta-message: closes the previously named frame (only used by TCP)
+    transmit_start = 36, // meta-message: acknowledges client messages up to named frame (only used by UDP)
 #endif // #ifdef THEXTECH_ENABLE_SDL_NET
 };
 

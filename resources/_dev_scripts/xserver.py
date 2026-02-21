@@ -23,10 +23,10 @@ import threading
 import random
 import os
 
-# roughly, an enum of header bytes for events
-HEADER_CLIENT_JOIN = 1
-HEADER_CLIENT_LOSS = 2
-HEADER_TEXT_EVENT = 3
+# roughly, an enum of header bytes for events (*control channel*)
+# HEADER_CLIENT_JOIN = 1
+# HEADER_CLIENT_LOSS = 2
+# HEADER_TEXT_EVENT = 3
 HEADER_FRAME_COMPLETE = 4
 # HEADER_YOU_ARE = 5
 # HEADER_RAND_SEED = 6
@@ -38,6 +38,16 @@ HEADER_ROOM_INFO = 10
 
 HEADER_CREATE_ROOM = 11
 HEADER_JOIN_ROOM = 12
+
+HEADER_DATA_CHANNEL = 13
+HEADER_ACK = 14
+
+# an enum of header bytes for messages (*data channel*)
+MESSAGE_FRAME_BEGIN = 32 # meta-message: the following messages belong to the named frame
+MESSAGE_ADD_CLIENT = 33
+MESSAGE_DROP_CLIENT = 34
+MESSAGE_FRAME_END = 35 # meta-message (TCP only): the previously named frame is now complete
+MESSAGE_TRANSMIT_START = 36 # meta-message (UDP only): transmission is only valid if this frame has passed, generally acknowledges receipt of messages up to the named frame
 
 def display_room_key(room_key):
     if len(room_key) != 4:
@@ -57,21 +67,46 @@ class Connection:
     def __init__(self, server, conn, address):
         self.server = server
         self.conn = conn
+        self.data_conn = None
         self.address = address
+
+        self.session_key = b'\0\0\0\0'
 
         # room state
         self.room = None
         self.id = 0
-        self.sent_to = -1
+        self.acked_to = 0
+        self.acked_frame = -1
+        self.double_acked_frame = -60
+        self.warned_frame = 0
+
+        self.tcp_send_start = 0
+        self.tcp_send_end = 0
+        self.tcp_sent_frame = -1
+
+        self.tcp_frame_in_progress = []
+        self.tcp_frame_no = -1
+
+        # UDP state
+        self.udp_dest = None
+        self.udp_recv = []
+        self.udp_send = b''
 
     def set_room(self, room, id):
         self.room = room
         self.id = id
-        self.sent_to = -1
+        self.acked_to = -1
+        self.acked_frame = -1
+        self.double_acked_frame = -60
+        self.warned_frame = 0
+
+        self.tcp_send_start = 0
+        self.tcp_send_end = 0
+        self.tcp_sent_frame = -1
 
     def read_in_room(self):
         # conn is the socket object
-        header = self.conn.recv(4)
+        header = self.data_conn.recv(4)
         if len(header) != 4:
             self.room.kill(self)
             return
@@ -82,22 +117,69 @@ class Connection:
             self.room = None
             self.server.register(self)
 
-            self.conn.sendall(bytes([HEADER_LEFT_ROOM]))
+            self.data_conn.sendall(bytes([HEADER_LEFT_ROOM]))
+            self.data_conn.close()
+            self.data_conn = None
+
             return
 
-        frame_no = header[0] * 256 * 256 + header[1] * 256 + header[2]
-        event_length = header[3]
+    def read_data(self):
+        # conn is the socket object
+        message = self.data_conn.recv(4)
+        if len(message) != 4:
+            self.room.kill(self)
+            return
 
-        if event_length > 0:
-            event_text = self.conn.recv(event_length)
+        if message[0] == MESSAGE_FRAME_BEGIN or message[0] == MESSAGE_FRAME_END:
+            if self.tcp_frame_no > self.acked_frame:
+                self.acked_frame = self.tcp_frame_no
 
-            if len(event_text) != event_length:
-                self.room.kill(self)
-                return
-        else:
-            event_text = bytes()
+                for msg in self.tcp_frame_in_progress:
+                    self.room.enqueue_text_event(self.tcp_frame_no, self.id, msg)
+                    print("Got 1 new event from TCP")
 
-        self.room.enqueue_text_event(frame_no, self.id, event_text)
+                self.tcp_frame_in_progress = []
+
+            self.tcp_frame_no = -1
+
+            frame_no = message[1] * 256 * 256 + message[2] * 256 + message[3]
+            if message[0] == MESSAGE_FRAME_BEGIN:
+                self.tcp_frame_no = frame_no
+                if frame_no - 1 > self.acked_frame:
+                    self.acked_frame = frame_no - 1
+            else:
+                if frame_no > self.acked_frame:
+                    self.acked_frame = frame_no
+        elif self.tcp_frame_no > self.acked_frame:
+            self.tcp_frame_in_progress.append(message)
+
+    def read_data_udp(self, msg):
+        if len(msg) % 4 != 0:
+            self.room.kill(self)
+            return
+
+        udp_frame_index = -1
+        for i in range(0, len(msg), 4):
+            message = msg[i : i + 4]
+
+            if message[0] == MESSAGE_FRAME_BEGIN or message[0] == MESSAGE_FRAME_END:
+                udp_frame_index = message[1] * 256 * 256 + message[2] * 256 + message[3]
+                if message[0] == MESSAGE_FRAME_END and udp_frame_index > self.acked_frame:
+                    self.acked_frame = udp_frame_index
+                elif udp_frame_index - 1 > self.acked_frame:
+                    self.acked_frame = udp_frame_index - 1
+            else:
+                if udp_frame_index > self.acked_frame:
+                    self.room.enqueue_text_event(udp_frame_index, self.id, message)
+                    print("Got 1 new event from UDP")
+
+    def set_data_conn(self, data_conn):
+        if self.data_conn:
+            return
+
+        self.data_conn = data_conn
+        if self.room:
+            self.room.selector.register(self.data_conn, selectors.EVENT_READ, self.read_data)
 
     def read_in_lobby(self):
         header = self.conn.recv(1)
@@ -112,8 +194,9 @@ class Connection:
                 return
 
             room = self.server.load_room(room_key)
-            if not room:
-                self.conn.sendall(bytes([HEADER_ROOM_INFO]) + b'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0')
+            if not room or room.room_key != room_key:
+                self.conn.sendall(bytes([HEADER_ROOM_INFO]) + room_key + b'\0\0\0\0\0\0\0\0\0\0\0\0')
+                return
 
             self.conn.sendall(bytes([HEADER_ROOM_INFO]) + room.room_key + room.room_info)
         elif header[0] == HEADER_JOIN_ROOM:
@@ -124,7 +207,7 @@ class Connection:
 
             room = self.server.load_room(room_key)
             if not room:
-                self.conn.sendall(bytes([HEADER_ROOM_KEY]) + b'\0' * 11)
+                self.conn.sendall(bytes([HEADER_ROOM_KEY]) + b'\0' * 15)
                 return
 
             self.server.unregister(self)
@@ -134,11 +217,24 @@ class Connection:
 
             room = self.server.create_room(room_info)
             if not room:
-                self.conn.sendall(bytes([HEADER_ROOM_KEY]) + b'\0' * 11)
+                self.conn.sendall(bytes([HEADER_ROOM_KEY]) + b'\0' * 15)
                 return
 
             self.server.unregister(self)
             room.add(self)
+        elif header[0] == HEADER_DATA_CHANNEL:
+            # unregister as a normal client
+            self.server.unregister(self)
+            self.server.unregister_session(self.session_key)
+            self.session_key = b'\0\0\0\0'
+
+            # transfer the conn to the correct client (if it exists)
+            session_key = self.conn.recv(4)
+            main_client = self.server.find_session(session_key)
+            if main_client:
+                main_client.set_data_conn(self.conn)
+
+            self.conn = None
 
     def read(self):
         if self.room is not None:
@@ -187,22 +283,31 @@ class Room:
             frame_no = self.frame_no
 
         # encode event
-        if len(event_text) > 255:
-            print(f"Warning: truncating text of length {len(event_text)} to 255 characters.")
-            event_text = event_text[:255]
-
-        header = bytes([HEADER_TEXT_EVENT, id, len(event_text)])
-
-        serialized_event = header + event_text
+        if len(event_text) != 4:
+            print(f"Warning: invalid event length {len(event_text)}, 4 expected.")
+            return
+        if event_text[1] != id:
+            # figure this out...
+            print(f"Warning: invalid event client ID {event_text[1]}, {id} expected.")
+            return
 
         # add to queue
-        heapq.heappush(self.event_queue, (frame_no, serialized_event))
+        heapq.heappush(self.event_queue, (frame_no, event_text))
 
     def unregister(self, client):
         # free client's network state
         try:
             self.selector.unregister(client.conn)
         except KeyError:
+            pass
+        except ValueError:
+            pass
+
+        try:
+            self.selector.unregister(client.data_conn)
+        except KeyError:
+            pass
+        except ValueError:
             pass
 
         # get client's ID
@@ -213,7 +318,7 @@ class Room:
             return
 
         # create loss event and add to queue
-        serialized_event = bytes([HEADER_CLIENT_LOSS, dead_id])
+        serialized_event = bytes([MESSAGE_DROP_CLIENT, 255, 0, dead_id])
         heapq.heappush(self.event_queue, (self.frame_no, serialized_event))
 
         # remove reference to this client
@@ -225,6 +330,8 @@ class Room:
     def kill(self, client):
         self.unregister(client)
         client.conn.close()
+        if client.data_conn:
+            client.data_conn.close()
 
     def add(self, client):
         # find an ID and slot for the client
@@ -240,22 +347,55 @@ class Room:
         self.clients[new_id] = client
 
         # create join event and add to queue
-        serialized_event = bytes([HEADER_CLIENT_JOIN, new_id])
+        serialized_event = bytes([MESSAGE_ADD_CLIENT, 255, 0, new_id])
         heapq.heappush(self.event_queue, (self.frame_no, serialized_event))
 
         # tell the client who they are, what the current time is, and the room's key (may throw)
+        if client.session_key == b'\0\0\0\0':
+            self.server.create_session(client)
+
         client.conn.sendall(bytes([
             HEADER_ROOM_KEY, self.room_key[0], self.room_key[1], self.room_key[2], self.room_key[3],
             new_id,
             self.rand_seed[0], self.rand_seed[1], self.rand_seed[2],
             self.frame_no // (256 * 256), (self.frame_no // 256) % 256, self.frame_no % 256,
+            client.session_key[0], client.session_key[1], client.session_key[2], client.session_key[3],
             ]))
-        client.sent_to = 0
+        client.acked_to = 0
+        client.acked_frame = -1
+        client.double_acked_frame = -60
+        client.warned_frame = self.frame_no
+        client.tcp_sent_frame = -1
 
         # register this socket's events to go to the client
         self.selector.register(client.conn, selectors.EVENT_READ, client.read)
+        if client.data_conn:
+            self.selector.register(client.data_conn, selectors.EVENT_READ, client.read_data)
+
+    def transmit(self, client):
+        # send UDP
+        if client.udp_send and client.udp_dest:
+            self.server.udp_socket.sendto(client.udp_send, client.udp_dest)
+            # print('Sending', list(client.udp_send))
+
+        # send TCP
+        if client.data_conn and (client.tcp_send_start < client.tcp_send_end or (not client.udp_dest and client.tcp_send_end == len(self.sent_history))):
+            try:
+                client.tcp_send_start += client.data_conn.send(self.sent_history[client.tcp_send_start:client.tcp_send_end])
+                if client.tcp_send_start == len(self.sent_history):
+                    client.data_conn.sendall(bytes([MESSAGE_FRAME_END, self.frame_no // (256 * 256), (self.frame_no // 256) % 256, self.frame_no % 256]))
+                    client.tcp_send_end = 0
+            except BlockingIOError:
+                pass
+            except ConnectionResetError:
+                pass
+            except BrokenPipeError:
+                pass
 
     def process_frame(self):
+        # increment the frame number
+        self.frame_no += 1
+
         # print(f"Debug: starting processing for frame {self.frame_no}")
 
         # thread-safe way of adopting added clients queue
@@ -265,7 +405,8 @@ class Room:
         for client in added_clients:
             try:
                 self.add(client)
-            except Exception:
+            except Exception as e:
+                print(e)
                 self.kill(client)
 
         # sync all network events
@@ -276,8 +417,20 @@ class Room:
             callback = key.data
             try:
                 callback()
-            except Exception:
+            except Exception as e:
+                print(e)
                 self.kill(callback.__self__)
+
+        # sync UDP events
+        for client in self.clients:
+            if client is None:
+                continue
+
+            got = client.udp_recv
+            client.udp_recv = []
+
+            for msg in got:
+                client.read_data_udp(msg)
 
         # combine all events from this frame
         serialized_events = bytes()
@@ -291,12 +444,11 @@ class Room:
             serialized_events += serialized_event
 
             # debug info
-            if serialized_event[0] == HEADER_CLIENT_JOIN:
-                print(f"Debug: sending CLIENT_JOIN ({serialized_event[1]})")
-            elif serialized_event[0] == HEADER_CLIENT_LOSS:
-                print(f"Debug: sending CLIENT_LOSS ({serialized_event[1]})")
-            elif serialized_event[0] == HEADER_TEXT_EVENT:
-                print(f"Debug: sending TEXT_EVENT ({serialized_event[1]}): {serialized_event[3:]}")
+            # if serialized_event[0] == HEADER_CLIENT_JOIN:
+            #     print(f"Debug: sending CLIENT_JOIN ({serialized_event[1]})")
+            # elif serialized_event[0] == HEADER_CLIENT_LOSS:
+            #     print(f"Debug: sending CLIENT_LOSS ({serialized_event[1]})")
+            print(f"Debug: sending TEXT_EVENT (from {serialized_event[1]}): {list(serialized_event)}")
 
             if event_frame != self.frame_no:
                 print(f"Warning: sent an event for frame {event_to_send[0]} on frame {self.frame_no}. This is not a normal lag situation.")
@@ -315,9 +467,9 @@ class Room:
             if not has_any_client:
                 return
 
-        # add the frame-end event
-        serialized_events += bytes([HEADER_FRAME_COMPLETE, self.frame_no // (256 * 256), (self.frame_no // 256) % 256, self.frame_no % 256])
-        # print(f"Debug: sending FRAME_COMPLETE ({self.frame_no})")
+        # add the frame-begin event
+        if serialized_events:
+            serialized_events = bytes([MESSAGE_FRAME_BEGIN, self.frame_no // (256 * 256), (self.frame_no // 256) % 256, self.frame_no % 256]) + serialized_events
 
         # actually send the frame's events to all client sockets
         self.sent_history += serialized_events
@@ -326,16 +478,59 @@ class Room:
             if client is None:
                 continue
 
-            if client.sent_to != -1:
+            if client.acked_to != -1 and (client.data_conn or client.udp_dest):
+                # adjust sent_to based on acked frame
+                if client.udp_dest and client.acked_frame >= 0:
+                    while client.acked_to + 4 <= len(self.sent_history):
+                        if self.sent_history[client.acked_to] == MESSAGE_FRAME_BEGIN and \
+                                self.sent_history[client.acked_to + 1 : client.acked_to + 4] >= bytes([client.acked_frame // (256 * 256), (client.acked_frame // 256) % 256, client.acked_frame % 256]):
+                            break
+                        client.acked_to += 4
+
+                MTU_size = 250
+                if client.udp_dest and len(self.sent_history) - client.acked_to <= MTU_size - 8:
+                    start = max(client.acked_frame, client.tcp_sent_frame + 1)
+                    if start >= 0:
+                        ack = bytes([MESSAGE_TRANSMIT_START, start // (256 * 256), (start // 256) % 256, start % 256])
+                    else:
+                        ack = bytes()
+                    client.udp_send = ack + self.sent_history[client.acked_to:] + bytes([MESSAGE_FRAME_END, self.frame_no // (256 * 256), (self.frame_no // 256) % 256, self.frame_no % 256])
+                # add the tail of the room history to the TCP send queue
+                else:
+                    if client.tcp_send_start == client.tcp_send_end:
+                        client.tcp_send_start = client.acked_to
+                    client.tcp_send_end = len(self.sent_history)
+                    client.acked_to = client.tcp_send_end
+                    client.tcp_sent_frame = self.frame_no
+                    client.udp_send = bytes()
+
+                self.transmit(client)
+
+            # warn clients if they are falling behind (in the future, this will happen based on whether the UDP MTU has been exceeded)
+            if self.frame_no - max(client.acked_frame, client.warned_frame) > 20:
+                # print('Warning client of catchup', self.frame_no, client.acked_frame, client.warned_frame)
                 try:
-                    client.sent_to += client.conn.send(self.sent_history[client.sent_to:])
+                    client.conn.sendall(bytes([HEADER_FRAME_COMPLETE, self.frame_no // (256 * 256), (self.frame_no // 256) % 256, self.frame_no % 256]))
                 except BlockingIOError:
                     pass
                 except ConnectionResetError:
                     pass
+                except BrokenPipeError:
+                    pass
+                client.warned_frame = self.frame_no
 
-        # increment the frame number
-        self.frame_no += 1
+            # TCP mode: double-ack clients to let them know their latency
+            if client.acked_frame - client.double_acked_frame > 60:
+                print('Client latency appears to be', self.frame_no - client.acked_frame)
+                try:
+                    client.conn.sendall(bytes([HEADER_ACK, client.acked_frame // (256 * 256), (client.acked_frame // 256) % 256, client.acked_frame % 256]))
+                except BlockingIOError:
+                    pass
+                except ConnectionResetError:
+                    pass
+                except BrokenPipeError:
+                    pass
+                client.double_acked_frame = client.acked_frame
 
         # update the free client ID list
         self.freed_clients.update(self.newly_freed_clients)
@@ -353,6 +548,13 @@ class Room:
                 print(f'Warning: overlong frame {self.frame_no - 1} ({proc_time}s > {self.frame_length}s)')
             else:
                 time.sleep(self.frame_length - proc_time)
+                # for i in range(2):
+                #     time.sleep((self.frame_length - proc_time) / 2)
+
+                #     for client in self.clients:
+                #         if client is None:
+                #             continue
+                #         self.transmit(client)
 
 
 class Server:
@@ -370,13 +572,28 @@ class Server:
         self.socket.setblocking(False)
         self.selector.register(self.socket, selectors.EVENT_READ, self.accept)
 
+        self.udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.udp_socket.bind((bind_address, bind_port))
+        self.udp_socket.setblocking(False)
+        self.selector.register(self.udp_socket, selectors.EVENT_READ, self.read_udp)
+
         # dictionary of loaded rooms
         self.loaded_rooms = {}
         self.room_insertion_lock = threading.Lock()
 
+        # dictionary of active sessions
+        self.sessions = {}
+        self.session_kill_list = [] # eventually, add a timeout list for unexpectedly disconnected sessions here
+        self.sessions_lock = threading.Lock()
+
+        # dictionary of UDP connections to clients (FIXME: need to timeout and deallocate these when client sessions are killed)
+        self.udp_connections = {}
+
         # directory to store saved rooms
         self.room_directory = '/tmp/py'
         os.makedirs(self.room_directory, exist_ok=True)
+
+        # FIXME: add some rate-limiting system soon
 
     def insert_room(self, new_room):
         with self.room_insertion_lock:
@@ -406,6 +623,31 @@ class Server:
         self.insert_room(new_room)
 
         return new_room
+
+    def create_session(self, client):
+        with self.sessions_lock:
+            while True:
+                session_key = bytes([random.randint(128, 255), random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)])
+
+                if session_key in self.sessions:
+                    continue
+
+                break
+
+            self.sessions[session_key] = client
+            client.session_key = session_key
+
+    def find_session(self, session_key):
+        with self.sessions_lock:
+            if session_key in self.sessions:
+                return self.sessions[session_key]
+
+        return None
+
+    def unregister_session(self, session_key):
+        with self.sessions_lock:
+            if session_key in self.sessions:
+                del self.sessions[session_key]
 
     def load_room(self, room_key):
         display_key = display_room_key(room_key)
@@ -445,15 +687,34 @@ class Server:
         # wait for events on this client
         self.selector.register(new_client.conn, selectors.EVENT_READ, new_client.read)
 
+    def read_udp(self):
+        data, addr = self.udp_socket.recvfrom(256)
+
+        if addr in self.udp_connections and data[0] < 128:
+            self.udp_connections[addr].udp_recv.append(data)
+        elif len(data) == 4 and not addr in self.udp_connections:
+            print(data, addr)
+            client = self.find_session(data)
+            if client:
+                self.udp_connections[addr] = client
+                client.udp_dest = addr
+                client.udp_recv = []
+                client.udp_send = b''
+
     def unregister(self, client):
         try:
             self.selector.unregister(client.conn)
         except KeyError:
             pass
+        except ValueError:
+            pass
 
     def kill(self, client):
         self.unregister(client)
         client.conn.close()
+
+        if client.data_conn:
+            client.data_conn.close()
 
     def process(self):
         # sync all network events
@@ -464,7 +725,8 @@ class Server:
             callback = key.data
             try:
                 callback()
-            except Exception:
+            except Exception as e:
+                print(e)
                 # don't kill self on failed accept, just ignore
                 if callback.__self__ is not self:
                     self.kill(callback.__self__)

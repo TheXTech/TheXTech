@@ -101,10 +101,6 @@ static SDL_atomic_t         loadingProgrssMax = {};
 static SDL_Thread*          loadingThread = nullptr;
 #endif
 
-#ifdef THEXTECH_ENABLE_SDL_NET
-static XMessage::RoomInfo   s_room_info;
-#endif
-
 static constexpr int c_menuSavesLength = maxSaveSlots + 2;
 static constexpr int c_menuSavesFooterHint = (c_menuSavesLength * 30) - 30;
 static constexpr int c_menuItemSavesEndList = maxSaveSlots - 1;
@@ -265,6 +261,14 @@ static bool s_show_online()
 
 static void s_StartEpisodeOnline()
 {
+    if(!XMessage::GetClientStatus())
+        return;
+
+    const auto& status = *XMessage::GetClientStatus();
+
+    l_screen = &Screens[status.client_index];
+    seedRandom(status.rand_seed);
+
     selSave = 0;
 
     if((int)Controls::g_InputMethods.size() > 1)
@@ -999,8 +1003,14 @@ bool mainMenuUpdate()
         if(MenuMode == MENU_INTRO && XRender::TargetH >= TinyScreenH)
             MenuMode = MENU_MAIN;
 
+        if(false
 #ifndef PGE_NO_THREADING
-        if(SDL_AtomicGet(&loading))
+            || SDL_AtomicGet(&loading)
+#endif
+#ifdef THEXTECH_ENABLE_SDL_NET
+            || XMessage::GetClientStatus() == nullptr
+#endif
+        )
         {
             if((menuControls.Do && MenuCursorCanMove) || MenuMouseClick)
                 PlaySoundMenu(SFX_BlockHit);
@@ -1008,11 +1018,16 @@ bool mainMenuUpdate()
             if(MenuCursor != 0)
                 MenuCursor = 0;
         }
-        else
-#endif
-
+#ifdef THEXTECH_ENABLE_SDL_NET
+        else if(XMessage::CompleteRequest())
+        {
+            if(XMessage::GetClientStatus() && (XMessage::GetClientStatus()->client_state == XMessage::CLIENT_GUEST || XMessage::GetClientStatus()->client_state == XMessage::CLIENT_HOST))
+                s_StartEpisodeOnline();
+            // ... some sort of switch for responses to queries
+        }
+#endif // #ifdef THEXTECH_ENABLE_SDL_NET
         // Menu Intro
-        if(MenuMode == MENU_INTRO)
+        else if(MenuMode == MENU_INTRO)
         {
             if(MenuMouseRelease && SharedCursor.Primary)
                 MenuMouseClick = true;
@@ -1294,6 +1309,9 @@ bool mainMenuUpdate()
                     netplayPos++;
 
                 XMessage::Disconnect();
+                // this also shouldn't be necessary
+                while(XMessage::GetClientStatus() == nullptr) {}
+
                 MenuMode = MENU_MAIN;
                 MenuCursor = netplayPos;
                 MenuCursorCanMove = false;
@@ -1303,38 +1321,38 @@ bool mainMenuUpdate()
             {
                 MenuCursorCanMove = false;
 
-                if((MenuCursor == 0 || MenuCursor == 1) && !XMessage::IsConnected())
+                if((MenuCursor == 0 || MenuCursor == 1) && (!XMessage::GetClientStatus() || XMessage::GetClientStatus()->client_state != XMessage::CLIENT_LOBBY))
                     PlaySoundMenu(SFX_BlockHit);
                 else if(MenuCursor == 0)
                 {
                     PlaySoundMenu(SFX_Do);
 
-                    s_room_info = XMessage::RoomInfo();
-                    s_room_info.room_key = XMessage::RoomFromString(TextEntryScreen::Run(g_mainMenu.netplayRoomKey));
+                    uint32_t room_key = XMessage::RoomFromString(TextEntryScreen::Run(g_mainMenu.netplayRoomKey));
 
-                    if(s_room_info.room_key)
+                    if(room_key && XMessage::RequestFillRoomInfo(room_key))
                     {
                         // this shouldn't actually happen synchronously
-                        XMessage::RequestFillRoomInfo(s_room_info);
+                        while(XMessage::GetRoomInfo() == nullptr) {}
+
+                        const XMessage::RoomInfo& room_info = *XMessage::GetRoomInfo();
 
                         selWorld = -1;
 
                         for(size_t i = 0; i < SelectWorld.size(); i++)
                         {
-                            if(SelectWorld[i].lz4_content_hash == s_room_info.content_hash)
+                            if(SelectWorld[i].lz4_content_hash == room_info.content_hash)
                             {
                                 selWorld = i;
                                 break;
                             }
                         }
 
-                        if(s_room_info.room_key == 0 || s_room_info.engine_hash != s_engineHash() || s_room_info.asset_hash != s_assetPackHash() || selWorld == -1)
+                        if(room_info.room_key == 0 || room_info.engine_hash != s_engineHash() || room_info.asset_hash != s_assetPackHash() || selWorld == -1)
                             PlaySoundMenu(SFX_BlockHit);
                         else
                         {
                             PlaySoundMenu(SFX_Do);
-                            XMessage::JoinRoom(s_room_info.room_key);
-                            s_StartEpisodeOnline();
+                            XMessage::JoinRoom(room_info.room_key);
                         }
                     }
                     else
@@ -1351,7 +1369,6 @@ bool mainMenuUpdate()
                 else if(MenuCursor == 2)
                 {
                     PlaySoundMenu(SFX_Do);
-                    XMessage::Disconnect();
                     g_netplayServer = TextEntryScreen::Run(g_mainMenu.netplayServer);
                     XMessage::Connect();
                 }
@@ -1541,15 +1558,11 @@ bool mainMenuUpdate()
                 // new room
                 else if(MenuMode == MENU_NETPLAY_WORLD_SELECT)
                 {
-                    s_room_info = XMessage::RoomInfo();
-                    s_room_info.engine_hash = s_engineHash();
-                    s_room_info.asset_hash = s_assetPackHash();
-                    s_room_info.content_hash = SelectWorld[selWorld].lz4_content_hash;
-
-                    // this shouldn't actually happen synchronously
-                    XMessage::JoinNewRoom(s_room_info);
-
-                    s_StartEpisodeOnline();
+                    XMessage::RoomInfo room_info = XMessage::RoomInfo();
+                    room_info.engine_hash = s_engineHash();
+                    room_info.asset_hash = s_assetPackHash();
+                    room_info.content_hash = SelectWorld[selWorld].lz4_content_hash;
+                    XMessage::JoinNewRoom(room_info);
                 }
 #endif
                 // enter save select
@@ -2299,7 +2312,16 @@ void mainMenuDraw()
     }
     // DO NOT DETACH THE BELOW ELSE STATEMENT FROM THE FOLLOWING SERIES OF IF CLAUSES
     else
-#endif
+#endif // #ifndef PGE_NO_THREADING
+#ifdef THEXTECH_ENABLE_SDL_NET
+    // loading (can't safely render)
+    if(XMessage::GetClientStatus() == nullptr)
+    {
+        SuperPrint(g_mainMenu.loading, 3, MenuX, MenuY);
+    }
+    // DO NOT DETACH THE BELOW ELSE STATEMENT FROM THE FOLLOWING SERIES OF IF CLAUSES
+    else
+#endif // #ifdef THEXTECH_ENABLE_SDL_NET
     // Main menu
         if(MenuMode == MENU_MAIN)
     {
@@ -2337,7 +2359,7 @@ void mainMenuDraw()
         XTColor c;
         XTColor s;
 
-        if(XMessage::IsConnected())
+        if(XMessage::GetClientStatus() && XMessage::GetClientStatus()->client_state == XMessage::CLIENT_LOBBY)
             s = {200, 255, 200};
         else
         {
