@@ -316,13 +316,13 @@ void SaveGame()
     sav.gameCompleted = BeatTheGame; // Can only get 99% until you finish the game;
 
     for(A = 1; A <= numWorldLevels; A++)
-        sav.visibleLevels.emplace_back(A, WorldLevel[A].Active);
+        sav.visibleLevels.emplace_back(0, WorldLevel[A].Active);
 
     for(A = 1; A <= numWorldPaths; A++)
-        sav.visiblePaths.emplace_back(A, WorldPath[A].Active);
+        sav.visiblePaths.emplace_back(0, WorldPath[A].Active);
 
     for(A = 1; A <= numScenes; A++)
-        sav.visibleScenery.emplace_back(A, Scene[A].Active);
+        sav.visibleScenery.emplace_back(0, Scene[A].Active);
 
     for(const auto& star : Star)
         sav.gottenStars.emplace_back(star.level, star.Section);
