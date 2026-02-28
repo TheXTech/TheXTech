@@ -1667,7 +1667,7 @@ void UpdateGraphicsMeta();
 
 void GraphicsClearScreen()
 {
-    if(!GameIsActive)
+    if(!GameIsActive || XMessage::GetStatus() == XMessage::Status::replay)
         return;
 
     XRender::setTargetTexture();
