@@ -77,6 +77,7 @@ struct Message
     }
 };
 
+void InitSession();
 void Tick();
 
 void PushMessage_Direct(Message message);

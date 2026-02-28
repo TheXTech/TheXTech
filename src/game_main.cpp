@@ -2424,6 +2424,9 @@ void SizableBlocks()
 
 static void s_InitPlayersFromCharSelect()
 {
+    for(int A = 0; A <= maxPlayers; A++)
+        Player[A] = Player_t();
+
     // load players from the screens
     numPlayers = 0;
     InitScreens();
@@ -2461,6 +2464,8 @@ static void s_InitPlayersFromCharSelect()
 
 void StartEpisode()
 {
+    XMessage::InitSession();
+
     For(A, 1, numCharacters)
     {
         SavedChar[A] = Player_t();
@@ -2608,6 +2613,8 @@ void StartEpisode()
 
 void StartBattleMode()
 {
+    XMessage::InitSession();
+
     int A = 0;
     Player_t blankPlayer;
 

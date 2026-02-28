@@ -189,6 +189,12 @@ void Handle(const Message& m)
     }
 }
 
+void InitSession()
+{
+    for(int A = 0; A <= maxNetplayPlayers; A++)
+        s_last_controls[A] = Controls_t();
+}
+
 void Tick()
 {
 #ifdef THEXTECH_ENABLE_SDL_NET
