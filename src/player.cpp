@@ -2096,15 +2096,21 @@ void PlayerFrame(Player_t &p)
     else
     {
         bool grounded = (p.Location.SpeedY == 0 || p.StandingOnNPC != 0 || p.Slope > 0);
+        bool wetframe = p.WetFrame;
 
         if(p.CurMazeZone)
+        {
             grounded = false;
+
+            if(p.State != PLR_STATE_POLAR && p.State != PLR_STATE_AQUATIC)
+                wetframe = true;
+        }
 
         if(p.State == 1 && (p.Character == 1 || p.Character == 2)) // Small Mario & Luigi
         {
             if(p.HoldingNPC == 0) // not holding anything
             {
-                if(p.WetFrame && !grounded && !p.Duck && p.Quicksand == 0) // swimming
+                if(wetframe && !grounded && !p.Duck && p.Quicksand == 0) // swimming
                 {
                     if(p.CurMazeZone)
                         p.Frame = 40;
@@ -2150,7 +2156,7 @@ void PlayerFrame(Player_t &p)
                         {
                             if(!LevelSelect)
                             {
-                                if(p.Mount != 2 && !p.WetFrame && !p.Duck)
+                                if(p.Mount != 2 && !wetframe && !p.Duck)
                                 {
                                     PlaySoundSpatial(SFX_Skid, p.Location);
                                     s_makeDust(p, -8, tempLocation);
@@ -2163,7 +2169,7 @@ void PlayerFrame(Player_t &p)
                         {
                             if(!LevelSelect)
                             {
-                                if(p.Mount != 2 && !p.WetFrame && !p.Duck)
+                                if(p.Mount != 2 && !wetframe && !p.Duck)
                                 {
                                     PlaySoundSpatial(SFX_Skid, p.Location);
                                     s_makeDust(p, -8, tempLocation);
@@ -2266,19 +2272,19 @@ void PlayerFrame(Player_t &p)
                 if(p.FrameCount <= 106)
                 {
                     p.Frame = 11;
-                    if(p.WetFrame && p.Quicksand == 0 && p.Location.SpeedY != 0 && p.Slope == 0 && p.StandingOnNPC == 0 && p.Character <= 2)
+                    if(wetframe && p.Quicksand == 0 && p.Location.SpeedY != 0 && p.Slope == 0 && p.StandingOnNPC == 0 && p.Character <= 2)
                         p.Frame = 43;
                 }
                 else if(p.FrameCount <= 112)
                 {
                     p.Frame = 12;
-                    if(p.WetFrame && p.Quicksand == 0 && p.Location.SpeedY != 0 && p.Slope == 0 && p.StandingOnNPC == 0 && p.Character <= 2)
+                    if(wetframe && p.Quicksand == 0 && p.Location.SpeedY != 0 && p.Slope == 0 && p.StandingOnNPC == 0 && p.Character <= 2)
                         p.Frame = 44;
                 }
                 else
                 {
                     p.Frame = 11;
-                    if(p.WetFrame && p.Quicksand == 0 && p.Location.SpeedY != 0 && p.Slope == 0 && p.StandingOnNPC == 0 && p.Character <= 2)
+                    if(wetframe && p.Quicksand == 0 && p.Location.SpeedY != 0 && p.Slope == 0 && p.StandingOnNPC == 0 && p.Character <= 2)
                         p.Frame = 43;
                 }
 
@@ -2306,7 +2312,7 @@ void PlayerFrame(Player_t &p)
         {
             if(p.HoldingNPC == 0 || (p.Effect == PLREFF_WARP_PIPE && p.Character >= 3))
             {
-                if(p.WetFrame && !grounded && !p.Duck && p.Quicksand == 0)
+                if(wetframe && !grounded && !p.Duck && p.Quicksand == 0)
                 {
                     if(p.CurMazeZone)
                     {

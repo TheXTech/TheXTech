@@ -1479,11 +1479,7 @@ void PlayerMazeZoneMovement(int A)
         SizeCheck(Player[A]);
     }
     else if(!Player[A].Rolling && !Player[A].AquaticSwim)
-    {
         UnDuck(Player[A]);
-        if(Player[A].State != PLR_STATE_POLAR && Player[A].State != PLR_STATE_AQUATIC)
-            Player[A].WetFrame = true;
-    }
 
     Player[A].Bumped = 0;
     Player[A].Bumped2 = 0;
