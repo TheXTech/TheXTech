@@ -125,33 +125,38 @@ class Connection:
 
     def read_data(self):
         # conn is the socket object
-        message = self.data_conn.recv(4)
-        if len(message) != 4:
-            self.room.kill(self)
-            return
+        while True:
+            try:
+                message = self.data_conn.recv(4)
+            except BlockingIOError:
+                break
 
-        if message[0] == MESSAGE_FRAME_BEGIN or message[0] == MESSAGE_FRAME_END:
-            if self.tcp_frame_no > self.acked_frame:
-                self.acked_frame = self.tcp_frame_no
+            if len(message) != 4:
+                self.room.kill(self)
+                return
 
-                for msg in self.tcp_frame_in_progress:
-                    self.room.enqueue_text_event(self.tcp_frame_no, self.id, msg)
-                    print("Got 1 new event from TCP")
+            if message[0] == MESSAGE_FRAME_BEGIN or message[0] == MESSAGE_FRAME_END:
+                if self.tcp_frame_no > self.acked_frame:
+                    self.acked_frame = self.tcp_frame_no
 
-                self.tcp_frame_in_progress = []
+                    for msg in self.tcp_frame_in_progress:
+                        self.room.enqueue_text_event(self.tcp_frame_no, self.id, msg)
+                        print("Got 1 new event from TCP")
 
-            self.tcp_frame_no = -1
+                    self.tcp_frame_in_progress = []
+
+                self.tcp_frame_no = -1
 
             frame_no = message[1] * 256 * 256 + message[2] * 256 + message[3]
             if message[0] == MESSAGE_FRAME_BEGIN:
                 self.tcp_frame_no = frame_no
                 if frame_no - 1 > self.acked_frame:
                     self.acked_frame = frame_no - 1
-            else:
-                if frame_no > self.acked_frame:
-                    self.acked_frame = frame_no
-        elif self.tcp_frame_no > self.acked_frame:
-            self.tcp_frame_in_progress.append(message)
+                else:
+                    if frame_no > self.acked_frame:
+                        self.acked_frame = frame_no
+            elif self.tcp_frame_no > self.acked_frame:
+                self.tcp_frame_in_progress.append(message)
 
     def read_data_udp(self, msg):
         if len(msg) % 4 != 0:

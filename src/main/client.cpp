@@ -297,8 +297,11 @@ void NetworkClient::SendAll()
 
         if(!ping_send_frame)
         {
-            ping_send_frame = tick;
-            ping_send_ms = SDL_GetTicks();
+            if(udp_packet_recd > 0 || tick - acked_frame > 60)
+            {
+                ping_send_frame = tick;
+                ping_send_ms = SDL_GetTicks();
+            }
         }
     }
 
