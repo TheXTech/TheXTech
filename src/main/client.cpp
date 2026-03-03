@@ -145,6 +145,18 @@ NetworkClient::~NetworkClient()
         thread = nullptr;
     }
 
+    if(client_wakeup)
+    {
+        SDL_DestroySemaphore(client_wakeup);
+        client_wakeup = nullptr;
+    }
+
+    if(game_wakeup)
+    {
+        SDL_DestroySemaphore(game_wakeup);
+        game_wakeup = nullptr;
+    }
+
     if(sdlnet_inited)
     {
         SDLNet_FreeSocketSet(socket_set);
@@ -169,6 +181,12 @@ void NetworkClient::EnsureThread()
         thread = SDL_CreateThread(s_client_thread, "network thread", this);
         shutdown = false;
     }
+
+    if(!client_wakeup)
+        client_wakeup = SDL_CreateSemaphore(0);
+
+    if(!game_wakeup)
+        game_wakeup = SDL_CreateSemaphore(0);
 }
 
 void NetworkClient::Connect(const char* host, int port)
@@ -536,9 +554,15 @@ bool NetworkClient::WaitAndFill()
 
 void NetworkClient::client_loop()
 {
-    // currently, sleep 2ms here
-    bool fast_forward = (status.client_state > CLIENT_LOBBY) && (receive_buffer.available_frame > tick + 10);
-    SDLNet_CheckSockets(socket_set, (fast_forward) ? 0 : 2);
+    // bool fast_forward = (status.client_state > CLIENT_LOBBY) && (receive_buffer.available_frame > tick + 8);
+    if(!SDLNet_CheckSockets(socket_set, 0))
+    {
+        // currently, sleep 2ms here (waiting on messages from the main thread), then check again
+        // if(!fast_forward)
+        SDL_SemWaitTimeout(client_wakeup, 2);
+
+        SDLNet_CheckSockets(socket_set, 0);
+    }
 
     // hang up on error
     if(tcp_control.err || tcp_data.err)
@@ -796,7 +820,10 @@ void NetworkClient::client_loop()
         ReceiveData();
 
         if(SDL_AtomicGet(&message_buffer_state) == REQUEST_PENDING && WaitAndFill())
+        {
             SDL_AtomicSet(&message_buffer_state, REQUEST_COMPLETED);
+            SDL_SemPost(game_wakeup);
+        }
     }
 }
 

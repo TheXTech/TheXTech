@@ -25,6 +25,8 @@
 #include "globals.h"
 #include "sound.h"
 
+#include "core/events.h"
+
 #include "main/client.h"
 #include "main/client_methods.h"
 #include "main/screen_progress.h"
@@ -63,6 +65,9 @@ void Disconnect()
     s_network_client.status_req = ClientStatus();
 
     SDL_AtomicSet(&s_network_client.status_req_state, REQUEST_SUBMIT);
+
+    if(!s_network_client.thread)
+        SDL_AtomicSet(&s_network_client.status_req_state, REQUEST_COMPLETED);
 }
 
 const ClientStatus* GetClientStatus()
@@ -119,18 +124,20 @@ void ClientFrameSync(std::deque<Message>& buffer)
         }
     }
 
-    while(SDL_AtomicGet(&s_network_client.message_buffer_state) != REQUEST_IDLE)
-    {
-        // fixme: wait on some cond here
-    }
+    SDL_assert_release(SDL_AtomicGet(&s_network_client.message_buffer_state) == REQUEST_IDLE);
 
     std::swap(s_network_client.message_buffer, buffer);
 
     SDL_AtomicSet(&s_network_client.message_buffer_state, REQUEST_SUBMIT);
+    SDL_SemPost(s_network_client.client_wakeup);
 
     while(SDL_AtomicGet(&s_network_client.message_buffer_state) != REQUEST_COMPLETED)
     {
-        // fixme: wait on some cond here
+        // wait for a wakeup call from the network thread, refreshing events every 5ms
+        if(SDL_SemWaitTimeout(s_network_client.game_wakeup, 5) < 0)
+        {
+            XEvents::doEvents();
+        }
     }
 
     std::swap(s_network_client.message_buffer, buffer);

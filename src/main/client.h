@@ -121,6 +121,8 @@ struct SendBuffer
 struct NetworkClient
 {
     SDL_Thread* thread = nullptr;
+    SDL_sem* client_wakeup = nullptr;
+    SDL_sem* game_wakeup = nullptr;
     bool shutdown = false;
 
     TCPWrapper tcp_control;
