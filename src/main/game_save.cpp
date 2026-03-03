@@ -134,8 +134,16 @@ void FindSaves()
             if(f.gameCompleted)
                 curActive++;
 
+            // how many items -- accept lvl/path count for interop with v1.3.8+ versions
+            if(f.lvl_path_count)
+                maxActive += (int)f.lvl_path_count;
+            else
+            {
+                maxActive += (int)f.visiblePaths.size();
+                maxActive += (int)f.visibleLevels.size();
+            }
+
             // How much paths open
-            maxActive += (int)f.visiblePaths.size();
             for(auto &p : f.visiblePaths)
             {
                 if(p.second)
@@ -143,7 +151,6 @@ void FindSaves()
             }
 
             // How much levels opened
-            maxActive += (int)f.visibleLevels.size();
             for(auto &p : f.visibleLevels)
             {
                 if(p.second)
@@ -313,6 +320,9 @@ void SaveGame()
     // ABOVE GETS SKIPPED BY FINDSAVES
     sav.gameCompleted = BeatTheGame; // Can only get 99% until you finish the game;
 
+    sav.lvl_path_count = numWorldLevels + numWorldPaths;
+
+    // do store all visible levels and paths for interop with pre v1.3.7.3-dev builds
     for(A = 1; A <= numWorldLevels; A++)
         sav.visibleLevels.emplace_back(A, WorldLevel[A].Active);
 
@@ -320,7 +330,10 @@ void SaveGame()
         sav.visiblePaths.emplace_back(A, WorldPath[A].Active);
 
     for(A = 1; A <= numScenes; A++)
-        sav.visibleScenery.emplace_back(A, Scene[A].Active);
+    {
+        if(!Scene[A].Active)
+            sav.visibleScenery.emplace_back(A, Scene[A].Active);
+    }
 
     for(const auto& star : Star)
         sav.gottenStars.emplace_back(star.level, star.Section);
