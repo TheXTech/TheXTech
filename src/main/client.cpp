@@ -27,6 +27,8 @@
 #include "message.h"
 #include "main/client.h"
 
+static constexpr bool max_debug = false;
+
 static XMessage::Message msg_from_frame_no(XMessage::Type type, uint32_t frame_no)
 {
     XMessage::Message ret;
@@ -429,7 +431,8 @@ void NetworkClient::ReceiveData()
                 for(Message msg : receive_buffer.tcp_frame_in_progress)
                 {
                     receive_buffer.messages.push_back(msg);
-                    // pLogDebug("TCP message get: %d %d %d %d", msg.type, msg.screen, msg.player, msg.message);
+                    if(max_debug)
+                        pLogDebug("TCP message get: %d %d %d %d", (int)msg.type, msg.screen, msg.player, msg.message);
                 }
 
                 receive_buffer.tcp_frame_in_progress.clear();
@@ -461,16 +464,19 @@ void NetworkClient::ReceiveData()
     {
         udp_packet_recd++;
 
+        if(max_debug)
+        {
+            std::string got;
+            for(int i = 0; i < udp_packet->len; i++)
+            {
+                got += std::to_string(udp_packet->data[i]);
+                got += ' ';
+            }
+
+            pLogDebug("UDP packet get: %s", got.c_str());
+        }
+
         int udp_frame_index = -1;
-
-        // std::string got;
-        // for(int i = 0; i < udp_packet->len; i++)
-        // {
-        //     got += std::to_string(udp_packet->data[i]);
-        //     got += ' ';
-        // }
-
-        // pLogDebug("UDP packet get: %s", got.c_str());
 
         for(int i = 0; i + 4 <= udp_packet->len; i += 4)
         {
@@ -507,7 +513,9 @@ void NetworkClient::ReceiveData()
                 if(udp_frame_index > receive_buffer.available_frame)
                 {
                     receive_buffer.messages.push_back(got);
-                    // pLogDebug("UDP message get: %d %d %d %d", got.type, got.screen, got.player, got.message);
+
+                    if(max_debug)
+                        pLogDebug("UDP message get: %d %d %d %d", (int)got.type, got.screen, got.player, got.message);
                 }
                 else
                 {
@@ -536,7 +544,9 @@ bool NetworkClient::WaitAndFill()
 
                 while(!receive_buffer.messages.empty() && receive_buffer.messages.front().type != Type::frame_begin)
                 {
-                    // pLogDebug("Message push: %d %d %d %d %d", tick, receive_buffer.messages.front().type, receive_buffer.messages.front().screen, receive_buffer.messages.front().player, receive_buffer.messages.front().message);
+                    if(max_debug)
+                        pLogDebug("Message push: %d %d %d %d %d", tick, (int)receive_buffer.messages.front().type, receive_buffer.messages.front().screen, receive_buffer.messages.front().player, receive_buffer.messages.front().message);
+
                     message_buffer.push_back(receive_buffer.messages.front());
                     receive_buffer.messages.pop_front();
                 }
