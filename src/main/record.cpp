@@ -39,6 +39,7 @@
 #include "../frame_timer.h"
 #include "../config.h"
 #include "record.h"
+#include "message.h"
 
 #include "sdl_proxy/sdl_timer.h"
 #include "sdl_proxy/sdl_stdinc.h"
@@ -776,7 +777,7 @@ static void read_NPCs()
 
 void InitRecording()
 {
-    if(LevelEditor || GameMenu || GameOutro)
+    if(LevelEditor || GameMenu || GameOutro || XMessage::Status() != XMessage::Status::local)
         return;
 
     if(!g_config.record_gameplay_data && !replay_file)
