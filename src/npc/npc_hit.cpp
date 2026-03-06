@@ -119,6 +119,8 @@ void NPCHit(int A, int B, int C)
             if(reset_frame)
                 NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
 
+            NPC[A].Wings = WING_NONE;
+
             NPC[A].Special = NPC[A].Type;
             NPC[A].Special2 = NPC[A].Frame;
             // If .Type = 52 Or .Type = 51 Then
