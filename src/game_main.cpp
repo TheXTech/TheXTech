@@ -2506,6 +2506,9 @@ void StartEpisode()
     UnloadCustomSound();
     Archives::unmount_episode();
 
+    // New: prevents any buggy processing of leftover effects during a pause on the world map
+    ClearLevel();
+
     std::string wPath = SelectWorld[selWorld].WorldFilePath;
     std::string recentWorldIntroPrev = g_recentWorldIntro;
     bool doSaveConfig = false;
