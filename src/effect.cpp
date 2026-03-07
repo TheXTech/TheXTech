@@ -1217,7 +1217,7 @@ bool NewEffect(EFFID A, const Location_t &Location, int Direction, bool Shadow)
                 if(b.Type == 82 || b.Type == 26 || b.Type == 65 || b.Type == 159 || b.Type == 166 || b.Type == 168)
                 {
                     // note: NOT a reference
-                    auto t = b.Location;
+                    auto t = b.FullLocation();
                     if(t.Height > 8 && g_config.fix_submerged_splash_effect)
                         t.Height = 8; // Limit the height
                     if(CheckCollision(ne.Location, t))

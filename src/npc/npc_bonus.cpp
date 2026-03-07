@@ -177,8 +177,8 @@ void CheckAfterStarTake(bool many)
             {
                 auto &b = Background[d];
                 if(b.Type == 160 &&
-                    (CheckCollision(w.Entrance, b.Location) ||
-                     (w.twoWay && CheckCollision(w.Exit, b.Location)))
+                    (CheckCollision(w.Entrance, b.FullLocation()) ||
+                     (w.twoWay && CheckCollision(w.Exit, b.FullLocation())))
                 )
                 {
                     // this makes the background permanently disappear
