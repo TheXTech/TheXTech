@@ -7,6 +7,10 @@ endif()
 
 project(TheXTech LANGUAGES C CXX)
 
+if(APPLE)
+    enable_language(OBJC)
+endif()
+
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 include(ExternalProject)
