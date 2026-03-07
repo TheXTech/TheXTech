@@ -1023,7 +1023,10 @@ bool mainMenuUpdate()
         {
             auto* status = XMessage::GetClientStatus();
             if(status && (status->client_state == XMessage::CLIENT_GUEST || status->client_state == XMessage::CLIENT_HOST))
+            {
                 s_StartEpisodeOnline();
+                return true;
+            }
             else if(status && status->client_state == XMessage::CLIENT_LOBBY && XMessage::GetRoomInfo() && XMessage::GetRoomInfo()->room_key)
             {
                 const XMessage::RoomInfo& room_info = *XMessage::GetRoomInfo();
