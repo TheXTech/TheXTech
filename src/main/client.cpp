@@ -180,6 +180,8 @@ void NetworkClient::EnsureThread()
 
     if(!thread)
     {
+        SDL_AtomicSet(&status_req_state, REQUEST_IDLE);
+        SDL_AtomicSet(&message_buffer_state, REQUEST_IDLE);
         thread = SDL_CreateThread(s_client_thread, "network thread", this);
         shutdown = false;
     }
@@ -565,13 +567,14 @@ bool NetworkClient::WaitAndFill()
 void NetworkClient::client_loop()
 {
     // bool fast_forward = (status.client_state > CLIENT_LOBBY) && (receive_buffer.available_frame > tick + 8);
-    if(!SDLNet_CheckSockets(socket_set, 0))
+    if(!tcp_control.socket || !SDLNet_CheckSockets(socket_set, 0))
     {
         // currently, sleep 2ms here (waiting on messages from the main thread), then check again
         // if(!fast_forward)
         SDL_SemWaitTimeout(client_wakeup, 2);
 
-        SDLNet_CheckSockets(socket_set, 0);
+        if(tcp_control.socket)
+            SDLNet_CheckSockets(socket_set, 0);
     }
 
     // hang up on error
