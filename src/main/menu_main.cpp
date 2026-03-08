@@ -1021,8 +1021,32 @@ bool mainMenuUpdate()
 #ifdef THEXTECH_ENABLE_SDL_NET
         else if(XMessage::CompleteRequest())
         {
-            if(XMessage::GetClientStatus() && (XMessage::GetClientStatus()->client_state == XMessage::CLIENT_GUEST || XMessage::GetClientStatus()->client_state == XMessage::CLIENT_HOST))
+            auto* status = XMessage::GetClientStatus();
+            if(status && (status->client_state == XMessage::CLIENT_GUEST || status->client_state == XMessage::CLIENT_HOST))
                 s_StartEpisodeOnline();
+            else if(status && status->client_state == XMessage::CLIENT_LOBBY && XMessage::GetRoomInfo() && XMessage::GetRoomInfo()->room_key)
+            {
+                const XMessage::RoomInfo& room_info = *XMessage::GetRoomInfo();
+
+                selWorld = -1;
+
+                for(size_t i = 0; i < SelectWorld.size(); i++)
+                {
+                    if(SelectWorld[i].lz4_content_hash == room_info.content_hash)
+                    {
+                        selWorld = i;
+                        break;
+                    }
+                }
+
+                if(room_info.room_key == 0 || room_info.engine_hash != s_engineHash() || room_info.asset_hash != s_assetPackHash() || room_info.content_hash == 0 || selWorld == -1)
+                    PlaySoundMenu(SFX_BlockHit);
+                else
+                {
+                    PlaySoundMenu(SFX_Do);
+                    XMessage::JoinRoom(room_info.room_key);
+                }
+            }
             // ... some sort of switch for responses to queries
         }
 #endif // #ifdef THEXTECH_ENABLE_SDL_NET
@@ -1309,8 +1333,6 @@ bool mainMenuUpdate()
                     netplayPos++;
 
                 XMessage::Disconnect();
-                // this also shouldn't be necessary
-                while(XMessage::GetClientStatus() == nullptr) {}
 
                 MenuMode = MENU_MAIN;
                 MenuCursor = netplayPos;
@@ -1331,29 +1353,6 @@ bool mainMenuUpdate()
 
                     if(room_key && XMessage::RequestFillRoomInfo(room_key))
                     {
-                        // this shouldn't actually happen synchronously
-                        while(XMessage::GetRoomInfo() == nullptr) {}
-
-                        const XMessage::RoomInfo& room_info = *XMessage::GetRoomInfo();
-
-                        selWorld = -1;
-
-                        for(size_t i = 0; i < SelectWorld.size(); i++)
-                        {
-                            if(SelectWorld[i].lz4_content_hash == room_info.content_hash)
-                            {
-                                selWorld = i;
-                                break;
-                            }
-                        }
-
-                        if(room_info.room_key == 0 || room_info.engine_hash != s_engineHash() || room_info.asset_hash != s_assetPackHash() || selWorld == -1)
-                            PlaySoundMenu(SFX_BlockHit);
-                        else
-                        {
-                            PlaySoundMenu(SFX_Do);
-                            XMessage::JoinRoom(room_info.room_key);
-                        }
                     }
                     else
                         PlaySoundMenu(SFX_BlockHit);
