@@ -1467,7 +1467,7 @@ if(WIN32 AND WINDOWS_STORE)
 endif()
 
 if(NINTENDO_3DS)
-    target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__3DS__)
+    target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__3DS__)
 elseif(NINTENDO_WII)
     target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__WII__)
 elseif(NINTENDO_WIIU)
