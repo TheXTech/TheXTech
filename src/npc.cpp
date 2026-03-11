@@ -2074,8 +2074,12 @@ void NPCSpecial(int A)
 
             int time_left = 45 - npc.Special;
 
-            npc.Location.X = npc.DefaultLocationX + (dRand() * 2 - dRand()) * time_left / 6;
-            npc.Location.Y = npc.DefaultLocationY + (dRand() * 2 - dRand()) * time_left / 6;
+            num_t dx1 = dRand();
+            num_t dx2 = dRand();
+            num_t dy1 = dRand();
+            num_t dy2 = dRand();
+            npc.Location.X = npc.DefaultLocationX + (dx1 * 2 - dx2) * time_left / 6;
+            npc.Location.Y = npc.DefaultLocationY + (dy1 * 2 - dy2) * time_left / 6;
 
             npc.Special += 1;
             if(npc.Special >= 45)
@@ -5140,7 +5144,9 @@ void SpecialNPC(int A)
         if(NPC[A].Special4 >= ((NPC[A].Special == 0) ? 5 : 10))
         {
             NPC[A].Special4 = 0;
-            NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + dRand().times(NPC[A].Location.Width) - 2, NPC[A].Location.Y + dRand().times(NPC[A].Location.Height)));
+            num_t dx = dRand();
+            num_t dy = dRand();
+            NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + dx.times(NPC[A].Location.Width) - 2, NPC[A].Location.Y + dy.times(NPC[A].Location.Height)));
             Effect[numEffects].Location.SpeedX = dRand() - 0.5_n;
             Effect[numEffects].Location.SpeedY = dRand() - 0.5_n;
 

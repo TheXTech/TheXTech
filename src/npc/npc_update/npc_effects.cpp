@@ -377,7 +377,10 @@ static inline void NPCEffectLogic_Maze(int A)
             }
 
             if(is_ball && npc.Special != 5)
-                npc.Location.SpeedX = 1 - 4 * iRand(2) + 2 * dRand();
+            {
+                int is_left = iRand(2);
+                npc.Location.SpeedX = 1 - 4 * is_left + 2 * dRand();
+            }
         }
     }
 }

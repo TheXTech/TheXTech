@@ -49,9 +49,11 @@
 
 void p_PlayerMakeFlySparkle(const Location_t& loc, int Frame)
 {
+    num_t dx = dRand();
+    num_t dy = dRand();
     NewEffect(EFFID_SPARKLE,
-        newLoc(loc.X - 8 + dRand() * ((int)loc.Width + 16) - 4,
-            loc.Y - 8 + dRand() * ((int)loc.Height + 16)),
+        newLoc(loc.X - 8 + dx * ((int)loc.Width + 16) - 4,
+            loc.Y - 8 + dy * ((int)loc.Height + 16)),
         1, ShadowMode);
     Effect[numEffects].Location.SpeedX = (dRand() / 2) - 0.25_n;
     Effect[numEffects].Location.SpeedY = (dRand() / 2) - 0.25_n;

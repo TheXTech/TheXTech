@@ -3219,7 +3219,9 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
     {
         if(((p.TailCount) % 10 == 0 && !p.SpinJump) || ((p.TailCount) % 5 == 0 && p.SpinJump))
         {
-            NewEffect(EFFID_SPARKLE, newLoc(tailLoc.X + (dRand() * (int_ok)tailLoc.Width) - 4, tailLoc.Y + (dRand() * (int_ok)tailLoc.Height)), 1, ShadowMode);
+            num_t dx = dRand();
+            num_t dy = dRand();
+            NewEffect(EFFID_SPARKLE, newLoc(tailLoc.X + (dx * (int_ok)tailLoc.Width) - 4, tailLoc.Y + (dy * (int_ok)tailLoc.Height)), 1, ShadowMode);
             Effect[numEffects].Location.SpeedX = (0.5_n + dRand()) * p.Direction;
             Effect[numEffects].Location.SpeedY = dRand() - 0.5_n;
         }
@@ -4748,10 +4750,12 @@ void WaterCheck(const int A)
     {
         if(iRand(100) >= 97)
         {
+            num_t dx = dRand();
+            num_t dy = dRand();
             if(p.Direction == 1)
-                tempLocation = newLoc(p.Location.X + p.Location.Width - dRand() * 8, p.Location.Y + 4 + dRand() * 8, 8, 8);
+                tempLocation = newLoc(p.Location.X + p.Location.Width - dx * 8, p.Location.Y + 4 + dy * 8, 8, 8);
             else
-                tempLocation = newLoc(p.Location.X - 8 + dRand() * 8, p.Location.Y + 4 + dRand() * 8, 8, 8);
+                tempLocation = newLoc(p.Location.X - 8 + dx * 8, p.Location.Y + 4 + dy * 8, 8, 8);
             if(!UnderWater[p.Section])
             {
                 for(int B : treeWaterQuery(tempLocation, SORTMODE_NONE))
@@ -5974,8 +5978,10 @@ void PlayerEffects(const int A)
             {
                 if(((LevelMacroCounter & 63) == 0) && iRand(2))
                 {
-                    Location_t target = newLoc(p.Location.X + (16 - 128 + iRand(256)),
-                                               p.Location.Y - 256 + iRand(192));
+                    int dx = iRand(256);
+                    int dy = iRand(192);
+                    Location_t target = newLoc(p.Location.X + (16 - 128 + dx),
+                                               p.Location.Y - 256 + dy);
                     PlaySoundSpatial(SFX_Fireworks, target);
                     NewEffect(EFFID_BOSS_FRAGILE_EXPLODE, target);
                 }
@@ -6341,8 +6347,10 @@ void PlayerEffects(const int A)
     {
         for(B = 1; B <= 2; B++)
         {
-            NewEffect(EFFID_SPARKLE, newLoc(p.Location.X + dRand() * ((int)p.Location.Width + 8) - 8,
-                                 p.Location.Y + dRand() * ((int)p.Location.Height + 8) - 4), 1, ShadowMode);
+            num_t dx = dRand();
+            num_t dy = dRand();
+            NewEffect(EFFID_SPARKLE, newLoc(p.Location.X + dx * ((int)p.Location.Width + 8) - 8,
+                                 p.Location.Y + dy * ((int)p.Location.Height + 8) - 4), 1, ShadowMode);
             Effect[numEffects].Location.SpeedX = dRand() * 2 - 1;
             Effect[numEffects].Location.SpeedY = dRand() * 2 - 1;
         }

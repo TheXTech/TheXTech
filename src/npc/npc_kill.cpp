@@ -434,7 +434,11 @@ resume_TriggerLast:
         {
             PlaySoundSpatial(SFX_SMGlass, NPC[A].Location);
             for(C = 1; C <= 100; C++)
-                NewEffect(EFFID_BOSS_CASE_BREAK, newLoc(NPC[A].Location.X + dRand().times(NPC[A].Location.Width) - 16, NPC[A].Location.Y + dRand().times(NPC[A].Location.Height) - 16));
+            {
+                num_t dx = dRand();
+                num_t dy = dRand();
+                NewEffect(EFFID_BOSS_CASE_BREAK, newLoc(NPC[A].Location.X + dx.times(NPC[A].Location.Width) - 16, NPC[A].Location.Y + dy.times(NPC[A].Location.Height) - 16));
+            }
         }
         else if(NPC[A].Type == NPCID_BOSS_FRAGILE)
         {

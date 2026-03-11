@@ -77,8 +77,10 @@ void UpdateEffects()
         {
             if(e.Life % 5 == 0)
             {
-                NewEffect(EFFID_BOSS_FRAGILE_EXPLODE, newLoc(e.Location.X + (dRand() * (int_ok)e.Location.Width),
-                                      e.Location.Y + (dRand() * (int_ok)e.Location.Height)));
+                num_t dx = dRand();
+                num_t dy = dRand();
+                NewEffect(EFFID_BOSS_FRAGILE_EXPLODE, newLoc(e.Location.X + (dx * (int_ok)e.Location.Width),
+                                      e.Location.Y + (dy * (int_ok)e.Location.Height)));
             }
         }
         else if(e.Type == EFFID_BOSS_CASE_BREAK)

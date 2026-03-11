@@ -177,12 +177,16 @@ void NPCSpecialMaybeHeld(int A)
 
         if(NPC[A].Special4 == 0 && tempBool)
         {
-            if(NPC[A].SpecialY >= 200 + dRand() * 400 - dRand() * 200) // hop on player
+            num_t r1 = dRand();
+            num_t r2 = dRand();
+            if(NPC[A].SpecialY >= 200 + r1 * 400 - r2 * 200) // hop on player
             {
                 if(NPC[A].SpecialY >= 200 + dRand() * 600)
                     NPC[A].SpecialY = 0;
                 NPC[A].Special4 = 3;
             }
+            // Even though this looks risky, it imposes strict sequencing semantics on the dRand() calls,
+            // matching TheXTech's lifelong logic, and smbx-experiments' logic since 2021
             else if((NPC[A].SpecialY >= 80 && NPC[A].SpecialY <= 130) || (NPC[A].SpecialY >= 160 + dRand() * 300 && NPC[A].SpecialY <= 180 + dRand() * 800)) // shoot fireball
                 NPC[A].Special4 = 4;
         }
