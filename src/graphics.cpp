@@ -169,7 +169,7 @@ void GetvScreenAverage(vScreen_t& vscreen)
     {
         if(vscreen.X > OldX)
         {
-            if(vscreen.X == -level[0].X)
+            if(-vscreen.X <= level[0].X)
                 vscreen.X = OldX + 20;
             else
                 vscreen.X = OldX;
