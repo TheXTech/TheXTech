@@ -70,6 +70,11 @@ void Disconnect()
         SDL_AtomicSet(&s_network_client.status_req_state, REQUEST_COMPLETED);
 }
 
+void Shutdown()
+{
+    s_network_client.Shutdown();
+}
+
 const ClientStatus* GetClientStatus()
 {
     if(SDL_AtomicGet(&s_network_client.status_req_state) > REQUEST_IDLE)

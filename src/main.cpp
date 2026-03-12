@@ -846,6 +846,10 @@ int main(int argc, char**argv)
 
     int ret = GameMain(setup);
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+    XMessage::Shutdown();
+#endif
+
 #ifdef ENABLE_XTECH_LUA
     if(!xtech_lua_quit())
         ret = 1;

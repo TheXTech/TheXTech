@@ -75,6 +75,7 @@ struct ClientStatus
 
 void Connect(const char* host = nullptr);
 void Disconnect();
+void Shutdown();
 const ClientStatus* GetClientStatus();
 bool CompleteRequest();
 

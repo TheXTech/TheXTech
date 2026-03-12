@@ -159,12 +159,12 @@ struct NetworkClient
 
     bool sdlnet_inited = false;
 
-    ~NetworkClient();
-
     void EnsureThread();
 
     void Connect(const char* host, int port);
     void Disconnect(bool shutdown = false);
+
+    void Shutdown();
 
     XMessage::Message ParseMessage(const uint8_t* message);
 

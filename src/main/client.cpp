@@ -136,16 +136,16 @@ XMessage::Message NetworkClient::ParseMessage(const uint8_t* message)
     return got;
 }
 
-NetworkClient::~NetworkClient()
+void NetworkClient::Shutdown()
 {
-    Disconnect(true);
-
     if(thread)
     {
         shutdown = true;
         SDL_WaitThread(thread, nullptr);
         thread = nullptr;
     }
+
+    Disconnect(true);
 
     if(client_wakeup)
     {
