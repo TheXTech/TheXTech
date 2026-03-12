@@ -1702,8 +1702,6 @@ int GameMain(const CmdLineSetup_t &setup)
         Archives::unmount_temp();
     }
 
-    Integrator::quitIntegrations();
-
     return 0;
 }
 

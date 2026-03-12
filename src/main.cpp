@@ -50,6 +50,7 @@
 #   include <tclap/CmdLine.h>
 #endif
 
+#include <Integrator/integrator.h>
 #include <Utils/strings.h>
 #include <Utils/files.h>
 #include <Archives/archives.h>
@@ -849,6 +850,8 @@ int main(int argc, char**argv)
 #ifdef THEXTECH_ENABLE_SDL_NET
     XMessage::Shutdown();
 #endif
+
+    Integrator::quitIntegrations();
 
 #ifdef ENABLE_XTECH_LUA
     if(!xtech_lua_quit())
