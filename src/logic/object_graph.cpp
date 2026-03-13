@@ -240,7 +240,7 @@ void FillGraph(Graph& graph)
         if(Background[i].Type == 35)
         {
             graph.level.exits.push_back(o(ObjectGraph::Object::Exit,
-                get_center(Background[i].Location),
+                Loc{num_t::floor(Background[i].Location.X) + GFXBackgroundBMP[35].w / 2, num_t::floor(Background[i].Location.Y) + BackgroundHeight[35] / 2},
                 ObjectGraph::Object::G_BGO, i));
         }
     }
