@@ -24,6 +24,7 @@
 #include "message.h"
 #include "globals.h"
 #include "sound.h"
+#include "change_res.h"
 
 #include "core/events.h"
 
@@ -126,6 +127,8 @@ void ClientFrameSync(std::deque<Message>& buffer)
             in_fast_forward = false;
             // start playing music when no longer fast forwarding
             UpdateMusicVolume();
+            // update current resolution (may need to resync screen size)
+            UpdateInternalRes();
         }
     }
 
