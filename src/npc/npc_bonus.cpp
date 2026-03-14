@@ -154,7 +154,8 @@ void DropBonus(int A)
     // enable modern NPC spawn code
     bool small_screen_cam = (g_config.small_screen_cam && screen.W < screen.canonical_screen().W);
     bool always_shared = (is_shared && screen.Type == ScreenTypes::SharedScreen);
-    if(!ForcedControls && (always_shared || small_screen_cam))
+    bool multi_screen = (numPlayers > screen.player_count) && !g_ClonedPlayerMode;
+    if(!ForcedControls && (always_shared || small_screen_cam || multi_screen))
     {
         NPC[numNPCs].Special5 = 120;
         NPC[numNPCs].Effect3 = A;
