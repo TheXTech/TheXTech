@@ -4300,16 +4300,21 @@ void RespawnPlayerTo(int A, int TargetPlayer)
     // Player[A].Section = Player[TargetPlayer].Section;
 
     // respawn at top of vScreen 1 in SMBX dynamic splitscreen, otherwise at top of target player's vScreen
-    const Screen_t& screen = ScreenByPlayer(A);
+    int screen_idx_A = ScreenIdxByPlayer(A);
+    int screen_idx_tgt = ScreenIdxByPlayer(TargetPlayer);
+    const Screen_t& screen = Screens[screen_idx_A];
     const vScreen_t& target_vscreen = (screen.Type == ScreenTypes::Dynamic) ? screen.vScreen(1) : vScreenByPlayer(TargetPlayer);
+
+    // force a modern respawn when players are on different screens (clients), or when a player was added during a cutscene
+    bool force_modern_respawn = (screen_idx_A != screen_idx_tgt) || ForcedControls;
 
     RespawnPlayer(A, Player[TargetPlayer].Direction, CenterX, StopY, target_vscreen);
 
     // if TargetPlayer is scrolling in warp, we can't spawn them directly.
-    if(PlayerScrollingInWarp(Player[TargetPlayer]) || Player[TargetPlayer].CurMazeZone || ForcedControls)
+    if(PlayerScrollingInWarp(Player[TargetPlayer]) || Player[TargetPlayer].CurMazeZone || force_modern_respawn)
     {
         // Give player A wings in shared screen
-        if(screen.Type == ScreenTypes::SharedScreen || Player[TargetPlayer].CurMazeZone || ForcedControls)
+        if(screen.Type == ScreenTypes::SharedScreen || Player[TargetPlayer].CurMazeZone || force_modern_respawn)
         {
             Player[A].Location.Y -= 100;
             Player[A].Dead = true;
