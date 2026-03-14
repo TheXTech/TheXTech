@@ -388,7 +388,7 @@ void UpdateConfig()
 
         g_config.enable_frameskip = true;
         g_config.unlimited_framerate = true;
-        g_config.render_vsync = false;
+        // g_config.render_vsync = false;
     }
 
     if(g_config.compatibility_mode)
