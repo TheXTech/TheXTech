@@ -187,6 +187,9 @@ public:
     //! the logical height of the screen in pixels
     int H = 600;
 
+    //! the amount of horizontal camera overscan in pixels (used for 3DS)
+    int CameraOverscanX = 0;
+
     //! the currently active split mode for the screen
     int Type = ScreenTypes::SinglePlayer;
 

@@ -281,10 +281,8 @@ void UpdateInternalRes()
         XRender::TargetH = SDL_max(XRender::TargetH, 480);
     }
 
-#ifdef __3DS__
-    if(g_config.allow_multires || ignore_compat)
-        XRender::TargetW += XRender::MAX_3D_OFFSET * 2;
-#endif
+    int new_CameraOverscanX = (g_config.allow_multires || ignore_compat) ? XRender::TargetCameraOverscanX : 0;
+    XRender::TargetW += new_CameraOverscanX * 2;
 
     // DONE: above should tweak render target resolution. This should tweak game's screen resolution.
     int new_ScreenW, new_ScreenH;
@@ -315,7 +313,8 @@ void UpdateInternalRes()
         XMessage::PushMessage({XMessage::Type::screen_w, (uint8_t)(new_ScreenW / 256), (uint8_t)(new_ScreenW % 256)});
     if(l_screen->H != new_ScreenH)
         XMessage::PushMessage({XMessage::Type::screen_h, (uint8_t)(new_ScreenH / 256), (uint8_t)(new_ScreenH % 256)});
-
+    if(l_screen->CameraOverscanX != new_CameraOverscanX)
+        XMessage::PushMessage({XMessage::Type::camera_overscan_x, 0, (uint8_t)new_CameraOverscanX});
     if(XRender::is_nullptr() || !GameIsActive)
         return;
 

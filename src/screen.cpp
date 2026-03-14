@@ -189,6 +189,7 @@ void InitScreens()
         // reset screen size and prefs
         Screens[s].W = 800;
         Screens[s].H = 600;
+        Screens[s].CameraOverscanX = 0;
         Screens[s].two_screen_pref = MultiplayerPrefs::Dynamic;
         Screens[s].four_screen_pref = MultiplayerPrefs::Shared;
 

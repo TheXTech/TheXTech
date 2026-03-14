@@ -63,6 +63,7 @@ void Handle(const Message& m)
             // reset screen parameters
             screen.W = 800;
             screen.H = 600;
+            screen.CameraOverscanX = 0;
             screen.two_screen_pref = MultiplayerPrefs::Dynamic;
             screen.four_screen_pref = MultiplayerPrefs::Shared;
             screen.canonical_screen().two_screen_pref = screen.two_screen_pref;
@@ -166,6 +167,10 @@ void Handle(const Message& m)
     else if(m.type == Type::screen_h)
     {
         screen.H = m.player * 256 + m.message;
+    }
+    else if(m.type == Type::camera_overscan_x)
+    {
+        screen.CameraOverscanX = m.message;
     }
     else if(m.type == Type::multiplayer_prefs)
     {
