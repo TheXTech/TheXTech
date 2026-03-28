@@ -34,6 +34,8 @@
 #include "../graphics.h"
 #include "../sound.h"
 #include "../main/trees.h"
+#include "../script/luna/luna.h"
+#include "layers.h"
 #include "game_info.h"
 #include "outro_loop.h"
 
@@ -139,6 +141,7 @@ void DoCredits(bool quit)
 
 void OutroLoop()
 {
+    lunaLoop();
     Controls::Update(false);
     Integrator::sync();
     bool quit = SharedControls.QuitCredits;
@@ -148,6 +151,8 @@ void OutroLoop()
 
     if(g_gameInfo.outroDeadMode)
     {
+        ClearTriggeredEvents();
+        UpdateLayers();
         UpdateNPCs();
         UpdateBlocks();
         UpdateEffects();
@@ -155,6 +160,7 @@ void OutroLoop()
         DoCredits(quit);
         UpdateGraphics();
         UpdateSound();
+        UpdateEvents();
 
         if(GameOutroDoQuit) // Don't unset the GameOutro before GFX update, otherwise a glitch will happen
         {
@@ -232,6 +238,8 @@ void OutroLoop()
         }
     }
 
+    ClearTriggeredEvents();
+    UpdateLayers();
     UpdateNPCs();
     UpdateBlocks();
     UpdateEffects();
@@ -239,6 +247,8 @@ void OutroLoop()
     DoCredits(quit);
     UpdateGraphics();
     UpdateSound();
+    UpdateEvents();
+
     if(GameOutroDoQuit) // Don't unset the GameOutro before GFX update, otherwise a glitch will happen
     {
         GameOutro = false;

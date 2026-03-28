@@ -10,6 +10,7 @@ Changelog for 1.3.7.3-dev
 -Logic change for TheXTech-exclusive feature: portal warps will not trigger until the player has spent 10 frames without overlapping any portal warps (@ds-sloth)
 -Fixed an inability to load a game pack from command line by path without slash ending (@Wohlstand)
 -3DS: fix v1.3.7 bug where the title screen could get stuck at the right of the level (@ds-sloth)
+-Enabled running of Layers, Events, and LunaScript loops at the Outro screen to allow more dynamics (@Wohlstand)
 
 Changelog for 1.3.7.2
 -i18n: Added support for the localisation of the loading screen (@Wohlstand)
