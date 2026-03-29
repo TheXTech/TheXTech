@@ -181,6 +181,8 @@ void JoinNewRoom(const RoomInfo& room_info)
     s_network_client.status_req.client_state = CLIENT_HOST;
     s_network_client.status_req.room_info = room_info;
 
+    s_network_client.status_req.rand_seed = iRand(2147483647);
+
     SDL_AtomicSet(&s_network_client.status_req_state, REQUEST_SUBMIT);
 }
 

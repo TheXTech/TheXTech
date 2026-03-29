@@ -42,6 +42,9 @@ HEADER_JOIN_ROOM = 12
 HEADER_DATA_CHANNEL = 13
 HEADER_ACK = 14
 
+HEADER_PUT_SESSION = 15
+HEADER_GET_SESSION = 16
+
 # an enum of header bytes for messages (*data channel*)
 MESSAGE_FRAME_BEGIN = 32 # meta-message: the following messages belong to the named frame
 MESSAGE_ADD_CLIENT = 33
@@ -72,6 +75,11 @@ class Connection:
 
         self.session_key = b'\0\0\0\0'
 
+        # session config state
+        self.providing_session = False
+        self.receiving_session = False
+        self.session_received = 0
+
         # room state
         self.room = None
         self.id = 0
@@ -93,6 +101,10 @@ class Connection:
         self.udp_send = b''
 
     def set_room(self, room, id):
+        self.providing_session = False
+        self.receiving_session = False
+        self.session_received = 0
+
         self.room = room
         self.id = id
         self.acked_to = -1
@@ -105,8 +117,49 @@ class Connection:
         self.tcp_sent_frame = -1
 
     def read_in_room(self):
+        # special case for when uploading a session object
+        if self.providing_session:
+            try:
+                self.room.session_config += self.conn.recv(self.room.session_config_length - len(self.room.session_config))
+            except BlockingIOError:
+                pass
+
+            if len(self.room.session_config) < self.room.session_config_length:
+                return
+
+            # acknowledge receipt of session config
+            self.conn.sendall(bytes([HEADER_GET_SESSION]))
+            self.receiving_session = False
+
         # conn is the socket object
-        header = self.data_conn.recv(4)
+        try:
+            header = self.conn.recv(1)
+        except BlockingIOError:
+            return
+
+        if len(header) != 1:
+            self.room.kill(self)
+            return
+
+        if header[0] == HEADER_PUT_SESSION:
+            session_config_length = self.conn.recv(4)
+            if len(session_config_length) != 4 or self.room.session_config_length != 0:
+                self.room.kill(self)
+                return
+
+            self.providing_session = True
+            self.room.session_config_length = (session_config_length[0] << 24) + (session_config_length[1] << 16) + (session_config_length[2] << 8) + (session_config_length[3] << 0)
+            return self.read_in_room()
+
+        if header[0] == HEADER_GET_SESSION:
+            self.receiving_session = True
+            self.session_received = -1
+            return
+
+        try:
+            header += self.conn.recv(3)
+        except BlockingIOError:
+            pass
         if len(header) != 4:
             self.room.kill(self)
             return
@@ -117,7 +170,7 @@ class Connection:
             self.room = None
             self.server.register(self)
 
-            self.data_conn.sendall(bytes([HEADER_LEFT_ROOM]))
+            self.conn.sendall(bytes([HEADER_LEFT_ROOM]))
             self.data_conn.close()
             self.data_conn = None
 
@@ -212,7 +265,7 @@ class Connection:
 
             room = self.server.load_room(room_key)
             if not room:
-                self.conn.sendall(bytes([HEADER_ROOM_KEY]) + b'\0' * 15)
+                self.conn.sendall(bytes([HEADER_ROOM_KEY]) + b'\0' * 12)
                 return
 
             self.server.unregister(self)
@@ -222,7 +275,7 @@ class Connection:
 
             room = self.server.create_room(room_info)
             if not room:
-                self.conn.sendall(bytes([HEADER_ROOM_KEY]) + b'\0' * 15)
+                self.conn.sendall(bytes([HEADER_ROOM_KEY]) + b'\0' * 12)
                 return
 
             self.server.unregister(self)
@@ -265,7 +318,8 @@ class Room:
 
         # room state
         self.frame_no = 0
-        self.rand_seed = bytes([random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)])
+        self.session_config_length = 0
+        self.session_config = bytes()
         self.sent_history = bytes()
 
         # this is a list of clients added by the main thread
@@ -338,6 +392,10 @@ class Room:
         if client.data_conn:
             client.data_conn.close()
 
+        if client.providing_session and len(self.session_config) < self.session_config_length:
+            self.session_config = bytes()
+            self.session_config_length = 0
+
     def add(self, client):
         # find an ID and slot for the client
         if self.freed_clients:
@@ -362,7 +420,6 @@ class Room:
         client.conn.sendall(bytes([
             HEADER_ROOM_KEY, self.room_key[0], self.room_key[1], self.room_key[2], self.room_key[3],
             new_id,
-            self.rand_seed[0], self.rand_seed[1], self.rand_seed[2],
             self.frame_no // (256 * 256), (self.frame_no // 256) % 256, self.frame_no % 256,
             client.session_key[0], client.session_key[1], client.session_key[2], client.session_key[3],
             ]))
@@ -398,9 +455,6 @@ class Room:
                 pass
 
     def process_frame(self):
-        # increment the frame number
-        self.frame_no += 1
-
         # print(f"Debug: starting processing for frame {self.frame_no}")
 
         # thread-safe way of adopting added clients queue
@@ -437,6 +491,27 @@ class Room:
             for msg in got:
                 client.read_data_udp(msg)
 
+        # don't run anything until we have a session_config
+        if not self.session_config or len(self.session_config) < self.session_config_length:
+            return
+
+        # skip the frame if nobody is connected
+        if not self.newly_freed_clients:
+            has_any_client = False
+
+            for client in self.clients:
+                if client is None:
+                    continue
+
+                has_any_client = True
+                break
+
+            if not has_any_client:
+                return
+
+        # increment the frame number
+        self.frame_no += 1
+
         # combine all events from this frame
         serialized_events = bytes()
 
@@ -458,20 +533,6 @@ class Room:
             if event_frame != self.frame_no:
                 print(f"Warning: sent an event for frame {event_to_send[0]} on frame {self.frame_no}. This is not a normal lag situation.")
 
-        # skip the frame if nobody is connected
-        if not serialized_events and not self.newly_freed_clients:
-            has_any_client = False
-
-            for client in self.clients:
-                if client is None:
-                    continue
-
-                has_any_client = True
-                break
-
-            if not has_any_client:
-                return
-
         # add the frame-begin event
         if serialized_events:
             serialized_events = bytes([MESSAGE_FRAME_BEGIN, self.frame_no // (256 * 256), (self.frame_no // 256) % 256, self.frame_no % 256]) + serialized_events
@@ -482,6 +543,25 @@ class Room:
         for client in self.clients:
             if client is None:
                 continue
+
+            if client.receiving_session:
+                if client.session_received == -1:
+                    client.conn.sendall(bytes([HEADER_PUT_SESSION,
+                        (self.session_config_length // (256 * 256 * 256)) % 256,
+                        (self.session_config_length // (      256 * 256)) % 256,
+                        (self.session_config_length //             (256)) % 256,
+                        (self.session_config_length                     ) % 256]))
+                    client.session_received = 0
+
+                try:
+                    client.session_received += client.conn.send(self.session_config[client.session_received:])
+                except BlockingIOError:
+                    pass
+
+                if client.session_received == self.session_config_length:
+                    client.receiving_session = False
+                else:
+                    continue
 
             if client.acked_to != -1 and (client.data_conn or client.udp_dest):
                 # adjust sent_to based on acked frame

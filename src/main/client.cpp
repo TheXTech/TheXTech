@@ -617,13 +617,40 @@ void NetworkClient::client_loop()
         if(status_req.client_state != status.client_state)
         {
             // always shift through lobby (in the future...)
-            if(status.client_state != CLIENT_LOBBY)
+            if(status.client_state != CLIENT_LOBBY && status.client_state != CLIENT_SESSION_CONFIG)
             {
                 // request leave room, mark as pending
                 return;
             }
 
-            if(status_req.client_state == CLIENT_GUEST)
+            if(status.client_state == CLIENT_SESSION_CONFIG)
+            {
+                if(status_req.client_state == CLIENT_GUEST)
+                {
+                    std::array<uint8_t, 1> to_send =
+                    {
+                        HEADER_GET_SESSION,
+                    };
+
+                    SDLNet_TCP_Send(tcp_control.socket, to_send.data(), to_send.size());
+                }
+                else if(status_req.client_state == CLIENT_HOST)
+                {
+                    // encode session here
+                    std::array<uint8_t, 9> to_send =
+                    {
+                        HEADER_PUT_SESSION,
+                        0, 0, 0, 4,
+                        uint8_t(status_req.rand_seed  >> 24), uint8_t(status_req.rand_seed  >> 16), uint8_t(status_req.rand_seed  >> 8), uint8_t(status_req.rand_seed  >> 0),
+                    };
+
+                    SDLNet_TCP_Send(tcp_control.socket, to_send.data(), to_send.size());
+                }
+
+                SDL_AtomicSet(&status_req_state, REQUEST_PENDING);
+                return;
+            }
+            else if(status_req.client_state == CLIENT_GUEST)
             {
                 auto room_key = status_req.room_info.room_key;
                 std::array<uint8_t, 5> to_send =
@@ -727,7 +754,7 @@ void NetworkClient::client_loop()
         }
         else if(tcp_control.buffer[0] == HEADER_ROOM_KEY)
         {
-            if(!tcp_control.FillBufferTo_NB(16))
+            if(!tcp_control.FillBufferTo_NB(13))
                 return;
 
             const auto& buffer = tcp_control.buffer;
@@ -736,13 +763,11 @@ void NetworkClient::client_loop()
 
             status.client_index = buffer[5];
 
-            status.rand_seed = ((uint32_t)buffer[6] << 16) | ((uint32_t)buffer[7] << 8) | ((uint32_t)buffer[8] << 0);
+            fast_forward_to = ((int)buffer[6] << 16) | ((int)buffer[7] << 8) | ((int)buffer[8] << 0);
 
-            fast_forward_to = ((int)buffer[9] << 16) | ((int)buffer[10] << 8) | ((int)buffer[11] << 0);
+            session_key = ((uint32_t)buffer[9] << 24) | ((uint32_t)buffer[10] << 16) | ((uint32_t)buffer[11] << 8) | ((uint32_t)buffer[12] << 0);
 
-            session_key = ((uint32_t)buffer[12] << 24) | ((uint32_t)buffer[13] << 16) | ((uint32_t)buffer[14] << 8) | ((uint32_t)buffer[15] << 0);
-
-            tcp_control.ShiftBuffer(16);
+            tcp_control.ShiftBuffer(13);
 
             if(status_req.room_info.room_key && status.room_info.room_key != status_req.room_info.room_key)
             {
@@ -784,15 +809,60 @@ void NetworkClient::client_loop()
             receive_buffer = RecvBuffer();
             send_buffer = SendBuffer();
 
-            pLogInfo("NetPlay: joined room %s", DisplayRoom(status.room_info.room_key).room_name);
+            pLogInfo("NetPlay: joining room %s", DisplayRoom(status.room_info.room_key).room_name);
 
-            status.client_state = status_req.client_state;
+            status.client_state = CLIENT_SESSION_CONFIG;
 
             if(SDL_AtomicGet(&status_req_state) == REQUEST_PENDING)
+                SDL_AtomicSet(&status_req_state, REQUEST_SUBMIT);
+        }
+        else if(tcp_control.buffer[0] == HEADER_GET_SESSION)
+        {
+            if(!tcp_control.FillBufferTo_NB(1))
+                return;
+
+            tcp_control.ShiftBuffer(1);
+
+            if(SDL_AtomicGet(&status_req_state) == REQUEST_PENDING && status.client_state == CLIENT_SESSION_CONFIG)
             {
-                // FIXME: maybe do SUBMIT if more actions need to be taken?
+                status.client_state = CLIENT_HOST;
+                status.rand_seed = status_req.rand_seed;
+                pLogDebug("The random seed is %d", (int)status.rand_seed);
                 SDL_AtomicSet(&status_req_state, REQUEST_COMPLETED);
             }
+            else
+                Disconnect();
+        }
+        else if(tcp_control.buffer[0] == HEADER_PUT_SESSION)
+        {
+            if(!tcp_control.FillBufferTo_NB(5))
+                return;
+
+            uint32_t session_size = ((uint32_t)tcp_control.buffer[1] << 24) | ((uint32_t)tcp_control.buffer[2] << 16) | ((uint32_t)tcp_control.buffer[3] << 8) | ((uint32_t)tcp_control.buffer[4] << 0);
+
+            tcp_control.ShiftBuffer(5);
+
+            // decode session here
+
+            // handle this later, once we know exactly what we're filling
+            if(session_size > network_client_buffer_size)
+                Disconnect();
+
+            // note: not NB
+            if(!tcp_control.FillBufferTo(session_size))
+                Disconnect();
+
+            tcp_control.ShiftBuffer(session_size);
+
+            if(SDL_AtomicGet(&status_req_state) == REQUEST_PENDING && status.client_state == CLIENT_SESSION_CONFIG)
+            {
+                status.rand_seed = ((uint32_t)tcp_control.buffer[0] << 24) | ((uint32_t)tcp_control.buffer[1] << 16) | ((uint32_t)tcp_control.buffer[2] << 8) | ((uint32_t)tcp_control.buffer[3] << 0);
+                status.client_state = CLIENT_GUEST;
+                pLogDebug("The random seed is %d", (int)status.rand_seed);
+                SDL_AtomicSet(&status_req_state, REQUEST_COMPLETED);
+            }
+            else
+                Disconnect();
         }
         else if(tcp_control.buffer[0] == HEADER_ACK)
         {

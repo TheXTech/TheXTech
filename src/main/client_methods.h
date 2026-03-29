@@ -55,12 +55,13 @@ struct RoomName
 enum ClientState
 {
     CLIENT_OFF = 0,
-    CLIENT_LOBBY = 1,
-    CLIENT_HOST_IDLE = 2,
-    CLIENT_HOST_SPECTATED = 3,
-    CLIENT_HOST = 4,
-    CLIENT_GUEST = 5,
-    CLIENT_SPECTATOR = 6,
+    CLIENT_SESSION_CONFIG, // joined room but haven't yet sent/received session
+    CLIENT_LOBBY,
+    CLIENT_HOST_IDLE,
+    CLIENT_HOST_SPECTATED,
+    CLIENT_HOST,
+    CLIENT_GUEST,
+    CLIENT_SPECTATOR,
 };
 
 struct ClientStatus
