@@ -213,13 +213,18 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
                                     if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL)
                                     {
-                                        if(Block[B].Type == 626 && NPC[A].Special == 1)
+                                        // NEW: bugfix to make ice balls properly respect char blocks
+                                        int special = (g_config.fix_char_pass_balls) ? NPC[A].Variant : NPC[A].Special;
+
+                                        if(Block[B].Type == 626 && special == 1)
                                             HitSpot = 0;
-                                        if(Block[B].Type == 627 && NPC[A].Special == 2)
+                                        if(Block[B].Type == 627 && special == 2)
                                             HitSpot = 0;
-                                        if(Block[B].Type == 628 && NPC[A].Special == 3)
+                                        if(Block[B].Type == 628 && special == 3)
                                             HitSpot = 0;
-                                        if(Block[B].Type == 629 && NPC[A].Special == 4)
+                                        if(Block[B].Type == 629 && special == 4)
+                                            HitSpot = 0;
+                                        if(Block[B].Type == 632 && special == 5 && g_config.fix_char_pass_balls) // NEW
                                             HitSpot = 0;
                                     }
 
