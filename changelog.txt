@@ -36,6 +36,8 @@ Changelog for 1.3.7.3-dev
 -Fixed an inability to load a game pack from command line by path without slash ending (@Wohlstand)
 -3DS: fix v1.3.7 bug where the title screen could get stuck at the right of the level (@ds-sloth)
 -Enabled running of Layers, Events, and LunaScript loops at the Outro screen to allow more dynamics (@Wohlstand)
+-Fix SMBX 1.3 bug where character passthrough blocks treated char 2-4's ice balls as belonging to char 1, guarded by compat flag "fix-char-pass-balls" [Modern Mode] (@ds-sloth, thanks to @Wohlstand for the report)
+-Fix SMBX 1.3 bug where character passthrough blocks did not allow char 5's fire/ice balls to pass through, guarded by compat flag "fix-char-pass-balls" [Modern Mode] (@ds-sloth)
 
 Changelog for 1.3.7.2
 -i18n: Added support for the localisation of the loading screen (@Wohlstand)

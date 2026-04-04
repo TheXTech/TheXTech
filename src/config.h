@@ -961,6 +961,10 @@ public:
     opt<bool> fix_player_grab_clip{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-player-grab-clip", "Fix player grab clip", "Don't clip downwards on powerup while digging"};
 
+    // 1.3.7.3
+    opt<bool> fix_char_pass_balls{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
+        "fix-char-pass-balls", "Fix char-pass balls", "Fix char 2-4's iceballs and char 5's fire/iceballs on char-pass blocks"};
+
     // 1.3.8
     opt<bool> new_conveyor_belts{this, defaults(true), {CompatClass::standard_update, false}, Scope::Creator,
         "new-conveyor-belts", "New conveyor belts", "Update belts to faster and more stable logic"};

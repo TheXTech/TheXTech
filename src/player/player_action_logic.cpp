@@ -195,6 +195,7 @@ void PlayerShootChar5Beam(int A)
     NPC[numNPCs].CantHurt = 100;
     NPC[numNPCs].CantHurtPlayer = A;
     NPC[numNPCs].Special = Player[A].Character;
+    NPC[numNPCs].Variant = Player[A].Character; // NEW: to fix a bug where ice balls did not respect char blocks
 
     if(NPC[numNPCs].Type == NPCID_PLR_FIREBALL)
         NPC[numNPCs].Frame = 16;
@@ -420,22 +421,13 @@ void PlayerThrowBall(const int A)
     NPC[numNPCs].CantHurt = 100;
     NPC[numNPCs].CantHurtPlayer = A;
     NPC[numNPCs].Special = p.Character;
-
-    if(throw_ice)
-        NPC[numNPCs].Special = 1;
+    NPC[numNPCs].Variant = p.Character; // NEW: to fix a bug where ice balls did not respect char blocks
 
     if((p.Character == 3 || p.Character == 4) && p.Mount == 0 && p.Controls.AltRun) // peach holds fireballs
     {
         p.HoldingNPC = numNPCs;
         NPC[numNPCs].HoldingPlayer = A;
     }
-
-    if(NPC[numNPCs].Special == 2)
-        NPC[numNPCs].Frame = 4;
-    if(NPC[numNPCs].Special == 3)
-        NPC[numNPCs].Frame = 8;
-    if(NPC[numNPCs].Special == 4)
-        NPC[numNPCs].Frame = 12;
 
     p.FireBallCD = 30;
     if(p.Character == 2)
@@ -455,6 +447,8 @@ void PlayerThrowBall(const int A)
 
     if(throw_ice)
     {
+        NPC[numNPCs].Special = 1;
+
         PlaySoundSpatial(SFX_Iceball, p.Location);
 
         NPC[numNPCs].Location.SpeedY = (throw_up) ? -8 : 5;
@@ -468,6 +462,13 @@ void PlayerThrowBall(const int A)
 
         if(NPC[numNPCs].Special == 2)
             NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.85_r;
+
+        if(NPC[numNPCs].Special == 2)
+            NPC[numNPCs].Frame = 4;
+        if(NPC[numNPCs].Special == 3)
+            NPC[numNPCs].Frame = 8;
+        if(NPC[numNPCs].Special == 4)
+            NPC[numNPCs].Frame = 12;
     }
 
     if(throw_up)
