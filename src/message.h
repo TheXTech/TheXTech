@@ -37,6 +37,11 @@ enum class Status : uint8_t
     connected,
 };
 
+struct Session
+{
+    uint32_t random_seed = 0;
+};
+
 enum class Type : uint8_t
 {
     empty,
@@ -77,6 +82,8 @@ struct Message
         return type != Type::empty;
     }
 };
+
+extern Session g_session;
 
 void InitSession();
 void Tick();

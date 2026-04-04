@@ -641,7 +641,7 @@ void NetworkClient::client_loop()
                     {
                         HEADER_PUT_SESSION,
                         0, 0, 0, 4,
-                        uint8_t(status_req.rand_seed  >> 24), uint8_t(status_req.rand_seed  >> 16), uint8_t(status_req.rand_seed  >> 8), uint8_t(status_req.rand_seed  >> 0),
+                        uint8_t(g_session.random_seed  >> 24), uint8_t(g_session.random_seed  >> 16), uint8_t(g_session.random_seed  >> 8), uint8_t(g_session.random_seed  >> 0),
                     };
 
                     SDLNet_TCP_Send(tcp_control.socket, to_send.data(), to_send.size());
@@ -826,8 +826,7 @@ void NetworkClient::client_loop()
             if(SDL_AtomicGet(&status_req_state) == REQUEST_PENDING && status.client_state == CLIENT_SESSION_CONFIG)
             {
                 status.client_state = CLIENT_HOST;
-                status.rand_seed = status_req.rand_seed;
-                pLogDebug("The random seed is %d", (int)status.rand_seed);
+                pLogDebug("The random seed is %d", (int)g_session.random_seed);
                 SDL_AtomicSet(&status_req_state, REQUEST_COMPLETED);
             }
             else
@@ -856,9 +855,9 @@ void NetworkClient::client_loop()
 
             if(SDL_AtomicGet(&status_req_state) == REQUEST_PENDING && status.client_state == CLIENT_SESSION_CONFIG)
             {
-                status.rand_seed = ((uint32_t)tcp_control.buffer[0] << 24) | ((uint32_t)tcp_control.buffer[1] << 16) | ((uint32_t)tcp_control.buffer[2] << 8) | ((uint32_t)tcp_control.buffer[3] << 0);
+                g_session.random_seed = ((uint32_t)tcp_control.buffer[0] << 24) | ((uint32_t)tcp_control.buffer[1] << 16) | ((uint32_t)tcp_control.buffer[2] << 8) | ((uint32_t)tcp_control.buffer[3] << 0);
                 status.client_state = CLIENT_GUEST;
-                pLogDebug("The random seed is %d", (int)status.rand_seed);
+                pLogDebug("The random seed is %d", (int)g_session.random_seed);
                 SDL_AtomicSet(&status_req_state, REQUEST_COMPLETED);
             }
             else

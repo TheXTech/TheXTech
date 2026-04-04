@@ -267,7 +267,7 @@ static void s_StartEpisodeOnline()
     const auto& status = *XMessage::GetClientStatus();
 
     l_screen = &Screens[status.client_index];
-    seedRandom(status.rand_seed);
+    seedRandom(XMessage::g_session.random_seed);
 
     selSave = 0;
 

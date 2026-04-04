@@ -37,6 +37,7 @@ namespace XMessage
 {
 
 static std::deque<Message> s_message_vector;
+Session g_session;
 
 static Controls_t s_last_controls[maxNetplayPlayers + 1];
 

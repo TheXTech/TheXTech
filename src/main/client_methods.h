@@ -71,7 +71,6 @@ struct ClientStatus
     int server_port = 4305;
     RoomInfo room_info;
     int client_index = 0;
-    int rand_seed = 0;
 };
 
 void Connect(const char* host = nullptr);
