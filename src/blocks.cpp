@@ -789,6 +789,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         syncLayers_NPC(numNPCs);
         CheckSectionNPC(numNPCs);
         b = Block_t();
+        // Prevent possible crash on render
+        b.Type = newBlock;
     }
 
     if(b.Type == 90)
