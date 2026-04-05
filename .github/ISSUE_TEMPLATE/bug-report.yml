@@ -90,7 +90,13 @@ body:
       description: |
         Which architecture your processor where you ran the game have?
 
+        * If you run the **Windows**, you can easily check your architecture (x86 32-bit, 64-bit, or "64-bit processor ARM"), you can open the properties of the "This computer" / "My computer".
+        * On **Linux** / **xBSD**, you can open the terminal and run the `uname -m` command to get the exact processor architecture.
+        * On **macOS**, just can open the "About this Mac" to see the architecture in the description. If you see in description such as 32-bit "Power PC" (PPC G3, PPC G4) or PPC G5 which is 64-bit Power PC, **Intel Core Solo, Core Duo (not 2 Duo!)** which are 32-bit i386, **Intel Core 2 Duo, Quad-Core, i3/i5/i7** which are 64-bit x86_64, and the **Apple M1/M2/M3/etc.** which is an ARM64).
+        * On **Android** you might want to use program such as AIDA64 where you can open the "CPU" list, and find the "Instructions set" paragraph where you can see exact processor architecture that your device runs.
+
         **Note:** Some platforms do have one single architecture only, for example:
+        * **PSP** has the MIPS32.
         * **3DS** and **Vita** has the ARM32/ARMv7.
         * **Wii** and **Wii U** has the PPC32.
         * **Switch** has the ARM64/AARCH64.
@@ -127,7 +133,7 @@ body:
       description: |
         Post a link to the level where the issue occurs:
         *levelname.lvl* from `[Episode name](https://link.to.episode/)`
-        Even better: If you make a dedicated test level and attach it to your GitHub Post (pack it as `.zip` or `.7z` first, and then drag it and drop into this text area).
+        Even better: If you make a dedicated test level and attach it to your GitHub Post (pack it as `.zip` first, and then drag it and drop into this text area).
     validations:
       required: false
 
@@ -143,7 +149,7 @@ body:
     id: vanilla_recording
     attributes:
       label: Vanilla Recording
-      description: Not required, but if you can run SMBX 1.3 (or [use our Research Version](https://github.com/Wohlstand/smbx-experiments/releases) that will work better on Linux under Wine because of the improved audio engine), it would be appreciated if you made a recording of whether the bug occurs here as well.
+      description: Not required, but if you can run SMBX 1.3 (or [use our Research Version](https://github.com/Wohlstand/smbx-experiments/releases) that will work better on Linux under Wine and has the built-in GIF recorder using the F11 key), it would be appreciated if you made a recording of whether the bug occurs here as well.
     validations:
       required: false
 
