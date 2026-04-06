@@ -750,8 +750,12 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         syncLayers_NPC(numNPCs);
         CheckSectionNPC(numNPCs);
         b = Block_t();
-        // Prevent possible crash on render
-        b.Type = newBlock;
+        // Prevent possible crash on render (#1136)
+        invalidateDrawBlocks();
+
+        // After additional research: consider syncing the erased block to keep logic working as expected.
+        // Right now some normal expectations (quadtree, layer list) may be violated, but the block's position is not immediately synced in SMBX 1.3.
+        // syncLayersTrees_Block(A);
     }
 
     if(b.Type == 90)
