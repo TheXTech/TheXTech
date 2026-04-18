@@ -368,6 +368,7 @@ static void s_playMusic(int mod, const char* qoa, int fadeInMs)
 
     s_curMusic = mod;
 
+    // QOA from music array
     if(qoa)
         s_curMusic = -4;
 
@@ -388,6 +389,7 @@ static void s_playMusic(int mod, const char* qoa, int fadeInMs)
         s_MusicSetupFade(1024, fadeInMs);
         mmStart(mod, MM_PLAY_LOOP);
     }
+    // QOA from level/world custom fields
     else if(mod == -2 || mod == -3)
     {
         std::string p = ((mod == -3) ? (curWorldMusicFile) : CustomMusic[s_customSection]);
@@ -401,7 +403,20 @@ static void s_playMusic(int mod, const char* qoa, int fadeInMs)
                 break;
             }
         }
-        p += ".qoa";
+
+        bool has_qoa_suffix = false;
+        if(p.size() >= 3)
+        {
+            char q = p[p.size() - 3];
+            char o = p[p.size() - 2];
+            char a = p[p.size() - 1];
+
+            if(q == 'q' && o == 'o' && a == 'a')
+                has_qoa_suffix = true;
+        }
+
+        if(!has_qoa_suffix)
+            p += ".qoa";
 
         g_stats.currentMusicFile = p;
 
