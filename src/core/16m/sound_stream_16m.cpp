@@ -20,6 +20,7 @@
 
 
 #include <SDL2/SDL_rwops.h>
+#include <string.h>
 #include <maxmod9.h>
 
 #ifdef __CALICO__
@@ -34,49 +35,100 @@
 
 
 static constexpr size_t s_max_qoa_frame_size = QOA_FRAME_SIZE(2, QOA_SLICES_PER_FRAME);
-
-struct xqoa_desc : public qoa_desc
-{
-    uint32_t loop_start = 0;
-    uint32_t loop_end = 0;
-};
+static constexpr size_t s_max_decoded_frame_size = 4 * QOA_FRAME_LEN;
 
 struct Sound_Stream
 {
     SDL_RWops* rwops = nullptr;
-    xqoa_desc desc;
+    qoa_desc desc;
     uint8_t encoded_frame[s_max_qoa_frame_size];
     unsigned int encoded_bytes = 0;
+
+    uint8_t decoded_frame[s_max_decoded_frame_size];
+    unsigned int decoded_start = 0;
+    unsigned int decoded_end = 0;
+
     int first_frame_filepos = 0;
+    uint32_t sample_pos = 0;
+
+    uint32_t loop_start = 0;
+    uint32_t loop_end = 0;
+
+    // clip the current frame
+    uint32_t play_start = 0;
 };
 
 static Sound_Stream s_stream;
 
-void Sound_StreamLoadData();;
+static void s_rewind()
+{
+    size_t frame_size = s_max_qoa_frame_size;
+    if(s_stream.desc.channels == 1)
+        frame_size = QOA_FRAME_SIZE(1, QOA_SLICES_PER_FRAME);
+
+    s_stream.sample_pos = s_stream.loop_start;
+    unsigned want_frame = (s_stream.loop_start / QOA_FRAME_LEN);
+    SDL_RWseek(s_stream.rwops, s_stream.first_frame_filepos + frame_size * want_frame, SEEK_SET);
+
+    s_stream.play_start = s_stream.loop_start - (want_frame * QOA_FRAME_LEN);
+}
+
+void Sound_StreamLoadData();
 
 
 mm_word s_fill_stream(mm_word length, mm_addr dest, mm_stream_formats /*format*/)
 {
-    if(length < QOA_FRAME_LEN)
-        return 0;
-
+    if(s_stream.decoded_start >= s_stream.decoded_end)
+    {
 #ifdef __CALICO__
-    if(!s_stream.encoded_bytes)
-        Sound_StreamLoadData();
+        if(!s_stream.encoded_bytes)
+            Sound_StreamLoadData();
 #endif
 
-    if(!s_stream.encoded_bytes)
+        if(!s_stream.encoded_bytes)
+            return 0;
+
+        unsigned int samples_decoded;
+        qoa_decode_frame(s_stream.encoded_frame, s_stream.encoded_bytes, &s_stream.desc, (int16_t*)s_stream.decoded_frame, &samples_decoded);
+
+        s_stream.decoded_start = 0;
+        s_stream.decoded_end = samples_decoded * 2 * s_stream.desc.channels;
+
+        if(s_stream.play_start)
+        {
+            samples_decoded -= s_stream.play_start;
+
+            s_stream.decoded_start += s_stream.play_start * 2 * s_stream.desc.channels;
+
+            s_stream.play_start = 0;
+        }
+
+        s_stream.sample_pos += samples_decoded;
+
+        // clip to loop_end if reached
+        if(s_stream.loop_end && s_stream.sample_pos > s_stream.loop_end)
+            s_stream.decoded_end -= (s_stream.sample_pos - s_stream.loop_end) * 2 * s_stream.desc.channels;
+
+        s_stream.encoded_bytes = 0;
+    }
+
+    if(s_stream.decoded_start >= s_stream.decoded_end)
         return 0;
 
-    unsigned int samples_decoded;
-    qoa_decode_frame(s_stream.encoded_frame, s_stream.encoded_bytes, &s_stream.desc, (int16_t*)dest, &samples_decoded);
+    unsigned copy_bytes = length * 2 * s_stream.desc.channels;
+
+    if(s_stream.decoded_end - s_stream.decoded_start < copy_bytes)
+        copy_bytes = s_stream.decoded_end - s_stream.decoded_start;
+
+    memcpy(dest, s_stream.decoded_frame + s_stream.decoded_start, copy_bytes);
+    s_stream.decoded_start += copy_bytes;
+
+    unsigned got_samples = copy_bytes / (2 * s_stream.desc.channels);
 
     // required a multiple of 4
-    samples_decoded &= ~3;
+    got_samples &= ~3;
 
-    s_stream.encoded_bytes = 0;
-
-    return samples_decoded;
+    return got_samples;
 }
 
 void Sound_StreamStart(SDL_RWops* rwops)
@@ -89,6 +141,8 @@ void Sound_StreamStart(SDL_RWops* rwops)
         SDL_RWclose(rwops);
         return;
     }
+
+    memset((void*)&s_stream, 0, sizeof(Sound_Stream));
 
     // check whether we have an XQOA file
     const uint32_t XQOA_MAGIC = 0x58514f41; /* 'XQOA' */
@@ -114,8 +168,8 @@ void Sound_StreamStart(SDL_RWops* rwops)
         junk_counter = 0;
         qoa_uint64_t loop_info = qoa_read_u64(qoa_header + 4, &junk_counter);
 
-        s_stream.desc.loop_start = (uint32_t)(loop_info >> 32);
-        s_stream.desc.loop_end = (uint32_t)(loop_info);
+        s_stream.loop_start = (uint32_t)(loop_info >> 32);
+        s_stream.loop_end = (uint32_t)(loop_info);
 
         // seek and re-read genuine QOA header
         SDL_RWseek(rwops, xqoa_headsize, RW_SEEK_SET);
@@ -141,15 +195,13 @@ void Sound_StreamStart(SDL_RWops* rwops)
 
     SDL_RWseek(rwops, s_stream.first_frame_filepos, RW_SEEK_SET);
     s_stream.rwops = rwops;
-    s_stream.encoded_bytes = 0;
-
 
     // qoa header successfully loaded
 
     mm_stream stream;
 
     stream.sampling_rate = s_stream.desc.samplerate;
-    stream.buffer_length = QOA_FRAME_LEN * 2;
+    stream.buffer_length = QOA_FRAME_LEN;
     stream.callback = s_fill_stream;
 
     stream.format = MM_STREAM_16BIT_STEREO;
@@ -197,7 +249,8 @@ void Sound_StreamLoadData()
     if(s_stream.desc.channels == 1)
         frame_size = QOA_FRAME_SIZE(1, QOA_SLICES_PER_FRAME);
 
-    s_stream.encoded_bytes = SDL_RWread(s_stream.rwops, s_stream.encoded_frame, 1, frame_size);
+    if(!s_stream.loop_end || s_stream.sample_pos < s_stream.loop_end)
+        s_stream.encoded_bytes = SDL_RWread(s_stream.rwops, s_stream.encoded_frame, 1, frame_size);
 
     while(s_stream.encoded_bytes != 0 && s_stream.encoded_bytes != frame_size)
     {
@@ -205,25 +258,19 @@ void Sound_StreamLoadData()
 
         if(new_bytes == 0)
             break;
-        else
-            printf("Stream: read %d bytes first and %d bytes second.", (int)s_stream.encoded_bytes, new_bytes);
+        // else
+        //     pLogDebug("Stream: read %d bytes first and %d bytes second.", (int)s_stream.encoded_bytes, new_bytes);
 
         s_stream.encoded_bytes += new_bytes;
     }
 
     if(s_stream.encoded_bytes != frame_size)
     {
-        // return to stream start
-        SDL_RWseek(s_stream.rwops, s_stream.first_frame_filepos, RW_SEEK_SET);
+        // return to stream/loop start
+        s_rewind();
 
-        // try to read again if there wasn't anything left (or always on Calico, which requires precise frames)
-#ifdef __CALICO__
-        const bool read_again = true;
-#else
-        const bool read_again = (s_stream.encoded_bytes == 0);
-#endif
-
-        if(read_again)
+        // try to read again if there wasn't anything left
+        if(s_stream.encoded_bytes == 0)
             s_stream.encoded_bytes = SDL_RWread(s_stream.rwops, s_stream.encoded_frame, 1, frame_size);
 
         // if still nothing, then panic and close the file
