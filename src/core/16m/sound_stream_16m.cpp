@@ -35,10 +35,16 @@
 
 static constexpr size_t s_max_qoa_frame_size = QOA_FRAME_SIZE(2, QOA_SLICES_PER_FRAME);
 
+struct xqoa_desc : public qoa_desc
+{
+    uint32_t loop_start = 0;
+    uint32_t loop_end = 0;
+};
+
 struct Sound_Stream
 {
     SDL_RWops* rwops = nullptr;
-    qoa_desc desc;
+    xqoa_desc desc;
     uint8_t encoded_frame[s_max_qoa_frame_size];
     unsigned int encoded_bytes = 0;
     int first_frame_filepos = 0;
@@ -84,8 +90,39 @@ void Sound_StreamStart(SDL_RWops* rwops)
         return;
     }
 
+    // check whether we have an XQOA file
+    const uint32_t XQOA_MAGIC = 0x58514f41; /* 'XQOA' */
+    uint32_t xqoa_headsize = 0;
     uint8_t qoa_header[QOA_MIN_FILESIZE];
-    int header_read = SDL_RWread(rwops, qoa_header, QOA_MIN_FILESIZE, 1);
+    int header_read = SDL_RWread(rwops, qoa_header, 8, 1);
+    if(!header_read)
+    {
+        SDL_RWclose(rwops);
+        return;
+    }
+
+    unsigned int junk_counter = 0;
+    qoa_uint64_t top = qoa_read_u64(qoa_header, &junk_counter);
+    if(top >> 32 == XQOA_MAGIC)
+    {
+        // XQOA header format (32-bit big endian unsigned ints)
+        // magic, header_size, data_size, loop_start, loop_end, multitrack_channels, multitrack_tracks, <...tags...>
+        xqoa_headsize = (uint32_t)(top);
+
+        // read 16 bytes to get data including loop info
+        header_read = SDL_RWread(rwops, qoa_header, QOA_MIN_FILESIZE, 1);
+        junk_counter = 0;
+        qoa_uint64_t loop_info = qoa_read_u64(qoa_header + 4, &junk_counter);
+
+        s_stream.desc.loop_start = (uint32_t)(loop_info >> 32);
+        s_stream.desc.loop_end = (uint32_t)(loop_info);
+
+        // seek and re-read genuine QOA header
+        SDL_RWseek(rwops, xqoa_headsize, RW_SEEK_SET);
+        header_read = SDL_RWread(rwops, qoa_header, 8, 1);
+    }
+
+    header_read = SDL_RWread(rwops, qoa_header + 8, QOA_MIN_FILESIZE - 8, 1);
     if(!header_read)
     {
         SDL_RWclose(rwops);
@@ -99,6 +136,8 @@ void Sound_StreamStart(SDL_RWops* rwops)
         SDL_RWclose(rwops);
         return;
     }
+
+    s_stream.first_frame_filepos += xqoa_headsize;
 
     SDL_RWseek(rwops, s_stream.first_frame_filepos, RW_SEEK_SET);
     s_stream.rwops = rwops;
