@@ -336,6 +336,12 @@ inline Location_t extract_loc(WorldLevelRef_t obj)
 }
 
 template<>
+inline Location_t extract_loc(BackgroundRef_t obj)
+{
+    return static_cast<Location_t>(obj->FullLocation());
+}
+
+template<>
 inline Location_t extract_loc(NPCRef_t obj)
 {
     Location_t ret = obj->Location;
@@ -366,7 +372,7 @@ inline Location_t extract_loc(NPCRef_t obj)
 template<class MyRef_t>
 inline Location_t extract_loc_layer(MyRef_t obj)
 {
-    Location_t loc = static_cast<Location_t>(obj->Location);
+    Location_t loc = extract_loc(obj);
 
     if(obj->Layer != LAYER_NONE)
     {
