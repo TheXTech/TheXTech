@@ -35,6 +35,7 @@
 #include "main/game_info.h"
 #include "window_sdl.h"
 #include "../render.h"
+#include "../events.h"
 #include "config.h"
 #include "../version.h"
 
@@ -506,6 +507,9 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
 #if defined(__SWITCH__) /* On Switch, expect the initial size 1920x1080 */
     const int initWindowW = 1920;
     const int initWindowH = 1080;
+#elif defined(__PSP__) /* On PSP, expect the initial size 480x272 */
+    const int initWindowW = 480;
+    const int initWindowH = 272;
 #else
     const auto initWindowW = XRender::TargetW;
     const auto initWindowH = XRender::TargetH;
@@ -564,12 +568,18 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
 
     SDL_SetWindowMinimumSize(m_window, 240, 160);
 
+#ifndef RENDER_HALFPIXEL_ALWAYS
+    AbstractRender_t::m_halfPixelMode = g_config.half_pixel_mode;
+#endif
+
 #ifdef __EMSCRIPTEN__ // Set canvas be 1/2 size for a faster rendering
     SDL_SetWindowSize(m_window, XRender::TargetW / 2, XRender::TargetH / 2);
 #elif defined(__ANDROID__) || defined(__SWITCH__) // Set as small as possible
     SDL_SetWindowMinimumSize(m_window, 200, 150);
 #elif defined(VITA)
     SDL_SetWindowSize(m_window, 960, 544);
+#elif defined(__PSP__)
+    SDL_SetWindowSize(m_window, 480, 272);
 #else
     if(g_config.scale_mode == Config_t::SCALE_FIXED_05X)
         SDL_SetWindowSize(m_window, XRender::TargetW / 2, XRender::TargetH / 2);
@@ -729,7 +739,7 @@ void WindowSDL::placeCursor(int window_x, int window_y)
     XRender::mapToScreen(old_window_x, old_window_y, &o_sx, &o_sy);
     XRender::mapToScreen(window_x, window_y, &n_sx, &n_sy);
 
-    if(n_sx - o_sx < -2 || n_sx - o_sx > 2 || n_sy - o_sy < -2 || n_sy - o_sy > 2)
+    if((n_sx - o_sx < -2) || (n_sx - o_sx > 2) || (n_sy - o_sy < -2) || (n_sy - o_sy > 2))
     {
         int window_w, window_h;
         this->getWindowSize(&window_w, &window_h);
@@ -800,6 +810,24 @@ int WindowSDL::setFullScreen(bool fs)
     }
 
     return 0;
+}
+
+void WindowSDL::setHalfPixMode(bool pixHalf)
+{
+#ifndef RENDER_HALFPIXEL_ALWAYS
+    m_halfPixelMode = pixHalf;
+
+    // Apply changes to the render too
+    if(!XRender::is_nullptr())
+        g_render->setHalfPixMode(pixHalf);
+    else
+        AbstractRender_t::m_halfPixelMode = pixHalf;
+
+    if(!XEvents::is_nullptr())
+        XEvents::eventResize();
+#else
+    UNUSED(pixHalf);
+#endif
 }
 
 
@@ -934,8 +962,12 @@ void WindowSDL::restoreWindow()
 
 void WindowSDL::setWindowSize(int w, int h)
 {
+#ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+    if(getFullScreenType() == FULLSCREEN_TYPE_REAL)
+        return; // Disallow window size changes when exclusive full-screen mode is set
+#endif
     // doesn't make sense on Emscripten, actually causes crashes on Wii U
-#if !defined(__EMSCRIPTEN__) && !defined(__WIIU__)
+#if !defined(__EMSCRIPTEN__) && !defined(__WIIU__) && !defined(__PSP__)
     // try to figure out whether requested size is bigger than the screen
     int display = SDL_GetWindowDisplayIndex(m_window);
     if(display >= 0)

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <inttypes.h>
 #include <SDL2/SDL_thread.h>
 #include <SDL2/SDL_power.h>
 #include <SDL2/SDL_rwops.h>
@@ -40,10 +41,18 @@
 #include <fmt_time_ne.h>
 #include <fmt_format_ne.h>
 
-#include <chrono>
+// FIXME: platform-dependent timestamp logic should be moved to its own XChrono namespace in the core directory (and this should apply to the Logger also)
+#if !defined(PGE_MIN_PORT) && !defined(__PSP__)
+#   define SHOOT_HAS_CHRONO
+#   include <chrono>
+#endif
+#ifdef __PSP__
+#   include <psprtc.h>
+#endif
 
 #include "core/base/render_base.h"
 #include "core/render.h"
+#include "core/window.h"
 
 #include "main/cheat_code.h"
 
@@ -73,6 +82,10 @@ int    AbstractRender_t::m_maxTextureHeight = 0;
 
 int    AbstractRender_t::ScaleWidth = 0;
 int    AbstractRender_t::ScaleHeight = 0;
+
+#ifndef RENDER_HALFPIXEL_ALWAYS
+bool   AbstractRender_t::m_halfPixelMode = false;
+#endif
 
 #ifdef USE_RENDER_BLOCKING
 bool   AbstractRender_t::m_blockRender = false;
@@ -147,6 +160,12 @@ bool AbstractRender_t::init()
     ScaleWidth = XRender::TargetW;
     ScaleHeight = XRender::TargetH;
 
+    if(m_halfPixelMode)
+    {
+        ScaleWidth >>= 1;
+        ScaleHeight >>= 1;
+    }
+
 #ifdef PGE_ENABLE_VIDEO_REC
     m_gif->init(this);
 #endif
@@ -158,6 +177,38 @@ void AbstractRender_t::close()
 #ifdef PGE_ENABLE_VIDEO_REC
     m_gif->quit();
 #endif
+}
+
+void AbstractRender_t::getLogicRenderSize(int *w, int *h)
+{
+    getRenderSize(w, h);
+
+#ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+    const bool doubleSize = m_halfPixelMode && XWindow::isFullScreen() && XWindow::getFullScreenType() == AbstractWindow_t::FULLSCREEN_TYPE_REAL;
+#elif defined(RENDER_FULLSCREEN_ALWAYS) && defined(RENDER_HALFPIXEL_ALWAYS)
+    constexpr bool doubleSize = m_halfPixelMode;
+#else
+    constexpr bool doubleSize = false;
+#endif
+
+    if(doubleSize)
+    {
+        *w <<= 1;
+        *h <<= 1;
+    }
+}
+
+void AbstractRender_t::getMaxLogicSize(int *w, int *h)
+{
+    if(m_maxTextureWidth > 0)
+        *w = m_halfPixelMode ? m_maxTextureWidth << 1 : m_maxTextureWidth;
+    else
+        *w = m_halfPixelMode ? 4096 << 1 : 4096;
+
+    if(m_maxTextureHeight > 0)
+        *h = m_halfPixelMode ? m_maxTextureHeight << 1 : m_maxTextureHeight;
+    else
+        *h = m_halfPixelMode ? 4096 << 1 : 4096;
 }
 
 void AbstractRender_t::dumpFullFile(std::vector<char> &dst, const std::string &path)
@@ -182,6 +233,17 @@ void AbstractRender_t::dumpFullFile(std::vector<char> &dst, const std::string &p
         pLogWarning("Failed to dump file on read operation: %s", path.c_str());
 
     SDL_RWclose(f);
+}
+
+void AbstractRender_t::setHalfPixMode(bool pixHalf)
+{
+#ifndef RENDER_HALFPIXEL_ALWAYS
+    m_halfPixelMode = pixHalf;
+    if(isWorking())
+        updateViewport();
+#else
+    UNUSED(pixHalf);
+#endif
 }
 
 void AbstractRender_t::loadTextureMask(StdPicture &target,
@@ -262,17 +324,29 @@ void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
     target.w = tSize.w() * scaleFactor;
     target.h = tSize.h() * scaleFactor;
 
+#ifdef THEXTECH_LAZYLOAD_FROM_DISK
+    target.l.path = path;
+#else
     target.l.raw = Files::load_file(path);
+#endif
 
     //Apply Alpha mask
     if(useMask && !maskPath.empty() && Files::fileExists(maskPath))
     {
+#ifdef THEXTECH_LAZYLOAD_FROM_DISK
+        target.l.pathMask = maskPath;
+#else
         target.l.rawMask = Files::load_file(maskPath);
+#endif
         target.l.isMaskPng = false; //-V1048
     }
     else if(useMask && !maskFallbackPath.empty())
     {
+#ifdef THEXTECH_LAZYLOAD_FROM_DISK
+        target.l.pathMask = maskFallbackPath;
+#else
         target.l.rawMask = Files::load_file(maskFallbackPath);
+#endif
         target.l.isMaskPng = true;
     }
 
@@ -506,6 +580,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
         return;
 
+#ifndef THEXTECH_LAZYLOAD_FROM_DISK
     bool is_qoi = false;
     bool qoi_depth_test_supported = false;
 
@@ -517,18 +592,36 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         is_qoi = true;
     else
         sourceImage = GraphicsHelps::loadImage(target.l.raw);
+#else
+    FIBITMAP *sourceImage = GraphicsHelps::loadImage(target.l.path);
+    constexpr bool is_qoi = false;
+    constexpr bool qoi_depth_test_supported = false;
+#endif
 
     if(!sourceImage)
     {
+#ifdef THEXTECH_LAZYLOAD_FROM_DISK
+        pLogCritical("Lazy-decompress has failed: invalid image file %s", target.l.path.c_str());
+#else
         pLogCritical("Lazy-decompress has failed: invalid image data");
+#endif
+        target.inited = false;
         return;
     }
 
     FIBITMAP *maskImage = nullptr;
+#ifdef THEXTECH_LAZYLOAD_FROM_DISK
+    if(!target.l.pathMask.empty())
+#else
     if(!target.l.rawMask.empty())
+#endif
     {
         // load mask
+#ifdef THEXTECH_LAZYLOAD_FROM_DISK
+        maskImage = GraphicsHelps::loadMask(target.l.pathMask, target.l.isMaskPng);
+#else
         maskImage = GraphicsHelps::loadMask(target.l.rawMask, target.l.isMaskPng);
+#endif
 
         if(!maskImage)
             pLogWarning("lazyLoad: failed to load mask image for texture at address %p [%s]", static_cast<void*>(&target), StdPictureGetOrigPath(target).c_str());
@@ -566,8 +659,15 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     }
 
     m_lazyLoadedBytes += (w * h * 4);
+
+#ifdef THEXTECH_LAZYLOAD_FROM_DISK
+    if(!target.l.pathMask.empty())
+#else
     if(!target.l.rawMask.empty())
+#endif
+    {
         m_lazyLoadedBytes += (w * h * 4);
+    }
 
     if(target.l.colorKey) // Apply transparent color for key pixels
     {
@@ -582,6 +682,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
     if(!is_qoi)
         FreeImage_FlipVertical(sourceImage);
+
     if(maskImage)
         FreeImage_FlipVertical(maskImage);
 
@@ -610,14 +711,19 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         // only do it if the texture isn't already downscaled
         shrink2x = (w >= Uint32(target.w) && h >= Uint32(target.h));
         break;
+
     case Config_t::SCALE_DOWN_SAFE:
         // only do it if the texture isn't already downscaled, and wasn't already testing during QOI conversion
-        shrink2x = (w >= Uint32(target.w) && h >= Uint32(target.h) && !is_qoi);
+        shrink2x = w >= Uint32(target.w) && h >= Uint32(target.h) && !is_qoi;
+
         if(shrink2x)
             shrink2x = GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target));
+
         if(maskImage && shrink2x)
             shrink2x = GraphicsHelps::validateFor2xScaleDown(maskImage, StdPictureGetOrigPath(target));
+
         break;
+
     case Config_t::SCALE_DOWN_NONE:
     default:
         shrink2x = false;
@@ -635,29 +741,71 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
     if(wLimitExcited || hLimitExcited || shrink2x)
     {
+        uint32_t old_w = w, old_h = h;
+        bool succ = true;
+
         // WORKAROUND: down-scale too big textures
+#ifdef __PSP__
+        int divX = shrink2x ? 2 : 1, divY = shrink2x ? 2 : 1;
+        if(wLimitExcited)
+        {
+            if(shrink2x)
+                w *= 2;
+
+            while((w / divX) > Uint32(m_maxTextureWidth))
+                divX *= 2;
+
+            w /= divX;
+        }
+
+        if(hLimitExcited)
+        {
+            if(shrink2x)
+                h *= 2;
+
+            while((h / divY) > Uint32(m_maxTextureHeight))
+                divY *= 2;
+
+            h /= divY;
+        }
+#else
         if(wLimitExcited)
             w = Uint32(m_maxTextureWidth);
+
         if(hLimitExcited)
             h = Uint32(m_maxTextureHeight);
+#endif
 
         if(wLimitExcited || hLimitExcited)
         {
-            pLogWarning("Texture is too big for a given hardware limit (%dx%d). "
-                        "Shrinking texture to %dx%d, quality may be distorted!",
+            pLogWarning("Texture of size %" PRIu32 "x%" PRIu32 " is too big for a given hardware limit (%dx%d). "
+                        "Shrinking texture to %" PRIu32 "x%" PRIu32 ", quality may be distorted!",
+                        old_w, old_h,
                         m_maxTextureWidth, m_maxTextureHeight,
                         w, h);
         }
 
+#ifdef __PSP__
+        FIBITMAP *d = (wLimitExcited || hLimitExcited) ? GraphicsHelps::fastIntScaleDown(sourceImage, divX, divY) : GraphicsHelps::fast2xScaleDown(sourceImage);
+#else
         FIBITMAP *d = (wLimitExcited || hLimitExcited) ? FreeImage_Rescale(sourceImage, int(w), int(h), FILTER_BOX) : GraphicsHelps::fast2xScaleDown(sourceImage);
+#endif
         if(d)
         {
             GraphicsHelps::closeImage(sourceImage);
             sourceImage = d;
             pitch = FreeImage_GetPitch(d);
+            succ = true;
+        }
+        else
+        {
+            succ = false;
+            pLogWarning("Failed to scale down the front texture of size %" PRIu32 "x%" PRIu32 " to %" PRIu32 "x%" PRIu32 ", keeping original image.", old_w, old_h, w, h);
+            w = old_w;
+            h = old_h;
         }
 
-        if(maskImage)
+        if(succ && maskImage)
         {
             d = (wLimitExcited || hLimitExcited) ? FreeImage_Rescale(maskImage, int(w), int(h), FILTER_BOX) : GraphicsHelps::fast2xScaleDown(maskImage);
             if(d)
@@ -665,6 +813,8 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
                 GraphicsHelps::closeImage(maskImage);
                 maskImage = d;
             }
+            else
+                pLogWarning("Failed to scale down the mask texture of size %" PRIu32 "x%" PRIu32 " to %" PRIu32 "x%" PRIu32 ", keeping original mask. Result will be SERIOUSLY distorted.", old_w, old_h, w, h);
         }
     }
 
@@ -673,7 +823,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         || ((is_qoi)
             ? !qoi_depth_test_supported
             : !GraphicsHelps::validateForDepthTest(sourceImage, StdPictureGetOrigPath(target)))
-        )
+    )
     {
         target.d.invalidateDepthTest();
     }
@@ -889,9 +1039,28 @@ void AbstractRender_t::setBlockRender(bool b)
 
 static std::string shoot_getTimedString(const std::string &path, const char *ext = "png")
 {
+    std::tm t;
+#ifdef SHOOT_HAS_CHRONO
     auto now = std::chrono::system_clock::now();
     std::time_t in_time_t = std::chrono::system_clock::to_time_t(now);
-    std::tm t = fmt::localtime_ne(in_time_t);
+#elif defined(__PSP__)
+    ScePspDateTime now;
+    sceRtcGetCurrentClockLocalTime(&now);
+    t.tm_year = now.year - 1900;
+    t.tm_mon = now.month;
+    t.tm_mday = now.day;
+    t.tm_hour = now.hour;
+    t.tm_min = now.minute;
+    t.tm_sec = now.second;
+#else
+    time_t in_time_t;
+    // chrono doesn't work reliably here
+    time(&in_time_t);
+#endif
+
+#if !defined(__PSP__)
+    t = fmt::localtime_ne(in_time_t);
+#endif
     static int prevSec = 0;
     static int prevSecCounter = 0;
 
@@ -929,7 +1098,8 @@ void AbstractRender_t::makeShot()
     if(!XRender::isWorking())
         return;
 
-    const int w = ScaleWidth, h = ScaleHeight;
+    const int w = m_halfPixelMode ? XRender::TargetW >> 1 : XRender::TargetW,
+              h = m_halfPixelMode ? XRender::TargetH >> 1 : XRender::TargetH;
     uint8_t *pixels = new uint8_t[size_t(4 * w * h)];
     g_render->getScreenPixelsRGBA(0, 0, w, h, pixels);
     PGE_GL_shoot *shoot = new PGE_GL_shoot();
@@ -1068,9 +1238,9 @@ void AbstractRender_t::toggleGifRecorder()
             DirMan::mkAbsPath(outDir);
 
         PGE_VideoSpec spec;
-        spec.frame_w = XRender::TargetW;
-        spec.frame_h = XRender::TargetH;
-        spec.frame_pitch = XRender::TargetW * 4;
+        spec.frame_w = m_halfPixelMode ? XRender::TargetW >> 1 : XRender::TargetW;
+        spec.frame_h = m_halfPixelMode ? XRender::TargetH >> 1 : XRender::TargetH;
+        spec.frame_pitch = spec.frame_w * 4;
 
         std::unique_ptr<PGE_VideoRecording> recording;
 
@@ -1157,7 +1327,8 @@ void AbstractRender_t::processRecorder()
         return;
     }
 
-    const int w = XRender::TargetW, h = XRender::TargetH;
+    const int w = m_halfPixelMode ? XRender::TargetW >> 1 : XRender::TargetW,
+              h = m_halfPixelMode ? XRender::TargetH >> 1 : XRender::TargetH;
 
     PGE_VideoFrame shoot;
     shoot.pixels.resize(4 * w * h);
