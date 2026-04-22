@@ -95,6 +95,7 @@ set(MixerX_SysLibs ${THEXTECH_SYSLIBS})
 set_static_lib(AC_FLAC         "${CODECS_LIBRARIES_DIR}" FLAC)
 set_static_lib(AC_FLUIDLITE    "${CODECS_LIBRARIES_DIR}" fluidlite)
 set_static_lib(AC_VORBISFILE   "${CODECS_LIBRARIES_DIR}" vorbisfile)
+set_static_lib(AC_VORBISENC    "${CODECS_LIBRARIES_DIR}" vorbisenc)
 set_static_lib(AC_VORBISIDEC   "${CODECS_LIBRARIES_DIR}" vorbisidec)
 set_static_lib(AC_VORBIS       "${CODECS_LIBRARIES_DIR}" vorbis)
 set_static_lib(AC_OPUSFILE     "${CODECS_LIBRARIES_DIR}" opusfile)
@@ -119,8 +120,15 @@ set(MixerX_CodecLibs
     "${AC_FLUIDLITE}"
 )
 
+if(PGE_VIDEO_REC_WEBM_SUPPORTED)
+    list(APPEND MixerX_CodecLibs ${AC_VORBISENC})
+endif()
+
 if(MIXER_USE_OGG_VORBIS_FILE)
     list(APPEND MixerX_CodecLibs ${AC_VORBISFILE})
+endif()
+
+if(MIXER_USE_OGG_VORBIS_FILE OR PGE_VIDEO_REC_WEBM_SUPPORTED)
     list(APPEND MixerX_CodecLibs ${AC_VORBIS})
 endif()
 
@@ -195,6 +203,7 @@ endif()
 set(MixerX_Deps)
 set(AudioCodecs_Deps)
 set(AUDIO_CODECS_BUILD_ARGS)
+set(MIXERX_CMAKE_FLAGS)
 
 if(THEXTECH_NO_MIXER_X)
     # Disable everything except of SDL2
@@ -219,18 +228,34 @@ if(THEXTECH_NO_MIXER_X)
     endif()
 else()
     list(APPEND AUDIO_CODECS_BUILD_ARGS
-        "-DBUILD_OGG_VORBIS=${MIXER_USE_OGG_VORBIS_TREMOR}"
         "-DOGG_UNSAFE_DISABLE_CRC=${AUDIOCODECS_OGG_UNSAFE_DISABLE_CRC}"
         "-DBUILD_FLAC=OFF"
         "-DBUILD_MPG123=OFF"
         "-DBUILD_GME_SYSTEM_ZLIB=${USE_SYSTEM_ZLIB}"
         "-DBUILD_WAVPACK=${MIXERX_ENABLE_WAVPACK}"
     )
+
+    if(PGE_VIDEO_REC_WEBM_SUPPORTED)
+        list(APPEND AUDIO_CODECS_BUILD_ARGS "-DBUILD_OGG_VORBIS=ON")
+    else()
+        list(APPEND AUDIO_CODECS_BUILD_ARGS "-DBUILD_OGG_VORBIS=${MIXER_USE_OGG_VORBIS_TREMOR}")
+    endif()
 endif()
 
 if(NINTENDO_WII OR NINTENDO_DS OR NINTENDO_3DS)
     list(APPEND AUDIO_CODECS_BUILD_ARGS
         "-DDISABLE_HEAVY_SYNTHS=ON"
+    )
+endif()
+
+if(PGE_FFMPEG_AVAILABLE)
+    list(APPEND MIXERX_CMAKE_FLAGS
+        "-DUSE_FFMPEG=ON"
+        "-DFFMPEG_INCLUDE_DIRS=${FFMPEG_INCLUDE_DIRS}"
+        "-DFFMPEG_avcodec_LIBRARY=${AVCODEC_LIBRARY}"
+        "-DFFMPEG_avformat_LIBRARY=${AVFORMAT_LIBRARY}"
+        "-DFFMPEG_avutil_LIBRARY=${AVUTIL_LIBRARY}"
+        "-DFFMPEG_swresample_LIBRARY=${SWRESAMPLE_LIBRARY}"
     )
 endif()
 
@@ -303,7 +328,6 @@ ExternalProject_Add(
 list(APPEND MixerX_Deps AudioCodecs_Local)
 
 if(NOT THEXTECH_NO_MIXER_X)
-    set(MIXERX_CMAKE_FLAGS)
     if(USE_SYSTEM_SDL2)
         # Ensure the SAME SDL2 directory will be used
         list(APPEND MIXERX_CMAKE_FLAGS
@@ -371,6 +395,14 @@ endif()
 
 
 message("--- Detected system libraries list: ${MixerX_SysLibs} ---")
+
+if(PGE_FFMPEG_AVAILABLE)
+    target_link_libraries(PGE_SDLMixerX_static INTERFACE PGE_FFMPEG)
+    if(PGE_VIDEO_REC_WEBM_SUPPORTED)
+        target_link_libraries(PGE_SDLMixerX_static INTERFACE PGE_libVPX)
+    endif()
+endif()
+
 if(NOT THEXTECH_CLI_BUILD AND NOT THEXTECH_NO_MIXER_X)
     target_link_libraries(PGE_SDLMixerX_static INTERFACE ${MixerX_CodecLibs})
 endif()
