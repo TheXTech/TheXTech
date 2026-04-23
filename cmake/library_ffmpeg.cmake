@@ -8,6 +8,11 @@ endif()
 
 set(PGE_FFMPEG_AVAILABLE OFF)
 
+macro(ffmpeg_cygpath InPath OutPath)
+    execute_process(COMMAND cygpath.exe -u ${${InPath}} OUTPUT_VARIABLE ${OutPath})
+    string(STRIP ${${OutPath}} ${OutPath})
+endmacro()
+
 if(USE_SYSTEM_LIBS)
     add_library(FFMPEG_Local INTERFACE)
 
@@ -74,6 +79,24 @@ else()
         set(FFMPEG_ARCH_ARGS --disable-altivec --disable-vsx --disable-power8 --disable-ppc4xx --disable-dcbzl)
     endif()
 
+    if(WIN32)
+        # FIXME: Implement the proper finding of MSYS2 environment and the bash.exe interpreter, and the make.exe
+        set(FFMPEG_BASH_RUNTIME bash)
+        set(FFMPEG_MAKE_TOOL "C:/msys64/usr/bin/make.exe")
+        if("${TARGET_PROCESSOR}" STREQUAL "x86_64")
+            set(FFMPEG_ARCH_ARGS --target-os=mingw64 --arch=x86_64 --extra-cflags="-DWINVER=0x0501 -D_WIN32_WINNT=0x0501")
+        elseif("${TARGET_PROCESSOR}" STREQUAL "i386")
+            set(FFMPEG_ARCH_ARGS --target-os=mingw32 --arch=i386 --extra-cflags="-DWINVER=0x0501 -D_WIN32_WINNT=0x0501")
+        endif()
+        ffmpeg_cygpath(CMAKE_C_COMPILER FFMPEG_CC)
+        ffmpeg_cygpath(CMAKE_CXX_COMPILER FFMPEG_CXX)
+    else()
+        set(FFMPEG_BASH_RUNTIME)
+        set(FFMPEG_MAKE_TOOL make)
+        set(FFMPEG_CC ${CMAKE_C_COMPILER})
+        set(FFMPEG_CXX ${CMAKE_CXX_COMPILER})
+        set(FFMPEG_ARCH_ARGS ${FFMPEG_ARCH_ARGS} --toolchain=hardened)
+    endif()
 
     ExternalProject_Add(
         FFMPEG_Local
@@ -81,11 +104,11 @@ else()
         DOWNLOAD_COMMAND ""
         SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/../3rdparty/ffmpeg
         CONFIGURE_COMMAND
+            ${FFMPEG_BASH_RUNTIME}
             "${CMAKE_CURRENT_LIST_DIR}/../3rdparty/ffmpeg/configure"
             "--prefix=${DEPENDENCIES_INSTALL_DIR}"
             --enable-rpath
             --build-suffix=mixerx
-            --toolchain=hardened
             --disable-all
             --disable-autodetect
             --disable-hwaccels
@@ -95,6 +118,9 @@ else()
             --disable-doc
             --disable-iconv
             --disable-sdl2
+
+            --cc=${FFMPEG_CC}
+            --cxx=${FFMPEG_CXX}
 
             ${FFMPEG_ARCH_ARGS}
 
@@ -116,11 +142,12 @@ else()
             ${FFMPEG_PIC_ARGS}
             ${FFMPEG_DEBUG_ARGS}
 
+        BUILD_IN_SOURCE FALSE
         BUILD_COMMAND
-            make -j 2
+            ${FFMPEG_MAKE_TOOL} -j 2
 
         INSTALL_COMMAND
-            make install
+            ${FFMPEG_MAKE_TOOL} install
 
         DEPENDS
             ${FFMPEG_DEPENDS}
