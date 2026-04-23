@@ -327,6 +327,10 @@ ExternalProject_Add(
 
 list(APPEND MixerX_Deps AudioCodecs_Local)
 
+if(TARGET FFMPEG_Local)
+    list(APPEND MixerX_Deps FFMPEG_Local)
+endif()
+
 if(NOT THEXTECH_NO_MIXER_X)
     if(USE_SYSTEM_SDL2)
         # Ensure the SAME SDL2 directory will be used
