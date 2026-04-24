@@ -62,8 +62,11 @@ else()
         set(FFMPEG_DEBUG_ARGS --enable-small --disable-debug --enable-stripping)
     endif()
 
+    set(FFMPEG_EXTRA_CFLAGS)
+
     if(FFMPEG_PIC)
-        set(FFMPEG_PIC_ARGS --enable-pic --extra-cflags=-fPIC --extra-cxxflags=-fPIC)
+        set(FFMPEG_PIC_ARGS --enable-pic)
+        list(APPEND FFMPEG_EXTRA_CFLAGS --extra-cflags=-fPIC --extra-cxxflags=-fPIC)
     else()
         set(FFMPEG_PIC_ARGS --disable-pic)
     endif()
@@ -71,6 +74,8 @@ else()
     if(PGE_VIDEO_REC_WEBM_SUPPORTED)
         set(FFMPEG_VPX_ARGS --enable-pthreads --enable-libvpx --enable-libvorbis --enable-encoder=libvorbis,libvpx_vp8 --enable-muxer=webm --enable-swscale --extra-cflags="-I${DEPENDENCIES_INSTALL_DIR}/include/" --extra-ldflags="-L${DEPENDENCIES_INSTALL_DIR}/lib/")
         set(FFMPEG_DEPENDS LIBVPX_Local)
+    elseif(WIN32)
+        set(FFMPEG_VPX_ARGS --disable-w32threads --enable-pthreads)
     else()
         set(FFMPEG_VPX_ARGS --disable-pthreads)
     endif()
@@ -81,12 +86,20 @@ else()
 
     if(WIN32)
         # FIXME: Implement the proper finding of MSYS2 environment and the bash.exe interpreter, and the make.exe
-        set(FFMPEG_BASH_RUNTIME bash)
+        set(FFMPEG_BASH_RUNTIME bash.exe)
         set(FFMPEG_MAKE_TOOL "C:/msys64/usr/bin/make.exe")
+        list(APPEND FFMPEG_EXTRA_CFLAGS
+            --extra-cflags=-DWINVER=0x0501
+            --extra-cflags=-D_WIN32_WINNT=0x0501
+            --extra-cxxflags=-DWINVER=0x0501
+            --extra-cxxflags=-D_WIN32_WINNT=0x0501
+            --extra-cflags=-DWC_ERR_INVALID_CHARS=WC_NO_BEST_FIT_CHARS
+            --extra-cxxflags=-DWC_ERR_INVALID_CHARS=WC_NO_BEST_FIT_CHARS
+        )
         if("${TARGET_PROCESSOR}" STREQUAL "x86_64")
-            set(FFMPEG_ARCH_ARGS --target-os=mingw64 --arch=x86_64 --extra-cflags="-DWINVER=0x0501 -D_WIN32_WINNT=0x0501")
+            set(FFMPEG_ARCH_ARGS --target-os=mingw64 --arch=x86_64)
         elseif("${TARGET_PROCESSOR}" STREQUAL "i386")
-            set(FFMPEG_ARCH_ARGS --target-os=mingw32 --arch=i386 --extra-cflags="-DWINVER=0x0501 -D_WIN32_WINNT=0x0501")
+            set(FFMPEG_ARCH_ARGS --target-os=mingw32 --arch=i386)
         endif()
         ffmpeg_cygpath(CMAKE_C_COMPILER FFMPEG_CC)
         ffmpeg_cygpath(CMAKE_CXX_COMPILER FFMPEG_CXX)
@@ -96,6 +109,10 @@ else()
         set(FFMPEG_CC ${CMAKE_C_COMPILER})
         set(FFMPEG_CXX ${CMAKE_CXX_COMPILER})
         set(FFMPEG_ARCH_ARGS ${FFMPEG_ARCH_ARGS} --toolchain=hardened)
+    endif()
+
+    if(FFMPEG_EXTRA_CFLAGS)
+        set(FFMPEG_C_ARGS ${FFMPEG_EXTRA_CFLAGS})
     endif()
 
     ExternalProject_Add(
@@ -123,6 +140,7 @@ else()
             --cxx=${FFMPEG_CXX}
 
             ${FFMPEG_ARCH_ARGS}
+            ${FFMPEG_C_ARGS}
 
             --disable-bzlib
             --disable-zlib
