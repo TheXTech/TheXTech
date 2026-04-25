@@ -46,6 +46,10 @@
 #endif
 #include <FreeImageLite.h>
 
+#ifndef PRIu32
+#   define PRIu32 "u"
+#endif
+
 static unsigned DLL_CALLCONV
 _RWopsReadProc(void *buffer, unsigned size, unsigned count, fi_handle handle) {
     return (unsigned)SDL_RWread ((SDL_RWops *)handle, buffer, size, count);
