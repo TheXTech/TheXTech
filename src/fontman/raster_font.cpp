@@ -35,6 +35,10 @@
 #endif
 #include "font_manager_private.h"
 
+#ifndef PRId32
+#   define PRId32 "d"
+#endif
+
 
 RasterFont::RasterFont() : BaseFontEngine()
 {
