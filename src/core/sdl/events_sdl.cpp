@@ -34,6 +34,9 @@
 #include "sound.h"
 #include "controls.h"
 
+#ifndef PRId64
+#   define PRId64 "lld"
+#endif
 
 #if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
 int EventsSDL::handle_ios_events(void * /*userdata*/, SDL_Event *event)

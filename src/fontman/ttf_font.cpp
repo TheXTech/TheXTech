@@ -38,6 +38,18 @@
 
 #include "font_manager_private.h"
 
+#ifndef PRIX32 // Workaround
+#   define PRIX32 "X"
+#endif
+
+#ifndef PRIu32
+#   define PRIu32 "u"
+#endif
+
+#ifndef PRId32
+#   define PRId32 "d"
+#endif
+
 //! FreeType library descriptor
 FT_Library  g_ft = nullptr;
 
