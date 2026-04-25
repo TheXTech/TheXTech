@@ -66,7 +66,9 @@ else()
 
     if(FFMPEG_PIC)
         set(FFMPEG_PIC_ARGS --enable-pic)
-        list(APPEND FFMPEG_EXTRA_CFLAGS --extra-cflags=-fPIC --extra-cxxflags=-fPIC)
+        if(NOT MSVC)
+            list(APPEND FFMPEG_EXTRA_CFLAGS --extra-cflags=-fPIC --extra-cxxflags=-fPIC)
+        endif()
     else()
         set(FFMPEG_PIC_ARGS --disable-pic)
     endif()
@@ -74,7 +76,7 @@ else()
     if(PGE_VIDEO_REC_WEBM_SUPPORTED)
         set(FFMPEG_VPX_ARGS --enable-pthreads --enable-libvpx --enable-libvorbis --enable-encoder=libvorbis,libvpx_vp8 --enable-muxer=webm --enable-swscale --extra-cflags="-I${DEPENDENCIES_INSTALL_DIR}/include/" --extra-ldflags="-L${DEPENDENCIES_INSTALL_DIR}/lib/")
         set(FFMPEG_DEPENDS LIBVPX_Local)
-    elseif(WIN32)
+    elseif(WIN32 AND NOT MSVC)
         set(FFMPEG_VPX_ARGS --disable-w32threads --enable-pthreads)
     else()
         set(FFMPEG_VPX_ARGS --disable-pthreads)
@@ -96,13 +98,34 @@ else()
             --extra-cflags=-DWC_ERR_INVALID_CHARS=WC_NO_BEST_FIT_CHARS
             --extra-cxxflags=-DWC_ERR_INVALID_CHARS=WC_NO_BEST_FIT_CHARS
         )
+
         if("${TARGET_PROCESSOR}" STREQUAL "x86_64")
-            set(FFMPEG_ARCH_ARGS --target-os=mingw64 --arch=x86_64)
+            if(MSVC)
+                set(FFMPEG_ARCH_ARGS --target-os=win64 --arch=x86_64 --toolchain=msvc)
+            else()
+                set(FFMPEG_ARCH_ARGS --target-os=mingw64 --arch=x86_64)
+            endif()
         elseif("${TARGET_PROCESSOR}" STREQUAL "i386")
-            set(FFMPEG_ARCH_ARGS --target-os=mingw32 --arch=i386)
+            if(MSVC)
+                set(FFMPEG_ARCH_ARGS --target-os=win32 --arch=i386 --toolchain=msvc)
+            else()
+                set(FFMPEG_ARCH_ARGS --target-os=mingw32 --arch=i386)
+            endif()
+        elseif("${TARGET_PROCESSOR}" STREQUAL "arm64")
+            if(MSVC)
+                set(FFMPEG_ARCH_ARGS --target-os=win64 --arch=arm64 --toolchain=msvc)
+            else()
+                set(FFMPEG_ARCH_ARGS --target-os=mingw64 --arch=arm64)
+            endif()
         endif()
-        ffmpeg_cygpath(CMAKE_C_COMPILER FFMPEG_CC)
-        ffmpeg_cygpath(CMAKE_CXX_COMPILER FFMPEG_CXX)
+
+        if(MSVC)
+            set(FFMPEG_CC cl.exe)
+            set(FFMPEG_CXX cl.exe)
+        else()
+            ffmpeg_cygpath(CMAKE_C_COMPILER FFMPEG_CC)
+            ffmpeg_cygpath(CMAKE_CXX_COMPILER FFMPEG_CXX)
+        endif()
     else()
         set(FFMPEG_BASH_RUNTIME)
         set(FFMPEG_MAKE_TOOL make)
@@ -113,6 +136,10 @@ else()
 
     if(FFMPEG_EXTRA_CFLAGS)
         set(FFMPEG_C_ARGS ${FFMPEG_EXTRA_CFLAGS})
+    endif()
+
+    if(NOT MSVC)
+        set(FFMPEG_LD_FLAGS --extra-ldflags=-Wl,--no-undefined)
     endif()
 
     ExternalProject_Add(
@@ -154,7 +181,7 @@ else()
             --enable-demuxer=asf,asf_o,aac,mov,matroska
             --enable-parser=aac,mpegaudio
             --enable-protocol=file,data
-            --extra-ldflags=-Wl,--no-undefined
+            ${FFMPEG_LD_FLAGS}
 
             ${FFMPEG_VPX_ARGS}
             ${FFMPEG_PIC_ARGS}
