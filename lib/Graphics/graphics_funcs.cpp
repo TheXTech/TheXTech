@@ -17,6 +17,7 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
+#include <inttypes.h>
 #include <array>
 
 #include <SDL2/SDL_video.h>
@@ -44,6 +45,10 @@
 #   include <SDL2/SDL_syswm.h>
 #endif
 #include <FreeImageLite.h>
+
+#ifndef PRIu32
+#   define PRIu32 "u"
+#endif
 
 static unsigned DLL_CALLCONV
 _RWopsReadProc(void *buffer, unsigned size, unsigned count, fi_handle handle) {

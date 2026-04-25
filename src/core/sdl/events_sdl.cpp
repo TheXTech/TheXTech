@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <inttypes.h>
 #include <SDL2/SDL_stdinc.h>
 
 #include <Logger/logger.h>
@@ -33,6 +34,9 @@
 #include "sound.h"
 #include "controls.h"
 
+#ifndef PRId64
+#   define PRId64 "lld"
+#endif
 
 EventsSDL::EventsSDL() :
     AbstractEvents_t()
