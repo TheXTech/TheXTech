@@ -1404,7 +1404,7 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h, bool show_name)
             scratch_player.Hearts = 2;
         }
         // empty save
-        else if(s_context == Context::MainMenu && SaveSlotInfo[selSave].Progress < 0)
+        else if(s_context == Context::MainMenu && (!selSave || SaveSlotInfo[selSave].Progress < 0))
         {
             scratch_player = Player_t();
             scratch_player.Character = ch;

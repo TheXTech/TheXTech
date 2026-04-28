@@ -51,6 +51,7 @@
 #include "main/menu_controls.h"
 #include "main/translate_episode.h"
 
+#include "message.h"
 #include "speedrunner.h"
 #include "main/gameplay_timer.h"
 #include "../game_main.h"
@@ -115,6 +116,11 @@ int NumSelectWorld = 0;
 int NumSelectBattle = 0;
 std::vector<SelectWorld_t> SelectWorld;
 std::vector<SelectWorld_t> SelectBattle;
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+// this is a temporary hack
+static bool s_char_select_netplay = false;
+#endif // #ifdef THEXTECH_ENABLE_SDL_NET
 
 
 void initMainMenu()
@@ -270,27 +276,6 @@ static void s_StartEpisodeOnline()
     seedRandom(XMessage::g_session.random_seed);
 
     selSave = 0;
-
-    if((int)Controls::g_InputMethods.size() > 1)
-        Controls::ClearInputMethods();
-
-    for(int A = 1; A <= numCharacters; A++)
-        blockCharacter[A] = (g_forceCharacter) ? false : SelectWorld[selWorld].blockChar[A];
-
-    for(int p = 0; p < maxLocalPlayers; p++)
-        l_screen->charSelect[p] = 0;
-
-    // find character for P1 (player on episode start)
-    Screens[0].charSelect[0] = 1;
-
-    for(int A = 1; A <= numCharacters; A++)
-    {
-        if(blockCharacter[A])
-            continue;
-
-        Screens[0].charSelect[0] = A;
-        break;
-    }
 
     StartEpisode();
 }
@@ -1024,6 +1009,15 @@ bool mainMenuUpdate()
             auto* status = XMessage::GetClientStatus();
             if(status && (status->client_state == XMessage::CLIENT_GUEST || status->client_state == XMessage::CLIENT_HOST))
             {
+                if(status->client_state == XMessage::CLIENT_GUEST)
+                {
+                    if((int)Controls::g_InputMethods.size() > 1)
+                        Controls::ClearInputMethods();
+                }
+
+                // no longer need NetPlay flag (hack) because we are starting game
+                s_char_select_netplay = false;
+
                 s_StartEpisodeOnline();
                 return true;
             }
@@ -1251,9 +1245,17 @@ bool mainMenuUpdate()
 
                 if(MenuMode == MENU_CHARACTER_SELECT_NEW_BM)
                 {
-                    MenuCursor = selWorld - 1;
                     MenuMode = MENU_BATTLE_MODE;
+                    MenuCursor = selWorld - 1;
                 }
+#ifdef THEXTECH_ENABLE_SDL_NET
+                else if(s_char_select_netplay)
+                {
+                    s_char_select_netplay = false;
+                    MenuMode = MENU_NETPLAY_WORLD_SELECT;
+                    MenuCursor = selWorld - 1;
+                }
+#endif
                 else
                 {
                     MenuCursor = selSave - 1;
@@ -1267,6 +1269,19 @@ bool mainMenuUpdate()
             }
             else if(ret == 1)
             {
+                XMessage::g_session.init_char_select = l_screen->charSelect;
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+                if(s_char_select_netplay)
+                {
+                    XMessage::RoomInfo room_info = XMessage::RoomInfo();
+                    room_info.engine_hash = s_engineHash();
+                    room_info.asset_hash = s_assetPackHash();
+                    room_info.content_hash = SelectWorld[selWorld].lz4_content_hash;
+                    XMessage::JoinNewRoom(room_info);
+                }
+                else
+#endif
                 if(MenuMode == MENU_CHARACTER_SELECT_NEW)
                 {
                     // writing to m_value to avoid extra UpdateConfig hook
@@ -1557,14 +1572,13 @@ bool mainMenuUpdate()
                     ConnectScreen::MainMenu_Start(2);
                 }
 #ifdef THEXTECH_ENABLE_SDL_NET
-                // new room
+                // NetPlay char select
                 else if(MenuMode == MENU_NETPLAY_WORLD_SELECT)
                 {
-                    XMessage::RoomInfo room_info = XMessage::RoomInfo();
-                    room_info.engine_hash = s_engineHash();
-                    room_info.asset_hash = s_assetPackHash();
-                    room_info.content_hash = SelectWorld[selWorld].lz4_content_hash;
-                    XMessage::JoinNewRoom(room_info);
+                    s_char_select_netplay = true;
+                    selSave = 0;
+                    MenuMode = MENU_CHARACTER_SELECT_NEW;
+                    ConnectScreen::MainMenu_Start(1);
                 }
 #endif
                 // enter save select

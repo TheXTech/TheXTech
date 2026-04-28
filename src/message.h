@@ -22,6 +22,8 @@
 #define XMESSAGE_H
 
 #include <cstdint>
+#include <array>
+#include "global_constants.h"
 
 struct Controls_t;
 
@@ -40,6 +42,7 @@ enum class Status : uint8_t
 struct Session
 {
     uint32_t random_seed = 0;
+    std::array<uint8_t, maxLocalPlayers> init_char_select{};
 };
 
 enum class Type : uint8_t

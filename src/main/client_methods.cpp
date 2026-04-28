@@ -182,6 +182,7 @@ void JoinNewRoom(const RoomInfo& room_info)
     s_network_client.status_req.room_info = room_info;
 
     XMessage::g_session.random_seed = iRand(2147483647);
+    XMessage::g_session.init_char_select = l_screen->charSelect;
 
     SDL_AtomicSet(&s_network_client.status_req_state, REQUEST_SUBMIT);
 }

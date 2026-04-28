@@ -637,11 +637,12 @@ void NetworkClient::client_loop()
                 else if(status_req.client_state == CLIENT_HOST)
                 {
                     // encode session here
-                    std::array<uint8_t, 9> to_send =
+                    std::array<uint8_t, 13> to_send =
                     {
                         HEADER_PUT_SESSION,
-                        0, 0, 0, 4,
+                        0, 0, 0, 8,
                         uint8_t(g_session.random_seed  >> 24), uint8_t(g_session.random_seed  >> 16), uint8_t(g_session.random_seed  >> 8), uint8_t(g_session.random_seed  >> 0),
+                        g_session.init_char_select[0], g_session.init_char_select[1], g_session.init_char_select[2], g_session.init_char_select[3],
                     };
 
                     SDLNet_TCP_Send(tcp_control.socket, to_send.data(), to_send.size());
@@ -844,7 +845,7 @@ void NetworkClient::client_loop()
             // decode session here
 
             // handle this later, once we know exactly what we're filling
-            if(session_size > network_client_buffer_size)
+            if(session_size > network_client_buffer_size || session_size < 8)
                 Disconnect();
 
             // note: not NB
@@ -856,6 +857,10 @@ void NetworkClient::client_loop()
             if(SDL_AtomicGet(&status_req_state) == REQUEST_PENDING && status.client_state == CLIENT_SESSION_CONFIG)
             {
                 g_session.random_seed = ((uint32_t)tcp_control.buffer[0] << 24) | ((uint32_t)tcp_control.buffer[1] << 16) | ((uint32_t)tcp_control.buffer[2] << 8) | ((uint32_t)tcp_control.buffer[3] << 0);
+                g_session.init_char_select[0] = tcp_control.buffer[4];
+                g_session.init_char_select[1] = tcp_control.buffer[5];
+                g_session.init_char_select[2] = tcp_control.buffer[6];
+                g_session.init_char_select[3] = tcp_control.buffer[7];
                 status.client_state = CLIENT_GUEST;
                 pLogDebug("The random seed is %d", (int)g_session.random_seed);
                 SDL_AtomicSet(&status_req_state, REQUEST_COMPLETED);

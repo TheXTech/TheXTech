@@ -2429,30 +2429,27 @@ static void s_InitPlayersFromCharSelect()
     numPlayers = 0;
     InitScreens();
 
-    for(int s = 0; s < maxNetplayClients; s++)
+    auto& screen = Screens[0];
+
+    for(int i = 0; i < maxLocalPlayers; i++)
     {
-        Screen_t& screen = Screens[s];
-
-        for(int i = 0; i < maxLocalPlayers; i++)
+        if(XMessage::g_session.init_char_select[i] != 0)
         {
-            if(screen.charSelect[i] != 0)
-            {
-                numPlayers++;
-                Screens_AssignPlayer(numPlayers, screen);
+            numPlayers++;
+            Screens_AssignPlayer(numPlayers, screen);
 
-                Player_t& p = Player[numPlayers];
-                p.State = 1;
-                p.Mount = 0;
-                p.Character = screen.charSelect[i];
-                p.HeldBonus = NPCID(0);
-                p.CanFly = false;
-                p.CanFly2 = false;
-                p.TailCount = 0;
-                p.YoshiBlue = false;
-                p.YoshiRed = false;
-                p.YoshiYellow = false;
-                p.Hearts = 0;
-            }
+            Player_t& p = Player[numPlayers];
+            p.State = 1;
+            p.Mount = 0;
+            p.Character = XMessage::g_session.init_char_select[i];
+            p.HeldBonus = NPCID(0);
+            p.CanFly = false;
+            p.CanFly2 = false;
+            p.TailCount = 0;
+            p.YoshiBlue = false;
+            p.YoshiRed = false;
+            p.YoshiYellow = false;
+            p.Hearts = 0;
         }
     }
 
