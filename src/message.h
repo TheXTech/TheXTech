@@ -23,6 +23,8 @@
 
 #include <cstdint>
 #include <array>
+#include <string>
+
 #include "global_constants.h"
 
 struct Controls_t;
@@ -43,6 +45,10 @@ struct Session
 {
     uint32_t random_seed = 0;
     std::array<uint8_t, maxLocalPlayers> init_char_select{};
+#ifdef THEXTECH_ENABLE_SDL_NET
+    uint8_t save_present = 0;
+    std::string save_data;
+#endif
 };
 
 enum class Type : uint8_t

@@ -2539,7 +2539,11 @@ void StartEpisode()
     if(doSaveConfig)
         SaveConfig();
 
+#ifndef THEXTECH_ENABLE_SDL_NET
     if(selSave && SaveSlotInfo[selSave].Progress >= 0)
+#else
+    if(XMessage::g_session.save_present)
+#endif
     {
         if(!NoMap)
             StartLevel.clear();

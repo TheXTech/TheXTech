@@ -1274,10 +1274,13 @@ bool mainMenuUpdate()
 #ifdef THEXTECH_ENABLE_SDL_NET
                 if(s_char_select_netplay)
                 {
+                    PreloadGame();
+
                     XMessage::RoomInfo room_info = XMessage::RoomInfo();
                     room_info.engine_hash = s_engineHash();
                     room_info.asset_hash = s_assetPackHash();
                     room_info.content_hash = SelectWorld[selWorld].lz4_content_hash;
+
                     XMessage::JoinNewRoom(room_info);
                 }
                 else
@@ -1295,6 +1298,11 @@ bool mainMenuUpdate()
                     }
 
                     MenuCursor = 0;
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+                    PreloadGame();
+#endif
+
                     StartEpisode();
                     return true;
                 }

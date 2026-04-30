@@ -93,6 +93,9 @@ extern std::string makeGameSavePath(std::string episode, std::string saveFile);
 
 void SaveGame();
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+void PreloadGame();
+#endif
 void LoadGame();
 //! Removes gamesave file and restores initial state of all level objects
 void ClearGame(bool punnish = false);

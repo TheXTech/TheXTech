@@ -21,6 +21,7 @@
 #include "../globals.h"
 #include "../game_main.h"
 #include "config.h"
+#include "message.h"
 
 #include "speedrunner.h"
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
@@ -373,14 +374,56 @@ void SaveGame()
     AppPathManager::syncFs();
 }
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+void PreloadGame()
+{
+    XMessage::g_session.save_present = 0;
+    XMessage::g_session.save_data.clear();
+
+    if(!selSave || SaveSlotInfo[selSave].Progress < 0)
+        return;
+
+    const auto &w = SelectWorld[selWorld];
+
+    std::string savePath = makeGameSavePath(w.WorldFilePath,
+                                            fmt::format_ne("save{0}.savx", selSave));
+    std::string savePathOld = s_legacy_save_path(w, selSave);
+    std::string legacySaveLocker = makeGameSavePath(w.WorldFilePath,
+                                                    fmt::format_ne("save{0}.nosave", selSave));
+
+    if(Files::fileExists(savePath))
+        XMessage::g_session.save_present = 2;
+    else if(!Files::fileExists(legacySaveLocker) && Files::fileExists(savePathOld))
+        XMessage::g_session.save_present = 1;
+    else
+    {
+        pLogDebug("Game save file not found: %s", savePath.c_str());
+        return;
+    }
+
+    Files::Data temp_save_data = Files::load_file((XMessage::g_session.save_present == 2) ? savePath : savePathOld);
+    XMessage::g_session.save_data.assign(temp_save_data.c_str(), temp_save_data.size());
+}
+#endif // #ifdef THEXTECH_ENABLE_SDL_NET
+
 void LoadGame()
 {
     int A = 0;
     size_t i = 0;
-    const auto &w = SelectWorld[selWorld];
 //    std::string newInput;
 
     GamesaveData sav;
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+    if(XMessage::g_session.save_present == 2)
+        FileFormats::ReadExtendedSaveFileRaw(XMessage::g_session.save_data, "", sav);
+    else if(XMessage::g_session.save_present == 2)
+        FileFormats::ReadSMBX64SavFileRaw(XMessage::g_session.save_data, "", sav);
+    else
+        return;
+#else // #ifdef THEXTECH_ENABLE_SDL_NET
+    const auto &w = SelectWorld[selWorld];
+
     std::string savePath = makeGameSavePath(w.WorldFilePath,
                                             fmt::format_ne("save{0}.savx", selSave));
     std::string savePathOld = s_legacy_save_path(w, selSave);
@@ -396,6 +439,7 @@ void LoadGame()
         pLogDebug("Game save file not found: %s", savePath.c_str());
         return;
     }
+#endif // #ifdef THEXTECH_ENABLE_SDL_NET
 
     if(!sav.meta.ReadFileValid)
     {
