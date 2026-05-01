@@ -107,7 +107,7 @@
             "fam-sandfg3": "前景",
             "fam-space5": "宇宙生物",
             "fam-structures3": "建筑",
-            "fam-temple5": "寺庙",
+            "fam-temple5": "神殿",
             "fam-tiles3": "图块",
             "fam-water1": "水",
             "fam-water2": "水",
@@ -207,7 +207,7 @@
                 "music20": "酷霸王的要塞",
                 "music23": "勇气森林",
                 "music37": "冰山",
-                "music38": "丛林村庄",
+                "music38": "耀西岛",
                 "music55": "标题画面",
                 "music56": "蘑菇峡谷",
                 "music8": "克尼利亚"
@@ -216,11 +216,11 @@
                 "header": "SMRPG",
                 "music16": "森林",
                 "music21": "战斗",
-                "music30": "小屋",
-                "music31": "海滨",
-                "music32": "池塘",
+                "music30": "马力欧的小屋",
+                "music31": "涟漪镇",
+                "music32": "呱呱湖",
                 "music33": "天空",
-                "music34": "小镇"
+                "music34": "玫瑰镇"
             },
             "fam-set1": {
                 "header": "超马一代",
