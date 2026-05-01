@@ -107,7 +107,7 @@
             "fam-sandfg3": "前景",
             "fam-space5": "宇宙生物",
             "fam-structures3": "建築",
-            "fam-temple5": "寺廟",
+            "fam-temple5": "神殿",
             "fam-tiles3": "圖塊",
             "fam-water1": "水",
             "fam-water2": "水",
@@ -207,7 +207,7 @@
                 "music20": "庫巴的要塞",
                 "music23": "勇氣森林",
                 "music37": "冰山",
-                "music38": "叢林村莊",
+                "music38": "耀西島",
                 "music55": "標題畫面",
                 "music56": "蘑菇峽谷",
                 "music8": "絕境！"
@@ -216,11 +216,11 @@
                 "header": "RPG",
                 "music16": "森林",
                 "music21": "戰鬥",
-                "music30": "小屋",
-                "music31": "海濱",
-                "music32": "池塘",
+                "music30": "瑪利歐的小屋",
+                "music31": "漣漪鎮",
+                "music32": "呱呱湖",
                 "music33": "天空",
-                "music34": "小鎮"
+                "music34": "玫瑰鎮"
             },
             "fam-set1": {
                 "header": "超瑪一代",
