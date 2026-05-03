@@ -104,6 +104,12 @@ void Prepare()
             if(g_gameInfo.disableBattleMode && i == editor_battle_levels)
                 continue;
         }
+#ifdef THEXTECH_ENABLE_SDL_NET
+        else if(MenuMode == MENU_NETPLAY && !SelectorList[i].lz4_content_hash)
+        {
+            continue;
+        }
+#endif
         // skip the special editor worlds if not in editor
         else if(MenuMode != MENU_BATTLE_MODE && i >= editor_entries_start)
             continue;
