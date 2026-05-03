@@ -66,3 +66,6 @@ We are being very careful in how we create the TheXTech standard, and we are gen
 We maintain ports for a wide variety of systems, and you should take care when developing new features to ensure that the appropriate ports of the game will continue to run with our minimum system requirements (16 MB of RAM and 200 MHz CPU).
 
 If you are interested in contributing new ports to any such systems, please see [Porting](PORTING.md).
+
+# Policy regarding AI (Large Language Models - LLMs)
+**AI must not be used to generate code for contributions to this project.** AI outputs often introduce unexpected issues, both technical and legal. AI systems are typically trained on low-quality code that cannot function in the resource-critical environments TheXTech targets. PRs generated with AI require serious manual verification, and we cannot assume that contributors have performed that verification themselves. To avoid wasting our time, we opt to reject such contributions altogether. See details in the [AGENTS.md](AGENTS.md) file.
