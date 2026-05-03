@@ -335,24 +335,6 @@ void Init(int plr, bool LegacyPause)
 
         s_items.push_back(MenuItem{editor_test ? g_gameStrings.pauseItemReturnToEditor : g_gameStrings.pauseItemQuitTesting, s_QuitTesting});
     }
-#ifdef THEXTECH_ENABLE_SDL_NET
-    // NetPlay pause
-    else if(XMessage::GetStatus() != XMessage::Status::local)
-    {
-        s_items.push_back(MenuItem{g_gameStrings.pauseItemContinue, s_Continue});
-
-        if(g_config.allow_drop_add && s_pause_type != PauseType::Legacy)
-            s_items.push_back(MenuItem{g_gameStrings.pauseItemPlayerSetup, s_DropAddScreen, true});
-
-        if(s_cheat_menu_bits >= 14 && s_pause_type != PauseType::Legacy && !BattleMode)
-            s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen, true});
-
-        if(s_pause_type != PauseType::Legacy)
-            s_items.push_back(MenuItem{g_mainMenu.mainOptions, s_OptionsScreen, true});
-
-        s_items.push_back(MenuItem{g_mainMenu.netplayLeaveRoom, s_Quit, true});
-    }
-#endif
     // main game pause
     else
     {
@@ -367,14 +349,20 @@ void Init(int plr, bool LegacyPause)
         if(s_pause_type != PauseType::Legacy)
             s_items.push_back(MenuItem{g_mainMenu.mainOptions, s_OptionsScreen, true});
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+        // NetPlay pause
+        if(XMessage::GetStatus() != XMessage::Status::local && XMessage::GetClientStatus() && XMessage::GetClientStatus()->client_state != XMessage::CLIENT_HOST)
+            s_items.push_back(MenuItem{g_mainMenu.netplayLeaveRoom, s_Quit, true});
+        else
+#endif
         if(CanSave)
         {
             s_items.push_back(MenuItem{g_gameStrings.pauseItemSaveAndContinue, s_SaveAndContinue});
-            s_items.push_back(MenuItem{g_gameStrings.pauseItemSaveAndQuit, s_Quit});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemSaveAndQuit, s_Quit, true});
         }
         else
         {
-            s_items.push_back(MenuItem{g_gameStrings.pauseItemQuit, TestLevel ? s_QuitTesting : s_Quit});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemQuit, TestLevel ? s_QuitTesting : s_Quit, true});
         }
     }
 
@@ -722,6 +710,9 @@ bool Logic()
 
     if(g_pending_action < s_items.size() && !s_items[g_pending_action].is_private)
         stopPause = s_items[g_pending_action].callback();
+    // SAVE & CONTINUE from host
+    else if(g_pending_action != 255 && s_items.size() > 0)
+        stopPause = s_items[0].callback();
 
     g_pending_action = 255;
 
