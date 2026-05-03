@@ -275,8 +275,6 @@ static void s_StartEpisodeOnline()
     l_screen = &Screens[status.client_index];
     seedRandom(XMessage::g_session.random_seed);
 
-    selSave = 0;
-
     StartEpisode();
 }
 
@@ -1013,6 +1011,8 @@ bool mainMenuUpdate()
                 {
                     if((int)Controls::g_InputMethods.size() > 1)
                         Controls::ClearInputMethods();
+
+                    selSave = 0;
                 }
 
                 // no longer need NetPlay flag (hack) because we are starting game
@@ -1248,14 +1248,6 @@ bool mainMenuUpdate()
                     MenuMode = MENU_BATTLE_MODE;
                     MenuCursor = selWorld - 1;
                 }
-#ifdef THEXTECH_ENABLE_SDL_NET
-                else if(s_char_select_netplay)
-                {
-                    s_char_select_netplay = false;
-                    MenuMode = MENU_NETPLAY_WORLD_SELECT;
-                    MenuCursor = selWorld - 1;
-                }
-#endif
                 else
                 {
                     MenuCursor = selSave - 1;
@@ -1579,22 +1571,22 @@ bool mainMenuUpdate()
                     MenuMode = MENU_CHARACTER_SELECT_NEW_BM;
                     ConnectScreen::MainMenu_Start(2);
                 }
-#ifdef THEXTECH_ENABLE_SDL_NET
-                // NetPlay char select
-                else if(MenuMode == MENU_NETPLAY_WORLD_SELECT)
-                {
-                    s_char_select_netplay = true;
-                    selSave = 0;
-                    MenuMode = MENU_CHARACTER_SELECT_NEW;
-                    ConnectScreen::MainMenu_Start(1);
-                }
-#endif
                 // enter save select
                 else
                 {
                     LoadCustomPlayerPreviews(Files::dirname(SelectWorld[selWorld].WorldFilePath).c_str());
 
                     FindSaves();
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+                    // NetPlay save select
+                    if(MenuMode == MENU_NETPLAY_WORLD_SELECT)
+                    {
+                        s_char_select_netplay = true;
+                        MenuMode = MENU_1PLAYER_GAME;
+                    }
+#endif
+
                     MenuMode *= MENU_SELECT_SLOT_BASE;
                     MenuCursor = 0;
 
@@ -1690,6 +1682,14 @@ bool mainMenuUpdate()
                     UnloadCustomPlayerPreviews();
 
                     MenuMode /= MENU_SELECT_SLOT_BASE;
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+                    if(s_char_select_netplay)
+                    {
+                        MenuMode = MENU_NETPLAY_WORLD_SELECT;
+                        s_char_select_netplay = false;
+                    }
+#endif
 
                     MenuCursorCanMove = false;
                     PlaySoundMenu(SFX_Slide);

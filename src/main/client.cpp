@@ -636,16 +636,20 @@ void NetworkClient::client_loop()
                 }
                 else if(status_req.client_state == CLIENT_HOST)
                 {
+                    uint32_t session_size = 9 + g_session.save_data.size();
+
                     // encode session here
-                    std::array<uint8_t, 13> to_send =
+                    std::array<uint8_t, 14> to_send_a =
                     {
                         HEADER_PUT_SESSION,
-                        0, 0, 0, 8,
+                        uint8_t(session_size >> 24), uint8_t(session_size >> 16), uint8_t(session_size >> 8), uint8_t(session_size >> 0),
                         uint8_t(g_session.random_seed  >> 24), uint8_t(g_session.random_seed  >> 16), uint8_t(g_session.random_seed  >> 8), uint8_t(g_session.random_seed  >> 0),
                         g_session.init_char_select[0], g_session.init_char_select[1], g_session.init_char_select[2], g_session.init_char_select[3],
+                        g_session.save_present
                     };
 
-                    SDLNet_TCP_Send(tcp_control.socket, to_send.data(), to_send.size());
+                    SDLNet_TCP_Send(tcp_control.socket, to_send_a.data(), to_send_a.size());
+                    SDLNet_TCP_Send(tcp_control.socket, g_session.save_data.data(), g_session.save_data.size());
                 }
 
                 SDL_AtomicSet(&status_req_state, REQUEST_PENDING);
@@ -843,16 +847,12 @@ void NetworkClient::client_loop()
             tcp_control.ShiftBuffer(5);
 
             // decode session here
-
-            // handle this later, once we know exactly what we're filling
-            if(session_size > network_client_buffer_size || session_size < 8)
+            if(session_size < 9 || session_size > 2048000)
                 Disconnect();
 
             // note: not NB
-            if(!tcp_control.FillBufferTo(session_size))
+            if(!tcp_control.FillBufferTo(9))
                 Disconnect();
-
-            tcp_control.ShiftBuffer(session_size);
 
             if(SDL_AtomicGet(&status_req_state) == REQUEST_PENDING && status.client_state == CLIENT_SESSION_CONFIG)
             {
@@ -861,9 +861,39 @@ void NetworkClient::client_loop()
                 g_session.init_char_select[1] = tcp_control.buffer[5];
                 g_session.init_char_select[2] = tcp_control.buffer[6];
                 g_session.init_char_select[3] = tcp_control.buffer[7];
-                status.client_state = CLIENT_GUEST;
-                pLogDebug("The random seed is %d", (int)g_session.random_seed);
-                SDL_AtomicSet(&status_req_state, REQUEST_COMPLETED);
+                g_session.save_present = tcp_control.buffer[8];
+
+                tcp_control.ShiftBuffer(9);
+
+                session_size -= 9;
+
+                // note: may throw
+                g_session.save_data.resize(session_size);
+
+                char* dest = &g_session.save_data[0];
+                while(session_size > 0)
+                {
+                    size_t want_bytes = SDL_min(network_client_buffer_size, session_size);
+                    if(!tcp_control.FillBufferTo(want_bytes))
+                    {
+                        Disconnect();
+                        break;
+                    }
+
+                    SDL_memcpy(dest, tcp_control.buffer, want_bytes);
+
+                    dest += want_bytes;
+                    session_size -= want_bytes;
+
+                    tcp_control.ShiftBuffer(want_bytes);
+                }
+
+                if(session_size == 0)
+                {
+                    status.client_state = CLIENT_GUEST;
+                    pLogDebug("The random seed is %d", (int)g_session.random_seed);
+                    SDL_AtomicSet(&status_req_state, REQUEST_COMPLETED);
+                }
             }
             else
                 Disconnect();
