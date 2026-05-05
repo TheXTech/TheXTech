@@ -436,14 +436,13 @@ void NetworkClient::ReceiveData()
                     if(max_debug)
                         pLogDebug("TCP message get: %d %d %d %d", (int)msg.type, msg.screen, msg.player, msg.message);
                 }
-
-                receive_buffer.tcp_frame_in_progress.clear();
             }
+
+            receive_buffer.tcp_frame_in_progress.clear();
 
             if(got.type == XMessage::Type::frame_begin)
             {
                 receive_buffer.tcp_frame_index = frame_no;
-                receive_buffer.tcp_frame_in_progress.push_back(got);
             }
             else if(got.type == XMessage::Type::frame_end)
             {
@@ -451,10 +450,10 @@ void NetworkClient::ReceiveData()
                     receive_buffer.available_frame = frame_no;
 
                 receive_buffer.tcp_frame_index = -1;
+                break;
             }
 
-            break;
-
+            // fallthrough
         default:
             if(receive_buffer.tcp_frame_index > receive_buffer.available_frame)
                 receive_buffer.tcp_frame_in_progress.push_back(got);
