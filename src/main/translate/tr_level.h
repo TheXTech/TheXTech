@@ -46,6 +46,12 @@ public:
             auto &it = m_trIdMap[GetS(Events[i].Text)];
             it.push_back(&Events[i].Text);
         }
+
+        for(int i = 1; i <= numWarps; ++i)
+        {
+            auto &it = m_trIdMap[GetS(Warp[i].StarsMsg)];
+            it.push_back(&Warp[i].StarsMsg);
+        }
     }
 
     TrLevelParser(const TrLevelParser&) = default;
@@ -66,7 +72,8 @@ public:
         W_ROOT,
         W_LEVEL,
         W_NPC,    W_NPC_OBJ,
-        W_EVENT,  W_EVENT_OBJ
+        W_EVENT,  W_EVENT_OBJ,
+        W_WARP,   W_WARP_OBJ
     } m_where = W_SKIP;
 
     void flushData()
@@ -92,6 +99,8 @@ public:
                 SetS(NPC[m_outKey + 1].Text, m_outValue);
             else if(m_where == W_EVENT_OBJ && m_outKey < numEvents)
                 SetS(Events[m_outKey].Text, m_outValue);
+            else if(m_where == W_WARP_OBJ && m_outKey < numWarps)
+                SetS(Warp[m_outKey + 1].StarsMsg, m_outValue);
         }
 
         m_outKey = -1;
@@ -114,14 +123,14 @@ public:
 
     bool number_integer(number_integer_t val)
     {
-        if((m_where == W_NPC_OBJ || m_where == W_EVENT_OBJ) && m_curKey == "i")
+        if((m_where == W_NPC_OBJ || m_where == W_EVENT_OBJ || m_where == W_WARP_OBJ) && m_curKey == "i")
             m_outKey = val;
         return true;
     }
 
     bool number_unsigned(number_unsigned_t val)
     {
-        if((m_where == W_NPC_OBJ || m_where == W_EVENT_OBJ) && m_curKey == "i")
+        if((m_where == W_NPC_OBJ || m_where == W_EVENT_OBJ || m_where == W_WARP_OBJ) && m_curKey == "i")
             m_outKey = (int)val;
         return true;
     }
@@ -133,11 +142,13 @@ public:
 
     bool string(string_t& val)
     {
-        if((m_where == W_NPC_OBJ || m_where == W_EVENT_OBJ) && m_curKey == "tr-id")
+        if((m_where == W_NPC_OBJ || m_where == W_EVENT_OBJ || m_where == W_WARP_OBJ) && m_curKey == "tr-id")
             m_outTrId = val;
         else if(m_where == W_NPC_OBJ && m_curKey == "talk")
             m_outValue = val;
         else if(m_where == W_EVENT_OBJ && m_curKey == "msg")
+            m_outValue = val;
+        else if(m_where == W_WARP_OBJ && m_curKey == "stars-msg")
             m_outValue = val;
         else if(m_where == W_LEVEL && m_curKey == "title")
             LevelName = m_outValue;
@@ -162,6 +173,8 @@ public:
             m_where = W_NPC_OBJ;
         else if(m_where == W_EVENT)
             m_where = W_EVENT_OBJ;
+        else if(m_where == W_WARP)
+            m_where = W_WARP_OBJ;
 
         D_pLogDebug("JSON: Start Object (where=%d)", m_where);
 
@@ -185,9 +198,16 @@ public:
             flushData();
             m_where = W_EVENT;
         }
+        else if(m_where == W_WARP_OBJ)
+        {
+            flushData();
+            m_where = W_WARP;
+        }
         else if(m_where == W_NPC)
             m_where = W_LEVEL;
         else if(m_where == W_EVENT)
+            m_where = W_LEVEL;
+        else if(m_where == W_WARP)
             m_where = W_LEVEL;
         else if(m_where == W_LEVEL)
             return false; // All enough data has been taken
@@ -208,6 +228,8 @@ public:
                 m_where = W_NPC;
             else if(m_curKey == "events")
                 m_where = W_EVENT;
+            else if(m_curKey == "warps")
+                m_where = W_WARP;
         }
 
         D_pLogDebug("JSON: Start Array (where=%d)", m_where);
@@ -220,7 +242,7 @@ public:
         if(m_where == W_SKIP)
             return true;
 
-        if(m_where == W_NPC || m_where == W_EVENT)
+        if(m_where == W_NPC || m_where == W_EVENT || m_where == W_WARP)
         {
             flushData();
             m_where = W_LEVEL;
