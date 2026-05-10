@@ -90,6 +90,12 @@ protected:
     {
         *viewport_w = m_viewport_w;
         *viewport_h = m_viewport_h;
+
+        if(m_halfPixelMode)
+        {
+            *viewport_w <<= 1;
+            *viewport_h <<= 1;
+        }
     }
 
 public:

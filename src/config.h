@@ -194,6 +194,14 @@ public:
     static constexpr bool fullscreen = true;
 #endif
 
+#ifndef RENDER_HALFPIXEL_ALWAYS
+    opt<bool> half_pixel_mode{this, defaults(false), {}, Scope::Config,
+        "halfpixel", "Half-pixel mode", nullptr,
+        config_halfpixel_set};
+#else
+    static constexpr bool half_pixel_mode = true;
+#endif
+
     opt_enum<std::pair<int, int>> internal_res{this,
         {
             {{480, 320}, "gba", "480x320 (GBA)"},
@@ -535,7 +543,6 @@ public:
         config_rendermode_set};
 #endif
 
-#ifndef PGE_MIN_PORT
     enum ScaleDownTextures
     {
         SCALE_DOWN_NONE = 0,
@@ -543,17 +550,21 @@ public:
         SCALE_DOWN_ALL = 2,
     };
 
+#if !defined(PGE_MIN_PORT) && !defined(RENDER_HALFPIXEL_ALWAYS)
     opt_enum<int> scale_down_textures{this,
         {
             {SCALE_DOWN_NONE, "none", "None", "Least loading stutter"},
             {SCALE_DOWN_SAFE, "safe", "Safe", "Checks if images are in 2x format"},
             {SCALE_DOWN_ALL, "all", "All", "Less loading stutter than 'Safe'"},
         },
-        defaults(SCALE_DOWN_SAFE), {}, Scope::Config,
+        defaults(SCALE_DOWN_SAFE),
+        {}, Scope::Config,
         "scale-down-textures", "Scale down images", "Store images as 1x to save memory"};
+#else
+    static constexpr int scale_down_textures = SCALE_DOWN_ALL;
 #endif
 
-#ifndef PGE_MIN_PORT
+#if !defined(PGE_MIN_PORT) && !defined(__PSP__)
     opt_enum<std::pair<int, int>> internal_res_4p{this,
         {
             {{0, 0}, "default", "Default"},

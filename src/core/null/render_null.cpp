@@ -85,6 +85,17 @@ void getRenderSize(int* w, int* h)
     return XWindow::getWindowSize(w, h);
 }
 
+void getLogicRenderSize(int *w, int *h)
+{
+    getRenderSize(w, h);
+}
+
+void getMaxLogicSize(int *w, int *h)
+{
+    *w = 2048;
+    *h = 2048;
+}
+
 void mapToScreen(int x, int y, int *dx, int *dy)
 {
     *dx = x;

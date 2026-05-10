@@ -40,6 +40,7 @@ struct CmdLineSetup_t;
 class AbstractRender_t
 {
     friend class FrmMain;
+    friend class AbstractWindow_t;
 
     static size_t m_lazyLoadedBytes;
 
@@ -62,7 +63,16 @@ protected:
 
     static void dumpFullFile(std::vector<char> &dst, const std::string &path);
 
+
 public:
+#ifndef RENDER_HALFPIXEL_ALWAYS
+    //! The half-pixel mode: once it gets set, the renderer will be initialized with the half-sized texture, and all input will be divided by two and outputs will be multipled by 2.
+    static bool m_halfPixelMode;
+#else
+    static constexpr bool m_halfPixelMode = true;
+#endif
+
+
     AbstractRender_t();
     virtual ~AbstractRender_t();
 
@@ -85,6 +95,15 @@ public:
      * \return true if framebuffer is available
      */
     virtual bool hasFrameBuffer() = 0;
+
+    /*!
+     * \brief Identify whether render engine is in half-pixel mode
+     * \return true if render is in half-pixel mode
+     */
+    inline static bool isHalfPixel()
+    {
+        return m_halfPixelMode;
+    }
 
     virtual bool initRender(SDL_Window *window) = 0;
 
@@ -157,6 +176,20 @@ public:
     virtual void getRenderSize(int *w, int *h) = 0;
 
     /*!
+     * \brief Get the current virtual size of the window in render pixels (Once half-pixel mode is enabled, the size will be twice larger than the physical size of the canvas)
+     * \param w Width
+     * \param h Height
+     */
+    virtual void getLogicRenderSize(int *w, int *h);
+
+    /*!
+     * \brief Get the maximum available virtual canvas size that depends on the maximum size of the frame buffer
+     * \param w Width
+     * \param h Height
+     */
+    virtual void getMaxLogicSize(int *w, int *h);
+
+    /*!
      * \brief Map cursor point coordinate into screen relative
      * \param x Window X position
      * \param y Window Y position
@@ -191,6 +224,18 @@ public:
      */
     virtual void setDrawPlane(uint8_t plane) = 0;
 
+    /*!
+     * \brief Change between normal and 2pix shrinked modes
+     * \param pixHalf 2pix shrink enabled
+     * \return 1 when enabling 2x shrinking of render result, 0 is normal render mode
+     *
+     * Once enabling this mode, all the sizes and coordinates will be reported like it being 2x larger,
+     * but de-facto drawn on 2x smaller canvas. On some devices such render mode is enforced because of
+     * too small screen resolution.
+     *
+     * NOTE: This function supposed to be called from inside the XWindow, don't call it directly!
+     */
+    virtual void setHalfPixMode(bool pixHalf);
 
 
 
