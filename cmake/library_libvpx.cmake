@@ -22,6 +22,17 @@ else()
         set(LIBVPX_DEBUG_ARGS --enable-debug)
     endif()
 
+    if(WIN32)
+        # FIXME: Implement the proper finding of MSYS2 environment and the bash.exe interpreter, and the make.exe
+        set(LIBVPX_BASH_RUNTIME bash.exe)
+        set(LIBVPX_MAKE_TOOL "C:/msys64/usr/bin/make.exe")
+        set($ENV{CC} ${CMAKE_C_COMPILER})
+        set($ENV{CXX} ${CMAKE_CXX_COMPILER})
+    else()
+        set(LIBVPX_BASH_RUNTIME)
+        set(LIBVPX_MAKE_TOOL make)
+    endif()
+
     if(LIBVPX_PIC)
         set(LIBVPX_PICARGS --enable-pic)
     else()
@@ -34,8 +45,12 @@ else()
         DOWNLOAD_COMMAND ""
         SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/../3rdparty/libvpx
         CONFIGURE_COMMAND
+            ${LIBVPX_BASH_RUNTIME}
             "${CMAKE_CURRENT_LIST_DIR}/../3rdparty/libvpx/configure"
             "--prefix=${DEPENDENCIES_INSTALL_DIR}"
+            --as=yasm
+            --disable-shared
+            --enable-static
             --disable-examples
             --disable-tools
             --disable-docs
@@ -46,10 +61,10 @@ else()
             ${LIBVPX_DEBUG_ARGS}
 
         BUILD_COMMAND
-            make -j 2
+            ${LIBVPX_MAKE_TOOL} -j 2
 
         INSTALL_COMMAND
-            make install
+            ${LIBVPX_MAKE_TOOL} install
 
 #         CMAKE_ARGS
 #             "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
