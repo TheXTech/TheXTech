@@ -42,6 +42,7 @@ class RenderSDL final : public AbstractRender_t
     SDL_Texture  *m_tBuffer = nullptr;
     bool          m_tBufferDisabled = false;
     SDL_Texture  *m_recentTarget = nullptr;
+    uint32_t      m_bestFormat = 0;
     std::set<StdPicture *> m_loadedPictures;
 
     bool m_pow2 = false;
