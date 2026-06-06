@@ -3448,6 +3448,10 @@ void PlayerDismount(const int A)
         NPC[numNPCs].CantHurt = 10;
         NPC[numNPCs].CantHurtPlayer = A;
 
+        // fixes #1138
+        if(g_config.fix_npc_camera_logic)
+            NPC[numNPCs].Section = Player[A].Section;
+
         syncLayers_NPC(numNPCs);
 
         Player[A].Location.Y = Player[A].Location.Y + Player[A].Location.Height;
