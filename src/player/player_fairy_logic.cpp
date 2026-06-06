@@ -95,6 +95,10 @@ void PlayerFairyMovementY(int A)
     Player[A].WetFrame = false;
     Player[A].Wet = 0;
 
+    // fixes #1141
+    if(g_config.fix_fairy_stuck_in_pipe)
+        Player[A].Stoned = false;
+
     // this was previously two separate clauses in VB6 (split by whether FairyCD was 0)
     if(Player[A].Controls.Jump || Player[A].Controls.AltJump || Player[A].Controls.Up)
     {
