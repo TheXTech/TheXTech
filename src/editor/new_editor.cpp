@@ -3702,17 +3702,18 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             EditorCursor.Warp.Direction2 = 4;
     }
 
-    if(EditorCursor.Warp.level == STRINGINDEX_NONE && !EditorCursor.Warp.LevelEnt && !EditorCursor.Warp.MapWarp)
-    {
-        SuperPrintR(mode, g_editorStrings.warpTwoWay, 3, e_ScreenW - 240 + 40 + 4, 134);
-        if(UpdateCheckBox(mode, e_ScreenW - 240 + 4, 120 + 4, EditorCursor.Warp.twoWay))
-            EditorCursor.Warp.twoWay = !EditorCursor.Warp.twoWay;
-
-    }
-
-    // Events
     if(FileFormat == FileFormats::LVL_PGEX)
     {
+        // Two-way
+        if(EditorCursor.Warp.level == STRINGINDEX_NONE && !EditorCursor.Warp.LevelEnt && !EditorCursor.Warp.MapWarp)
+        {
+            SuperPrintR(mode, g_editorStrings.warpTwoWay, 3, e_ScreenW - 240 + 40 + 4, 134);
+            if(UpdateCheckBox(mode, e_ScreenW - 240 + 4, 120 + 4, EditorCursor.Warp.twoWay))
+                EditorCursor.Warp.twoWay = !EditorCursor.Warp.twoWay;
+
+        }
+
+        // Events
         if(mode == CallMode::Render)
         {
             SuperPrintRightAlign(g_editorStrings.eventsHeader, 3, e_ScreenW - 80, 334);
