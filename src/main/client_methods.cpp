@@ -110,17 +110,17 @@ Status GetStatus()
 
 void ClientFrameSync(std::deque<Message>& buffer)
 {
-    bool start_fast_forward = (s_network_client.tick < s_network_client.fast_forward_to - 8);
-    bool end_fast_forward = (s_network_client.tick >= s_network_client.fast_forward_to);
+    bool start_fast_forward = (g_session.current_frame < s_network_client.fast_forward_to - 8);
+    bool end_fast_forward = (g_session.current_frame >= s_network_client.fast_forward_to);
     if(!in_fast_forward && start_fast_forward)
     {
         in_fast_forward = true;
         fast_forward_begin_ms = SDL_GetTicks();
-        fast_forward_begin_frame = s_network_client.tick;
+        fast_forward_begin_frame = g_session.current_frame;
     }
     else if(in_fast_forward)
     {
-        IndicateProgress(fast_forward_begin_ms, num_t(s_network_client.tick - fast_forward_begin_frame) / (s_network_client.fast_forward_to - fast_forward_begin_frame), "Loading game history...");
+        IndicateProgress(fast_forward_begin_ms, num_t(g_session.current_frame - fast_forward_begin_frame) / (s_network_client.fast_forward_to - fast_forward_begin_frame), "Loading game history...");
 
         if(end_fast_forward)
         {

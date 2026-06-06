@@ -105,11 +105,8 @@ struct TCPWrapper
 
 struct RecvBuffer
 {
-    std::deque<Message> messages;
     std::vector<Message> tcp_frame_in_progress;
     int tcp_frame_index = -1;
-
-    int available_frame = -1;
 };
 
 struct SendBuffer
@@ -137,7 +134,6 @@ struct NetworkClient
     int udp_packet_recd = 0;
 
     SDLNet_SocketSet socket_set = nullptr;
-    int tick = 0;
     uint32_t session_key = 0;
 
     int fast_forward_to = INT_MAX;

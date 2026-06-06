@@ -240,8 +240,6 @@ void NetworkClient::Connect(const char* host, int port)
     status.client_state = CLIENT_LOBBY;
     status.server_address = host;
     status.server_port = port;
-
-    tick = 0;
 }
 
 void NetworkClient::Disconnect(bool shutdown)
@@ -306,11 +304,11 @@ void NetworkClient::SendAll()
     if(!tcp_data.socket)
         return;
 
-    send_buffer.current_frame = tick;
+    send_buffer.current_frame = g_session.current_frame;
 
     if(!message_buffer.empty())
     {
-        send_buffer.messages.push_back(msg_from_frame_no(Type::frame_begin, tick));
+        send_buffer.messages.push_back(msg_from_frame_no(Type::frame_begin, g_session.current_frame));
 
         for(Message msg : message_buffer)
             send_buffer.messages.push_back(msg);
@@ -319,15 +317,15 @@ void NetworkClient::SendAll()
 
         if(!ping_send_frame)
         {
-            if(udp_packet_recd > 0 || tick - acked_frame > 60)
+            if(udp_packet_recd > 0 || g_session.current_frame - acked_frame > 60)
             {
-                ping_send_frame = tick;
+                ping_send_frame = g_session.current_frame;
                 ping_send_ms = SDL_GetTicks();
             }
         }
     }
 
-    bool fast_forward = (receive_buffer.available_frame > tick + 10);
+    bool fast_forward = (g_session.available_frame > g_session.current_frame + 10);
     if(!send_buffer.messages.empty() || !fast_forward)
         SendData();
 
@@ -426,16 +424,16 @@ void NetworkClient::ReceiveData()
             frame_no = frame_no_from_message(got);
 
             // previous TCP frame is finished!
-            if(receive_buffer.tcp_frame_index > receive_buffer.available_frame)
+            if(receive_buffer.tcp_frame_index > g_session.available_frame)
             {
-                receive_buffer.available_frame = receive_buffer.tcp_frame_index;
-
                 for(Message msg : receive_buffer.tcp_frame_in_progress)
                 {
-                    receive_buffer.messages.push_back(msg);
+                    g_session.history.push_back(msg);
                     if(max_debug)
                         pLogDebug("TCP message get: %d %d %d %d", (int)msg.type, msg.screen, msg.player, msg.message);
                 }
+
+                g_session.available_frame = receive_buffer.tcp_frame_index;
             }
 
             receive_buffer.tcp_frame_in_progress.clear();
@@ -446,8 +444,8 @@ void NetworkClient::ReceiveData()
             }
             else if(got.type == XMessage::Type::frame_end)
             {
-                if(frame_no > receive_buffer.available_frame)
-                    receive_buffer.available_frame = frame_no;
+                if(frame_no > g_session.available_frame)
+                    g_session.available_frame = frame_no;
 
                 receive_buffer.tcp_frame_index = -1;
                 break;
@@ -455,7 +453,7 @@ void NetworkClient::ReceiveData()
 
             // fallthrough
         default:
-            if(receive_buffer.tcp_frame_index > receive_buffer.available_frame)
+            if(receive_buffer.tcp_frame_index > g_session.available_frame)
                 receive_buffer.tcp_frame_in_progress.push_back(got);
         }
     }
@@ -488,7 +486,7 @@ void NetworkClient::ReceiveData()
             // can recognize acks here soon
             case(XMessage::Type::transmit_start):
                 acked_frame = frame_no_from_message(got);
-                if(acked_frame > tick)
+                if(acked_frame > g_session.available_frame + 1)
                 {
                     // prematurely received packet
                     goto skip_packet;
@@ -497,30 +495,30 @@ void NetworkClient::ReceiveData()
                 if(acked_frame >= ping_send_frame && ping_send_frame != 0)
                 {
                     latency_ms = SDL_GetTicks() - ping_send_ms;
-                    latency_frames = tick - ping_send_frame;
+                    latency_frames = g_session.current_frame - ping_send_frame;
                     ping_send_frame = 0;
                     pLogDebug("UDP latency: %u ms, %d ticks", latency_ms, latency_frames);
                 }
                 break;
             case(XMessage::Type::frame_end):
                 udp_frame_index = frame_no_from_message(got);
-                if(udp_frame_index > receive_buffer.available_frame)
-                    receive_buffer.available_frame = udp_frame_index;
+                if(udp_frame_index > g_session.available_frame)
+                    g_session.available_frame = udp_frame_index;
                 break;
             case(XMessage::Type::frame_begin):
                 udp_frame_index = frame_no_from_message(got);
             // fallthrough
             default:
-                if(udp_frame_index > receive_buffer.available_frame)
+                if(udp_frame_index > g_session.available_frame)
                 {
-                    receive_buffer.messages.push_back(got);
+                    g_session.history.push_back(got);
 
                     if(max_debug)
                         pLogDebug("UDP message get: %d %d %d %d", (int)got.type, got.screen, got.player, got.message);
                 }
                 else
                 {
-                    // pLogDebug("UDP stale message get: %d %d %d %d [%d %d]", got.type, got.screen, got.player, got.message, udp_frame_index, receive_buffer.available_frame);
+                    // pLogDebug("UDP stale message get: %d %d %d %d [%d %d]", got.type, got.screen, got.player, got.message, udp_frame_index, g_session.available_frame);
                 }
                 break;
             }
@@ -534,29 +532,27 @@ skip_packet:
 bool NetworkClient::WaitAndFill()
 {
     // use the receive buffer to fill a frame if possible
-    if(receive_buffer.available_frame >= tick)
+    // FIXME: all of this logic should probably happen elsewhere
+    if(g_session.available_frame >= g_session.current_frame)
     {
-        if(!receive_buffer.messages.empty())
+        while(g_session.next_message < g_session.history.size())
         {
-            Message front = receive_buffer.messages.front();
-            if(front.type == Type::frame_begin && frame_no_from_message(front) == tick)
-            {
-                receive_buffer.messages.pop_front();
+            Message front = g_session.history[g_session.next_message];
+            if(front.type == Type::frame_begin && frame_no_from_message(front) > g_session.current_frame)
+                break;
 
-                while(!receive_buffer.messages.empty() && receive_buffer.messages.front().type != Type::frame_begin)
-                {
-                    if(max_debug)
-                        pLogDebug("Message push: %d %d %d %d %d", tick, (int)receive_buffer.messages.front().type, receive_buffer.messages.front().screen, receive_buffer.messages.front().player, receive_buffer.messages.front().message);
+            g_session.next_message++;
+            if(max_debug)
+                pLogDebug("Message push: %d %d %d %d %d", g_session.current_frame, (int)front.type, front.screen, front.player, front.message);
 
-                    message_buffer.push_back(receive_buffer.messages.front());
-                    receive_buffer.messages.pop_front();
-                }
-            }
+            if(front.type != Type::frame_begin)
+                message_buffer.push_back(front);
         }
 
         // pLogDebug("UDP packets sent %d recv %d", udp_packet_sent, udp_packet_recd);
 
-        tick++;
+        // FIXME: should happen elsewhere
+        g_session.current_frame++;
         return true;
     }
 
@@ -565,7 +561,7 @@ bool NetworkClient::WaitAndFill()
 
 void NetworkClient::client_loop()
 {
-    // bool fast_forward = (status.client_state > CLIENT_LOBBY) && (receive_buffer.available_frame > tick + 8);
+    // bool fast_forward = (status.client_state > CLIENT_LOBBY) && (g_session.available_frame > g_session.current_frame + 8);
     if(!tcp_control.socket || !SDLNet_CheckSockets(socket_set, 0))
     {
         // currently, sleep 2ms here (waiting on messages from the main thread), then check again
@@ -813,6 +809,12 @@ void NetworkClient::client_loop()
             receive_buffer = RecvBuffer();
             send_buffer = SendBuffer();
 
+            // copying previously-existing logic from receive_buffer reinitialization, but these should probably happen elsewhere
+            g_session.current_frame = 0;
+            g_session.available_frame = -1;
+            g_session.history.clear();
+            g_session.next_message = 0;
+
             pLogInfo("NetPlay: joining room %s", DisplayRoom(status.room_info.room_key).room_name);
 
             status.client_state = CLIENT_SESSION_CONFIG;
@@ -907,7 +909,7 @@ void NetworkClient::client_loop()
             if(acked_frame >= ping_send_frame && ping_send_frame != 0)
             {
                 latency_ms = SDL_GetTicks() - ping_send_ms;
-                latency_frames = tick - ping_send_frame;
+                latency_frames = g_session.current_frame - ping_send_frame;
                 ping_send_frame = 0;
                 pLogDebug("TCP latency: %u ms, %d ticks", latency_ms, latency_frames);
             }

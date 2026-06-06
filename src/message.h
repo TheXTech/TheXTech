@@ -23,6 +23,7 @@
 
 #include <cstdint>
 #include <array>
+#include <vector>
 #include <string>
 
 #include "global_constants.h"
@@ -39,16 +40,6 @@ enum class Status : uint8_t
     local,
     replay,
     connected,
-};
-
-struct Session
-{
-    uint32_t random_seed = 0;
-    std::array<uint8_t, maxLocalPlayers> init_char_select{};
-#ifdef THEXTECH_ENABLE_SDL_NET
-    uint8_t save_present = 0;
-    std::string save_data;
-#endif
 };
 
 enum class Type : uint8_t
@@ -90,6 +81,23 @@ struct Message
     {
         return type != Type::empty;
     }
+};
+
+struct Session
+{
+    // initial state
+    uint32_t random_seed = 0;
+    std::array<uint8_t, maxLocalPlayers> init_char_select{};
+#ifdef THEXTECH_ENABLE_SDL_NET
+    uint8_t save_present = 0;
+    std::string save_data;
+
+    // current state
+    int current_frame = 0;
+    int available_frame = -1;
+    std::vector<Message> history;
+    size_t next_message = 0;
+#endif
 };
 
 extern Session g_session;
