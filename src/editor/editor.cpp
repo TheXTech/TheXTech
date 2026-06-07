@@ -595,6 +595,10 @@ void UpdateEditor()
                     EditorCursor.Warp = Warp[A];
                     EditorCursor.Layer = EditorCursor.Warp.Layer;
 
+                    // preserve warp dimensions while placing different objects
+                    EditorCursor.Warp.Entrance.Width = EditorCursor.Location.Width;
+                    EditorCursor.Warp.Entrance.Height = EditorCursor.Location.Height;
+
                     if(!Warp[A].PlacedEnt && !Warp[A].PlacedExit)
                         KillWarp(A);
                 }
@@ -1338,6 +1342,12 @@ void UpdateEditor()
                 if(A > numWarps)
                     numWarps = A;
 
+                // keep (possibly resized) portions of the warp that were already placed
+                if(Warp[A].PlacedEnt)
+                    EditorCursor.Warp.Entrance = Warp[A].Entrance;
+                else if(Warp[A].PlacedExit)
+                    EditorCursor.Warp.Exit = Warp[A].Exit;
+
                 if(EditorCursor.SubMode == 1 || EditorCursor.Warp.level != STRINGINDEX_NONE || EditorCursor.Warp.LevelEnt || EditorCursor.Warp.MapWarp)
                 {
                     EditorCursor.Warp.Entrance = static_cast<SpeedlessLocation_t>(EditorCursor.Location);
@@ -1378,6 +1388,10 @@ void UpdateEditor()
                     EditorCursor.SubMode = 2;
                 else
                     EditorCursor.SubMode = 1;
+
+                // preserve warp dimensions while placing different objects
+                EditorCursor.Warp.Entrance.Width = EditorCursor.Location.Width;
+                EditorCursor.Warp.Entrance.Height = EditorCursor.Location.Height;
 
                 syncLayers_Warp(A);
 //                if(nPlay.Online == true)
@@ -2260,15 +2274,18 @@ void SetCursor()
     else if(EditorCursor.Mode == OptCursor_t::LVL_WARPS) // Warps
     {
         EditorCursor.Warp.Layer = EditorCursor.Layer;
+
+        // load warp dimensions (keeps dims even if other objects were placed)
+        EditorCursor.Location.Width = EditorCursor.Warp.Entrance.Width;
+        EditorCursor.Location.Height = EditorCursor.Warp.Entrance.Height;
+
         if(EditorCursor.Location.Width < 32)
             EditorCursor.Location.Width = 32;
         if(EditorCursor.Location.Height < 32)
             EditorCursor.Location.Height = 32;
         // EditorCursor.Warp is now the canonical Warp object.
         // It stores the warp's entrance and exit until the warp is placed,
-        // instead of finding and modifying an existing warp.
-        // EditorCursor.Warp.Entrance = EditorCursor.Location;
-        // EditorCursor.Warp.Exit = EditorCursor.Location;
+        // overwriting most portions of the target warp.
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_TILES) // Tiles
     {
