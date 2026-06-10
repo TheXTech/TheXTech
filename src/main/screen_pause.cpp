@@ -228,7 +228,10 @@ static bool s_SaveAndContinue()
         PlaySound(SFX_VillainKilled);
     }
 
-    return true;
+    SoundPause[SFX_Pause] = 2;
+    s_push_unpause();
+
+    return false;
 }
 
 static bool s_Quit()
@@ -356,7 +359,7 @@ void Init(int plr, bool LegacyPause)
 #endif
         if(CanSave)
         {
-            s_items.push_back(MenuItem{g_gameStrings.pauseItemSaveAndContinue, s_SaveAndContinue});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemSaveAndContinue, s_SaveAndContinue, true});
             s_items.push_back(MenuItem{g_gameStrings.pauseItemSaveAndQuit, s_Quit, true});
         }
         else
@@ -709,9 +712,6 @@ bool Logic()
 
     if(g_pending_action < s_items.size() && !s_items[g_pending_action].is_private)
         stopPause = s_items[g_pending_action].callback();
-    // SAVE & CONTINUE from host
-    else if(g_pending_action != 255 && s_items.size() > 0)
-        stopPause = s_items[0].callback();
 
     g_pending_action = 255;
 
