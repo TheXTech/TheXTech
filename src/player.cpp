@@ -1785,6 +1785,16 @@ void PlayerFrame(Player_t &p)
 // updates the players GFX
     Location_t tempLocation;
 //    auto &p = Player[A];
+    bool grounded = (p.Location.SpeedY == 0 || p.StandingOnNPC != 0 || p.Slope > 0);
+    bool wetframe = p.WetFrame;
+
+    if(p.CurMazeZone)
+    {
+        grounded = false;
+
+        if(p.State != PLR_STATE_POLAR && p.State != PLR_STATE_AQUATIC)
+            wetframe = true;
+    }
 
 // cause the flicker when he is immune
     if(p.Effect != PLREFF_NO_COLLIDE)
@@ -1841,6 +1851,9 @@ void PlayerFrame(Player_t &p)
         {
             p.FrameCount = (p.FrameCount + 1) & 15;
             p.Frame = 16 + p.FrameCount / 4;
+
+            if(grounded)
+                s_makeDust(p, 4, tempLocation);
         }
         else if(p.State == PLR_STATE_POLAR)
         {
@@ -2095,17 +2108,6 @@ void PlayerFrame(Player_t &p)
     }
     else
     {
-        bool grounded = (p.Location.SpeedY == 0 || p.StandingOnNPC != 0 || p.Slope > 0);
-        bool wetframe = p.WetFrame;
-
-        if(p.CurMazeZone)
-        {
-            grounded = false;
-
-            if(p.State != PLR_STATE_POLAR && p.State != PLR_STATE_AQUATIC)
-                wetframe = true;
-        }
-
         if(p.State == 1 && (p.Character == 1 || p.Character == 2)) // Small Mario & Luigi
         {
             if(p.HoldingNPC == 0) // not holding anything
@@ -5511,6 +5513,8 @@ void LinkFrame(const int A)
 void LinkFrame(Player_t &p)
 {
     Location_t tempLocation;
+
+    bool grounded = (p.Location.SpeedY == 0) || (p.StandingOnNPC != 0) || (p.Slope > 0);
     //auto &p = Player[A];
 
     p.MountOffsetY = 0;
@@ -5540,7 +5544,7 @@ void LinkFrame(Player_t &p)
         p.Frame = 12;
         if(p.Location.SpeedX != 0)
         {
-            if(p.Location.SpeedY == 0 || p.Slope > 0 || p.StandingOnNPC != 0)
+            if(grounded)
             {
                 if(p.SlideCounter <= 0)
                 {
@@ -5556,11 +5560,19 @@ void LinkFrame(Player_t &p)
 
     if(p.Rolling)
     {
-        p.FrameCount = (p.FrameCount + 1) & 15;
-        p.Frame = 12 + p.FrameCount / 4;
-
         if(p.State == PLR_STATE_POLAR)
             p.Frame = 11;
+        else
+        {
+            p.FrameCount = (p.FrameCount + 1) & 15;
+            p.Frame = 12 + p.FrameCount / 4;
+
+            if(grounded)
+            {
+                s_makeDust(p, 4, tempLocation);
+                // PlaySoundSpatial(SFX_HeroDash, p.Location);
+            }
+        }
 
         return;
     }
@@ -5625,7 +5637,7 @@ void LinkFrame(Player_t &p)
         else
             p.Frame = 3;
     }
-    else if(p.Location.SpeedY != 0 && p.StandingOnNPC == 0 && p.Slope == 0 && !(p.Quicksand > 0 && p.Location.SpeedY > 0)) // Jumping/falling
+    else if(!grounded && !(p.Quicksand > 0 && p.Location.SpeedY > 0)) // Jumping/falling
     {
         if(CanWallJump && (p.Pinched.Left2 == 2 || p.Pinched.Right4 == 2) && (!p.SlippyWall || p.State == PLR_STATE_POLAR) && !(p.State == PLR_STATE_CYCLONE && !p.DoubleJump))
         {
