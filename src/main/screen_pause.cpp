@@ -190,7 +190,7 @@ static bool s_CheatScreen()
 {
     TextEntryScreen::Init(g_gameStrings.pauseItemEnterCode, s_CheatScreen_callback);
 
-    return true;
+    return false;
 }
 
 static bool s_QuitTesting()
@@ -235,7 +235,6 @@ static bool s_Quit()
 {
 #ifdef THEXTECH_ENABLE_SDL_NET
     XMessage::Disconnect();
-    s_force_exit = true;
 #endif
 
     bool CanSave = (LevelSelect || IsHubLevel) && !Cheater;
@@ -687,7 +686,7 @@ void ControlsLogic()
     if(menuControls.Do && MenuCursor >= 0 && MenuCursor < (int)s_items.size())
     {
         if(s_items[MenuCursor].is_private)
-            s_items[MenuCursor].callback();
+            s_force_exit = s_items[MenuCursor].callback();
         else
         {
             XMessage::Message menu_action;
