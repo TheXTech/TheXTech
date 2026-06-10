@@ -1272,6 +1272,8 @@ int GameMain(const CmdLineSetup_t &setup)
                 ResetSoundFX();
                 ClearLevel();
 
+                bool is_hub = true;
+
                 std::string levelPath;
                 if(GoToLevel.empty())
                 {
@@ -1284,6 +1286,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 {
                     levelPath = FileNamePathWorld + GoToLevel;
                     GoToLevel.clear();
+                    is_hub = false;
                 }
 
                 levelPath = s_prepare_episode_path(levelPath);
@@ -1291,7 +1294,13 @@ int GameMain(const CmdLineSetup_t &setup)
                 if(!OpenLevel(levelPath))
                 {
                     ReportLoadFailure(levelPath);
-                    ErrorQuit = true;
+
+                    if(is_hub)
+                    {
+                        LevelSelect = true;
+                        ErrorQuit = true;
+                        GoToLevelNoGameThing = true;
+                    }
                 }
 
                 if(!GoToLevelNoGameThing)
