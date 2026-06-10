@@ -1563,9 +1563,16 @@ void EveryonesDead()
 
         if(RestartLevel)
         {
-            OpenLevel(FullFileName);
-            LevelSelect = false;
-            LevelRestartRequested = true;
+            if(!OpenLevel(FullFileName))
+            {
+                ReportLoadFailure(FullFileName);
+                LevelSelect = true;
+            }
+            else
+            {
+                LevelSelect = false;
+                LevelRestartRequested = true;
+            }
 //            SetupPlayers();
         }
         else
