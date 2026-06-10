@@ -1221,6 +1221,8 @@ int GameMain(const CmdLineSetup_t &setup)
                 ResetSoundFX();
                 ClearLevel();
 
+                bool is_hub = true;
+
                 std::string levelPath;
                 if(GoToLevel.empty())
                 {
@@ -1233,12 +1235,19 @@ int GameMain(const CmdLineSetup_t &setup)
                 {
                     levelPath = SelectWorld[selWorld].WorldPath + GoToLevel;
                     GoToLevel.clear();
+                    is_hub = false;
                 }
 
                 if(!OpenLevel(levelPath))
                 {
                     ReportLoadFailure(levelPath);
-                    ErrorQuit = true;
+
+                    if(is_hub)
+                    {
+                        LevelSelect = true;
+                        ErrorQuit = true;
+                        GoToLevelNoGameThing = true;
+                    }
                 }
 
                 if(!GoToLevelNoGameThing)
