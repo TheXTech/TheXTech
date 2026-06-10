@@ -1053,6 +1053,7 @@ int GameMain(const CmdLineSetup_t &setup)
             SuperSpeed = false;
             FlyForever = false;
             BeatTheGame = false;
+            g_VanillaInvalid = false;
             g_ForceBitmaskMerge = false;
 #ifdef __3DS__
             g_ForceBitmaskMerge = g_config.inaccurate_gifs;

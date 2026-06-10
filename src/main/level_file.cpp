@@ -91,6 +91,7 @@
 
 // warning for improper rects
 static const char* s_improper_rect_warning = "Attempted to set %s %d %s to %d, setting to 0";
+static const char* s_destroy_event_warning = "Block 186 or 457 has a destroy event. TheXTech does not match SMBX 1.3 logic in this case. A vanilla speedrun is not fully valid.";
 
 // used to signal a total failure in a callback
 #ifdef PGEFL_CALLBACK_API
@@ -846,12 +847,13 @@ bool OpenLevel_Block(void* userdata, LevelBlock& b)
 
         if((block.Type == 186 || block.Type == 457) && (block.TriggerDeath != EVENT_NONE || block.TriggerLast != EVENT_NONE))
         {
-            const char* error_string = "Block 186 or 457 has a destroy event. TheXTech does not match SMBX 1.3 logic in this case. This content cannot be played in Vanilla mode.";
-
-            pLogWarningS(error_string);
+            pLogWarningS(s_destroy_event_warning);
 
             if(g_config.playstyle == Config_t::MODE_VANILLA)
-                throw callback_error(error_string);
+            {
+                if(!g_VanillaInvalid)
+                    g_VanillaInvalid = 2;
+            }
         }
 
         if(IF_OUTRANGE(block.Type, 0, maxBlockType) || block.Type == BLKID_CONVEYOR_L_CONV || block.Type == BLKID_CONVEYOR_R_CONV) // Drop ID to 1 for blocks of out of range IDs
@@ -1676,6 +1678,14 @@ void OpenLevelDataPost()
     {
         g_curLevelMedals.prepare_lvl();
         OrderMedals();
+    }
+
+    if(g_VanillaInvalid == 2)
+    {
+        g_MessageType = MESSAGE_TYPE_SYS_WARNING;
+        MessageText = s_destroy_event_warning;
+        PauseGame(PauseCode::Message);
+        g_VanillaInvalid = 1;
     }
 
     // If too much locks

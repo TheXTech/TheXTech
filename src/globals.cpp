@@ -385,6 +385,7 @@ bool CoinMode = false;
 bool GodMode = false;
 bool GrabAll = false;
 bool Cheater = false;
+uint8_t g_VanillaInvalid = false;
 #ifdef ENABLE_ANTICHEAT_TRAP
 bool CheaterMustDie = false;
 #endif

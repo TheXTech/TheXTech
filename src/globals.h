@@ -2265,6 +2265,8 @@ extern bool GrabAll;
 //Public Cheater As Boolean 'if the player is a cheater
 extern bool Cheater;
 
+extern uint8_t g_VanillaInvalid;
+
 #ifdef ENABLE_ANTICHEAT_TRAP
 //EXTRA: Quit the game like "game over" even with enough lifes
 extern bool CheaterMustDie;
