@@ -1296,6 +1296,7 @@ void PlayerEffectWarpWait(int A)
             {
                 Checkpoint.clear();
                 CheckpointsList.clear();
+                g_curLevelMedals.reset_checkpoint();
             }
 
             EndLevel = true;
