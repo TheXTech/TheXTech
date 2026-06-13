@@ -21,13 +21,7 @@
 #include "../sdl_timer.h"
 
 #include <gccore.h>
-
-extern "C"
-{
-    extern uint64_t gettime();
-    extern uint32_t diff_msec(uint64_t start, uint64_t end);
-    extern uint32_t diff_usec(uint64_t start, uint64_t end);
-}
+#include <ogc/lwp_watchdog.h>
 
 uint64_t startTime = -1;
 
