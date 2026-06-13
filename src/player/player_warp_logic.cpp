@@ -46,6 +46,7 @@
 #include "main/game_strings.h"
 #include "main/game_info.h"
 #include "main/game_loop_interrupt.h"
+#include "main/level_medals.h"
 
 
 static constexpr int plr_warp_scroll_speed = 8; // 8px / frame
