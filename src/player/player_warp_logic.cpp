@@ -1351,8 +1351,8 @@ void PlayerEffectWarpWait(int A)
                 {
                     WorldPlayer[1].Location.X = w.MapX;
                     WorldPlayer[1].Location.Y = w.MapY;
-                    // Don't return to sub-hub when it's an explicit target to the worlld map!
-                    IsHubLevel = NoMap;
+
+                    // Forget about sub-hub -- it's an explicit target to the world map!
                     FileRecentSubHubLevel.clear();
 
                     for(int l = 1; l <= numWorldLevels; ++l)
