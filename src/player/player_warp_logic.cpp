@@ -1290,6 +1290,14 @@ void PlayerEffectWarpWait(int A)
                     }
                 }
             }
+
+            // Checkpoints must be reset when player successfully quits a level
+            if(g_config.fix_warp_exit_checkpoints)
+            {
+                Checkpoint.clear();
+                CheckpointsList.clear();
+            }
+
             EndLevel = true;
             return;
         }

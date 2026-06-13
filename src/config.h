@@ -964,6 +964,8 @@ public:
     // 1.3.7.3
     opt<bool> fix_char_pass_balls{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-char-pass-balls", "Fix char-pass balls", "Fix char 2-4's iceballs and char 5's fire/iceballs on char-pass blocks"};
+    opt<bool> fix_warp_exit_checkpoints{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
+        "fix-warp-exit-checkpoints", "Fix warp exit checkpoints", "Fixes the problem when checkpoints weren't been reset when player correctly exits level via warps."};
 
     // 1.3.8
     opt<bool> new_conveyor_belts{this, defaults(true), {CompatClass::standard_update, false}, Scope::Creator,
