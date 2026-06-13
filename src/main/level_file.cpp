@@ -1439,7 +1439,9 @@ void OpenLevelDataPost()
     if(IsEpisodeIntro)
     {
         IsHubLevel = NoMap;
-        FileRecentSubHubLevel.clear();
+
+        if(IsHubLevel)
+            FileRecentSubHubLevel.clear();
     }
 
     if(!IsHubLevel)
