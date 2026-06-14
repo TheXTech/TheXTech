@@ -148,8 +148,9 @@ static bool s_WiiRemoteNunchackControlsDefault(const std::string& guid)
 
 static void s_updateJoystickKey(SDL_Joystick* j, bool& key, const KM_Key& mkey)
 {
-    Sint32 val = 0, dx = 0, dy = 0;
+    Sint32 val = 0;
     Sint16 val_initial = 0;
+    int dx = 0, dy = 0;
     bool key_new = false;
 
     switch(mkey.type)
@@ -252,8 +253,9 @@ static void s_updateCtrlKey(SDL_GameController* c, bool& key, const KM_Key& mkey
 
 static void s_updateJoystickAnalogue(SDL_Joystick* j, num_t& amount, const KM_Key& mkey, num_t digital_amount = 1)
 {
-    Sint32 val = 0, dx = 0, dy = 0;
+    Sint32 val = 0;
     Sint16 val_initial = 0;
+    int dx = 0, dy = 0;
     num_t amount_new = 0;
 
     switch(mkey.type)

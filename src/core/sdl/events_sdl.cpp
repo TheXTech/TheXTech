@@ -18,8 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <inttypes.h>
 #include <SDL2/SDL_stdinc.h>
-
 #include <Logger/logger.h>
 
 #include "events_sdl.h"

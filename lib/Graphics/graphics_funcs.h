@@ -179,6 +179,15 @@ public:
     static FIBITMAP *fast2xScaleDown(FIBITMAP *image);
 
     /*!
+     * \brief Quickly scales down the image by integer factor using nearest-neighbor downsampling
+     * \param image Image to downscale
+     * \param divX Dividor of width
+     * \param divY Dividor of height
+     * \return FreeImage descriptor to scaled image
+     */
+    static FIBITMAP *fastIntScaleDown(FIBITMAP *image, int divX, int divY);
+
+    /*!
      * \brief Quickly convert the image from 16-color or 256-color to 32-bit RGBA
      * \param image Image to convert
      * \return FreeImage descriptor to converted image

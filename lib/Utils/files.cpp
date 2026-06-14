@@ -144,6 +144,16 @@ void Files::Data::init_from_mem(const unsigned char* data, size_t size)
     m_length = static_cast<long long int>(size);
 }
 
+void Files::Data::clearData()
+{
+    if(m_free_me)
+        free(const_cast<unsigned char*>(m_data));
+
+    m_data = nullptr;
+    m_length = -1;
+    m_free_me = false;
+}
+
 #ifdef FILES_DISOWN_NEEDED
 void* Files::Data::disown()
 {
