@@ -23,6 +23,9 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <ogc/system.h>
+
+#include "globals.h"
 #include "core/events.h"
 
 
@@ -38,7 +41,10 @@ void quit()
 {}
 
 void doEvents()
-{}
+{
+    if(!SYS_MainLoop())
+        GameIsActive = false;
+}
 
 void waitEvents() {}
 
