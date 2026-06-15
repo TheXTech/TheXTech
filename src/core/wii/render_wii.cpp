@@ -729,6 +729,12 @@ void repaint()
     g_in_frame = false;
 }
 
+void getMaxLogicSize(int *w, int *h)
+{
+    *w = 2048;
+    *h = 2048;
+}
+
 void mapToScreen(int x, int y, int* dx, int* dy)
 {
     *dx = (x - g_screen_phys_x) * XRender::TargetW / g_screen_phys_w;
