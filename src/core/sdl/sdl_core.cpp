@@ -23,36 +23,11 @@
 
 #include "sdl_core.h"
 
-static void sdl_logger_callnack(void *, int category, SDL_LogPriority priority, const char *message)
-{
-    switch(priority)
-    {
-    case SDL_LOG_PRIORITY_VERBOSE:
-    case SDL_LOG_PRIORITY_DEBUG:
-        pLogDebug("SDL2 (%d): %s", category, message);
-        break;
-    case SDL_LOG_PRIORITY_INFO:
-        pLogInfo("SDL2 (%d): %s", category, message);
-        break;
-    case SDL_LOG_PRIORITY_WARN:
-        pLogWarning("SDL2 (%d): %s", category, message);
-        break;
-    case SDL_LOG_PRIORITY_ERROR:
-        pLogCritical("SDL2 (%d): %s", category, message);
-        break;
-    case SDL_LOG_PRIORITY_CRITICAL:
-        pLogFatal("SDL2 (%d): %s", category, message);
-        break;
-    }
-}
-
 bool CoreSDL::init(const CmdLineSetup_t &setup)
 {
     (void)(setup);
 
     bool res;
-    SDL_LogSetOutputFunction(sdl_logger_callnack, NULL);
-    SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
 
     // if(g_config.background_work)
     // apply this unconditionally -- otherwise, need to restart game for background-work to function as expected

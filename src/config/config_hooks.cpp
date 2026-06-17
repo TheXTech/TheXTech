@@ -176,7 +176,7 @@ void config_language_set()
 void config_log_level_set()
 {
     g_pLogGlobalSetup.level = (PGE_LogLevel::Level)(int)g_config.log_level;
-    LogWriter::m_logLevel = g_pLogGlobalSetup.level;
+    UpdateLogLevel(g_pLogGlobalSetup.level);
     pLogInfo("Updated log level to %d", (int)g_config.log_level);
 }
 

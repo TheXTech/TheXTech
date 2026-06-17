@@ -31,8 +31,11 @@
 #include <fmt_format_ne.h>
 #include <fmt/fmt_printf.h>
 
-#include "sdl_proxy/sdl_stdinc.h"
-#include "sdl_proxy/sdl_timer.h"
+#include "sdl_proxy/sdl_stdinc.h"   /* IWYU pragma: keep */
+#include "sdl_proxy/sdl_timer.h"    /* IWYU pragma: keep */
+#ifndef THEXTECH_NO_SDL_CORE
+#   include <SDL2/SDL_log.h>
+#endif
 
 #ifndef MOONDUST_LOGGER_FILENAME_PREFIX
 #   error Please define the "-DMOONDUST_LOGGER_FILENAME_PREFIX=<name-of-application>" to specify the log filename prefix
@@ -119,6 +122,100 @@ static void cleanUpLogs(const std::string &logsPath, int maxLogs)
 #endif // !NO_FILE_LOGGING
 
 
+#ifndef THEXTECH_NO_SDL_CORE
+static void sdl_logger_callback(void *, int category, SDL_LogPriority priority, const char *message)
+{
+    const char *cat_str;
+
+    switch(category)
+    {
+    case SDL_LOG_CATEGORY_APPLICATION:
+        cat_str = "App";
+        break;
+    case SDL_LOG_CATEGORY_ERROR:
+        cat_str = "Error";
+        break;
+    case SDL_LOG_CATEGORY_ASSERT:
+        cat_str = "Assert";
+        break;
+    case SDL_LOG_CATEGORY_SYSTEM:
+        cat_str = "System";
+        break;
+    case SDL_LOG_CATEGORY_AUDIO:
+        cat_str = "Audio";
+        break;
+    case SDL_LOG_CATEGORY_VIDEO:
+        cat_str = "Video";
+        break;
+    case SDL_LOG_CATEGORY_RENDER:
+        cat_str = "Render";
+        break;
+    case SDL_LOG_CATEGORY_INPUT:
+        cat_str = "Input";
+        break;
+    case SDL_LOG_CATEGORY_TEST:
+        cat_str = "Test";
+        break;
+
+    default:
+        cat_str = "Custom";
+        break;
+    }
+
+    switch(priority)
+    {
+    case SDL_LOG_PRIORITY_VERBOSE:
+        pLogDebug("V-SDL2 (%d:%s): %s", category, cat_str, message);
+        break;
+
+    case SDL_LOG_PRIORITY_DEBUG:
+        pLogDebug("D-SDL2 (%d:%s): %s", category, cat_str, message);
+        break;
+
+    case SDL_LOG_PRIORITY_INFO:
+        pLogInfo("I-SDL2 (%d:%s): %s", category, cat_str, message);
+        break;
+
+    case SDL_LOG_PRIORITY_WARN:
+        pLogWarning("W-SDL2 (%d:%s): %s", category, cat_str, message);
+        break;
+
+    case SDL_LOG_PRIORITY_ERROR:
+        pLogCritical("E-SDL2 (%d:%s): %s", category, cat_str, message);
+        break;
+
+    default:
+    case SDL_LOG_PRIORITY_CRITICAL:
+        pLogFatal("C-SDL2 (%d:%s): %s", category, cat_str, message);
+        break;
+    }
+}
+
+static SDL_LogPriority log_pge2sdl(PGE_LogLevel::Level l)
+{
+    switch(l)
+    {
+    case PGE_LogLevel::Debug:
+        return SDL_LOG_PRIORITY_VERBOSE;
+
+    case PGE_LogLevel::Info:
+        return SDL_LOG_PRIORITY_INFO;
+
+    case PGE_LogLevel::Warning:
+        return SDL_LOG_PRIORITY_WARN;
+
+    case PGE_LogLevel::Critical:
+        return SDL_LOG_PRIORITY_ERROR;
+
+    case PGE_LogLevel::Fatal:
+    case PGE_LogLevel::NoLog:
+    default:
+        return SDL_LOG_PRIORITY_CRITICAL;
+    }
+}
+#endif
+
+
 void LoadLogSettings(bool disableStdOut, bool verboseLogs)
 {
 #if defined(DEBUG_BUILD) || defined(__WIIU__)
@@ -166,7 +263,23 @@ void LoadLogSettings(bool disableStdOut, bool verboseLogs)
     LogWriter::m_logFilePath.clear();
 #endif // !NO_FILE_LOGGING
 
+#ifndef THEXTECH_NO_SDL_CORE
+    // Forward SDL's log into our logger
+    SDL_LogSetOutputFunction(sdl_logger_callback, NULL);
+    SDL_LogSetAllPriority(log_pge2sdl(LogWriter::m_logLevel));
+#endif
+
     LogWriter::OpenLogFile();
+}
+
+void UpdateLogLevel(PGE_LogLevel::Level logLevel)
+{
+    if(LogWriter::m_logLevel != logLevel)
+        LogWriter::m_logLevel = logLevel;
+
+#ifndef THEXTECH_NO_SDL_CORE
+    SDL_LogSetAllPriority(log_pge2sdl(logLevel));
+#endif
 }
 
 void CloseLog()
