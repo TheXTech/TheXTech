@@ -284,6 +284,11 @@ void UpdateLogLevel(PGE_LogLevel::Level logLevel)
 
 void CloseLog()
 {
+#ifndef THEXTECH_NO_SDL_CORE
+    // Remove SDL's log callbacks
+    SDL_LogResetPriorities();
+#endif
+
     LogWriter::CloseLog();
 }
 
