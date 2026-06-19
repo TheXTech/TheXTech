@@ -23,7 +23,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <inttypes.h>
+#include <pge_inttypes.h>
 #include <set>
 
 #include <nds.h>

@@ -22,6 +22,7 @@
 #ifndef SDL_SDL_TYPES_H
 #define SDL_SDL_TYPES_H
 
+// IWYU pragma: begin_exports
 #if defined(SDLRPOXY_NULL)
 #include <cstdint>
 
@@ -44,5 +45,6 @@ typedef uint8_t Uint8;
 #else
 #include <SDL2/SDL_types.h>
 #endif
+// IWYU pragma: end_exports
 
 #endif // #ifndef SDL_SDL_TYPES_H

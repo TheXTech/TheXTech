@@ -22,6 +22,7 @@
 #ifndef SDL_HEAD_HHHHHH
 #define SDL_HEAD_HHHHHH
 
+// IWYU pragma: begin_exports
 #if defined(SDLRPOXY_NULL)
 #include "sdl_types.h"
 #include "sdl_stdinc.h"
@@ -32,5 +33,6 @@
 #else
 #include <SDL2/SDL.h>
 #endif
+// IWYU pragma: end_exports
 
 #endif // #ifndef SDL_ATOMIC_HHHHHH

@@ -17,7 +17,7 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
-#include <inttypes.h>
+#include <pge_inttypes.h>
 #include <SDL2/SDL_rwops.h>
 #include <Utils/files.h>
 #include <Utils/strings.h>

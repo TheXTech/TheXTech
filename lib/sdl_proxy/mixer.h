@@ -22,11 +22,13 @@
 #ifndef MIXER_HHHHH
 #define MIXER_HHHHH
 
+// IWYU pragma: begin_exports
 #include <cstdint>
 
 // for AudioSetup_t
 #include "sound.h"
 #include "sdl_audio.h"
+// IWYU pragma: end_exports
 
 #ifdef CUSTOM_AUDIO
 

@@ -22,6 +22,7 @@
 #ifndef SDL_SDL_ATOMIC_H
 #define SDL_SDL_ATOMIC_H
 
+// IWYU pragma: begin_exports
 #if defined(SDLRPOXY_NULL)
 using SDL_atomic_t = volatile int;
 
@@ -38,5 +39,6 @@ inline int SDL_AtomicGet(const SDL_atomic_t* loc)
 #else
 #   include <SDL2/SDL_atomic.h>
 #endif
+// IWYU pragma: end_exports
 
 #endif // #ifndef SDL_SDL_ATOMIC_H
