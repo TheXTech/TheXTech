@@ -31,7 +31,7 @@
 #endif
 
 #if INTPTR_MAX == INT32_MAX
-#   PGE_INTTYPES_INT64_IS_LONG_LONG
+#   define PGE_INTTYPES_INT64_IS_LONG_LONG
 #endif
 
 /* Workarounds */
