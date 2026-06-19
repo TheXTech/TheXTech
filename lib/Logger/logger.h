@@ -53,6 +53,7 @@ extern struct PGE_LogSetup
 } g_pLogGlobalSetup;
 
 extern void LoadLogSettings(bool disableStdOut = false, bool verboseLogs = false);
+extern void UpdateLogLevel(PGE_LogLevel::Level logLevel);
 extern void CloseLog();
 #endif//__cplusplus
 
