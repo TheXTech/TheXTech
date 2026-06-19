@@ -101,6 +101,25 @@ public:
     void placeCursor(int window_x, int window_y) override;
 
     /*!
+     * \brief Start the text input and enable IME candidates
+     */
+    void textInputStart() override;
+
+    /*!
+     * \brief Stop the text input and disable IME candidates
+     */
+    void textInputStop() override;
+
+    /*!
+     * \brief Set the location of text input area to hint IME candidates placement
+     * \param x Offset X
+     * \param y Offset Y
+     * \param w Width
+     * \param h Height
+     */
+    void textInputSetRect(int x, int y, int w, int h) override;
+
+    /*!
      * \brief Is full-screen mode active?
      * \return True if the full-screen mode works right now
      */

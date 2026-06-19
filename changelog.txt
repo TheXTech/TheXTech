@@ -46,6 +46,7 @@ Changelog for 1.3.7.3-dev
 -Bugfix: quit the episode if the hub level can't be reloaded (@ds-sloth)
 -Fixed an unexpected going to the last sub-hub level instead of the world map even explicit coordinates are been specified (@Wohlstand, thanks to @Liebning for the report)
 -Fixed the case when checkpoints won't reset when successfully quitting a level via warp exits, guarded by compat flag "fix-warp-exit-checkpoints" [Modern Mode] (@Wohlstand)
+-Fixed the unwanted triggering of the IME candidates window during the gameplay use of the keyboard when PinYin or any other IME method is enabled. (@Wohlstand)
 
 Changelog for 1.3.7.2
 -i18n: Added support for the localisation of the loading screen (@Wohlstand)

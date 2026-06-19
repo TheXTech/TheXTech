@@ -119,6 +119,9 @@ void EventsSDL::processEvent()
         case SDL_WINDOWEVENT_FOCUS_GAINED:
             if(!g_config.background_work && !LoadingInProcess)
                 SoundPauseEngine(0);
+
+            if(GamePaused != PauseCode::TextEntry)
+                XWindow::textInputStop(); /* Workaround to avoid unwanted IME candidates shown */
             break;
         case SDL_WINDOWEVENT_FOCUS_LOST:
             if(!g_config.background_work && !LoadingInProcess)
