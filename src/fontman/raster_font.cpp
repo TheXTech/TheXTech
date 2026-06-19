@@ -17,7 +17,7 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
-#include <inttypes.h>
+#include <pge_inttypes.h>
 #include "raster_font.h"
 
 #include "../core/render.h"

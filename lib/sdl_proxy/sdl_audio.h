@@ -26,7 +26,7 @@
 #   include <SDL2/SDL_audio.h>
 #endif
 
-
+// IWYU pragma: begin_exports
 #ifdef SDLRPOXY_NULL
 
 #include "sdl_types.h"
@@ -98,5 +98,6 @@ typedef struct SDL_AudioSpec
     void *userdata;             /**< Userdata passed to callback (ignored for NULL callbacks). */
 } SDL_AudioSpec;
 #endif /* SDLRPOXY_NULL */
+// IWYU pragma: end_exports
 
 #endif // #ifndef SDL_SDL_AUDIO_H

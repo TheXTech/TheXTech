@@ -22,6 +22,7 @@
 #ifndef SDL_SDL_FILESYSTEM_H
 #define SDL_SDL_FILESYSTEM_H
 
+// IWYU pragma: begin_exports
 #if !defined(SDLRPOXY_NULL)
 
 #include <SDL2/SDL_filesystem.h>
@@ -34,5 +35,6 @@ inline char* SDL_GetBasePath()
 }
 
 #endif
+// IWYU pragma: end_exports
 
 #endif // #ifndef SDL_SDL_FILESYSTEM_H

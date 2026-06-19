@@ -36,6 +36,11 @@ bool CoreSDL::init(const CmdLineSetup_t &setup)
     // Disable the audio capture at all (some systems do ask microphone permission because of that)
     SDL_SetHint("SDL_AUDIO_DISABLE_CAPTURE", "1");
 
+#ifdef _WIN32
+    /* Workaround for Windows to don't pop the IME while using game input */
+    SDL_EventState(SDL_TEXTINPUT, SDL_DISABLE);
+#endif
+
 #if defined(__ANDROID__) || (defined(__APPLE__) && (defined(TARGET_IPHONE_SIMULATOR) || defined(TARGET_OS_IPHONE)))
     // Restrict the landscape orientation only
     SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");

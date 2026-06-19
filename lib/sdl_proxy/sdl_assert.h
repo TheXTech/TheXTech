@@ -22,6 +22,7 @@
 #ifndef SDL_SDL_ASSERT_H
 #define SDL_SDL_ASSERT_H
 
+// IWYU pragma: begin_exports
 #if defined(SDLRPOXY_NULL)
 
 #   include <assert.h>
@@ -40,5 +41,6 @@
 #include <SDL2/SDL_assert.h>
 
 #endif
+// IWYU pragma: end_exports
 
 #endif // #ifndef SDL_SDL_ASSERT_H

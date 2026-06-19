@@ -22,6 +22,7 @@
 #ifndef SDL_SDL_STDINC_H
 #define SDL_SDL_STDINC_H
 
+// IWYU pragma: begin_exports
 #if !defined(SDLRPOXY_NULL)
 
 #include <SDL2/SDL_stdinc.h>
@@ -124,5 +125,6 @@ SDL_IMPORT_MATH(round)
 SDL_IMPORT_MATH(sqrt)
 
 #endif
+// IWYU pragma: end_exports
 
 #endif // #ifndef SDL_SDL_STDINC_H

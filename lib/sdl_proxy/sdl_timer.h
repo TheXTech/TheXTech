@@ -22,6 +22,7 @@
 #ifndef SDL_SDL_TIMER_H
 #define SDL_SDL_TIMER_H
 
+// IWYU pragma: begin_exports
 #ifndef SDLRPOXY_NULL
 
 #include <SDL2/SDL_version.h>
@@ -51,6 +52,7 @@ inline uint64_t SDL_GetTicks64()
 void SDL_Delay(int ms);
 
 #endif
+// IWYU pragma: end_exports
 
 extern uint64_t SDL_GetMicroTicks();
 
