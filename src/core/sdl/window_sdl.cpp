@@ -366,9 +366,9 @@ static void s_updateSysInfo()
     videoMemSize = s_getVideoRam();
 
     pLogDebug("Windows Version: %u.%u, CPU type: %u, Video memory: %d MB",
-              osvi.dwMajorVersion,
-              osvi.dwMinorVersion,
-              sysInfo.dwProcessorType,
+              (unsigned int)osvi.dwMajorVersion,
+              (unsigned int)osvi.dwMinorVersion,
+              (unsigned int)sysInfo.dwProcessorType,
               videoMemSize
     );
 
