@@ -27,3 +27,12 @@ AbstractWindow_t::AbstractWindow_t()
 
 AbstractWindow_t::~AbstractWindow_t()
 {}
+
+void AbstractWindow_t::textInputStart()
+{}
+
+void AbstractWindow_t::textInputStop()
+{}
+
+void AbstractWindow_t::textInputSetRect(int, int, int, int)
+{}

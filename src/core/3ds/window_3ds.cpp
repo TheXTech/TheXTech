@@ -52,6 +52,9 @@ int showCursor(int show) { return show; }
 void setCursor(WindowCursor_t /*cursor*/) {}
 WindowCursor_t getCursor() { return CURSOR_NONE; }
 void placeCursor(int /*window_x*/, int /*window_y*/) {}
+void textInputStart() {}
+void textInputStop() {}
+void textInputSetRect(int, int, int, int) {}
 bool isFullScreen() { return true; }
 int setFullScreen(bool /*fs*/) { return 1; }
 void restoreWindow() {}

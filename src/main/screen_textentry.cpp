@@ -23,6 +23,7 @@
 #include "../graphics.h"
 #include "../config.h"
 #include "core/render.h"
+#include "core/window.h"
 #include "../game_main.h"
 #include "controls.h"
 #include "gfx.h"
@@ -635,7 +636,20 @@ const std::string& Run(const std::string& Prompt, const std::string Value)
     s_render_sel = false;
     s_timer = -1;
     s_committed = false;
+
+    // FIXME: This is the coarse and aproximiate location of the text input field
+    // It would look better if it gets initialised and updated in the proper place.
+    // The purpose of this call is hinting where input field is placed so IME can show
+    // the candidates window at the right screen position.
+    XWindow::textInputSetRect(XRender::TargetW / 2 + (5 * 40) / 2,
+                              XRender::TargetH / 1.25 - (5 * 40) / 1.25,
+                              (12 * 40),
+                              18);
+
+    XWindow::textInputStart();
     PauseGame(PauseCode::TextEntry, 0);
+    XWindow::textInputStop();
+
     MenuCursorCanMove = false;
     MenuMouseRelease = false;
     MouseRelease = false;
