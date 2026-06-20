@@ -37,6 +37,8 @@
 #include "../render.h"
 #include "config.h"
 #include "../version.h"
+#include "controls.h"
+#include "control/keyboard.h"
 
 
 #ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
@@ -745,7 +747,16 @@ void WindowSDL::placeCursor(int window_x, int window_y)
 
 void WindowSDL::textInputStart()
 {
-    SDL_StartTextInput();
+    bool direct_text = true;
+    for(const Controls::InputMethodType* im : Controls::g_InputMethodTypes)
+    {
+        const auto* im_keyboard = dynamic_cast<const Controls::InputMethodType_Keyboard*>(im);
+        if(im_keyboard && !im_keyboard->m_directText)
+            direct_text = false;
+    }
+
+    if(direct_text)
+        SDL_StartTextInput();
 }
 
 void WindowSDL::textInputStop()
