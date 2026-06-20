@@ -603,7 +603,7 @@ static void GifWriteBit( GifBitStatus& stat, uint32_t bit )
 static void GifWriteChunk( buf_t& buffer, GifBitStatus& stat )
 {
     buffer.push_back(stat.chunkIndex);
-    buffer.append(stat.chunk, stat.chunkIndex);
+    buffer.insert(buffer.end(), stat.chunk, stat.chunk + stat.chunkIndex);
 
     stat.bitIndex = 0;
     stat.byte = 0;
@@ -790,9 +790,9 @@ static bool GifBegin( GifWriter* writer, SDL_RWops *file, uint32_t width, uint32
     writer->oldImage = (uint8_t*)GIF_MALLOC(width*height*4);
 
     auto& buffer = writer->buffer;
+    const uint8_t *gif_head = (const uint8_t*)"GIF89a";
     buffer.clear();
-
-    buffer.append((const uint8_t*)"GIF89a");
+    buffer.insert(buffer.end(), gif_head, gif_head + 6);
 
     // screen descriptor
     buffer.push_back(width & 0xff);
@@ -816,11 +816,12 @@ static bool GifBegin( GifWriter* writer, SDL_RWops *file, uint32_t width, uint32
 
     if( delay != 0 )
     {
+        const uint8_t *netscape_head = (const uint8_t*)"NETSCAPE2.0";
         // animation header
         buffer.push_back(0x21); // extension
         buffer.push_back(0xff); // application specific
         buffer.push_back(11); // length 11
-        buffer.append((const uint8_t*)"NETSCAPE2.0"); // yes, really
+        buffer.insert(buffer.end(), netscape_head, netscape_head + 11); // yes, really
         buffer.push_back(3); // 3 bytes of NETSCAPE2.0 data
 
         buffer.push_back(1); // JUST BECAUSE
