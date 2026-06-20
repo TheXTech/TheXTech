@@ -2,14 +2,14 @@
 #define GIF_WRITER_HHHH
 
 #include <stdint.h>  // for integer typedefs
-#include <string>
+#include <vector>
 
 struct SDL_RWops;
 
 namespace GIF_H
 {
 
-using buf_t = std::basic_string<uint8_t>;
+using buf_t = std::vector<uint8_t>;
 
 struct GifWriter
 {
