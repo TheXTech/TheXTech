@@ -524,7 +524,7 @@ target_compile_definitions(A2XT_Int INTERFACE
     -DINI_PROCESSING_USE_MDX_PARSER  # IniProcessor should use the MDX tokenizer for lists
 )
 
-if("${CMAKE_SYSTEM_NAME}" MATCHES "(Open|Free|Net)BSD")
+if(XTECH_BSD_BUILD)
     list(APPEND A2XT_INCS "/usr/local/include")  # Workaround
 endif()
 
@@ -1674,7 +1674,7 @@ else()
 endif()
 
 if(USE_STATIC_LIBC AND NOT USE_SYSTEM_LIBS)
-    if(NOT APPLE AND NOT MSVC)
+    if(NOT APPLE AND NOT MSVC AND NOT XTECH_BSD_BUILD)
 #        target_link_libraries(thextech PRIVATE -static)
         set_property(TARGET thextech APPEND_STRING PROPERTY LINK_FLAGS " -static-libgcc -static-libstdc++")
     endif()

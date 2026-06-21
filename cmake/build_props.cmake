@@ -11,6 +11,10 @@ if(APPLE AND CMAKE_HOST_SYSTEM_VERSION VERSION_LESS 9)
     set(XTECH_MACOSX_TIGER TRUE)
 endif()
 
+if("${CMAKE_SYSTEM_NAME}" MATCHES "(Open|Free|Net)BSD")
+    set(XTECH_BSD_BUILD TRUE)
+endif()
+
 # =========================== Architecture info ===============================
 
 include(${CMAKE_CURRENT_LIST_DIR}/TargetArch.cmake)
