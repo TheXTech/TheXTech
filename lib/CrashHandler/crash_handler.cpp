@@ -177,7 +177,7 @@ static int isDebuggerPresent()
 #   include <unistd.h>
 #elif defined(__ANDROID__)
 #   include <unwind.h>
-#   include <dlfcn.h>	
+#   include <dlfcn.h>
 #   include <sstream>
 #   include <iomanip>
 #endif
