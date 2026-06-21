@@ -178,19 +178,19 @@ void NetworkClient::EnsureThread()
         socket_set = SDLNet_AllocSocketSet(3);
     }
 
-    if(!thread)
-    {
-        SDL_AtomicSet(&status_req_state, REQUEST_IDLE);
-        SDL_AtomicSet(&message_buffer_state, REQUEST_IDLE);
-        thread = SDL_CreateThread(s_client_thread, "network thread", this);
-        shutdown = false;
-    }
-
     if(!client_wakeup)
         client_wakeup = SDL_CreateSemaphore(0);
 
     if(!game_wakeup)
         game_wakeup = SDL_CreateSemaphore(0);
+
+    if(!thread)
+    {
+        SDL_AtomicSet(&status_req_state, REQUEST_IDLE);
+        SDL_AtomicSet(&message_buffer_state, REQUEST_IDLE);
+        shutdown = false;
+        thread = SDL_CreateThread(s_client_thread, "network thread", this);
+    }
 }
 
 void NetworkClient::Connect(const char* host, int port)
