@@ -502,7 +502,7 @@ endif()
 include(cmake/library_glew.cmake)
 include(cmake/library_syslibs.cmake)
 
-if("${CMAKE_SYSTEM_NAME}" MATCHES "(Open|Free|Net)BSD")
+if(XTECH_BSD_BUILD)
     list(APPEND A2XT_INCS "/usr/local/include")  # Workaround
 endif()
 
@@ -1576,7 +1576,7 @@ else()
 endif()
 
 if(USE_STATIC_LIBC AND NOT USE_SYSTEM_LIBS)
-    if(NOT APPLE AND NOT MSVC)
+    if(NOT APPLE AND NOT MSVC AND NOT XTECH_BSD_BUILD)
 #        target_link_libraries(thextech PRIVATE -static)
         set_property(TARGET thextech APPEND_STRING PROPERTY LINK_FLAGS " -static-libgcc -static-libstdc++")
     endif()
