@@ -409,7 +409,6 @@ void PreloadGame()
 void LoadGame()
 {
     int A = 0;
-    size_t i = 0;
 //    std::string newInput;
 
     GamesaveData sav;
@@ -493,7 +492,7 @@ void LoadGame()
 
     ReturnWarpSaved = ReturnWarp;
 
-    for(A = 1, i = 0; A <= 5; A++, i++)
+    for(A = 1; A <= 5; A++)
     {
         SavedChar[A] = SavedChar_t();
         SavedChar[A].Character = A;
@@ -580,7 +579,7 @@ void ClearGame(bool punnish)
     WorldPlayer[1].Location.X = -1;
     WorldPlayer[1].Location.Y = -1;
 
-    for(int A = 1, i = 0; A <= 5; A++, i++)
+    for(int A = 1; A <= 5; A++)
     {
         SavedChar[A].State = 1;
         SavedChar[A].HeldBonus = NPCID(0);
