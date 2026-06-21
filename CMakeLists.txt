@@ -524,6 +524,10 @@ target_compile_definitions(A2XT_Int INTERFACE
     -DINI_PROCESSING_USE_MDX_PARSER  # IniProcessor should use the MDX tokenizer for lists
 )
 
+if("${CMAKE_SYSTEM_NAME}" MATCHES "(Open|Free|Net)BSD")
+    list(APPEND A2XT_INCS "/usr/local/include")  # Workaround
+endif()
+
 include(cmake/library_glew.cmake)
 include(cmake/library_syslibs.cmake)
 
