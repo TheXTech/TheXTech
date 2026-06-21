@@ -77,6 +77,8 @@
 
 #ifdef __WII__
 #include <gccore.h>
+#include <ogc/if_config.h>
+#include <Logger/logger.h>
 #endif
 
 #ifdef __WIIU__
@@ -824,6 +826,17 @@ int main(int argc, char**argv)
         g_frmMain.freeSystem();
         return 1;
     }
+
+
+#if defined(__WII__) && defined(THEXTECH_ENABLE_SDL_NET)
+    char localip[16] = {0};
+    char gateway[16] = {0};
+    char netmask[16] = {0};
+
+    // Configure the network interface
+    int if_ret = if_config ( localip, netmask, gateway, true, 20);
+    pLogInfo("Network init: %d %s", if_ret, localip);
+#endif
 
 #ifdef __APPLE__
     macosReceiveOpenFile();
