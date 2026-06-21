@@ -7,6 +7,23 @@
 #include "md5_loc.h"
 
 namespace md5 {
+
+#ifdef THEXTECH_BIG_ENDIAN
+    void match_le(unsigned char* c)
+    {
+        std::swap(c[0], c[3]);
+        std::swap(c[1], c[2]);
+    }
+
+    void match_le(unsigned int* n)
+    {
+        *n = (((*n) << 24) | (((*n) & 0xff00) << 8) | (((*n) >> 8) & 0xff00) | ((*n) >> 24));
+    }
+#else
+    void match_le(unsigned char* c) { (void)c; }
+    void match_le(unsigned int* n) { (void)n; }
+#endif
+
     /****************************** Public Functions ******************************/
 
     /*
@@ -168,11 +185,13 @@ namespace md5 {
              */
             unsigned int size_low = ((message_length[0] & 0x1FFFFFFF) << 3);
             memcpy(stored + stored_size, &size_low, sizeof(unsigned int));
+            md5::match_le(stored + stored_size);
             stored_size += sizeof(unsigned int);
 
             /* shift the high word over by 3 and add in the top 3 bits from the low */
             unsigned int size_high = (message_length[1] << 3) | ((message_length[0] & 0xE0000000) >> 29);
             memcpy(stored + stored_size, &size_high, sizeof(unsigned int));
+            md5::match_le(stored + stored_size);
             stored_size += sizeof(unsigned int);
 
             /*
@@ -322,6 +341,7 @@ namespace md5 {
         unsigned int X[16];
         for (unsigned int i = 0; i < 16; i++) {
             memcpy(X + i, block + 4 * i, 4);
+            md5::match_le(X + i);
         }
 
         /* Save A as AA, B as BB, C as CC, and D as DD. */
@@ -458,9 +478,13 @@ namespace md5 {
      */
     void md5_t::get_result(void *result) {
         memcpy((char*)result, &A, sizeof(unsigned int));
+        md5::match_le((unsigned char*)result);
         memcpy((char*)result + sizeof(unsigned int), &B, sizeof(unsigned int));
+        md5::match_le((unsigned char*)result + sizeof(unsigned int));
         memcpy((char*)result + 2 * sizeof(unsigned int), &C, sizeof(unsigned int));
+        md5::match_le((unsigned char*)result + 2 * sizeof(unsigned int));
         memcpy((char*)result + 3 * sizeof(unsigned int), &D, sizeof(unsigned int));
+        md5::match_le((unsigned char*)result + 3 * sizeof(unsigned int));
     }
 
     /****************************** Exported Functions ******************************/
