@@ -502,6 +502,10 @@ endif()
 include(cmake/library_glew.cmake)
 include(cmake/library_syslibs.cmake)
 
+if("${CMAKE_SYSTEM_NAME}" MATCHES "(Open|Free|Net)BSD")
+    list(APPEND A2XT_INCS "/usr/local/include")  # Workaround
+endif()
+
 if(USE_SYSTEM_LIBS)
     find_package(SDL2 REQUIRED)
 
