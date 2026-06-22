@@ -1495,6 +1495,11 @@ void OpenLevelDataPost()
             FileRecentSubHubLevel = FileNameFull;
     }
 
+    // NEW LOGIC: reset LevelBeatCode when entering Hub
+    // (Safe because SMBX 1.3 only uses LevelBeatCode on the world map)
+    if(IsHubLevel)
+        LevelBeatCode = BEATCODE_NONE;
+
     // turn NPC conveyor belts into new conveyor belts in modern mode
     bool used_new_belts = false;
 

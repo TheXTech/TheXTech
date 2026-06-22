@@ -55,6 +55,7 @@ Changelog for 1.3.7.3-hotfix1
 -Fixed build on FreeBSD (@Wohlstand and also contributed by @Sumimi~)
 -Fixed behaviour of the MD5 algorithm on Big Endian hardware (@ds-sloth)
 -Fixed a critical bug of checkpoints being reset when re-entering normal level from the hub (@Wohlstand)
+-Fixed TheXTech bug where medals were incorrectly saved after death in hub worlds (@ds-sloth)
 
 Changelog for 1.3.7.2
 -i18n: Added support for the localisation of the loading screen (@Wohlstand)
