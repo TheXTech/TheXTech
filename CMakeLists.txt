@@ -577,6 +577,7 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     else()
         list(APPEND A2XT_LIBS PGE_SDLMixerX_static)
     endif()
+
     if(NOT USE_SYSTEM_SDL2 AND XTECH_BSD_BUILD)
         list(APPEND A2XT_LIBS usbhid)
         find_library(LIBUSB_LIB NAMES usb)
