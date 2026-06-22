@@ -171,6 +171,10 @@ static int isDebuggerPresent()
 #elif (defined(__linux__) && !defined(__ANDROID__) || defined(__APPLE__))
 #   include <pwd.h>
 #   include <unistd.h>
+#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+#   define PGE_BSD_BUILD
+#   include <pwd.h>
+#   include <unistd.h>
 #elif defined(__ANDROID__)
 #   include <unwind.h>
 #   include <dlfcn.h>
@@ -372,6 +376,14 @@ static std::string getCurrentHomePath()
             return "/home/<unknown>"; // Failed to get a user name!
         homedir = std::string(home);
     }
+#elif defined(PGE_BSD_BUILD)
+    struct passwd buff, *pwd;
+    char buff_s[1024];
+
+    if(getpwuid_r(getuid(), &buff, buff_s, sizeof(buff_s), &pwd) != 0)
+        return "/home/<unknown>"; // Failed to get a user name!
+
+    homedir = std::string(pwd->pw_dir);
 #else
     struct passwd *pwd = getpwuid(getuid());
     if(pwd == nullptr)
