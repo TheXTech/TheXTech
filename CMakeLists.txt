@@ -552,6 +552,16 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     else()
         list(APPEND A2XT_LIBS PGE_SDLMixerX_static)
     endif()
+    if(NOT USE_SYSTEM_SDL2 AND XTECH_BSD_BUILD)
+        list(APPEND A2XT_LIBS usbhid)
+        find_library(LIBUSB_LIB NAMES usb)
+        find_library(HIDAPI_LIB NAMES hidapi)
+
+        if(LIBUSB_LIB AND HIDAPI_LIB)
+            list(APPEND A2XT_LIBS ${LIBUSB_LIB} ${HIDAPI_LIB})
+        else()
+        endif()
+    endif()
 
 # UNIX seems to be too general -- how to target desktop Linux specifically?
 #    if(UNIX AND (THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_DESKTOP_LEGACY OR THEXTECH_BUILD_GL_ES_MODERN OR THEXTECH_BUILD_GL_ES_LEGACY))
