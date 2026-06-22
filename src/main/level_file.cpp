@@ -1452,6 +1452,11 @@ void OpenLevelDataPost()
             FileRecentSubHubLevel = FileNameFull;
     }
 
+    // NEW LOGIC: reset LevelBeatCode when entering Hub
+    // (Safe because SMBX 1.3 only uses LevelBeatCode on the world map)
+    if(IsHubLevel)
+        LevelBeatCode = BEATCODE_NONE;
+
     // TODO: disable this if the file indicates that it is already sorted
     if(g_config.emulate_classic_block_order && FileFormat == FileFormats::LVL_PGEX)
     {

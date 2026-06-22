@@ -214,6 +214,12 @@ void GameLoop()
                 ReturnWarp = 0;
                 ReturnWarpSaved = 0;
             }
+            // New logic: otherwise, reset beat code if hub level
+            // (Safe because SMBX 1.3 only uses LevelBeatCode on the world map)
+            else if(IsHubLevel)
+            {
+                LevelBeatCode = BEATCODE_NONE;
+            }
         }
 
         if(SwapCharAllowed())
