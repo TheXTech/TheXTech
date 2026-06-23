@@ -25,7 +25,7 @@ Changelog for 1.3.8-dev
 -For creators: add compat flag "alt-powerdown" which makes Chars 1 and 2 go to Big after being hit with a stronger powerup, and disables the item box (@ds-sloth)
 
 Changelog for 1.3.7.4-dev
-<comming soon!>
+-Fix SMBX 1.3 bug where items on top of a vehicle could be lost when entering it, guarded by compat flag "fix-vehicle-item-loss" [Modern/Classic Mode] (@ds-sloth)
 
 Changelog for 1.3.7.3
 -Update LVLX/WLDX/SAVX loader to use new MDX file parser by ds-sloth (speeds up level/world loads on slow devices) (@ds-sloth, @Wohlstand)
