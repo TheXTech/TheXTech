@@ -967,6 +967,10 @@ public:
     opt<bool> fix_warp_exit_checkpoints{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-warp-exit-checkpoints", "Fix warp exit checkpoints", "Fixes the problem when checkpoints weren't been reset when player correctly exits level via warps."};
 
+    // 1.3.7.4
+    opt<bool> fix_vehicle_item_loss{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
+        "fix-vehicle-item-loss", "Fix vehicle item loss", "Prevents risk of losing items when entering vehicle"};
+
     /* ---- Compatibility - Speedrun ----*/
 
     section speedrun{this, Scope::CreatorEpisode, "speedrun", "Speedrun"};

@@ -813,6 +813,10 @@ void UpdateNPCs()
             Block[numBlock].Location.Width = static_cast<int>(floor(static_cast<double>(Block[numBlock].Location.Width))) + 1;
             Block[numBlock].tempBlockVehiclePlr = A;
 
+            // adjust vehicle SpeedY by gravity constant, plus a constant value, to prevent an item falling through the vehicle on the frame the player enters it
+            if(g_config.fix_vehicle_item_loss)
+                Block[numBlock].Location.SpeedY -= (double)(0.26f) + 0.1;
+
             // delay add to below if it will be sorted
             if(!g_config.emulate_classic_block_order)
                 treeTempBlockAdd(numBlock);
