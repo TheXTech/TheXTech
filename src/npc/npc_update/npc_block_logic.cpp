@@ -1037,6 +1037,10 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                                             bool tempBool = false;
                                                             for(int C = 1; C <= numPlayers; C++)
                                                             {
+                                                                // allow thrown key to attach to player in vehicle
+                                                                if(g_config.fix_vehicle_item_loss && NPC[A]->StandsOnPlayer && Player[C].Mount == 2)
+                                                                    continue;
+
                                                                 if(CheckCollision(NPC[A].Location, Player[C].Location))
                                                                 {
                                                                     tempBool = true;
