@@ -3527,6 +3527,10 @@ void PlayerDismount(const int A)
                 NPC[B].Location.Y = NPC[numNPCs].Location.Y - 0.1 - NPC[B].vehicleYOffset;
                 treeNPCUpdate(B);
 
+                // don't player clip downwards when dismounting with a key on top
+                if(g_config.fix_vehicle_item_loss && NPC[B]->MovesPlayer)
+                    NPC[B].Projectile = true;
+
                 NPC[B].vehicleYOffset = 0;
                 if(NPC[B].Type == NPCID_CANNONITEM)
                     NPC[B].Special = 0;
