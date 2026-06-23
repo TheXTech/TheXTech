@@ -900,25 +900,18 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                         {
                                             resetBeltSpeed = true;
 
-                                            if(Block[B].tempBlockNpcType != 0)
-                                            {
-                                                if(Block[B].Location.SpeedY > 0 && Block[B].tempBlockNpcType >= NPCID_YEL_PLATFORM && Block[B].tempBlockNpcType <= NPCID_RED_PLATFORM)
-                                                    tempHit = Block[B].Location.Y - NPC[A].Location.Height - 0.01_n + Block[B].Location.SpeedY;
-                                                else
-                                                    tempHit = Block[B].Location.Y - NPC[A].Location.Height - 0.01_n;
-
-                                                tempHitBlock = B;
-                                            }
-                                            else
-                                            {
-                                                tempHitBlock = B;
-                                                tempHit = Block[B].Location.Y - NPC[A].Location.Height - 0.01_n;
-                                            }
+                                            // simplified from VB6: rail/lineguide special case moved below
+                                            tempHitBlock = B;
+                                            tempHit = Block[B].Location.Y - NPC[A].Location.Height - 0.01_n;
 
                                             if(Block[B].tempBlockNpcType >= NPCID_YEL_PLATFORM && Block[B].tempBlockNpcType <= NPCID_RED_PLATFORM)
                                             {
                                                 beltSpeed = 0;
                                                 beltCount = 0;
+
+                                                // moved from above
+                                                if(Block[B].Location.SpeedY > 0)
+                                                    tempHit += Block[B].Location.SpeedY;
                                             }
 
                                             num_t C = 0;
