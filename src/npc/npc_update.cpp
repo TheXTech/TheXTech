@@ -757,9 +757,9 @@ interrupt_Activation:
             Block[numBlock].Location.Width = num_t::floor(Block[numBlock].Location.Width) + 1;
             Block[numBlock].tempBlockVehiclePlr = A;
 
-            // adjust vehicle SpeedY by gravity constant, plus a constant value, to prevent an item falling through the vehicle on the frame the player enters it
+            // use ceiling instead of floor + 1 for vehicle position to prevent items clipping through
             if(g_config.fix_vehicle_item_loss)
-                Block[numBlock].Location.SpeedY -= (num_t)(0.26_nf) + 0.1_n;
+                Block[numBlock].Location.Y = num_t::ceil(Player[A].Location.Y);
 
             // delay add to below if it will be sorted
             if(!g_config.emulate_classic_block_order)
