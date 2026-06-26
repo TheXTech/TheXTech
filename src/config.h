@@ -249,6 +249,13 @@ public:
     static constexpr int scale_mode = SCALE_DYNAMIC_NEAREST;
 #endif
 
+#ifdef __WII__
+    opt_range<int> overscan_x{this, {0, 5, 1}, defaults(0), {}, Scope::Config,
+        "overscan-x", "Overscan X", nullptr, config_res_set};
+    opt_range<int> overscan_y{this, {0, 5, 1}, defaults(0), {}, Scope::Config,
+        "overscan-y", "Overscan Y", nullptr, config_res_set};
+#endif
+
 #ifdef __3DS__
     opt<bool> td_compat_mode{this, defaults(false), {}, Scope::Config,
         "3d-compat-mode", "3D compat mode", "Draw all objects in one 3D plane"};
