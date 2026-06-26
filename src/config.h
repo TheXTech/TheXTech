@@ -190,8 +190,13 @@ public:
     opt<bool> fullscreen{this, defaults(false), {}, Scope::Config,
         "fullscreen", "Fullscreen", nullptr,
         config_fullscreen_set};
+
+    opt<bool> disable_fullscreen_toggle{this, defaults(false), {}, Scope::Config,
+        "disable-fullscreen-toggle", "Disable fullscreen toggle", nullptr,
+        nullptr};
 #else
     static constexpr bool fullscreen = true;
+    static constexpr bool disable_fullscreen_toggle = true;
 #endif
 
     opt_enum<std::pair<int, int>> internal_res{this,
