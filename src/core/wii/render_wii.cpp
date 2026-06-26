@@ -518,6 +518,9 @@ void video_set_rmode()
     if(new_rmode.fbWidth > 640)
         new_rmode.fbWidth = 640;
 
+    if(new_rmode.efbHeight > 480)
+        new_rmode.efbHeight = 480;
+
     if(new_rmode.fbWidth == rmode.fbWidth && new_rmode.efbHeight == rmode.efbHeight)
         return;
 
