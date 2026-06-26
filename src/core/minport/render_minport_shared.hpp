@@ -177,7 +177,7 @@ void setTransparentColor(StdPicture &target, uint32_t rgb)
 void getRenderSize(int* w, int* h)
 {
 #ifdef __WII__
-    *w = 1280;
+    *w = 1280 - g_config.overscan_x * 32;
     *h = (CONF_GetAspectRatio()) ? 720 : 960;
 #else
     return XWindow::getWindowSize(w, h);
