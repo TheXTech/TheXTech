@@ -858,10 +858,14 @@ int main(int argc, char**argv)
     Controls::Init();
     Controls::LoadConfig();
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+    XMessage::NetStartup();
+#endif
+
     int ret = GameMain(setup);
 
 #ifdef THEXTECH_ENABLE_SDL_NET
-    XMessage::Shutdown();
+    XMessage::NetShutdown();
 #endif
 
     Integrator::quitIntegrations();

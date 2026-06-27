@@ -205,7 +205,7 @@ void Tick()
 {
 #ifdef THEXTECH_ENABLE_SDL_NET
     // sync state with other clients here
-    if(CurrentRoom())
+    if(XMessage::GetStatus() != XMessage::Status::local)
         ClientFrameSync(s_message_vector);
 #endif
 

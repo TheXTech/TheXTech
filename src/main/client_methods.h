@@ -58,7 +58,9 @@ enum ClientState
     CLIENT_SESSION_CONFIG, // joined room but haven't yet sent/received session
     CLIENT_LOBBY,
     CLIENT_HOST_IDLE,
-    CLIENT_HOST_SPECTATED,
+    // first active state
+    CLIENT_ACTIVE_START,
+    CLIENT_HOST_SPECTATED = CLIENT_ACTIVE_START,
     CLIENT_HOST,
     CLIENT_GUEST,
     CLIENT_SPECTATOR,
@@ -73,9 +75,26 @@ struct ClientStatus
     int client_index = 0;
 };
 
+struct GameThread
+{
+    ClientStatus status_req;
+    ClientStatus status;
+
+    // track new replies
+    int status_req_reply_seen = 0;
+
+    // track new status updates
+    int status_alarm_id_seen = 0;
+
+    void push_status_req();
+    bool pull_status();
+    bool status_req_completed();
+};
+
 void Connect(const char* host = nullptr);
 void Disconnect();
-void Shutdown();
+void NetStartup();
+void NetShutdown();
 const ClientStatus* GetClientStatus();
 bool CompleteRequest();
 

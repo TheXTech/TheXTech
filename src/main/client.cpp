@@ -49,7 +49,7 @@ static int frame_no_from_message(XMessage::Message message)
 namespace XMessage
 {
 
-static int s_client_thread(void* _client)
+int client_thread(void* _client)
 {
     if(!_client)
         return 1;
@@ -159,6 +159,18 @@ void NetworkClient::Shutdown()
         game_wakeup = nullptr;
     }
 
+    if(status_req_sync_lock)
+    {
+        SDL_DestroyMutex(status_req_sync_lock);
+        status_req_sync_lock = nullptr;
+    }
+
+    if(status_sync_lock)
+    {
+        SDL_DestroyMutex(status_sync_lock);
+        status_sync_lock = nullptr;
+    }
+
     if(sdlnet_inited)
     {
         SDLNet_FreeSocketSet(socket_set);
@@ -169,8 +181,11 @@ void NetworkClient::Shutdown()
     }
 }
 
-void NetworkClient::EnsureThread()
+void NetworkClient::Startup()
 {
+    if(thread)
+        return;
+
     if(!sdlnet_inited)
     {
         SDLNet_Init();
@@ -184,13 +199,70 @@ void NetworkClient::EnsureThread()
     if(!game_wakeup)
         game_wakeup = SDL_CreateSemaphore(0);
 
+    if(!status_req_sync_lock)
+        status_req_sync_lock = SDL_CreateMutex();
+
+    if(!status_sync_lock)
+        status_sync_lock = SDL_CreateMutex();
+
+    SDL_AtomicSet(&message_buffer_state, REQUEST_IDLE);
+    SDL_AtomicSet(&status_req_id, 0);
+    SDL_AtomicSet(&status_req_completed, 0);
+    SDL_AtomicSet(&status_alarm_id, 0);
+
     if(!thread)
     {
-        SDL_AtomicSet(&status_req_state, REQUEST_IDLE);
-        SDL_AtomicSet(&message_buffer_state, REQUEST_IDLE);
         shutdown = false;
-        thread = SDL_CreateThread(s_client_thread, "network thread", this);
+        thread = SDL_CreateThread(client_thread, "network thread", this);
     }
+}
+
+void NetworkClient::pull_status_req()
+{
+    if(SDL_AtomicGet(&status_req_id) == status_req_id_seen)
+        return;
+
+    if(SDL_TryLockMutex(status_req_sync_lock) == SDL_MUTEX_TIMEDOUT)
+        return;
+
+    // don't interrupt a status request unless the new request is to disconnect
+    if(!status_req_in_progress || status_req_sync.client_state == CLIENT_OFF)
+    {
+        try
+        {
+            status_req = status_req_sync;
+            status_req_id_seen = SDL_AtomicGet(&status_req_id);
+            status_req_in_progress = REQUEST_SUBMIT;
+        }
+        catch(...)
+        {
+            // ignore exception on string copy, make sure to unlock mutex
+        }
+    }
+
+    SDL_UnlockMutex(status_req_sync_lock);
+}
+
+void NetworkClient::push_status()
+{
+    SDL_LockMutex(status_sync_lock);
+    try
+    {
+        status_sync = status;
+    }
+    catch(...)
+    {
+        // ignore exception on string copy, make sure to unlock mutex
+    }
+    SDL_AtomicAdd(&status_alarm_id, 1);
+    SDL_UnlockMutex(status_sync_lock);
+}
+
+void NetworkClient::push_completed_request()
+{
+    push_status();
+    SDL_AtomicSet(&status_req_completed, status_req_id_seen);
+    status_req_in_progress = 0;
 }
 
 void NetworkClient::Connect(const char* host, int port)
@@ -216,6 +288,7 @@ void NetworkClient::Connect(const char* host, int port)
 
     SDLNet_TCP_AddSocket(socket_set, tcp_data.socket);
 
+#ifndef __WII__
     udp_socket = SDLNet_UDP_Open(0);
     if(!udp_socket || SDLNet_UDP_Bind(udp_socket, 0, &addr) != 0)
     {
@@ -225,6 +298,7 @@ void NetworkClient::Connect(const char* host, int port)
 
     // SDLNet_UDP_SetPacketLoss(udp_socket, 99);
     SDLNet_UDP_AddSocket(socket_set, udp_socket);
+#endif
 
     udp_packet = SDLNet_AllocPacket(256);
     if(!udp_packet)
@@ -240,6 +314,8 @@ void NetworkClient::Connect(const char* host, int port)
     status.client_state = CLIENT_LOBBY;
     status.server_address = host;
     status.server_port = port;
+
+    push_status();
 }
 
 void NetworkClient::Disconnect(bool shutdown)
@@ -279,11 +355,11 @@ void NetworkClient::Disconnect(bool shutdown)
 
     session_key = 0;
 
-    // FIXME: think carefully about how to update status field
-    // given that the primary status struct is owned by the game thread at this point
-
     if(shutdown)
         return;
+
+    status = ClientStatus();
+    push_status();
 
     // UpdateConfig();
     // UpdateInternalRes();
@@ -576,18 +652,20 @@ void NetworkClient::client_loop()
     if(tcp_control.err || tcp_data.err)
     {
         Disconnect();
-        if(SDL_AtomicGet(&status_req_state) > REQUEST_IDLE)
+        if(status_req_in_progress)
         {
             status = ClientStatus();
-            SDL_AtomicSet(&status_req_state, REQUEST_COMPLETED);
+            push_completed_request();
         }
 
         if(SDL_AtomicGet(&message_buffer_state) == REQUEST_PENDING)
             SDL_AtomicSet(&message_buffer_state, REQUEST_COMPLETED);
     }
 
+    pull_status_req();
+
     // section to handle connection status updates
-    if(SDL_AtomicGet(&status_req_state) == REQUEST_SUBMIT)
+    if(status_req_in_progress == REQUEST_SUBMIT)
     {
         // if we shouldn't be connected, disconnect!
         if(status_req.client_state == CLIENT_OFF)
@@ -605,7 +683,7 @@ void NetworkClient::client_loop()
         if(!tcp_control.socket)
         {
             status = ClientStatus();
-            SDL_AtomicSet(&status_req_state, REQUEST_COMPLETED);
+            push_completed_request();
             return;
         }
 
@@ -646,9 +724,6 @@ void NetworkClient::client_loop()
                     SDLNet_TCP_Send(tcp_control.socket, to_send_a.data(), to_send_a.size());
                     SDLNet_TCP_Send(tcp_control.socket, g_session.save_data.data(), g_session.save_data.size());
                 }
-
-                SDL_AtomicSet(&status_req_state, REQUEST_PENDING);
-                return;
             }
             else if(status_req.client_state == CLIENT_GUEST)
             {
@@ -676,7 +751,7 @@ void NetworkClient::client_loop()
                 SDLNet_TCP_Send(tcp_control.socket, to_send.data(), to_send.size());
             }
 
-            SDL_AtomicSet(&status_req_state, REQUEST_PENDING);
+            status_req_in_progress = REQUEST_PENDING;
             return;
         }
 
@@ -694,30 +769,14 @@ void NetworkClient::client_loop()
 
                 SDLNet_TCP_Send(tcp_control.socket, to_send.data(), to_send.size());
 
-                SDL_AtomicSet(&status_req_state, REQUEST_PENDING);
+                status_req_in_progress = REQUEST_PENDING;
                 return;
             }
         }
 
         // all done with the request
-        SDL_AtomicSet(&status_req_state, REQUEST_COMPLETED);
+        push_completed_request();
         return;
-
-        // // if currently in a room, try to leave it
-        // if(status.client_state != CLIENT_LOBBY)
-        // {
-        //     // ...
-        //     SDL_AtomicSet(&status_req_state, REQUEST_PENDING);
-        //     return;
-        // }
-
-        // // try to join a room as a guest
-        // if(status_req.client_state == CLIENT_GUEST)
-        // {
-        //     // try to leave the room
-        //     // ...
-        //     SDL_AtomicSet(&status_req_state, REQUEST_PENDING);
-        // }
     }
 
     // section to send pending messages
@@ -742,14 +801,14 @@ void NetworkClient::client_loop()
             tcp_control.ShiftBuffer(17);
 
             // ignore unexpected (stale?) rooom key responses
-            if(SDL_AtomicGet(&status_req_state) == REQUEST_PENDING && got_room_key == status_req.room_info.room_key)
+            if(status_req_in_progress == REQUEST_PENDING && got_room_key == status_req.room_info.room_key)
             {
                 status.room_info.room_key = got_room_key;
                 status.room_info.engine_hash = engine_hash;
                 status.room_info.asset_hash = asset_hash;
                 status.room_info.content_hash = content_hash;
 
-                SDL_AtomicSet(&status_req_state, REQUEST_COMPLETED);
+                push_completed_request();
             }
         }
         else if(tcp_control.buffer[0] == HEADER_ROOM_KEY)
@@ -787,6 +846,7 @@ void NetworkClient::client_loop()
             }
 
             // register data UDP channel
+            if(udp_socket)
             {
                 udp_packet->data[0] = uint8_t(session_key >> 24);
                 udp_packet->data[1] = uint8_t(session_key >> 16);
@@ -819,8 +879,8 @@ void NetworkClient::client_loop()
 
             status.client_state = CLIENT_SESSION_CONFIG;
 
-            if(SDL_AtomicGet(&status_req_state) == REQUEST_PENDING)
-                SDL_AtomicSet(&status_req_state, REQUEST_SUBMIT);
+            if(status_req_in_progress == REQUEST_PENDING)
+                status_req_in_progress = REQUEST_SUBMIT;
         }
         else if(tcp_control.buffer[0] == HEADER_GET_SESSION)
         {
@@ -829,11 +889,11 @@ void NetworkClient::client_loop()
 
             tcp_control.ShiftBuffer(1);
 
-            if(SDL_AtomicGet(&status_req_state) == REQUEST_PENDING && status.client_state == CLIENT_SESSION_CONFIG)
+            if(status_req_in_progress == REQUEST_PENDING && status.client_state == CLIENT_SESSION_CONFIG)
             {
                 status.client_state = CLIENT_HOST;
                 pLogDebug("The random seed is %d", (int)g_session.random_seed);
-                SDL_AtomicSet(&status_req_state, REQUEST_COMPLETED);
+                push_completed_request();
             }
             else
                 Disconnect();
@@ -855,8 +915,9 @@ void NetworkClient::client_loop()
             if(!tcp_control.FillBufferTo(9))
                 Disconnect();
 
-            if(SDL_AtomicGet(&status_req_state) == REQUEST_PENDING && status.client_state == CLIENT_SESSION_CONFIG)
+            if(status_req_in_progress == REQUEST_PENDING && status.client_state == CLIENT_SESSION_CONFIG)
             {
+                // lots of access to g_session here...
                 g_session.random_seed = ((uint32_t)tcp_control.buffer[0] << 24) | ((uint32_t)tcp_control.buffer[1] << 16) | ((uint32_t)tcp_control.buffer[2] << 8) | ((uint32_t)tcp_control.buffer[3] << 0);
                 g_session.init_char_select[0] = tcp_control.buffer[4];
                 g_session.init_char_select[1] = tcp_control.buffer[5];
@@ -893,7 +954,7 @@ void NetworkClient::client_loop()
                 {
                     status.client_state = CLIENT_GUEST;
                     pLogDebug("The random seed is %d", (int)g_session.random_seed);
-                    SDL_AtomicSet(&status_req_state, REQUEST_COMPLETED);
+                    push_completed_request();
                 }
             }
             else

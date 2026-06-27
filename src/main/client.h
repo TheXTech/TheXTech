@@ -118,13 +118,48 @@ struct SendBuffer
     size_t tcp_transmit_pos = 0;
 };
 
+int client_thread(void* _client);
+
 struct NetworkClient
 {
+    friend int client_thread(void* _client);
+
+    // synchronization state
+public:
     SDL_Thread* thread = nullptr;
     SDL_sem* client_wakeup = nullptr;
     SDL_sem* game_wakeup = nullptr;
     bool shutdown = false;
 
+    // both to be called from main thread
+    void Startup();
+    void Shutdown();
+
+    // status requests -- sent by main thread, used by network thread
+public:
+    SDL_mutex*   status_req_sync_lock; // locked by main thread when altering status_req and by network thread when reading status_req (try_lock) or when altering gameplay state
+    ClientStatus status_req_sync;      // copy of status_req to synchronize from main thread to network thread
+    SDL_atomic_t status_req_id;        // incremented by main thread to indicate new status change request
+    SDL_atomic_t status_req_completed; // set by network thread to indicate completed status changes
+private:
+    ClientStatus status_req;                     // network thread's copy of status_req
+    int          status_req_id_seen = 0;         // set by network thread to indicate seen requests
+    int          status_req_in_progress = false; // tracks whether the network thread is currently responding to a status change request
+
+    void pull_status_req();
+
+    // status change notifications -- sent by network thread, used by main thread
+public:
+    SDL_mutex*   status_sync_lock;     // try_locked by main thread when copying status, locked by network thread when altering status
+    ClientStatus status_sync;          // copy of status to synchronize from network thread to main thread
+    SDL_atomic_t status_alarm_id;      // incremented by network thread to indicate new status change
+private:
+    ClientStatus status;               // network thread's copy of status
+
+    void push_status();
+    void push_completed_request();
+
+private:
     TCPWrapper tcp_control;
     TCPWrapper tcp_data;
     UDPsocket  udp_socket = nullptr;
@@ -136,18 +171,17 @@ struct NetworkClient
     SDLNet_SocketSet socket_set = nullptr;
     uint32_t session_key = 0;
 
-    int fast_forward_to = INT_MAX;
-
-    SDL_atomic_t status_req_state;
-    ClientStatus status_req;
-    ClientStatus status;
-
     RecvBuffer receive_buffer;
     SendBuffer send_buffer;
+
+    // public for now, but this is not desired
+public:
+    int fast_forward_to = INT_MAX;
 
     SDL_atomic_t message_buffer_state;
     std::deque<Message> message_buffer;
 
+private:
     // ping info
     int ping_send_frame = -1;
     uint32_t ping_send_ms = 0;
@@ -158,12 +192,8 @@ struct NetworkClient
 
     bool sdlnet_inited = false;
 
-    void EnsureThread();
-
     void Connect(const char* host, int port);
     void Disconnect(bool shutdown = false);
-
-    void Shutdown();
 
     XMessage::Message ParseMessage(const uint8_t* message);
 
