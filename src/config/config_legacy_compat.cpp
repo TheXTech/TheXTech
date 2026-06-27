@@ -33,7 +33,6 @@ void Config_t::LoadLegacyCompat(IniProcessing* ini, ConfigSetLevel level)
 {
     ini->beginGroup("compatibility");
     {
-        std::string buffer;
         if(ini->hasKey("enable-last-warp-hub-resume"))
         {
             ini->read("enable-last-warp-hub-resume", enable_last_warp_hub_resume.m_value, true);
