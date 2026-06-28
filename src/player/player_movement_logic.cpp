@@ -553,11 +553,11 @@ void PlayerMovementY(int A)
             if(Player[A].Location.SpeedY == 0 || Player[A].Slope > 0 || (Player[A].StandingOnNPC != 0 && Player[A].Location.Y + Player[A].Location.Height >= NPC[Player[A].StandingOnNPC].Location.Y - NPC[Player[A].StandingOnNPC].Location.SpeedY))
             {
                 num_t rel_speed = Player[A].Location.SpeedX - floor_speed;
-                if(aquatic_jumps && Player[A].SwimCount > 0)
+                if(aquatic_jumps && Player[A].SwimCount > 16)
                 {
                     // wait for player to get some friction
                 }
-                else if((Player[A].Controls.Left && rel_speed <= 0) || (Player[A].Controls.Right && rel_speed >= 0))
+                else if((Player[A].Controls.Left && rel_speed <= 0) || (Player[A].Controls.Right && rel_speed >= 0) || (aquatic_jumps && Player[A].SwimCount <= 0))
                 {
                     Player[A].Location.SpeedY = -4.1_n + NPC[Player[A].StandingOnNPC].Location.SpeedY;
 
@@ -570,9 +570,9 @@ void PlayerMovementY(int A)
                         if(SuperSpeed)
                             Player[A].Location.SpeedX *= 2;
 
-                        Player[A].SwimCount = 35;
+                        Player[A].SwimCount = 36 + 16;
                         if(Player[A].Character == 4)
-                            Player[A].SwimCount = 32;
+                            Player[A].SwimCount = 32 + 16;
 
                         PlaySoundSpatial(SFX_Swim, Player[A].Location);
                     }
