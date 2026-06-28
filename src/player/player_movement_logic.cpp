@@ -573,6 +573,8 @@ void PlayerMovementY(int A)
                         Player[A].SwimCount = 35;
                         if(Player[A].Character == 4)
                             Player[A].SwimCount = 32;
+
+                        PlaySoundSpatial(SFX_Swim, Player[A].Location);
                     }
                 }
                 else
