@@ -1828,6 +1828,20 @@ void PlayerFrame(Player_t &p)
     if(p.State == PLR_STATE_CYCLONE && !p.DoubleJump && (p.Jump || (p.Controls.Down && p.Location.SpeedY > Physics.PlayerTerminalVelocity * 0.9_n)))
         s_makeDust(p, 2, tempLocation);
 
+    if(LevelMacro == LEVELMACRO_FLAG_EXIT && p.Location.SpeedY == 2)
+    {
+        p.Direction = 1;
+
+        if(p.Character == 5)
+            p.Frame = 11;
+        else if((p.Character == 1 || p.Character == 2) && p.State == 1)
+            p.Frame = -4;
+        else
+            p.Frame = -6;
+
+        return;
+    }
+
 // find frames for link
     if(p.Character == 5)
     {
