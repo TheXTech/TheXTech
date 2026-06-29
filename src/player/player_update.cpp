@@ -268,7 +268,7 @@ bool UpdatePlayer()
                 if(Player[A].CurMazeZone)
                     PlayerMazeZoneMovement(A);
                 // first stage of flag exit
-                else if(LevelMacro == LEVELMACRO_FLAG_EXIT && LevelMacroWhich < 0)
+                else if(LevelMacro == LEVELMACRO_FLAG_EXIT && LevelMacroCounter < 0)
                     PlayerFlagSlideMovement(A);
                 // normal player movement
                 else

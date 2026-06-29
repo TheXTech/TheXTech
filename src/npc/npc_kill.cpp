@@ -1631,6 +1631,14 @@ resume_TriggerLast:
             NPC[NPC[A].Special2].Special2 = A;
         else if(NPC[A].Type == NPCID_TOOTHY && NPC[A].Special2 > 0)
             NPC[NPC[A].Special2].Special2 = A;
+
+        if(LevelMacro == LEVELMACRO_FLAG_EXIT)
+        {
+            if(LevelMacroWhich == A)
+                LevelMacroWhich = 0;
+            else if(LevelMacroWhich == numNPCs + 1)
+                LevelMacroWhich = A;
+        }
     }
     else
     {

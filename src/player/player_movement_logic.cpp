@@ -1540,8 +1540,12 @@ void PlayerFlagSlideMovement(int A)
     // have we hit the ground yet?
     if(Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC)
     {
-        // this results in waiting 16 frames after hitting the ground
-        LevelMacroWhich++;
+        // this results in waiting 16 frames after both the player and the flag are on the ground
+        if(!LevelMacroWhich || NPC[LevelMacroWhich].Special)
+            LevelMacroCounter++;
+
+        if(LevelMacroCounter == 0)
+            LevelMacroCounter = 240;
     }
     else
     {

@@ -2176,7 +2176,8 @@ void UpdateMacro()
             }
         }
 
-        LevelMacroCounter++;
+        if(LevelMacro != LEVELMACRO_FLAG_EXIT || LevelMacroCounter >= 0)
+            LevelMacroCounter++;
 
         if(g_config.EnableInterLevelFade && LevelMacroCounter == 598)
         {

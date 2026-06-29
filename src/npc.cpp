@@ -2985,10 +2985,10 @@ void NPCSpecial(int A)
                             if(npc.Type == NPCID_FLAG_EXIT)
                             {
                                 LevelMacro = LEVELMACRO_FLAG_EXIT;
+                                LevelMacroWhich = A;
+                                LevelMacroCounter = -16; // 16 frames of waiting once player reaches ground
                                 // go towards the ground
                                 npc.Location.Y += 2;
-                                // wait for player to reach ground
-                                LevelMacroWhich = -16;
                                 PlaySound(SFX_FlagExit);
                             }
                             else
