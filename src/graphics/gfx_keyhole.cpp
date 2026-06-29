@@ -50,16 +50,19 @@ void RenderKeyhole(int Z)
 
     num_t keyholeBottom = (realKeyholeBottom * (128 - keyholeGrowthCoord) + idealKeyholeBottom * keyholeGrowthCoord) / 128;
 
+    int keywidth = GFXBackgroundBMP[keyhole.Type].w;
+    int keyheight = BackgroundHeight[keyhole.Type];
+
     RenderTexturePlayerScale(Z, Player[0],
-        num_t::round(vScreen[Z].X + keyhole.Location.X + keyhole.Location.Width / 2 - keyhole.Location.Width * keyholeScale / 256),
+        num_t::round(vScreen[Z].X + keyhole.Location.X + keywidth / 2 - keywidth * keyholeScale / 256),
         num_t::round(vScreen[Z].Y + keyholeBottom - 24 * keyholeScale / 128),
-        (int)(keyhole.Location.Width) * keyholeScale / 128,
-        (int)(keyhole.Location.Height) * keyholeScale / 128,
+        keywidth * keyholeScale / 128,
+        keyheight * keyholeScale / 128,
         GFXBackgroundBMP[keyhole.Type],
         0,
         0,
-        (int)(keyhole.Location.Width),
-        (int)(keyhole.Location.Height));
+        keywidth,
+        keyheight);
 
     // hide the real keyhole underneath
     if(ratio >= 164)
@@ -172,7 +175,7 @@ void RenderTexturePlayerScale(int Z, const Player_t& p,
     // basis of 128
     int scale = (ratio < 199) ? 128 : (327 - ratio);
 
-    num_t cx = vScreen[Z].X + keyhole.Location.X + keyhole.Location.Width / 2;
+    num_t cx = vScreen[Z].X + keyhole.Location.X + GFXBackgroundBMP[keyhole.Type].w / 2;
     num_t cy = vScreen[Z].Y + keyhole.Location.Y + 12;
 
     return XRender::renderTextureScaleEx(
