@@ -2202,6 +2202,11 @@ void UpdateMacro()
             // LEVELMACRO_FLAG_EXIT = 8 -> 9
             // LEVELMACRO_ALT_FLAG_EXIT = 9 -> 10 (reserved)
             LevelBeatCode = (LevelBeatCode_t)(LevelMacro + 1);
+
+            // alt flag exit
+            if(LevelMacroWhich && NPC[LevelMacroWhich].GFXSlot)
+                LevelBeatCode = BEATCODE_ALT_FLAG;
+
             LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
             EndLevel = true;
