@@ -53,7 +53,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
     int ceilingBlock1 = 0;
     int ceilingBlock2 = 0;
 
-    Location_t floorLocation; // was previously called tempLocation3
+    // Location_t floorLocation; // was previously called tempLocation3, moved into walking section
 
     // This was previously shared between players, but is safe unless Block[wallBlock] satisfies certain properties before wallBlock gets set
     num_t preWallX = 0; // The old X before player was moved -- was previously called tempSlope2X
@@ -132,16 +132,15 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                 {}
                                 else
                                 {
-                                    if(HitSpot == 1 && (Block[B].Type == 110 || Block[B].Type == 408 || Block[B].Type == 430 || Block[B].Type == 511))
+                                    if((HitSpot == 1 && (Block[B].Type == 110 || Block[B].Type == 408 || Block[B].Type == 430 || Block[B].Type == 511))
+                                        || (HitSpot == 4 && (Block[B].Type == 269 || Block[B].Type == 429))
+                                        || (HitSpot == 3 && (Block[B].Type == 268 || Block[B].Type == 407 || Block[B].Type == 431))
+                                        || (HitSpot == 2 && (Block[B].Type == 267 || Block[B].Type == 428))
+                                        || (Block[B].Type == 109))
+                                    {
                                         PlayerHurt(A);
-                                    if(HitSpot == 4 && (Block[B].Type == 269 || Block[B].Type == 429))
-                                        PlayerHurt(A);
-                                    if(HitSpot == 3 && (Block[B].Type == 268 || Block[B].Type == 407 || Block[B].Type == 431))
-                                        PlayerHurt(A);
-                                    if(HitSpot == 2 && (Block[B].Type == 267 || Block[B].Type == 428))
-                                        PlayerHurt(A);
-                                    if(Block[B].Type == 109)
-                                        PlayerHurt(A);
+                                    }
+
                                     if(Block[B].Type == 598)
                                     {
                                         if(Player[A].Mount > 0 && HitSpot == 1)
@@ -563,27 +562,18 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                     // just keep going down
                                 }
                                 else if(floorBlock == 0) // For walking
-                                {
                                     floorBlock = B;
-                                    floorLocation = Block[B].Location;
-                                }
                                 else // Find the best block to walk on if touching multiple blocks
                                 {
                                     if(g_config.fix_player_downward_clip)
                                     {
                                         if(CompareWalkBlock(floorBlock, B, Player[A].Location))
-                                        {
                                             floorBlock = B;
-                                            floorLocation = Block[B].Location;
-                                        }
                                     }
                                     else // Using old code
                                     {
                                         if(Block[B].Location.SpeedY != 0 && Block[floorBlock].Location.SpeedY == 0)
-                                        {
                                             floorBlock = B;
-                                            floorLocation = Block[B].Location;
-                                        }
                                         else if(Block[B].Location.SpeedY == 0 && Block[floorBlock].Location.SpeedY != 0)
                                         {
                                         }
@@ -601,10 +591,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
                                         // if this block is moving up give it priority
                                         if(Block[B].Location.SpeedY < 0 && Block[B].Location.Y < Block[floorBlock].Location.Y)
-                                        {
                                             floorBlock = B;
-                                            floorLocation = Block[B].Location;
-                                        }
                                     }
                                 }
 
@@ -905,6 +892,8 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
         if(!cancelWalk)
         {
+            // was previously called tempLocation3 and set whenever floorBlock (previously tempHit3) was set
+            const Location_t& floorLocation = Block[floorBlock].Location;
             Player[A].Location.Y = floorLocation.Y - Player[A].Location.Height;
 
             // NEW: move aquatic swimming player away from the floor -- helps with spikes
