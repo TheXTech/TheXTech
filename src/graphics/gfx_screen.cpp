@@ -506,7 +506,7 @@ void CenterScreens(Screen_t& screen)
         int allow_X = (vscreen.Width == Screens[vscreen.screen_ref].W) ? Screens[vscreen.screen_ref].CameraOverscanX : 0;
 
         // don't do overscan if the section will be smaller than the screen after overscan (add 1 for floating precision margin)
-        if(MaxWidth + XRender::TargetCameraOverscanX * 2 + 1 < vscreen.Width)
+        if(MaxWidth + Screens[vscreen.screen_ref].CameraOverscanX * 2 + 1 < vscreen.Width)
             allow_X = 0;
 
         MaxWidth += allow_X * 2;
