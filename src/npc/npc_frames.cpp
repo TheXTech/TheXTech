@@ -2205,10 +2205,6 @@ void NPCFrames(int A)
     {
         NPC[A].Frame = CoinFrame[2];
     }
-    else if(NPC[A].Type == NPCID_RING)
-    {
-        NPC[A].Frame = CoinFrame[3];
-    }
     // non-type based logic
     else if(NPC[A]->IsACoin) // Coin
     {
