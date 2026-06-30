@@ -40,11 +40,6 @@ static XMessage::Message msg_from_frame_no(XMessage::Type type, uint32_t frame_n
     return ret;
 }
 
-static int frame_no_from_message(XMessage::Message message)
-{
-    return (int)(message.screen << 16) | (int)(message.player << 8) | (int)(message.message << 0);
-}
-
 
 namespace XMessage
 {
@@ -123,6 +118,11 @@ void TCPWrapper::ShiftBuffer(size_t shift)
     size_t to_move = buffer_used - shift;
     SDL_memmove(&buffer[0], &buffer[shift], to_move);
     buffer_used = to_move;
+}
+
+int NetworkClient::frame_no_from_message(XMessage::Message message)
+{
+    return (int)(message.screen << 16) | (int)(message.player << 8) | (int)(message.message << 0);
 }
 
 XMessage::Message NetworkClient::ParseMessage(const uint8_t* message)
@@ -205,7 +205,6 @@ void NetworkClient::Startup()
     if(!status_sync_lock)
         status_sync_lock = SDL_CreateMutex();
 
-    SDL_AtomicSet(&message_buffer_state, REQUEST_IDLE);
     SDL_AtomicSet(&status_req_id, 0);
     SDL_AtomicSet(&status_req_completed, 0);
     SDL_AtomicSet(&status_alarm_id, 0);
@@ -263,6 +262,21 @@ void NetworkClient::push_completed_request()
     push_status();
     SDL_AtomicSet(&status_req_completed, status_req_id_seen);
     status_req_in_progress = 0;
+}
+
+MutexSent NetworkClient::get_session_access()
+{
+    // cached copy - don't even try if there isn't a request we're trying to handle
+    if(status_req.client_state < CLIENT_MIN_ACTIVE_STATE)
+        return MutexSent(nullptr);
+
+    MutexSent ret(status_req_sync_lock);
+
+    // don't return a valid mutex (and modify the session) if the client doesn't want active NetPlay right now
+    if(status_req_sync.client_state < CLIENT_MIN_ACTIVE_STATE)
+        ret.release();
+
+    return ret;
 }
 
 void NetworkClient::Connect(const char* host, int port)
@@ -375,42 +389,73 @@ void NetworkClient::LeaveRoom()
     SDLNet_TCP_Send(tcp_control.socket, to_send, 4);
 }
 
-void NetworkClient::SendAll()
+void NetworkClient::SyncData()
 {
-    if(!tcp_data.socket)
+    if(!tcp_data.socket || status.client_state < CLIENT_MIN_ACTIVE_STATE)
         return;
 
-    send_buffer.current_frame = g_session.current_frame;
+    auto session_access = get_session_access();
+    if(!session_access)
+        return;
 
-    if(!message_buffer.empty())
+    // checks if there was a new frame on the main thread's side
+    bool new_frame = (g_session.current_frame > temp_state.current_frame);
+    bool is_waiting = (g_session.current_frame > g_session.available_frame);
+
+    temp_state.current_frame = g_session.current_frame;
+
+    if(new_frame && !g_session.submit_buffer.empty())
     {
-        send_buffer.messages.push_back(msg_from_frame_no(Type::frame_begin, g_session.current_frame));
+        // maybe use remote_frame here?? prevents killing some un-acked messages
+        send_buffer.messages.push_back(msg_from_frame_no(Type::frame_begin, temp_state.current_frame));
 
-        for(Message msg : message_buffer)
+        for(Message msg : g_session.submit_buffer)
+        {
             send_buffer.messages.push_back(msg);
+            if(max_debug)
+                pLogDebug("Message send %d %d %d %d %d", temp_state.current_frame, (int)msg.type, msg.screen, msg.player, msg.message);
+        }
 
-        message_buffer.clear();
+        g_session.submit_buffer.clear();
 
         if(!ping_send_frame)
         {
-            if(udp_packet_recd > 0 || g_session.current_frame - acked_frame > 60)
+            if(udp_packet_recd > 0 || temp_state.current_frame - acked_frame > 60)
             {
-                ping_send_frame = g_session.current_frame;
+                ping_send_frame = temp_state.current_frame;
                 ping_send_ms = SDL_GetTicks();
             }
         }
     }
 
-    bool fast_forward = (g_session.available_frame > g_session.current_frame + 10);
-    if(!send_buffer.messages.empty() || !fast_forward)
-        SendData();
+    // remote_frame is explicitly specified, available_frame is implicit
+    if(temp_state.available_frame > temp_state.remote_frame)
+        temp_state.remote_frame = temp_state.available_frame;
 
-    SDL_AtomicSet(&message_buffer_state, REQUEST_PENDING);
+    // sync values from temp_state to g_session
+    g_session.available_frame = temp_state.available_frame;
+    g_session.remote_frame = temp_state.remote_frame;
+
+    // FIXME: can throw
+    for(Message msg : temp_state.new_history)
+        g_session.history.push_back(msg);
+
+    session_access.release();
+
+    // no longer waiting? wake up main thread!
+    if(is_waiting && temp_state.available_frame >= temp_state.current_frame)
+        SDL_SemPost(game_wakeup);
+
+    temp_state.new_history.clear();
+
+    bool fast_forward = (temp_state.remote_frame > temp_state.current_frame + 10);
+    if(!send_buffer.messages.empty() || (new_frame && !fast_forward))
+        SendData();
 }
 
 void NetworkClient::SendData()
 {
-    if(send_buffer.current_frame < 0)
+    if(temp_state.current_frame < 0)
         return;
 
     // remove any ACKed messages from send buffer
@@ -419,6 +464,8 @@ void NetworkClient::SendData()
         Message front = send_buffer.messages.front();
         if(front.type == Type::frame_begin && frame_no_from_message(front) > acked_frame)
             break;
+        else if(max_debug && front.type == Type::frame_begin)
+            pLogDebug("Killed acked message (%d <= %d)", frame_no_from_message(front), acked_frame);
 
         send_buffer.messages.pop_front();
     }
@@ -436,7 +483,7 @@ void NetworkClient::SendData()
     to_send.reserve(4096);
 
     // temporary marker to let server know how far the client has ACKed
-    send_buffer.messages.push_back(msg_from_frame_no(Type::frame_end, send_buffer.current_frame));
+    send_buffer.messages.push_back(msg_from_frame_no(Type::frame_end, temp_state.current_frame));
 
     for(XMessage::Message m : send_buffer.messages)
     {
@@ -462,6 +509,8 @@ void NetworkClient::SendData()
     // fallback to TCP if UDP is unavailable or unfeasible
     else
     {
+        // WARNING: at this point, we don't currently have a safe transition back to UDP.
+        // Eventually, add a special header for the UDP packet following a TCP transmission.
         // send_buffer.udp_transmission.clear();
         send_buffer.messages.clear();
         for(uint8_t c : to_send)
@@ -473,6 +522,18 @@ void NetworkClient::SendData()
     // update any TCP transmission in progress
     if(!send_buffer.tcp_transmit_in_progress.empty())
     {
+        if(max_debug)
+        {
+            std::string out;
+            for(int i = send_buffer.tcp_transmit_pos; i < (int)send_buffer.tcp_transmit_in_progress.size(); i++)
+            {
+                out += std::to_string((int)send_buffer.tcp_transmit_in_progress[i]);
+                out += ' ';
+            }
+
+            pLogDebug("TCP transmit %s", out.c_str());
+        }
+
         send_buffer.tcp_transmit_pos += SDLNet_TCP_Send(tcp_data.socket,
             send_buffer.tcp_transmit_in_progress.data() + send_buffer.tcp_transmit_pos,
             send_buffer.tcp_transmit_in_progress.size() - send_buffer.tcp_transmit_pos);
@@ -500,16 +561,16 @@ void NetworkClient::ReceiveData()
             frame_no = frame_no_from_message(got);
 
             // previous TCP frame is finished!
-            if(receive_buffer.tcp_frame_index > g_session.available_frame)
+            if(receive_buffer.tcp_frame_index > temp_state.available_frame)
             {
                 for(Message msg : receive_buffer.tcp_frame_in_progress)
                 {
-                    g_session.history.push_back(msg);
+                    temp_state.new_history.push_back(msg);
                     if(max_debug)
                         pLogDebug("TCP message get: %d %d %d %d", (int)msg.type, msg.screen, msg.player, msg.message);
                 }
 
-                g_session.available_frame = receive_buffer.tcp_frame_index;
+                temp_state.available_frame = receive_buffer.tcp_frame_index;
             }
 
             receive_buffer.tcp_frame_in_progress.clear();
@@ -520,8 +581,8 @@ void NetworkClient::ReceiveData()
             }
             else if(got.type == XMessage::Type::frame_end)
             {
-                if(frame_no > g_session.available_frame)
-                    g_session.available_frame = frame_no;
+                if(frame_no > temp_state.available_frame)
+                    temp_state.available_frame = frame_no;
 
                 receive_buffer.tcp_frame_index = -1;
                 break;
@@ -529,7 +590,7 @@ void NetworkClient::ReceiveData()
 
             // fallthrough
         default:
-            if(receive_buffer.tcp_frame_index > g_session.available_frame)
+            if(receive_buffer.tcp_frame_index > temp_state.available_frame)
                 receive_buffer.tcp_frame_in_progress.push_back(got);
         }
     }
@@ -562,7 +623,7 @@ void NetworkClient::ReceiveData()
             // can recognize acks here soon
             case(XMessage::Type::transmit_start):
                 acked_frame = frame_no_from_message(got);
-                if(acked_frame > g_session.available_frame + 1)
+                if(acked_frame > temp_state.available_frame + 1)
                 {
                     // prematurely received packet
                     goto skip_packet;
@@ -571,30 +632,30 @@ void NetworkClient::ReceiveData()
                 if(acked_frame >= ping_send_frame && ping_send_frame != 0)
                 {
                     latency_ms = SDL_GetTicks() - ping_send_ms;
-                    latency_frames = g_session.current_frame - ping_send_frame;
+                    latency_frames = temp_state.current_frame - ping_send_frame;
                     ping_send_frame = 0;
                     pLogDebug("UDP latency: %u ms, %d ticks", latency_ms, latency_frames);
                 }
                 break;
             case(XMessage::Type::frame_end):
                 udp_frame_index = frame_no_from_message(got);
-                if(udp_frame_index > g_session.available_frame)
-                    g_session.available_frame = udp_frame_index;
+                if(udp_frame_index > temp_state.available_frame)
+                    temp_state.available_frame = udp_frame_index;
                 break;
             case(XMessage::Type::frame_begin):
                 udp_frame_index = frame_no_from_message(got);
             // fallthrough
             default:
-                if(udp_frame_index > g_session.available_frame)
+                if(udp_frame_index > temp_state.available_frame)
                 {
-                    g_session.history.push_back(got);
+                    temp_state.new_history.push_back(got);
 
                     if(max_debug)
                         pLogDebug("UDP message get: %d %d %d %d", (int)got.type, got.screen, got.player, got.message);
                 }
                 else
                 {
-                    // pLogDebug("UDP stale message get: %d %d %d %d [%d %d]", got.type, got.screen, got.player, got.message, udp_frame_index, g_session.available_frame);
+                    // pLogDebug("UDP stale message get: %d %d %d %d [%d %d]", got.type, got.screen, got.player, got.message, udp_frame_index, temp_state.available_frame);
                 }
                 break;
             }
@@ -605,43 +666,11 @@ skip_packet:
     }
 }
 
-bool NetworkClient::WaitAndFill()
-{
-    // use the receive buffer to fill a frame if possible
-    // FIXME: all of this logic should probably happen elsewhere
-    if(g_session.available_frame >= g_session.current_frame)
-    {
-        while(g_session.next_message < g_session.history.size())
-        {
-            Message front = g_session.history[g_session.next_message];
-            if(front.type == Type::frame_begin && frame_no_from_message(front) > g_session.current_frame)
-                break;
-
-            g_session.next_message++;
-            if(max_debug)
-                pLogDebug("Message push: %d %d %d %d %d", g_session.current_frame, (int)front.type, front.screen, front.player, front.message);
-
-            if(front.type != Type::frame_begin)
-                message_buffer.push_back(front);
-        }
-
-        // pLogDebug("UDP packets sent %d recv %d", udp_packet_sent, udp_packet_recd);
-
-        // FIXME: should happen elsewhere
-        g_session.current_frame++;
-        return true;
-    }
-
-    return false;
-}
-
 void NetworkClient::client_loop()
 {
-    // bool fast_forward = (status.client_state > CLIENT_LOBBY) && (g_session.available_frame > g_session.current_frame + 8);
     if(!tcp_control.socket || !SDLNet_CheckSockets(socket_set, 0))
     {
         // currently, sleep 2ms here (waiting on messages from the main thread), then check again
-        // if(!fast_forward)
         SDL_SemWaitTimeout(client_wakeup, 2);
 
         if(tcp_control.socket)
@@ -657,9 +686,6 @@ void NetworkClient::client_loop()
             status = ClientStatus();
             push_completed_request();
         }
-
-        if(SDL_AtomicGet(&message_buffer_state) == REQUEST_PENDING)
-            SDL_AtomicSet(&message_buffer_state, REQUEST_COMPLETED);
     }
 
     pull_status_req();
@@ -709,20 +735,28 @@ void NetworkClient::client_loop()
                 }
                 else if(status_req.client_state == CLIENT_HOST)
                 {
-                    uint32_t session_size = 9 + g_session.save_data.size();
+                    MutexSent session_access = get_session_access();
 
-                    // encode session here
-                    std::array<uint8_t, 14> to_send_a =
+                    if(session_access)
                     {
-                        HEADER_PUT_SESSION,
-                        uint8_t(session_size >> 24), uint8_t(session_size >> 16), uint8_t(session_size >> 8), uint8_t(session_size >> 0),
-                        uint8_t(g_session.random_seed  >> 24), uint8_t(g_session.random_seed  >> 16), uint8_t(g_session.random_seed  >> 8), uint8_t(g_session.random_seed  >> 0),
-                        g_session.init_char_select[0], g_session.init_char_select[1], g_session.init_char_select[2], g_session.init_char_select[3],
-                        g_session.save_present
-                    };
+                        uint32_t session_size = 9 + g_session.save_data.size();
 
-                    SDLNet_TCP_Send(tcp_control.socket, to_send_a.data(), to_send_a.size());
-                    SDLNet_TCP_Send(tcp_control.socket, g_session.save_data.data(), g_session.save_data.size());
+                        // encode session here
+                        std::array<uint8_t, 14> to_send_a =
+                        {
+                            HEADER_PUT_SESSION,
+                            uint8_t(session_size >> 24), uint8_t(session_size >> 16), uint8_t(session_size >> 8), uint8_t(session_size >> 0),
+                            uint8_t(g_session.random_seed  >> 24), uint8_t(g_session.random_seed  >> 16), uint8_t(g_session.random_seed  >> 8), uint8_t(g_session.random_seed  >> 0),
+                            g_session.init_char_select[0], g_session.init_char_select[1], g_session.init_char_select[2], g_session.init_char_select[3],
+                            g_session.save_present
+                        };
+
+                        // FIXME: blocking while lock is held
+                        SDLNet_TCP_Send(tcp_control.socket, to_send_a.data(), to_send_a.size());
+                        SDLNet_TCP_Send(tcp_control.socket, g_session.save_data.data(), g_session.save_data.size());
+                    }
+                    else
+                        Disconnect();
                 }
             }
             else if(status_req.client_state == CLIENT_GUEST)
@@ -779,9 +813,8 @@ void NetworkClient::client_loop()
         return;
     }
 
-    // section to send pending messages
-    if(SDL_AtomicGet(&message_buffer_state) == REQUEST_SUBMIT)
-        SendAll();
+    // section to send pending messages, and update the main thread if needed
+    SyncData();
 
     // section to handle incoming TCP control messages
     if(tcp_control.FillBufferTo_NB(1))
@@ -822,7 +855,7 @@ void NetworkClient::client_loop()
 
             status.client_index = buffer[5];
 
-            fast_forward_to = ((int)buffer[6] << 16) | ((int)buffer[7] << 8) | ((int)buffer[8] << 0);
+            temp_state.remote_frame = ((int)buffer[6] << 16) | ((int)buffer[7] << 8) | ((int)buffer[8] << 0);
 
             session_key = ((uint32_t)buffer[9] << 24) | ((uint32_t)buffer[10] << 16) | ((uint32_t)buffer[11] << 8) | ((uint32_t)buffer[12] << 0);
 
@@ -870,10 +903,9 @@ void NetworkClient::client_loop()
             send_buffer = SendBuffer();
 
             // copying previously-existing logic from receive_buffer reinitialization, but these should probably happen elsewhere
-            g_session.current_frame = 0;
-            g_session.available_frame = -1;
-            g_session.history.clear();
-            g_session.next_message = 0;
+            temp_state.current_frame = 0;
+            temp_state.available_frame = -1;
+            temp_state.new_history.clear();
 
             pLogInfo("NetPlay: joining room %s", DisplayRoom(status.room_info.room_key).room_name);
 
@@ -911,30 +943,42 @@ void NetworkClient::client_loop()
             if(session_size < 9 || session_size > 2048000)
                 Disconnect();
 
-            // note: not NB
+            // FIXME: not NB, should be checking for cancel
             if(!tcp_control.FillBufferTo(9))
                 Disconnect();
 
             if(status_req_in_progress == REQUEST_PENDING && status.client_state == CLIENT_SESSION_CONFIG)
             {
-                // lots of access to g_session here...
-                g_session.random_seed = ((uint32_t)tcp_control.buffer[0] << 24) | ((uint32_t)tcp_control.buffer[1] << 16) | ((uint32_t)tcp_control.buffer[2] << 8) | ((uint32_t)tcp_control.buffer[3] << 0);
-                g_session.init_char_select[0] = tcp_control.buffer[4];
-                g_session.init_char_select[1] = tcp_control.buffer[5];
-                g_session.init_char_select[2] = tcp_control.buffer[6];
-                g_session.init_char_select[3] = tcp_control.buffer[7];
-                g_session.save_present = tcp_control.buffer[8];
+                auto session_access = get_session_access();
+                if(session_access)
+                {
+                    g_session.random_seed = ((uint32_t)tcp_control.buffer[0] << 24) | ((uint32_t)tcp_control.buffer[1] << 16) | ((uint32_t)tcp_control.buffer[2] << 8) | ((uint32_t)tcp_control.buffer[3] << 0);
+                    g_session.init_char_select[0] = tcp_control.buffer[4];
+                    g_session.init_char_select[1] = tcp_control.buffer[5];
+                    g_session.init_char_select[2] = tcp_control.buffer[6];
+                    g_session.init_char_select[3] = tcp_control.buffer[7];
+                    g_session.save_present = tcp_control.buffer[8];
+
+                    session_size -= 9;
+
+                    // FIXME: may throw
+                    g_session.save_data.resize(session_size);
+                }
+                else
+                {
+                    session_size = 0;
+                    Disconnect();
+                }
+
+                session_access.release();
 
                 tcp_control.ShiftBuffer(9);
 
-                session_size -= 9;
-
-                // note: may throw
-                g_session.save_data.resize(session_size);
-
+                // yes, we're accessing this memory directly, because we know exactly where this gets called from
                 char* dest = &g_session.save_data[0];
                 while(session_size > 0)
                 {
+                    // FIXME: not NB, should be checking for cancel
                     size_t want_bytes = SDL_min(network_client_buffer_size, session_size);
                     if(!tcp_control.FillBufferTo(want_bytes))
                     {
@@ -942,6 +986,7 @@ void NetworkClient::client_loop()
                         break;
                     }
 
+                    // note: direct access
                     SDL_memcpy(dest, tcp_control.buffer, want_bytes);
 
                     dest += want_bytes;
@@ -967,10 +1012,13 @@ void NetworkClient::client_loop()
 
             acked_frame = ((int)tcp_control.buffer[1] << 16) | ((int)tcp_control.buffer[2] << 8) | ((int)tcp_control.buffer[3] << 0);
 
+            if(max_debug)
+                pLogDebug("TCP ack %d", acked_frame);
+
             if(acked_frame >= ping_send_frame && ping_send_frame != 0)
             {
                 latency_ms = SDL_GetTicks() - ping_send_ms;
-                latency_frames = g_session.current_frame - ping_send_frame;
+                latency_frames = temp_state.current_frame - ping_send_frame;
                 ping_send_frame = 0;
                 pLogDebug("TCP latency: %u ms, %d ticks", latency_ms, latency_frames);
             }
@@ -983,26 +1031,19 @@ void NetworkClient::client_loop()
             if(!tcp_control.FillBufferTo_NB(4))
                 return;
 
-            // fixme: consider how to handle
-            fast_forward_to = ((int)tcp_control.buffer[1] << 16) | ((int)tcp_control.buffer[2] << 8) | ((int)tcp_control.buffer[3] << 0);
+            temp_state.remote_frame = ((int)tcp_control.buffer[1] << 16) | ((int)tcp_control.buffer[2] << 8) | ((int)tcp_control.buffer[3] << 0);
 
             tcp_control.ShiftBuffer(4);
         }
     }
 
-    // handle incoming data messages from TCP data channel
-    if(status.client_state > CLIENT_LOBBY)
+    // handle incoming data messages from TCP/UDP data channels
+    if(status.client_state >= CLIENT_MIN_ACTIVE_STATE)
     {
-        // if(!fast_forward)
-        //     SendData();
-
+        bool is_waiting = (temp_state.available_frame < temp_state.current_frame);
         ReceiveData();
-
-        if(SDL_AtomicGet(&message_buffer_state) == REQUEST_PENDING && WaitAndFill())
-        {
-            SDL_AtomicSet(&message_buffer_state, REQUEST_COMPLETED);
-            SDL_SemPost(game_wakeup);
-        }
+        if(is_waiting && temp_state.available_frame >= temp_state.current_frame)
+            SyncData();
     }
 }
 

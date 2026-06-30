@@ -20,6 +20,7 @@
 
 #include <deque>
 
+#include "Logger/logger.h"
 #include "controls.h"
 #include "message.h"
 #include "globals.h"
@@ -144,7 +145,7 @@ bool CompleteRequest()
 
 Status GetStatus()
 {
-    if(s_game_thread.status_req.client_state >= CLIENT_ACTIVE_START)
+    if(s_game_thread.status_req.client_state >= CLIENT_MIN_ACTIVE_STATE)
     {
         if(s_in_fast_forward)
             return Status::replay;
@@ -155,19 +156,68 @@ Status GetStatus()
         return Status::local;
 }
 
-void ClientFrameSync(std::deque<Message>& buffer)
+void ClientFrameSync(std::vector<Message>& submit_buffer, std::vector<Message>& message_vector)
 {
-    bool start_fast_forward = (g_session.current_frame < s_network_client.fast_forward_to - 8);
-    bool end_fast_forward = (g_session.current_frame >= s_network_client.fast_forward_to);
+    SDL_LockMutex(s_network_client.status_req_sync_lock);
+
+    g_session.current_frame++;
+
+    int remote_frame = g_session.remote_frame;
+    int current_frame = g_session.current_frame;
+
+    bool start_fast_forward = (current_frame < remote_frame - 8);
+    bool end_fast_forward = (current_frame >= remote_frame);
+
+    // submit requested messages
+    // warning: can throw
+    for(Message i : submit_buffer)
+        g_session.submit_buffer.push_back(i);
+
+    submit_buffer.clear();
+
+    // wait for network thread to prepare current frame
+    while(g_session.available_frame < current_frame && GameIsActive)
+    {
+        SDL_UnlockMutex(s_network_client.status_req_sync_lock);
+        SDL_SemPost(s_network_client.client_wakeup);
+
+        // wait for a wakeup call from the network thread, refreshing events every 5ms
+        SDL_SemWaitTimeout(s_network_client.game_wakeup, 5);
+
+        // this is the frame loop for waiting
+        XEvents::doEvents();
+
+        SDL_LockMutex(s_network_client.status_req_sync_lock);
+    }
+
+    // fill buffer of events that happened
+    while(g_session.next_message < g_session.history.size())
+    {
+        Message front = g_session.history[g_session.next_message];
+        if(front.type == Type::frame_begin && NetworkClient::frame_no_from_message(front) > current_frame)
+            break;
+
+        g_session.next_message++;
+        // if(max_debug)
+        //     pLogDebug("Message get: %d %d %d %d %d", current_frame, (int)front.type, front.screen, front.player, front.message);
+
+        if(front.type != Type::frame_begin)
+            message_vector.push_back(front);
+    }
+
+    // update current frame and unlock mutex
+    SDL_UnlockMutex(s_network_client.status_req_sync_lock);
+
+    // local logic: handle fast-forward
     if(!s_in_fast_forward && start_fast_forward)
     {
         s_in_fast_forward = true;
         s_fast_forward_begin_ms = SDL_GetTicks();
-        s_fast_forward_begin_frame = g_session.current_frame;
+        s_fast_forward_begin_frame = current_frame;
     }
     else if(s_in_fast_forward)
     {
-        IndicateProgress(s_fast_forward_begin_ms, num_t(g_session.current_frame - s_fast_forward_begin_frame) / (s_network_client.fast_forward_to - s_fast_forward_begin_frame), "Loading game history...");
+        IndicateProgress(s_fast_forward_begin_ms, num_t(current_frame - s_fast_forward_begin_frame) / (remote_frame - s_fast_forward_begin_frame), "Loading game history...");
 
         if(end_fast_forward)
         {
@@ -178,26 +228,6 @@ void ClientFrameSync(std::deque<Message>& buffer)
             UpdateInternalRes();
         }
     }
-
-    SDL_assert_release(SDL_AtomicGet(&s_network_client.message_buffer_state) == REQUEST_IDLE);
-
-    std::swap(s_network_client.message_buffer, buffer);
-
-    SDL_AtomicSet(&s_network_client.message_buffer_state, REQUEST_SUBMIT);
-    SDL_SemPost(s_network_client.client_wakeup);
-
-    while(SDL_AtomicGet(&s_network_client.message_buffer_state) != REQUEST_COMPLETED && GameIsActive)
-    {
-        // wait for a wakeup call from the network thread, refreshing events every 5ms
-        if(SDL_SemWaitTimeout(s_network_client.game_wakeup, 5) < 0)
-        {
-            XEvents::doEvents();
-        }
-    }
-
-    std::swap(s_network_client.message_buffer, buffer);
-
-    SDL_AtomicSet(&s_network_client.message_buffer_state, REQUEST_IDLE);
 }
 
 bool RequestFillRoomInfo(uint32_t room_key)
@@ -219,16 +249,32 @@ const RoomInfo* GetRoomInfo()
 
 void JoinNewRoom(const RoomInfo& room_info)
 {
+    XMessage::g_session.random_seed = iRand(2147483647);
+
+    XMessage::g_session.current_frame = 0;
+    XMessage::g_session.available_frame = -1;
+    XMessage::g_session.remote_frame = -1;
+
+    XMessage::g_session.submit_buffer.clear();
+    XMessage::g_session.history.clear();
+    XMessage::g_session.next_message = 0;
+
     s_game_thread.status_req.client_state = CLIENT_HOST;
     s_game_thread.status_req.room_info = room_info;
-
-    XMessage::g_session.random_seed = iRand(2147483647);
 
     s_game_thread.push_status_req();
 }
 
 void JoinRoom(uint32_t room_key)
 {
+    XMessage::g_session.current_frame = 0;
+    XMessage::g_session.available_frame = -1;
+    XMessage::g_session.remote_frame = -1;
+
+    XMessage::g_session.submit_buffer.clear();
+    XMessage::g_session.history.clear();
+    XMessage::g_session.next_message = 0;
+
     s_game_thread.status_req.client_state = CLIENT_GUEST;
     s_game_thread.status_req.room_info.room_key = room_key;
 

@@ -112,17 +112,67 @@ struct RecvBuffer
 struct SendBuffer
 {
     std::deque<Message> messages;
-    int current_frame = -1;
 
     std::vector<uint8_t> tcp_transmit_in_progress;
     size_t tcp_transmit_pos = 0;
 };
 
+struct MutexSent final
+{
+    SDL_mutex* mutex = nullptr;
+
+    MutexSent(const MutexSent&) = delete;
+    MutexSent& operator=(const MutexSent&) = delete;
+    MutexSent(MutexSent&& o)
+    {
+        release();
+        mutex = o.mutex;
+        o.mutex = nullptr;
+    }
+
+    MutexSent(SDL_mutex* _mutex)
+    {
+        mutex = _mutex;
+
+        if(mutex)
+            SDL_LockMutex(mutex);
+    }
+
+    ~MutexSent()
+    {
+        release();
+    }
+
+    void release()
+    {
+        if(mutex)
+            SDL_UnlockMutex(mutex);
+
+        mutex = nullptr;
+    }
+
+    operator bool() const
+    {
+        return this->mutex;
+    }
+};
+
 int client_thread(void* _client);
+
+struct NetworkClientState
+{
+    int current_frame = 0;
+    int available_frame = -1;
+    int remote_frame = -1;
+
+    std::vector<Message> new_history;
+};
 
 struct NetworkClient
 {
     friend int client_thread(void* _client);
+
+    static int frame_no_from_message(XMessage::Message message);
 
     // synchronization state
 public:
@@ -159,6 +209,8 @@ private:
     void push_status();
     void push_completed_request();
 
+    MutexSent get_session_access();
+
 private:
     TCPWrapper tcp_control;
     TCPWrapper tcp_data;
@@ -174,14 +226,10 @@ private:
     RecvBuffer receive_buffer;
     SendBuffer send_buffer;
 
-    // public for now, but this is not desired
-public:
-    int fast_forward_to = INT_MAX;
-
-    SDL_atomic_t message_buffer_state;
-    std::deque<Message> message_buffer;
-
 private:
+    // network thread's copy of critical game state, to avoid needing to synchronize prematurely.
+    NetworkClientState temp_state;
+
     // ping info
     int ping_send_frame = -1;
     uint32_t ping_send_ms = 0;
@@ -200,8 +248,8 @@ private:
     // misc in-game calls
     void LeaveRoom();
 
-    // load messages into send buffer
-    void SendAll();
+    // load messages into send buffer, and store history into g_session
+    void SyncData();
 
     // transmit messages
     void SendData();

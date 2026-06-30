@@ -18,8 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <deque>
-
 #include "controls.h"
 #include "message.h"
 #include "globals.h"
@@ -29,6 +27,8 @@
 #include "main/cheat_code.h"
 #include "main/screen_pause.h"
 
+#include <Logger/logger.h>
+
 #ifdef THEXTECH_ENABLE_SDL_NET
 #   include "main/client_methods.h"
 #endif
@@ -36,7 +36,11 @@
 namespace XMessage
 {
 
-static std::deque<Message> s_message_vector;
+#ifdef THEXTECH_ENABLE_SDL_NET
+static std::vector<Message> s_message_submit_queue;
+#endif
+
+static std::vector<Message> s_message_vector;
 Session g_session;
 
 static Controls_t s_last_controls[maxNetplayPlayers + 1];
@@ -206,13 +210,23 @@ void Tick()
 #ifdef THEXTECH_ENABLE_SDL_NET
     // sync state with other clients here
     if(XMessage::GetStatus() != XMessage::Status::local)
-        ClientFrameSync(s_message_vector);
+        ClientFrameSync(s_message_submit_queue, s_message_vector);
+    else
+    {
+        // fixme: should include a history update, maybe even reuse code from above
+        if(!s_message_submit_queue.empty())
+        {
+            for(Message m : s_message_submit_queue)
+                s_message_vector.push_back(m);
+            s_message_submit_queue.clear();
+        }
+    }
 #endif
 
     // update player controls based on message queue
-    Message m;
-    while((m = PopMessage()))
+    for(Message m : s_message_vector)
         Handle(m);
+    s_message_vector.clear();
 
     int numPlayers_p = numPlayers;
 
@@ -226,24 +240,17 @@ void Tick()
 
 void PushMessage_Direct(Message message)
 {
+#ifdef THEXTECH_ENABLE_SDL_NET
+    s_message_submit_queue.push_back(message);
+#else
     s_message_vector.push_back(message);
+#endif
 }
 
 void PushMessage(Message message)
 {
     message.screen = l_screen - &Screens[0];
     PushMessage_Direct(message);
-}
-
-Message PopMessage()
-{
-    Message ret;
-    if(s_message_vector.empty())
-        return ret;
-
-    ret = s_message_vector.front();
-    s_message_vector.pop_front();
-    return ret;
 }
 
 void PushControls(int l_player_i, const Controls_t& controls)

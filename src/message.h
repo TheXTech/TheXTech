@@ -95,8 +95,12 @@ struct Session
     // current state
     int current_frame = 0;
     int available_frame = -1;
+    int remote_frame = -1;
     std::vector<Message> history;
-    size_t next_message = 0;
+    size_t next_message = 0; // index into history
+
+    // messages to submit to the network client
+    std::vector<Message> submit_buffer;
 #endif
 };
 
@@ -107,7 +111,6 @@ void Tick();
 
 void PushMessage_Direct(Message message);
 void PushMessage(Message message);
-Message PopMessage();
 
 void PushControls(int l_player_i, const Controls_t& controls);
 

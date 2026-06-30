@@ -200,14 +200,14 @@ class Connection:
 
                 self.tcp_frame_no = -1
 
-            frame_no = message[1] * 256 * 256 + message[2] * 256 + message[3]
-            if message[0] == MESSAGE_FRAME_BEGIN:
-                self.tcp_frame_no = frame_no
-                if frame_no - 1 > self.acked_frame:
-                    self.acked_frame = frame_no - 1
-                else:
-                    if frame_no > self.acked_frame:
-                        self.acked_frame = frame_no
+            if message[0] == MESSAGE_FRAME_BEGIN or message[0] == MESSAGE_FRAME_END:
+                tcp_frame_index = message[1] * 256 * 256 + message[2] * 256 + message[3]
+                if message[0] == MESSAGE_FRAME_END and tcp_frame_index > self.acked_frame:
+                    self.acked_frame = tcp_frame_index
+                elif message[0] == MESSAGE_FRAME_BEGIN:
+                    self.tcp_frame_no = tcp_frame_index
+                    if tcp_frame_index - 1 > self.acked_frame:
+                        self.acked_frame = tcp_frame_index - 1
             elif self.tcp_frame_no > self.acked_frame:
                 self.tcp_frame_in_progress.append(message)
 
@@ -222,6 +222,14 @@ class Connection:
 
             if message[0] == MESSAGE_FRAME_BEGIN or message[0] == MESSAGE_FRAME_END:
                 udp_frame_index = message[1] * 256 * 256 + message[2] * 256 + message[3]
+
+                # FIXME: figure out whether this is a good idea
+                # bad idea because game transmits UDP starting from the first un-acked frame with inputs, but doesn't clarify which frame this is
+                # reject UDP packets that start after acked_frame, as premature.
+                # if i == 0 and udp_frame_index > self.acked_frame + 1:
+                #     print(f"Ignoring premature UDP packet (starts {udp_frame_index}, last seen {self.acked_frame})")
+                #     return
+
                 if message[0] == MESSAGE_FRAME_END and udp_frame_index > self.acked_frame:
                     self.acked_frame = udp_frame_index
                 elif udp_frame_index - 1 > self.acked_frame:

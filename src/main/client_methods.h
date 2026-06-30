@@ -25,7 +25,6 @@
 #ifndef XCLIENT_METHODS_H
 #define XCLIENT_METHODS_H
 
-#include <deque>
 #include <cstdint>
 #include <string>
 
@@ -59,8 +58,8 @@ enum ClientState
     CLIENT_LOBBY,
     CLIENT_HOST_IDLE,
     // first active state
-    CLIENT_ACTIVE_START,
-    CLIENT_HOST_SPECTATED = CLIENT_ACTIVE_START,
+    CLIENT_MIN_ACTIVE_STATE,
+    CLIENT_HOST_SPECTATED = CLIENT_MIN_ACTIVE_STATE,
     CLIENT_HOST,
     CLIENT_GUEST,
     CLIENT_SPECTATOR,
@@ -98,7 +97,7 @@ void NetShutdown();
 const ClientStatus* GetClientStatus();
 bool CompleteRequest();
 
-void ClientFrameSync(std::deque<Message>& buffer);
+void ClientFrameSync(std::vector<Message>& submit_queue, std::vector<Message>& message_vector);
 
 bool RequestFillRoomInfo(uint32_t room_key);
 const RoomInfo* GetRoomInfo();
