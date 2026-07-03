@@ -33,10 +33,8 @@ void UpdatePlayerTimeToLive(int A)
         gDeathCounter.MarkDeath();
 
     const Screen_t& screen = ScreenByPlayer(A);
-    bool dynamic_screen = (screen.Type == ScreenTypes::Dynamic);
     bool shared_screen = (screen.Type == ScreenTypes::SharedScreen);
-    bool split_screen = (screen.active_end() - screen.active_begin() > 1);
-    bool normal_multiplayer = (dynamic_screen || shared_screen || split_screen || XMessage::GetStatus() != XMessage::Status::local);
+    bool normal_multiplayer = (numPlayers > 1 && !g_ClonedPlayerMode);
 
     bool player_timer_done = (Player[A].TimeToLive >= 200);
 
