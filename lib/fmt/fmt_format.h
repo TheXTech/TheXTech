@@ -59,7 +59,7 @@
 # define FMT_HAS_STRING_VIEW 0
 #endif
 
-#if defined _SECURE_SCL && _SECURE_SCL && _MSC_VER < 1938
+#if defined _SECURE_SCL && _SECURE_SCL && defined _MSC_VER && _MSC_VER < 1938
 # define FMT_SECURE_SCL _SECURE_SCL
 #else
 # define FMT_SECURE_SCL 0
