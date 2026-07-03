@@ -1211,7 +1211,7 @@ void PlayerEffectWarpWait(int A)
 
             const Screen_t& screen = ScreenByPlayer(A);
 
-            bool do_modern = !g_ClonedPlayerMode && (numPlayers > 2 || screen.Type == ScreenTypes::SharedScreen || XMessage::GetStatus() != XMessage::Status::local);
+            bool do_modern = !g_ClonedPlayerMode && (numPlayers > 2 || screen.Type == ScreenTypes::SharedScreen || numPlayers > Screens[0].player_count);
             if(!do_modern)
             {
                 // 2P holding condition for start warp
