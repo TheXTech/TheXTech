@@ -1837,14 +1837,22 @@ void NextLevel()
     // do an inter-level delay here if there won't be a GameThing later
     if(!TestLevel && GoToLevel.empty() && !NoMap && FileRecentSubHubLevel.empty())
     {
-        if(XMessage::GetStatus() != XMessage::Status::local)
+        int wait_frames = (g_ShortDelay) ? 16 : 32;
+        while(wait_frames > 0 && GameIsActive)
         {
-            for(int i = 0; i < ((g_ShortDelay) ? 16 : 32); i++)
-                Controls::Update(false);
-        }
-        else if(!g_config.unlimited_framerate)
-            PGE_Delay(500 - (g_ShortDelay * 250));
+            XEvents::doEvents();
 
+            if(canProceedFrame())
+            {
+                computeFrameTime1();
+                Controls::Update(false);
+                wait_frames--;
+                computeFrameTime2();
+            }
+
+            if(!g_config.unlimited_framerate)
+                PGE_Delay(1);
+        }
         g_ShortDelay = false;
     }
 
