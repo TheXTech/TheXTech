@@ -878,7 +878,10 @@ bool Update(bool check_lost_devices)
             }
         }
         else
+        {
+            okay = false;
             prev_okay = false;
+        }
 
         if(g_hotkeysPressed[Hotkeys::Buttons::LegacyPause] == i + 1)
             newControls.Start = true;
@@ -1005,13 +1008,18 @@ bool Update(bool check_lost_devices)
         }
     }
 
-    // indicate if some control slots are missing
-    if(!prev_okay && !SingleCoop && !GameMenu && !LevelEditor && !Record::replay_file && check_lost_devices)
-        okay = false;
-
     g_disallowHotkeys = false;
 
-    return okay;
+    // indicate if some control slots are missing (in particular conditions)
+    if(!SingleCoop && !GameMenu && !LevelEditor && !Record::replay_file && check_lost_devices)
+    {
+        if(prev_okay)
+            return okay;
+        else if(!okay)
+            QuickReconnectScreen::g_active = true;
+    }
+
+    return true;
 }
 
 void SaveConfig(IniProcessing* ctl)

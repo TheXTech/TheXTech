@@ -233,8 +233,6 @@ resume_IntroEvents:
 
     if(!Controls::Update())
     {
-        QuickReconnectScreen::g_active = true;
-
         if(g_config.allow_drop_add && !TestLevel && XMessage::GetStatus() == XMessage::Status::local)
             PauseGame(PauseCode::DropAdd, 0);
     }
