@@ -79,6 +79,7 @@ enum class PauseType
 
 static PauseType s_pause_type = PauseType::Modern;
 static int s_pause_plr = 0;
+static PauseCode s_forced_pausecode = PauseCode::None;
 static int s_longest_width = 0;
 static std::vector<MenuItem> s_items;
 static int s_cheat_menu_bits = 0;
@@ -281,6 +282,13 @@ void UnlockCheats()
         TextEntryScreen::Init(g_gameStrings.pauseItemEnterCode, s_CheatScreen_callback);
 }
 
+void ForceDropAdd()
+{
+    XMessage::PushMessage({XMessage::Type::shared_controls, 0, 0});
+    XMessage::PushMessage({XMessage::Type::shared_controls, 0, 2});
+    s_forced_pausecode = PauseCode::DropAdd;
+}
+
 void Init(int plr, bool LegacyPause)
 {
     XHints::Select();
@@ -393,6 +401,12 @@ void Init(int plr, bool LegacyPause)
         s_cheat_menu_bits = 14;
         if(CommonFrame - s_cheat_menu_frame < 60)
             TextEntryScreen::Init(g_gameStrings.pauseItemEnterCode, s_CheatScreen_callback);
+    }
+
+    if(s_forced_pausecode != PauseCode::None)
+    {
+        PauseInit(s_forced_pausecode, 0, s_push_unpause);
+        s_forced_pausecode = PauseCode::None;
     }
 }
 
