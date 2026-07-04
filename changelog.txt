@@ -27,6 +27,7 @@ Changelog for 1.3.8-dev
 Changelog for 1.3.7.4-dev
 -Fix SMBX 1.3 bug where items on top of a vehicle could be lost when entering it, guarded by compat flag "fix-vehicle-item-loss" [Modern/Classic Mode] (@ds-sloth)
 -Wii: add overscan compensation options (@ds-sloth, thanks to @TheEeveeLovers for the report)
+-Fix SMBX 1.3 bug where a climbable NPC spawner (eg, vine top) would deactivate if the player left the section, guarded by compat flag "fix-npc-camera-logic" [Modern/Classic Mode] (@ds-sloth, thanks to @Wohlstand for the report)
 
 Changelog for 1.3.7.3
 -Update LVLX/WLDX/SAVX loader to use new MDX file parser by ds-sloth (speeds up level/world loads on slow devices) (@ds-sloth, @Wohlstand)
