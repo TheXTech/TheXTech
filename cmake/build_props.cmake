@@ -124,6 +124,7 @@ if(APPLE)
     if(SUPPORTS_FVISIBILITY_INLINES_HIDDEN_FLAG)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility-inlines-hidden")
     endif()
+
 elseif(NOT MSVC)
     if(EMSCRIPTEN)
         set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -Os -fdata-sections -ffunction-sections")
@@ -293,6 +294,8 @@ if(ANDROID)
             "-DFDROID_BUILD=TRUE"
         )
     endif()
+
+    list(APPEND XTECH_PLATFORM_GENERAL_CMAKE_FLAGS ${ANDROID_CMAKE_FLAGS})
 endif()
 
 if(VITA)
