@@ -124,6 +124,7 @@ if(APPLE)
     if(SUPPORTS_FVISIBILITY_INLINES_HIDDEN_FLAG)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility-inlines-hidden")
     endif()
+
 elseif(NOT MSVC)
     if(EMSCRIPTEN)
         set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -Os -fdata-sections -ffunction-sections")
@@ -222,6 +223,19 @@ if(NOT MSVC)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-omit-frame-pointer")
 endif()
 
+
+# CMake flags to share with external projects
+set(XTECH_PLATFORM_GENERAL_CMAKE_FLAGS)
+
+
+if(APPLE)
+    list(APPEND XTECH_PLATFORM_GENERAL_CMAKE_FLAGS
+        -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
+        -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
+    )
+endif()
+
+
 if(ANDROID)
     if(${ANDROID_ABI} STREQUAL "armeabi-v7a")
         # Disable NEON support for old devices
@@ -283,6 +297,8 @@ if(ANDROID)
             "-DFDROID_BUILD=TRUE"
         )
     endif()
+
+    list(APPEND XTECH_PLATFORM_GENERAL_CMAKE_FLAGS ${ANDROID_CMAKE_FLAGS})
 endif()
 
 if(VITA)
