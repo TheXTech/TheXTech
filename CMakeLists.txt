@@ -351,7 +351,12 @@ if(ANDROID)
 endif()
 
 if(APPLE OR WIN32)
-    set(THEXTECH_BUILD_GL_ES_MODERN OFF CACHE BOOL "" FORCE)
+    if(IOS)
+        set(THEXTECH_BUILD_GL_DESKTOP_MODERN OFF CACHE BOOL "" FORCE)
+        set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
+    else()
+        set(THEXTECH_BUILD_GL_ES_MODERN OFF CACHE BOOL "" FORCE)
+    endif()
     set(THEXTECH_BUILD_GL_ES_LEGACY OFF CACHE BOOL "" FORCE)
 endif()
 
@@ -1302,6 +1307,10 @@ if(APPLE)
         set(THEXTECH_EXECUTABLE_NAME_OUT ${THEXTECH_EXECUTABLE_NAME})
     endif()
 
+    if(IOS)
+        target_compile_definitions(thextech PRIVATE -DTHEXTECH_IOS)
+    endif()
+
     set_target_properties(thextech PROPERTIES
         OUTPUT_NAME "${THEXTECH_BUNDLE_NAME}"
         MACOSX_BUNDLE TRUE
@@ -1317,7 +1326,9 @@ if(APPLE)
     )
     set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/${XTECH_DEFAULT_ICNS}" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_source_files_properties(${PGE_FILE_ICONS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-    set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/resources/PkgInfo PROPERTIES MACOSX_PACKAGE_LOCATION "")
+    if(NOT IOS)
+        set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/resources/PkgInfo PROPERTIES MACOSX_PACKAGE_LOCATION "")
+    endif()
     if(XTECH_MACOSX_TIGER)
         set_source_files_properties("${THEXTECH_MAC_EXEX_GENERATED}" PROPERTIES MACOSX_PACKAGE_LOCATION "MacOS")
     endif()
