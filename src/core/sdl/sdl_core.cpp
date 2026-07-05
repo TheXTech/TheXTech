@@ -36,7 +36,7 @@ bool CoreSDL::init(const CmdLineSetup_t &setup)
     // Disable the audio capture at all (some systems do ask microphone permission because of that)
     SDL_SetHint("SDL_AUDIO_DISABLE_CAPTURE", "1");
 
-#if defined(__ANDROID__) || (defined(__APPLE__) && (defined(TARGET_IPHONE_SIMULATOR) || defined(TARGET_OS_IPHONE)))
+#if defined(__ANDROID__) || defined(THEXTECH_IOS)
     // Restrict the landscape orientation only
     SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
 #endif

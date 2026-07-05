@@ -420,13 +420,19 @@ bool FrmMain::restartRenderer()
     m_render.reset();
     g_render = nullptr;
 
-    m_render.reset(new RenderSDL());
-
+    RenderSDL *render = new RenderSDL();
+    m_render.reset(render);
     g_render = m_render.get();
 
-    CmdLineSetup_t setup;
+    res = reinterpret_cast<WindowUsed*>(g_window)->initSDL(g_render->SDL_InitFlags());
 
-    res = m_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+    if(res)
+    {
+        reinterpret_cast<MsgBoxUsed*>(g_msgBox)->init(reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+        res = m_render->initRender(reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+    }
+
+    res = false;
 #    endif
 
     XWindow::show();
