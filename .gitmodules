@@ -56,7 +56,7 @@
 	branch = master
 [submodule "mbediso"]
 	path = 3rdparty/mbediso
-	url = https://github.com/ds-sloth/mbediso/
+	url = https://github.com/WohlSoft/mbediso/
 	branch = main
 [submodule "3rdparty/SDL_net"]
 	path = 3rdparty/SDL_net
