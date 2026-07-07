@@ -64,6 +64,8 @@ enum NetworkHeader
 
     HEADER_PUT_SESSION = 15,
     HEADER_GET_SESSION = 16,
+
+    HEADER_KNOCK_KNOCK = 17,
 };
 
 // enum BufferState

@@ -29,18 +29,6 @@
 
 static constexpr bool max_debug = false;
 
-static XMessage::Message msg_from_frame_no(XMessage::Type type, uint32_t frame_no)
-{
-    XMessage::Message ret;
-    ret.type = type;
-    ret.screen = (uint8_t)(frame_no >> 16);
-    ret.player = (uint8_t)(frame_no >> 8);
-    ret.message = (uint8_t)(frame_no >> 0);
-
-    return ret;
-}
-
-
 namespace XMessage
 {
 
@@ -373,7 +361,11 @@ void NetworkClient::Disconnect(bool shutdown)
         return;
 
     status = ClientStatus();
-    push_status();
+
+    if(status_req_in_progress)
+        push_completed_request();
+    else
+        push_status();
 
     // UpdateConfig();
     // UpdateInternalRes();
@@ -679,14 +671,7 @@ void NetworkClient::client_loop()
 
     // hang up on error
     if(tcp_control.err || tcp_data.err)
-    {
         Disconnect();
-        if(status_req_in_progress)
-        {
-            status = ClientStatus();
-            push_completed_request();
-        }
-    }
 
     pull_status_req();
 
@@ -716,15 +701,15 @@ void NetworkClient::client_loop()
         if(status_req.client_state != status.client_state)
         {
             // always shift through lobby (in the future...)
-            if(status.client_state != CLIENT_LOBBY && status.client_state != CLIENT_SESSION_CONFIG)
+            if(status.client_state != CLIENT_LOBBY && status.client_state != CLIENT_SESSION_CONFIG && status.client_state != CLIENT_HOST_IDLE)
             {
                 // request leave room, mark as pending
                 return;
             }
 
-            if(status.client_state == CLIENT_SESSION_CONFIG)
+            if(status.client_state == CLIENT_SESSION_CONFIG || status.client_state == CLIENT_HOST_IDLE)
             {
-                if(status_req.client_state == CLIENT_GUEST)
+                if(status_req.client_state == CLIENT_GUEST && status.client_state == CLIENT_SESSION_CONFIG)
                 {
                     std::array<uint8_t, 1> to_send =
                     {
@@ -733,19 +718,25 @@ void NetworkClient::client_loop()
 
                     SDLNet_TCP_Send(tcp_control.socket, to_send.data(), to_send.size());
                 }
-                else if(status_req.client_state == CLIENT_HOST)
+                else if(status_req.client_state == CLIENT_HOST && status.client_state == CLIENT_HOST_IDLE)
                 {
                     MutexSent session_access = get_session_access();
 
                     if(session_access)
                     {
                         uint32_t session_size = 9 + g_session.save_data.size();
+                        uint32_t current_frame = g_session.current_frame;
+                        uint32_t history_size = g_session.history.size() * 4;
+
+                        temp_state.remote_frame = current_frame;
 
                         // encode session here
-                        std::array<uint8_t, 14> to_send_a =
+                        std::array<uint8_t, 21> to_send_a =
                         {
                             HEADER_PUT_SESSION,
+                            uint8_t(current_frame >> 16), uint8_t(current_frame >> 8), uint8_t(current_frame >> 0),
                             uint8_t(session_size >> 24), uint8_t(session_size >> 16), uint8_t(session_size >> 8), uint8_t(session_size >> 0),
+                            uint8_t(history_size >> 24), uint8_t(history_size >> 16), uint8_t(history_size >> 8), uint8_t(history_size >> 0),
                             uint8_t(g_session.random_seed  >> 24), uint8_t(g_session.random_seed  >> 16), uint8_t(g_session.random_seed  >> 8), uint8_t(g_session.random_seed  >> 0),
                             g_session.init_char_select[0], g_session.init_char_select[1], g_session.init_char_select[2], g_session.init_char_select[3],
                             g_session.save_present
@@ -754,6 +745,9 @@ void NetworkClient::client_loop()
                         // FIXME: blocking while lock is held
                         SDLNet_TCP_Send(tcp_control.socket, to_send_a.data(), to_send_a.size());
                         SDLNet_TCP_Send(tcp_control.socket, g_session.save_data.data(), g_session.save_data.size());
+                        SDLNet_TCP_Send(tcp_control.socket, g_session.history.data(), history_size);
+
+                        pLogDebug("Activating hosting, sending session to server (frame %d, save size %d, history size %d)...", (int)current_frame, (int)g_session.save_data.size(), (int)(g_session.history.size() * 4));
                     }
                     else
                         Disconnect();
@@ -770,7 +764,7 @@ void NetworkClient::client_loop()
 
                 SDLNet_TCP_Send(tcp_control.socket, to_send.data(), to_send.size());
             }
-            else if(status_req.client_state == CLIENT_HOST)
+            else if(status_req.client_state == CLIENT_HOST || status_req.client_state == CLIENT_HOST_IDLE)
             {
                 const auto& room_info = status_req.room_info;
 
@@ -846,7 +840,7 @@ void NetworkClient::client_loop()
         }
         else if(tcp_control.buffer[0] == HEADER_ROOM_KEY)
         {
-            if(!tcp_control.FillBufferTo_NB(13))
+            if(!tcp_control.FillBufferTo_NB(10))
                 return;
 
             const auto& buffer = tcp_control.buffer;
@@ -855,11 +849,9 @@ void NetworkClient::client_loop()
 
             status.client_index = buffer[5];
 
-            temp_state.remote_frame = ((int)buffer[6] << 16) | ((int)buffer[7] << 8) | ((int)buffer[8] << 0);
+            session_key = ((uint32_t)buffer[6] << 24) | ((uint32_t)buffer[7] << 16) | ((uint32_t)buffer[8] << 8) | ((uint32_t)buffer[9] << 0);
 
-            session_key = ((uint32_t)buffer[9] << 24) | ((uint32_t)buffer[10] << 16) | ((uint32_t)buffer[11] << 8) | ((uint32_t)buffer[12] << 0);
-
-            tcp_control.ShiftBuffer(13);
+            tcp_control.ShiftBuffer(10);
 
             if(status_req.room_info.room_key && status.room_info.room_key != status_req.room_info.room_key)
             {
@@ -903,15 +895,24 @@ void NetworkClient::client_loop()
             send_buffer = SendBuffer();
 
             // copying previously-existing logic from receive_buffer reinitialization, but these should probably happen elsewhere
+            temp_state.remote_frame = 0;
             temp_state.current_frame = 0;
             temp_state.available_frame = -1;
             temp_state.new_history.clear();
 
             pLogInfo("NetPlay: joining room %s", DisplayRoom(status.room_info.room_key).room_name);
 
-            status.client_state = CLIENT_SESSION_CONFIG;
+            if(status_req.client_state == CLIENT_HOST || status_req.client_state == CLIENT_HOST_IDLE)
+                status.client_state = CLIENT_HOST_IDLE;
+            else
+                status.client_state = CLIENT_SESSION_CONFIG;
 
-            if(status_req_in_progress == REQUEST_PENDING)
+            if(status_req.client_state == CLIENT_HOST_IDLE)
+            {
+                status_req_in_progress = REQUEST_COMPLETED;
+                push_completed_request();
+            }
+            else if(status_req_in_progress == REQUEST_PENDING)
                 status_req_in_progress = REQUEST_SUBMIT;
         }
         else if(tcp_control.buffer[0] == HEADER_GET_SESSION)
@@ -921,10 +922,12 @@ void NetworkClient::client_loop()
 
             tcp_control.ShiftBuffer(1);
 
-            if(status_req_in_progress == REQUEST_PENDING && status.client_state == CLIENT_SESSION_CONFIG)
+            if(status_req_in_progress == REQUEST_PENDING && (status.client_state == CLIENT_SESSION_CONFIG || status.client_state == CLIENT_HOST_IDLE))
             {
+                temp_state.available_frame = temp_state.remote_frame;
+
                 status.client_state = CLIENT_HOST;
-                pLogDebug("The random seed is %d", (int)g_session.random_seed);
+                pLogDebug("Hosting begun. The random seed is %d.", (int)g_session.random_seed);
                 push_completed_request();
             }
             else
@@ -932,12 +935,14 @@ void NetworkClient::client_loop()
         }
         else if(tcp_control.buffer[0] == HEADER_PUT_SESSION)
         {
-            if(!tcp_control.FillBufferTo_NB(5))
+            if(!tcp_control.FillBufferTo_NB(8))
                 return;
 
-            uint32_t session_size = ((uint32_t)tcp_control.buffer[1] << 24) | ((uint32_t)tcp_control.buffer[2] << 16) | ((uint32_t)tcp_control.buffer[3] << 8) | ((uint32_t)tcp_control.buffer[4] << 0);
+            temp_state.remote_frame = ((int)tcp_control.buffer[1] << 16) | ((int)tcp_control.buffer[2] << 8) | ((int)tcp_control.buffer[3] << 0);
 
-            tcp_control.ShiftBuffer(5);
+            uint32_t session_size = ((uint32_t)tcp_control.buffer[4] << 24) | ((uint32_t)tcp_control.buffer[5] << 16) | ((uint32_t)tcp_control.buffer[6] << 8) | ((uint32_t)tcp_control.buffer[7] << 0);
+
+            tcp_control.ShiftBuffer(8);
 
             // decode session here
             if(session_size < 9 || session_size > 2048000)
@@ -1034,6 +1039,20 @@ void NetworkClient::client_loop()
             temp_state.remote_frame = ((int)tcp_control.buffer[1] << 16) | ((int)tcp_control.buffer[2] << 8) | ((int)tcp_control.buffer[3] << 0);
 
             tcp_control.ShiftBuffer(4);
+        }
+        // request to start the session
+        else if(tcp_control.buffer[0] == HEADER_KNOCK_KNOCK)
+        {
+            tcp_control.ShiftBuffer(1);
+
+            if(status.client_state != CLIENT_HOST_IDLE)
+                Disconnect();
+            else
+            {
+                pLogDebug("Received request to initiate hosting.");
+                status.knock_knock = true;
+                push_status();
+            }
         }
     }
 

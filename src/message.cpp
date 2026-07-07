@@ -208,16 +208,28 @@ void InitSession()
 void Tick()
 {
 #ifdef THEXTECH_ENABLE_SDL_NET
+    const auto* status = GetClientStatus();
+    if(status->client_state == CLIENT_HOST_IDLE && status->knock_knock)
+        ActivateHost();
+
     // sync state with other clients here
     if(XMessage::GetStatus() != XMessage::Status::local)
         ClientFrameSync(s_message_submit_queue, s_message_vector);
+    // log state for future saving or syncing
     else
     {
-        // fixme: should include a history update, maybe even reuse code from above
+        g_session.current_frame++;
+
         if(!s_message_submit_queue.empty())
         {
+            g_session.history.push_back(msg_from_frame_no(Type::frame_begin, g_session.current_frame));
+
             for(Message m : s_message_submit_queue)
+            {
+                g_session.history.push_back(m);
                 s_message_vector.push_back(m);
+            }
+
             s_message_submit_queue.clear();
         }
     }

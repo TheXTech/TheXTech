@@ -438,7 +438,7 @@ void Render()
 
     // display room info above the pause menu
 #ifdef THEXTECH_ENABLE_SDL_NET
-    if(XMessage::GetStatus() == XMessage::Status::connected)
+    if(XMessage::CurrentRoom())
     {
         XRender::renderRect(XRender::TargetW / 2 - menu_box_width / 2 - 4, XRender::TargetH / 2 - menu_box_height / 2 - 40 - 4, menu_box_width + 8, 28 + 8, {0, 0, 0});
         XRender::renderRect(XRender::TargetW / 2 - menu_box_width / 2 - 2, XRender::TargetH / 2 - menu_box_height / 2 - 40 - 2, menu_box_width + 4, 28 + 4, {255, 255, 255});

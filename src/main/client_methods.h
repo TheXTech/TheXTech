@@ -72,6 +72,7 @@ struct ClientStatus
     int server_port = 4305;
     RoomInfo room_info;
     int client_index = 0;
+    bool knock_knock = false;
 };
 
 struct GameThread
@@ -90,6 +91,17 @@ struct GameThread
     bool status_req_completed();
 };
 
+inline XMessage::Message msg_from_frame_no(XMessage::Type type, uint32_t frame_no)
+{
+    XMessage::Message ret;
+    ret.type = type;
+    ret.screen = (uint8_t)(frame_no >> 16);
+    ret.player = (uint8_t)(frame_no >> 8);
+    ret.message = (uint8_t)(frame_no >> 0);
+
+    return ret;
+}
+
 void Connect(const char* host = nullptr);
 void Disconnect();
 void NetStartup();
@@ -104,6 +116,7 @@ const RoomInfo* GetRoomInfo();
 
 void JoinNewRoom(const RoomInfo& room_info);
 void JoinRoom(uint32_t room_key);
+void ActivateHost();
 uint32_t CurrentRoom();
 void LeaveRoom();
 

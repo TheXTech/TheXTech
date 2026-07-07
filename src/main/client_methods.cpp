@@ -158,6 +158,12 @@ Status GetStatus()
 
 void ClientFrameSync(std::vector<Message>& submit_buffer, std::vector<Message>& message_vector)
 {
+    if(s_game_thread.status.client_state == CLIENT_OFF)
+    {
+        Disconnect();
+        return;
+    }
+
     SDL_LockMutex(s_network_client.status_req_sync_lock);
 
     g_session.current_frame++;
@@ -188,6 +194,10 @@ void ClientFrameSync(std::vector<Message>& submit_buffer, std::vector<Message>& 
         XEvents::doEvents();
 
         SDL_LockMutex(s_network_client.status_req_sync_lock);
+
+        // early-stop if fully lost connection
+        if(g_session.available_frame < current_frame && GetClientStatus()->client_state == CLIENT_OFF)
+            break;
     }
 
     // fill buffer of events that happened
@@ -259,7 +269,7 @@ void JoinNewRoom(const RoomInfo& room_info)
     XMessage::g_session.history.clear();
     XMessage::g_session.next_message = 0;
 
-    s_game_thread.status_req.client_state = CLIENT_HOST;
+    s_game_thread.status_req.client_state = CLIENT_HOST_IDLE;
     s_game_thread.status_req.room_info = room_info;
 
     s_game_thread.push_status_req();
@@ -278,6 +288,15 @@ void JoinRoom(uint32_t room_key)
     s_game_thread.status_req.client_state = CLIENT_GUEST;
     s_game_thread.status_req.room_info.room_key = room_key;
 
+    s_game_thread.push_status_req();
+}
+
+void ActivateHost()
+{
+    if(s_game_thread.status_req.client_state != CLIENT_HOST_IDLE)
+        return;
+
+    s_game_thread.status_req.client_state = CLIENT_HOST;
     s_game_thread.push_status_req();
 }
 

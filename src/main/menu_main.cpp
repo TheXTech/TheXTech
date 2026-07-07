@@ -1005,7 +1005,7 @@ bool mainMenuUpdate()
         else if(XMessage::CompleteRequest())
         {
             auto* status = XMessage::GetClientStatus();
-            if(status && (status->client_state == XMessage::CLIENT_GUEST || status->client_state == XMessage::CLIENT_HOST))
+            if(status && (status->client_state == XMessage::CLIENT_GUEST || status->client_state == XMessage::CLIENT_HOST || status->client_state == XMessage::CLIENT_HOST_IDLE))
             {
                 if(status->client_state == XMessage::CLIENT_GUEST)
                 {
