@@ -43,11 +43,18 @@ bool CoreSDL::init(const CmdLineSetup_t &setup)
 
 #if defined(__ANDROID__)
     SDL_setenv("SDL_AUDIODRIVER", "openslES", 1);
-    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
-    SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 6);
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
+#endif
+
+#if defined(__ANDROID__) || defined(THEXTECH_IOS)
+    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
+    SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
+#endif
+
+#if defined(THEXTECH_IOS)
+    SDL_SetHint(SDL_HINT_IOS_HIDE_HOME_INDICATOR, "1");
 #endif
 
     Uint32 sdlInitFlags = 0;
