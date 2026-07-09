@@ -7,12 +7,19 @@ list(APPEND APPPATH_SRCS
 )
 
 if(APPLE)
-    message("-- AppPath for Apple")
-    list(APPEND APPPATH_SRCS
-        ${CMAKE_CURRENT_LIST_DIR}/private/app_path_macos.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/private/app_path_macos_dirs.h
-        ${CMAKE_CURRENT_LIST_DIR}/private/app_path_macos_dirs.m
-    )
+    if(IOS)
+        message("-- AppPath for Apple iOS")
+        list(APPEND APPPATH_SRCS
+            ${CMAKE_CURRENT_LIST_DIR}/private/app_path_ios.cpp
+        )
+    else()
+        message("-- AppPath for Apple macOS")
+        list(APPEND APPPATH_SRCS
+            ${CMAKE_CURRENT_LIST_DIR}/private/app_path_macos.cpp
+            ${CMAKE_CURRENT_LIST_DIR}/private/app_path_macos_dirs.h
+            ${CMAKE_CURRENT_LIST_DIR}/private/app_path_macos_dirs.m
+        )
+    endif()
 elseif(ANDROID)
     message("-- AppPath for Android")
     list(APPEND APPPATH_SRCS

@@ -38,6 +38,10 @@
 #include "controls.h"
 #include <AppPath/app_path.h>
 
+#if defined(THEXTECH_IOS)
+#   include "core/extras.h"
+#endif
+
 #ifdef THEXTECH_INTERPROC_SUPPORTED
 #   include "capabilities.h"
 #endif
@@ -835,6 +839,10 @@ int main(int argc, char**argv)
             window.close();
         }, 250);
     );
+#endif
+
+#if defined(THEXTECH_IOS)
+    ios_quit(ret); // Apple hates this, but we need it!
 #endif
 
     return ret;

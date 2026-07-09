@@ -50,7 +50,19 @@ if(EMSCRIPTEN)
 endif()
 
 if(APPLE)
-    if(CMAKE_HOST_SYSTEM_VERSION VERSION_LESS 9)
+    if(NOT IOS)
+        option(BUILD_MACOS_FORCE_TIGER "Force build as for Mac OS X 10.4 (primarily when performing a cross-compilation)" OFF)
+
+        if(CMAKE_HOST_SYSTEM_VERSION VERSION_LESS 9 OR BUILD_MACOS_FORCE_TIGER)
+            message("-- MacOS X 10.4 Tiger detected!")
+            set(XTECH_MACOSX_TIGER TRUE)
+        endif()
+    endif()
+
+    if(IOS)
+        set(XTECH_PLIST_NAME "thextech.plist.ios.in")
+        set(XTECH_DEFAULT_ICNS "resources/thextech.icns")
+    elseif(XTECH_MACOSX_TIGER)
         set(XTECH_PLIST_NAME "thextech.plist.tiger.in")
         set(XTECH_DEFAULT_ICNS "resources/tiger/thextech.icns")
     else()
@@ -59,7 +71,7 @@ if(APPLE)
     endif()
 
     if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET OR CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
-        if(CMAKE_HOST_SYSTEM_VERSION VERSION_LESS 9)
+        if(XTECH_MACOSX_TIGER)
             set(THEXTECH_MACOS_MIN_VERSION "10.4")
         else()
             set(THEXTECH_MACOS_MIN_VERSION "10.9")
@@ -140,7 +152,7 @@ endif()
 set(USE_SYSTEM_LIBS_DEFAULT OFF)
 
 
-if(UNIX)
+if(UNIX AND NOT APPLE)
     option(PORTMASTER "Make a special build for PortMaster" OFF)
 endif()
 
@@ -175,7 +187,7 @@ if(NINTENDO_3DS)
     option(THEXTECH_CUSTOM_AUDIO_LIBRARY "Use the custom audio library instead of MixerX" OFF)
 endif()
 
-if(ANDROID OR VITA OR NINTENDO_DS OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH OR PGE_MIN_PORT OR THEXTECH_NO_SDL_BUILD OR PORTMASTER)
+if(ANDROID OR IOS OR VITA OR NINTENDO_DS OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH OR PGE_MIN_PORT OR THEXTECH_NO_SDL_BUILD OR PORTMASTER)
     set(THEXTECH_FORCE_FULLSCREEN ON)
 else()
     option(THEXTECH_FORCE_FULLSCREEN "Force the game to only use fullscreen mode" OFF)
@@ -231,11 +243,15 @@ set(THEXTECH_DIRECTORY_PREFIX "TheXTech" CACHE STRING "Name used for directories
 set(THEXTECH_INSTALLER_PACKAGE_NAME "${THEXTECH_EXECUTABLE_NAME}" CACHE STRING "The package name for the package manager")
 
 if(APPLE)
-    set(THEXTECH_PRELOAD_ENVIRONMENT "" CACHE STRING "Path to resources root to pack")
-    option(THEXTECH_PRELOAD_ENVIRONMENT_MANUALLY "Make application look for assets inside the bundle, but don't actually put any assets. The 'Template' app will be produced for manual addition of assets." OFF)
+    if(NOT IOS)
+        set(THEXTECH_PRELOAD_ENVIRONMENT "" CACHE STRING "Path to resources root to pack")
+        option(THEXTECH_PRELOAD_ENVIRONMENT_MANUALLY "Make application look for assets inside the bundle, but don't actually put any assets. The 'Template' app will be produced for manual addition of assets." OFF)
+    endif()
+
     set(THEXTECH_BUNDLE_NAME "TheXTech" CACHE STRING "Name of bundle folder")
     set(THEXTECH_ICON_NAME "thextech.icns" CACHE STRING "Name of bundle icon file")
     set(THEXTECH_CUSTOM_ICON_PATH "" CACHE STRING "Name of icon file to pack into the bundle")
+
     if(NOT THEXTECH_CUSTOM_ICON_PATH STREQUAL "")
         message("Use custom macOS icon: ${THEXTECH_CUSTOM_ICON_PATH}")
         list(APPEND LIB_SRC_EXTRA
@@ -244,7 +260,7 @@ if(APPLE)
     endif()
 endif()
 
-if(NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
+if(NOT APPLE AND NOT ANDROID AND NOT IOS AND NOT EMSCRIPTEN)
     set(THEXTECH_UNIX_INSTALL TRUE)
 endif()
 
@@ -699,6 +715,7 @@ list(APPEND LIB_SRC
 endif()
 
 if(NOT ANDROID
+   AND NOT IOS
    AND NOT EMSCRIPTEN
    AND NOT VITA
    AND NOT NINTENDO_3DS
@@ -893,6 +910,11 @@ set(THEXTECH_SRC
     src/fontman/hardcoded_font.cpp
     src/fontman/utf8_helpers.cpp
 )
+
+if(IOS)
+    list(APPEND THEXTECH_SRC src/core/extras.h src/core/extras_ios.m)
+endif()
+
 
 if(NOT THEXTECH_NO_SDL_BUILD)
     list(APPEND THEXTECH_SRC src/sound_thread.cpp)
@@ -1570,7 +1592,7 @@ if(NOT EMSCRIPTEN AND
     )
 endif()
 
-if(ANDROID)
+if(ANDROID OR IOS)
     target_compile_definitions(thextech PRIVATE
         -DUSE_RENDER_BLOCKING
     )
