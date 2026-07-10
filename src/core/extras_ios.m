@@ -19,8 +19,11 @@
 
 #include "extras.h"
 
+#include <tgmath.h>
 #include <Foundation/Foundation.h>
 #include <UIKit/UIApplication.h>
+#include <UIKit/UIScreen.h>
+#include <SDL2/SDL_video.h>
 
 void ios_quit(int ret)
 {
@@ -34,3 +37,27 @@ void ios_quit(int ret)
     //exit app when app is in background
     exit(ret);
 }
+
+double ios_get_screen_diagonal(double *ow, double *oh)
+{
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    CGFloat scale = UIScreen.mainScreen.scale;
+    CGFloat w = screenRect.size.width * scale;
+    CGFloat h = screenRect.size.height * scale;
+    float diagDPI = -1;
+    float horiDPI = -1;
+    float vertDPI = -1;
+    double diag;
+    
+    *ow = w;
+    *oh = h;
+    
+    // SDL2 already returns the DPI that can be used to compute physical thing
+    SDL_GetDisplayDPI(0, &diagDPI, &horiDPI, &vertDPI);
+    
+    // Diagonal - is a hypotinuse!
+    diag = sqrt((w * w) + (h * h)) / diagDPI;
+
+    return diag;
+}
+

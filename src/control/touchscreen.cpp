@@ -25,6 +25,9 @@
 #ifdef __ANDROID__
 #   include <Utils/files.h>
 #endif
+#ifdef THEXTECH_IOS
+#   include "core/extras.h"
+#endif
 
 #include "AppPath/app_path.h"
 
@@ -46,6 +49,12 @@
 
 #include <SDL2/SDL_haptic.h>
 
+
+#ifdef THEXTECH_IOS
+static double s_screenSize = -1;
+static double s_screenWidth = -1;
+static double s_screenHeight = -1;
+#endif
 
 #ifdef __ANDROID__
 #   include <jni.h>
@@ -1750,7 +1759,12 @@ InputMethodProfile_TouchScreen::InputMethodProfile_TouchScreen()
 {
     this->m_showPowerStatus = false;
 
-#ifdef __ANDROID__
+#ifdef THEXTECH_IOS
+    if(s_screenSize < 0.0)
+        s_screenSize = ios_get_screen_diagonal(&s_screenWidth, &s_screenHeight);
+#endif
+
+#if defined(__ANDROID__) || defined(THEXTECH_IOS)
     if(s_screenSize >= 9.0) // Big tablets
     {
         m_default_layout = TouchScreenController::layout_standard;
