@@ -53,15 +53,15 @@ inline bool fEqual(float a, float b)
 
 inline bool fiEqual(double a, int b)
 {
-    int ai = int64_t(Maths::iRound(a));
-    int bi = b;
+    int64_t ai = int64_t(Maths::iRound(a));
+    int64_t bi = b;
     return ai == bi;
 }
 
 inline bool fiEqual(float a, int b)
 {
-    int ai = int64_t(Maths::iRound(a));
-    int bi = b;
+    int64_t ai = int64_t(Maths::iRound(a));
+    int64_t bi = b;
     return ai == bi;
 }
 
