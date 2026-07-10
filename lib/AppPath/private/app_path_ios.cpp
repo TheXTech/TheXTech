@@ -32,23 +32,14 @@ static std::string s_gifRecordPath;
 
 void AppPathP::initDefaultPaths(const std::string &)
 {
+    char app_home[1024];
+
     // Initialize the application path
-    {
-        char app_home[1024];
-        // Получаем путь к домашней директории приложения
-        strcpy(app_home, getenv("HOME"));
-        s_applicationPath = std::string(app_home);
+    strcpy(app_home, getenv("HOME"));
+    s_applicationPath = std::string(app_home);
 
-//        auto i = s_applicationPath.find_last_of(".app");
-//        i = s_applicationPath.find_last_of('/', i);
-//
-//        s_applicationPath.erase(i, s_applicationPath.size() - i);
-//        if(s_applicationPath.compare(0, 7, "file://") == 0)
-//            s_applicationPath.erase(0, 7);
-
-        if(!s_applicationPath.empty() && (s_applicationPath.back() != '/'))
-            s_applicationPath.push_back('/');
-    }
+    if(!s_applicationPath.empty() && (s_applicationPath.back() != '/'))
+        s_applicationPath.push_back('/');
 
     // Initialize the user directory
     s_userDirectory = s_applicationPath + "Documents/";
