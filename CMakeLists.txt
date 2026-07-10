@@ -1610,7 +1610,7 @@ if(NOT EMSCRIPTEN AND
     )
 endif()
 
-if(ANDROID OR IOS)
+if(ANDROID)
     target_compile_definitions(thextech PRIVATE
         -DUSE_RENDER_BLOCKING
     )
