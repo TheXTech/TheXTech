@@ -36,11 +36,23 @@
 
 
 #ifdef THEXTECH_IOS
-int EventsSDL::handle_ios_events(void *userdata, SDL_Event *event)
+int EventsSDL::handle_ios_events(void * /*userdata*/, SDL_Event * /*event*/)
 {
-    EventsSDL *self = reinterpret_cast<EventsSDL*>(userdata);
-    SDL_memcpy(&self->m_event, event, sizeof(SDL_Event));
-    self->processEvent();
+    return 1;
+
+    // EventsSDL *self = reinterpret_cast<EventsSDL*>(userdata);
+
+    // switch(event->type)
+    // {
+    // case SDL_QUIT:
+    // case SDL_WINDOWEVENT:
+    //     SDL_memcpy(&self->m_event, event, sizeof(SDL_Event));
+    //     self->processEvent();
+    //     return 0;
+
+    // default:
+    //     return 1;
+    // }
 }
 #endif
 

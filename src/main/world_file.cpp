@@ -265,8 +265,8 @@ bool OpenWorld_Tile(void*, WorldTerrainTile& t)
 
         terra = Tile_t();
 
-        terra.Location.X = t.x;
-        terra.Location.Y = t.y;
+        terra.Location.X = (int32_t)t.x;
+        terra.Location.Y = (int32_t)t.y;
         terra.Type = int(t.id);
         terra.Location.Width = TileWidth[terra.Type];
         terra.Location.Height = TileHeight[terra.Type];
@@ -298,8 +298,8 @@ bool OpenWorld_Scene(void*, WorldScenery& s)
         scene = Scene_t();
 
         scene.Type = int(s.id);
-        scene.Location.X = s.x;
-        scene.Location.Y = s.y;
+        scene.Location.X = (int32_t)s.x;
+        scene.Location.Y = (int32_t)s.y;
         scene.Location.Width = SceneWidth[scene.Type];
         scene.Location.Height = SceneHeight[scene.Type];
         scene.Active = true;
@@ -330,8 +330,8 @@ bool OpenWorld_Path(void*, WorldPathTile& p)
 
         pp = WorldPath_t();
 
-        pp.Location.X = p.x;
-        pp.Location.Y = p.y;
+        pp.Location.X = (int32_t)p.x;
+        pp.Location.Y = (int32_t)p.y;
         pp.Type = int(p.id);
         pp.Location.Width = 32;
         pp.Location.Height = 32;
@@ -365,8 +365,8 @@ bool OpenWorld_Level(void*, WorldLevelTile& l)
 
         ll = WorldLevel_t();
 
-        ll.Location.X = l.x;
-        ll.Location.Y = l.y;
+        ll.Location.X = (int32_t)l.x;
+        ll.Location.Y = (int32_t)l.y;
         ll.Type = int(l.id);
         validateLevelName(ll.FileName, l.lvlfile);
         ll.LevelName = l.title;
@@ -415,8 +415,8 @@ bool OpenWorld_Music(void*, WorldMusicBox& m)
 
         box = WorldMusic_t();
 
-        box.Location.X = m.x;
-        box.Location.Y = m.y;
+        box.Location.X = (int32_t)m.x;
+        box.Location.Y = (int32_t)m.y;
         box.Type = int(m.id);
 
         // new:
@@ -464,10 +464,10 @@ bool OpenWorld_AreaRect(void*, WorldAreaRect& m)
 
         area = WorldArea_t();
 
-        area.Location.X = m.x;
-        area.Location.Y = m.y;
-        area.Location.Width = m.w;
-        area.Location.Height = m.h;
+        area.Location.X = (int32_t)m.x;
+        area.Location.Y = (int32_t)m.y;
+        area.Location.Width = (int32_t)m.w;
+        area.Location.Height = (int32_t)m.h;
     }
 
     return true;

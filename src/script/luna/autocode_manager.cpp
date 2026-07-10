@@ -195,7 +195,7 @@ struct read_buf
             }
 
             temp_buf_cur = 0;
-            temp_buf_end = SDL_RWread(code_file, temp_buf, 1, sizeof(temp_buf));
+            temp_buf_end = (int)SDL_RWread(code_file, temp_buf, 1, sizeof(temp_buf));
 
             if(temp_buf_end == 0)
                 eof = true;

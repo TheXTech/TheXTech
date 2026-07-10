@@ -313,7 +313,7 @@ int main(int argc, char**argv)
     SwapClockSpeed();
 #endif
 
-    seedRandom(std::time(NULL));
+    seedRandom((int)std::time(NULL));
 
     testPlayer.fill(Player_t());
     for(int i = 1; i <= maxLocalPlayers; i++)
