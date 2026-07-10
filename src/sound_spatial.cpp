@@ -60,6 +60,7 @@ void Sound_ResolveSpatialMod(uint8_t& left, uint8_t& right, int l, int t, int r,
 
         if(x_num <= 0)
             x_num = 1;
+
         if(y_num <= 0)
             y_num = 1;
 
@@ -69,16 +70,17 @@ void Sound_ResolveSpatialMod(uint8_t& left, uint8_t& right, int l, int t, int r,
         int64_t c_div = x_dist * x_dist;
         int64_t y_div = y_dist * y_dist;
 
-        int l_calc = 127 * (x_num + y_num) / (l_div + y_div + x_num + y_num);
-        int r_calc = 127 * (x_num + y_num) / (r_div + y_div + x_num + y_num);
+        int l_calc = (int)(127 * (x_num + y_num) / (l_div + y_div + x_num + y_num));
+        int r_calc = (int)(127 * (x_num + y_num) / (r_div + y_div + x_num + y_num));
 
-        int c_calc = 128 * (x_num + y_num) / (c_div + y_div + x_num + y_num);
+        int c_calc = (int)(128 * (x_num + y_num) / (c_div + y_div + x_num + y_num));
 
         l_calc = l_calc + c_calc;
         r_calc = r_calc + c_calc;
 
         if(l_calc > 255)
             l_calc = 255;
+
         if(r_calc > 255)
             r_calc = 255;
 
@@ -89,6 +91,7 @@ void Sound_ResolveSpatialMod(uint8_t& left, uint8_t& right, int l, int t, int r,
 
         if(l_calc > (int)left)
             left = l_calc;
+
         if(r_calc > (int)right)
             right = r_calc;
     }
