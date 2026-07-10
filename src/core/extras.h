@@ -25,7 +25,16 @@
 extern "C"
 {
 #   endif
+
+/**
+ * @brief Attempt to gracefully quit the app
+ * @param ret Exit code same as returned via Main
+ */
 void ios_quit(int ret);
+
+double ios_get_screen_diagonal(double *ow, double *oh);
+
+
 #   ifdef __cplusplus
 }
 #   endif
