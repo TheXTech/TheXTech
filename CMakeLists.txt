@@ -912,7 +912,24 @@ set(THEXTECH_SRC
 )
 
 if(IOS)
-    list(APPEND THEXTECH_SRC src/core/extras.h src/core/extras_ios.m)
+    list(APPEND THEXTECH_SRC
+        src/core/extras.h
+        src/core/extras_ios.m
+    )
+
+    set(IOS_STORYBOARD_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/core/ios/LaunchScreen.storyboard")
+    set(IOS_STORYBOARD_BIN "${CMAKE_CURRENT_BINARY_DIR}/LaunchScreen.storyboardc")
+
+    add_custom_command(
+        OUTPUT ${IOS_STORYBOARD_BIN}
+        COMMAND ibtool --compile ${IOS_STORYBOARD_BIN} ${IOS_STORYBOARD_SRC}
+        DEPENDS ${IOS_STORYBOARD_SRC}
+    )
+
+    list(APPEND THEXTECH_SRC ${IOS_STORYBOARD_SRC} ${IOS_STORYBOARD_BIN})
+
+    set_property(SOURCE ${IOS_STORYBOARD_SRC} PROPERTY HEADER_FILE_ONLY TRUE)
+    set_source_files_properties(${IOS_STORYBOARD_BIN} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 endif()
 
 
@@ -1207,6 +1224,7 @@ set(THEXTECH_EXTRA_RESOURCES
     README.RUS.md
     README.ESP.md
     resources/thextech.plist.in
+    resources/thextech.plist.ios.in
     resources/thextech.plist.tiger.in
     resources/emscripten/manifest.json.in
     resources/emscripten/shell_minimal.html
