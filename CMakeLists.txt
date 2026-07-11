@@ -200,8 +200,15 @@ else()
     set(THEXTECH_BUILD_GL_DESKTOP_DEFAULT ON)
 endif()
 
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS")
+    message("-- OpenGL ES build will be disabled on iOS until the support will be fixed")
+    set(THEXTECH_BUILD_GL_ES_MODERN_DEFAULT OFF)
+else()
+    set(THEXTECH_BUILD_GL_ES_MODERN_DEFAULT ON)
+endif()
+
 option(THEXTECH_BUILD_GL_DESKTOP_MODERN "On SDL builds, include the OpenGL 2.0+ Core/Compatibility renderer" ${THEXTECH_BUILD_GL_DESKTOP_DEFAULT})
-option(THEXTECH_BUILD_GL_ES_MODERN "On SDL builds, include the OpenGL ES 2.0+ renderer" ON)
+option(THEXTECH_BUILD_GL_ES_MODERN "On SDL builds, include the OpenGL ES 2.0+ renderer" ${THEXTECH_BUILD_GL_ES_MODERN_DEFAULT})
 option(THEXTECH_BUILD_GL_DESKTOP_LEGACY "On SDL builds, include the OpenGL 1.1+ renderer" ${THEXTECH_BUILD_GL_DESKTOP_DEFAULT})
 option(THEXTECH_BUILD_GL_ES_LEGACY "On SDL builds, include the OpenGL ES 1.1 renderer" OFF)
 
@@ -372,8 +379,8 @@ if(APPLE OR WIN32)
         set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
     else()
         set(THEXTECH_BUILD_GL_ES_MODERN OFF CACHE BOOL "" FORCE)
+        set(THEXTECH_BUILD_GL_ES_LEGACY OFF CACHE BOOL "" FORCE)
     endif()
-    set(THEXTECH_BUILD_GL_ES_LEGACY OFF CACHE BOOL "" FORCE)
 endif()
 
 # 32-bit Android special case, temporarily disabled for some experiments
@@ -766,7 +773,7 @@ if(PGE_ENABLE_VIDEO_REC)
     list(APPEND LIB_SRC ${VIDEO_REC_SRCS})
 endif()
 
-if(APPLE)
+if(APPLE AND NOT IOS)
     file(GLOB PGE_FILE_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/resources/file_icons/*.icns")
     list(APPEND LIB_SRC
         ${XTECH_DEFAULT_ICNS}
@@ -784,6 +791,14 @@ if(APPLE)
         )
         list(APPEND LIB_SRC "${THEXTECH_MAC_EXEX_GENERATED}")
     endif()
+endif()
+
+if(IOS)
+    list(APPEND LIB_SRC "${CMAKE_CURRENT_SOURCE_DIR}/resources/ios/Assets.xcassets")
+
+    set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/resources/ios/Assets.xcassets"
+        PROPERTIES MACOSX_PACKAGE_LOCATION Resources
+    )
 endif()
 
 set(THEXTECH_SRC
@@ -1366,7 +1381,9 @@ if(APPLE)
     )
     set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/${XTECH_DEFAULT_ICNS}" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_source_files_properties(${PGE_FILE_ICONS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-    if(NOT IOS)
+    if(IOS)
+        set_target_properties(thextech PROPERTIES XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME AppIcon)
+    else()
         set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/resources/PkgInfo PROPERTIES MACOSX_PACKAGE_LOCATION "")
     endif()
     if(XTECH_MACOSX_TIGER)
