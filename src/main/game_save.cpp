@@ -380,6 +380,11 @@ void PreloadGame()
     XMessage::g_session.save_present = 0;
     XMessage::g_session.save_data.clear();
 
+    // set save_configs
+    XMessage::g_session.init_save_configs = g_config.playstyle.m_value + 1;
+    if(g_config.speedrun_mode.m_value != 0)
+        XMessage::g_session.init_save_configs = 256 - g_config.speedrun_mode.m_value;
+
     if(!selSave || SaveSlotInfo[selSave].Progress < 0)
         return;
 
@@ -416,7 +421,7 @@ void LoadGame()
 #ifdef THEXTECH_ENABLE_SDL_NET
     if(XMessage::g_session.save_present == 2)
         FileFormats::ReadExtendedSaveFileRaw(XMessage::g_session.save_data, "", sav);
-    else if(XMessage::g_session.save_present == 2)
+    else if(XMessage::g_session.save_present == 1)
         FileFormats::ReadSMBX64SavFileRaw(XMessage::g_session.save_data, "", sav);
     else
         return;

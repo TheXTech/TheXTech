@@ -724,14 +724,14 @@ void NetworkClient::client_loop()
 
                     if(session_access)
                     {
-                        uint32_t session_size = 9 + g_session.save_data.size();
+                        uint32_t session_size = 10 + g_session.save_data.size();
                         uint32_t current_frame = g_session.current_frame;
                         uint32_t history_size = g_session.history.size() * 4;
 
                         temp_state.remote_frame = current_frame;
 
                         // encode session here
-                        std::array<uint8_t, 21> to_send_a =
+                        std::array<uint8_t, 22> to_send_a =
                         {
                             HEADER_PUT_SESSION,
                             uint8_t(current_frame >> 16), uint8_t(current_frame >> 8), uint8_t(current_frame >> 0),
@@ -739,7 +739,7 @@ void NetworkClient::client_loop()
                             uint8_t(history_size >> 24), uint8_t(history_size >> 16), uint8_t(history_size >> 8), uint8_t(history_size >> 0),
                             uint8_t(g_session.random_seed  >> 24), uint8_t(g_session.random_seed  >> 16), uint8_t(g_session.random_seed  >> 8), uint8_t(g_session.random_seed  >> 0),
                             g_session.init_char_select[0], g_session.init_char_select[1], g_session.init_char_select[2], g_session.init_char_select[3],
-                            g_session.save_present
+                            g_session.save_present, g_session.init_save_configs,
                         };
 
                         // FIXME: blocking while lock is held
@@ -927,7 +927,7 @@ void NetworkClient::client_loop()
                 temp_state.available_frame = temp_state.remote_frame;
 
                 status.client_state = CLIENT_HOST;
-                pLogDebug("Hosting begun. The random seed is %d.", (int)g_session.random_seed);
+                pLogDebug("Hosting begun. The random seed is %d, and the init save configs are %d.", (int)g_session.random_seed, (int)g_session.init_save_configs);
                 push_completed_request();
             }
             else
@@ -945,11 +945,11 @@ void NetworkClient::client_loop()
             tcp_control.ShiftBuffer(8);
 
             // decode session here
-            if(session_size < 9 || session_size > 2048000)
+            if(session_size < 10 || session_size > 2048000)
                 Disconnect();
 
             // FIXME: not NB, should be checking for cancel
-            if(!tcp_control.FillBufferTo(9))
+            if(!tcp_control.FillBufferTo(10))
                 Disconnect();
 
             if(status_req_in_progress == REQUEST_PENDING && status.client_state == CLIENT_SESSION_CONFIG)
@@ -963,8 +963,9 @@ void NetworkClient::client_loop()
                     g_session.init_char_select[2] = tcp_control.buffer[6];
                     g_session.init_char_select[3] = tcp_control.buffer[7];
                     g_session.save_present = tcp_control.buffer[8];
+                    g_session.init_save_configs = tcp_control.buffer[9];
 
-                    session_size -= 9;
+                    session_size -= 10;
 
                     // FIXME: may throw
                     g_session.save_data.resize(session_size);
@@ -977,7 +978,7 @@ void NetworkClient::client_loop()
 
                 session_access.release();
 
-                tcp_control.ShiftBuffer(9);
+                tcp_control.ShiftBuffer(10);
 
                 // yes, we're accessing this memory directly, because we know exactly where this gets called from
                 char* dest = &g_session.save_data[0];
@@ -1003,7 +1004,7 @@ void NetworkClient::client_loop()
                 if(session_size == 0)
                 {
                     status.client_state = CLIENT_GUEST;
-                    pLogDebug("The random seed is %d", (int)g_session.random_seed);
+                    pLogDebug("Client session begun. The random seed is %d, and the init save configs are %d.", (int)g_session.random_seed, (int)g_session.init_save_configs);
                     push_completed_request();
                 }
             }

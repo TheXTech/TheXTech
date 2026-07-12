@@ -2483,8 +2483,6 @@ static void s_InitPlayersFromCharSelect()
 
 void StartEpisode()
 {
-    XMessage::InitSession();
-
     For(A, 1, numCharacters)
     {
         SavedChar[A] = Player_t();
@@ -2505,6 +2503,9 @@ void StartEpisode()
     LevelSelect = true;
     GameMenu = false;
     g_ShortDelay = false;
+
+    // Update controllers and game config
+    XMessage::InitSession();
 
     // Update local screen size and multiplayer prefs
     UpdateInternalRes();

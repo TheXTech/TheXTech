@@ -21,6 +21,7 @@
 #include "controls.h"
 #include "message.h"
 #include "globals.h"
+#include "config.h"
 
 #include "graphics.h"
 #include "player.h"
@@ -206,6 +207,24 @@ void InitSession()
 {
     for(int A = 0; A <= maxNetplayPlayers; A++)
         s_last_controls[A] = Controls_t();
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+    if(g_session.init_save_configs >= 128)
+    {
+        if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
+        {
+            g_config.speedrun_mode.m_value = 256 - g_session.init_save_configs;
+            g_config.speedrun_mode.m_set = ConfigSetLevel::ep_config;
+        }
+    }
+    else
+    {
+        g_config.playstyle.m_value = g_session.init_save_configs - 1;
+        g_config.speedrun_mode.m_set = ConfigSetLevel::ep_config;
+    }
+#endif
+
+    UpdateConfig();
 }
 
 void Tick()

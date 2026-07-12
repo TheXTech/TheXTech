@@ -93,6 +93,7 @@ struct Session
 #ifdef THEXTECH_ENABLE_SDL_NET
     uint8_t save_present = 0;
     std::string save_data;
+    uint8_t init_save_configs = 0;
 
     // current state
     int current_frame = 0;

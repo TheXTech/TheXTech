@@ -1263,6 +1263,19 @@ bool mainMenuUpdate()
             {
                 XMessage::g_session.init_char_select = l_screen->charSelect;
 
+                if(MenuMode == MENU_CHARACTER_SELECT_NEW)
+                {
+                    // writing to m_value to avoid extra UpdateConfig hook
+                    g_config.playstyle.m_value = s_episode_playstyle;
+                    g_config.playstyle.m_set = ConfigSetLevel::ep_config;
+
+                    if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
+                    {
+                        g_config.speedrun_mode.m_value = s_episode_speedrun_mode;
+                        g_config.speedrun_mode.m_set = ConfigSetLevel::ep_config;
+                    }
+                }
+
 #ifdef THEXTECH_ENABLE_SDL_NET
                 if(s_char_select_netplay)
                 {
@@ -1279,16 +1292,6 @@ bool mainMenuUpdate()
 #endif
                 if(MenuMode == MENU_CHARACTER_SELECT_NEW)
                 {
-                    // writing to m_value to avoid extra UpdateConfig hook
-                    g_config.playstyle.m_value = s_episode_playstyle;
-                    g_config.playstyle.m_set = ConfigSetLevel::ep_config;
-
-                    if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
-                    {
-                        g_config.speedrun_mode.m_value = s_episode_speedrun_mode;
-                        g_config.speedrun_mode.m_set = ConfigSetLevel::ep_config;
-                    }
-
                     MenuCursor = 0;
 
 #ifdef THEXTECH_ENABLE_SDL_NET
