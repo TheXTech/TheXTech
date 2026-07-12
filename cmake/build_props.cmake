@@ -15,6 +15,10 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "iOS")
     if(NOT DEFINED PLATFORM_IOS)
         set(PLATFORM_IOS TRUE)
     endif()
+elseif(APPLE AND NOT IOS)
+    if(NOT DEFINED MACOS)
+        set(MACOS 1)
+    endif()
 endif()
 
 
