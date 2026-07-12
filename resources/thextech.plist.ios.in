@@ -96,6 +96,8 @@
         <integer>1</integer>
         <integer>2</integer>
     </array>
+    <key>CADisableMinimumFrameDurationOnPhone</key>
+    <true/>
     <key>UISupportedInterfaceOrientations</key>
     <array>
         <string>UIInterfaceOrientationLandscapeLeft</string>
@@ -106,5 +108,7 @@
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>TheXTech would like to remain connected to nearby bluetooth Game Controllers and Game Pads even when you're not using the game.</string>
 </dict>
 </plist>
