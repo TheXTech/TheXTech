@@ -235,7 +235,7 @@ resume_IntroEvents:
     {
         // request a pause of the game, locally going to the drop-add screen
         if(g_config.allow_drop_add && !TestLevel && XMessage::GetStatus() == XMessage::Status::local)
-            PauseScreen::ForceDropAdd();
+            PauseScreen::RequestForcedPause(PauseCode::DropAdd);
     }
 
     if(QuickReconnectScreen::g_active)

@@ -22,13 +22,15 @@
 #ifndef SCREEN_PAUSE_H
 #define SCREEN_PAUSE_H
 
+#include "game_main.h"
+
 namespace PauseScreen
 {
 
 extern uint8_t g_pending_action;
 
 void UnlockCheats();
-void ForceDropAdd();
+void RequestForcedPause(PauseCode code);
 
 void Init(int plr, bool LegacyPause);
 

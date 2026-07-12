@@ -282,11 +282,11 @@ void UnlockCheats()
         TextEntryScreen::Init(g_gameStrings.pauseItemEnterCode, s_CheatScreen_callback);
 }
 
-void ForceDropAdd()
+void RequestForcedPause(PauseCode code)
 {
     XMessage::PushMessage({XMessage::Type::shared_controls, 0, 0});
     XMessage::PushMessage({XMessage::Type::shared_controls, 0, 2});
-    s_forced_pausecode = PauseCode::DropAdd;
+    s_forced_pausecode = code;
 }
 
 void Init(int plr, bool LegacyPause)

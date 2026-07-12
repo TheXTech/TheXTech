@@ -46,9 +46,18 @@
 #include "main/menu_controls.h"
 #include "controls.h"
 #include "control/controls_methods.h" // to cancel keyboard's double-click fullscreen
+#include "message.h"
 
 namespace OptionsScreen
 {
+
+enum Callsite : uint8_t
+{
+    CALLSITE_DELETE = 0,
+    CALLSITE_DO = 1,
+    CALLSITE_ROTATE_LEFT = 2,
+    CALLSITE_ROTATE_RIGHT = 3,
+};
 
 constexpr size_t SECTION_NONE = -1;
 size_t section_index = SECTION_NONE;
@@ -56,6 +65,13 @@ std::vector<size_t> section_header_indexes;
 size_t next_section_index = 0;
 
 std::vector<size_t> visible_items;
+
+// start indexes for episode options and session tweaks (compat)
+size_t ep_options_start = SECTION_NONE;
+size_t compat_start = SECTION_NONE;
+// pending action
+bool action_reqd = false;
+XMessage::Message force_action;
 
 
 size_t cur_item = 0;
@@ -165,6 +181,19 @@ inline void s_check_friends_edited()
     g_CheatEditYourFriends = any_compat_set;
 }
 
+static inline size_t s_get_action_item_index()
+{
+    if(force_action.type == XMessage::Type::episode_option_change)
+        return ep_options_start + force_action.message;
+    else if(force_action.type == XMessage::Type::compat_session_tweak_change)
+        return compat_start + force_action.message;
+
+    if(cur_item >= visible_items.size())
+        return -1;
+
+    return visible_items[cur_item];
+}
+
 void RefreshVisibleItems();
 
 void ResetStrings()
@@ -175,31 +204,34 @@ void ResetStrings()
     value_tooltip_marquee.reset_width();
 }
 
-void Init()
+void FindSections()
 {
     section_header_indexes.clear();
     size_t i = 0;
     for(BaseConfigOption_t<false>* opt : g_options.m_options)
     {
         if(dynamic_cast<ConfigSection_t<false>*>(opt))
+        {
             section_header_indexes.push_back(i);
+
+            if(opt == &g_options.compat)
+                compat_start = i;
+            else if(opt == &g_options.episode_options)
+                ep_options_start = i;
+        }
+
         i++;
     }
+}
+
+void Init()
+{
+    FindSections();
 
     section_index = SECTION_NONE;
 
     if(g_CheatEditYourFriends == 2)
-    {
-        // set to compat
-        for(size_t i : section_header_indexes)
-        {
-            if(g_options.m_options[i] == &g_options.compat)
-            {
-                section_index = i;
-                break;
-            }
-        }
-    }
+        section_index = compat_start;
 
     RefreshVisibleItems();
 
@@ -273,14 +305,27 @@ void RefreshVisibleItems()
 }
 
 // checks to see whether it is possible for a Left/Right/Do to be performed given the current cursor and resolve which exact option should be modified
-inline BaseConfigOption_t<true>* PrepareAction(bool to_delete = false)
+inline BaseConfigOption_t<true>* PrepareAction(Callsite callsite)
 {
-    if(cur_item >= visible_items.size())
-        return nullptr;
-
-    size_t i = visible_items[cur_item];
+    size_t i = s_get_action_item_index();
     if(i >= next_section_index)
         return nullptr;
+
+    // force changes in ep options and compat to go through XMessage system
+    if((section_index == ep_options_start || section_index == compat_start) && force_action.type == XMessage::Type::empty)
+    {
+        XMessage::Message req_action;
+        req_action.type = (section_index == ep_options_start) ? XMessage::Type::episode_option_change : XMessage::Type::compat_session_tweak_change;
+        req_action.message = (uint8_t)(i - section_index);
+        req_action.player = (uint8_t)callsite;
+
+        XMessage::PushMessage(req_action);
+
+        action_reqd = true;
+        return nullptr;
+    }
+
+    bool to_delete = (callsite == CALLSITE_DELETE);
 
     // ban changing speedrun mode
     if(g_config.m_options[i] == &g_config.speedrun_mode)
@@ -343,11 +388,7 @@ inline BaseConfigOption_t<true>* PrepareAction(bool to_delete = false)
 
 void Do()
 {
-    if(cur_item >= visible_items.size())
-        return;
-
-    size_t real_item = visible_items[cur_item];
-
+    size_t real_item = s_get_action_item_index();
     if(real_item >= g_config.m_options.size())
         return;
 
@@ -405,9 +446,13 @@ void Do()
     }
     else
     {
-        BaseConfigOption_t<true>* opt = PrepareAction();
+        BaseConfigOption_t<true>* opt = PrepareAction(CALLSITE_DO);
 
-        if(opt && opt->change())
+        if(action_reqd)
+        {
+            action_reqd = false;
+        }
+        else if(opt && opt->change())
         {
             s_change_item();
             PlaySoundMenu(SFX_Do);
@@ -424,9 +469,13 @@ void RotateLeft()
     if(section_index == SECTION_NONE)
         return;
 
-    BaseConfigOption_t<true>* opt = PrepareAction();
+    BaseConfigOption_t<true>* opt = PrepareAction(CALLSITE_ROTATE_LEFT);
 
-    if(opt && opt->rotate_left())
+    if(action_reqd)
+    {
+        action_reqd = false;
+    }
+    else if(opt && opt->rotate_left())
     {
         s_change_item();
         PlaySoundMenu(SFX_Do);
@@ -442,9 +491,13 @@ void RotateRight()
     if(section_index == SECTION_NONE)
         return;
 
-    BaseConfigOption_t<true>* opt = PrepareAction();
+    BaseConfigOption_t<true>* opt = PrepareAction(CALLSITE_ROTATE_RIGHT);
 
-    if(opt && opt->rotate_right())
+    if(action_reqd)
+    {
+        action_reqd = false;
+    }
+    else if(opt && opt->rotate_right())
     {
         s_change_item();
         PlaySoundMenu(SFX_Do);
@@ -460,9 +513,13 @@ void Delete()
     if(section_index == SECTION_NONE)
         return;
 
-    BaseConfigOption_t<true>* opt = PrepareAction(true);
+    BaseConfigOption_t<true>* opt = PrepareAction(CALLSITE_DELETE);
 
-    if(opt && opt->is_set() && opt != &g_config.playstyle && opt != &g_config.creator_compat)
+    if(action_reqd)
+    {
+        action_reqd = false;
+    }
+    else if(opt && opt->is_set() && opt != &g_config.playstyle && opt != &g_config.creator_compat)
     {
         // restore to default internally -- this helps when directly displaying g_config_game_user items
         opt->set_from_default(ConfigSetLevel::set);
@@ -1043,6 +1100,31 @@ bool Logic()
     }
 
     return Mouse_Render(true, false);
+}
+
+void ChangeOption(XMessage::Message action)
+{
+    FindSections();
+
+    force_action = action;
+
+    switch(force_action.player)
+    {
+    case CALLSITE_DELETE:
+        Delete();
+        break;
+    case CALLSITE_DO:
+        Do();
+        break;
+    case CALLSITE_ROTATE_LEFT:
+        RotateLeft();
+        break;
+    case CALLSITE_ROTATE_RIGHT:
+        RotateRight();
+        break;
+    }
+
+    force_action = XMessage::Message{};
 }
 
 } // namespace OptionsScreen

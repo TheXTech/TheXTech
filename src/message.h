@@ -58,6 +58,8 @@ enum class Type : uint8_t
     screen_h,
     multiplayer_prefs,
     camera_overscan_x,
+    episode_option_change,
+    compat_session_tweak_change,
     frame_begin = 32, // meta-message: the following messages belong to the named frame
 #ifdef THEXTECH_ENABLE_SDL_NET
     // special server control messages

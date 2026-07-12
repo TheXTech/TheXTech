@@ -26,6 +26,7 @@
 #include "player.h"
 #include "main/cheat_code.h"
 #include "main/screen_pause.h"
+#include "main/screen_options.h"
 
 #include <Logger/logger.h>
 
@@ -197,6 +198,8 @@ void Handle(const Message& m)
         SetupScreens();
         PlayersEnsureNearby(screen);
     }
+    else if(m.type == Type::episode_option_change || m.type == Type::compat_session_tweak_change)
+        OptionsScreen::ChangeOption(m);
 }
 
 void InitSession()

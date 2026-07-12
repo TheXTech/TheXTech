@@ -57,6 +57,7 @@
 #include "main/game_info.h"
 #include "main/screen_quickreconnect.h"
 #include "main/screen_textentry.h"
+#include "main/screen_pause.h"
 
 #include "main/trees.h"
 
@@ -1349,7 +1350,7 @@ static void logicScreen()
 static void editYourFriends()
 {
     g_CheatEditYourFriends = 2;
-    PauseGame(PauseCode::Options);
+    PauseScreen::RequestForcedPause(PauseCode::Options);
 }
 
 static void bornToClimb()

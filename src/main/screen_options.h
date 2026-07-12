@@ -22,6 +22,8 @@
 
 #define SCREEN_OPTIONS_H
 
+#include "message.h"
+
 namespace OptionsScreen
 {
 
@@ -33,6 +35,8 @@ void Render();
 bool Logic();
 
 void ResetStrings();
+
+void ChangeOption(XMessage::Message action);
 
 } // namespace OptionsScreen
 
