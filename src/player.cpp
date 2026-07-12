@@ -5292,6 +5292,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         else
                             NPC[B].Location.X = NPC[p.HoldingNPC].Location.X - NPC[B].Location.Width;
                         NPC[B].Location.Y = NPC[p.HoldingNPC].Location.Y;
+                        treeNPCUpdate(B);
                     }
                 }
             }
