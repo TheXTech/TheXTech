@@ -780,7 +780,12 @@ static void updateTouchMap(int preferredLayout,
                            int scaleFactor,
                            int scaleFactorDPad,
                            int scaleFactorButtons,
-                           int ssSpacing)
+                           int ssSpacing,
+                           int dpadOffsetH,
+                           int dpadOffsetV,
+                           int buttonsOffsetH,
+                           int buttonsOffsetV,
+                           int ssOffset)
 {
     switch(preferredLayout)
     {
@@ -841,6 +846,34 @@ static void updateTouchMap(int preferredLayout,
 
     for(int i = 0; i < TouchScreenController::key_END; i++)
     {
+        if(i >= TouchScreenController::key_left && i <= TouchScreenController::key_downright)
+        {
+            g_touchKeyMap.touchKeysMap[i].x1 += dpadOffsetH / screenWidth;
+            g_touchKeyMap.touchKeysMap[i].x2 += dpadOffsetH / screenWidth;
+            g_touchKeyMap.touchKeysMap[i].y1 -= dpadOffsetV / screenHeight;
+            g_touchKeyMap.touchKeysMap[i].y2 -= dpadOffsetV / screenHeight;
+        }
+        else if((i >= TouchScreenController::key_run && i <= TouchScreenController::key_altjump) || i == TouchScreenController::key_altjump)
+        {
+            g_touchKeyMap.touchKeysMap[i].x1 -= buttonsOffsetH / screenWidth;
+            g_touchKeyMap.touchKeysMap[i].x2 -= buttonsOffsetH / screenWidth;
+            g_touchKeyMap.touchKeysMap[i].y1 -= buttonsOffsetV / screenHeight;
+            g_touchKeyMap.touchKeysMap[i].y2 -= buttonsOffsetV / screenHeight;
+        }
+        else if(i == TouchScreenController::key_start || i == TouchScreenController::key_drop)
+        {
+            if(preferredLayout == TouchScreenController::layout_tight)
+            {
+                g_touchKeyMap.touchKeysMap[i].y1 += ssOffset / screenHeight;
+                g_touchKeyMap.touchKeysMap[i].y2 += ssOffset / screenHeight;
+            }
+            else
+            {
+                g_touchKeyMap.touchKeysMap[i].y1 -= ssOffset / screenHeight;
+                g_touchKeyMap.touchKeysMap[i].y2 -= ssOffset / screenHeight;
+            }
+        }
+
         g_touchKeyMap.touchKeysMap[i].x1 *= scaleFactor / 100.f;
         g_touchKeyMap.touchKeysMap[i].x2 *= scaleFactor / 100.f;
         g_touchKeyMap.touchKeysMap[i].y1 *= scaleFactor / 100.f;
@@ -1084,7 +1117,12 @@ void TouchScreenController::updateScreenSize()
                    m_scale_factor,
                    m_scale_factor_dpad,
                    m_scale_factor_buttons,
-                   m_scale_factor_ss_spacing);
+                   m_scale_factor_ss_spacing,
+                   m_offset_dpad_h,
+                   m_offset_dpad_v,
+                   m_offset_buttons_h,
+                   m_offset_buttons_v,
+                   m_offset_ss);
 }
 
 static void updateKeyValue(bool& key, bool state)
@@ -1405,6 +1443,36 @@ void TouchScreenController::update()
             if(this->m_scale_factor_ss_spacing != p->m_scale_factor_ss_spacing)
             {
                 this->m_scale_factor_ss_spacing = p->m_scale_factor_ss_spacing;
+                this->updateScreenSize();
+            }
+
+            if(this->m_offset_dpad_h != p->m_offset_dpad_h)
+            {
+                this->m_offset_dpad_h = p->m_offset_dpad_h;
+                this->updateScreenSize();
+            }
+
+            if(this->m_offset_dpad_v != p->m_offset_dpad_v)
+            {
+                this->m_offset_dpad_v = p->m_offset_dpad_v;
+                this->updateScreenSize();
+            }
+
+            if(this->m_offset_buttons_h != p->m_offset_buttons_h)
+            {
+                this->m_offset_buttons_h = p->m_offset_buttons_h;
+                this->updateScreenSize();
+            }
+
+            if(this->m_offset_buttons_v != p->m_offset_buttons_v)
+            {
+                this->m_offset_buttons_v = p->m_offset_buttons_v;
+                this->updateScreenSize();
+            }
+
+            if(this->m_offset_ss != p->m_offset_ss)
+            {
+                this->m_offset_ss = p->m_offset_ss;
                 this->updateScreenSize();
             }
         }
@@ -1765,6 +1833,12 @@ InputMethodProfile_TouchScreen::InputMethodProfile_TouchScreen()
 #endif
 
 #if defined(__ANDROID__) || defined(THEXTECH_IOS)
+    // TODO: Implement automatical definition of offsets depending on device type
+    // like, iPhone X and similar devices have the Face ID cut at the screen
+    // that makes controls being partially covered by that cut, and because of
+    // the screen edge is too small, it's very inconvenient for fingers to manipulate
+    // it.
+    
     if(s_screenSize >= 9.0) // Big tablets
     {
         m_default_layout = TouchScreenController::layout_standard;
@@ -1861,6 +1935,11 @@ void InputMethodProfile_TouchScreen::SaveConfig(IniProcessing* ctl)
     ctl->setValue("scale-factor-dpad", this->m_scale_factor_dpad);
     ctl->setValue("scale-factor-buttons", this->m_scale_factor_buttons);
     ctl->setValue("scale-factor-ss-spacing", this->m_scale_factor_ss_spacing);
+    ctl->setValue("offset-dpad-h", this->m_offset_dpad_h);
+    ctl->setValue("offset-dpad-v", this->m_offset_dpad_v);
+    ctl->setValue("offset-buttons-h", this->m_offset_buttons_h);
+    ctl->setValue("offset-buttons-v", this->m_offset_buttons_v);
+    ctl->setValue("offset-ss", this->m_offset_ss);
     ctl->setValue("ui-style", this->m_touchpad_style);
     ctl->setValue("vibration-strength", this->m_feedback_strength);
     ctl->setValue("vibration-length", this->m_feedback_length);
@@ -1879,6 +1958,11 @@ void InputMethodProfile_TouchScreen::LoadConfig(IniProcessing* ctl)
     ctl->read("scale-factor-dpad", this->m_scale_factor_dpad, this->m_default_scale_factor_dpad);
     ctl->read("scale-factor-buttons", this->m_scale_factor_buttons, this->m_default_scale_factor_buttons);
     ctl->read("scale-factor-ss-spacing", this->m_scale_factor_ss_spacing, this->m_default_scale_factor_ss_spacing);
+    ctl->read("offset-dpad-h", this->m_offset_dpad_h, this->m_default_offset_dpad_h);
+    ctl->read("offset-dpad-v", this->m_offset_dpad_v, this->m_default_offset_dpad_v);
+    ctl->read("offset-buttons-h", this->m_offset_buttons_h, this->m_default_offset_buttons_h);
+    ctl->read("offset-buttons-v", this->m_offset_buttons_v, this->m_default_offset_buttons_v);
+    ctl->read("offset-ss", this->m_offset_ss, this->m_default_offset_ss);
     ctl->read("ui-style", this->m_touchpad_style, TouchScreenController::style_actions);
     ctl->read("vibration-strength", this->m_feedback_strength, 0.f);
     ctl->read("vibration-length", this->m_feedback_length, 12);
@@ -1914,6 +1998,21 @@ const char* InputMethodProfile_TouchScreen::GetOptionName_Custom(size_t i)
 
     case Options::scale_factor_ss_spacing:
         return g_controlsStrings.touchscreenOptionSStartSpacing.c_str();
+
+    case Options::offset_dpad_h:
+        return g_controlsStrings.touchscreenOptionOffsetDPadH.c_str();
+
+    case Options::offset_dpad_v:
+        return g_controlsStrings.touchscreenOptionOffsetDPadV.c_str();
+
+    case Options::offset_buttons_h:
+        return g_controlsStrings.touchscreenOptionOffsetButtonsH.c_str();
+
+    case Options::offset_buttons_v:
+        return g_controlsStrings.touchscreenOptionOffsetButtonsV.c_str();
+
+    case Options::offset_ss:
+        return g_controlsStrings.touchscreenOptionOffsetSStart.c_str();
 
     case Options::reset_layout:
         return g_controlsStrings.touchscreenOptionResetLayout.c_str();
@@ -1979,6 +2078,26 @@ const char* InputMethodProfile_TouchScreen::GetOptionValue_Custom(size_t i)
         SDL_snprintf(length_buf, 8, "%d%%", this->m_scale_factor_ss_spacing);
         return length_buf;
 
+    case Options::offset_dpad_h:
+        SDL_snprintf(length_buf, 8, "%d", this->m_offset_dpad_h);
+        return length_buf;
+
+    case Options::offset_dpad_v:
+        SDL_snprintf(length_buf, 8, "%d", this->m_offset_dpad_v);
+        return length_buf;
+
+    case Options::offset_buttons_h:
+        SDL_snprintf(length_buf, 8, "%d", this->m_offset_buttons_h);
+        return length_buf;
+
+    case Options::offset_buttons_v:
+        SDL_snprintf(length_buf, 8, "%d", this->m_offset_buttons_v);
+        return length_buf;
+
+    case Options::offset_ss:
+        SDL_snprintf(length_buf, 8, "%d", this->m_offset_ss);
+        return length_buf;
+
     case Options::style:
         if(this->m_touchpad_style == TouchScreenController::style_actions)
             return g_controlsStrings.touchscreenStyleActions.c_str();
@@ -2032,6 +2151,11 @@ bool InputMethodProfile_TouchScreen::OptionChange_Custom(size_t i)
         this->m_scale_factor_dpad = this->m_default_scale_factor_dpad;
         this->m_scale_factor_buttons = this->m_default_scale_factor_buttons;
         this->m_scale_factor_ss_spacing = this->m_default_scale_factor_ss_spacing;
+        this->m_offset_dpad_h = this->m_default_offset_dpad_h;
+        this->m_offset_dpad_h = this->m_default_offset_dpad_v;
+        this->m_offset_buttons_h = this->m_default_offset_buttons_h;
+        this->m_offset_buttons_h = this->m_default_offset_buttons_v;
+        this->m_offset_ss = this->m_default_offset_ss;
         return true;
 
     default:
@@ -2083,6 +2207,51 @@ bool InputMethodProfile_TouchScreen::OptionRotateLeft_Custom(size_t i)
         if(this->m_scale_factor_ss_spacing > 20)
         {
             this->m_scale_factor_ss_spacing -= 5;
+            return true;
+        }
+        else
+            return false;
+
+    case Options::offset_dpad_h:
+        if(this->m_offset_dpad_h > 0)
+        {
+            this->m_offset_dpad_h -= 5;
+            return true;
+        }
+        else
+            return false;
+
+    case Options::offset_dpad_v:
+        if(this->m_offset_dpad_v > 0)
+        {
+            this->m_offset_dpad_v -= 5;
+            return true;
+        }
+        else
+            return false;
+
+    case Options::offset_buttons_h:
+        if(this->m_offset_buttons_h > 0)
+        {
+            this->m_offset_buttons_h -= 5;
+            return true;
+        }
+        else
+            return false;
+
+    case Options::offset_buttons_v:
+        if(this->m_offset_buttons_v > 0)
+        {
+            this->m_offset_buttons_v -= 5;
+            return true;
+        }
+        else
+            return false;
+
+    case Options::offset_ss:
+        if(this->m_offset_ss > 0)
+        {
+            this->m_offset_ss -= 5;
             return true;
         }
         else
@@ -2170,6 +2339,51 @@ bool InputMethodProfile_TouchScreen::OptionRotateRight_Custom(size_t i)
         if(this->m_scale_factor_ss_spacing < 110)
         {
             this->m_scale_factor_ss_spacing += 5;
+            return true;
+        }
+        else
+            return false;
+
+    case Options::offset_dpad_h:
+        if(this->m_offset_dpad_h < 500)
+        {
+            this->m_offset_dpad_h += 5;
+            return true;
+        }
+        else
+            return false;
+
+    case Options::offset_dpad_v:
+        if(this->m_offset_dpad_v < 500)
+        {
+            this->m_offset_dpad_v += 5;
+            return true;
+        }
+        else
+            return false;
+
+    case Options::offset_buttons_h:
+        if(this->m_offset_buttons_h < 500)
+        {
+            this->m_offset_buttons_h += 5;
+            return true;
+        }
+        else
+            return false;
+
+    case Options::offset_buttons_v:
+        if(this->m_offset_buttons_v < 500)
+        {
+            this->m_offset_buttons_v += 5;
+            return true;
+        }
+        else
+            return false;
+
+    case Options::offset_ss:
+        if(this->m_offset_ss < 500)
+        {
+            this->m_offset_ss += 5;
             return true;
         }
         else

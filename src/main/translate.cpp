@@ -346,6 +346,11 @@ XTechTranslate::XTechTranslate()
     insert(m_engineMap, "menu.controls.touchscreen.option.scaleDPad",      &g_controlsStrings.touchscreenOptionScaleDPad);
     insert(m_engineMap, "menu.controls.touchscreen.option.scaleButtons",   &g_controlsStrings.touchscreenOptionScaleButtons);
     insert(m_engineMap, "menu.controls.touchscreen.option.sStartSpacing",  &g_controlsStrings.touchscreenOptionSStartSpacing);
+    insert(m_engineMap, "menu.controls.touchscreen.option.OffsetDPadH",    &g_controlsStrings.touchscreenOptionOffsetDPadH);
+    insert(m_engineMap, "menu.controls.touchscreen.option.OffsetDPadV",    &g_controlsStrings.touchscreenOptionOffsetDPadV);
+    insert(m_engineMap, "menu.controls.touchscreen.option.OffsetButtonsH", &g_controlsStrings.touchscreenOptionOffsetButtonsH);
+    insert(m_engineMap, "menu.controls.touchscreen.option.OffsetButtonsV", &g_controlsStrings.touchscreenOptionOffsetButtonsV);
+    insert(m_engineMap, "menu.controls.touchscreen.option.OffsetSStart",   &g_controlsStrings.touchscreenOptionOffsetSStart);
     insert(m_engineMap, "menu.controls.touchscreen.option.resetLayout",    &g_controlsStrings.touchscreenOptionResetLayout);
     insert(m_engineMap, "menu.controls.touchscreen.option.interfaceStyle", &g_controlsStrings.touchscreenOptionInterfaceStyle);
     insert(m_engineMap, "menu.controls.touchscreen.option.feedbackStrength", &g_controlsStrings.touchscreenOptionFeedbackStrength);

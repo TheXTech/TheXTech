@@ -88,6 +88,11 @@ struct ControlsStrings_t
     std::string touchscreenOptionScaleDPad = "Scale D-Pad";
     std::string touchscreenOptionScaleButtons = "Scale Buttons";
     std::string touchscreenOptionSStartSpacing = "S-Start Spacing";
+    std::string touchscreenOptionOffsetDPadH = "D-Pad Offset Left";
+    std::string touchscreenOptionOffsetDPadV = "D-Pad Offset Bottom";
+    std::string touchscreenOptionOffsetButtonsH = "Buttons Offset Right";
+    std::string touchscreenOptionOffsetButtonsV = "Buttons Offset Bottom";
+    std::string touchscreenOptionOffsetSStart = "S-Start Offset";
     std::string touchscreenOptionResetLayout = "Reset Layout";
     std::string touchscreenOptionInterfaceStyle = "Interface Style";
     std::string touchscreenOptionFeedbackStrength = "Feedback Strength";
