@@ -1683,10 +1683,18 @@ endif()
 include(cmake/deploy.cmake)
 
 if(APPLE)
-    install(TARGETS thextech DESTINATION .)
-    install(FILES changelog.txt DESTINATION .)
-    install(FILES README.md DESTINATION . RENAME ReadMe.txt)
-    install(FILES LICENSE DESTINATION . RENAME License.txt)
+    if(MACOS)
+        install(TARGETS thextech DESTINATION .)
+        install(FILES changelog.txt DESTINATION .)
+        install(FILES README.md DESTINATION . RENAME ReadMe.txt)
+        install(FILES LICENSE DESTINATION . RENAME License.txt)
+    elseif(IOS)
+        # add_custom_command(TARGET thextech POST_BUILD
+        #     COMMAND ${CMAKE_COMMAND} --install "${DEPENDENCIES_INSTALL_DIR}" --component "${CMAKE_INSTALL_DEFAULT_COMPONENT_NAME}" --config "$<CONFIG>" --prefix "$<TARGET_BUNDLE_CONTENT_DIR:thextech>"
+        #     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        # )
+        install(TARGETS thextech DESTINATION Payload COMPONENT thextech_app)
+    endif()
 elseif(WIN32)
     # For MinGW toolchain, copy missing DLLs
     if(MINGW)
