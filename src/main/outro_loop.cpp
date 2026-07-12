@@ -383,7 +383,7 @@ void SetupCredits()
     AddCredit("ddrsoul"); // For sharing the engine with the PortMaster community
     AddCredit("ChaikaWiFika"); // For the help with the testing/debugging on Intel Iris Xe GPU in 2025
     AddCredit("Bloxen"); // For help testing and improving the 38A powerups (2025) [not included until v1.3.8]
-    AddCredit("Liebning"); // For careful bugtesting in 2025
+    AddCredit("Liebning"); // For careful bugtesting in 2025 and 2026
     AddCredit("55jedat555"); // For long-term research support regarding SMBX 1.3 bugs, from ~2023 until at least 2025
     // --- P.S. Put all next lines above THIS comment line. ---
 #endif
