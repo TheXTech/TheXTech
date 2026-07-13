@@ -110,7 +110,7 @@ jobs:
       continue-on-error: true
       with:
         path: ./build-ios/*.ipa
-        name: ${{ matrix.config.name }} ${{ matrix.config.build_type }} DMG
+        name: ${{ matrix.config.name }} ${{ matrix.config.build_type }} IPA
 
     - name: Deploy to builds.wohlsoft.ru
       if: success() && github.event_name != 'pull_request' && steps.upload-check.outputs.available == 'true'
