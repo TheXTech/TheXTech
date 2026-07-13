@@ -27,7 +27,8 @@ jobs:
             name: "iOS iOS 12+ (Modern)",
             os: macos-26,
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=\"thextech\"",
-            deps_cmdline: "brew install ninja wget p7zip lftp",
+            # ninja wget p7zip - are already installed
+            deps_cmdline: "brew trust aws/tap && brew install lftp",
             generator: "Xcode",
             build_type: "MinSizeRel",
             upload_directory: "www/ios/"
@@ -105,7 +106,7 @@ jobs:
 
     - name: Upload IPA artifact
       if: success()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       continue-on-error: true
       with:
         path: ./build-ios/*.ipa
