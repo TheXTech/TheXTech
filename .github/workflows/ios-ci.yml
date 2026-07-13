@@ -25,7 +25,7 @@ jobs:
         config:
         - {
             name: "iOS iOS 12+ (Modern)",
-            os: macos-15-intel,
+            os: macos-26,
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=\"thextech\"",
             deps_cmdline: "brew install ninja wget p7zip lftp",
             generator: "Xcode",
@@ -119,13 +119,19 @@ jobs:
         if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
             export PATH=${{ matrix.config.extra_path }}:${PATH}
         fi
+
         UPLOAD_LIST="set ssl:verify-certificate no;"
-        if ls build-ios/*.ipa 1> /dev/null 2>&1; then
-            for q in *.dmg; do
+        cd build-ios
+
+        if ls *.ipa 1> /dev/null 2>&1; then
+            for q in *.ipa; do
                 UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
             done
         fi
+
         lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
+
+        cd ..
 
     - name: List Build Directory
       if: always()
