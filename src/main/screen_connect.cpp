@@ -57,6 +57,9 @@ enum class Context
 static Context s_context;
 static std::array<uint8_t, maxLocalPlayers> s_recent_char{};
 
+//! which characters have been requested
+std::array<uint8_t, maxLocalPlayers> g_charSelect;
+
 struct CharInfo
 {
 private:
@@ -188,7 +191,7 @@ private:
     // adds player if not present, and updates player's character
     void UpdatePlayer();
 
-    // makes sure that l_screen->charSelect[p] is valid
+    // makes sure that g_charSelect[p] is valid
     void ValidateChar(bool ghost_mode = false);
 
     // does logic for an item the mouse is currently over
@@ -255,7 +258,7 @@ static void s_logRecentChars()
     for(size_t i = 0; i < maxLocalPlayers; i++)
     {
         if(s_players[i].m_state != PlayerState::Disconnected)
-            s_recent_char[i] = l_screen->charSelect[i];
+            s_recent_char[i] = g_charSelect[i];
     }
 
     // mark input methods as used
@@ -400,7 +403,7 @@ void MainMenu_Start(int minPlayers)
         Controls::g_InputMethods[0]->used_for_player = true;
 
     for(int i = 0; i < maxLocalPlayers; i++)
-        l_screen->charSelect[i] = 0;
+        g_charSelect[i] = 0;
 
     if(!(g_forceCharacter && SelectWorld[selWorld].blockChar[s_recent_char[0]]))
         s_InitBlockCharacter();
@@ -432,7 +435,7 @@ void LegacyMenu_Start()
         Controls::g_InputMethods[0]->used_for_player = true;
 
     for(int i = 0; i < maxLocalPlayers; i++)
-        l_screen->charSelect[i] = 0;
+        g_charSelect[i] = 0;
 
     s_InitBlockCharacter();
 
@@ -522,13 +525,13 @@ void PlayerBox::Init()
 
     if(s_context == Context::DropAdd && p < l_screen->player_count)
     {
-        l_screen->charSelect[p] = Player[l_screen->players[p]].Character;
+        g_charSelect[p] = Player[l_screen->players[p]].Character;
     }
     else
     {
-        l_screen->charSelect[p] = s_recent_char[p];
-        if(l_screen->charSelect[p] == 0)
-            l_screen->charSelect[p] = p + 1;
+        g_charSelect[p] = s_recent_char[p];
+        if(g_charSelect[p] == 0)
+            g_charSelect[p] = p + 1;
         ValidateChar(true);
     }
 }
@@ -557,7 +560,7 @@ bool PlayerBox::CharAvailable(int c, bool ghost_mode)
         if(i == p)
             continue;
 
-        if(l_screen->charSelect[i] == c && !(s_context == Context::MainMenu && MenuMode == MENU_CHARACTER_SELECT_NEW_BM) && !g_forceCharacter)
+        if(g_charSelect[i] == c && !(s_context == Context::MainMenu && MenuMode == MENU_CHARACTER_SELECT_NEW_BM) && !g_forceCharacter)
             return false;
     }
 
@@ -632,7 +635,7 @@ static void Player_Remove(int p)
 {
     // if it was a novel add, mark their character as allowed
     if(s_players[p].m_current_add == 2)
-        s_char_info.mark_char_present(l_screen->charSelect[p]);
+        s_char_info.mark_char_present(g_charSelect[p]);
 
     Controls::DeleteInputMethodSlot(p);
 
@@ -641,7 +644,7 @@ static void Player_Remove(int p)
     {
         s_players[p2] = s_players[p2 + 1];
         s_players[p2].m_input_ready = false;
-        l_screen->charSelect[p2] = l_screen->charSelect[p2 + 1];
+        g_charSelect[p2] = g_charSelect[p2 + 1];
     }
 
     s_players[maxLocalPlayers - 1] = PlayerBox();
@@ -666,7 +669,7 @@ static void Player_Swap(int p1, int p2)
 
     std::swap(s_players[p1], s_players[p2]);
 
-    std::swap(l_screen->charSelect[p1], l_screen->charSelect[p2]);
+    std::swap(g_charSelect[p1], g_charSelect[p2]);
 
     s_players[p1].m_input_ready = false;
     s_players[p2].m_input_ready = false;
@@ -701,8 +704,8 @@ void PlayerBox::UpdatePlayer()
     // if initialized, then update character
     if(p < l_screen->player_count)
     {
-        if(l_screen->charSelect[p] != Player[l_screen->players[p]].Character)
-            XMessage::PushMessage({XMessage::Type::char_swap, (uint8_t)p, (uint8_t)l_screen->charSelect[p]});
+        if(g_charSelect[p] != Player[l_screen->players[p]].Character)
+            XMessage::PushMessage({XMessage::Type::char_swap, (uint8_t)p, (uint8_t)g_charSelect[p]});
     }
     // otherwise, add new player!
     else
@@ -711,7 +714,7 @@ void PlayerBox::UpdatePlayer()
         Player_Swap(l_screen->player_count, p);
 
         // check the desired character
-        uint8_t chara = l_screen->charSelect[l_screen->player_count];
+        uint8_t chara = g_charSelect[l_screen->player_count];
 
         // add as dead if dead player was dropped in this level
         if(s_char_info.dead_count > 0)
@@ -732,7 +735,7 @@ void PlayerBox::ValidateChar(bool ghost_mode)
 {
     int p = CalcIndex();
 
-    uint8_t& sel = l_screen->charSelect[p];
+    uint8_t& sel = g_charSelect[p];
 
     // ensure that character selection is still valid
 
@@ -918,7 +921,7 @@ bool PlayerBox::Do()
             {
                 // clean up charSelect fields
                 for(int p = (int)Controls::g_InputMethods.size(); p < maxLocalPlayers; p++)
-                    l_screen->charSelect[p] = 0;
+                    g_charSelect[p] = 0;
 
                 do_sentinel.active = true;
                 return true;
@@ -979,7 +982,7 @@ bool PlayerBox::CanChangeChar()
     // see if any other character is totally free for self
     for(int ch = 1; ch <= numCharacters; ch++)
     {
-        if(ch == l_screen->charSelect[p])
+        if(ch == g_charSelect[p])
             continue;
 
         if(CharAvailable(ch))
@@ -987,16 +990,16 @@ bool PlayerBox::CanChangeChar()
     }
 
     // if own character is okay, then it'll be kept. return false here.
-    if(CharAvailable(l_screen->charSelect[p]))
+    if(CharAvailable(g_charSelect[p]))
         return false;
 
     // if even own character not totally free, see if any character is allowed by the s_char_info state
     for(int ch = 1; ch <= numCharacters; ch++)
     {
-        if(ch == l_screen->charSelect[p])
+        if(ch == g_charSelect[p])
             continue;
 
-        if(s_char_info.accept(l_screen->charSelect[p], p, m_current_add))
+        if(s_char_info.accept(g_charSelect[p], p, m_current_add))
             return true;
     }
 
@@ -1012,17 +1015,17 @@ void PlayerBox::PrevChar()
     // }
 
     int p = CalcIndex();
-    int old_ch = l_screen->charSelect[p];
+    int old_ch = g_charSelect[p];
 
     int i = 0;
     for(i = 0; i < numCharacters; i++)
     {
-        l_screen->charSelect[p] --;
+        g_charSelect[p] --;
 
-        if(l_screen->charSelect[p] < 1)
-            l_screen->charSelect[p] = numCharacters;
+        if(g_charSelect[p] < 1)
+            g_charSelect[p] = numCharacters;
 
-        if(CharAvailable(l_screen->charSelect[p]))
+        if(CharAvailable(g_charSelect[p]))
             break;
     }
 
@@ -1031,18 +1034,18 @@ void PlayerBox::PrevChar()
     {
         for(i = 0; i < numCharacters; i++)
         {
-            l_screen->charSelect[p] --;
+            g_charSelect[p] --;
 
-            if(l_screen->charSelect[p] < 1)
-                l_screen->charSelect[p] = numCharacters;
+            if(g_charSelect[p] < 1)
+                g_charSelect[p] = numCharacters;
 
-            if(s_char_info.accept(l_screen->charSelect[p], p, m_current_add))
+            if(s_char_info.accept(g_charSelect[p], p, m_current_add))
                 break;
         }
     }
 
     // eventually changed character, update the player
-    if(l_screen->charSelect[p] != old_ch)
+    if(g_charSelect[p] != old_ch)
     {
         PlaySoundMenu(SFX_Slide);
         UpdatePlayer();
@@ -1060,17 +1063,17 @@ void PlayerBox::NextChar()
     // }
 
     int p = CalcIndex();
-    int old_ch = l_screen->charSelect[p];
+    int old_ch = g_charSelect[p];
 
     int i;
     for(i = 0; i < numCharacters; i++)
     {
-        l_screen->charSelect[p] ++;
+        g_charSelect[p] ++;
 
-        if(l_screen->charSelect[p] > numCharacters)
-            l_screen->charSelect[p] = 1;
+        if(g_charSelect[p] > numCharacters)
+            g_charSelect[p] = 1;
 
-        if(CharAvailable(l_screen->charSelect[p]))
+        if(CharAvailable(g_charSelect[p]))
             break;
     }
 
@@ -1079,18 +1082,18 @@ void PlayerBox::NextChar()
     {
         for(i = 0; i < numCharacters; i++)
         {
-            l_screen->charSelect[p] ++;
+            g_charSelect[p] ++;
 
-            if(l_screen->charSelect[p] > numCharacters)
-                l_screen->charSelect[p] = 1;
+            if(g_charSelect[p] > numCharacters)
+                g_charSelect[p] = 1;
 
-            if(s_char_info.accept(l_screen->charSelect[p], p, m_current_add))
+            if(s_char_info.accept(g_charSelect[p], p, m_current_add))
                 break;
         }
     }
 
     // eventually changed character, update the player
-    if(l_screen->charSelect[p] != old_ch)
+    if(g_charSelect[p] != old_ch)
     {
         PlaySoundMenu(SFX_Slide);
         UpdatePlayer();
@@ -1227,14 +1230,14 @@ bool PlayerBox::MouseItem(int i)
         PlaySoundMenu(SFX_Slide);
     }
 
-    int sel = (m_state == PlayerState::SelectChar) ? l_screen->charSelect[0] : m_menu_item;
+    int sel = (m_state == PlayerState::SelectChar) ? g_charSelect[0] : m_menu_item;
 
     if(sel != i)
     {
         PlaySoundMenu(SFX_Slide);
 
         if(m_state == PlayerState::SelectChar)
-            l_screen->charSelect[0] = i;
+            g_charSelect[0] = i;
         else
             m_menu_item = i;
 
@@ -1325,7 +1328,7 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h, bool show_name)
     uint8_t alpha = (show_inactive) ? 127 : 255;
 
     // verify that character is valid
-    int ch = l_screen->charSelect[p];
+    int ch = g_charSelect[p];
     if(ch < 1 || ch > numCharacters)
         return false;
 
@@ -1483,7 +1486,7 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h, bool show_name)
 #if 0
     // finish with character name
     if(show_name)
-        SuperPrintCenter(g_gameInfo.characterName[l_screen->charSelect[p]], 3, x + w / 2, y + h + 12, XTAlpha(alpha));
+        SuperPrintCenter(g_gameInfo.characterName[g_charSelect[p]], 3, x + w / 2, y + h + 12, XTAlpha(alpha));
 #else
     UNUSED(show_name);
 #endif
@@ -1527,7 +1530,7 @@ int PlayerBox::Mouse_Render_1P(bool render)
             if(MenuItem_Mouse_Render(i, fmt::format_ne(g_mainMenu.selectCharacter, g_gameInfo.characterName[i]), MenuX, y_pos, mouse, render))
                 return 1;
 
-            if(render && l_screen->charSelect[p] == i)
+            if(render && g_charSelect[p] == i)
                 XRender::renderTextureBasic(MenuX - 20, y_pos, GFX.MCursor[0]);
 
             y_pos += 30;
@@ -1561,8 +1564,8 @@ int PlayerBox::Mouse_Render_1P(bool render)
     }
 
     // do char transform thing!
-    if(render && l_screen->charSelect[p] >= 1 && l_screen->charSelect[p] <= numCharacters)
-        DoTransform(p, l_screen->charSelect[p]);
+    if(render && g_charSelect[p] >= 1 && g_charSelect[p] <= numCharacters)
+        DoTransform(p, g_charSelect[p]);
 
     return 0;
 }
@@ -1605,12 +1608,12 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
     if(inactive)
     {
         if(show_inactive)
-            l_screen->charSelect[p] = s_recent_char[p];
+            g_charSelect[p] = s_recent_char[p];
         ValidateChar(true);
     }
 
     // check currently selected character
-    int ch = l_screen->charSelect[p];
+    int ch = g_charSelect[p];
 
     // verify that character is valid
     if(ch < 1 || ch > numCharacters)
@@ -2123,7 +2126,7 @@ int PlayerBox::Logic()
 
                 m_menu_item = 0;
                 if(p >= s_minPlayers)
-                    l_screen->charSelect[p] = s_recent_char[p];
+                    g_charSelect[p] = s_recent_char[p];
                 m_state = PlayerState::SelectChar;
                 ValidateChar();
             }
@@ -2134,7 +2137,7 @@ int PlayerBox::Logic()
             if(p >= l_screen->player_count)
             {
                 m_menu_item = 0;
-                l_screen->charSelect[p] = s_recent_char[p];
+                g_charSelect[p] = s_recent_char[p];
                 m_state = PlayerState::SelectChar;
 
                 // check whether a novel add

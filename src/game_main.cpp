@@ -716,12 +716,12 @@ int GameMain(const CmdLineSetup_t &setup)
                 for(int i = 0; i < numPlayers; i++)
                 {
                     if(testPlayer[i + 1].Character != 0)
-                        l_screen->charSelect[i] = testPlayer[i + 1].Character;
+                        ConnectScreen::g_charSelect[i] = testPlayer[i + 1].Character;
                     else
-                        l_screen->charSelect[i] = i + 1;
+                        ConnectScreen::g_charSelect[i] = i + 1;
 
                     // replace blocked characters
-                    if(blockCharacter[l_screen->charSelect[i]])
+                    if(blockCharacter[ConnectScreen::g_charSelect[i]])
                     {
                         for(int new_char = 1; new_char <= numCharacters; new_char++)
                         {
@@ -733,14 +733,14 @@ int GameMain(const CmdLineSetup_t &setup)
                             int j = 0;
                             for(; j < i; j++)
                             {
-                                if(l_screen->charSelect[j] == new_char)
+                                if(ConnectScreen::g_charSelect[j] == new_char)
                                     break;
                             }
 
                             // if loop ended naturally, character is unused
                             if(j == i)
                             {
-                                l_screen->charSelect[i] = new_char;
+                                ConnectScreen::g_charSelect[i] = new_char;
                                 break;
                             }
                         }
@@ -1074,9 +1074,8 @@ int GameMain(const CmdLineSetup_t &setup)
             Screens[0] = *l_screen;
             l_screen = &Screens[0];
 
-            // reset non-local screens' charSelect
-            for(int s = 1; s < maxNetplayClients; s++)
-                Screens[s].charSelect = {};
+            // reset charSelect
+            ConnectScreen::g_charSelect = {};
 
             // reinitialize the screens (resets multiplayer preferences and restores state disrupted by reassigning Screens[0])
             InitScreens();

@@ -2,11 +2,16 @@
 
 #define SCREEN_CONNECT_H
 
+#include <array>
+
 // for maxLocalPlayers
 #include "../global_constants.h"
 
 namespace ConnectScreen
 {
+
+//! which characters have been requested
+extern std::array<uint8_t, maxLocalPlayers> g_charSelect;
 
 void MainMenu_Start(int minPlayers);
 void DropAdd_Start();

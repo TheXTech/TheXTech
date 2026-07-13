@@ -1261,7 +1261,7 @@ bool mainMenuUpdate()
             }
             else if(ret == 1)
             {
-                XMessage::g_session.init_char_select = l_screen->charSelect;
+                XMessage::g_session.init_char_select = ConnectScreen::g_charSelect;
 
                 if(MenuMode == MENU_CHARACTER_SELECT_NEW)
                 {
