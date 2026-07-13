@@ -119,7 +119,7 @@ std::vector<SelectWorld_t> SelectBattle;
 
 #ifdef THEXTECH_ENABLE_SDL_NET
 // this is a temporary hack
-static bool s_char_select_netplay = false;
+static int s_char_select_netplay = false;
 #endif // #ifdef THEXTECH_ENABLE_SDL_NET
 
 
@@ -1007,17 +1007,8 @@ bool mainMenuUpdate()
             auto* status = XMessage::GetClientStatus();
             if(status && (status->client_state == XMessage::CLIENT_GUEST || status->client_state == XMessage::CLIENT_HOST || status->client_state == XMessage::CLIENT_HOST_IDLE))
             {
-                if(status->client_state == XMessage::CLIENT_GUEST)
-                {
-                    if((int)Controls::g_InputMethods.size() > 1)
-                        Controls::ClearInputMethods();
-
-                    selSave = 0;
-                }
-
                 // no longer need NetPlay flag (hack) because we are starting game
                 s_char_select_netplay = false;
-
                 s_StartEpisodeOnline();
                 return true;
             }
@@ -1041,7 +1032,10 @@ bool mainMenuUpdate()
                 else
                 {
                     PlaySoundMenu(SFX_Do);
-                    XMessage::JoinRoom(room_info.room_key);
+                    s_char_select_netplay = 2;
+                    selSave = 0;
+                    MenuMode = MENU_CHARACTER_SELECT_NEW;
+                    ConnectScreen::MainMenu_Start(1);
                 }
             }
             // ... some sort of switch for responses to queries
@@ -1243,6 +1237,15 @@ bool mainMenuUpdate()
                 // disconnect input methods for convenience
                 Controls::ClearInputMethods();
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+                if(s_char_select_netplay == 2)
+                {
+                    MenuMode = MENU_NETPLAY;
+                    MenuCursor = 0;
+                    s_char_select_netplay = 0;
+                }
+                else
+#endif
                 if(MenuMode == MENU_CHARACTER_SELECT_NEW_BM)
                 {
                     MenuMode = MENU_BATTLE_MODE;
@@ -1277,7 +1280,7 @@ bool mainMenuUpdate()
                 }
 
 #ifdef THEXTECH_ENABLE_SDL_NET
-                if(s_char_select_netplay)
+                if(s_char_select_netplay == 1)
                 {
                     PreloadGame();
 
@@ -1287,6 +1290,20 @@ bool mainMenuUpdate()
                     room_info.content_hash = SelectWorld[selWorld].lz4_content_hash;
 
                     XMessage::JoinNewRoom(room_info);
+                }
+                else if(s_char_select_netplay == 2)
+                {
+                    const XMessage::RoomInfo& room_info = *XMessage::GetRoomInfo();
+
+                    if(room_info.room_key == 0 || room_info.engine_hash != s_engineHash() || room_info.asset_hash != s_assetPackHash() || room_info.content_hash == 0)
+                    {
+                        PlaySoundMenu(SFX_BlockHit);
+                    }
+                    else
+                    {
+                        PlaySoundMenu(SFX_Do);
+                        XMessage::JoinRoom(room_info.room_key);
+                    }
                 }
                 else
 #endif

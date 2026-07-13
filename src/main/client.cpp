@@ -729,6 +729,7 @@ void NetworkClient::client_loop()
                         uint32_t history_size = g_session.history.size() * 4;
 
                         temp_state.remote_frame = current_frame;
+                        temp_state.available_frame = current_frame;
 
                         // encode session here
                         std::array<uint8_t, 22> to_send_a =
@@ -924,8 +925,6 @@ void NetworkClient::client_loop()
 
             if(status_req_in_progress == REQUEST_PENDING && (status.client_state == CLIENT_SESSION_CONFIG || status.client_state == CLIENT_HOST_IDLE))
             {
-                temp_state.available_frame = temp_state.remote_frame;
-
                 status.client_state = CLIENT_HOST;
                 pLogDebug("Hosting begun. The random seed is %d, and the init save configs are %d.", (int)g_session.random_seed, (int)g_session.init_save_configs);
                 push_completed_request();

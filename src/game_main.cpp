@@ -2476,7 +2476,7 @@ static void s_InitPlayersFromCharSelect()
         }
     }
 
-    for(int i = (int)Controls::g_InputMethods.size() - 1; i >= l_screen->player_count; i--)
+    for(int i = (int)Controls::g_InputMethods.size() - 1; i >= 0 && ConnectScreen::g_charSelect[i] == 0; i--)
         Controls::DeleteInputMethodSlot(i);
 }
 

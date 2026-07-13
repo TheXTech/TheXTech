@@ -55,13 +55,6 @@ void Handle(const Message& m)
     {
         if(m.type == Type::add_client)
         {
-            Screen_t& screen = Screens[m.message];
-
-            // add player if there isn't any
-            if(screen.player_count == 0)
-                AddPlayer((m.message % 5) + 1, screen);
-
-            SetupScreens();
         }
         else if(m.type == Type::drop_client)
         {
@@ -252,6 +245,7 @@ void Tick()
                 s_message_vector.push_back(m);
             }
 
+            g_session.next_message = g_session.history.size();
             s_message_submit_queue.clear();
         }
     }

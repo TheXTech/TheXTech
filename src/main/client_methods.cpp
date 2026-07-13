@@ -26,6 +26,7 @@
 #include "globals.h"
 #include "sound.h"
 #include "change_res.h"
+#include "config.h"
 
 #include "core/events.h"
 
@@ -45,6 +46,8 @@ static NetworkClient s_network_client;
 static bool s_in_fast_forward = false;
 static uint32_t s_fast_forward_begin_ms = 0;
 static uint32_t s_fast_forward_begin_frame = 0;
+
+static std::array<uint8_t, maxLocalPlayers> s_client_char_select;
 
 void GameThread::push_status_req()
 {
@@ -117,8 +120,14 @@ void Connect(const char* host)
 
 void Disconnect()
 {
+    bool was_netplay = (GetStatus() != Status::local);
+
     s_game_thread.status_req = ClientStatus();
     s_game_thread.push_status_req();
+
+    // deactivate Netplay-related settings
+    if(was_netplay)
+        UpdateConfig();
 }
 
 void NetStartup()
@@ -236,6 +245,18 @@ void ClientFrameSync(std::vector<Message>& submit_buffer, std::vector<Message>& 
             UpdateMusicVolume();
             // update current resolution (may need to resync screen size)
             UpdateInternalRes();
+
+            // add players from char select
+            for(int i = 0; i < maxLocalPlayers; i++)
+            {
+                if(s_client_char_select[i] == 0)
+                    break;
+
+                if(l_screen->player_count <= i)
+                    XMessage::PushMessage({XMessage::Type::add_player, 0, s_client_char_select[i]});
+
+                s_client_char_select[i] = 0;
+            }
         }
     }
 }
@@ -259,6 +280,8 @@ const RoomInfo* GetRoomInfo()
 
 void JoinNewRoom(const RoomInfo& room_info)
 {
+    s_client_char_select = {};
+
     XMessage::g_session.random_seed = iRand(2147483647);
 
     XMessage::g_session.current_frame = 0;
@@ -277,6 +300,8 @@ void JoinNewRoom(const RoomInfo& room_info)
 
 void JoinRoom(uint32_t room_key)
 {
+    s_client_char_select = XMessage::g_session.init_char_select;
+
     XMessage::g_session.current_frame = 0;
     XMessage::g_session.available_frame = -1;
     XMessage::g_session.remote_frame = -1;
@@ -298,6 +323,9 @@ void ActivateHost()
 
     s_game_thread.status_req.client_state = CLIENT_HOST;
     s_game_thread.push_status_req();
+
+    // activate Netplay-related settings
+    UpdateConfig();
 }
 
 uint32_t CurrentRoom()
