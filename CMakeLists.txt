@@ -21,7 +21,7 @@ include(FindBacktrace)
 include(TestBigEndian)
 include(CheckIncludeFile)
 
-
+include(cmake/build_platforms.cmake)
 include(cmake/git_info.cmake)
 message("== Current GIT hash [${GIT_COMMIT_HASH}], branch [${GIT_BRANCH}], package [${PACKAGE_SUFFIX}] ==")
 
@@ -963,7 +963,7 @@ if(TVOS)
     )
 endif()
 
-if(IOS OR TVOS)
+if(IOS)
     set(IOS_STORYBOARD_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/core/ios/LaunchScreen.storyboard")
     set(IOS_STORYBOARD_BIN "${CMAKE_CURRENT_BINARY_DIR}/LaunchScreen.storyboardc")
 
