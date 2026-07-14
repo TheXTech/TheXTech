@@ -31,6 +31,7 @@ jobs:
             deps_cmdline: "brew trust aws/tap && brew install lftp",
             generator: "Xcode",
             build_type: "MinSizeRel",
+            platform: "iOS",
             min_version: "12.0",
             package_prefix: "thextech-ios12",
             package_arch: "arm64",
@@ -44,6 +45,7 @@ jobs:
             deps_cmdline: "brew trust aws/tap && brew install lftp",
             generator: "Xcode",
             build_type: "MinSizeRel",
+            platform: "tvOS",
             min_version: "12.0",
             package_prefix: "thextech-tvos",
             package_arch: "arm64",
@@ -88,7 +90,7 @@ jobs:
       run: |
         git submodule update --init --recursive
 
-    - name: Configure (arm64, iOS 12+)
+    - name: Configure
       shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
@@ -98,12 +100,12 @@ jobs:
         cmake -B build-ios \
               -G "${{ matrix.config.generator }}" \
               -DCPACK_PACKAGE_FILE_NAME="${{ matrix.config.package_prefix }}-${{ matrix.config.package_arch }}-${BRANCH_NAME}" \
-              -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_DEPLOYMENT_TARGET=${{ matrix.config.min_version }} -DCMAKE_OSX_ARCHITECTURES="${{ matrix.config.package_arch }}" \
+              -DCMAKE_SYSTEM_NAME=${{ matrix.config.platform }} -DCMAKE_OSX_DEPLOYMENT_TARGET=${{ matrix.config.min_version }} -DCMAKE_OSX_ARCHITECTURES="${{ matrix.config.package_arch }}" \
               -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED="NO" -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED="NO" \
               -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} \
               ${{ matrix.config.extra_options }} .
 
-    - name: Build (arm64, iOS 12+)
+    - name: Build
       shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
