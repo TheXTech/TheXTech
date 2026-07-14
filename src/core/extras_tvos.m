@@ -22,7 +22,7 @@
 #include <Foundation/Foundation.h>
 #include <UIKit/UIApplication.h>
 
-void ios_quit(int ret)
+void tvos_quit(int ret)
 {
     //home button press programmatically
     UIApplication *app = [UIApplication sharedApplication];

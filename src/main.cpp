@@ -841,8 +841,12 @@ int main(int argc, char**argv)
     );
 #endif
 
-#if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
+#if defined(THEXTECH_IOS)
     ios_quit(ret); // Apple hates this, but we need it!
+#endif
+
+#if  defined(THEXTECH_TVOS)
+    tvos_quit(ret);
 #endif
 
     return ret;

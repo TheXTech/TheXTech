@@ -41,4 +41,17 @@ int ios_get_cut_off_size(void);
 #   endif
 #endif
 
+#ifdef THEXTECH_TVOS
+#   ifdef __cplusplus
+extern "C"
+{
+#   endif
+
+void tvos_quit(int ret);
+
+#   ifdef __cplusplus
+}
+#   endif
+#endif
+
 #endif // EXTRAS_H
