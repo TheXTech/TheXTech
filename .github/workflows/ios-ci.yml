@@ -24,14 +24,30 @@ jobs:
       matrix:
         config:
         - {
-            name: "iOS iOS 12+ (Modern)",
+            name: "iOS 12+ arm64 (Modern)",
             os: macos-26,
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=\"thextech\"",
             # ninja wget p7zip - are already installed
             deps_cmdline: "brew trust aws/tap && brew install lftp",
             generator: "Xcode",
             build_type: "MinSizeRel",
+            min_version: "12.0",
+            package_prefix: "thextech-ios12",
+            package_arch: "arm64",
             upload_directory: "www/ios/"
+          }
+        - {
+            name: "tvOS 12+ arm64",
+            os: macos-26,
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=\"thextech\"",
+            # ninja wget p7zip - are already installed
+            deps_cmdline: "brew trust aws/tap && brew install lftp",
+            generator: "Xcode",
+            build_type: "MinSizeRel",
+            min_version: "12.0",
+            package_prefix: "thextech-tvos",
+            package_arch: "arm64",
+            upload_directory: "www/tvos/"
           }
 
     steps:
@@ -81,8 +97,8 @@ jobs:
         fi
         cmake -B build-ios \
               -G "${{ matrix.config.generator }}" \
-              -DCPACK_PACKAGE_FILE_NAME="thextech-ios12-arm64-${BRANCH_NAME}" \
-              -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0 -DCMAKE_OSX_ARCHITECTURES="arm64" \
+              -DCPACK_PACKAGE_FILE_NAME="${{ matrix.config.package_prefix }}-${{ matrix.config.package_arch }}-${BRANCH_NAME}" \
+              -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_DEPLOYMENT_TARGET=${{ matrix.config.min_version }} -DCMAKE_OSX_ARCHITECTURES="${{ matrix.config.package_arch }}" \
               -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED="NO" -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED="NO" \
               -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} \
               ${{ matrix.config.extra_options }} .
