@@ -603,7 +603,7 @@ textureTryAgain:
 
     target.d.texture = texture;
 
-#if !defined(THEXTECH_IOS)
+#if !defined(THEXTECH_IOS) && !defined(THEXTECH_TVOS)
     target.d.nOfColors = GL_RGBA;
     target.d.format = GL_BGRA;
 #endif

@@ -486,7 +486,7 @@ public:
         "log-level", "Log level", nullptr,
         config_log_level_set};
 
-#if defined(__ANDROID__) || defined(THEXTECH_IOS) || defined(__3DS__)
+#if defined(__ANDROID__) || defined(THEXTECH_IOS) || defined(THEXTECH_TVOS) || defined(__3DS__)
     opt<bool> use_native_osk{this, defaults(false), {}, Scope::Config,
         "use-native-osk", "Native OSK", nullptr};
 #endif
