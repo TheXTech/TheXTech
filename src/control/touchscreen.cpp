@@ -1830,6 +1830,17 @@ InputMethodProfile_TouchScreen::InputMethodProfile_TouchScreen()
 #ifdef THEXTECH_IOS
     if(s_screenSize < 0.0)
         s_screenSize = ios_get_screen_diagonal(&s_screenWidth, &s_screenHeight);
+
+    int cut_off = ios_get_cut_off_size();
+    m_default_offset_dpad_h = cut_off;
+
+    if(cut_off > 0)
+    {
+        // To compensate thin edge
+        m_default_offset_buttons_h = 100;
+        // To don't overlap the home bar
+        m_default_offset_ss = 20;
+    }
 #endif
 
 #if defined(__ANDROID__) || defined(THEXTECH_IOS)
@@ -2152,9 +2163,9 @@ bool InputMethodProfile_TouchScreen::OptionChange_Custom(size_t i)
         this->m_scale_factor_buttons = this->m_default_scale_factor_buttons;
         this->m_scale_factor_ss_spacing = this->m_default_scale_factor_ss_spacing;
         this->m_offset_dpad_h = this->m_default_offset_dpad_h;
-        this->m_offset_dpad_h = this->m_default_offset_dpad_v;
+        this->m_offset_dpad_v = this->m_default_offset_dpad_v;
         this->m_offset_buttons_h = this->m_default_offset_buttons_h;
-        this->m_offset_buttons_h = this->m_default_offset_buttons_v;
+        this->m_offset_buttons_v = this->m_default_offset_buttons_v;
         this->m_offset_ss = this->m_default_offset_ss;
         return true;
 
