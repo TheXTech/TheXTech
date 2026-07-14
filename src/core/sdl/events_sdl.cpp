@@ -35,7 +35,7 @@
 #include "controls.h"
 
 
-#ifdef THEXTECH_IOS
+#if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
 int EventsSDL::handle_ios_events(void * /*userdata*/, SDL_Event * /*event*/)
 {
     return 1;
@@ -60,14 +60,14 @@ EventsSDL::EventsSDL() :
     AbstractEvents_t()
 {
     SDL_memset(&m_event, 0, sizeof(SDL_Event));
-#ifdef THEXTECH_IOS
+#if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
     SDL_SetEventFilter(handle_ios_events, this);
 #endif
 }
 
 EventsSDL::~EventsSDL()
 {
-#ifdef THEXTECH_IOS
+#if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
     SDL_SetEventFilter(NULL, NULL);
 #endif
 }

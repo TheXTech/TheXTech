@@ -38,7 +38,7 @@
 #include "controls.h"
 #include <AppPath/app_path.h>
 
-#if defined(THEXTECH_IOS)
+#if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
 #   include "core/extras.h"
 #endif
 
@@ -841,7 +841,7 @@ int main(int argc, char**argv)
     );
 #endif
 
-#if defined(THEXTECH_IOS)
+#if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
     ios_quit(ret); // Apple hates this, but we need it!
 #endif
 

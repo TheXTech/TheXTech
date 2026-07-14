@@ -976,7 +976,7 @@ void InputMethodType_Keyboard::UpdateControlsPost()
         }
     }
 
-#if defined(__ANDROID__) || defined(THEXTECH_IOS) // Quit credits on BACK key press
+#if defined(__ANDROID__) || defined(THEXTECH_IOS) || defined(THEXTECH_TVOS) // Quit credits on BACK key press
     bool backPressed = this->m_keyboardState[SDL_SCANCODE_AC_BACK];
 #else
     bool backPressed = false;

@@ -509,7 +509,7 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
 #if defined(__SWITCH__) /* On Switch, expect the initial size 1920x1080 */
     const int initWindowW = 1920;
     const int initWindowH = 1080;
-#elif defined(THEXTECH_IOS)
+#elif defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
     SDL_DisplayMode mode;
     SDL_GetDisplayMode(0, 0, &mode);
     const auto initWindowW = mode.w;
@@ -529,13 +529,13 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
     m_fullscreen_type = -1; // Will be initialized later
 #endif
 
-#ifndef THEXTECH_IOS
+#if !defined(THEXTECH_IOS) && !defined(THEXTECH_TVOS)
     // restore fullscreen state
     if(m_fullscreen)
         windowInitFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 #endif
 
-#ifdef THEXTECH_IOS
+#if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
     windowInitFlags |= SDL_WINDOW_BORDERLESS;
 #endif
 
@@ -580,7 +580,7 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
 
 #ifdef __EMSCRIPTEN__ // Set canvas be 1/2 size for a faster rendering
     SDL_SetWindowSize(m_window, XRender::TargetW / 2, XRender::TargetH / 2);
-#elif defined(__ANDROID__) || defined(THEXTECH_IOS) || defined(__SWITCH__) // Set as small as possible
+#elif defined(__ANDROID__) || defined(THEXTECH_IOS) || defined(THEXTECH_TVOS) || defined(__SWITCH__) // Set as small as possible
     SDL_SetWindowMinimumSize(m_window, 200, 150);
 #elif defined(VITA)
     SDL_SetWindowSize(m_window, 960, 544);
@@ -979,7 +979,7 @@ void WindowSDL::restoreWindow()
 void WindowSDL::setWindowSize(int w, int h)
 {
     // doesn't make sense on Emscripten, actually causes crashes on Wii U
-#if !defined(__EMSCRIPTEN__) && !defined(__WIIU__) && !defined(THEXTECH_IOS)
+#if !defined(__EMSCRIPTEN__) && !defined(__WIIU__) && !defined(THEXTECH_IOS) && !defined(THEXTECH_TVOS)
     // try to figure out whether requested size is bigger than the screen
     int display = SDL_GetWindowDisplayIndex(m_window);
     if(display >= 0)

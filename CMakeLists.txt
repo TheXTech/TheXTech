@@ -63,7 +63,8 @@ if(APPLE)
         set(XTECH_PLIST_NAME "thextech.plist.ios.in")
         set(XTECH_DEFAULT_ICNS "resources/thextech.icns")
     elseif(TVOS)
-        message(FATAL_ERROR "FIXME: The proper tvOS handling support is not yet implemented, still work in process!")
+        set(XTECH_PLIST_NAME "thextech.plist.tvos.in")
+        set(XTECH_DEFAULT_ICNS "resources/thextech.icns")
     elseif(VISIONOS)
         message(FATAL_ERROR "visionOS is not yet supported (And will be? This device is too expensive and inconvenient. There are gossips that Apple attempts to make a cheap and lightweight thing, but no any related news right now).")
     elseif(WATCHOS)
@@ -205,7 +206,7 @@ if(NINTENDO_3DS)
     option(THEXTECH_CUSTOM_AUDIO_LIBRARY "Use the custom audio library instead of MixerX" OFF)
 endif()
 
-if(ANDROID OR IOS OR VITA OR NINTENDO_DS OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH OR PGE_MIN_PORT OR THEXTECH_NO_SDL_BUILD OR PORTMASTER)
+if(ANDROID OR IOS OR TVOS OR VITA OR NINTENDO_DS OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH OR PGE_MIN_PORT OR THEXTECH_NO_SDL_BUILD OR PORTMASTER)
     set(THEXTECH_FORCE_FULLSCREEN ON)
 else()
     option(THEXTECH_FORCE_FULLSCREEN "Force the game to only use fullscreen mode" OFF)
@@ -218,8 +219,8 @@ else()
     set(THEXTECH_BUILD_GL_DESKTOP_DEFAULT ON)
 endif()
 
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS")
-    message("-- OpenGL ES build will be disabled on iOS until the support will be fixed")
+if(IOS OR TVOS)
+    message("-- OpenGL ES build will be disabled on iOS and tvOS until the support will be fixed")
     set(THEXTECH_BUILD_GL_ES_MODERN_DEFAULT OFF)
 else()
     set(THEXTECH_BUILD_GL_ES_MODERN_DEFAULT ON)
@@ -268,7 +269,7 @@ set(THEXTECH_DIRECTORY_PREFIX "TheXTech" CACHE STRING "Name used for directories
 set(THEXTECH_INSTALLER_PACKAGE_NAME "${THEXTECH_EXECUTABLE_NAME}" CACHE STRING "The package name for the package manager")
 
 if(APPLE)
-    if(NOT IOS)
+    if(MACOS)
         set(THEXTECH_PRELOAD_ENVIRONMENT "" CACHE STRING "Path to resources root to pack")
         option(THEXTECH_PRELOAD_ENVIRONMENT_MANUALLY "Make application look for assets inside the bundle, but don't actually put any assets. The 'Template' app will be produced for manual addition of assets." OFF)
     endif()
@@ -285,7 +286,7 @@ if(APPLE)
     endif()
 endif()
 
-if(NOT APPLE AND NOT ANDROID AND NOT IOS AND NOT EMSCRIPTEN)
+if(NOT APPLE AND NOT ANDROID AND NOT IOS AND NOT TVOS AND NOT EMSCRIPTEN)
     set(THEXTECH_UNIX_INSTALL TRUE)
 endif()
 
@@ -392,7 +393,7 @@ if(ANDROID)
 endif()
 
 if(APPLE OR WIN32)
-    if(IOS)
+    if(IOS OR TVOS)
         set(THEXTECH_BUILD_GL_DESKTOP_MODERN OFF CACHE BOOL "" FORCE)
         set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
     else()
@@ -741,6 +742,7 @@ endif()
 
 if(NOT ANDROID
    AND NOT IOS
+   AND NOT TVOS
    AND NOT EMSCRIPTEN
    AND NOT VITA
    AND NOT NINTENDO_3DS
@@ -791,7 +793,7 @@ if(PGE_ENABLE_VIDEO_REC)
     list(APPEND LIB_SRC ${VIDEO_REC_SRCS})
 endif()
 
-if(APPLE AND NOT IOS)
+if(APPLE AND MACOS)
     file(GLOB PGE_FILE_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/resources/file_icons/*.icns")
     list(APPEND LIB_SRC
         ${XTECH_DEFAULT_ICNS}
@@ -811,7 +813,10 @@ if(APPLE AND NOT IOS)
     endif()
 endif()
 
-if(IOS)
+if(IOS OR TVOS)
+    if(TVOS)
+        message(WARNING "FIXME: Make a valid tvOS icon!")
+    endif()
     list(APPEND LIB_SRC "${CMAKE_CURRENT_SOURCE_DIR}/resources/ios/Assets.xcassets")
 
     set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/resources/ios/Assets.xcassets"
@@ -949,7 +954,16 @@ if(IOS)
         src/core/extras.h
         src/core/extras_ios.m
     )
+endif()
 
+if(TVOS)
+    list(APPEND THEXTECH_SRC
+        src/core/extras.h
+        src/core/extras_tvos.m
+    )
+endif()
+
+if(IOS OR TVOS)
     set(IOS_STORYBOARD_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/core/ios/LaunchScreen.storyboard")
     set(IOS_STORYBOARD_BIN "${CMAKE_CURRENT_BINARY_DIR}/LaunchScreen.storyboardc")
 
@@ -1258,6 +1272,7 @@ set(THEXTECH_EXTRA_RESOURCES
     README.ESP.md
     resources/thextech.plist.in
     resources/thextech.plist.ios.in
+    resources/thextech.plist.tvos.in
     resources/thextech.plist.tiger.in
     resources/emscripten/manifest.json.in
     resources/emscripten/shell_minimal.html
@@ -1384,6 +1399,10 @@ if(APPLE)
         target_compile_definitions(thextech PRIVATE -DTHEXTECH_IOS)
     endif()
 
+    if(TVOS)
+        target_compile_definitions(thextech PRIVATE -DTHEXTECH_TVOS)
+    endif()
+
     set_target_properties(thextech PROPERTIES
         OUTPUT_NAME "${THEXTECH_BUNDLE_NAME}"
         MACOSX_BUNDLE TRUE
@@ -1399,7 +1418,7 @@ if(APPLE)
     )
     set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/${XTECH_DEFAULT_ICNS}" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_source_files_properties(${PGE_FILE_ICONS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-    if(IOS)
+    if(IOS OR TVOS)
         set_target_properties(thextech PROPERTIES XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME AppIcon)
     else()
         set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/resources/PkgInfo PROPERTIES MACOSX_PACKAGE_LOCATION "")
@@ -1706,11 +1725,7 @@ if(APPLE)
         install(FILES changelog.txt DESTINATION .)
         install(FILES README.md DESTINATION . RENAME ReadMe.txt)
         install(FILES LICENSE DESTINATION . RENAME License.txt)
-    elseif(IOS)
-        # add_custom_command(TARGET thextech POST_BUILD
-        #     COMMAND ${CMAKE_COMMAND} --install "${DEPENDENCIES_INSTALL_DIR}" --component "${CMAKE_INSTALL_DEFAULT_COMPONENT_NAME}" --config "$<CONFIG>" --prefix "$<TARGET_BUNDLE_CONTENT_DIR:thextech>"
-        #     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        # )
+    elseif(IOS OR TVOS)
         install(TARGETS thextech DESTINATION Payload COMPONENT thextech_app)
     endif()
 elseif(WIN32)

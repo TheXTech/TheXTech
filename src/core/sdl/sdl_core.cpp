@@ -48,7 +48,7 @@ bool CoreSDL::init(const CmdLineSetup_t &setup)
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
 #endif
 
-#if defined(__ANDROID__) || defined(THEXTECH_IOS)
+#if defined(__ANDROID__) || defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
     SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
     SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
 #endif
