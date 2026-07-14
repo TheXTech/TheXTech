@@ -813,13 +813,16 @@ if(APPLE AND MACOS)
     endif()
 endif()
 
-if(IOS OR TVOS)
-    if(TVOS)
-        message(WARNING "FIXME: Make a valid tvOS icon!")
-    endif()
+if(IOS)
     list(APPEND LIB_SRC "${CMAKE_CURRENT_SOURCE_DIR}/resources/ios/Assets.xcassets")
 
     set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/resources/ios/Assets.xcassets"
+        PROPERTIES MACOSX_PACKAGE_LOCATION Resources
+    )
+elseif(TVOS)
+    list(APPEND LIB_SRC "${CMAKE_CURRENT_SOURCE_DIR}/resources/ios/TVAssets.xcassets")
+
+    set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/resources/ios/TVAssets.xcassets"
         PROPERTIES MACOSX_PACKAGE_LOCATION Resources
     )
 endif()
@@ -1418,8 +1421,10 @@ if(APPLE)
     )
     set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/${XTECH_DEFAULT_ICNS}" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_source_files_properties(${PGE_FILE_ICONS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-    if(IOS OR TVOS)
+    if(IOS)
         set_target_properties(thextech PROPERTIES XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME AppIcon)
+    elseif(TVOS)
+        set_target_properties(thextech PROPERTIES XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME TVIcon)
     else()
         set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/resources/PkgInfo PROPERTIES MACOSX_PACKAGE_LOCATION "")
     endif()
