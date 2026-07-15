@@ -89,8 +89,6 @@
     <true/>
     <key>LSSupportsOpeningDocumentsInPlace</key>
     <true/>
-    <key>UILaunchStoryboardName</key>
-    <string>LaunchScreen</string>
     <key>CADisableMinimumFrameDurationOnPhone</key>
     <true/>
     <key>NSBluetoothPeripheralUsageDescription</key>
