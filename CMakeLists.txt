@@ -1922,10 +1922,12 @@ elseif(HAIKU)
                 "${CMAKE_BINARY_DIR}/icon.rsrc"
         COMMENT "Assigning icon to ${THEXTECH_EXECUTABLE_NAME}...")
 
-    add_custom_command(
-        TARGET make_hkpg PRE_BUILD
-        COMMAND cp -a "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/*.so*" "${CMAKE_BINARY_DIR}/package/apps/TheXTech/lib/"
-    )
+    if(USE_SHARED_FREEIMAGE OR PGE_SHARED_SDLMIXER)
+        add_custom_command(
+            TARGET make_hkpg PRE_BUILD
+            COMMAND cp -a "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/*.so*" "${CMAKE_BINARY_DIR}/package/apps/TheXTech/lib/"
+        )
+    endif()
 
     add_custom_command(
         TARGET make_hkpg PRE_BUILD
