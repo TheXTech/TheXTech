@@ -81,8 +81,9 @@ jobs:
         version: r1beta5
 
     - name: Install host dependencies
+      shell: bash
       run: |
-        sudo apt update -qq && sudo apt install -y lftp git
+        sudo apt-get update -qq && sudo apt-get install -y lftp git
 
     - name: Install Dependencies
       run: |
