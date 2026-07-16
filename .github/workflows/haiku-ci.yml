@@ -92,13 +92,18 @@ jobs:
         fi
         cmake --version
 
+    - name: Git Status (For debug purposes)
+      if: always()
+      run: |
+        git status
+
     - name: Configure
       run: |
         if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
           export PATH=${{ matrix.config.extra_path }}:${PATH}
           echo "PATH environment: ${PATH}"
         fi
-        cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} -DCPACK_PACKAGE_FILE_NAME="thextech-${{ matrix.config.package_filename_suffix }}" ${LOCAL_EXTRA_SETUP} .
+        cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} -DTHEXTECH_HAIKU_VERSION_BUILD_NUMBER=${{ github.run_number }} -DCPACK_PACKAGE_FILE_NAME="thextech-${{ matrix.config.package_filename_suffix }}" ${LOCAL_EXTRA_SETUP} .
 
     - name: Build
       run: |
@@ -116,7 +121,7 @@ jobs:
 
     - name: Upload artifact
       if: success()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       continue-on-error: true
       with:
         path: build/*.hpkg

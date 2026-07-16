@@ -1936,7 +1936,7 @@ elseif(HAIKU)
                 "${CMAKE_BINARY_DIR}/package/data/deskbar/menu/Applications/${DESKTOP_NAME}"
     )
 
-    if(NOT CPACK_PACKAGE_FILE_NAME)
+    if(NOT HAIKU_PACKAGE_FILE_NAME)
         add_custom_command(
             TARGET make_hkpg POST_BUILD
             COMMAND package create -C "${CMAKE_BINARY_DIR}/package/"
@@ -1946,7 +1946,7 @@ elseif(HAIKU)
         add_custom_command(
             TARGET make_hkpg POST_BUILD
             COMMAND package create -C "${CMAKE_BINARY_DIR}/package/"
-                    "${CMAKE_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.hpkg"
+                    "${CMAKE_BINARY_DIR}/${HAIKU_PACKAGE_FILE_NAME}.hpkg"
         )
     endif()
 
