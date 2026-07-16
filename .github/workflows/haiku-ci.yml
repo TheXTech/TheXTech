@@ -36,7 +36,7 @@ jobs:
             -DUSE_SHARED_FREEIMAGE=OFF \
             -DPGE_SHARED_SDLMIXER=OFF",
 
-            deps_cmdline: "pkgman add-repo -y https://eu.hpkg.haiku-os.org/haikuports/master/x86_64/current; pkgman install -y libsdl2 libsdl2_devel cmake ninja git lftp",
+            deps_cmdline: "pkgman add-repo https://eu.hpkg.haiku-os.org/haikuports/master/x86_64/current; pkgman install -y libsdl2 libsdl2_devel cmake ninja git lftp",
 
             executable_name: "thextech",
             generator: "Ninja",
