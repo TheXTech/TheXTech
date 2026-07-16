@@ -92,10 +92,10 @@ jobs:
         fi
         cmake --version
 
-    - name: Git Status (For debug purposes)
+    - name: Git Diff Index
       if: always()
       run: |
-        git status
+        git diff-index HEAD --
 
     - name: Configure
       run: |
@@ -103,7 +103,8 @@ jobs:
           export PATH=${{ matrix.config.extra_path }}:${PATH}
           echo "PATH environment: ${PATH}"
         fi
-        cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} -DTHEXTECH_HAIKU_VERSION_BUILD_NUMBER=${{ github.run_number }} -DCPACK_PACKAGE_FILE_NAME="thextech-${{ matrix.config.package_filename_suffix }}" ${LOCAL_EXTRA_SETUP} .
+        git update-index --refresh
+        cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} -DTHEXTECH_HAIKU_VERSION_BUILD_NUMBER=${{ github.run_number }} -DHAIKU_PACKAGE_FILE_NAME="thextech-${{ matrix.config.package_filename_suffix }}" ${LOCAL_EXTRA_SETUP} .
 
     - name: Build
       run: |
