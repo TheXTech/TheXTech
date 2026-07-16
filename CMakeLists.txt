@@ -1846,7 +1846,7 @@ elseif(EMSCRIPTEN)
 
 elseif(HAIKU)
     string(TIMESTAMP XTECH_HAIKU_COPYRIGHT_YEAR "%Y")
-    message("-- Haiku package version: ${THEXTECH_HAIKU_VERSION_STRING} (Yer ${XTECH_HAIKU_COPYRIGHT_YEAR})")
+    message("-- Haiku package version: ${THEXTECH_HAIKU_VERSION_STRING} (Year ${XTECH_HAIKU_COPYRIGHT_YEAR})")
     set(DESKTOP_NAME "TheXTech" CACHE STRING "Name for the application icon")
     set(XTECH_HAIKU_SHORT_DESC "TheXTech is an open-source continuation of the SMBX 1.3 platformer game engine. Its highest priority is full compatibility with the SMBX 1.3 content standard, but it also adds a number of enhancements and bugfixes." CACHE STRING "Description for the installable Haiku package.")
     configure_file("${CMAKE_SOURCE_DIR}/resources/haiku/PackageInfo.in" "${CMAKE_BINARY_DIR}/package/.PackageInfo")
@@ -1934,11 +1934,19 @@ elseif(HAIKU)
                 "${CMAKE_BINARY_DIR}/package/data/deskbar/menu/Applications/${DESKTOP_NAME}"
     )
 
-    add_custom_command(
-        TARGET make_hkpg POST_BUILD
-        COMMAND package create -C "${CMAKE_BINARY_DIR}/package/"
-                "${CMAKE_BINARY_DIR}/${THEXTECH_INSTALLER_PACKAGE_NAME}_bin-${THEXTECH_HAIKU_VERSION_STRING}-${TARGET_PROCESSOR}.hpkg"
-    )
+    if(NOT CPACK_PACKAGE_FILE_NAME)
+        add_custom_command(
+            TARGET make_hkpg POST_BUILD
+            COMMAND package create -C "${CMAKE_BINARY_DIR}/package/"
+                    "${CMAKE_BINARY_DIR}/${THEXTECH_INSTALLER_PACKAGE_NAME}_bin-${THEXTECH_HAIKU_VERSION_STRING}-${TARGET_PROCESSOR}.hpkg"
+        )
+    else()
+        add_custom_command(
+            TARGET make_hkpg POST_BUILD
+            COMMAND package create -C "${CMAKE_BINARY_DIR}/package/"
+                    "${CMAKE_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.hpkg"
+        )
+    endif()
 
 else()
     install(TARGETS thextech
