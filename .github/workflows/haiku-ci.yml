@@ -20,6 +20,9 @@ jobs:
     name: "${{ matrix.config.name }} | ${{ matrix.config.build_type }}"
     runs-on: ${{ matrix.config.os }}
     container: ${{ matrix.config.container }}
+    defaults:
+      run:
+        shell: cpa.sh {0}
     strategy:
       fail-fast: false
       matrix:
@@ -77,8 +80,11 @@ jobs:
         architecture: x86-64
         version: r1beta5
 
+    - name: Install host dependencies
+      run: |
+        sudo apt update -qq && sudo apt install -y lftp git
+
     - name: Install Dependencies
-      shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
           eval ${{ matrix.config.deps_cmdline }}
@@ -86,7 +92,6 @@ jobs:
         cmake --version
 
     - name: Configure
-      shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
           export PATH=${{ matrix.config.extra_path }}:${PATH}
@@ -95,7 +100,6 @@ jobs:
         cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} -DCPACK_PACKAGE_FILE_NAME="thextech-${{ matrix.config.package_filename_suffix }}" ${LOCAL_EXTRA_SETUP} .
 
     - name: Build
-      shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
           export PATH=${{ matrix.config.extra_path }}:${PATH}
@@ -106,7 +110,6 @@ jobs:
     - name: Create Package
       if: success()
       id: create_package
-      shell: bash
       run: |
         cmake --build build --config ${{ matrix.config.build_type }} --target make_hkpg --parallel 3
 
