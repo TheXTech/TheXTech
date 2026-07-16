@@ -112,12 +112,14 @@ jobs:
           export PATH=${{ matrix.config.extra_path }}:${PATH}
         fi
         export MAKEFLAGS=--keep-going
+        git update-index --refresh
         cmake --build build --config ${{ matrix.config.build_type }} --parallel 3
 
     - name: Create Package
       if: success()
       id: create_package
       run: |
+        git update-index --refresh
         cmake --build build --config ${{ matrix.config.build_type }} --target make_hkpg --parallel 3
 
     - name: Upload artifact
