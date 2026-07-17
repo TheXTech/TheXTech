@@ -55,6 +55,7 @@ for q in \
     "git@gitea.wohlsoft.ru:Games-for-TheXTech/thextech-smbx-nes.git" \
     "git@gitea.wohlsoft.ru:Games-for-TheXTech/thextech-smbx-nostalgic.git" \
     "git@gitea.wohlsoft.ru:Games-for-TheXTech/thextech-super-talking-time-bros-1n2-v1-5.git" \
+    "git@gitea.wohlsoft.ru:Games-for-TheXTech/smbx-8-bit-edition.git" \
     ;
 do
     update_repo "$q"
