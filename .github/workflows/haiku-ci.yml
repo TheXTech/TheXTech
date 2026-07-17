@@ -1,0 +1,160 @@
+name: Haiku CI
+
+on:
+  push:
+    branches:
+      - main
+      - stable*
+      - versus-ci
+      - versus-ci-haiku
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: "${{ matrix.config.name }} | ${{ matrix.config.build_type }}"
+    runs-on: ${{ matrix.config.os }}
+    container: ${{ matrix.config.container }}
+    defaults:
+      run:
+        shell: cpa.sh {0} --sync-files none
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - {
+            name: "Haiku R1-Beta5 x86_64",
+            os: ubuntu-latest,
+
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
+            -DUSE_SYSTEM_SDL2=ON \
+            -DUSE_SHARED_FREEIMAGE=OFF \
+            -DPGE_SHARED_SDLMIXER=OFF",
+
+            deps_cmdline: "pkgman install -y libsdl2 libsdl2_devel cmake ninja git lftp",
+
+            executable_name: "thextech",
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            package_filename_suffix: "haiku-r1beta5-x86_64",
+            upload_directory: "www/haiku/"
+          }
+
+    steps:
+    - name: Host info
+      shell: bash
+      run: |
+        uname -a
+        cat /proc/cpuinfo
+
+    - name: Check for the upload support
+      id: upload-check
+      shell: bash
+      run: |
+        if [[ "${{ secrets.builds_login }}" != '' && \
+              "${{ secrets.builds_password }}" != '' && \
+              "${{ secrets.builds_host }}" != '' ]]; then
+          echo "available=true" >> $GITHUB_OUTPUT;
+        else
+          echo "available=false" >> $GITHUB_OUTPUT;
+        fi
+
+    - uses: TheXTech/checkout@v0.1
+
+    - uses: TheXTech/branch-name@v0.1
+
+    - name: Store the branch name
+      id: branch-name
+      shell: bash
+      run: |
+        echo "branch=${BRANCH_NAME}" >> $GITHUB_OUTPUT;
+
+    - name: Pull submodules
+      shell: bash
+      run: |
+        git submodule update --init --recursive
+
+    - name: Start Haiku VM
+      uses: cross-platform-actions/action@v1
+      env:
+        BRANCH_NAME: ${BRANCH_NAME}
+      with:
+        environment_variables: BRANCH_NAME
+        operating_system: haiku
+        architecture: x86-64
+        version: r1beta5
+
+    - name: Install host dependencies
+      shell: bash
+      run: |
+        sudo apt-get update -qq && sudo apt-get install -y lftp git
+
+    - name: Install Dependencies
+      shell: cpa.sh {0} --sync-files none
+      run: |
+        if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
+          eval ${{ matrix.config.deps_cmdline }}
+        fi
+        cmake --version
+
+    - name: Git Refresh Index and Sync files to VM
+      shell: cpa.sh {0} --sync-files runner-to-vm
+      run: |
+        git update-index --refresh
+
+    - name: Configure
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+          echo "PATH environment: ${PATH}"
+        fi
+        cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} -DTHEXTECH_HAIKU_VERSION_BUILD_NUMBER=${{ github.run_number }} -DHAIKU_PACKAGE_FILE_NAME="thextech-${{ matrix.config.package_filename_suffix }}-${{ steps.branch-name.outputs.branch }}" .
+
+    - name: Build
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+        fi
+        export MAKEFLAGS=--keep-going
+        cmake --build build --config ${{ matrix.config.build_type }} --parallel 3
+
+    - name: Create Package
+      if: success()
+      id: create_package
+      shell: cpa.sh {0} --sync-files vm-to-runner
+      run: |
+        cmake --build build --config ${{ matrix.config.build_type }} --target make_hkpg --parallel 3
+
+    - name: Upload artifact
+      if: success()
+      uses: actions/upload-artifact@v7
+      continue-on-error: true
+      with:
+        path: build/*.hpkg
+        name: TheXTech ${{ matrix.config.name }} ${{ matrix.config.build_type }}
+
+    - name: Deploy to builds.wohlsoft.ru
+      if: steps.create_package.outcome == 'success' && github.event_name != 'pull_request' && steps.upload-check.outputs.available == 'true'
+      continue-on-error: true
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+        fi
+        UPLOAD_LIST="set ssl:verify-certificate no;"
+        for q in ./build/*.hpkg; do
+            UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
+        done
+        lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
+
+    - name: List Build Directory
+      if: always()
+      shell: bash
+      run: |
+        git status
+        ls -lR build
