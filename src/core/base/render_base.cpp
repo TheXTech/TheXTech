@@ -355,10 +355,10 @@ void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
 
             ini.endGroup();
 
-            GLPictureLightInfoPtr temp = std::move(target.l.light_info);
+            GLPictureLightInfoPtr tmp_p = std::move(target.l.light_info);
             target.l.light_info.init();
             target.l.light_info->light = temp_light;
-            target.l.light_info->next = std::move(temp);
+            target.l.light_info->next = std::move(tmp_p);
         }
     }
 #endif

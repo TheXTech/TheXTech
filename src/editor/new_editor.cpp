@@ -874,9 +874,9 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 std::string ai_invalid;
                 const std::string* ai_name = &ai_invalid;
 
-                int index = EditorCursor.NPC.Special;
+                int idx = EditorCursor.NPC.Special;
 
-                if(index >= 0 && index < 4)
+                if(idx >= 0 && idx < 4)
                 {
                     const std::string* map[] = {
                         &g_editorStrings.npcAiTarget,
@@ -884,7 +884,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                         &g_editorStrings.npcAiLR,
                         &g_editorStrings.npcAiUD,
                     };
-                    ai_name = map[index];
+                    ai_name = map[idx];
                 }
 
                 std::string&& ai_is = fmt::format_ne(g_editorStrings.npcAiIs, *ai_name);
@@ -913,9 +913,9 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 std::string ai_invalid;
                 const std::string* ai_name = &ai_invalid;
 
-                int index = EditorCursor.NPC.Special;
+                int idx = EditorCursor.NPC.Special;
 
-                if(index >= 0 && index < 5)
+                if(idx >= 0 && idx < 5)
                 {
                     const std::string* map[] =
                     {
@@ -925,7 +925,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                         &g_editorStrings.npcAiLR,
                         &g_editorStrings.npcAiUD,
                     };
-                    ai_name = map[index];
+                    ai_name = map[idx];
                 }
 
                 std::string&& ai_is = fmt::format_ne(g_editorStrings.npcAiIs, *ai_name);
@@ -1017,7 +1017,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             int i;
             bool valid;
 
-            i = data->find_current(EditorCursor.NPC.Variant);
+            i = (int)data->find_current(EditorCursor.NPC.Variant);
             valid = data->strings[i] != nullptr;
 
             if(mode == CallMode::Render)
@@ -4944,7 +4944,9 @@ bool EditorScreen::FileExists(const std::string& cur_file)
 
 void EditorScreen::UpdateBrowserScreen(CallMode mode)
 {
+    // FIXME: Maybe turn this into macro? Otherwise it spawns compiler warnings regarding dead code!
     constexpr bool IGNORE_DIRS = true;
+
     // render shared GUI elements on right
     if(UpdateButton(mode, e_ScreenW - 40 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
     {
@@ -4977,8 +4979,8 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
     if(!m_path_synced)
         SyncPath();
 
-    int dir_length = m_cur_path_dirs.size() + 1; // ".."
-    int file_length = m_cur_path_files.size();
+    int dir_length = (int)m_cur_path_dirs.size() + 1; // ".."
+    int file_length = (int)m_cur_path_files.size();
 
     if(m_browser_mode == BROWSER_MODE_SAVE || m_browser_mode == BROWSER_MODE_SAVE_NEW)
     {

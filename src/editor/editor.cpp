@@ -402,14 +402,14 @@ void UpdateEditor()
             {
                 if(EditorCursor.InteractMode == OptCursor_t::LVL_PLAYERSTART) // Player start points
                 {
-                    int A = EditorCursor.InteractIndex;
+                    int ia = EditorCursor.InteractIndex;
                     PlaySound(SFX_Grab);
 
                     EditorCursor.Mode = OptCursor_t::LVL_PLAYERSTART;
-                    EditorCursor.SubMode = 3 + A;
+                    EditorCursor.SubMode = 3 + ia;
 
-                    EditorCursor.Location = PlayerStart[A];
-                    PlayerStart[A] = PlayerStart_t();
+                    EditorCursor.Location = PlayerStart[ia];
+                    PlayerStart[ia] = PlayerStart_t();
                     MouseMove(EditorCursor.X, EditorCursor.Y);
                     MouseRelease = false;
                     MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
@@ -425,28 +425,28 @@ void UpdateEditor()
                 // event section resize
                 if(EditorCursor.InteractMode == OptCursor_t::LVL_EVENTS)
                 {
-                    int A = EditorCursor.InteractIndex;
-                    InteractResizeSection(Events[A].section[curSection].position);
+                    int ia = EditorCursor.InteractIndex;
+                    InteractResizeSection(Events[ia].section[curSection].position);
                     MouseRelease = false;
                 }
 
                 if(EditorCursor.InteractMode == OptCursor_t::LVL_NPCS) // NPCs
                 {
-                    int A = EditorCursor.InteractIndex;
+                    int ia = EditorCursor.InteractIndex;
                     PlaySound(SFX_Grab);
 
                     EditorCursor.Mode = OptCursor_t::LVL_NPCS;
-                    EditorCursor.NPC = NPC[A];
+                    EditorCursor.NPC = NPC[ia];
                     EditorCursor.NPC.Hidden = false;
-                    EditorCursor.Layer = NPC[A].Layer;
-                    EditorCursor.Location = NPC[A].Location;
-                    EditorCursor.Location.X = NPC[A].Location.X;
-                    EditorCursor.Location.Y = NPC[A].Location.Y;
+                    EditorCursor.Layer = NPC[ia].Layer;
+                    EditorCursor.Location = NPC[ia].Location;
+                    EditorCursor.Location.X = NPC[ia].Location.X;
+                    EditorCursor.Location.Y = NPC[ia].Location.Y;
                     SetCursor();
                     ResetNPC(EditorCursor.NPC.Type);
 
-                    NPC[A].DefaultType = NPCID_NULL;
-                    KillNPC(A, 9);
+                    NPC[ia].DefaultType = NPCID_NULL;
+                    KillNPC(ia, 9);
 
                     editorScreen.FocusNPC();
                     MouseRelease = false;
@@ -509,21 +509,21 @@ void UpdateEditor()
                 }
                 else if(EditorCursor.InteractMode == OptCursor_t::LVL_BLOCKS) // Blocks
                 {
-                    int A = EditorCursor.InteractIndex;
+                    int ia = EditorCursor.InteractIndex;
                     PlaySound(SFX_Grab);
 
                     EditorCursor.Mode = OptCursor_t::LVL_BLOCKS;
-                    EditorCursor.Block = Block[A];
-                    EditorCursor.Layer = Block[A].Layer;
-                    EditorCursor.Location.X = Block[A].Location.X;
-                    EditorCursor.Location.Y = Block[A].Location.Y;
-                    EditorCursor.Location.Width = Block[A].Location.Width;
-                    EditorCursor.Location.Height = Block[A].Location.Height;
+                    EditorCursor.Block = Block[ia];
+                    EditorCursor.Layer = Block[ia].Layer;
+                    EditorCursor.Location.X = Block[ia].Location.X;
+                    EditorCursor.Location.Y = Block[ia].Location.Y;
+                    EditorCursor.Location.Width = Block[ia].Location.Width;
+                    EditorCursor.Location.Height = Block[ia].Location.Height;
                     SetCursor();
 
-                    Location_t loc = Block[A].Location;
-                    int type = Block[A].Type;
-                    KillBlock(A, false);
+                    Location_t loc = Block[ia].Location;
+                    int type = Block[ia].Type;
+                    KillBlock(ia, false);
 
                     MagicBlock::MagicBlock(type, loc);
 
@@ -564,7 +564,7 @@ void UpdateEditor()
                 }
                 else if(EditorCursor.InteractMode == OptCursor_t::LVL_WARPS) // Warps
                 {
-                    int A = EditorCursor.InteractIndex;
+                    int ia = EditorCursor.InteractIndex;
                     PlaySound(SFX_Grab);
                     MouseRelease = false;
                     EditorCursor.Mode = OptCursor_t::LVL_WARPS;
@@ -572,54 +572,54 @@ void UpdateEditor()
 
                     if(EditorCursor.InteractFlags == 0)
                     {
-                        Warp[A].PlacedEnt = false;
+                        Warp[ia].PlacedEnt = false;
                         EditorCursor.SubMode = 1;
-                        EditorCursor.Location.Width = Warp[A].Entrance.Width;
-                        EditorCursor.Location.Height = Warp[A].Entrance.Height;
+                        EditorCursor.Location.Width = Warp[ia].Entrance.Width;
+                        EditorCursor.Location.Height = Warp[ia].Entrance.Height;
 
-                        if(Warp[A].LevelEnt || EditorCursor.Warp.MapWarp || EditorCursor.Warp.level != STRINGINDEX_NONE)
-                            Warp[A].PlacedExit = false;
+                        if(Warp[ia].LevelEnt || EditorCursor.Warp.MapWarp || EditorCursor.Warp.level != STRINGINDEX_NONE)
+                            Warp[ia].PlacedExit = false;
                     }
                     else
                     {
-                        Warp[A].PlacedExit = false;
+                        Warp[ia].PlacedExit = false;
                         EditorCursor.SubMode = 2;
-                        EditorCursor.Location.Width = Warp[A].Exit.Width;
-                        EditorCursor.Location.Height = Warp[A].Exit.Height;
+                        EditorCursor.Location.Width = Warp[ia].Exit.Width;
+                        EditorCursor.Location.Height = Warp[ia].Exit.Height;
 
                         // TODO: additional testing of these situations
-                        if(Warp[A].LevelEnt || EditorCursor.Warp.MapWarp || EditorCursor.Warp.level != STRINGINDEX_NONE)
-                            Warp[A].PlacedEnt = false;
+                        if(Warp[ia].LevelEnt || EditorCursor.Warp.MapWarp || EditorCursor.Warp.level != STRINGINDEX_NONE)
+                            Warp[ia].PlacedEnt = false;
                     }
 
-                    EditorCursor.Warp = Warp[A];
+                    EditorCursor.Warp = Warp[ia];
                     EditorCursor.Layer = EditorCursor.Warp.Layer;
 
                     // preserve warp dimensions while placing different objects
                     EditorCursor.Warp.Entrance.Width = EditorCursor.Location.Width;
                     EditorCursor.Warp.Entrance.Height = EditorCursor.Location.Height;
 
-                    if(!Warp[A].PlacedEnt && !Warp[A].PlacedExit)
-                        KillWarp(A);
+                    if(!Warp[ia].PlacedEnt && !Warp[ia].PlacedExit)
+                        KillWarp(ia);
                 }
 
                 if(EditorCursor.InteractMode == OptCursor_t::LVL_BGOS) // BGOs
                 {
-                    int A = EditorCursor.InteractIndex;
+                    int ia = EditorCursor.InteractIndex;
 
                     PlaySound(SFX_Grab);
 
                     EditorCursor.Mode = OptCursor_t::LVL_BGOS;
-                    EditorCursor.Background = Background[A];
-                    EditorCursor.Layer = Background[A].Layer;
-                    EditorCursor.Location.X = Background[A].Location.X;
-                    EditorCursor.Location.Y = Background[A].Location.Y;
+                    EditorCursor.Background = Background[ia];
+                    EditorCursor.Layer = Background[ia].Layer;
+                    EditorCursor.Location.X = Background[ia].Location.X;
+                    EditorCursor.Location.Y = Background[ia].Location.Y;
                     SetCursor();
 
-                    Location_t loc = static_cast<Location_t>(Background[A].Location);
-                    int type = Background[A].Type;
+                    Location_t loc = static_cast<Location_t>(Background[ia].Location);
+                    int type = Background[ia].Type;
 
-                    Background[A] = Background[numBackground];
+                    Background[ia] = Background[numBackground];
                     numBackground--;
 
                     editorScreen.FocusBGO();
@@ -631,7 +631,7 @@ void UpdateEditor()
                     }
                     else
                     {
-                        syncLayers_BGO(A);
+                        syncLayers_BGO(ia);
                         syncLayers_BGO(numBackground+1);
                     }
 
@@ -664,16 +664,16 @@ void UpdateEditor()
                 }
                 else if(EditorCursor.InteractMode == OptCursor_t::LVL_WATER) // water
                 {
-                    int A = EditorCursor.InteractIndex;
+                    int ia = EditorCursor.InteractIndex;
 
                     PlaySound(SFX_Grab);
                     EditorCursor.Mode = OptCursor_t::LVL_WATER;
-                    EditorCursor.Location = static_cast<Location_t>(Water[A].Location);
-                    EditorCursor.Layer = Water[A].Layer;
-                    EditorCursor.Water = Water[A];
-                    Water[A] = Water[numWater];
+                    EditorCursor.Location = static_cast<Location_t>(Water[ia].Location);
+                    EditorCursor.Layer = Water[ia].Layer;
+                    EditorCursor.Water = Water[ia];
+                    Water[ia] = Water[numWater];
                     numWater--;
-                    syncLayers_Water(A);
+                    syncLayers_Water(ia);
                     syncLayers_Water(numWater+1);
                     MouseRelease = false;
                     MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
@@ -688,14 +688,14 @@ void UpdateEditor()
                 }
                 else if(EditorCursor.InteractMode == OptCursor_t::WLD_AREA) // World map areas
                 {
-                    int A = EditorCursor.InteractIndex;
+                    int ia = EditorCursor.InteractIndex;
                     PlaySound(SFX_Grab);
                     EditorCursor.Mode = OptCursor_t::WLD_AREA;
-                    EditorCursor.Location = static_cast<Location_t>(WorldArea[A].Location);
+                    EditorCursor.Location = static_cast<Location_t>(WorldArea[ia].Location);
                     SetCursor();
-                    EditorCursor.WorldArea = WorldArea[A];
-                    if(A != numWorldAreas)
-                        WorldArea[A] = WorldArea[numWorldAreas];
+                    EditorCursor.WorldArea = WorldArea[ia];
+                    if(ia != numWorldAreas)
+                        WorldArea[ia] = WorldArea[numWorldAreas];
                     numWorldAreas--;
                     MouseRelease = false;
                     MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
@@ -703,16 +703,16 @@ void UpdateEditor()
 
                 if(EditorCursor.InteractMode == OptCursor_t::WLD_MUSIC) // World map music
                 {
-                    int A = EditorCursor.InteractIndex;
+                    int ia = EditorCursor.InteractIndex;
                     PlaySound(SFX_Grab);
                     EditorCursor.Mode = OptCursor_t::WLD_MUSIC;
-                    EditorCursor.Location = static_cast<Location_t>(WorldMusic[A].Location);
+                    EditorCursor.Location = static_cast<Location_t>(WorldMusic[ia].Location);
                     SetCursor();
-                    EditorCursor.WorldMusic = WorldMusic[A];
-                    if(A != numWorldMusic)
+                    EditorCursor.WorldMusic = WorldMusic[ia];
+                    if(ia != numWorldMusic)
                     {
-                        WorldMusic[A] = WorldMusic[numWorldMusic];
-                        treeWorldMusicUpdate(&WorldMusic[A]);
+                        WorldMusic[ia] = WorldMusic[numWorldMusic];
+                        treeWorldMusicUpdate(&WorldMusic[ia]);
                     }
                     treeWorldMusicRemove(&WorldMusic[numWorldMusic]);
                     numWorldMusic--;
@@ -722,16 +722,16 @@ void UpdateEditor()
 
                 if(EditorCursor.InteractMode == OptCursor_t::WLD_PATHS) // World paths
                 {
-                    int A = EditorCursor.InteractIndex;
+                    int ia = EditorCursor.InteractIndex;
                     PlaySound(SFX_Grab);
                     EditorCursor.Mode = OptCursor_t::WLD_PATHS;
-                    EditorCursor.Location = static_cast<Location_t>(WorldPath[A].Location);
-                    EditorCursor.WorldPath = WorldPath[A];
+                    EditorCursor.Location = static_cast<Location_t>(WorldPath[ia].Location);
+                    EditorCursor.WorldPath = WorldPath[ia];
                     SetCursor();
-                    if(A != numWorldPaths)
+                    if(ia != numWorldPaths)
                     {
-                        WorldPath[A] = WorldPath[numWorldPaths];
-                        treeWorldPathUpdate(&WorldPath[A]);
+                        WorldPath[ia] = WorldPath[numWorldPaths];
+                        treeWorldPathUpdate(&WorldPath[ia]);
                     }
                     treeWorldPathRemove(&WorldPath[numWorldPaths]);
                     numWorldPaths--;
@@ -741,16 +741,16 @@ void UpdateEditor()
 
                 if(EditorCursor.InteractMode == OptCursor_t::WLD_SCENES) // World scenes
                 {
-                    int A = EditorCursor.InteractIndex;
+                    int ia = EditorCursor.InteractIndex;
                     PlaySound(SFX_Grab);
                     EditorCursor.Mode = OptCursor_t::WLD_SCENES;
-                    EditorCursor.Location = static_cast<Location_t>(Scene[A].Location);
-                    EditorCursor.Scene = Scene[A];
+                    EditorCursor.Location = static_cast<Location_t>(Scene[ia].Location);
+                    EditorCursor.Scene = Scene[ia];
                     SetCursor();
                     MouseMove(EditorCursor.X, EditorCursor.Y);
                     // this maintains the order of the scenes
                     // but makes for a hellish quadtree update
-                    for(int B = A; B < numScenes; B++)
+                    for(int B = ia; B < numScenes; B++)
                     {
                         Scene[B] = Scene[B + 1];
                         treeWorldSceneUpdate(&Scene[B]);
@@ -763,16 +763,16 @@ void UpdateEditor()
 
                 if(EditorCursor.InteractMode == OptCursor_t::WLD_LEVELS) // World map level points
                 {
-                    int A = EditorCursor.InteractIndex;
+                    int ia = EditorCursor.InteractIndex;
                     PlaySound(SFX_Grab);
                     EditorCursor.Mode = OptCursor_t::WLD_LEVELS;
-                    EditorCursor.Location = static_cast<Location_t>(WorldLevel[A].Location);
-                    EditorCursor.WorldLevel = WorldLevel[A];
+                    EditorCursor.Location = static_cast<Location_t>(WorldLevel[ia].Location);
+                    EditorCursor.WorldLevel = WorldLevel[ia];
                     SetCursor();
-                    if(A != numWorldLevels)
+                    if(ia != numWorldLevels)
                     {
-                        WorldLevel[A] = WorldLevel[numWorldLevels];
-                        treeWorldLevelUpdate(&WorldLevel[A]);
+                        WorldLevel[ia] = WorldLevel[numWorldLevels];
+                        treeWorldLevelUpdate(&WorldLevel[ia]);
                     }
                     treeWorldLevelRemove(&WorldLevel[numWorldLevels]);
                     numWorldLevels--;
@@ -782,21 +782,22 @@ void UpdateEditor()
 
                 if(EditorCursor.InteractMode == OptCursor_t::WLD_TILES) // World map tiles
                 {
-                    int A = EditorCursor.InteractIndex;
+                    int ia = EditorCursor.InteractIndex;
                     PlaySound(SFX_Grab);
                     EditorCursor.Mode = OptCursor_t::WLD_TILES;
-                    EditorCursor.Location = static_cast<Location_t>(Tile[A].Location);
-                    EditorCursor.Tile = Tile[A];
+                    EditorCursor.Location = static_cast<Location_t>(Tile[ia].Location);
+                    EditorCursor.Tile = Tile[ia];
                     SetCursor();
 
-                    Location_t loc = static_cast<Location_t>(Tile[A].Location);
-                    int type = Tile[A].Type;
+                    Location_t loc = static_cast<Location_t>(Tile[ia].Location);
+                    int type = Tile[ia].Type;
 
-                    if(A != numTiles)
+                    if(ia != numTiles)
                     {
-                        Tile[A] = Tile[numTiles];
-                        treeWorldTileUpdate(&Tile[A]);
+                        Tile[ia] = Tile[numTiles];
+                        treeWorldTileUpdate(&Tile[ia]);
                     }
+
                     treeWorldTileRemove(&Tile[numTiles]);
 
                     numTiles--;
@@ -812,18 +813,18 @@ void UpdateEditor()
             {
                 if(EditorCursor.InteractMode == OptCursor_t::LVL_NPCS)
                 {
-                    int A = EditorCursor.InteractIndex;
+                    int ia = EditorCursor.InteractIndex;
 
                     if(iRand(2) == 0)
-                        NPC[A].Location.SpeedX = Physics.NPCShellSpeed / 2;
+                        NPC[ia].Location.SpeedX = Physics.NPCShellSpeed / 2;
                     else
-                        NPC[A].Location.SpeedX = -Physics.NPCShellSpeed / 2;
+                        NPC[ia].Location.SpeedX = -Physics.NPCShellSpeed / 2;
 
-                    NPC[A].DefaultType = NPCID_NULL;
-                    if(NPC[A]->IsABonus || NPC[A]->IsACoin)
-                        KillNPC(A, 4); // Kill the bonus/coin
+                    NPC[ia].DefaultType = NPCID_NULL;
+                    if(NPC[ia]->IsABonus || NPC[ia]->IsACoin)
+                        KillNPC(ia, 4); // Kill the bonus/coin
                     else
-                        KillNPC(A, 2); // Kill the NPC
+                        KillNPC(ia, 2); // Kill the NPC
 
                     MouseRelease = false;
 
@@ -833,11 +834,11 @@ void UpdateEditor()
 
                 if(EditorCursor.InteractMode == OptCursor_t::LVL_BLOCKS)
                 {
-                    int A = EditorCursor.InteractIndex;
+                    int ia = EditorCursor.InteractIndex;
 
-                    Location_t loc = Block[A].Location;
-                    int type = Block[A].Type;
-                    KillBlock(A);
+                    Location_t loc = Block[ia].Location;
+                    int type = Block[ia].Type;
+                    KillBlock(ia);
 
                     MagicBlock::MagicBlock(type, loc);
 
@@ -848,8 +849,8 @@ void UpdateEditor()
 
                 if(EditorCursor.InteractMode == OptCursor_t::LVL_WARPS)
                 {
-                    int A = EditorCursor.InteractIndex;
-                    KillWarp(A);
+                    int ia = EditorCursor.InteractIndex;
+                    KillWarp(ia);
                     MouseRelease = false;
                     if(EditorCursor.SubMode == 0)
                         EditorCursor.SubMode = OptCursor_t::LVL_WARPS;
@@ -857,15 +858,15 @@ void UpdateEditor()
 
                 if(EditorCursor.InteractMode == OptCursor_t::LVL_BGOS)
                 {
-                    int A = EditorCursor.InteractIndex;
+                    int ia = EditorCursor.InteractIndex;
 
-                    Location_t loc = static_cast<Location_t>(Background[A].Location);
-                    int type = Background[A].Type;
+                    Location_t loc = static_cast<Location_t>(Background[ia].Location);
+                    int type = Background[ia].Type;
 
                     NewEffect(EFFID_SMOKE_S3_CENTER, loc);
                     PlaySound(SFX_Smash);
 
-                    Background[A] = Background[numBackground];
+                    Background[ia] = Background[numBackground];
                     numBackground--;
 
                     MouseRelease = false;
@@ -881,7 +882,7 @@ void UpdateEditor()
                     }
                     else
                     {
-                        syncLayers_BGO(A);
+                        syncLayers_BGO(ia);
                         syncLayers_BGO(numBackground + 1);
                     }
 
@@ -890,11 +891,11 @@ void UpdateEditor()
 
                 if(EditorCursor.InteractMode == OptCursor_t::LVL_WATER)
                 {
-                    int A = EditorCursor.InteractIndex;
+                    int ia = EditorCursor.InteractIndex;
                     PlaySound(SFX_Smash);
-                    Water[A] = Water[numWater];
+                    Water[ia] = Water[numWater];
                     numWater--;
-                    syncLayers_Water(A);
+                    syncLayers_Water(ia);
                     syncLayers_Water(numWater + 1);
                     MouseRelease = false;
                     if(EditorCursor.SubMode == 0)
@@ -903,11 +904,11 @@ void UpdateEditor()
 
                 if(EditorCursor.InteractMode == OptCursor_t::WLD_AREA)
                 {
-                    int A = EditorCursor.InteractIndex;
-                    tempLocation = static_cast<Location_t>(WorldArea[A].Location);
-                    for(int X = 16; X < WorldArea[A].Location.Width; X += 32)
+                    int ia = EditorCursor.InteractIndex;
+                    tempLocation = static_cast<Location_t>(WorldArea[ia].Location);
+                    for(int X = 16; X < WorldArea[ia].Location.Width; X += 32)
                     {
-                        for(int Y = 16; Y < WorldArea[A].Location.Height; Y += 32)
+                        for(int Y = 16; Y < WorldArea[ia].Location.Height; Y += 32)
                         {
                             tempLocation.X += X - EffectWidth[EFFID_SMOKE_S3] / 2;
                             tempLocation.Y += Y - EffectHeight[EFFID_SMOKE_S3] / 2;
@@ -916,8 +917,8 @@ void UpdateEditor()
                     }
 
                     PlaySound(SFX_ShellHit);
-                    if(A != numWorldAreas)
-                        WorldArea[A] = WorldArea[numWorldAreas];
+                    if(ia != numWorldAreas)
+                        WorldArea[ia] = WorldArea[numWorldAreas];
                     numWorldAreas--;
                     MouseRelease = false;
                     if(EditorCursor.SubMode == 0)
@@ -926,14 +927,14 @@ void UpdateEditor()
 
                 if(EditorCursor.InteractMode == OptCursor_t::WLD_MUSIC)
                 {
-                    int A = EditorCursor.InteractIndex;
-                    tempLocation = static_cast<Location_t>(WorldMusic[A].Location);
+                    int ia = EditorCursor.InteractIndex;
+                    tempLocation = static_cast<Location_t>(WorldMusic[ia].Location);
                     NewEffect(EFFID_SMOKE_S3_CENTER, tempLocation);
                     PlaySound(SFX_ShellHit);
-                    if(A != numWorldMusic)
+                    if(ia != numWorldMusic)
                     {
-                        WorldMusic[A] = WorldMusic[numWorldMusic];
-                        treeWorldMusicUpdate(&WorldMusic[A]);
+                        WorldMusic[ia] = WorldMusic[numWorldMusic];
+                        treeWorldMusicUpdate(&WorldMusic[ia]);
                     }
                     treeWorldMusicRemove(&WorldMusic[numWorldMusic]);
                     numWorldMusic--;
@@ -944,14 +945,14 @@ void UpdateEditor()
 
                 if(EditorCursor.InteractMode == OptCursor_t::WLD_PATHS)
                 {
-                    int A = EditorCursor.InteractIndex;
-                    tempLocation = static_cast<Location_t>(WorldPath[A].Location);
+                    int ia = EditorCursor.InteractIndex;
+                    tempLocation = static_cast<Location_t>(WorldPath[ia].Location);
                     NewEffect(EFFID_SMOKE_S3_CENTER, tempLocation);
                     PlaySound(SFX_ShellHit);
-                    if(A != numWorldPaths)
+                    if(ia != numWorldPaths)
                     {
-                        WorldPath[A] = WorldPath[numWorldPaths];
-                        treeWorldPathUpdate(&WorldPath[A]);
+                        WorldPath[ia] = WorldPath[numWorldPaths];
+                        treeWorldPathUpdate(&WorldPath[ia]);
                     }
                     treeWorldPathRemove(&WorldPath[numWorldPaths]);
                     numWorldPaths--;
@@ -962,11 +963,11 @@ void UpdateEditor()
 
                 if(EditorCursor.InteractMode == OptCursor_t::WLD_SCENES)
                 {
-                    int A = EditorCursor.InteractIndex;
-                    tempLocation = static_cast<Location_t>(Scene[A].Location);
+                    int ia = EditorCursor.InteractIndex;
+                    tempLocation = static_cast<Location_t>(Scene[ia].Location);
                     NewEffect(EFFID_SMOKE_S3_CENTER, tempLocation);
                     PlaySound(SFX_ShellHit);
-                    for(int B = A; B < numScenes; B++)
+                    for(int B = ia; B < numScenes; B++)
                     {
                         Scene[B] = Scene[B + 1];
                         treeWorldSceneUpdate(&Scene[B]);
@@ -980,14 +981,14 @@ void UpdateEditor()
 
                 if(EditorCursor.InteractMode == OptCursor_t::WLD_LEVELS)
                 {
-                    int A = EditorCursor.InteractIndex;
-                    tempLocation = static_cast<Location_t>(WorldLevel[A].Location);
+                    int ia = EditorCursor.InteractIndex;
+                    tempLocation = static_cast<Location_t>(WorldLevel[ia].Location);
                     NewEffect(EFFID_SMOKE_S3_CENTER, tempLocation);
                     PlaySound(SFX_ShellHit);
-                    if(A != numWorldLevels)
+                    if(ia != numWorldLevels)
                     {
-                        WorldLevel[A] = WorldLevel[numWorldLevels];
-                        treeWorldLevelUpdate(&WorldLevel[A]);
+                        WorldLevel[ia] = WorldLevel[numWorldLevels];
+                        treeWorldLevelUpdate(&WorldLevel[ia]);
                     }
                     treeWorldLevelRemove(&WorldLevel[numWorldLevels]);
                     numWorldLevels--;
@@ -998,17 +999,17 @@ void UpdateEditor()
 
                 if(EditorCursor.InteractMode == OptCursor_t::WLD_TILES)
                 {
-                    int A = EditorCursor.InteractIndex;
-                    Location_t loc = static_cast<Location_t>(Tile[A].Location);
+                    int ia = EditorCursor.InteractIndex;
+                    Location_t loc = static_cast<Location_t>(Tile[ia].Location);
                     NewEffect(EFFID_SMOKE_S3_CENTER, loc);
                     PlaySound(SFX_ShellHit);
 
-                    int type = Tile[A].Type;
+                    int type = Tile[ia].Type;
 
-                    if(A != numTiles)
+                    if(ia != numTiles)
                     {
-                        Tile[A] = Tile[numTiles];
-                        treeWorldTileUpdate(&Tile[A]);
+                        Tile[ia] = Tile[numTiles];
+                        treeWorldTileUpdate(&Tile[ia]);
                     }
                     treeWorldTileRemove(&Tile[numTiles]);
 
