@@ -54,6 +54,10 @@
 	path = 3rdparty/luau
 	url = https://github.com/TheXTech/luau.git
 	branch = master
+[submodule "3rdparty/lz4"]
+	path = 3rdparty/lz4
+	url = https://github.com/WohlSoft/lz4.git
+	branch = release-patches
 [submodule "mbediso"]
 	path = 3rdparty/mbediso
 	url = https://github.com/WohlSoft/mbediso.git
