@@ -143,10 +143,12 @@ T f2i_cast(num_t in)
 SDL_FORCE_INLINE void modifyByteX86(num_t &dst, size_t byte, uint8_t data)
 {
 #ifdef THEXTECH_FIXED_POINT
-    return;
+    double tmp = (double)dst;
+    auto *in = reinterpret_cast<uint8_t*>(&tmp);
+#else
+    auto *in = reinterpret_cast<uint8_t*>(&dst);
 #endif
 
-    auto *in = reinterpret_cast<uint8_t*>(&dst);
     SDL_assert(byte < 8);
 
 #if defined(THEXTECH_BIG_ENDIAN)
@@ -157,21 +159,31 @@ SDL_FORCE_INLINE void modifyByteX86(num_t &dst, size_t byte, uint8_t data)
 #else // normal little endian
     in[byte] = data;
 #endif
+
+#ifdef THEXTECH_FIXED_POINT
+    dst = num_t::from_double(tmp);
+#endif
 }
 
 SDL_FORCE_INLINE void modifyByteX86(numf_t &dst, size_t byte, uint8_t data)
 {
 #ifdef THEXTECH_FIXED_POINT
-    return;
+    float tmp = (double)dst;
+    auto *in = reinterpret_cast<uint8_t*>(&tmp);
+#else
+    auto *in = reinterpret_cast<uint8_t*>(&dst);
 #endif
 
-    auto *in = reinterpret_cast<uint8_t*>(&dst);
     SDL_assert(byte < 4);
 
 #if defined(THEXTECH_BIG_ENDIAN)
     in[3 - byte] = data;
 #else // normal little endian
     in[byte] = data;
+#endif
+
+#ifdef THEXTECH_FIXED_POINT
+    dst = tmp;
 #endif
 }
 
@@ -191,10 +203,12 @@ SDL_FORCE_INLINE void modifyByteX86(int16_t &dst, size_t byte, uint8_t data)
 SDL_FORCE_INLINE uint8_t getByteX86(const num_t &src, size_t byte)
 {
 #ifdef THEXTECH_FIXED_POINT
-    return 0;
+    double tmp = (double)src;
+    const auto *in = reinterpret_cast<const uint8_t*>(&tmp);
+#else
+    const auto *in = reinterpret_cast<const uint8_t*>(&src);
 #endif
 
-    const auto *in = reinterpret_cast<const uint8_t*>(&src);
     SDL_assert(byte < 8);
 #if defined(THEXTECH_BIG_ENDIAN)
     return in[7 - byte];
@@ -209,10 +223,12 @@ SDL_FORCE_INLINE uint8_t getByteX86(const num_t &src, size_t byte)
 SDL_FORCE_INLINE uint8_t getByteX86(const numf_t &src, size_t byte)
 {
 #ifdef THEXTECH_FIXED_POINT
-    return 0;
+    float tmp = (float)src;
+    const auto *in = reinterpret_cast<const uint8_t*>(&tmp);
+#else
+    const auto *in = reinterpret_cast<const uint8_t*>(&src);
 #endif
 
-    const auto *in = reinterpret_cast<const uint8_t*>(&src);
     SDL_assert(byte < 4);
 #if defined(THEXTECH_BIG_ENDIAN)
     return in[3 - byte];

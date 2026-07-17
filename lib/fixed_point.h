@@ -126,6 +126,12 @@ public:
         return (double)(i) / (1 << 24);
     }
 
+    explicit constexpr operator float() const
+    {
+        // FIXME: Verify this!
+        return (float)(i) / (1 << 24);
+    }
+
     constexpr numf_t operator-() const
     {
         return numf_t(-i, nullptr);
