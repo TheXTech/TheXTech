@@ -58,7 +58,7 @@
 	path = 3rdparty/lz4
 	url = https://github.com/WohlSoft/lz4.git
 	branch = release-patches
-[submodule "mbediso"]
+[submodule "3rdparty/mbediso"]
 	path = 3rdparty/mbediso
 	url = https://github.com/WohlSoft/mbediso/
 	branch = main
