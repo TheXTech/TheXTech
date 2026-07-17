@@ -68,6 +68,12 @@ jobs:
 
     - uses: TheXTech/branch-name@v0.1
 
+    - name: Store the branch name
+      id: branch-name
+      shell: bash
+      run: |
+        echo "branch=${BRANCH_NAME}" >> $GITHUB_OUTPUT;
+
     - name: Pull submodules
       shell: bash
       run: |
@@ -107,7 +113,7 @@ jobs:
           export PATH=${{ matrix.config.extra_path }}:${PATH}
           echo "PATH environment: ${PATH}"
         fi
-        cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} -DTHEXTECH_HAIKU_VERSION_BUILD_NUMBER=${{ github.run_number }} -DHAIKU_PACKAGE_FILE_NAME="thextech-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}" ${LOCAL_EXTRA_SETUP} .
+        cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} -DTHEXTECH_HAIKU_VERSION_BUILD_NUMBER=${{ github.run_number }} -DHAIKU_PACKAGE_FILE_NAME="thextech-${{ matrix.config.package_filename_suffix }}-${{ steps.branch-name.outputs.branch }}" .
 
     - name: Build
       run: |
