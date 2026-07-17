@@ -30,6 +30,7 @@ set(LZ4_LIBRARIES ${liblz4_Libs} CACHE STRING "" FORCE)
 set(USE_EXTERNAL_LZ4 ON CACHE BOOL "" FORCE)
 set(MBEDISO_BUILD_EXECUTABLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/mbediso EXCLUDE_FROM_ALL)
+add_dependencies(lz4_static lz4_Local)
 add_dependencies(mbediso lz4_Local)
 
 if(NOT THEXTECH_NO_SDL_BUILD)
