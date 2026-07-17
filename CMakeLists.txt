@@ -691,27 +691,12 @@ if(NINTENDO_DS AND CALICO_ROOT)
     target_link_libraries(A2XT_Int INTERFACE xtbootstrap)
 endif()
 
-add_subdirectory(3rdparty/mbediso EXCLUDE_FROM_ALL)
-if(NOT THEXTECH_NO_SDL_BUILD)
-    if(NOT USE_SYSTEM_SDL2)
-        target_include_directories(mbediso PRIVATE "${DEPENDENCIES_INSTALL_DIR}/include")
-        add_dependencies(mbediso AudioCodecs_Local)
-    else()
-        target_include_directories(mbediso PRIVATE "${SDL2_INCLUDE_DIRS}")
-    endif()
-endif()
+include(cmake/library_mbediso.cmake)
 target_link_libraries(A2XT_Int INTERFACE mbediso)
 target_compile_definitions(A2XT_Int INTERFACE
     -DPGE_USE_ARCHIVES   # DirMan should use the archives library
     -DPGE_FILES_PRESENT  # DirMan should use the Files checkSuffix routine
 )
-
-if(ANDROID)
-    set_target_properties(lz4 PROPERTIES POSITION_INDEPENDENT_CODE ON)
-    set_target_properties(lz4_static PROPERTIES POSITION_INDEPENDENT_CODE ON)
-    set_target_properties(mbediso PROPERTIES POSITION_INDEPENDENT_CODE ON)
-endif()
-
 
 target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
 target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
