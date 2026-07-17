@@ -73,10 +73,10 @@ jobs:
       run: |
         git submodule update --init --recursive
 
-    - name: Start VM
+    - name: Start Haiku VM
       uses: cross-platform-actions/action@v1
       env:
-        BRANCH_NAME: BRANCH_NAME
+        BRANCH_NAME: ${BRANCH_NAME}
       with:
         environment_variables: BRANCH_NAME
         operating_system: haiku
