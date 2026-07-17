@@ -21,6 +21,16 @@
 #include "globals.h"
 #include "collision.h"
 
+SpeedlessLocation_t Background_t::FullLocation() const
+{
+    SpeedlessLocation_t ret;
+    ret.X = Location.X;
+    ret.Y = Location.Y;
+    ret.Width = GFXBackgroundBMP[Type].w;
+    ret.Height = BackgroundHeight[Type];
+    return ret;
+}
+
 // Intersect collisions
 bool CheckCollisionIntersect(const Location_t &Loc1, const Location_t &Loc2)
 {
