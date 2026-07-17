@@ -28,6 +28,11 @@ elseif(VITA)
     list(APPEND APPPATH_SRCS
         ${CMAKE_CURRENT_LIST_DIR}/private/app_path_vita.cpp
     )
+elseif(PSP)
+    message("-- AppPath for PSP")
+    list(APPEND APPPATH_SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/private/app_path_psp.cpp
+    )
 elseif(NINTENDO_3DS)
     message("-- AppPath for 3DS")
     list(APPEND APPPATH_SRCS

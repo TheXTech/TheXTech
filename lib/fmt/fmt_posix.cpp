@@ -170,28 +170,41 @@ std::size_t fmt::File::write(const void *buffer, std::size_t count) {
 }
 
 fmt::File fmt::File::dup(int fd) {
+#if defined(__PSP__)
+  FMT_THROW(SystemError(errno, "cannot duplicate file descriptor {}, dup() is not supported on this platform", fd));
+#else
   // Don't retry as dup doesn't return EINTR.
   // http://pubs.opengroup.org/onlinepubs/009695399/functions/dup.html
   int new_fd = FMT_POSIX_CALL(dup(fd));
   if (new_fd == -1)
     FMT_THROW(SystemError(errno, "cannot duplicate file descriptor {}", fd));
   return File(new_fd);
+#endif
 }
 
 void fmt::File::dup2(int fd) {
+#if defined(__PSP__)
+  FMT_THROW(SystemError(errno, "cannot duplicate file descriptor {} to {}, dup2() is not supported on this platform", fd_, fd));
+#else
   int result = 0;
   FMT_RETRY(result, FMT_POSIX_CALL(dup2(fd_, fd)));
   if (result == -1) {
     FMT_THROW(SystemError(errno,
       "cannot duplicate file descriptor {} to {}", fd_, fd));
   }
+#endif
 }
 
 void fmt::File::dup2(int fd, ErrorCode &ec) FMT_NOEXCEPT {
+#if defined(__PSP__)
+  (void)ec;
+  FMT_THROW(SystemError(errno, "cannot duplicate file descriptor {} to {}, dup2() is not supported on this platform", fd_, fd));
+#else
   int result = 0;
   FMT_RETRY(result, FMT_POSIX_CALL(dup2(fd_, fd)));
   if (result == -1)
     ec = ErrorCode(errno);
+#endif
 }
 
 void fmt::File::pipe(File &read_end, File &write_end) {
@@ -232,6 +245,8 @@ long fmt::getpagesize() {
   SYSTEM_INFO si;
   GetSystemInfo(&si);
   return si.dwPageSize;
+#elif defined(__PSP__)
+    return 4096U;
 #else
   long size = FMT_POSIX_CALL(sysconf(_SC_PAGESIZE));
   if (size < 0)
