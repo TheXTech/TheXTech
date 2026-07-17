@@ -42,7 +42,6 @@ if(NOT THEXTECH_NO_SDL_BUILD)
 endif()
 
 if(ANDROID)
-    set_target_properties(lz4 PROPERTIES POSITION_INDEPENDENT_CODE ON)
     set_target_properties(lz4_static PROPERTIES POSITION_INDEPENDENT_CODE ON)
     set_target_properties(mbediso PROPERTIES POSITION_INDEPENDENT_CODE ON)
 endif()
