@@ -75,7 +75,10 @@ jobs:
 
     - name: Start VM
       uses: cross-platform-actions/action@v1
+      env:
+        BRANCH_NAME: BRANCH_NAME
       with:
+        environment_variables: BRANCH_NAME
         operating_system: haiku
         architecture: x86-64
         version: r1beta5
