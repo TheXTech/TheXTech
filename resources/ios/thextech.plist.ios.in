@@ -53,39 +53,12 @@
             <string>Owner</string>
         </dict>
     </array>
-    <key>CFBundleIcons</key>
-    <dict>
-        <key>CFBundlePrimaryIcon</key>
-        <dict>
-            <key>CFBundleIconFiles</key>
-            <array>
-                <string>AppIcon60x60</string>
-            </array>
-            <key>CFBundleIconName</key>
-            <string>AppIcon</string>
-        </dict>
-    </dict>
-    <key>CFBundleIcons~ipad</key>
-    <dict>
-        <key>CFBundlePrimaryIcon</key>
-        <dict>
-            <key>CFBundleIconFiles</key>
-            <array>
-                <string>AppIcon60x60</string>
-                <string>AppIcon76x76</string>
-            </array>
-            <key>CFBundleIconName</key>
-            <string>AppIcon</string>
-        </dict>
-    </dict>
     <key>UIRequiredDeviceCapabilities</key>
     <array>
         <string>${CMAKE_OSX_ARCHITECTURES}</string>
     </array>
     <key>CFBundleExecutable</key>
     <string>${MACOSX_BUNDLE_EXECUTABLE_NAME}</string>
-    <key>CFBundleIconFile</key>
-    <string>${MACOSX_BUNDLE_ICON_FILE}</string>
     <key>CFBundleName</key>
     <string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
     <key>CFBundleIdentifier</key>

@@ -79,11 +79,7 @@ if(APPLE)
         if(CMAKE_GENERATOR STREQUAL "Xcode")
             set(XTECH_PLIST_NAME "ios/thextech.plist.ios.xcode.in")
         else()
-            if(THEXTECH_MACOS_MIN_VERSION VERSION_LESS "12.0")
-                set(XTECH_PLIST_NAME "ios/thextech.plist.ios9.in")
-            else()
-                set(XTECH_PLIST_NAME "ios/thextech.plist.ios.in")
-            endif()
+            set(XTECH_PLIST_NAME "ios/thextech.plist.ios.in")
         endif()
         set(XTECH_DEFAULT_ICNS "resources/thextech.icns")
     elseif(TVOS)
@@ -1296,7 +1292,6 @@ set(THEXTECH_EXTRA_RESOURCES
     resources/thextech.plist.in
     resources/thextech.plist.tiger.in
     resources/ios/thextech.plist.ios.in
-    resources/ios/thextech.plist.ios9.in
     resources/ios/thextech.plist.ios.xcode.in
     resources/ios/thextech.plist.tvos.in
     resources/emscripten/manifest.json.in
@@ -1468,13 +1463,7 @@ if(APPLE)
     endif()
 
     if((IOS OR TVOS) AND NOT CMAKE_GENERATOR STREQUAL "Xcode")
-        # Convert plist into binary format as Xcode does
-        add_custom_command(TARGET thextech POST_BUILD
-            COMMAND plutil -convert binary1 "$<TARGET_FILE_DIR:thextech>/Info.plist"
-            COMMENT "Converting Info.plist to binary format..."
-        )
-
-        # Convert assets into car format as Xcode does
+        # Convert assets into car format as Xcode does, and pack Info.plist files
         add_custom_command(TARGET thextech POST_BUILD
             COMMAND actool "${XTECH_MACOS_ASSETS_PACK_PATH}"
                     --app-icon ${XTECH_MACOS_ASSETS_ICON}
@@ -1482,6 +1471,8 @@ if(APPLE)
                     --compile "$<TARGET_FILE_DIR:thextech>"
                     --platform ${XTECH_MACOS_ASSETS_PLATFORM}
                     --minimum-deployment-target ${THEXTECH_MACOS_MIN_VERSION}
+            COMMAND /usr/libexec/PlistBuddy -x -c "Merge ${CMAKE_BINARY_DIR}/PartialInfo.plist" "$<TARGET_FILE_DIR:thextech>/Info.plist"
+            COMMAND plutil -convert binary1 "$<TARGET_FILE_DIR:thextech>/Info.plist"
             COMMENT "Packing assets..."
         )
 
