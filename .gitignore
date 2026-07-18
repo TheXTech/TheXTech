@@ -92,3 +92,6 @@ CMakeSettings.json
 
 # clangd related stuff
 .cache/
+
+# A local config for IDE on Haiku
+.genio.yaml

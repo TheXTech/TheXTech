@@ -628,6 +628,10 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     endif()
 
     list(APPEND A2XT_LIBS PGE_ZLib)
+
+    if(HAIKU)
+        list(APPEND A2XT_LIBS be)
+    endif()
 endif()
 
 if(THEXTECH_ENABLE_DISCORD_RPC)
