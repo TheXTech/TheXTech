@@ -51,6 +51,38 @@ jobs:
             package_arch: "arm64",
             upload_directory: "www/tvos/"
           }
+        - {
+            name: "iOS 9+ armv7 (iPhone 4S)",
+            os: macos-26,
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=\"thextech\" -DCMAKE_TOOLCHAIN_FILE=\"/Users/iOS9Kit/ios9-kit/ios_9_toolchain.cmake\"",
+            # ninja wget p7zip - are already installed
+            deps_cmdline: "brew trust aws/tap && brew install lftp",
+            generator: "ninja",
+            build_type: "MinSizeRel",
+            platform: "iOS",
+            min_version: "9.0",
+            package_prefix: "thextech-ios9",
+            package_arch: "armv7",
+            upload_directory: "www/ios/",
+            ios9_kit_download: "https://wohlsoft.ru/docs/Software/ios9-kit.tar.bz2",
+            ios9_kit_install_dir: "/Users/iOS9Kit/"
+          }
+        - {
+            name: "iOS 9+ armv7s (iPhone 5)",
+            os: macos-26,
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=\"thextech\" -DCMAKE_TOOLCHAIN_FILE=\"/Users/iOS9Kit/ios9-kit/ios_9_toolchain.cmake\"",
+            # ninja wget p7zip - are already installed
+            deps_cmdline: "brew trust aws/tap && brew install lftp",
+            generator: "ninja",
+            build_type: "MinSizeRel",
+            platform: "iOS",
+            min_version: "9.0",
+            package_prefix: "thextech-ios9",
+            package_arch: "armv7s",
+            upload_directory: "www/ios/",
+            ios9_kit_download: "https://wohlsoft.ru/docs/Software/ios9-kit.tar.bz2",
+            ios9_kit_install_dir: "/Users/iOS9Kit/"
+          }
 
     steps:
     - name: Check for the upload support
@@ -71,6 +103,20 @@ jobs:
         if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
             eval ${{ matrix.config.deps_cmdline }}
         fi
+
+    - name: Download iOS 9 kit
+      if: matrix.config.ios9_kit_download
+      uses: carlosperate/download-file-action@v2
+      with:
+        file-url: "${{ matrix.config.ios9_kit_download }}"
+        file-name: build-temp/ios9-kit.tar.bz2
+
+    - name: Extract iOS 9 kit
+      if: matrix.config.ios9_kit_install_dir
+      shell: bash
+      run: |
+        sudo mkdir -p "${{ matrix.config.ios9_kit_install_dir }}"
+        sudo tar -xf build-temp/ios9-kit.tar.bz2 -C "${{ matrix.config.ios9_kit_install_dir }}"
 
     - name: CI Server's network meta-info
       shell: bash
