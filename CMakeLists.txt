@@ -59,28 +59,6 @@ if(APPLE)
         endif()
     endif()
 
-    if(IOS)
-        if(CMAKE_GENERATOR STREQUAL "Xcode")
-            set(XTECH_PLIST_NAME "thextech.plist.ios.xcode.in")
-        else()
-            set(XTECH_PLIST_NAME "thextech.plist.ios.in")
-        endif()
-        set(XTECH_DEFAULT_ICNS "resources/thextech.icns")
-    elseif(TVOS)
-        set(XTECH_PLIST_NAME "thextech.plist.tvos.in")
-        set(XTECH_DEFAULT_ICNS "resources/thextech.icns")
-    elseif(VISIONOS)
-        message(FATAL_ERROR "visionOS is not yet supported (And will be? This device is too expensive and inconvenient. There are gossips that Apple attempts to make a cheap and lightweight thing, but no any related news right now).")
-    elseif(WATCHOS)
-        message(FATAL_ERROR "watchOS is not supported, touchscreen is too limited to play a game here, and no way to plug any Blueooth gamepads at all (Please play Doom here instead!).")
-    elseif(XTECH_MACOSX_TIGER)
-        set(XTECH_PLIST_NAME "thextech.plist.tiger.in")
-        set(XTECH_DEFAULT_ICNS "resources/tiger/thextech.icns")
-    else()
-        set(XTECH_PLIST_NAME "thextech.plist.in")
-        set(XTECH_DEFAULT_ICNS "resources/thextech.icns")
-    endif()
-
     if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET OR CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
         if(IOS)
             set(THEXTECH_MACOS_MIN_VERSION "12.0")
@@ -95,6 +73,32 @@ if(APPLE)
         endif()
     else()
         set(THEXTECH_MACOS_MIN_VERSION "${CMAKE_OSX_DEPLOYMENT_TARGET}")
+    endif()
+
+    if(IOS)
+        if(CMAKE_GENERATOR STREQUAL "Xcode")
+            set(XTECH_PLIST_NAME "ios/thextech.plist.ios.xcode.in")
+        else()
+            if(THEXTECH_MACOS_MIN_VERSION VERSION_LESS "12.0")
+                set(XTECH_PLIST_NAME "ios/thextech.plist.ios9.in")
+            else()
+                set(XTECH_PLIST_NAME "ios/thextech.plist.ios.in")
+            endif()
+        endif()
+        set(XTECH_DEFAULT_ICNS "resources/thextech.icns")
+    elseif(TVOS)
+        set(XTECH_PLIST_NAME "ios/thextech.plist.tvos.in")
+        set(XTECH_DEFAULT_ICNS "resources/thextech.icns")
+    elseif(VISIONOS)
+        message(FATAL_ERROR "visionOS is not yet supported (And will be? This device is too expensive and inconvenient. There are gossips that Apple attempts to make a cheap and lightweight thing, but no any related news right now).")
+    elseif(WATCHOS)
+        message(FATAL_ERROR "watchOS is not supported, touchscreen is too limited to play a game here, and no way to plug any Blueooth gamepads at all (Please play Doom here instead!).")
+    elseif(XTECH_MACOSX_TIGER)
+        set(XTECH_PLIST_NAME "thextech.plist.tiger.in")
+        set(XTECH_DEFAULT_ICNS "resources/tiger/thextech.icns")
+    else()
+        set(XTECH_PLIST_NAME "thextech.plist.in")
+        set(XTECH_DEFAULT_ICNS "resources/thextech.icns")
     endif()
 
     if(IOS)
@@ -1290,10 +1294,11 @@ set(THEXTECH_EXTRA_RESOURCES
     README.RUS.md
     README.ESP.md
     resources/thextech.plist.in
-    resources/thextech.plist.ios.in
-    resources/thextech.plist.ios.xcode.in
-    resources/thextech.plist.tvos.in
     resources/thextech.plist.tiger.in
+    resources/ios/thextech.plist.ios.in
+    resources/ios/thextech.plist.ios9.in
+    resources/ios/thextech.plist.ios.xcode.in
+    resources/ios/thextech.plist.tvos.in
     resources/emscripten/manifest.json.in
     resources/emscripten/shell_minimal.html
     resources/emscripten/sw.js.in
