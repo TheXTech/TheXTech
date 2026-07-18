@@ -20,6 +20,10 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
+#ifdef __HAIKU__
+#   include <FindDirectory.h>
+#   include <fs_info.h>
+#endif
 
 #include <DirManager/dirman.h>
 
@@ -61,13 +65,23 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     s_gameInstallDirectory += s_gamesSysDir;
 
     // Environment
+#if defined(__HAIKU__)
+    dev_t volume = dev_for_path("/boot");
+    char buffer[B_PATH_NAME_LENGTH + B_FILE_NAME_LENGTH];
+    status_t result = find_directory(B_USER_SETTINGS_DIRECTORY, volume, false, buffer, sizeof(buffer));
+
+    if(result == B_OK)
+        userDir = std::string(buffer);
+#else
     const char *env_home = SDL_getenv("HOME");
     userDir = s_getEnvNotNull("XDG_DATA_HOME");
+#endif
 
     // Init home directory
 #if defined(__HAIKU__)
-    if(env_home)
-        homePath.append(env_home);
+    result = find_directory(B_USER_DIRECTORY, volume, false, buffer, sizeof(buffer));
+    if(result == B_OK)
+        homePath = std::string(buffer);
 #else
     passwd *pw = getpwuid(getuid());
     if(pw)
