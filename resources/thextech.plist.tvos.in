@@ -9,8 +9,6 @@
             <array>
                 <string>lvl</string>
             </array>
-            <key>CFBundleTypeIconFile</key>
-            <string>file_lvl.icns</string>
             <key>CFBundleTypeName</key>
             <string>SMBX64/38A Level File</string>
             <key>CFBundleTypeRole</key>
@@ -23,8 +21,6 @@
             <array>
                 <string>lvlx</string>
             </array>
-            <key>CFBundleTypeIconFile</key>
-            <string>file_lvlx.icns</string>
             <key>CFBundleTypeName</key>
             <string>Moondust Level File</string>
             <key>CFBundleTypeRole</key>
@@ -37,8 +33,6 @@
             <array>
                 <string>wld</string>
             </array>
-            <key>CFBundleTypeIconFile</key>
-            <string>file_wld.icns</string>
             <key>CFBundleTypeName</key>
             <string>SMBX64/38A World map file</string>
             <key>CFBundleTypeRole</key>
@@ -51,8 +45,6 @@
             <array>
                 <string>wldx</string>
             </array>
-            <key>CFBundleTypeIconFile</key>
-            <string>file_wldx.icns</string>
             <key>CFBundleTypeName</key>
             <string>Moondust World map file</string>
             <key>CFBundleTypeRole</key>
