@@ -57,7 +57,7 @@ jobs:
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=\"thextech\" -DCMAKE_TOOLCHAIN_FILE=\"/Users/iOS9Kit/ios9-kit/ios_9_toolchain.cmake\"",
             # ninja wget p7zip - are already installed
             deps_cmdline: "brew trust aws/tap && brew install lftp",
-            generator: "ninja",
+            generator: "Ninja",
             build_type: "MinSizeRel",
             platform: "iOS",
             min_version: "9.0",
@@ -73,7 +73,7 @@ jobs:
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=\"thextech\" -DCMAKE_TOOLCHAIN_FILE=\"/Users/iOS9Kit/ios9-kit/ios_9_toolchain.cmake\"",
             # ninja wget p7zip - are already installed
             deps_cmdline: "brew trust aws/tap && brew install lftp",
-            generator: "ninja",
+            generator: "Ninja",
             build_type: "MinSizeRel",
             platform: "iOS",
             min_version: "9.0",
