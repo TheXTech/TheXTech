@@ -60,7 +60,11 @@ if(APPLE)
     endif()
 
     if(IOS)
-        set(XTECH_PLIST_NAME "thextech.plist.ios.in")
+        if(CMAKE_GENERATOR STREQUAL "Xcode")
+            set(XTECH_PLIST_NAME "thextech.plist.ios.xcode.in")
+        else()
+            set(XTECH_PLIST_NAME "thextech.plist.ios.in")
+        endif()
         set(XTECH_DEFAULT_ICNS "resources/thextech.icns")
     elseif(TVOS)
         set(XTECH_PLIST_NAME "thextech.plist.tvos.in")
@@ -814,17 +818,29 @@ if(APPLE AND MACOS)
 endif()
 
 if(IOS)
-    list(APPEND LIB_SRC "${CMAKE_CURRENT_SOURCE_DIR}/resources/ios/Assets.xcassets")
+    if(CMAKE_GENERATOR STREQUAL "Xcode")
+        list(APPEND LIB_SRC "${CMAKE_CURRENT_SOURCE_DIR}/resources/ios/Assets.xcassets")
 
-    set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/resources/ios/Assets.xcassets"
-        PROPERTIES MACOSX_PACKAGE_LOCATION Resources
-    )
+        set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/resources/ios/Assets.xcassets"
+            PROPERTIES MACOSX_PACKAGE_LOCATION Resources
+        )
+    else()
+        set(XTECH_MACOS_ASSETS_PACK_PATH "${CMAKE_CURRENT_SOURCE_DIR}/resources/ios/Assets.xcassets")
+        set(XTECH_MACOS_ASSETS_ICON "AppIcon")
+        set(XTECH_MACOS_ASSETS_PLATFORM "iphoneos")
+    endif()
 elseif(TVOS)
-    list(APPEND LIB_SRC "${CMAKE_CURRENT_SOURCE_DIR}/resources/ios/TVAssets.xcassets")
+    if(CMAKE_GENERATOR STREQUAL "Xcode")
+        list(APPEND LIB_SRC "${CMAKE_CURRENT_SOURCE_DIR}/resources/ios/TVAssets.xcassets")
 
-    set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/resources/ios/TVAssets.xcassets"
-        PROPERTIES MACOSX_PACKAGE_LOCATION Resources
-    )
+        set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/resources/ios/TVAssets.xcassets"
+            PROPERTIES MACOSX_PACKAGE_LOCATION Resources
+        )
+    else()
+        set(XTECH_MACOS_ASSETS_PACK_PATH "${CMAKE_CURRENT_SOURCE_DIR}/resources/ios/TVAssets.xcassets")
+        set(XTECH_MACOS_ASSETS_ICON "TVIcon")
+        set(XTECH_MACOS_ASSETS_PLATFORM "tvos")
+    endif()
 endif()
 
 set(THEXTECH_SRC
@@ -1275,6 +1291,7 @@ set(THEXTECH_EXTRA_RESOURCES
     README.ESP.md
     resources/thextech.plist.in
     resources/thextech.plist.ios.in
+    resources/thextech.plist.ios.xcode.in
     resources/thextech.plist.tvos.in
     resources/thextech.plist.tiger.in
     resources/emscripten/manifest.json.in
@@ -1443,6 +1460,28 @@ if(APPLE)
             COMMENT "Copying assets into bundle..."
         )
         target_compile_definitions(thextech PRIVATE -DUSE_BUNDLED_ASSETS)
+    endif()
+
+    if((IOS OR TVOS) AND NOT CMAKE_GENERATOR STREQUAL "Xcode")
+        # Convert plist into binary format as Xcode does
+        add_custom_command(TARGET thextech POST_BUILD
+            COMMAND plutil -convert binary1 "$<TARGET_FILE_DIR:thextech>/Info.plist"
+            COMMENT "Converting Info.plist to binary format..."
+        )
+
+        # Convert assets into car format as Xcode does
+        add_custom_command(TARGET thextech POST_BUILD
+            COMMAND actool "${XTECH_MACOS_ASSETS_PACK_PATH}"
+                    --app-icon ${XTECH_MACOS_ASSETS_ICON}
+                    --output-partial-info-plist "${CMAKE_BINARY_DIR}/PartialInfo.plist"
+                    --compile "$<TARGET_FILE_DIR:thextech>"
+                    --platform ${XTECH_MACOS_ASSETS_PLATFORM}
+                    --minimum-deployment-target ${THEXTECH_MACOS_MIN_VERSION}
+            COMMENT "Packing assets..."
+        )
+
+        target_sources(thextech PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/resources/PkgInfo")
+        set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/resources/PkgInfo PROPERTIES MACOSX_PACKAGE_LOCATION "")
     endif()
 
     if(THEXTECH_PRELOAD_ENVIRONMENT_MANUALLY)
