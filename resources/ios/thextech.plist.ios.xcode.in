@@ -75,6 +75,10 @@
     <string>APPL</string>
     <key>NSHighResolutionCapable</key>
     <true/>
+    <key>UIApplicationDelegateClassName</key>
+    <string>TheXTechDelegate</string>
+    <key>NSApplicationFormsToDirectories</key>
+    <false/>
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
     <key>UIFileSharingEnabled</key>

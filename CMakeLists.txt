@@ -279,6 +279,7 @@ if(APPLE)
     endif()
 
     set(THEXTECH_BUNDLE_NAME "TheXTech" CACHE STRING "Name of bundle folder")
+    set(THEXTECH_MACOS_APP_IDENTIFIER "ru.wohlsoft.thextech" CACHE STRING "An application identifier for macOS/iOS/tvOS. Change it if having troubles to sign and sideload.")
     set(THEXTECH_ICON_NAME "thextech.icns" CACHE STRING "Name of bundle icon file")
     set(THEXTECH_CUSTOM_ICON_PATH "" CACHE STRING "Name of icon file to pack into the bundle")
 
@@ -1429,7 +1430,7 @@ if(APPLE)
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/resources/${XTECH_PLIST_NAME}"
         MACOSX_BUNDLE_BUNDLE_NAME "${THEXTECH_BUNDLE_NAME}"
         MACOSX_BUNDLE_EXECUTABLE_NAME "${THEXTECH_EXECUTABLE_NAME_OUT}"
-        MACOSX_BUNDLE_GUI_IDENTIFIER "ru.wohlsoft.thextech"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "${THEXTECH_MACOS_APP_IDENTIFIER}"
         MACOSX_BUNDLE_SHORT_VERSION_STRING "${THEXTECH_VERSION_STRING}"
         MACOSX_BUNDLE_LONG_VERSION_STRING "${THEXTECH_VERSION_STRING}"
         MACOSX_BUNDLE_ICON_FILE "${THEXTECH_ICON_NAME}"
