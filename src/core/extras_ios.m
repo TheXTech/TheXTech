@@ -310,7 +310,12 @@ void ios_trigger_vibrator(float strenght, int ms)
 #endif
 
     /* Fallback for devices without haptics, and for iOS older than 13! */
-    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+    if(ms >= 50)
+        AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+    else if(ms >= 12)
+        AudioServicesPlaySystemSound(1520);
+    else
+        AudioServicesPlaySystemSound(1519);
 }
 
 int ios_trigger_vibrator_taps(float strenght, int ms)
@@ -342,8 +347,14 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
     }
 #else
     (void)strenght;
-    (void)ms;
 #endif
 
-    return -1;
+    if(ms >= 12)
+        AudioServicesPlaySystemSound(1520);
+    else if(ms >= 6)
+        AudioServicesPlaySystemSound(1519);
+    else
+        return -1;
+
+    return 0;
 }
