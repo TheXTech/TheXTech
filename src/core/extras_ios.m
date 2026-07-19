@@ -200,7 +200,7 @@ static int s_hapticsSupported = -1;
 static int s_hapticsCounter = 0;
 
 API_AVAILABLE(ios(13.0))
-static CHHapticEngine *s_hapticsEngine = nil;
+__strong static CHHapticEngine *s_hapticsEngine = nil;
 
 #endif
 
@@ -224,7 +224,10 @@ int ios_vibrator_init()
 
         s_hapticsEngine = [[CHHapticEngine alloc] initAndReturnError:&error];
         if(error)
+        {
+            pLogWarning("Failed to initialise the Haptics Engine: %s", [error.localizedDescription UTF8String]);
             return -1;
+        }
         
         s_hapticsSupported = 0;
         ++s_hapticsCounter;
@@ -238,7 +241,7 @@ int ios_vibrator_init()
             [s_hapticsEngine startAndReturnError:&startupError];
             
             if(startupError)
-                pLogWarning("Haptics Engine couldn't restart!");
+                pLogWarning("Haptics Engine couldn't restart!: %s", [startupError.localizedDescription UTF8String]);
             
             // Register any custom resources you had registered, using registerAudioResource.
             // Recreate all haptic pattern players you had created, using createPlayer.
@@ -334,13 +337,37 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
             CHHapticPattern *patten = [[CHHapticPattern alloc] initWithEvents:@[event] parameterCurves:@[] error:&error];
 
             id<CHHapticPatternPlayer> player = [s_hapticsEngine createPlayerWithPattern:patten error:&error];
-            
+
+            if(error)
+            {
+                pLogWarning("Failed to create the Haptics Player: %s", [error.localizedDescription UTF8String]);
+                return -1;
+            }
+
+
             [s_hapticsEngine startAndReturnError:&error];
+
+            if(error)
+            {
+                pLogWarning("Failed to start the Haptics Engine: %s", [error.localizedDescription UTF8String]);
+                return -1;
+            }
+
+
             [player startAtTime:0 error:&error];
 
-            // FIXME: An error occurs:
-            // CHHapticEngine.mm:1917  -[CHHapticEngine(CHHapticEngineInternal) getAvailableChannel:]: ERROR: Unable to add an additional player channel
-            // after several time handling of the vibration. It starts to fail.
+            if(error)
+            {
+                pLogWarning("Failed to start the Haptics Player: %s", [error.localizedDescription UTF8String]);
+                [player release];
+                return -1;
+            }
+
+            [s_hapticsEngine notifyWhenPlayersFinished:^CHHapticEngineFinishedAction(NSError * _Nullable error)
+            {
+                [s_hapticsEngine stopWithCompletionHandler:nil];
+                return CHHapticEngineFinishedActionStopEngine;
+            }];
 
             return 0;
         }
