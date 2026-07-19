@@ -26,6 +26,14 @@
 #include <SDL2/SDL_video.h>
 #include <sys/utsname.h>
 
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
+// Fore iOS 13+
+#   include <CoreHaptics/CoreHaptics.h>
+#endif
+// For iOS older than 13
+#include <AudioToolbox/AudioToolbox.h>
+
+
 void ios_quit(int ret)
 {
     //home button press programmatically
@@ -153,4 +161,161 @@ int ios_get_cut_off_size(void)
         ret = (int)[foundCut integerValue];
 
     return ret;
+}
+
+
+/* Haptics Implementation */
+
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
+static int s_hapticsSupported = -1;
+static int s_hapticsCounter = 0;
+
+API_AVAILABLE(ios(13.0))
+static CHHapticEngine *s_hapticsEngine = nil;
+
+#endif
+
+int ios_vibrator_init()
+{
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
+    NSError *error = nil;
+
+    if(@available(iOS 13.0, *))
+    {
+        if(s_hapticsEngine)
+        {
+            ++s_hapticsCounter;
+            return s_hapticsSupported;
+        }
+        
+        s_hapticsSupported = -1;
+
+        if(![CHHapticEngine capabilitiesForHardware].supportsHaptics)
+            return -1; /* Hardware does not supports haptics */
+
+        s_hapticsEngine = [[CHHapticEngine alloc] initAndReturnError:&error];
+        if(error)
+            return -1;
+        
+        s_hapticsSupported = 0;
+        ++s_hapticsCounter;
+        
+        [s_hapticsEngine setResetHandler:^
+        {
+            NSLog(@"Haptics Engine RESET!");
+                
+            // Try restarting the engine again.
+            NSError* startupError;
+            [s_hapticsEngine startAndReturnError:&startupError];
+            
+            if(startupError)
+                NSLog(@"ERROR: Haptics Engine couldn't restart!");
+            
+            // Register any custom resources you had registered, using registerAudioResource.
+            // Recreate all haptic pattern players you had created, using createPlayer.
+        }];
+        
+        [s_hapticsEngine setStoppedHandler:^(CHHapticEngineStoppedReason reason)
+        {
+            switch(reason)
+            {
+            default:
+                break;
+
+            case CHHapticEngineStoppedReasonAudioSessionInterrupt:
+            {
+                NSLog(@"REASON: Audio Session Interrupt");
+                break;
+            }
+            case CHHapticEngineStoppedReasonApplicationSuspended:
+            {
+                NSLog(@"REASON: Application Suspended");
+                break;
+            }
+            
+            case CHHapticEngineStoppedReasonIdleTimeout:
+            {
+                NSLog(@"REASON: Idle Timeout");
+                break;
+            }
+            
+            case CHHapticEngineStoppedReasonSystemError:
+            {
+                NSLog(@"REASON: System Error");
+                break;
+            }
+            }
+        }];
+
+        return 0;
+    }
+#endif
+    return -1;
+}
+
+int ios_vibrator_quit()
+{
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
+    if(@available(iOS 13.0, *))
+    {
+        if(s_hapticsEngine)
+        {
+            if(s_hapticsCounter-- == 1)
+            {
+                s_hapticsEngine = nil;
+                [s_hapticsEngine release];
+                s_hapticsSupported = -1;
+            }
+        }
+    }
+#endif
+}
+
+void ios_trigger_vibrator(float strenght, int ms)
+{
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
+    if(ios_trigger_vibrator_taps(strenght, ms) == 0)
+        return;
+#else
+    (void)strenght;
+    (void)ms;
+#endif
+
+    /* Fallback for devices without haptics, and for iOS older than 13! */
+    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+}
+
+int ios_trigger_vibrator_taps(float strenght, int ms)
+{
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
+    if(@available(iOS 13.0, *))
+    {
+        NSError* error;
+
+        if(s_hapticsSupported == 0)
+        {
+            CHHapticEventParameter *strengthParameter = [[CHHapticEventParameter alloc] initWithParameterID:CHHapticEventParameterIDHapticIntensity value:strenght];
+            CHHapticEventParameter *sharpnessParameter = [[CHHapticEventParameter alloc] initWithParameterID:CHHapticEventParameterIDHapticSharpness value:1.0];
+            
+            CHHapticEvent *event = [[CHHapticEvent alloc] initWithEventType:CHHapticEventTypeHapticContinuous parameters:@[strengthParameter, sharpnessParameter] relativeTime:0 duration:(ms / 1000.0f)];
+            CHHapticPattern *patten = [[CHHapticPattern alloc] initWithEvents:@[event] parameterCurves:@[] error:&error];
+
+            id<CHHapticPatternPlayer> player = [s_hapticsEngine createPlayerWithPattern:patten error:&error];
+            
+            [s_hapticsEngine startAndReturnError:&error];
+            [player startAtTime:0 error:&error];
+            
+            // FIXME: An error occurs:
+            // CHHapticEngine.mm:1917  -[CHHapticEngine(CHHapticEngineInternal) getAvailableChannel:]: ERROR: Unable to add an additional player channel
+            // after several time handling of the vibration. It starts to fail.
+
+            return 0;
+        }
+    }
+#else
+    (void)strenght;
+    (void)ms;
+#endif
+
+    return -1;
 }
