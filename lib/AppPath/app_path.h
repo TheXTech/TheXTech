@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-#if defined(__3DS__)
+#if defined(__3DS__) || defined(THEXTECH_TVOS)
 #   define APP_PATH_HAS_EXTRA_WORLDS
 #endif
 
