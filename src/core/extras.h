@@ -21,6 +21,7 @@
 #define EXTRAS_H
 
 #ifdef THEXTECH_IOS
+
 #   ifdef __cplusplus
 extern "C"
 {
@@ -35,6 +36,16 @@ void ios_quit(int ret);
 double ios_get_screen_diagonal(double *ow, double *oh);
 
 int ios_get_cut_off_size(void);
+
+/* Device vibration support */
+int ios_vibrator_init();
+int ios_vibrator_quit();
+
+/* With a fallback on 0.5 vibrato */
+void ios_trigger_vibrator(float strenght, int ms);
+
+/* Without vibrato if not supported, for short taps */
+int ios_trigger_vibrator_taps(float strenght, int ms);
 
 #   ifdef __cplusplus
 }

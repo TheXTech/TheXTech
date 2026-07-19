@@ -959,6 +959,12 @@ static void updateTouchMap(int preferredLayout,
 
 void TouchScreenController::doVibration()
 {
+#ifdef THEXTECH_IOS
+    if(m_feedback_strength == 0.f)
+        return;
+
+    ios_trigger_vibrator_taps(m_feedback_strength, m_feedback_length);
+#else
     if(!m_vibrator)
         return;
 
@@ -966,15 +972,21 @@ void TouchScreenController::doVibration()
         return;
 
     SDL_HapticRumblePlay(m_vibrator, m_feedback_strength, m_feedback_length);
+#endif
+
     D_pLogDebug("TouchScreen: Vibration %g, %d ms", m_feedback_strength, m_feedback_length);
 }
 
 TouchScreenController::~TouchScreenController()
 {
+#ifdef THEXTECH_IOS
+    ios_vibrator_quit();
+#else
     if(m_vibrator)
         SDL_HapticClose(m_vibrator);
 
     m_vibrator = nullptr;
+#endif
 }
 
 TouchScreenController::TouchScreenController() noexcept
@@ -992,6 +1004,12 @@ TouchScreenController::TouchScreenController() noexcept
     }
 
     m_vibrator = nullptr;
+
+#ifdef THEXTECH_IOS
+    if(ios_vibrator_init() < 0)
+        pLogWarning("TouchScreen: Can't open haptics device!");
+
+#else
     int numHaptics = SDL_NumHaptics();
 
     const std::array<const char*, 3> allowlist = {
@@ -1028,6 +1046,7 @@ TouchScreenController::TouchScreenController() noexcept
         else
             pLogInfo("TouchScreen: ignoring haptics device [%s]", SDL_HapticName(i));
     }
+#endif
 }
 
 void TouchScreenController::scanTouchDevices()
@@ -1804,6 +1823,9 @@ void InputMethod_TouchScreen::Rumble(int ms, float strength)
     if(!t->m_controller.touchSupported())
         return;
 
+#ifdef THEXTECH_IOS
+    ios_trigger_vibrator(strength, ms);
+#else
     if(!t->m_controller.m_vibrator)
         return;
 
@@ -1811,6 +1833,7 @@ void InputMethod_TouchScreen::Rumble(int ms, float strength)
 
     if(SDL_HapticRumblePlay(t->m_controller.m_vibrator, strength, ms) == 0)
         return;
+#endif
 }
 
 StatusInfo InputMethod_TouchScreen::GetStatus()
