@@ -27,6 +27,10 @@
 #   include <TargetConditionals.h>
 #endif
 
+#ifdef THEXTECH_IOS
+#   include "../extras.h"
+#endif
+
 #include <FreeImageLite.h>
 #include <Logger/logger.h>
 #include <Utils/maths.h>
@@ -122,6 +126,10 @@ bool RenderSDL::initRender(SDL_Window *window)
 
     if(!AbstractRender_t::init())
         return false;
+
+#ifdef THEXTECH_IOS
+    XRender::TargetOverscanX = ios_get_overscan_pix_size();
+#endif
 
     m_window = window;
 

@@ -37,6 +37,8 @@ double ios_get_screen_diagonal(double *ow, double *oh);
 
 int ios_get_cut_off_size(void);
 
+int ios_get_overscan_pix_size(void);
+
 /* Device vibration support */
 int ios_vibrator_init();
 int ios_vibrator_quit();

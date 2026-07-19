@@ -192,6 +192,99 @@ int ios_get_cut_off_size(void)
     return ret;
 }
 
+int ios_get_overscan_pix_size(void)
+{
+    NSDictionary* devices;
+    struct utsname systemInfo;
+    NSString* deviceName;
+    int ret = 0;
+    id foundCut;
+
+    /*
+     * A well up to date list of device info can be found here:
+     * https://github.com/lmirosevic/GBDeviceInfo/blob/master/GBDeviceInfo/GBDeviceInfo_iOS.m
+     */
+    devices = @{
+        // X
+        @"iPhone10,3": @50,
+        @"iPhone10,6": @50,
+        // XR
+        @"iPhone11,8": @50,
+        // XS
+        @"iPhone11,2": @50,
+        // XS Max
+        @"iPhone11,4": @50,
+        @"iPhone11,6": @50,
+        // 11
+        @"iPhone12,1": @50,
+        // 11 Pro
+        @"iPhone12,3": @50,
+        // 11 Pro Max
+        @"iPhone12,5": @50,
+        // 12 mini
+        @"iPhone13,1": @50,
+        // 12
+        @"iPhone13,2": @50,
+        // 12 Pro
+        @"iPhone13,3": @50,
+        // 12 Pro Max
+        @"iPhone13,4": @50,
+        // 13 mini
+        @"iPhone14,4": @50,
+        // 13
+        @"iPhone14,5": @50,
+        // 13 Pro
+        @"iPhone14,2": @50,
+        // 13 Pro Max
+        @"iPhone14,3": @50,
+        // 14
+        @"iPhone14,7": @50,
+        // 14 Plus
+        @"iPhone14,8": @50,
+
+        // These devices now have different cut off
+
+        // 14 Pro
+        @"iPhone15,2": @50,
+        // 14 Pro Max
+        @"iPhone15,3": @50,
+        // 15
+        @"iPhone15,4": @50,
+        // 15 Plus
+        @"iPhone15,5": @50,
+        // 15 Pro
+        @"iPhone16,1": @50,
+        // 15 Pro Max
+        @"iPhone16,2": @50,
+        // 16 Pro
+        @"iPhone17,1": @50,
+        // 16 Pro Max
+        @"iPhone17,2": @50,
+        // 16
+        @"iPhone17,3": @50,
+        // 16 Plus
+        @"iPhone17,4": @50,
+        // 17
+        @"iPhone18,3": @50,
+        // Air
+        @"iPhone18,4": @50,
+        // 17 Pro
+        @"iPhone18,1": @50,
+        // 17 Pro Max
+        @"iPhone18,2": @50,
+        // 17e
+        @"iPhone18,5": @50,
+    };
+
+    uname(&systemInfo);
+    deviceName = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+    foundCut = devices[deviceName];
+    if(foundCut)
+        ret = (int)[foundCut integerValue];
+
+    return ret;
+}
+
 
 /* Haptics Implementation */
 

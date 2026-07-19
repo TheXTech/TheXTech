@@ -56,6 +56,11 @@ constexpr int MAX_3D_OFFSET = 20;
 constexpr int TargetCameraOverscanX = 20;
 constexpr int TargetOverscanX = 28;
 
+#elif defined(THEXTECH_IOS)
+
+extern int TargetCameraOverscanX;
+extern int TargetOverscanX;
+
 #else
 
 constexpr int TargetCameraOverscanX = 0;
