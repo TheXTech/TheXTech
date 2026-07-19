@@ -306,7 +306,6 @@ void ios_trigger_vibrator(float strenght, int ms)
         return;
 #else
     (void)strenght;
-    (void)ms;
 #endif
 
     /* Fallback for devices without haptics, and for iOS older than 13! */
