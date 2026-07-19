@@ -318,7 +318,7 @@ int ios_vibrator_init()
         s_hapticsEngine = [[CHHapticEngine alloc] initAndReturnError:&error];
         if(error)
         {
-            pLogWarning("Failed to initialise the Haptics Engine: %s", [error.localizedDescription UTF8String]);
+            pLogWarning("iOS: Failed to initialise the Haptics Engine: %s", [error.localizedDescription UTF8String]);
             return -1;
         }
         
@@ -327,14 +327,14 @@ int ios_vibrator_init()
         
         [s_hapticsEngine setResetHandler:^
         {
-            pLogInfo("Haptics Engine RESET!");
+            pLogInfo("iOS: Haptics Engine RESET!");
 
             // Try restarting the engine again.
             NSError* startupError;
             [s_hapticsEngine startAndReturnError:&startupError];
             
             if(startupError)
-                pLogWarning("Haptics Engine couldn't restart!: %s", [startupError.localizedDescription UTF8String]);
+                pLogWarning("iOS: Haptics Engine couldn't restart!: %s", [startupError.localizedDescription UTF8String]);
             
             // Register any custom resources you had registered, using registerAudioResource.
             // Recreate all haptic pattern players you had created, using createPlayer.
@@ -349,24 +349,24 @@ int ios_vibrator_init()
 
             case CHHapticEngineStoppedReasonAudioSessionInterrupt:
             {
-                pLogWarning("Haptics Engine stopped: Audio Session Interrupt");
+                pLogWarning("iOS: Haptics Engine stopped: Audio Session Interrupt");
                 break;
             }
             case CHHapticEngineStoppedReasonApplicationSuspended:
             {
-                pLogWarning("Haptics Engine stopped: Application Suspended");
+                pLogWarning("iOS: Haptics Engine stopped: Application Suspended");
                 break;
             }
             
             case CHHapticEngineStoppedReasonIdleTimeout:
             {
-                pLogWarning("Haptics Engine stopped: Idle Timeout");
+                pLogWarning("iOS: Haptics Engine stopped: Idle Timeout");
                 break;
             }
             
             case CHHapticEngineStoppedReasonSystemError:
             {
-                pLogWarning("Haptics Engine stopped: System Error");
+                pLogWarning("iOS: Haptics Engine stopped: System Error");
                 break;
             }
             }
@@ -375,6 +375,7 @@ int ios_vibrator_init()
         return 0;
     }
 #endif
+    
     return -1;
 }
 
@@ -401,8 +402,11 @@ int ios_vibrator_quit()
 void ios_trigger_vibrator(float strenght, int ms)
 {
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
-    if(ios_trigger_vibrator_taps(strenght, ms) == 0)
-        return;
+    if(@available(iOS 13.0, *))
+    {
+        if(ios_trigger_vibrator_taps(strenght, ms) == 0)
+            return;
+    }
 #else
     (void)strenght;
 #endif
@@ -429,7 +433,7 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
 
                 if(e_error)
                 {
-                    pLogWarning("Failed to start the Haptics Engine: %s", [error.localizedDescription UTF8String]);
+                    pLogWarning("iOS: Failed to start the Haptics Engine: %s", [error.localizedDescription UTF8String]);
                     return;
                 }
 
@@ -443,7 +447,7 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
 
                 if(error)
                 {
-                    pLogWarning("Failed to create the Haptics Player: %s", [error.localizedDescription UTF8String]);
+                    pLogWarning("iOS: Failed to create the Haptics Player: %s", [error.localizedDescription UTF8String]);
                     return;
                 }
 
@@ -451,7 +455,7 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
 
                 if(error)
                 {
-                    pLogWarning("Failed to start the Haptics Player: %s", [error.localizedDescription UTF8String]);
+                    pLogWarning("iOS: Failed to start the Haptics Player: %s", [error.localizedDescription UTF8String]);
                     [player release];
                     return;
                 }
