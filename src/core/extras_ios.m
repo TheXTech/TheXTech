@@ -328,47 +328,46 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
     if(@available(iOS 13.0, *))
     {
-        NSError* error;
-
         if(s_hapticsSupported == 0)
         {
-            CHHapticEventParameter *strengthParameter = [[CHHapticEventParameter alloc] initWithParameterID:CHHapticEventParameterIDHapticIntensity value:strenght];
-            CHHapticEventParameter *sharpnessParameter = [[CHHapticEventParameter alloc] initWithParameterID:CHHapticEventParameterIDHapticSharpness value:1.0];
-
-            CHHapticEvent *event = [[CHHapticEvent alloc] initWithEventType:CHHapticEventTypeHapticContinuous parameters:@[strengthParameter, sharpnessParameter] relativeTime:0 duration:(ms / 1000.0f)];
-            CHHapticPattern *patten = [[CHHapticPattern alloc] initWithEvents:@[event] parameterCurves:@[] error:&error];
-
-            id<CHHapticPatternPlayer> player = [s_hapticsEngine createPlayerWithPattern:patten error:&error];
-
-            if(error)
+            [s_hapticsEngine startWithCompletionHandler:^(NSError * _Nullable e_error)
             {
-                pLogWarning("Failed to create the Haptics Player: %s", [error.localizedDescription UTF8String]);
-                return -1;
-            }
+                NSError* error;
 
+                if(e_error)
+                {
+                    pLogWarning("Failed to start the Haptics Engine: %s", [error.localizedDescription UTF8String]);
+                    return;
+                }
 
-            [s_hapticsEngine startAndReturnError:&error];
+                CHHapticEventParameter *strengthParameter = [[CHHapticEventParameter alloc] initWithParameterID:CHHapticEventParameterIDHapticIntensity value:strenght];
+                CHHapticEventParameter *sharpnessParameter = [[CHHapticEventParameter alloc] initWithParameterID:CHHapticEventParameterIDHapticSharpness value:1.0];
 
-            if(error)
-            {
-                pLogWarning("Failed to start the Haptics Engine: %s", [error.localizedDescription UTF8String]);
-                return -1;
-            }
+                CHHapticEvent *event = [[CHHapticEvent alloc] initWithEventType:CHHapticEventTypeHapticContinuous parameters:@[strengthParameter, sharpnessParameter] relativeTime:0 duration:(ms / 1000.0f)];
+                CHHapticPattern *patten = [[CHHapticPattern alloc] initWithEvents:@[event] parameterCurves:@[] error:&error];
 
+                id<CHHapticPatternPlayer> player = [s_hapticsEngine createPlayerWithPattern:patten error:&error];
 
-            [player startAtTime:0 error:&error];
+                if(error)
+                {
+                    pLogWarning("Failed to create the Haptics Player: %s", [error.localizedDescription UTF8String]);
+                    return;
+                }
 
-            if(error)
-            {
-                pLogWarning("Failed to start the Haptics Player: %s", [error.localizedDescription UTF8String]);
-                [player release];
-                return -1;
-            }
+                [player startAtTime:0 error:&error];
 
-            [s_hapticsEngine notifyWhenPlayersFinished:^CHHapticEngineFinishedAction(NSError * _Nullable error)
-            {
-                [s_hapticsEngine stopWithCompletionHandler:nil];
-                return CHHapticEngineFinishedActionStopEngine;
+                if(error)
+                {
+                    pLogWarning("Failed to start the Haptics Player: %s", [error.localizedDescription UTF8String]);
+                    [player release];
+                    return;
+                }
+                
+                [s_hapticsEngine notifyWhenPlayersFinished:^CHHapticEngineFinishedAction(NSError * _Nullable error)
+                {
+                    [s_hapticsEngine stopWithCompletionHandler:nil];
+                    return CHHapticEngineFinishedActionStopEngine;
+                }];
             }];
 
             return 0;
