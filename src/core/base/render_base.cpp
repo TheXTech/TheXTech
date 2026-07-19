@@ -59,6 +59,11 @@
 #endif
 
 
+#ifdef THEXTECH_IOS
+int XRender::TargetCameraOverscanX = 0;
+int XRender::TargetOverscanX = 0;
+#endif
+
 int XRender::TargetW = 800;
 int XRender::TargetH = 600;
 bool XRender::g_BitmaskTexturePresent = false;
