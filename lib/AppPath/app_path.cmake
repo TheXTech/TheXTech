@@ -7,10 +7,15 @@ list(APPEND APPPATH_SRCS
 )
 
 if(APPLE)
-    if(IOS OR TVOS)
-        message("-- AppPath for Apple iOS/tvOS")
+    if(IOS)
+        message("-- AppPath for Apple iOS")
         list(APPEND APPPATH_SRCS
             ${CMAKE_CURRENT_LIST_DIR}/private/app_path_ios.cpp
+        )
+    elseif(TVOS)
+        message("-- AppPath for Apple tvOS")
+        list(APPEND APPPATH_SRCS
+            ${CMAKE_CURRENT_LIST_DIR}/private/app_path_tvos.mm
         )
     else()
         message("-- AppPath for Apple macOS")

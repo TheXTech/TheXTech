@@ -275,9 +275,14 @@ set(THEXTECH_DIRECTORY_PREFIX "TheXTech" CACHE STRING "Name used for directories
 set(THEXTECH_INSTALLER_PACKAGE_NAME "${THEXTECH_EXECUTABLE_NAME}" CACHE STRING "The package name for the package manager")
 
 if(APPLE)
-    if(MACOS)
-        set(THEXTECH_PRELOAD_ENVIRONMENT "" CACHE STRING "Path to resources root to pack")
-        option(THEXTECH_PRELOAD_ENVIRONMENT_MANUALLY "Make application look for assets inside the bundle, but don't actually put any assets. The 'Template' app will be produced for manual addition of assets." OFF)
+    if(MACOS OR TVOS)
+        set(THEXTECH_PRELOAD_ENVIRONMENT "" CACHE STRING "Path to resources root to pack. When building for macOS, it should be one single game pack. But when building for tvOS, the directory may contain multiple games as well as extra episodes.")
+
+        if(TVOS)
+            set(THEXTECH_PRELOAD_ENVIRONMENT_MANUALLY ON)  # Always allow to inject assets into the IPA
+        else()
+            option(THEXTECH_PRELOAD_ENVIRONMENT_MANUALLY "Make application look for assets inside the bundle, but don't actually put any assets. The 'Template' app will be produced for manual addition of assets." OFF)
+        endif()
     endif()
 
     set(THEXTECH_BUNDLE_NAME "TheXTech" CACHE STRING "Name of bundle folder")
@@ -1439,8 +1444,14 @@ if(APPLE)
         CPACK_BUNDLE_NAME "${THEXTECH_BUNDLE_NAME}"
         MACOSX_BUNDLE_INFO_STRING "TheXTech classic game engine"
     )
+
     set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/${XTECH_DEFAULT_ICNS}" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_source_files_properties(${PGE_FILE_ICONS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
+    if(IOS OR TVOS)
+        set_target_properties(thextech PROPERTIES XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "${THEXTECH_MACOS_APP_IDENTIFIER}")
+    endif()
+
     if(IOS)
         set_target_properties(thextech PROPERTIES XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME AppIcon)
     elseif(TVOS)
@@ -1448,6 +1459,7 @@ if(APPLE)
     else()
         set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/resources/PkgInfo PROPERTIES MACOSX_PACKAGE_LOCATION "")
     endif()
+
     if(XTECH_MACOSX_TIGER)
         set_source_files_properties("${THEXTECH_MAC_EXEX_GENERATED}" PROPERTIES MACOSX_PACKAGE_LOCATION "MacOS")
     endif()
@@ -1457,11 +1469,20 @@ if(APPLE)
     endif()
 
     if(THEXTECH_PRELOAD_ENVIRONMENT AND NOT THEXTECH_PRELOAD_ENVIRONMENT STREQUAL "")
-        add_custom_command(TARGET thextech POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:thextech>/../Resources/assets"
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${THEXTECH_PRELOAD_ENVIRONMENT}" "$<TARGET_FILE_DIR:thextech>/../Resources/assets"
-            COMMENT "Copying assets into bundle..."
-        )
+        if(TVOS)
+            pge_add_bundle_resources_directory(thextech "${THEXTECH_PRELOAD_ENVIRONMENT}")
+            # add_custom_command(TARGET thextech POST_BUILD
+            #     COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:thextech>/Resources"
+            #     COMMAND ${CMAKE_COMMAND} -E copy_directory "${THEXTECH_PRELOAD_ENVIRONMENT}" "$<TARGET_FILE_DIR:thextech>/Resources"
+            #     COMMENT "Copying assets into bundle..."
+            # )
+        else()
+            add_custom_command(TARGET thextech POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:thextech>/../Resources/assets"
+                COMMAND ${CMAKE_COMMAND} -E copy_directory "${THEXTECH_PRELOAD_ENVIRONMENT}" "$<TARGET_FILE_DIR:thextech>/../Resources/assets"
+                COMMENT "Copying assets into bundle..."
+            )
+        endif()
         target_compile_definitions(thextech PRIVATE -DUSE_BUNDLED_ASSETS)
     endif()
 
