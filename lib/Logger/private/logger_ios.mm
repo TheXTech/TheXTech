@@ -64,15 +64,15 @@ void LogWriter::CloseLog()
 
 void LoggerPrivate_pLogConsole(int level, const char *label, const char *format, va_list arg)
 {
+    char buf[OUT_BUFFER_SIZE];
     va_list arg_in;
-    NSString *format_o = [NSString stringWithFormat:@"%@: %@", [NSString stringWithUTF8String:label], [NSString stringWithUTF8String:format]];
+    size_t off = 0;
     (void)level;
 
-    // FIXME: Resolve the invalid encoding problem
-    // Some advices https://stackoverflow.com/questions/58180594/nslogv-c-strings-encoding
-
     va_copy(arg_in, arg);
-    NSLogv(format_o, arg_in);
+    off = snprintf(buf, OUT_BUFFER_STRING_SIZE, "%s: ", label);
+    vsnprintf(buf + off, OUT_BUFFER_STRING_SIZE - off, format, arg_in);
+    NSLog(@"%s", buf);
     va_end(arg_in);
 }
 
