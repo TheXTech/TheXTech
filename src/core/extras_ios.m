@@ -26,6 +26,7 @@
 #include <UIKit/UIWindow.h>
 #include <SDL2/SDL_video.h>
 #include <sys/utsname.h>
+#include <Logger/logger.h>
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
 // Fore iOS 13+
@@ -230,14 +231,14 @@ int ios_vibrator_init()
         
         [s_hapticsEngine setResetHandler:^
         {
-            NSLog(@"Haptics Engine RESET!");
-                
+            pLogInfo("Haptics Engine RESET!");
+
             // Try restarting the engine again.
             NSError* startupError;
             [s_hapticsEngine startAndReturnError:&startupError];
             
             if(startupError)
-                NSLog(@"ERROR: Haptics Engine couldn't restart!");
+                pLogWarning("Haptics Engine couldn't restart!");
             
             // Register any custom resources you had registered, using registerAudioResource.
             // Recreate all haptic pattern players you had created, using createPlayer.
@@ -252,24 +253,24 @@ int ios_vibrator_init()
 
             case CHHapticEngineStoppedReasonAudioSessionInterrupt:
             {
-                NSLog(@"REASON: Audio Session Interrupt");
+                pLogWarning("Haptics Engine stopped: Audio Session Interrupt");
                 break;
             }
             case CHHapticEngineStoppedReasonApplicationSuspended:
             {
-                NSLog(@"REASON: Application Suspended");
+                pLogWarning("Haptics Engine stopped: Application Suspended");
                 break;
             }
             
             case CHHapticEngineStoppedReasonIdleTimeout:
             {
-                NSLog(@"REASON: Idle Timeout");
+                pLogWarning("Haptics Engine stopped: Idle Timeout");
                 break;
             }
             
             case CHHapticEngineStoppedReasonSystemError:
             {
-                NSLog(@"REASON: System Error");
+                pLogWarning("Haptics Engine stopped: System Error");
                 break;
             }
             }
@@ -328,7 +329,7 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
         {
             CHHapticEventParameter *strengthParameter = [[CHHapticEventParameter alloc] initWithParameterID:CHHapticEventParameterIDHapticIntensity value:strenght];
             CHHapticEventParameter *sharpnessParameter = [[CHHapticEventParameter alloc] initWithParameterID:CHHapticEventParameterIDHapticSharpness value:1.0];
-            
+
             CHHapticEvent *event = [[CHHapticEvent alloc] initWithEventType:CHHapticEventTypeHapticContinuous parameters:@[strengthParameter, sharpnessParameter] relativeTime:0 duration:(ms / 1000.0f)];
             CHHapticPattern *patten = [[CHHapticPattern alloc] initWithEvents:@[event] parameterCurves:@[] error:&error];
 
@@ -336,7 +337,7 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
             
             [s_hapticsEngine startAndReturnError:&error];
             [player startAtTime:0 error:&error];
-            
+
             // FIXME: An error occurs:
             // CHHapticEngine.mm:1917  -[CHHapticEngine(CHHapticEngineInternal) getAvailableChannel:]: ERROR: Unable to add an additional player channel
             // after several time handling of the vibration. It starts to fail.
@@ -348,7 +349,10 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
     (void)strenght;
 #endif
 
-    if(ms >= 12)
+    /* Fallback for devices without haptics, and for iOS older than 13! */
+    if(ms >= 450)
+        AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+    else if(ms >= 12)
         AudioServicesPlaySystemSound(1520);
     else if(ms >= 6)
         AudioServicesPlaySystemSound(1519);
