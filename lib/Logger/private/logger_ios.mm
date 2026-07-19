@@ -65,11 +65,12 @@ void LogWriter::CloseLog()
 void LoggerPrivate_pLogConsole(int level, const char *label, const char *format, va_list arg)
 {
     va_list arg_in;
-    NSString *format_ns = [NSString stringWithUTF8String:format];
-    NSString *label_ns = [NSString stringWithUTF8String:label];
-    NSString *format_o = [NSString stringWithFormat:@"%@: %@", label_ns, format_ns];
+    NSString *format_o = [NSString stringWithFormat:@"%@: %@", [NSString stringWithUTF8String:label], [NSString stringWithUTF8String:format]];
     (void)level;
-    
+
+    // FIXME: Resolve the invalid encoding problem
+    // Some advices https://stackoverflow.com/questions/58180594/nslogv-c-strings-encoding
+
     va_copy(arg_in, arg);
     NSLogv(format_o, arg_in);
     va_end(arg_in);
