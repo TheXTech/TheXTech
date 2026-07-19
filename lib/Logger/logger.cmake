@@ -12,6 +12,11 @@ if(ANDROID)
     list(APPEND LOGGER_SRCS
         ${CMAKE_CURRENT_LIST_DIR}/private/logger_android.cpp
     )
+elseif(IOS OR TVOS)
+    message("-- Logger for iOS/tvOS")
+    list(APPEND LOGGER_SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/private/logger_ios.mm
+    )
 elseif(EMSCRIPTEN)
     message("-- Logger for Emscripten")
     list(APPEND LOGGER_SRCS
