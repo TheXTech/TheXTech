@@ -23,6 +23,7 @@
 #include <Foundation/Foundation.h>
 #include <UIKit/UIApplication.h>
 #include <UIKit/UIScreen.h>
+#include <UIKit/UIWindow.h>
 #include <SDL2/SDL_video.h>
 #include <sys/utsname.h>
 
@@ -32,6 +33,33 @@
 #endif
 // For iOS older than 13
 #include <AudioToolbox/AudioToolbox.h>
+
+/* Copy from private heads of SDL2 (src/video/uikit/SDL_uikitappdelegate.h) to inherit */
+@interface SDLUIKitDelegate : NSObject<UIApplicationDelegate>
+
++ (id)sharedAppDelegate;
++ (NSString *)getAppDelegateClassName;
+
+- (void)hideLaunchScreen;
+
+/* This property is marked as optional, and is only intended to be used when
+ * the app's UI is storyboard-based. SDL is not storyboard-based, however
+ * several major third-party ad APIs (e.g. Google admob) incorrectly assume this
+ * property always exists, and will crash if it doesn't. */
+@property (nonatomic) UIWindow *window;
+@end
+
+
+@interface TheXTechDelegate : SDLUIKitDelegate
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer;
+@end
+
+@implementation TheXTechDelegate
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+{
+    return NO; /* Workaround to not steal internal hesture handler */
+}
+@end
 
 
 void ios_quit(int ret)
