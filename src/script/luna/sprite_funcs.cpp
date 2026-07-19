@@ -385,7 +385,7 @@ void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
 
     // Get all blocks being collided with into collide_list
     std::list<CellObj> collide_list;
-    for(const auto cellobj : nearby_list)
+    for(const auto &cellobj : nearby_list)
     {
         bool collide = false;
         if(cellobj.Type == CLOBJ_SMBXBLOCK)
@@ -406,7 +406,7 @@ void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
     // Force sprite out of block if colliding with block, and reverse speed according to energy_loss_mod
     if(!collide_list.empty())
     {
-        for(const auto cellobj : collide_list)
+        for(const auto &cellobj : collide_list)
         {
             if(cellobj.Type == CLOBJ_SMBXBLOCK)
             {
@@ -496,7 +496,7 @@ void SpriteFunc::CrashMove(CSprite *me, SpriteComponent *obj)
                                   (int)me->m_Hitbox.H);
     if(!collide_list.empty())
     {
-        for(const auto cellobj : collide_list)
+        for(const auto &cellobj : collide_list)
         {
             if(cellobj.Type == CLOBJ_SMBXBLOCK)
             {

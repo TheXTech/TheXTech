@@ -68,7 +68,9 @@ int XRender::TargetW = 800;
 int XRender::TargetH = 600;
 bool XRender::g_BitmaskTexturePresent = false;
 
+#ifdef THEXTECH_BUILD_GL_MODERN
 static const unsigned char blank_gif[] = "GIF89a\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\2D\x01\x00;";
+#endif
 
 AbstractRender_t* g_render = nullptr;
 
