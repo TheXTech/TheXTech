@@ -1470,12 +1470,10 @@ if(APPLE)
 
     if(THEXTECH_PRELOAD_ENVIRONMENT AND NOT THEXTECH_PRELOAD_ENVIRONMENT STREQUAL "")
         if(TVOS)
+            # Important: for tvOS bundles any preloaded resources must be added as a target
+            # otherwise it will be impossible to run the debug on simulator or device, it will
+            # fail with the "Missing Bundle ID" error even everything is valid here.
             pge_add_bundle_resources_directory(thextech "${THEXTECH_PRELOAD_ENVIRONMENT}")
-            # add_custom_command(TARGET thextech POST_BUILD
-            #     COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:thextech>/Resources"
-            #     COMMAND ${CMAKE_COMMAND} -E copy_directory "${THEXTECH_PRELOAD_ENVIRONMENT}" "$<TARGET_FILE_DIR:thextech>/Resources"
-            #     COMMENT "Copying assets into bundle..."
-            # )
         else()
             add_custom_command(TARGET thextech POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:thextech>/../Resources/assets"
