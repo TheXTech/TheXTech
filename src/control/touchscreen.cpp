@@ -1867,12 +1867,6 @@ InputMethodProfile_TouchScreen::InputMethodProfile_TouchScreen()
 #endif
 
 #if defined(__ANDROID__) || defined(THEXTECH_IOS)
-    // TODO: Implement automatical definition of offsets depending on device type
-    // like, iPhone X and similar devices have the Face ID cut at the screen
-    // that makes controls being partially covered by that cut, and because of
-    // the screen edge is too small, it's very inconvenient for fingers to manipulate
-    // it.
-    
     if(s_screenSize >= 9.0) // Big tablets
     {
         m_default_layout = TouchScreenController::layout_standard;
