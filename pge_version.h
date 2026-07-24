@@ -112,10 +112,12 @@
 #   define OPERATION_SYSTEM "Windows"
 #elif defined __APPLE__
 #   include <TargetConditionals.h>
-#   if TARGET_IPHONE_SIMULATOR
-#       define OPERATION_SYSTEM "iOS Simulator"
+#   if TARGET_OS_SIMULATOR
+#       define OPERATION_SYSTEM "Apple Simulator"
 #   elif TARGET_OS_IPHONE
 #       define OPERATION_SYSTEM "iOS"
+#   elif TARGET_OS_TV
+#       define OPERATION_SYSTEM "tvOS"
 #   else
 #       define OPERATION_SYSTEM "macOS"
 #   endif

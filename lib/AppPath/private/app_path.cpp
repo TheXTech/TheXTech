@@ -155,6 +155,7 @@ std::vector<std::pair<std::string, AssetsPathType>> AppPathManager::assetsSearch
 
 #ifdef APP_PATH_HAS_EXTRA_WORLDS
         // 3DS: add assets from additional romfs packages
+        // tvOS: add extra episodes per assets from the bundle package
         for(const std::string& root : AppPathManager::worldRootDirs())
             out.push_back({root, AssetsPathType::Single});
 #endif

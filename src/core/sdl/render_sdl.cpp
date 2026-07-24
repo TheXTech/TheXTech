@@ -23,6 +23,14 @@
 #include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL_hints.h>
 
+#if defined(__APPLE__) && defined(__MACH__)
+#   include <TargetConditionals.h>
+#endif
+
+#ifdef THEXTECH_IOS
+#   include "../extras.h"
+#endif
+
 #include <FreeImageLite.h>
 #include <Logger/logger.h>
 #include <Utils/maths.h>
@@ -118,6 +126,10 @@ bool RenderSDL::initRender(SDL_Window *window)
 
     if(!AbstractRender_t::init())
         return false;
+
+#ifdef THEXTECH_IOS
+    XRender::TargetOverscanX = ios_get_overscan_pix_size();
+#endif
 
     m_window = window;
 
@@ -598,8 +610,10 @@ textureTryAgain:
 
     target.d.texture = texture;
 
+#if !defined(THEXTECH_IOS) && !defined(THEXTECH_TVOS)
     target.d.nOfColors = GL_RGBA;
     target.d.format = GL_BGRA;
+#endif
 
     target.d.w_scale = static_cast<float>(width) / target.w;
     target.d.h_scale = static_cast<float>(height) / target.h;

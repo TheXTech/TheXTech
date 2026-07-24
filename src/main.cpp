@@ -38,6 +38,10 @@
 #include "controls.h"
 #include <AppPath/app_path.h>
 
+#if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
+#   include "core/extras.h"
+#endif
+
 #ifdef THEXTECH_INTERPROC_SUPPORTED
 #   include "capabilities.h"
 #endif
@@ -309,7 +313,7 @@ int main(int argc, char**argv)
     SwapClockSpeed();
 #endif
 
-    seedRandom(std::time(NULL));
+    seedRandom((int)std::time(NULL));
 
     testPlayer.fill(Player_t());
     for(int i = 1; i <= maxLocalPlayers; i++)
@@ -835,6 +839,14 @@ int main(int argc, char**argv)
             window.close();
         }, 250);
     );
+#endif
+
+#if defined(THEXTECH_IOS)
+    ios_quit(ret); // Apple hates this, but we need it!
+#endif
+
+#if  defined(THEXTECH_TVOS)
+    tvos_quit(ret);
 #endif
 
     return ret;

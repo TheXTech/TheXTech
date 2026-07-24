@@ -33,6 +33,10 @@ class EventsSDL final : public AbstractEvents_t
     bool m_gotExit = false;
 #endif
 
+#if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
+    static int handle_ios_events(void *userdata, SDL_Event *event);
+#endif
+
 public:
     EventsSDL();
     virtual ~EventsSDL() override;

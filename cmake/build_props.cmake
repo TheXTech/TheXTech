@@ -1,15 +1,10 @@
 # ============================ Generic setup ==================================
-# If platform is Emscripten
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
-    set(EMSCRIPTEN 1 BOOLEAN)
-    unset(WIN32)
-    unset(APPLE)
-endif()
 
-if(APPLE AND CMAKE_HOST_SYSTEM_VERSION VERSION_LESS 9)
-    message("-- MacOS X 10.4 Tiger detected!")
-    set(XTECH_MACOSX_TIGER TRUE)
-endif()
+# Moved to main CMakeLists.txt as it's need to check this BEFORE this file gets included
+# if(APPLE AND CMAKE_HOST_SYSTEM_VERSION VERSION_LESS 9)
+#     message("-- MacOS X 10.4 Tiger detected!")
+#     set(XTECH_MACOSX_TIGER TRUE)
+# endif()
 
 if("${CMAKE_SYSTEM_NAME}" MATCHES "(Open|Free|Net)BSD")
     set(XTECH_BSD_BUILD TRUE)
@@ -106,6 +101,35 @@ function(pge_cxx_standard STDVER)
     endif()
 endfunction()
 
+macro(_pge_make_absolute path)
+    if(NOT IS_ABSOLUTE "${${path}}")
+        get_filename_component(${path} "${${path}}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_LIST_DIR}")
+    endif()
+
+    string(REGEX REPLACE "\\\\" "/" ${path} "${${path}}")
+endmacro()
+
+# Borrowed from JUCE project and redone for our purposes
+function(pge_add_bundle_resources_directory target folder)
+    _pge_make_absolute(folder)
+
+    if(NOT EXISTS "${folder}")
+        message(FATAL_ERROR "Could not find resource folder ${folder}")
+    endif()
+
+    file(GLOB_RECURSE resources RELATIVE "${folder}" "${folder}/*")
+
+    foreach(file IN LISTS resources)
+        target_sources(${target} PRIVATE "${folder}/${file}")
+        get_filename_component(resource_parent_path "${file}" DIRECTORY)
+        get_filename_component(resource_file_name "${file}" NAME)
+        if(NOT resource_file_name STREQUAL ".DS_Store")
+            set_source_files_properties("${folder}/${file}" PROPERTIES
+                HEADER_FILE_ONLY TRUE
+                MACOSX_PACKAGE_LOCATION "Resources/${resource_parent_path}")
+        endif()
+    endforeach()
+endfunction()
 
 # ============================ Optimisations ==================================
 
@@ -229,9 +253,18 @@ set(XTECH_PLATFORM_GENERAL_CMAKE_FLAGS)
 
 
 if(APPLE)
+    if(IOS OR TVOS)
+        list(APPEND XTECH_PLATFORM_GENERAL_CMAKE_FLAGS
+            "-DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}"
+            "-DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=${CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM}"
+            "-DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=${CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY}"
+            "-DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_STYLE=${CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_STYLE}"
+        )
+    endif()
+
     list(APPEND XTECH_PLATFORM_GENERAL_CMAKE_FLAGS
         -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
-        -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
+        "-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}"
     )
 endif()
 

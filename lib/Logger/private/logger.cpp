@@ -218,7 +218,7 @@ static SDL_LogPriority log_pge2sdl(PGE_LogLevel::Level l)
 
 void LoadLogSettings(bool disableStdOut, bool verboseLogs)
 {
-#if defined(DEBUG_BUILD) || defined(__WIIU__)
+#if defined(DEBUG_BUILD) || defined(__WIIU__) || defined(THEXTECH_IOS)
     (void)verboseLogs; // unused
     LogWriter::m_enabledVerboseLogs = true; // Enforce verbose log for debug builds or on some platforms like WiiU
 #else
