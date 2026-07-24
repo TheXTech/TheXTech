@@ -994,16 +994,28 @@ if(IOS)
     set(IOS_STORYBOARD_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/core/ios/LaunchScreen.storyboard")
     set(IOS_STORYBOARD_BIN "${CMAKE_CURRENT_BINARY_DIR}/LaunchScreen.storyboardc")
 
-    add_custom_command(
-        OUTPUT ${IOS_STORYBOARD_BIN}
+    add_custom_target(
+        IOSLaunchScreen
         COMMAND ibtool --compile ${IOS_STORYBOARD_BIN} ${IOS_STORYBOARD_SRC}
-        DEPENDS ${IOS_STORYBOARD_SRC}
+        DEPENDS
+            ${IOS_STORYBOARD_SRC}
+        BYPRODUCTS
+            ${IOS_STORYBOARD_BIN}
     )
 
     list(APPEND THEXTECH_SRC ${IOS_STORYBOARD_SRC} ${IOS_STORYBOARD_BIN})
 
     set_property(SOURCE ${IOS_STORYBOARD_SRC} PROPERTY HEADER_FILE_ONLY TRUE)
     set_source_files_properties(${IOS_STORYBOARD_BIN} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.15)
+        set_property(TARGET IOSLaunchScreen APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${IOS_STORYBOARD_BIN}")
+    endif()
+
+    # Touch buttons fallback
+    file(GLOB TOUCH_BUTTONS android-project/thextech/src/main/assets/buttons/*.png)
+    list(APPEND THEXTECH_SRC ${TOUCH_BUTTONS})
+    set_property(SOURCE ${TOUCH_BUTTONS} PROPERTY HEADER_FILE_ONLY TRUE)
+    set_source_files_properties(${TOUCH_BUTTONS} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/buttons)
 endif()
 
 
@@ -1501,6 +1513,10 @@ if(APPLE)
 
         target_sources(thextech PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/resources/PkgInfo")
         set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/resources/PkgInfo PROPERTIES MACOSX_PACKAGE_LOCATION "")
+    endif()
+
+    if(IOS AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.15)
+        set_property(TARGET IOSLaunchScreen APPEND PROPERTY ADDITIONAL_CLEAN_FILES "$<TARGET_FILE_DIR:thextech>/LaunchScreen.storyboardc")
     endif()
 
     if(THEXTECH_PRELOAD_ENVIRONMENT_MANUALLY)

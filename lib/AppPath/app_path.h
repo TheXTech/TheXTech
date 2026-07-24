@@ -27,6 +27,10 @@
 #   define APP_PATH_HAS_EXTRA_WORLDS
 #endif
 
+#if defined(THEXTECH_IOS)
+#   define APP_ATH_HAS_BUNDLE_PATH
+#endif
+
 
 /*!
  * \brief Set of possible asset pack search path types
@@ -163,6 +167,10 @@ public:
 
 #ifdef APP_PATH_HAS_EXTRA_WORLDS
     static const std::vector<std::string>& worldRootDirs(); // Read-Only, appears at writable directory
+#endif
+
+#ifdef APP_ATH_HAS_BUNDLE_PATH
+    static std::string bundleResourcesPath(); // Read-Only, a resources root at the app bundle
 #endif
 
     static void install();

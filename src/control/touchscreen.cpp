@@ -105,6 +105,12 @@ void TouchScreenGFX_t::loadImage(StdPicture& img, const std::string& fileName)
 {
     std::string imgPath = m_gfxPath + fileName;
 
+
+#ifdef THEXTECH_IOS
+    if(!Files::fileExists(imgPath)) // If not exists at assets, do load bundled
+        imgPath = AppPathManager::bundleResourcesPath() + "buttons/" + fileName;
+#endif
+
 #ifdef __ANDROID__
     if(!Files::fileExists(imgPath)) // If not exists at assets, do load bundled
         imgPath = "buttons/" + fileName;

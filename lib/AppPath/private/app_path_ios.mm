@@ -20,12 +20,14 @@
 #include <unistd.h>
 #include <SDL2/SDL_stdinc.h>
 #include <DirManager/dirman.h>
+#include <Foundation/Foundation.h>
 #include "app_path_private.h"
 
 
 static std::string s_assetsRoot;
 static std::string s_userDirectory;
 static std::string s_applicationPath;
+static std::string s_bundlePath;
 static std::string s_screenshotsPath;
 static std::string s_gifRecordPath;
 
@@ -33,6 +35,15 @@ static std::string s_gifRecordPath;
 void AppPathP::initDefaultPaths(const std::string &)
 {
     char app_home[1024];
+
+    // Bundle directory for local resources fetching
+    {
+        NSString *path_b = [NSBundle mainBundle].bundlePath;
+        const char *path_s = path_b.UTF8String;
+        std::string path = std::string(path_s) + "/";
+
+        s_bundlePath = path;
+    }
 
     // Initialize the application path
     strcpy(app_home, getenv("HOME"));
@@ -116,4 +127,9 @@ bool AppPathP::portableAvailable()
 void AppPathP::syncFS()
 {
     /* Run the FS synchronization (Implement this for Emscripten only) */
+}
+
+std::string AppPathManager::bundleResourcesPath()
+{
+    return s_bundlePath;
 }
