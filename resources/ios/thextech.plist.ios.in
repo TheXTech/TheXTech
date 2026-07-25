@@ -76,8 +76,8 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>NSHighResolutionCapable</key>
-    <key>UIApplicationSceneManifest</key>
     <true/>
+    <key>UIApplicationSceneManifest</key>
     <dict>
         <key>UIApplicationSupportsMultipleScenes</key>
         <false/>
