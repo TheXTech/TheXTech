@@ -21,6 +21,9 @@
 
 #include <Foundation/Foundation.h>
 #include <UIKit/UIApplication.h>
+#include <UIKit/UIScreen.h>
+#include <UIKit/UIWindow.h>
+
 
 void tvos_quit(int ret)
 {
@@ -34,4 +37,3 @@ void tvos_quit(int ret)
     //exit app when app is in background
     exit(ret);
 }
-
