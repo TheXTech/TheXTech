@@ -1743,17 +1743,20 @@ if(NOT EMSCRIPTEN AND
     )
 endif()
 
-if(ANDROID)
+if(ANDROID OR IOS OR TVOS)
     target_compile_definitions(thextech PRIVATE
         -DUSE_RENDER_BLOCKING
     )
 endif()
 
 if(THEXTECH_FORCE_FULLSCREEN)
-    target_compile_definitions(thextech PRIVATE
-        -DRENDER_FULLSCREEN_ALWAYS  # Game works always fullscreen
-        -DNO_WINDOW_FOCUS_TRACKING  # Don't track for window focus
-    )
+    target_compile_definitions(thextech PRIVATE -DRENDER_FULLSCREEN_ALWAYS) # Game works always fullscreen
+
+    if(IOS OR TVOS)
+        target_compile_definitions(thextech PRIVATE -DMOBILE_WINDOW_FOCUS_TRACKING)
+    else()
+        target_compile_definitions(thextech PRIVATE -DNO_WINDOW_FOCUS_TRACKING) # Don't track for window focus
+    endif()
 endif()
 
 # ==============================================================================

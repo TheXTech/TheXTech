@@ -119,6 +119,8 @@ void EventsSDL::processEvent()
 #ifdef USE_RENDER_BLOCKING
 #   ifdef THEXTECH_IOS
         const char *os_name = "iOS";
+#   elif defined(THEXTECH_TVOS)
+        const char *os_name = "tvOS";
 #   else
         const char *os_name = "Android";
 #   endif
@@ -152,7 +154,7 @@ void EventsSDL::processEvent()
         case SDL_WINDOWEVENT_MOVED:
             eventResize();
             break;
-#if !defined(NO_WINDOW_FOCUS_TRACKING)
+#if !defined(NO_WINDOW_FOCUS_TRACKING) && !defined(MOBILE_WINDOW_FOCUS_TRACKING)
         case SDL_WINDOWEVENT_FOCUS_GAINED:
             if(!g_config.background_work && !LoadingInProcess)
                 SoundPauseEngine(0);
@@ -176,10 +178,21 @@ void EventsSDL::processEvent()
         break;
     case SDL_APP_WILLENTERBACKGROUND:
         XRender::setBlockRender(true);
+#   if defined(MOBILE_WINDOW_FOCUS_TRACKING)
+        if(!g_config.background_work && !LoadingInProcess)
+            SoundPauseEngine(1);
+#   endif
         D_pLogDebug("%s: Entering background", os_name);
         break;
     case SDL_APP_DIDENTERFOREGROUND:
         XRender::setBlockRender(false);
+#   if defined(MOBILE_WINDOW_FOCUS_TRACKING)
+        if(!g_config.background_work && !LoadingInProcess)
+            SoundPauseEngine(0);
+
+        if(GamePaused != PauseCode::TextEntry)
+            XWindow::textInputStop(); /* Workaround to avoid unwanted IME candidates shown */
+#   endif
         D_pLogDebug("%s: Resumed foreground", os_name);
         break;
 #endif

@@ -132,9 +132,11 @@ public:
         config_integrations_set};
 #endif
 
-#ifndef NO_WINDOW_FOCUS_TRACKING
+#if !defined(NO_WINDOW_FOCUS_TRACKING) && !defined(MOBILE_WINDOW_FOCUS_TRACKING)
     opt<bool> background_work{this, defaults(false), {}, Scope::Config,
         "background-work", "Run in background", "Play with joystick while game is unfocused"};
+#elif defined(MOBILE_WINDOW_FOCUS_TRACKING)
+    static constexpr bool background_work = false;
 #else
     static constexpr bool background_work = true;
 #endif
@@ -144,7 +146,15 @@ public:
     /* ---- Main - Frame Timing ----*/
     subsection main_frame_timing{this, "timing", "Frame Timing"};
 
-    opt<bool> enable_frameskip{this, defaults(false), {}, Scope::Config,
+#if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
+    // Set by default on platforms that enforces V-Sync without an ability to disable it
+    // Or on platforms that are known as frame losers
+    static constexpr bool enable_frameskip_default = true;
+#else
+    static constexpr bool enable_frameskip_default = false;
+#endif
+
+    opt<bool> enable_frameskip{this, defaults(enable_frameskip_default), {}, Scope::Config,
         "frame-skip", "Frameskip", nullptr};
 
     opt<bool> unlimited_framerate{this, defaults(false), {}, Scope::Config,

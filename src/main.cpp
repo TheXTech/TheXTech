@@ -660,7 +660,7 @@ int main(int argc, char**argv)
         if(switchVSync.isSet())
             g_config.render_vsync    = switchVSync.getValue();
 
-#ifndef NO_WINDOW_FOCUS_TRACKING
+#if !defined(NO_WINDOW_FOCUS_TRACKING) && !defined(MOBILE_WINDOW_FOCUS_TRACKING)
         if(switchNoPause.isSet())
             g_config.background_work = switchNoPause.getValue();
 
