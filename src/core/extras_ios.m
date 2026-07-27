@@ -839,6 +839,12 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
                     return;
                 }
 
+                [s_hapticsEngine notifyWhenPlayersFinished:^CHHapticEngineFinishedAction(NSError * _Nullable error)
+                {
+                    [s_hapticsEngine stopWithCompletionHandler:nil];
+                    return CHHapticEngineFinishedActionStopEngine;
+                }];
+
                 [player startAtTime:0 error:&error];
 
                 if(error)
@@ -847,12 +853,6 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
                     [player release];
                     return;
                 }
-                
-                [s_hapticsEngine notifyWhenPlayersFinished:^CHHapticEngineFinishedAction(NSError * _Nullable error)
-                {
-                    [s_hapticsEngine stopWithCompletionHandler:nil];
-                    return CHHapticEngineFinishedActionStopEngine;
-                }];
             }];
 
             return 0;
