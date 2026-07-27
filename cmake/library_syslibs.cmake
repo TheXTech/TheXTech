@@ -39,6 +39,12 @@ if(NINTENDO_3DS)
     )
 endif()
 
+if(PSP)
+    list(APPEND THEXTECH_SYSLIBS
+        GL pspgu pspge pspaudio pspdisplay pspctrl psphprm psppower pspdebug pspvfpu pspvram pthread
+    )
+endif()
+
 if(NOT WIN32 AND NOT EMSCRIPTEN AND NOT APPLE AND NOT ANDROID AND NOT NINTENDO_SWITCH AND NOT NINTENDO_WIIU)
     if(THEXTECH_BUILD_GL_ES_MODERN AND NOT THEXTECH_BUILD_GL_DESKTOP_MODERN AND NOT THEXTECH_BUILD_GL_DESKTOP_LEGACY)
         find_library(_LIB_GL GLESv2)

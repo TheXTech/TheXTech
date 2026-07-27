@@ -467,11 +467,14 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
 
             if(p.Fairy) // draw a fairy
             {
+                // as above -- probably move both cases where Frame is set to UpdateGraphicsLogic for safety
                 p.Frame = 1;
 
                 //if(!p.Immune2) // Always true because of covered condition above
                 {
-                    RenderTexturePlayer(Z, p, sX - 5,
+                    // the offset was -5 in SMBX 1.3, but offsets must be even to avoid jittering in half-pixel mode
+                    int x_offset = (XRender::isHalfPixel() ? -6 : -5);
+                    RenderTexturePlayer(Z, p, sX - x_offset,
                                           sY - 2,
                                           32, 32,
                                           GFXNPC[NPCID_FLY_POWER],

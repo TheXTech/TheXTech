@@ -23,7 +23,7 @@
 
 #include "core/msgbox.h"
 #include "core/events.h"
-#ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
+#if defined(RENDER_FULLSCREEN_TYPES_SUPPORTED) || !defined(RENDER_HALFPIXEL_ALWAYS)
 #   include "core/window.h"
 #endif
 
@@ -89,6 +89,16 @@ void config_fullscreen_set()
 
     XEvents::doEvents();
 }
+
+#ifndef RENDER_HALFPIXEL_ALWAYS
+void config_halfpixel_set()
+{
+    if(!GameIsActive)
+        return;
+
+    XWindow::setHalfPixMode(g_config.half_pixel_mode);
+}
+#endif
 
 #ifdef RENDER_FULLSCREEN_TYPES_SUPPORTED
 void config_video_mode_set()
