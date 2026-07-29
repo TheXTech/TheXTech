@@ -824,18 +824,24 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
     {
         if(s_hapticsSupported == 0)
         {
-            if([s_hapticsPlayers count] > 0 && ms < 100)
+            if(ms < 100)
             {
-                for(id<CHHapticPatternPlayer> player in s_hapticsPlayers)
+                if([s_hapticsPlayers count] > 2)
                 {
-                    [player cancelAndReturnError:nil];
+                    for(id<CHHapticPatternPlayer> player in s_hapticsPlayers)
+                    {
+                        [player stopAtTime:0 error:nil];
+                    }
                 }
             }
             else
             {
-                for(id<CHHapticPatternPlayer> player in s_hapticsPlayersLong)
+                if([s_hapticsPlayersLong count] > 2)
                 {
-                    [player cancelAndReturnError:nil];
+                    for(id<CHHapticPatternPlayer> player in s_hapticsPlayersLong)
+                    {
+                        [player stopAtTime:0 error:nil];
+                    }
                 }
             }
 
@@ -895,18 +901,17 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
                     return;
                 }
 
-                [s_hapticsEngine
-                    notifyWhenPlayersFinished:^CHHapticEngineFinishedAction(NSError * _Nullable error)
-                    {
-                        NSError *subError;
-                        (void)error;
+                [s_hapticsEngine notifyWhenPlayersFinished:^CHHapticEngineFinishedAction(NSError * _Nullable error)
+                {
+                    NSError *subError;
+                    (void)error;
 
-                        [s_hapticsEngine stopWithCompletionHandler:nil];
-                        [s_hapticsPlayers removeAllObjects];
-                        [s_hapticsPlayersLong removeAllObjects];
-                        return CHHapticEngineFinishedActionStopEngine;
-                    }
-                ];
+                    [s_hapticsEngine stopWithCompletionHandler:nil];
+                    [s_hapticsPlayers removeAllObjects];
+                    [s_hapticsPlayersLong removeAllObjects];
+
+                    return CHHapticEngineFinishedActionStopEngine;
+                }];
 
                 if([player startAtTime:0 error:&error])
                 {
