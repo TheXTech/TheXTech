@@ -26,6 +26,7 @@
 #include <UIKit/UIWindow.h>
 
 #include <SDL2/SDL_video.h>
+#include <SDL2/SDL_mutex.h>
 #include <sys/utsname.h>
 #include <Logger/logger.h>
 
@@ -679,8 +680,9 @@ int ios_get_overscan_pix_size(void)
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
 static int s_hapticsSupported = -1;
 static int s_hapticsCounter = 0;
-static NSMutableArray *s_hapticsPlayers = nil;
-static NSMutableArray *s_hapticsPlayersLong = nil;
+__strong static NSMutableArray *s_hapticsPlayers = nil;
+__strong static NSMutableArray *s_hapticsPlayersLong = nil;
+static SDL_mutex *s_hapticsMutex = nil;
 
 API_AVAILABLE(ios(13.0))
 __strong static CHHapticEngine *s_hapticsEngine = nil;
@@ -762,6 +764,7 @@ int ios_vibrator_init()
             }
         }];
 
+        s_hapticsMutex = SDL_CreateMutex();
         s_hapticsPlayers = [NSMutableArray arrayWithCapacity:10];
         s_hapticsPlayersLong = [NSMutableArray arrayWithCapacity:10];
 
@@ -781,13 +784,23 @@ int ios_vibrator_quit()
         {
             if(s_hapticsCounter-- == 1)
             {
+                SDL_LockMutex(s_hapticsMutex);
+
                 s_hapticsEngine = nil;
                 [s_hapticsEngine release];
+
                 s_hapticsSupported = -1;
+
                 [s_hapticsPlayers release];
                 s_hapticsPlayers = nil;
+
                 [s_hapticsPlayersLong release];
                 s_hapticsPlayersLong = nil;
+
+                SDL_UnlockMutex(s_hapticsMutex);
+
+                SDL_DestroyMutex(s_hapticsMutex);
+                s_hapticsMutex = nil;
             }
         }
     }
@@ -824,6 +837,8 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
     {
         if(s_hapticsSupported == 0)
         {
+            SDL_LockMutex(s_hapticsMutex);
+
             if(ms < 100)
             {
                 if([s_hapticsPlayers count] > 2)
@@ -844,6 +859,8 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
                     }
                 }
             }
+
+            SDL_UnlockMutex(s_hapticsMutex);
 
             [s_hapticsEngine startWithCompletionHandler:^(NSError * _Nullable e_error)
             {
@@ -888,6 +905,8 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
                     error:&error
                 ];
 
+                SDL_LockMutex(s_hapticsMutex);
+
                 id<CHHapticPatternPlayer> player =
                 [
                     s_hapticsEngine
@@ -906,9 +925,13 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
                     NSError *subError;
                     (void)error;
 
+                    SDL_LockMutex(s_hapticsMutex);
+
                     [s_hapticsEngine stopWithCompletionHandler:nil];
                     [s_hapticsPlayers removeAllObjects];
                     [s_hapticsPlayersLong removeAllObjects];
+
+                    SDL_UnlockMutex(s_hapticsMutex);
 
                     return CHHapticEngineFinishedActionStopEngine;
                 }];
@@ -920,6 +943,8 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
                     else
                         [s_hapticsPlayers addObject:player];
                 }
+
+                SDL_UnlockMutex(s_hapticsMutex);
 
                 if(error)
                 {
