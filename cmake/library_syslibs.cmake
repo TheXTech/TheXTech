@@ -131,4 +131,8 @@ if(APPLE)
         xtech_add_macos_library(AVFoundation)
         xtech_add_macos_library(OpenGLES)
     endif()
+
+    if((IOS OR TVOS) AND (THEXTECH_BUILD_GL_ES_MODERN OR THEXTECH_BUILD_GL_ES_LEGACY))
+        xtech_add_macos_library(GLKit)
+    endif()
 endif()
