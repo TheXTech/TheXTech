@@ -679,6 +679,8 @@ int ios_get_overscan_pix_size(void)
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
 static int s_hapticsSupported = -1;
 static int s_hapticsCounter = 0;
+static NSMutableArray *s_hapticsPlayers = nil;
+static NSMutableArray *s_hapticsPlayersLong = nil;
 
 API_AVAILABLE(ios(13.0))
 __strong static CHHapticEngine *s_hapticsEngine = nil;
@@ -760,6 +762,9 @@ int ios_vibrator_init()
             }
         }];
 
+        s_hapticsPlayers = [NSMutableArray arrayWithCapacity:10];
+        s_hapticsPlayersLong = [NSMutableArray arrayWithCapacity:10];
+
         return 0;
     }
 #endif
@@ -779,6 +784,10 @@ int ios_vibrator_quit()
                 s_hapticsEngine = nil;
                 [s_hapticsEngine release];
                 s_hapticsSupported = -1;
+                [s_hapticsPlayers release];
+                s_hapticsPlayers = nil;
+                [s_hapticsPlayersLong release];
+                s_hapticsPlayersLong = nil;
             }
         }
     }
@@ -815,9 +824,26 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
     {
         if(s_hapticsSupported == 0)
         {
+            if([s_hapticsPlayers count] > 0 && ms < 100)
+            {
+                for(id<CHHapticPatternPlayer> player in s_hapticsPlayers)
+                {
+                    [player cancelAndReturnError:nil];
+                }
+            }
+            else
+            {
+                for(id<CHHapticPatternPlayer> player in s_hapticsPlayersLong)
+                {
+                    [player cancelAndReturnError:nil];
+                }
+            }
+
             [s_hapticsEngine startWithCompletionHandler:^(NSError * _Nullable e_error)
             {
                 NSError* error;
+                CHHapticEventParameter *strengthParameter;
+                CHHapticEventParameter *sharpnessParameter;
 
                 if(e_error)
                 {
@@ -825,13 +851,43 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
                     return;
                 }
 
-                CHHapticEventParameter *strengthParameter = [[CHHapticEventParameter alloc] initWithParameterID:CHHapticEventParameterIDHapticIntensity value:strenght];
-                CHHapticEventParameter *sharpnessParameter = [[CHHapticEventParameter alloc] initWithParameterID:CHHapticEventParameterIDHapticSharpness value:1.0];
+                strengthParameter =
+                [
+                    [CHHapticEventParameter alloc]
+                    initWithParameterID:CHHapticEventParameterIDHapticIntensity
+                    value:strenght
+                ];
 
-                CHHapticEvent *event = [[CHHapticEvent alloc] initWithEventType:CHHapticEventTypeHapticContinuous parameters:@[strengthParameter, sharpnessParameter] relativeTime:0 duration:(ms / 1000.0f)];
-                CHHapticPattern *patten = [[CHHapticPattern alloc] initWithEvents:@[event] parameterCurves:@[] error:&error];
+                sharpnessParameter =
+                [
+                    [CHHapticEventParameter alloc]
+                    initWithParameterID:CHHapticEventParameterIDHapticSharpness
+                    value:1.0
+                ];
 
-                id<CHHapticPatternPlayer> player = [s_hapticsEngine createPlayerWithPattern:patten error:&error];
+                CHHapticEvent *event =
+                [
+                    [CHHapticEvent alloc]
+                    initWithEventType:CHHapticEventTypeHapticContinuous
+                    parameters:@[strengthParameter, sharpnessParameter]
+                    relativeTime:0
+                    duration:(ms / 1000.0f)
+                ];
+
+                CHHapticPattern *patten =
+                [
+                    [CHHapticPattern alloc]
+                    initWithEvents:@[event]
+                    parameterCurves:@[]
+                    error:&error
+                ];
+
+                id<CHHapticPatternPlayer> player =
+                [
+                    s_hapticsEngine
+                    createPlayerWithPattern:patten
+                    error:&error
+                ];
 
                 if(error)
                 {
@@ -839,13 +895,26 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
                     return;
                 }
 
-                [s_hapticsEngine notifyWhenPlayersFinished:^CHHapticEngineFinishedAction(NSError * _Nullable error)
-                {
-                    [s_hapticsEngine stopWithCompletionHandler:nil];
-                    return CHHapticEngineFinishedActionStopEngine;
-                }];
+                [s_hapticsEngine
+                    notifyWhenPlayersFinished:^CHHapticEngineFinishedAction(NSError * _Nullable error)
+                    {
+                        NSError *subError;
+                        (void)error;
 
-                [player startAtTime:0 error:&error];
+                        [s_hapticsEngine stopWithCompletionHandler:nil];
+                        [s_hapticsPlayers removeAllObjects];
+                        [s_hapticsPlayersLong removeAllObjects];
+                        return CHHapticEngineFinishedActionStopEngine;
+                    }
+                ];
+
+                if([player startAtTime:0 error:&error])
+                {
+                    if(ms >= 100)
+                        [s_hapticsPlayersLong addObject:player];
+                    else
+                        [s_hapticsPlayers addObject:player];
+                }
 
                 if(error)
                 {
