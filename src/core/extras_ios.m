@@ -680,8 +680,6 @@ int ios_get_overscan_pix_size(void)
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
 static int s_hapticsSupported = -1;
 static int s_hapticsCounter = 0;
-__strong static NSMutableArray *s_hapticsPlayers = nil;
-__strong static NSMutableArray *s_hapticsPlayersLong = nil;
 static SDL_mutex *s_hapticsMutex = nil;
 
 API_AVAILABLE(ios(13.0))
@@ -765,8 +763,6 @@ int ios_vibrator_init()
         }];
 
         s_hapticsMutex = SDL_CreateMutex();
-        s_hapticsPlayers = [NSMutableArray arrayWithCapacity:10];
-        s_hapticsPlayersLong = [NSMutableArray arrayWithCapacity:10];
 
         return 0;
     }
@@ -790,12 +786,6 @@ int ios_vibrator_quit()
                 [s_hapticsEngine release];
 
                 s_hapticsSupported = -1;
-
-                [s_hapticsPlayers release];
-                s_hapticsPlayers = nil;
-
-                [s_hapticsPlayersLong release];
-                s_hapticsPlayersLong = nil;
 
                 SDL_UnlockMutex(s_hapticsMutex);
 
@@ -838,27 +828,6 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
         if(s_hapticsSupported == 0)
         {
             SDL_LockMutex(s_hapticsMutex);
-
-            if(ms < 100)
-            {
-                if([s_hapticsPlayers count] > 2)
-                {
-                    for(id<CHHapticPatternPlayer> player in s_hapticsPlayers)
-                    {
-                        [player stopAtTime:0 error:nil];
-                    }
-                }
-            }
-            else
-            {
-                if([s_hapticsPlayersLong count] > 2)
-                {
-                    for(id<CHHapticPatternPlayer> player in s_hapticsPlayersLong)
-                    {
-                        [player stopAtTime:0 error:nil];
-                    }
-                }
-            }
 
             [s_hapticsEngine startWithCompletionHandler:^(NSError * _Nullable e_error)
             {
@@ -927,21 +896,13 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
                     SDL_LockMutex(s_hapticsMutex);
 
                     [s_hapticsEngine stopWithCompletionHandler:nil];
-                    [s_hapticsPlayers removeAllObjects];
-                    [s_hapticsPlayersLong removeAllObjects];
 
                     SDL_UnlockMutex(s_hapticsMutex);
 
                     return CHHapticEngineFinishedActionStopEngine;
                 }];
 
-                if([player startAtTime:0 error:&error])
-                {
-                    if(ms >= 100)
-                        [s_hapticsPlayersLong addObject:player];
-                    else
-                        [s_hapticsPlayers addObject:player];
-                }
+                [player startAtTime:0 error:&error];
 
                 if(error)
                 {
