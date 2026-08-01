@@ -1490,5 +1490,17 @@ void LoadTouchScreenGFX()
 #endif // #ifdef TOUCHSCREEN_H
 }
 
+void UnloadTouchScreenTextures()
+{
+#ifdef TOUCHSCREEN_H
+    InputMethodType_TouchScreen* touchscreen = s_getTouchScreenType();
+
+    if(!touchscreen)
+        return;
+
+    touchscreen->m_controller.unLoadGFX();
+#endif // #ifdef TOUCHSCREEN_H
+}
+
 } // namespace Controls
 

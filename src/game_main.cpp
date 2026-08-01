@@ -317,6 +317,9 @@ void MainLoadAll()
 
     FontManager::initFull();
 
+    // To ensure no further threading issues
+    Controls::UnloadTouchScreenTextures();
+
 #ifndef PGE_NO_THREADING
     {
         gfxLoaderThreadingMode = true;

@@ -219,6 +219,12 @@ void TouchScreenGFX_t::load()
         pLogWarning("Touch-screen controller cannot be used due to missing assets.");
 }
 
+void TouchScreenGFX_t::lazyUnload()
+{
+    for(size_t i = 0; i < BUTTONS_END; ++i)
+        XRender::unloadTexture(touch[i]);
+}
+
 /*------------------------------------------*\
 || implementation for TouchScreenController ||
 \*------------------------------------------*/
@@ -1579,14 +1585,14 @@ void TouchScreenController::update()
 
 void TouchScreenController::render(int player_no)
 {
-    if(!touchSupported())
+    if(!touchSupported() || LoadingInProcess)
         return;
 
     int style = m_touchpad_style;
 
     for(int key = key_BEGIN; key < key_END; key++)
     {
-        if((m_touchHidden && key != TouchScreenController::key_toggleKeysView) || (LoadingInProcess && !ScreenAssetPack::g_LoopActive) || LevelEditor)
+        if((m_touchHidden && key != TouchScreenController::key_toggleKeysView) || LevelEditor)
             continue;
 
         const auto& k = g_touchKeyMap.touchKeysMap[key];
