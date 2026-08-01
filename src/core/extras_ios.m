@@ -874,10 +874,10 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
 
                 SDL_LockMutex(s_hapticsMutex);
 
-                id<CHHapticPatternPlayer> player =
+                id<CHHapticAdvancedPatternPlayer> player =
                 [
                     s_hapticsEngine
-                    createPlayerWithPattern:patten
+                    createAdvancedPlayerWithPattern:patten
                     error:&error
                 ];
 
@@ -887,6 +887,8 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
                     SDL_UnlockMutex(s_hapticsMutex);
                     return;
                 }
+
+                player.loopEnabled = NO;
 
                 [s_hapticsEngine notifyWhenPlayersFinished:^CHHapticEngineFinishedAction(NSError * _Nullable error)
                 {
@@ -902,7 +904,7 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
                     return CHHapticEngineFinishedActionStopEngine;
                 }];
 
-                [player startAtTime:0 error:&error];
+                [player startAtTime:CHHapticTimeImmediate error:&error];
 
                 if(error)
                 {
