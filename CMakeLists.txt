@@ -467,6 +467,9 @@ include(lib/sdl_proxy/sdl_proxy.cmake)
 if(WIN32)
     include(lib/CrashHandler/StackWalker/StackWalker.cmake)
 endif()
+if(TVOS)
+    include(lib/miniz/miniz.cmake)
+endif()
 
 include(cmake/library_zlib.cmake)
 
@@ -739,6 +742,7 @@ set(LIB_SRC
     ${UTILS_SRCS}
     ${LIB_SRC_EXTRA}
     ${SDLPROXY_SRCS}
+    ${MINIZ_SRC}
 )
 
 if(NOT THEXTECH_NO_SDL_BUILD)

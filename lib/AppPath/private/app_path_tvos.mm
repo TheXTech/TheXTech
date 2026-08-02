@@ -23,6 +23,10 @@
 #include <SDL2/SDL_error.h>
 #include <DirManager/dirman.h>
 #include <Foundation/Foundation.h>
+#include <DirManager/dirman.h>
+#include <Utils/files.h>
+#include <Logger/logger.h>
+#include <miniz.h>
 #include <PGE_File_Formats/pge_file_lib_private.h> // For URL-Decode.
 
 #include "app_path_private.h"
@@ -91,8 +95,8 @@ void AppPathP::initDefaultPaths(const std::string &)
     DirMan::mkAbsDir(s_userDirectory);
 
     // Screenshots directory (!!!WILL BE STORED AT CACHES!!!)
-    s_screenshotsPath = s_userDirectory + "screenshots/";
-    s_gifRecordPath = s_userDirectory + "gif-recordings/";
+    s_screenshotsPath = s_userDirectory + "/screenshots/";
+    s_gifRecordPath = s_userDirectory + "/gif-recordings/";
 }
 
 std::string AppPathP::appDirectory()
@@ -117,12 +121,8 @@ AssetsPathType AppPathP::assetsRootType()
 
 std::string AppPathP::settingsRoot()
 {
-    /*
-     * Fill this in only condition when you want to use the system-wide settings
-     * directory out of user directory. Keep it empty if you want to keep the
-     * default behaviour (i.e. settings saved at the user directory)
-     */
-    return std::string();
+    // To ensure the directiry will be same!
+    return s_userDirectory + "/settings/";
 }
 
 std::string AppPathP::gamesavesRoot()
@@ -157,7 +157,45 @@ bool AppPathP::portableAvailable()
 
 void AppPathP::syncFS()
 {
-    /* Run the FS synchronization (Implement this for Emscripten only) */
+    std::string ar_file = s_userDirectory + "/tmp.zip";
+    mz_zip_archive ar;
+    std::string settings_root = settingsRoot();
+    DirMan setup_dir(settings_root);
+
+    if(!setup_dir.exists())
+        return; // Do nothing, directory does not exists
+
+    memset(&ar, 0, sizeof(mz_zip_archive));
+
+    Files::deleteFile(ar_file.c_str());
+
+    if(mz_zip_writer_init_file_v2(&ar, ar_file.c_str(), 0, 0))
+    {
+        std::string cur_path;
+        std::vector<std::string> cur_files;
+        bool failed = false;
+
+        setup_dir.beginWalking();
+
+        while(!failed && setup_dir.fetchListFromWalker(cur_path, cur_files))
+        {
+            for(std::string &file : cur_files)
+            {
+                std::string cur_file = cur_path + "/" + file;
+                std::string cur_relative_file = cur_file.substr(settings_root.size());
+                int status = mz_zip_writer_add_file(&ar, cur_file.c_str(), cur_relative_file.c_str(), NULL, 0, MZ_ZIP_FLAG_COMPRESSED_DATA|MZ_BEST_COMPRESSION);
+
+                if(status != MZ_OK)
+                {
+                    pLogWarning("tvOS: Failed to store %s into archive %s: %d", cur_relative_file.c_str(), ar_file.c_str(), status);
+                    failed = true;
+                    break;
+                }
+            }
+        }
+
+        mz_zip_writer_end(&ar);
+    }
 }
 
 const std::vector<std::string>& AppPathManager::worldRootDirs() // Read-Only, appears at writable directory
