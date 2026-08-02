@@ -25,6 +25,11 @@
 #include <SDL2/SDL_rwops.h>
 
 #include <Foundation/Foundation.h>
+#include <TargetConditionals.h>
+#if defined(TARGET_OS_TV) || defined(TARGET_OS_SIMULATOR) || (defined(TARGET_OS_IPHONE) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 100000)
+#   define LOGGER_HAS_OSLOG_API
+#   include <os/log.h>
+#endif
 
 #ifndef NO_FILE_LOGGING
 static std::mutex g_lockLocker;
@@ -35,8 +40,20 @@ static char       g_outputBuffer[OUT_BUFFER_SIZE];
 static SDL_RWops *s_logout = nullptr;
 #endif // NO_FILE_LOGGING
 
+#if defined(LOGGER_HAS_OSLOG_API)
+__strong static os_log_t s_console_log = nil;
+#endif
+
 void LogWriter::OpenLogFile()
 {
+#if defined(LOGGER_HAS_OSLOG_API)
+    if(@available(iOS 10.0, *))
+    {
+        if(!s_console_log)
+            s_console_log = os_log_create("ru.wohlsoft.thextech", "Default");
+    }
+#endif
+
 #ifndef NO_FILE_LOGGING
     MUTEXLOCK(mutex);
 
@@ -60,6 +77,8 @@ void LogWriter::CloseLog()
         SDL_RWclose(s_logout);
     s_logout = nullptr;
 #endif // NO_FILE_LOGGING
+
+    s_console_log = nil;
 }
 
 void LoggerPrivate_pLogConsole(int level, const char *label, const char *format, va_list arg)
@@ -67,13 +86,48 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
     char buf[OUT_BUFFER_SIZE];
     va_list arg_in;
     size_t off = 0;
+#if defined(LOGGER_HAS_OSLOG_API)
+    os_log_type_t l = OS_LOG_TYPE_DEFAULT;
+
+    switch(level)
+    {
+    case PGE_LogLevel::Debug:
+        l = OS_LOG_TYPE_DEBUG;
+        break;
+    default:
+    case PGE_LogLevel::Info:
+        l = OS_LOG_TYPE_DEFAULT;
+        break;
+    case PGE_LogLevel::Warning:
+        l = OS_LOG_TYPE_ERROR;
+        break;
+    case PGE_LogLevel::Critical:
+    case PGE_LogLevel::Fatal:
+        l = OS_LOG_TYPE_FAULT;
+        break;
+    }
+#else
     (void)level;
+#endif
 
     va_copy(arg_in, arg);
     off = snprintf(buf, OUT_BUFFER_STRING_SIZE, "%s: ", label);
     vsnprintf(buf + off, OUT_BUFFER_STRING_SIZE - off, format, arg_in);
-    NSLog(@"%s", buf);
     va_end(arg_in);
+
+#if defined(LOGGER_HAS_OSLOG_API)
+    if(@available(iOS 10.0, *))
+    {
+        if(s_console_log)
+            os_log_with_type(s_console_log, l, "%s", buf);
+        else
+            NSLog(@"%s", buf);
+    }
+    else
+        NSLog(@"%s", buf);
+#else
+    NSLog(@"%s", buf);
+#endif
 }
 
 #ifndef NO_FILE_LOGGING
