@@ -681,6 +681,10 @@ int ios_get_overscan_pix_size(void)
 static int s_hapticsSupported = -1;
 static int s_hapticsCounter = 0;
 static SDL_mutex *s_hapticsMutex = nil;
+static int s_hapticsPlayersIdCounter = 0;
+
+API_AVAILABLE(ios(13.0))
+__strong static NSMutableDictionary<NSNumber *, id<CHHapticAdvancedPatternPlayer>> *s_hapticsPlayers;
 
 API_AVAILABLE(ios(13.0))
 __strong static CHHapticEngine *s_hapticsEngine = nil;
@@ -763,6 +767,7 @@ int ios_vibrator_init()
         }];
 
         s_hapticsMutex = SDL_CreateMutex();
+        s_hapticsPlayers = [[NSMutableDictionary alloc] init];
 
         return 0;
     }
@@ -786,6 +791,9 @@ int ios_vibrator_quit()
                 [s_hapticsEngine release];
 
                 s_hapticsSupported = -1;
+
+                [s_hapticsPlayers release];
+                s_hapticsPlayers = nil;
 
                 SDL_UnlockMutex(s_hapticsMutex);
 
@@ -834,10 +842,14 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
                 NSError* error;
                 CHHapticEventParameter *strengthParameter;
                 CHHapticEventParameter *sharpnessParameter;
+                int playerId;
+
+                NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
                 if(e_error)
                 {
                     pLogWarning("iOS: Failed to start the Haptics Engine: %s", [error.localizedDescription UTF8String]);
+                    [pool drain];
                     return;
                 }
 
@@ -881,10 +893,11 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
                     error:&error
                 ];
 
-                if(error)
+                if(!player || error)
                 {
-                    pLogWarning("iOS: Failed to create the Haptics Player: %s", [error.localizedDescription UTF8String]);
+                    pLogWarning("iOS: Failed to create the Haptics Player: %s", error ? [error.localizedDescription UTF8String] : "<Unknown error>");
                     SDL_UnlockMutex(s_hapticsMutex);
+                    [pool drain];
                     return;
                 }
 
@@ -897,7 +910,11 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
 
                     SDL_LockMutex(s_hapticsMutex);
 
-                    [s_hapticsEngine stopWithCompletionHandler:nil];
+                    [s_hapticsEngine stopWithCompletionHandler:^(NSError * _Nullable error)
+                    {
+                        if(error)
+                            pLogWarning("iOS: Haptics Engine stopped by request with error: %s", [error.localizedDescription UTF8String]);
+                    }];
 
                     SDL_UnlockMutex(s_hapticsMutex);
 
@@ -911,8 +928,23 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
                     pLogWarning("iOS: Failed to start the Haptics Player: %s", [error.localizedDescription UTF8String]);
                     [player release];
                 }
+                else
+                {
+                    NSNumber *key;
+                    playerId = s_hapticsPlayersIdCounter++;
+                    key = [NSNumber numberWithInt:42];
+                    s_hapticsPlayers[key] = player;
+
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ms * 1000000)), dispatch_get_main_queue(), ^
+                    {
+                        SDL_LockMutex(s_hapticsMutex);
+                        [s_hapticsPlayers removeObjectForKey:key];
+                        SDL_UnlockMutex(s_hapticsMutex);
+                    });
+                }
 
                 SDL_UnlockMutex(s_hapticsMutex);
+                [pool drain];
             }];
 
             SDL_UnlockMutex(s_hapticsMutex);
