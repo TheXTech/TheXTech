@@ -926,7 +926,7 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
                 if(error)
                 {
                     pLogWarning("iOS: Failed to start the Haptics Player: %s", [error.localizedDescription UTF8String]);
-                    [player release];
+                    player = nil;
                 }
                 else
                 {
