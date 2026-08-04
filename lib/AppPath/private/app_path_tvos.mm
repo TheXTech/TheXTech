@@ -70,6 +70,9 @@ static bool zipSettingsPack()
         {
             for(std::string &file : cur_files)
             {
+                if(file == ".DS_Store")
+                    continue; // Don't store a junk!
+
                 std::string cur_file = cur_path + "/" + file;
                 std::string cur_relative_file = cur_file.substr(settings_root.size());
 
