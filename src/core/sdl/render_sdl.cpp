@@ -682,8 +682,12 @@ void RenderSDL::clearAllTextures()
 
 void RenderSDL::clearBuffer()
 {
-#ifdef USE_RENDER_BLOCKING
-    SDL_assert(!m_blockRender);
+#if defined(USE_RENDER_BLOCKING)
+    if(m_blockRender)
+    {
+        m_render_queue.clear();
+        return;
+    }
 #endif
     SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 255);
     SDL_RenderClear(m_gRenderer);
@@ -707,7 +711,8 @@ void RenderSDL::flushRenderQueue()
 void RenderSDL::execute(const XRenderOp& op)
 {
 #ifdef USE_RENDER_BLOCKING
-    SDL_assert(!m_blockRender);
+    if(m_blockRender)
+        return;
 #endif
 
     switch(op.type)
@@ -1239,7 +1244,8 @@ void RenderSDL::renderTexture(float xDst, float yDst,
                                 XTColor color)
 {
 #ifdef USE_RENDER_BLOCKING
-    SDL_assert(!m_blockRender);
+    if(m_blockRender)
+        return;
 #endif
 
     if(!tx.inited)
