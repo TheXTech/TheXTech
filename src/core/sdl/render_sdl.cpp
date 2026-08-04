@@ -31,6 +31,10 @@
 #   include "../extras.h"
 #endif
 
+#ifdef THEXTECH_TVOS
+#   include <AppPath/app_path.h>
+#endif
+
 #include <FreeImageLite.h>
 #include <Logger/logger.h>
 #include <Utils/maths.h>
@@ -50,6 +54,10 @@
 #include "graphics.h"
 #include "controls.h"
 #include "sound.h"
+
+#ifdef THEXTECH_TVOS
+#   include "fontman/font_manager.h"
+#endif
 
 #ifndef UNUSED
 #define UNUSED(x) (void)x
@@ -256,10 +264,16 @@ void RenderSDL::repaint()
         return;
 #endif
 
+    // FIXME: Make these strings below localisable!
     if(XRender::g_BitmaskTexturePresent)
         SuperPrintScreenCenter(g_gameStrings.onScreenWarningBitmaskFallback, 5, 2, XTColorF(1.0f, 0.7f, 0.5f));
     else if(g_ForceBitmaskMerge)
         SuperPrintScreenCenter(g_gameStrings.onScreenWarningBitmaskEnforced, 5, 2, XTColorF(1.0f, 0.7f, 0.5f));
+
+#ifdef APP_PATH_HAS_SETTINGS_SIZE_LIMIT
+    if(AppPathManager::settingsSizeExceeded() && FontManager::isInitied())
+        SuperPrintScreenCenter("Settings storage is oveflown.\nPlease remove unneded gamesaves,\notherwise you may lose your data.", 5, 20, XTColorF(1.0f, 0.2f, 0.2f));
+#endif
 
     int w, h, off_x, off_y, wDst, hDst;
 

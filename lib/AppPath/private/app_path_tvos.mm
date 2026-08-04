@@ -19,6 +19,7 @@
 
 #include <unistd.h>
 #include <mutex>
+#include <sys/stat.h>
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_error.h>
 #include <DirManager/dirman.h>
@@ -43,6 +44,36 @@ static std::string s_screenshotsPath;
 static std::string s_gifRecordPath;
 //! The name of application bundle to be re-used as the user directory name
 static std::string s_bundleName;
+static bool s_settingsTooLarge = false;
+
+
+static void zipCheckSize()
+{
+    struct stat st;
+    const off_t max_size = 491520; // 480 kB
+    std::string ar_file_1 = s_userDirectory + "/tmp.zip";
+    std::string ar_file_2 = s_userDirectory + "/tmp-out.zip";
+
+    if(Files::fileExists(ar_file_1))
+    {
+        if(stat(ar_file_1.c_str(), &st) == 0)
+        {
+            s_settingsTooLarge = st.st_size > max_size;
+            return;
+        }
+    }
+
+    if(Files::fileExists(ar_file_2))
+    {
+        if(stat(ar_file_2.c_str(), &st) == 0)
+        {
+            s_settingsTooLarge = st.st_size > max_size;
+            return;
+        }
+    }
+
+    s_settingsTooLarge = false;
+}
 
 static bool zipSettingsPack()
 {
@@ -91,6 +122,13 @@ static bool zipSettingsPack()
             mz_zip_writer_finalize_archive(&ar);
 
         mz_zip_writer_end(&ar);
+
+        // Check package sizes
+        zipCheckSize();
+
+        if(s_settingsTooLarge)
+            return false; // Can't store data as the data set is too large!
+
         return !failed;
     }
     else
@@ -264,6 +302,9 @@ void AppPathP::initDefaultPaths(const std::string &)
     // Attempt to restore settings directory from a ZIP archive
     if(!DirMan::exists(AppPathP::settingsRoot()) && loadZipSettings())
         zipSettingsExtract();
+
+    // Check file sizes
+    zipCheckSize();
 }
 
 std::string AppPathP::appDirectory()
@@ -340,4 +381,9 @@ const std::vector<std::string>& AppPathManager::worldRootDirs() // Read-Only, ap
     }
 
     return s_worldRootDirs;
+}
+
+bool AppPathManager::settingsSizeExceeded()
+{
+    return s_settingsTooLarge;
 }
