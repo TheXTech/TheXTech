@@ -28,7 +28,7 @@
 #endif
 
 #if defined(THEXTECH_IOS)
-#   define APP_ATH_HAS_BUNDLE_PATH
+#   define APP_PATH_HAS_BUNDLE_PATH
 #endif
 
 
@@ -169,7 +169,7 @@ public:
     static const std::vector<std::string>& worldRootDirs(); // Read-Only, appears at writable directory
 #endif
 
-#ifdef APP_ATH_HAS_BUNDLE_PATH
+#ifdef APP_PATH_HAS_BUNDLE_PATH
     static std::string bundleResourcesPath(); // Read-Only, a resources root at the app bundle
 #endif
 
