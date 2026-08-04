@@ -169,7 +169,7 @@ void AppPathP::syncFS()
 
     Files::deleteFile(ar_file.c_str());
 
-    if(mz_zip_writer_init_file_v2(&ar, ar_file.c_str(), 0, 0))
+    if(mz_zip_writer_init_file_v2(&ar, ar_file.c_str(), 0, MZ_ZIP_FLAG_WRITE_ALLOW_READING))
     {
         std::string cur_path;
         std::vector<std::string> cur_files;
@@ -183,18 +183,26 @@ void AppPathP::syncFS()
             {
                 std::string cur_file = cur_path + "/" + file;
                 std::string cur_relative_file = cur_file.substr(settings_root.size());
-                int status = mz_zip_writer_add_file(&ar, cur_file.c_str(), cur_relative_file.c_str(), NULL, 0, MZ_ZIP_FLAG_COMPRESSED_DATA|MZ_BEST_COMPRESSION);
 
-                if(status != MZ_OK)
+                D_pLogDebug("Adding to archive: %s", cur_relative_file.c_str());
+
+                if(!mz_zip_writer_add_file(&ar, cur_relative_file.c_str(), cur_file.c_str(), NULL, 0, MZ_BEST_COMPRESSION|MZ_ZIP_FLAG_WRITE_HEADER_SET_SIZE))
                 {
-                    pLogWarning("tvOS: Failed to store %s into archive %s: %d", cur_relative_file.c_str(), ar_file.c_str(), status);
+                    pLogWarning("tvOS: Failed to store %s into archive %s: %s", cur_relative_file.c_str(), ar_file.c_str(), mz_zip_get_error_string(ar.m_last_error));
                     failed = true;
                     break;
                 }
             }
         }
 
+        if(!failed)
+            mz_zip_writer_finalize_archive(&ar);
+
         mz_zip_writer_end(&ar);
+    }
+    else
+    {
+        pLogWarning("tvOS: Failed to open an archive %s: %s", ar_file.c_str(), mz_zip_get_error_string(ar.m_last_error));
     }
 }
 
