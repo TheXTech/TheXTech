@@ -264,15 +264,15 @@ void RenderSDL::repaint()
         return;
 #endif
 
-    // FIXME: Make these strings below localisable!
     if(XRender::g_BitmaskTexturePresent)
         SuperPrintScreenCenter(g_gameStrings.onScreenWarningBitmaskFallback, 5, 2, XTColorF(1.0f, 0.7f, 0.5f));
     else if(g_ForceBitmaskMerge)
         SuperPrintScreenCenter(g_gameStrings.onScreenWarningBitmaskEnforced, 5, 2, XTColorF(1.0f, 0.7f, 0.5f));
 
 #ifdef APP_PATH_HAS_SETTINGS_SIZE_LIMIT
+    // FIXME: Copy this to other renderers once they gets fixed on mobile Apple platforms (iOS and tvOS)
     if(AppPathManager::settingsSizeExceeded() && FontManager::isInitied())
-        SuperPrintScreenCenter("Settings storage is overflown.\nPlease remove any unneeded gamesaves,\notherwise you may lose your data.", 5, 20, XTColorF(1.0f, 0.2f, 0.2f));
+        SuperPrintScreenCenter(g_gameStrings.onScreenWarningSettingsStorageOverflown, 5, 20, XTColorF(1.0f, 0.2f, 0.2f));
 #endif
 
     int w, h, off_x, off_y, wDst, hDst;
