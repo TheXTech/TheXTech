@@ -272,7 +272,7 @@ void RenderSDL::repaint()
 
 #ifdef APP_PATH_HAS_SETTINGS_SIZE_LIMIT
     if(AppPathManager::settingsSizeExceeded() && FontManager::isInitied())
-        SuperPrintScreenCenter("Settings storage is oveflown.\nPlease remove unneeded gamesaves,\notherwise you may lose your data.", 5, 20, XTColorF(1.0f, 0.2f, 0.2f));
+        SuperPrintScreenCenter("Settings storage is overflown.\nPlease remove any unneeded gamesaves,\notherwise you may lose your data.", 5, 20, XTColorF(1.0f, 0.2f, 0.2f));
 #endif
 
     int w, h, off_x, off_y, wDst, hDst;
