@@ -36,23 +36,30 @@
 
 
 #if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
-int EventsSDL::handle_ios_events(void * /*userdata*/, SDL_Event * /*event*/)
+int EventsSDL::handle_ios_events(void * /*userdata*/, SDL_Event *event)
 {
-    return 1;
-
     // EventsSDL *self = reinterpret_cast<EventsSDL*>(userdata);
 
-    // switch(event->type)
-    // {
-    // case SDL_QUIT:
-    // case SDL_WINDOWEVENT:
-    //     SDL_memcpy(&self->m_event, event, sizeof(SDL_Event));
-    //     self->processEvent();
+    switch(event->type)
+    {
+    case SDL_APP_TERMINATING:
+        pLogInfo("iOS/tvOS: Application was been terminated");
+        XWindow::showCursor(1);
+        KillIt();
+
+        // Do same what main.cpp does:
+        Controls::Quit();
+        QuitMixerX();
+        g_frmMain.freeSystem();
+        return 0;
+
+    // case SDL_APP_LOWMEMORY:
+    // TODO: Implement handling of low-memory event for iOS here
     //     return 0;
 
-    // default:
-    //     return 1;
-    // }
+    default:
+        return 1;
+    }
 }
 #endif
 
