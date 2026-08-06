@@ -935,7 +935,7 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
                     key = [NSNumber numberWithInt:42];
                     s_hapticsPlayers[key] = player;
 
-                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ms * 1000000)), dispatch_get_main_queue(), ^
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ms * 1200000)), dispatch_get_main_queue(), ^
                     {
                         SDL_LockMutex(s_hapticsMutex);
                         [s_hapticsPlayers removeObjectForKey:key];
