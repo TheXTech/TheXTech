@@ -97,6 +97,21 @@ struct GameContent
     std::string connectWaitingForInputDevice;
     std::string connectPressSelectForControlsOptions_P1;
     std::string connectPressSelectForControlsOptions_P2;
+
+    // On-Screen warnings
+
+#if defined(CORE_EVERYTHING_SDL) || !defined(THEXTECH_DISABLE_LANG_TOOLS)
+    std::string onScreenWarningBitmaskFallback;
+    std::string onScreenWarningBitmaskEnforced;
+#   if defined(THEXTECH_TVOS) || !defined(THEXTECH_DISABLE_LANG_TOOLS)
+    std::string onScreenWarningSettingsStorageOverflown;
+#   endif
+#endif
+
+#if defined(THEXTECH_BUILD_GL_DESKTOP_MODERN) || defined(THEXTECH_BUILD_GL_ES_MODERN) || defined(THEXTECH_BUILD_GL_DESKTOP_LEGACY) || defined(THEXTECH_BUILD_GL_ES_LEGACY) || !defined(THEXTECH_DISABLE_LANG_TOOLS)
+    std::string onScreenWarningSimGIFs2PNGAct;
+    std::string onScreenWarningSimGIFs2PNGInact;
+#endif
 };
 
 extern GameContent g_gameStrings;
