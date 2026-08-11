@@ -514,7 +514,12 @@
                     "scaleButtons": "Scale Buttons",
                     "scaleDPad": "Scale D-Pad",
                     "scaleFactor": "Scale Factor",
-                    "showCodeButton": "Show Code Button"
+                    "showCodeButton": "Show Code Button",
+                    "OffsetButtonsH": "Buttons Offset Right",
+                    "OffsetButtonsV": "Buttons Offset Bottom",
+                    "OffsetDPadH": "D-Pad Offset Left",
+                    "OffsetDPadV": "D-Pad Offset Bottom",
+                    "OffsetSStart": "S-Start Offset"
                 },
                 "style": {
                     "ABXY": "ABXY",

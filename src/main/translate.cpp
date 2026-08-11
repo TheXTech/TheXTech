@@ -346,6 +346,11 @@ XTechTranslate::XTechTranslate()
     insert(m_engineMap, "menu.controls.touchscreen.option.scaleDPad",      &g_controlsStrings.touchscreenOptionScaleDPad);
     insert(m_engineMap, "menu.controls.touchscreen.option.scaleButtons",   &g_controlsStrings.touchscreenOptionScaleButtons);
     insert(m_engineMap, "menu.controls.touchscreen.option.sStartSpacing",  &g_controlsStrings.touchscreenOptionSStartSpacing);
+    insert(m_engineMap, "menu.controls.touchscreen.option.OffsetDPadH",    &g_controlsStrings.touchscreenOptionOffsetDPadH);
+    insert(m_engineMap, "menu.controls.touchscreen.option.OffsetDPadV",    &g_controlsStrings.touchscreenOptionOffsetDPadV);
+    insert(m_engineMap, "menu.controls.touchscreen.option.OffsetButtonsH", &g_controlsStrings.touchscreenOptionOffsetButtonsH);
+    insert(m_engineMap, "menu.controls.touchscreen.option.OffsetButtonsV", &g_controlsStrings.touchscreenOptionOffsetButtonsV);
+    insert(m_engineMap, "menu.controls.touchscreen.option.OffsetSStart",   &g_controlsStrings.touchscreenOptionOffsetSStart);
     insert(m_engineMap, "menu.controls.touchscreen.option.resetLayout",    &g_controlsStrings.touchscreenOptionResetLayout);
     insert(m_engineMap, "menu.controls.touchscreen.option.interfaceStyle", &g_controlsStrings.touchscreenOptionInterfaceStyle);
     insert(m_engineMap, "menu.controls.touchscreen.option.feedbackStrength", &g_controlsStrings.touchscreenOptionFeedbackStrength);
@@ -519,6 +524,19 @@ XTechTranslate::XTechTranslate()
     insert(m_engineMap, "game.connect.splitPressSelect_2",        &g_gameStrings.connectPressSelectForControlsOptions_P2);
 
     insert(m_engineMap, "game.connect.phraseDropMe",              &g_gameStrings.connectDropMe);
+
+#if defined(CORE_EVERYTHING_SDL) || !defined(THEXTECH_DISABLE_LANG_TOOLS)
+    insert(m_engineMap, "game.warning.bitmaskFallback",             &g_gameStrings.onScreenWarningBitmaskFallback);
+    insert(m_engineMap, "game.warning.bitmaskEnforced",             &g_gameStrings.onScreenWarningBitmaskEnforced);
+#   if defined(THEXTECH_TVOS) || !defined(THEXTECH_DISABLE_LANG_TOOLS)
+    insert(m_engineMap, "game.warning.settingsStorageOverflown",    &g_gameStrings.onScreenWarningSettingsStorageOverflown);
+#   endif
+#endif
+
+#if defined(THEXTECH_BUILD_GL_DESKTOP_MODERN) || defined(THEXTECH_BUILD_GL_ES_MODERN) || defined(THEXTECH_BUILD_GL_DESKTOP_LEGACY) || defined(THEXTECH_BUILD_GL_ES_LEGACY) || !defined(THEXTECH_DISABLE_LANG_TOOLS)
+    insert(m_engineMap, "game.warning.simGIFS2PNGAct",      &g_gameStrings.onScreenWarningSimGIFs2PNGAct);
+    insert(m_engineMap, "game.warning.simGIFS2PNGInact",    &g_gameStrings.onScreenWarningSimGIFs2PNGInact);
+#endif
 
 #if defined(THEXTECH_ENABLE_EDITOR) || !defined(THEXTECH_DISABLE_LANG_TOOLS)
     insert(m_engineMap, "editor.block.pickContents",       &g_editorStrings.pickBlockContents);
