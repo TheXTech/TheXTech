@@ -1389,12 +1389,14 @@ StatusInfo GetStatus(int l_player_i)
 }
 
 
-void RenderTouchControls()
-{
 #ifdef TOUCHSCREEN_H
+SDL_FORCE_INLINE InputMethod_TouchScreen* s_getActiveTouchScreen(int *player_no_p = nullptr)
+{
     // only want to render when the touchscreen is in use
-    InputMethod_TouchScreen* active_touchscreen = nullptr;
-    int player_no = 1;
+    InputMethod_TouchScreen* ret = nullptr;
+
+    if(player_no_p)
+        *player_no_p = 1;
 
     for(size_t i = 0; i < g_InputMethods.size(); i++)
     {
@@ -1406,11 +1408,46 @@ void RenderTouchControls()
         auto* m = dynamic_cast<InputMethod_TouchScreen*>(method);
         if(m)
         {
-            active_touchscreen = m;
-            player_no = (int)i + 1;
+            ret = m;
+            if(player_no_p)
+                *player_no_p = (int)i + 1;
             break;
         }
     }
+
+    return ret;
+}
+
+SDL_FORCE_INLINE InputMethodType_TouchScreen* s_getTouchScreenType()
+{
+    InputMethodType_TouchScreen* ret = nullptr;
+
+    for(InputMethodType* type : g_InputMethodTypes)
+    {
+        if(!type)
+            continue;
+
+        auto* t = dynamic_cast<InputMethodType_TouchScreen*>(type);
+
+        if(t)
+        {
+            ret = t;
+            break;
+        }
+    }
+
+    return ret;
+}
+#endif
+
+void RenderTouchControls()
+{
+#ifdef TOUCHSCREEN_H
+    // only want to render when the touchscreen is in use
+    InputMethod_TouchScreen* active_touchscreen = nullptr;
+    int player_no = 1;
+
+    active_touchscreen = s_getActiveTouchScreen(&player_no);
 
     if(!g_renderTouchscreen)
         return;
@@ -1420,20 +1457,7 @@ void RenderTouchControls()
     if(active_touchscreen)
         touchscreen = dynamic_cast<InputMethodType_TouchScreen*>(active_touchscreen->Type);
     else
-    {
-        for(InputMethodType* type : g_InputMethodTypes)
-        {
-            if(!type)
-                continue;
-
-            auto* t = dynamic_cast<InputMethodType_TouchScreen*>(type);
-            if(t)
-            {
-                touchscreen = t;
-                break;
-            }
-        }
-    }
+        touchscreen = s_getTouchScreenType();
 
     if(!touchscreen)
         return;
@@ -1445,21 +1469,7 @@ void RenderTouchControls()
 void UpdateTouchScreenSize()
 {
 #ifdef TOUCHSCREEN_H
-    InputMethodType_TouchScreen* touchscreen = nullptr;
-
-    for(InputMethodType* type : g_InputMethodTypes)
-    {
-        if(!type)
-            continue;
-
-        auto* t = dynamic_cast<InputMethodType_TouchScreen*>(type);
-
-        if(t)
-        {
-            touchscreen = t;
-            break;
-        }
-    }
+    InputMethodType_TouchScreen* touchscreen = s_getTouchScreenType();
 
     if(!touchscreen)
         return;
@@ -1471,21 +1481,7 @@ void UpdateTouchScreenSize()
 void LoadTouchScreenGFX()
 {
 #ifdef TOUCHSCREEN_H
-    InputMethodType_TouchScreen* touchscreen = nullptr;
-
-    for(InputMethodType* type : g_InputMethodTypes)
-    {
-        if(!type)
-            continue;
-
-        auto* t = dynamic_cast<InputMethodType_TouchScreen*>(type);
-
-        if(t)
-        {
-            touchscreen = t;
-            break;
-        }
-    }
+    InputMethodType_TouchScreen* touchscreen = s_getTouchScreenType();
 
     if(!touchscreen)
         return;
