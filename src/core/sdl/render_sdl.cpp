@@ -55,10 +55,6 @@
 #include "controls.h"
 #include "sound.h"
 
-#ifdef THEXTECH_TVOS
-#   include "fontman/font_manager.h"
-#endif
-
 #ifndef UNUSED
 #define UNUSED(x) (void)x
 #endif
@@ -271,7 +267,7 @@ void RenderSDL::repaint()
 
 #ifdef APP_PATH_HAS_SETTINGS_SIZE_LIMIT
     // FIXME: Copy this to other renderers once they gets fixed on mobile Apple platforms (iOS and tvOS)
-    if(AppPathManager::settingsSizeExceeded() && FontManager::isInitied())
+    if(AppPathManager::settingsSizeExceeded())
         SuperPrintScreenCenter(g_gameStrings.onScreenWarningSettingsStorageOverflown, 5, 20, XTColorF(1.0f, 0.2f, 0.2f));
 #endif
 
