@@ -132,7 +132,7 @@ LunaRect PlayerF::GetScreenPosition(Player_t *player)
     if(plr_index < 1 || plr_index > numPlayers)
         plr_index = 1;
 
-    const auto& vscreen = vScreenByPlayer(plr_index);
+    const auto& vscreen = vScreenByPlayer((int)plr_index);
     num_t cam_y = -vscreen.Y;
     num_t cam_x = -vscreen.X;
     //    double cam_d = cam_y + 600;

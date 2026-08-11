@@ -70,9 +70,9 @@ void RenderStringOp::Draw(Renderer *renderer)
     }
     else
     {
-        int w = SuperTextPixLen(m_StringSize, m_String, m_FontType);
+        int w = SuperTextPixLen((int)m_StringSize, m_String, m_FontType);
         Render::TranslateScreenCoords(x, y, w, 18);
     }
 
-    SuperPrint(m_StringSize, m_String, m_FontType, x, y);
+    SuperPrint((int)m_StringSize, m_String, m_FontType, x, y);
 }

@@ -455,7 +455,7 @@ inline void fmtPrintLine(std::ostream &os, const std::string &s, int maxWidth,
         while (tooFar - from <= maxChars &&
                static_cast<std::size_t>(tooFar) != std::string::npos) {
             to = tooFar;
-            tooFar = s.find_first_of(splitChars, (int)to + 1);
+            tooFar = (int)s.find_first_of(splitChars, (int)to + 1);
         }
 
         if (to == from) {

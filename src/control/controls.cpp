@@ -1245,7 +1245,7 @@ void RemoveNullInputMethods()
         if(Controls::g_InputMethods[i])
             i++;
         else
-            Controls::DeleteInputMethodSlot(i);
+            Controls::DeleteInputMethodSlot((int)i);
     }
 }
 
