@@ -829,10 +829,6 @@ StatusInfo GetStatus(int l_player_i);
 void RenderTouchControls();
 void UpdateTouchScreenSize();
 void LoadTouchScreenGFX();
-/**
- * @brief Unloads lazy-loaded textures to avoud possible threading troubles during reload
- */
-void UnloadTouchScreenTextures();
 
 // global variables at bottom
 

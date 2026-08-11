@@ -219,12 +219,6 @@ void TouchScreenGFX_t::load()
         pLogWarning("Touch-screen controller cannot be used due to missing assets.");
 }
 
-void TouchScreenGFX_t::lazyUnload()
-{
-    for(size_t i = 0; i < BUTTONS_END; ++i)
-        XRender::unloadTexture(touch[i]);
-}
-
 /*------------------------------------------*\
 || implementation for TouchScreenController ||
 \*------------------------------------------*/
@@ -1585,7 +1579,10 @@ void TouchScreenController::update()
 
 void TouchScreenController::render(int player_no)
 {
-    if(!touchSupported() || LoadingInProcess)
+    if(!touchSupported())
+        return;
+
+    if(LoadingInProcess && !ScreenAssetPack::g_LoopActive)
         return;
 
     int style = m_touchpad_style;

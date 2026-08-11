@@ -60,9 +60,6 @@ public:
     //! (re)load the touchscreen graphics from the current asset pack
     void load();
 
-    //! Unload any GPU-loaded textures
-    void lazyUnload();
-
     enum
     {
         BUTTON_START = 0,
@@ -336,11 +333,6 @@ public:
     inline void loadGFX()
     {
         m_GFX.load();
-    }
-
-    inline void unLoadGFX()
-    {
-        m_GFX.lazyUnload();
     }
 };
 
