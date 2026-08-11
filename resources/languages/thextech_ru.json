@@ -512,7 +512,12 @@
                     "scaleButtons": "Масштаб кнопок",
                     "scaleDPad": "Масштаб крестовины",
                     "scaleFactor": "Общий масштаб",
-                    "showCodeButton": "Показать кнопку кода"
+                    "showCodeButton": "Показать кнопку кода",
+                    "OffsetButtonsH": "Смещение кнопок справа",
+                    "OffsetButtonsV": "Смещение кнопок снизу",
+                    "OffsetDPadH": "Смещение крестовины слева",
+                    "OffsetDPadV": "Смещение крестовины снизу",
+                    "OffsetSStart": "Смещение Выбор-Старт"
                 },
                 "style": {
                     "ABXY": "ABXY",
