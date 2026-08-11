@@ -1697,7 +1697,10 @@ bool InputMethod_TouchScreen::Update(int player, Controls_t& c, CursorControls_t
 
     const TouchScreenController::ExtraKeys_t& te = t->m_controller.m_current_extra_keys;
 
-    if(GamePaused == PauseCode::None && !GameMenu && !GameOutro && !LevelSelect && t->m_controller.m_runHeld)
+    if(GamePaused == PauseCode::None
+       && !GameMenu && !GameOutro && !LevelSelect
+       && !ScreenAssetPack::g_LoopActive
+       && t->m_controller.m_runHeld)
     {
         // Alt Run functions as normal
         if(c.AltRun)
