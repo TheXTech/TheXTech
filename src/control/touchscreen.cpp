@@ -26,7 +26,7 @@
 #   include <Utils/files.h>
 #endif
 #ifdef THEXTECH_IOS
-#   include "core/extras.h"
+#   include "core/ios/extras.h"
 #endif
 
 #include "AppPath/app_path.h"

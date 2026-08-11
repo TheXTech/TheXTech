@@ -982,15 +982,15 @@ set(THEXTECH_SRC
 
 if(IOS)
     list(APPEND THEXTECH_SRC
-        src/core/extras.h
-        src/core/extras_ios.m
+        src/core/ios/extras.h
+        src/core/ios/extras_ios.m
     )
 endif()
 
 if(TVOS)
     list(APPEND THEXTECH_SRC
-        src/core/extras.h
-        src/core/extras_tvos.m
+        src/core/ios/extras.h
+        src/core/ios/extras_tvos.m
     )
 endif()
 

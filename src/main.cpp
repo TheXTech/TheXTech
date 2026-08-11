@@ -39,7 +39,7 @@
 #include <AppPath/app_path.h>
 
 #if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
-#   include "core/extras.h"
+#   include "core/ios/extras.h"
 #endif
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
