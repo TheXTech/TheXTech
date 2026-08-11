@@ -1864,6 +1864,9 @@ InputMethodProfile_TouchScreen::InputMethodProfile_TouchScreen()
         }
     }
 #endif
+
+    // Assign all the defaults to fix the initial state on profile creation
+    OptionChange_Custom(Options::reset_layout);
 }
 
 bool InputMethodProfile_TouchScreen::PollPrimaryButton(ControlsClass c, size_t i)
