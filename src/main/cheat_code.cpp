@@ -2158,7 +2158,7 @@ static void setResCustom()
 
     w = 0; // just to suppress an unneeded warning
 
-    while(s != "dyn" && (w = atol(s.c_str())) <= 0)
+    while(s != "dyn" && (w = (int)atol(s.c_str())) <= 0)
     {
         s = TextEntryScreen::Run("Invalid input. Game width:");
         if(s.empty())
@@ -2172,7 +2172,7 @@ static void setResCustom()
     if(s.empty())
         return;
 
-    while((h = atol(s.c_str())) <= 0)
+    while((h = (int)atol(s.c_str())) <= 0)
     {
         s = TextEntryScreen::Run("Invalid input. Game height:");
         if(s.empty())

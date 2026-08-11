@@ -392,7 +392,7 @@ void MainMenu_Start(int minPlayers)
             if(Controls::g_InputMethods[i] && Controls::g_InputMethods[i]->used_for_player)
                 i++;
             else
-                Controls::DeleteInputMethodSlot(i);
+                Controls::DeleteInputMethodSlot((int)i);
         }
     }
     else if(Controls::g_InputMethods.size() > 0 && Controls::g_InputMethods[0])
@@ -485,9 +485,7 @@ void DropAdd_Start()
 int PlayerBox::CalcIndex() const
 {
     if(this >= &s_players[0] && this <= &s_players[maxLocalPlayers - 1])
-    {
-        return this - &s_players[0];
-    }
+        return (int)(this - &s_players[0]);
 
     return 0;
 }
@@ -908,7 +906,7 @@ bool PlayerBox::Do()
                     = std::find(profiles.begin(), profiles.end(), Controls::g_InputMethods[p]->Profile);
 
                 if(profiles.size() > 1 && p_profile != profiles.end())
-                    m_menu_item = p_profile - profiles.begin();
+                    m_menu_item = (int)(p_profile - profiles.begin());
                 else
                     m_menu_item = 0;
             }
@@ -2294,7 +2292,7 @@ int PlayerBox::Logic()
                     = std::find(profiles.begin(), profiles.end(), input_method->Profile);
 
                 if(profiles.size() > 1 && p_profile != profiles.end())
-                    m_menu_item = p_profile - profiles.begin();
+                    m_menu_item = (int)(p_profile - profiles.begin());
                 else
                     m_menu_item = 0;
 
@@ -2470,7 +2468,7 @@ int Logic()
     bool block_poll = false;
 
     // only allow the correct number of players to connect
-    int first_not_connected = std::find(Controls::g_InputMethods.begin(), Controls::g_InputMethods.end(), nullptr) - Controls::g_InputMethods.begin();
+    int first_not_connected = (int)(std::find(Controls::g_InputMethods.begin(), Controls::g_InputMethods.end(), nullptr) - Controls::g_InputMethods.begin());
     if(first_not_connected >= BoxCount())
         block_poll = true;
 

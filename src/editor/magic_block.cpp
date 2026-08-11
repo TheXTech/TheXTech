@@ -134,7 +134,7 @@ ItemType_t s_match_type(const ItemFamily& family, const ItemType_t inferred_type
     printf("Self is %d\n", inferred_type.type);
 #endif
 
-    for(const ItemType_t t : family.types)
+    for(const ItemType_t &t : family.types)
     {
         if(t.type == inferred_type.type)
         {
@@ -147,7 +147,7 @@ ItemType_t s_match_type(const ItemFamily& family, const ItemType_t inferred_type
 
     int matches = 1;
 
-    for(const ItemType_t t : family.types)
+    for(const ItemType_t &t : family.types)
     {
         int score = s_score_match(t, inferred_type);
 
@@ -306,7 +306,7 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
     inferred_type.width = std::round(A->Location.Width / 32);
     inferred_type.height = std::round(A->Location.Height / 32);
 
-    for(ItemType_t t : family.types)
+    for(const ItemType_t &t : family.types)
     {
         if(t.type == A->Type)
         {
@@ -334,7 +334,7 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
                 continue;
 
             bool hit = false;
-            for(ItemType_t t : family.types)
+            for(const ItemType_t &t : family.types)
             {
                 if(t.type == B->Type && (check_level != LEVEL_GROUP || t.group == inferred_type.group))
                 {
@@ -368,7 +368,7 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
                 continue;
 
             bool hit = false;
-            for(ItemType_t t : family.types)
+            for(const ItemType_t &t : family.types)
             {
                 if(t.type == B->Type && (check_level != LEVEL_GROUP || t.group == inferred_type.group))
                 {
@@ -405,7 +405,7 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
                 continue;
 
             bool hit = false;
-            for(ItemType_t t : family.types)
+            for(const ItemType_t &t : family.types)
             {
                 if(t.type == B->Type && (check_level != LEVEL_GROUP || t.group == inferred_type.group))
                 {
@@ -439,7 +439,7 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
                 continue;
 
             bool hit = false;
-            for(ItemType_t t : family.types)
+            for(const ItemType_t &t : family.types)
             {
                 if(t.type == B->Type && (check_level != LEVEL_GROUP || t.group == inferred_type.group))
                 {
@@ -477,7 +477,7 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
                 continue;
 
             bool hit = false;
-            for(ItemType_t t : family.types)
+            for(const ItemType_t &t : family.types)
             {
                 if(t.type == B->Type && (check_level != LEVEL_GROUP || t.group == inferred_type.group))
                 {
@@ -512,7 +512,7 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
                 continue;
 
             bool hit = false;
-            for(ItemType_t t : family.types)
+            for(const ItemType_t &t : family.types)
             {
                 if(t.type == B->Type && (check_level != LEVEL_GROUP || t.group == inferred_type.group))
                 {
@@ -550,7 +550,7 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
                 continue;
 
             bool hit = false;
-            for(ItemType_t t : family.types)
+            for(const ItemType_t &t : family.types)
             {
                 if(t.type == B->Type && (check_level != LEVEL_GROUP || t.group == inferred_type.group))
                 {
@@ -584,7 +584,7 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
                 continue;
 
             bool hit = false;
-            for(ItemType_t t : family.types)
+            for(const ItemType_t &t : family.types)
             {
                 if(t.type == B->Type && (check_level != LEVEL_GROUP || t.group == inferred_type.group))
                 {

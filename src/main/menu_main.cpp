@@ -1934,7 +1934,7 @@ bool mainMenuUpdate()
 static constexpr int find_in_string(const char* haystack, const char* haystack_start, char needle)
 {
     return (*haystack == '\0') ? -1 :
-        ((*haystack == needle) ? haystack - haystack_start : find_in_string(haystack + 1, haystack_start, needle));
+        ((*haystack == needle) ? (int)(haystack - haystack_start) : find_in_string(haystack + 1, haystack_start, needle));
 }
 
 static constexpr bool in_string(const char* haystack, char needle)

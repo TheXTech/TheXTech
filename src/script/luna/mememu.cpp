@@ -508,7 +508,7 @@ class SMBXMemoryEmulator
         VT_STRLAMBDA
     };
 
-    std::unordered_map<int, ValueType> m_type;
+    std::unordered_map<size_t, ValueType> m_type;
 
     void insert(size_t address, short *field)
     {

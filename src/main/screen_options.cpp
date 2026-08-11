@@ -520,7 +520,7 @@ bool Back()
 
         s_switch_item();
 
-        int last_section = section_index;
+        int last_section = (int)section_index;
 
         section_index = SECTION_NONE;
         cur_scroll = 0;
@@ -645,7 +645,7 @@ bool Mouse_Render(bool mouse, bool render)
             return false;
 
         int cur_mouse_line = (SharedCursor.Y - sY) / line;
-        int cur_mouse_item = cur_scroll + cur_mouse_line - first_display_row;
+        int cur_mouse_item = (int)(cur_scroll + cur_mouse_line - first_display_row);
 
         if(SharedCursor.Primary && cur_mouse_item == (int)cur_item && MenuMouseRelease)
         {
@@ -731,7 +731,7 @@ bool Mouse_Render(bool mouse, bool render)
     SuperPrintScreenCenter(s_temp_string, 3, sY);
 
     // locate the cursor
-    int cur_item_row = cur_item - cur_scroll;
+    int cur_item_row = (int)(cur_item - cur_scroll);
 
     // handle forced scrolling
     if(cur_item_row < 1 && cur_scroll > 0)

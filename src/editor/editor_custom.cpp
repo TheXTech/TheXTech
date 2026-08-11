@@ -490,7 +490,7 @@ bool ItemFamily::make_layout(int layout_width)
 
         if(!okay)
         {
-            layout_pod.resize(types.size() / layout_width + 1, layout_width);
+            layout_pod.resize((int)types.size() / layout_width + 1, layout_width);
             return false;
         }
 
@@ -1115,7 +1115,7 @@ void Load(XTechTranslate* translate)
 
                 const char* endptr;
 
-                int i = strtol(startptr, const_cast<char**>(&endptr), 0);
+                int i = (int)strtol(startptr, const_cast<char**>(&endptr), 0);
                 if(endptr == startptr)
                 {
                     pLogWarning("Ignoring invalid key %s in family %s", key.c_str(), group.c_str());
@@ -1255,7 +1255,7 @@ void Load(XTechTranslate* translate)
 
                     const char* endptr;
 
-                    int i = strtol(startptr, const_cast<char**>(&endptr), 0);
+                    int i = (int)strtol(startptr, const_cast<char**>(&endptr), 0);
                     if(endptr == startptr)
                     {
                         pLogWarning("Ignoring invalid key %s in family %s", key.c_str(), group.c_str());
@@ -1320,7 +1320,7 @@ void Load(XTechTranslate* translate)
                             if(pod.cols <= 0)
                                 pod.cols = 4;
 
-                            pod.rows = (pod.types.size() - 1) / pod.cols + 1;
+                            pod.rows = (int)(pod.types.size() - 1) / pod.cols + 1;
                             pod.types.resize(pod.rows * pod.cols);
                         }
                         else if(SDL_strncasecmp(endptr, "col", 3) == 0 || SDL_strncasecmp(endptr, "wid", 3) == 0)
@@ -1334,7 +1334,7 @@ void Load(XTechTranslate* translate)
 
                             if(!pod.types.empty() && pod.cols > 0)
                             {
-                                pod.rows = pod.types.size() / pod.cols + 1;
+                                pod.rows = (int)pod.types.size() / pod.cols + 1;
                                 pod.types.resize(pod.rows * pod.cols);
                             }
                         }
