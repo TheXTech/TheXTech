@@ -33,6 +33,7 @@
 #include "core/render.h"
 
 #include "main/cheat_code.h"
+#include "main/game_strings.h"
 
 #include <fmt_format_ne.h>
 
@@ -244,9 +245,9 @@ void RenderSDL::repaint()
 #endif
 
     if(XRender::g_BitmaskTexturePresent)
-        SuperPrintScreenCenter("Bitmasks using GIFs2PNG in SDL", 5, 2, XTColorF(1.0_n, 0.7_n, 0.5_n));
+        SuperPrintScreenCenter(g_gameStrings.onScreenWarningBitmaskFallback, 5, 2, XTColorF(1.0_n, 0.7_n, 0.5_n));
     else if(g_ForceBitmaskMerge)
-        SuperPrintScreenCenter("GIFs2PNG always simulated in SDL", 5, 2, XTColorF(1.0_n, 0.7_n, 0.5_n));
+        SuperPrintScreenCenter(g_gameStrings.onScreenWarningBitmaskEnforced, 5, 2, XTColorF(1.0_n, 0.7_n, 0.5_n));
 
     int w, h, off_x, off_y, wDst, hDst;
 

@@ -41,6 +41,7 @@
 #include "core/render.h"
 
 #include "main/cheat_code.h"
+#include "main/game_strings.h"
 
 #include "globals.h"
 #include "sound.h"
@@ -444,9 +445,9 @@ void RenderGL::repaint()
 #endif
 
     if(XRender::g_BitmaskTexturePresent && g_ForceBitmaskMerge)
-        SuperPrintScreenCenter("Simulating GIFs2PNG (active)", 5, 2, XTColorF(1.0_n, 0.7_n, 0.5_n));
+        SuperPrintScreenCenter(g_gameStrings.onScreenWarningSimGIFs2PNGAct, 5, 2, XTColorF(1.0_n, 0.7_n, 0.5_n));
     else if(g_ForceBitmaskMerge)
-        SuperPrintScreenCenter("Simulating GIFs2PNG (inactive)", 5, 2, XTColorF(1.0_n, 0.7_n, 0.5_n));
+        SuperPrintScreenCenter(g_gameStrings.onScreenWarningSimGIFs2PNGInact, 5, 2, XTColorF(1.0_n, 0.7_n, 0.5_n));
 
     flushDrawQueues();
 

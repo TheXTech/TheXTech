@@ -391,6 +391,13 @@
             "statusLoadFile": "Load: {0}",
             "statusTranslations": "Translations",
             "loading": "Loading..."
+        },
+        "warning": {
+            "bitmaskEnforced": "GIFs2PNG always simulated in SDL",
+            "bitmaskFallback": "Bitmasks using GIFs2PNG in SDL",
+            "settingsStorageOverflown": "Settings storage is overflown.\nPlease remove any unneeded gamesaves,\notherwise you may lose your data.",
+            "simGIFS2PNGAct": "Simulating GIFs2PNG (active)",
+            "simGIFS2PNGInact": "Simulating GIFs2PNG (inactive)"
         }
     },
     "languageName": "English",

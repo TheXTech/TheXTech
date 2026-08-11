@@ -391,6 +391,13 @@
             "statusLoadFile": "Загрузка: {0}",
             "statusTranslations": "Переводы",
             "loading": "Загрузка..."
+        },
+        "warning": {
+            "bitmaskEnforced": "Принудительно симулируется GIFs2PNG на SDL",
+            "bitmaskFallback": "Битовые маски используют GIFs2PNG на SDL",
+            "settingsStorageOverflown": "Хранилище настроек переполнено.\nПросьба удалить любые ненужные сохранения игр,\nиначе вы можете потерять свои данные.",
+            "simGIFS2PNGAct": "Симуляция GIFs2PNG (активно)",
+            "simGIFS2PNGInact": "Симуляция GIFs2PNG (неактивно)"
         }
     },
     "languageName": "Русский",

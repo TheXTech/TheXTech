@@ -106,4 +106,20 @@ void initGameStrings()
     g_gameStrings.connectPressSelectForControlsOptions_P1 = "Press Select for";
     g_gameStrings.connectPressSelectForControlsOptions_P2 = "Controls Options";
 
+    // On-Screen warnings
+
+#if defined(CORE_EVERYTHING_SDL) || !defined(THEXTECH_DISABLE_LANG_TOOLS)
+    g_gameStrings.onScreenWarningBitmaskFallback = "Bitmasks using GIFs2PNG in SDL";
+    g_gameStrings.onScreenWarningBitmaskEnforced = "GIFs2PNG always simulated in SDL";
+#   if defined(THEXTECH_TVOS) || !defined(THEXTECH_DISABLE_LANG_TOOLS)
+    g_gameStrings.onScreenWarningSettingsStorageOverflown = "Settings storage is overflown.\n"
+                                                            "Please remove any unneeded gamesaves,\n"
+                                                            "otherwise you may lose your data.";
+#   endif
+#endif
+
+#if defined(THEXTECH_BUILD_GL_DESKTOP_MODERN) || defined(THEXTECH_BUILD_GL_ES_MODERN) || defined(THEXTECH_BUILD_GL_DESKTOP_LEGACY) || defined(THEXTECH_BUILD_GL_ES_LEGACY) || !defined(THEXTECH_DISABLE_LANG_TOOLS)
+    g_gameStrings.onScreenWarningSimGIFs2PNGAct = "Simulating GIFs2PNG (active)";
+    g_gameStrings.onScreenWarningSimGIFs2PNGInact = "Simulating GIFs2PNG (inactive)";
+#endif
 }
