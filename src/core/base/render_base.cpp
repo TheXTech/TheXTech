@@ -60,7 +60,6 @@
 
 
 #ifdef THEXTECH_IOS
-int XRender::TargetCameraOverscanX = 0;
 int XRender::TargetOverscanX = 0;
 #endif
 

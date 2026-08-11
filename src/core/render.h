@@ -58,7 +58,7 @@ constexpr int TargetOverscanX = 28;
 
 #elif defined(THEXTECH_IOS)
 
-extern int TargetCameraOverscanX;
+constexpr int TargetCameraOverscanX = 0;
 extern int TargetOverscanX;
 
 #else
