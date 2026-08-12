@@ -671,15 +671,11 @@ bool FontManager::isLegacy()
 PGE_Size FontManager::textSize(const char* text, size_t text_size, int fontID,
                                uint32_t ttfFontSize)
 {
-    SDL_assert_release(g_fontManagerIsInit);// Font manager is not initialized!
 #ifndef THEXTECH_ENABLE_TTF_SUPPORT
     (void)ttfFontSize;
 #endif
 
-    if(!g_fontManagerIsInit)
-        return PGE_Size(27 * 20, static_cast<int>(std::count(text, text + text_size, '\n') + 1) * 20);
-
-    if(!text || text_size == 0)
+    if(!g_fontManagerIsInit || !text || text_size == 0)
         return PGE_Size(0, 0);
 
     //Use one of loaded fonts

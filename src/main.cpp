@@ -38,6 +38,10 @@
 #include "controls.h"
 #include <AppPath/app_path.h>
 
+#if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
+#   include "core/ios/extras.h"
+#endif
+
 #ifdef THEXTECH_INTERPROC_SUPPORTED
 #   include "capabilities.h"
 #endif
@@ -682,7 +686,7 @@ int main(int argc, char**argv)
         if(switchVSync.isSet())
             g_config.render_vsync    = switchVSync.getValue();
 
-#ifndef NO_WINDOW_FOCUS_TRACKING
+#if !defined(NO_WINDOW_FOCUS_TRACKING) && !defined(MOBILE_WINDOW_FOCUS_TRACKING)
         if(switchNoPause.isSet())
             g_config.background_work = switchNoPause.getValue();
 
@@ -899,6 +903,14 @@ int main(int argc, char**argv)
             window.close();
         }, 250);
     );
+#endif
+
+#if defined(THEXTECH_IOS)
+    ios_quit(ret); // Apple hates this, but we need it!
+#endif
+
+#if  defined(THEXTECH_TVOS)
+    tvos_quit(ret);
 #endif
 
     return ret;

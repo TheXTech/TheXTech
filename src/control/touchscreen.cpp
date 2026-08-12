@@ -24,6 +24,9 @@
 #ifdef __ANDROID__
 #   include <Utils/files.h>
 #endif
+#ifdef THEXTECH_IOS
+#   include "core/ios/extras.h"
+#endif
 
 #include "AppPath/app_path.h"
 
@@ -45,6 +48,12 @@
 
 #include <SDL2/SDL_haptic.h>
 
+
+#ifdef THEXTECH_IOS
+static double s_screenSize = -1;
+static double s_screenWidth = -1;
+static double s_screenHeight = -1;
+#endif
 
 #ifdef __ANDROID__
 #   include <jni.h>
@@ -94,6 +103,12 @@ namespace Controls
 void TouchScreenGFX_t::loadImage(StdPicture& img, const std::string& fileName)
 {
     std::string imgPath = m_gfxPath + fileName;
+
+
+#ifdef THEXTECH_IOS
+    if(!Files::fileExists(imgPath)) // If not exists at assets, do load bundled
+        imgPath = AppPathManager::bundleResourcesPath() + "buttons/" + fileName;
+#endif
 
 #ifdef __ANDROID__
     if(!Files::fileExists(imgPath)) // If not exists at assets, do load bundled
@@ -949,6 +964,12 @@ static void updateTouchMap(int preferredLayout,
 
 void TouchScreenController::doVibration()
 {
+#ifdef THEXTECH_IOS
+    if(m_feedback_strength == 0.f)
+        return;
+
+    ios_trigger_vibrator_taps(m_feedback_strength, m_feedback_length);
+#else
     if(!m_vibrator)
         return;
 
@@ -956,15 +977,21 @@ void TouchScreenController::doVibration()
         return;
 
     SDL_HapticRumblePlay(m_vibrator, m_feedback_strength, m_feedback_length);
+#endif
+
     D_pLogDebug("TouchScreen: Vibration %g, %d ms", m_feedback_strength, m_feedback_length);
 }
 
 TouchScreenController::~TouchScreenController()
 {
+#ifdef THEXTECH_IOS
+    ios_vibrator_quit();
+#else
     if(m_vibrator)
         SDL_HapticClose(m_vibrator);
 
     m_vibrator = nullptr;
+#endif
 }
 
 TouchScreenController::TouchScreenController() noexcept
@@ -982,6 +1009,12 @@ TouchScreenController::TouchScreenController() noexcept
     }
 
     m_vibrator = nullptr;
+
+#ifdef THEXTECH_IOS
+    if(ios_vibrator_init() < 0)
+        pLogWarning("TouchScreen: Can't open haptics device!");
+
+#else
     int numHaptics = SDL_NumHaptics();
 
     const std::array<const char*, 3> allowlist = {
@@ -1018,6 +1051,7 @@ TouchScreenController::TouchScreenController() noexcept
         else
             pLogInfo("TouchScreen: ignoring haptics device [%s]", SDL_HapticName(i));
     }
+#endif
 }
 
 void TouchScreenController::scanTouchDevices()
@@ -1547,11 +1581,14 @@ void TouchScreenController::render(int player_no)
     if(!touchSupported())
         return;
 
+    if(LoadingInProcess && !ScreenAssetPack::g_LoopActive)
+        return;
+
     int style = m_touchpad_style;
 
     for(int key = key_BEGIN; key < key_END; key++)
     {
-        if((m_touchHidden && key != TouchScreenController::key_toggleKeysView) || (LoadingInProcess && !ScreenAssetPack::g_LoopActive) || LevelEditor)
+        if((m_touchHidden && key != TouchScreenController::key_toggleKeysView) || LevelEditor)
             continue;
 
         const auto& k = g_touchKeyMap.touchKeysMap[key];
@@ -1797,6 +1834,9 @@ void InputMethod_TouchScreen::Rumble(int ms, float strength)
     if(!t->m_controller.touchSupported())
         return;
 
+#ifdef THEXTECH_IOS
+    ios_trigger_vibrator(strength, ms);
+#else
     if(!t->m_controller.m_vibrator)
         return;
 
@@ -1804,6 +1844,7 @@ void InputMethod_TouchScreen::Rumble(int ms, float strength)
 
     if(SDL_HapticRumblePlay(t->m_controller.m_vibrator, strength, ms) == 0)
         return;
+#endif
 }
 
 StatusInfo InputMethod_TouchScreen::GetStatus()
@@ -1820,7 +1861,23 @@ InputMethodProfile_TouchScreen::InputMethodProfile_TouchScreen()
 {
     this->m_showPowerStatus = false;
 
-#ifdef __ANDROID__
+#ifdef THEXTECH_IOS
+    if(s_screenSize < 0.0)
+        s_screenSize = ios_get_screen_diagonal(&s_screenWidth, &s_screenHeight);
+
+    int cut_off = ios_get_cut_off_size();
+    m_default_offset_dpad_h = cut_off;
+
+    if(cut_off > 0)
+    {
+        // To compensate thin edge
+        m_default_offset_buttons_h = 100;
+        // To don't overlap the home bar
+        m_default_offset_ss = 20;
+    }
+#endif
+
+#if defined(__ANDROID__) || defined(THEXTECH_IOS)
     if(s_screenSize >= 9.0) // Big tablets
     {
         m_default_layout = TouchScreenController::layout_standard;

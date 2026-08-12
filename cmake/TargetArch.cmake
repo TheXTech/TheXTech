@@ -5,6 +5,8 @@
 # Regarding POWER/PowerPC, just as is noted in the Qt source,
 # "There are many more known variants/revisions that we do not handle/detect."
 
+# FIXME: properly detect armv7l and armv7hf to properly detect possibility of asm optimisations
+
 set(archdetect_c_code "
 #if defined(__arm__) || defined(__TARGET_ARCH_ARM) || defined(__ARM_ARCH)
     #if defined(__ARM_ARCH_8__) \\
@@ -91,6 +93,10 @@ function(target_architecture output_var)
                 set(osx_arch_ppc64 TRUE)
             elseif("${osx_arch}" STREQUAL "arm64")
                 set(osx_arch_arm64 TRUE)
+            elseif("${osx_arch}" STREQUAL "armv7s")
+                set(osx_arch_armv7 TRUE)
+            elseif("${osx_arch}" STREQUAL "armv7")
+                set(osx_arch_armv7 TRUE)    
             elseif("${osx_arch}" STREQUAL "arm")
                 set(osx_arch_arm TRUE)
             else()
@@ -117,6 +123,10 @@ function(target_architecture output_var)
 
         if(osx_arch_arm)
             list(APPEND ARCH arm)
+        endif()
+
+        if(osx_arch_armv7)
+            list(APPEND ARCH armv7)
         endif()
 
         if(osx_arch_arm64)

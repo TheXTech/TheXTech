@@ -23,6 +23,18 @@
 #include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL_hints.h>
 
+#if defined(__APPLE__) && defined(__MACH__)
+#   include <TargetConditionals.h>
+#endif
+
+#ifdef THEXTECH_IOS
+#   include "core/ios/extras.h"
+#endif
+
+#ifdef THEXTECH_TVOS
+#   include <AppPath/app_path.h>
+#endif
+
 #include <FreeImageLite.h>
 #include <Logger/logger.h>
 
@@ -117,6 +129,10 @@ bool RenderSDL::initRender(SDL_Window *window)
 
     if(!AbstractRender_t::init())
         return false;
+
+#ifdef THEXTECH_IOS
+    XRender::TargetOverscanX = ios_get_overscan_pix_size();
+#endif
 
     m_window = window;
 
@@ -248,6 +264,12 @@ void RenderSDL::repaint()
         SuperPrintScreenCenter(g_gameStrings.onScreenWarningBitmaskFallback, 5, 2, XTColorF(1.0_n, 0.7_n, 0.5_n));
     else if(g_ForceBitmaskMerge)
         SuperPrintScreenCenter(g_gameStrings.onScreenWarningBitmaskEnforced, 5, 2, XTColorF(1.0_n, 0.7_n, 0.5_n));
+
+#ifdef APP_PATH_HAS_SETTINGS_SIZE_LIMIT
+    // FIXME: Copy this to other renderers once they gets fixed on mobile Apple platforms (iOS and tvOS)
+    if(AppPathManager::settingsSizeExceeded())
+        SuperPrintScreenCenter(g_gameStrings.onScreenWarningSettingsStorageOverflown, 5, 20, XTColorF(1.0f, 0.2f, 0.2f));
+#endif
 
     int w, h, off_x, off_y, wDst, hDst;
 
@@ -599,8 +621,10 @@ textureTryAgain:
 
     target.d.texture = texture;
 
+#if !defined(THEXTECH_IOS) && !defined(THEXTECH_TVOS)
     target.d.nOfColors = GL_RGBA;
     target.d.format = GL_BGRA;
+#endif
 
     target.d.w_scale = static_cast<float>(width) / target.w;
     target.d.h_scale = static_cast<float>(height) / target.h;
@@ -654,8 +678,12 @@ void RenderSDL::clearAllTextures()
 
 void RenderSDL::clearBuffer()
 {
-#ifdef USE_RENDER_BLOCKING
-    SDL_assert(!m_blockRender);
+#if defined(USE_RENDER_BLOCKING)
+    if(m_blockRender)
+    {
+        m_render_queue.clear();
+        return;
+    }
 #endif
     SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 255);
     SDL_RenderClear(m_gRenderer);
@@ -679,7 +707,8 @@ void RenderSDL::flushRenderQueue()
 void RenderSDL::execute(const XRenderOp& op)
 {
 #ifdef USE_RENDER_BLOCKING
-    SDL_assert(!m_blockRender);
+    if(m_blockRender)
+        return;
 #endif
 
     switch(op.type)
@@ -1208,7 +1237,8 @@ void RenderSDL::renderTexture(int xDst, int yDst,
                                 XTColor color)
 {
 #ifdef USE_RENDER_BLOCKING
-    SDL_assert(!m_blockRender);
+    if(m_blockRender)
+        return;
 #endif
 
     if(!tx.inited)
