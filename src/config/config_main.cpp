@@ -382,7 +382,7 @@ void UpdateConfig()
     {
         ConfigChangeSentinel sent(ConfigSetLevel::speedrun);
 
-#ifndef NO_WINDOW_FOCUS_TRACKING
+#if !defined(NO_WINDOW_FOCUS_TRACKING) && !defined(MOBILE_WINDOW_FOCUS_TRACKING)
         g_config.background_work = true;
 #endif
 
