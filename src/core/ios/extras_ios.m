@@ -681,10 +681,10 @@ int ios_get_overscan_pix_size(void)
 static int s_hapticsSupported = -1;
 static int s_hapticsCounter = 0;
 static SDL_mutex *s_hapticsMutex = nil;
-static int s_hapticsPlayersIdCounter = 0;
 
 API_AVAILABLE(ios(13.0))
-__strong static NSMutableDictionary<NSNumber *, id<CHHapticAdvancedPatternPlayer>> *s_hapticsPlayers;
+__strong static id<CHHapticAdvancedPatternPlayer> s_playersRing[10];
+static int s_playerRingIndex = 0;
 
 API_AVAILABLE(ios(13.0))
 __strong static CHHapticEngine *s_hapticsEngine = nil;
@@ -767,7 +767,11 @@ int ios_vibrator_init()
         }];
 
         s_hapticsMutex = SDL_CreateMutex();
-        s_hapticsPlayers = [[NSMutableDictionary alloc] init];
+
+        s_playerRingIndex = 0;
+
+        for(int i = 0; i < 10; i++)
+            s_playersRing[i] = nil;
 
         return 0;
     }
@@ -792,8 +796,10 @@ int ios_vibrator_quit()
 
                 s_hapticsSupported = -1;
 
-                [s_hapticsPlayers release];
-                s_hapticsPlayers = nil;
+                s_playerRingIndex = 0;
+
+                for(int i = 0; i < 10; i++)
+                    s_playersRing[i] = nil;
 
                 SDL_UnlockMutex(s_hapticsMutex);
 
@@ -930,17 +936,10 @@ int ios_trigger_vibrator_taps(float strenght, int ms)
                 }
                 else
                 {
-                    NSNumber *key;
-                    playerId = s_hapticsPlayersIdCounter++;
-                    key = [NSNumber numberWithInt:42];
-                    s_hapticsPlayers[key] = player;
+                    s_playersRing[s_playerRingIndex++] = player;
 
-                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ms * 1200000)), dispatch_get_main_queue(), ^
-                    {
-                        SDL_LockMutex(s_hapticsMutex);
-                        [s_hapticsPlayers removeObjectForKey:key];
-                        SDL_UnlockMutex(s_hapticsMutex);
-                    });
+                    if(s_playerRingIndex >= 10)
+                        s_playerRingIndex = 0;
                 }
 
                 SDL_UnlockMutex(s_hapticsMutex);
