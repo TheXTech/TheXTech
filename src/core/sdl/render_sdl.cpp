@@ -268,7 +268,7 @@ void RenderSDL::repaint()
 #ifdef APP_PATH_HAS_SETTINGS_SIZE_LIMIT
     // FIXME: Copy this to other renderers once they gets fixed on mobile Apple platforms (iOS and tvOS)
     if(AppPathManager::settingsSizeExceeded())
-        SuperPrintScreenCenter(g_gameStrings.onScreenWarningSettingsStorageOverflown, 5, 20, XTColorF(1.0f, 0.2f, 0.2f));
+        SuperPrintScreenCenter(g_gameStrings.onScreenWarningSettingsStorageOverflown, 5, 20, XTColorF(1.0_n, 0.2_n, 0.2_n));
 #endif
 
     int w, h, off_x, off_y, wDst, hDst;
