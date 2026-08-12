@@ -67,7 +67,6 @@ else()
             -DCMAKE_DISABLE_FIND_PACKAGE_PNG=TRUE
             -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE
             -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=TRUE
-            ${XTECH_PLATFORM_GENERAL_CMAKE_FLAGS}
         BUILD_BYPRODUCTS
             "${libFreeType_Libs}"
         DEPENDS
