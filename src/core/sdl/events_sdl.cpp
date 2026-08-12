@@ -51,7 +51,7 @@ int EventsSDL::handle_ios_events(void * /*userdata*/, SDL_Event *event)
         Controls::Quit();
         QuitMixerX();
         g_frmMain.freeSystem();
-        return 0;
+        exit(0);
 
     // case SDL_APP_LOWMEMORY:
     // TODO: Implement handling of low-memory event for iOS here
