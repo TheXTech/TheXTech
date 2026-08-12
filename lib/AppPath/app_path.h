@@ -23,8 +23,16 @@
 #include <string>
 #include <vector>
 
-#if defined(__3DS__)
+#if defined(__3DS__) || defined(THEXTECH_TVOS)
 #   define APP_PATH_HAS_EXTRA_WORLDS
+#endif
+
+#if defined(THEXTECH_TVOS)
+#   define APP_PATH_HAS_SETTINGS_SIZE_LIMIT
+#endif
+
+#if defined(THEXTECH_IOS)
+#   define APP_PATH_HAS_BUNDLE_PATH
 #endif
 
 
@@ -163,6 +171,18 @@ public:
 
 #ifdef APP_PATH_HAS_EXTRA_WORLDS
     static const std::vector<std::string>& worldRootDirs(); // Read-Only, appears at writable directory
+#endif
+
+#ifdef APP_PATH_HAS_BUNDLE_PATH
+    static std::string bundleResourcesPath(); // Read-Only, a resources root at the app bundle
+#endif
+
+#ifdef APP_PATH_HAS_SETTINGS_SIZE_LIMIT
+    /**
+     * @brief Check is the settings (including gamesaves) settings store is out of memory on platforms such as tvOS
+     * @return true If size of the settings package is larger than 480 kB on tvOS or any different limit on other platforms
+     */
+    static bool settingsSizeExceeded();
 #endif
 
     static void install();

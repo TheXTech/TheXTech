@@ -32,12 +32,6 @@
 
 #include "logger_level.h"
 
-#if defined(__GNUC__) || defined(__clang__)
-#   define FORMAT_ATTRIBUTE_PRINTF_12  __attribute__ ((format (printf, 1, 2)))
-#else
-#   define FORMAT_ATTRIBUTE_PRINTF_12
-#endif
-
 extern struct PGE_LogSetup
 {
     //! The logging level
@@ -55,7 +49,13 @@ extern struct PGE_LogSetup
 extern void LoadLogSettings(bool disableStdOut = false, bool verboseLogs = false);
 extern void UpdateLogLevel(PGE_LogLevel::Level logLevel);
 extern void CloseLog();
-#endif//__cplusplus
+#endif //__cplusplus
+
+#if defined(__GNUC__) || defined(__clang__)
+#   define FORMAT_ATTRIBUTE_PRINTF_12  __attribute__ ((format (printf, 1, 2)))
+#else
+#   define FORMAT_ATTRIBUTE_PRINTF_12
+#endif
 
 #ifdef __cplusplus
 extern "C"

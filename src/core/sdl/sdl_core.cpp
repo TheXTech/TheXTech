@@ -36,18 +36,25 @@ bool CoreSDL::init(const CmdLineSetup_t &setup)
     // Disable the audio capture at all (some systems do ask microphone permission because of that)
     SDL_SetHint("SDL_AUDIO_DISABLE_CAPTURE", "1");
 
-#if defined(__ANDROID__) || (defined(__APPLE__) && (defined(TARGET_IPHONE_SIMULATOR) || defined(TARGET_OS_IPHONE)))
+#if defined(__ANDROID__) || defined(THEXTECH_IOS)
     // Restrict the landscape orientation only
     SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
 #endif
 
 #if defined(__ANDROID__)
     SDL_setenv("SDL_AUDIODRIVER", "openslES", 1);
-    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
-    SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 6);
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
+#endif
+
+#if defined(__ANDROID__) || defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
+    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
+    SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
+#endif
+
+#if defined(THEXTECH_IOS)
+    SDL_SetHint(SDL_HINT_IOS_HIDE_HOME_INDICATOR, "1");
 #endif
 
     Uint32 sdlInitFlags = 0;

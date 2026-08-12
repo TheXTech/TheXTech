@@ -9,6 +9,8 @@ Changelog for 1.3.7.4-dev
 -Controls: Fixed the problem of touch-screen controller's defaults are not loaded when profile gets juts created (@Wohlstand)
 -i18n: On-screen warning messages (such as bitmask render warnings) are now translatable! (@Wohlstand)
 -Fixed broken user directory handling on the Haiku (@Wohlstand)
+-Added support for the iOS platform (@Wohlstand)
+-Added support for the tvOS platform (@Wohlstand)
 
 Changelog for 1.3.7.3
 -Update LVLX/WLDX/SAVX loader to use new MDX file parser by ds-sloth (speeds up level/world loads on slow devices) (@ds-sloth, @Wohlstand)

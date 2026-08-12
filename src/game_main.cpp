@@ -136,8 +136,6 @@ static int loadingThread(void *waiter_ptr)
     SizableBlocks();
     LoadGFX(); // load the graphics from file
 
-    Controls::LoadTouchScreenGFX();
-
     SetupVars(); //Setup Variables
 
 #ifdef THEXTECH_PRELOAD_LEVELS
@@ -316,6 +314,7 @@ void MainLoadAll()
     LoaderUpdateDebugString("Fonts");
 
     FontManager::initFull();
+    Controls::LoadTouchScreenGFX();
 
 #ifndef PGE_NO_THREADING
     {

@@ -79,7 +79,11 @@ extern GL_APICALL void (* GL_APIENTRY glBlitFramebuffer) (GLint srcX0, GLint src
 
 #        define RENDERGL_LOAD_ES3_SYMBOLS
 #    else
-#        include <GLES3/gl3.h>
+#        ifdef __APPLE__
+#            include <OpenGLES/ES3/gl.h>
+#        else
+#            include <GLES3/gl3.h>
+#        endif
 #    endif
 
 #    define RENDERGL_HAS_SHADERS

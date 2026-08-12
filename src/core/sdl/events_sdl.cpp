@@ -35,14 +35,49 @@
 #include "controls.h"
 
 
+#if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
+int EventsSDL::handle_ios_events(void * /*userdata*/, SDL_Event *event)
+{
+    // EventsSDL *self = reinterpret_cast<EventsSDL*>(userdata);
+
+    switch(event->type)
+    {
+    case SDL_APP_TERMINATING:
+        pLogInfo("iOS/tvOS: Application was been terminated");
+        XWindow::showCursor(1);
+        KillIt();
+
+        // Do same what main.cpp does:
+        Controls::Quit();
+        QuitMixerX();
+        g_frmMain.freeSystem();
+        exit(0);
+
+    // case SDL_APP_LOWMEMORY:
+    // TODO: Implement handling of low-memory event for iOS here
+    //     return 0;
+
+    default:
+        return 1;
+    }
+}
+#endif
+
 EventsSDL::EventsSDL() :
     AbstractEvents_t()
 {
     SDL_memset(&m_event, 0, sizeof(SDL_Event));
+#if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
+    SDL_SetEventFilter(handle_ios_events, this);
+#endif
 }
 
 EventsSDL::~EventsSDL()
-{}
+{
+#if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
+    SDL_SetEventFilter(NULL, NULL);
+#endif
+}
 
 void EventsSDL::init(FrmMain *form)
 {
@@ -88,6 +123,17 @@ void EventsSDL::processEvent()
         return;
 #endif
 
+#ifdef USE_RENDER_BLOCKING
+#   ifdef THEXTECH_IOS
+        const char *os_name = "iOS";
+#   elif defined(THEXTECH_TVOS)
+        const char *os_name = "tvOS";
+#   else
+        const char *os_name = "Android";
+#   endif
+#endif
+
+
     if(Controls::ProcessEvent(&m_event))
         return;
 
@@ -115,7 +161,7 @@ void EventsSDL::processEvent()
         case SDL_WINDOWEVENT_MOVED:
             eventResize();
             break;
-#if !defined(NO_WINDOW_FOCUS_TRACKING)
+#if !defined(NO_WINDOW_FOCUS_TRACKING) && !defined(MOBILE_WINDOW_FOCUS_TRACKING)
         case SDL_WINDOWEVENT_FOCUS_GAINED:
             if(!g_config.background_work && !LoadingInProcess)
                 SoundPauseEngine(0);
@@ -134,16 +180,27 @@ void EventsSDL::processEvent()
         break;
 #ifdef USE_RENDER_BLOCKING
     case SDL_RENDER_DEVICE_RESET:
-        pLogInfo("Android: Render Device Reset");
+        pLogInfo("%s: Render Device Reset", os_name);
         g_frmMain.restartRenderer();
         break;
     case SDL_APP_WILLENTERBACKGROUND:
         XRender::setBlockRender(true);
-        D_pLogDebugNA("Android: Entering background");
+#   if defined(MOBILE_WINDOW_FOCUS_TRACKING)
+        if(!g_config.background_work && !LoadingInProcess)
+            SoundPauseEngine(1);
+#   endif
+        D_pLogDebug("%s: Entering background", os_name);
         break;
     case SDL_APP_DIDENTERFOREGROUND:
         XRender::setBlockRender(false);
-        D_pLogDebugNA("Android: Resumed foreground");
+#   if defined(MOBILE_WINDOW_FOCUS_TRACKING)
+        if(!g_config.background_work && !LoadingInProcess)
+            SoundPauseEngine(0);
+
+        if(GamePaused != PauseCode::TextEntry)
+            XWindow::textInputStop(); /* Workaround to avoid unwanted IME candidates shown */
+#   endif
+        D_pLogDebug("%s: Resumed foreground", os_name);
         break;
 #endif
     }
