@@ -1,11 +1,12 @@
 name: Haiku CI
 
 on:
+  workflow_dispatch:
   push:
     branches:
-      - main
-      - stable*
-      - versus-ci
+#      - main
+#      - stable*
+#      - versus-ci
       - versus-ci-haiku
   pull_request:
     branches:
