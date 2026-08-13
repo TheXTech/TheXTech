@@ -15,8 +15,8 @@ provides {
     thextech_bin = @THEXTECH_HAIKU_VERSION_STRING@
 }
 requires {
-    haiku >= r1~beta6_hrev59866+60
-    libsdl2 >= 2.32.10-3
+    haiku >= r1~beta5_hrev57937-129
+    libsdl2 >= 2.30.10-1
 }
 urls {
 # TheXTech Project page

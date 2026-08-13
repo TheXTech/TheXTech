@@ -28,7 +28,7 @@ jobs:
       matrix:
         config:
         - {
-            name: "Haiku R1-Beta6 x86_64",
+            name: "Haiku R1-Beta5 x86_64",
             os: ubuntu-latest,
 
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
@@ -87,7 +87,7 @@ jobs:
         environment_variables: BRANCH_NAME
         operating_system: haiku
         architecture: x86-64
-        version: r1beta6
+        version: r1beta5
 
     - name: Install host dependencies
       shell: bash
