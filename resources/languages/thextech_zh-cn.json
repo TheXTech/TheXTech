@@ -391,6 +391,13 @@
             "statusLoadFile": "正在加载：{0}",
             "statusTranslations": "翻译",
             "loading": "加载中……"
+        },
+        "warning": {
+            "bitmaskEnforced": "SDL环境下始终模拟GIFs2PNG以加载带蒙版的GIF图像",
+            "bitmaskFallback": "正在SDL环境下通过GIFs2PNG加载带蒙版的GIF图像",
+            "settingsStorageOverflown": "存储设置的数据已超出上限，\n请删除不必要的游戏存档，\n否则您的数据可能会丢失。",
+            "simGIFS2PNGAct": "正在模拟GIFs2PNG（正在运行）",
+            "simGIFS2PNGInact": "正在模拟GIFs2PNG（未运行）"
         }
     },
     "languageName": "简体中文",
@@ -513,7 +520,12 @@
                     "scaleButtons": "按钮缩放",
                     "scaleDPad": "方向键缩放",
                     "scaleFactor": "按键全局缩放",
-                    "showCodeButton": "显示作弊指令按钮"
+                    "showCodeButton": "显示作弊指令按钮",
+                    "OffsetButtonsH": "按键右偏移",
+                    "OffsetButtonsV": "按键下偏移",
+                    "OffsetDPadH": "十字键左偏移",
+                    "OffsetDPadV": "十字键下偏移",
+                    "OffsetSStart": "选择/开始键偏移"
                 },
                 "style": {
                     "ABXY": "ABXY",
