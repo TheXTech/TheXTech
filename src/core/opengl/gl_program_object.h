@@ -119,6 +119,7 @@ private:
     GLint m_u_transform_loc = -1;
     GLint m_u_read_viewport_loc = -1;
     GLint m_u_clock_loc = -1;
+    GLint m_u_camera_pos_loc = -1;
     GLint m_u_framebuffer_pixsize_loc = -1;
     GLint m_u_texture_pixsize_loc = -1;
 
@@ -152,7 +153,7 @@ private:
     //! map a binding point in case the shader was translated
     const char* m_map_var(const char* variable);
 
-    void m_update_transform(const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock);
+    void m_update_transform(const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock, const GLfloat* camera_pos);
 
     static GLuint s_compile_shader(GLenum type, const char* src);
 
@@ -198,15 +199,16 @@ public:
      * \param transform_tick    the number of times the transform matrix has been changed since game start.
      * \param transform         pointer to GLfloat array of size 16, the projection matrix that should be used if necessary.
      * \param read_viewport     pointer to GLfloat array of size 4, an additional multiply-and-add transform for fb read shaders.
+     * \param camera_pos        pointer to GLfloat array of size 2, the current camera position in pre-transform coords.
      *
      * Important note: may only be called while program has been activated by use_program()
      */
-    inline void update_transform(uint64_t transform_tick, const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock)
+    inline void update_transform(uint64_t transform_tick, const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock, const GLfloat* camera_pos)
     {
         if(transform_tick != m_transform_tick)
         {
             m_transform_tick = transform_tick;
-            m_update_transform(transform, read_viewport, clock);
+            m_update_transform(transform, read_viewport, clock, camera_pos);
         }
     }
 

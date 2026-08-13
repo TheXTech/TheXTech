@@ -321,9 +321,8 @@ public:
 
     void renderSizableBlock(int xDst, int yDst, int wDst, int hDst, StdPicture &tx);
 
-    virtual void renderParticleSystem(StdPicture &tx,
-                                      double camX,
-                                      double camY);
+    virtual void renderParticleSystem(StdPicture &tx);
+    virtual void setCameraPos(int camX, int camY);
 
 
 

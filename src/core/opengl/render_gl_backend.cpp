@@ -131,7 +131,7 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, RectSiz
         if(m_use_shaders)
         {
             m_standard_program.use_program();
-            m_standard_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+            m_standard_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock, m_recent_camera_pos.data());
         }
 
         // form vertices: dest is relative to viewport, source isn't
@@ -421,7 +421,7 @@ void RenderGL::flushUnorderedDrawQueue()
             SDL_assert(program->inited());
 
             program->use_program();
-            program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+            program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock, m_recent_camera_pos.data());
             program->activate_uniform_step(context.uniform_step);
         }
 
@@ -527,7 +527,7 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
             SDL_assert(program->inited());
 
             program->use_program();
-            program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+            program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock, m_recent_camera_pos.data());
             program->activate_uniform_step(context.uniform_step);
         }
 
@@ -624,7 +624,7 @@ void RenderGL::calculateDistanceField()
 
     // (2) run the first pass (edge or not?)
     m_distance_field_1_program.use_program();
-    m_distance_field_1_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+    m_distance_field_1_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock, m_recent_camera_pos.data());
 
     fillVertexBuffer(dist_triangle_strip.data(), 4);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -646,7 +646,7 @@ void RenderGL::calculateDistanceField()
 
         // (4) run the nth pass (edge distance propagation)
         m_distance_field_2_program.use_program();
-        m_distance_field_2_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+        m_distance_field_2_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock, m_recent_camera_pos.data());
         glUniform1f(m_distance_field_2_program.get_uniform_loc(0), pass_step_size[pass]);
         // glUniform1f(m_distance_field_2_program.get_uniform_loc(0), 1.0);
 
@@ -890,7 +890,7 @@ void RenderGL::calculateLighting()
     glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_INT_PASS_1]);
 
     m_lighting_calc_program.use_program();
-    m_lighting_calc_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+    m_lighting_calc_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock, m_recent_camera_pos.data());
 
 
     // (4) create and execute the draw call

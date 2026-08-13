@@ -495,7 +495,7 @@ void RenderGL::repaint()
         if(m_use_shaders)
         {
             m_output_program.use_program();
-            m_output_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+            m_output_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock, m_recent_camera_pos.data());
         }
 #endif
 
@@ -1752,9 +1752,7 @@ void RenderGL::renderTexture(int xDst, int yDst,
     m_drawQueued = true;
 }
 
-void RenderGL::renderParticleSystem(StdPicture &tx,
-                          double camX,
-                          double camY)
+void RenderGL::renderParticleSystem(StdPicture &tx)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -1777,9 +1775,6 @@ void RenderGL::renderParticleSystem(StdPicture &tx,
     // assign depth
     assignUniform(tx, 0, UniformValue_t(cur_depth * m_transform_matrix[2 * 4 + 2] + m_transform_matrix[3 * 4 + 2]));
 
-    // assign camera pos
-    assignUniform(tx, 1, UniformValue_t((GLfloat)camX, (GLfloat)camY));
-
     DrawContext_t context = {*tx.d.shader_program, &tx};
 
     auto& vertex_attribs = getOrderedDrawVertexList(context, cur_depth).vertices;
@@ -1787,6 +1782,11 @@ void RenderGL::renderParticleSystem(StdPicture &tx,
     vertex_attribs.emplace_back();
 
     m_drawQueued = true;
+}
+
+void RenderGL::setCameraPos(int camX, int camY)
+{
+    m_recent_camera_pos = {(GLfloat)camX, (GLfloat)camY};
 }
 
 void RenderGL::getScreenPixels(int x, int y, int w, int h, unsigned char *pixels)

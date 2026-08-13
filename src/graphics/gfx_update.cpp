@@ -2186,11 +2186,13 @@ void UpdateGraphicsScreen(Screen_t& screen)
         int camX_i = num_t::floor(camX);
         int camY_i = num_t::floor(camY);
 
+        XRender::setCameraPos(camX_i, camY_i);
+
         DrawBackground(S, Z);
 
 #ifdef THEXTECH_BUILD_GL_MODERN
         if(SectionParticlesBG[S])
-            XRender::renderParticleSystem(**SectionParticlesBG[S], camX_i, camY_i);
+            XRender::renderParticleSystem(**SectionParticlesBG[S]);
 #endif
 
         // don't show background outside of the current section!
@@ -2969,7 +2971,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
 #ifdef THEXTECH_BUILD_GL_MODERN
         if(SectionParticlesFG[S])
-            XRender::renderParticleSystem(**SectionParticlesFG[S], camX_i, camY_i);
+            XRender::renderParticleSystem(**SectionParticlesFG[S]);
 
         XRender::setupLighting(SectionLighting[S]);
 

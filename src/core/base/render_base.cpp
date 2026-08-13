@@ -867,11 +867,17 @@ void AbstractRender_t::renderSizableBlock(int bLeftOnscreen, int bTopOnscreen, i
     }
 }
 
-void AbstractRender_t::renderParticleSystem(StdPicture &tx, double camX, double camY)
+void AbstractRender_t::renderParticleSystem(StdPicture &tx)
 {
     // no-op
 
     UNUSED(tx);
+}
+
+void AbstractRender_t::setCameraPos(int camX, int camY)
+{
+    // no-op
+
     UNUSED(camX);
     UNUSED(camY);
 }

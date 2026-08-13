@@ -241,7 +241,7 @@ const char* GLProgramObject::m_map_var(const char* variable)
     return s_temp_string.c_str();
 }
 
-void GLProgramObject::m_update_transform(const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock)
+void GLProgramObject::m_update_transform(const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock, const GLfloat* camera_pos)
 {
     if(m_u_transform_loc != -1)
         glUniformMatrix4fv(m_u_transform_loc, 1, GL_FALSE, transform);
@@ -249,6 +249,8 @@ void GLProgramObject::m_update_transform(const GLfloat* transform, const GLfloat
         glUniform4fv(m_u_read_viewport_loc, 1, read_viewport);
     if(m_u_clock_loc != -1)
         glUniform1f(m_u_clock_loc, clock);
+    if(m_u_camera_pos_loc != -1)
+        glUniform2fv(m_u_camera_pos_loc, 1, camera_pos);
     if(m_u_framebuffer_pixsize_loc != -1)
         glUniform2f(m_u_framebuffer_pixsize_loc, 1.0f / XRender::TargetW, 1.0f / XRender::TargetH);
 }
@@ -330,6 +332,7 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
     m_u_transform_loc = glGetUniformLocation(m_program, m_map_var("u_transform"));
     m_u_read_viewport_loc = glGetUniformLocation(m_program, m_map_var("u_read_viewport"));
     m_u_clock_loc = glGetUniformLocation(m_program, m_map_var("u_clock"));
+    m_u_camera_pos_loc = glGetUniformLocation(m_program, m_map_var("u_camera_pos"));
     m_u_framebuffer_pixsize_loc = glGetUniformLocation(m_program, m_map_var("u_framebuffer_pixsize"));
     m_u_texture_pixsize_loc = glGetUniformLocation(m_program, m_map_var("u_texture_pixsize"));
 
@@ -506,6 +509,7 @@ const GLProgramObject& GLProgramObject::operator=(GLProgramObject&& other)
     m_u_transform_loc = other.m_u_transform_loc;
     m_u_read_viewport_loc = other.m_u_read_viewport_loc;
     m_u_clock_loc = other.m_u_clock_loc;
+    m_u_camera_pos_loc = other.m_u_camera_pos_loc;
     m_u_framebuffer_pixsize_loc = other.m_u_framebuffer_pixsize_loc;
     m_u_texture_pixsize_loc = other.m_u_texture_pixsize_loc;
 
@@ -742,12 +746,13 @@ void GLProgramObject::m_activate_uniform_step(uint16_t step)
     (void)(step);
 }
 
-void GLProgramObject::m_update_transform(const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock)
+void GLProgramObject::m_update_transform(const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock, const GLfloat* camera_pos)
 {
     // empty
     (void)(transform);
     (void)(read_viewport);
     (void)(clock);
+    (void)(camera_pos);
 }
 
 #endif
