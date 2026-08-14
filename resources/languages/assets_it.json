@@ -34,7 +34,7 @@
                 "bg2-15": "Cripta 2",
                 "bg2-3": "Cripta",
                 "header": "Set 3",
-                "bg2-26": ""
+                "bg2-26": "Spacciatore di funghi"
             },
             "auto": {
                 "bg2-0": "Nessuno"
@@ -100,11 +100,11 @@
             "fam-water2": "Acqua",
             "fam-water3": "Acqua",
             "fam-water4": "Acqua",
-            "fam-sandbg3": "",
-            "fam-art2": "",
-            "fam-bars4": "",
-            "fam-platform4": "",
-            "fam-space5": "",
+            "fam-sandbg3": "Sfondo Sabbia",
+            "fam-art2": "Arte",
+            "fam-bars4": "Barre",
+            "fam-platform4": "Platina",
+            "fam-space5": "Spazio Bug",
             "fam-sandfg3": ""
         },
         "block": {
@@ -148,14 +148,14 @@
             "fam-wood3": "Legno",
             "fam-woods4": "Bosco",
             "fam-steampunk3": "",
-            "fam-sized1": "",
-            "fam-hurts3": "",
-            "fam-sized4": "",
+            "fam-sized1": "Tagliato",
+            "fam-hurts3": "Danni",
+            "fam-sized4": "Tagliato",
             "fam-switch4": "",
-            "fam-sized3": "",
-            "fam-lava4": "",
-            "fam-metal5-1": "",
-            "fam-sized2": ""
+            "fam-sized3": "Tagliato 3",
+            "fam-lava4": "Lava e Danni",
+            "fam-metal5-1": "Piatti",
+            "fam-sized2": "Tagliato"
         },
         "music": {
             "fam-misc": {
