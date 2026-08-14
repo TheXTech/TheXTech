@@ -15,4 +15,27 @@
     <string name="setup_max_framerate_mode">Modalità frame-rate massimi</string>
     <string name="setup_touchscreen_mode">Modalità controller</string>
     <string name="setup_sr_speedrunMode">Modalità Speed-Run</string>
+    <string name="setup_sr_stopwatchSemiTransparent">Rendi il cronomentro semi-trasparente</string>
+    <string name="setup_touchpad_style">Stile Controller</string>
+    <string name="managePermExplainTitle">È richiesto l\'accesso a tutti i file</string>
+    <string name="managePermExplainText">Questo gioco usa risorse (come livelli, episodi, grafiche, musiche, suoni, configurazioni, ecc.) che sono state messe dall\'utente direttamente nello store locale. Questo concetto permette agli utenti di modificare ed estendere il contenuto per le loro proposte come stato fatto nella versione desktop di questo gioco. Sfortunatamente, Andrioid 11+ non dà la possibilità di avere i permessi di lettura per directory specifiche invece di un singolo file. Per eseguire questo gioco dovresti dare l\'accesso a tutti i file per il gioco.</string>
+    <string name="setup_assets_path_label">Cambia il percorso assoluto delle risorse</string>
+    <string name="launcher_no_resources_question">Il gioco richiede un pacchetto di risorse per funzionare. Scarica le risorse di gioco ed estraile nella directory conviviente. Vuoi selezionare una cartella giù estratta?</string>
+    <string name="setup_feedback_enable_vibration">Abilita Vibrazione</string>
+    <string name="setup_feedback_vibration_strength">Forza vibrazione</string>
+    <string name="setup_feedback_vibration_length">Lunghezza vibrazione</string>
+    <string name="touchscreen_vibration_test_label">Prova feedback</string>
+    <string name="setup_show_battery_status_label">Stato batteria dispositivo</string>
+    <string name="setup_renderer_label">Sistema render</string>
+    <string name="setup_show_controller_state_label">Mostra lo stato di un controller</string>
+    <string name="cheat_dialog_cancel">Annulla</string>
+    <string name="cheat_dialog_ok">Esegui</string>
+    <string name="cheat_dialog_title">Scrivi comando:</string>
+    <string name="launcher_gameSelect_clearList">Cancella lista</string>
+    <string name="launcher_gameSelect_pickTheDir">Seleziona directory...</string>
+    <string name="launcher_gameselect_toast_selected">Cambiato al gioco: %s</string>
+    <string name="launcher_gameselect_toast_listclean">La lista dei giochi è stata pulita.</string>
+    <string name="launcher_gameselect_clearlist_title">Cancella la lista dei giochi</string>
+    <string name="launcher_gameselect_clearlist_question">Vuoi cancellare la lista dei giochi?</string>
+    <string name="launcher_openfile_indirectly">Impossibile ricevere un percorso assoluto per il file aperto, e quindi, è stato copiato all\'interno dei file di gioco. Risorse extra (come grafiche custom, musiche, configurazioni, script, ecc.) non possono venir caricate. Vuoi lo stesso far partire il gioco?</string>
 </resources>
