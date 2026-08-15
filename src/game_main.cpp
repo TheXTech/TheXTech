@@ -747,6 +747,8 @@ int GameMain(const CmdLineSetup_t &setup)
 
                     if(i <= (int)Controls::g_InputMethods.size())
                         Controls::g_InputMethods.push_back(nullptr);
+
+                    XMessage::g_session.init_char_select = ConnectScreen::g_charSelect;
                 }
 
                 QuickReconnectScreen::g_active = true;
