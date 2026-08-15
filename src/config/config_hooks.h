@@ -40,5 +40,8 @@ void config_log_level_set();
 void config_integrations_set();
 void config_3ds_inaccurate_gifs_set();
 void config_compat_changed();
+#ifdef THEXTECH_ENABLE_SDL_NET
+void config_netplay_update();
+#endif
 
 #endif

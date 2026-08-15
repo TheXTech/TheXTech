@@ -32,6 +32,10 @@
 #include "main/menu_main.h"
 #include "sound.h"
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+#include "main/client_methods.h"
+#endif
+
 static int s_backup_bugfixes = Config_t::MODE_MODERN;
 static int s_backup_creator_compat = Config_t::CREATORCOMPAT_ENABLE;
 
@@ -389,6 +393,13 @@ void UpdateConfig()
         g_config.enable_frameskip = true;
         g_config.unlimited_framerate = true;
         // g_config.render_vsync = false;
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+        if(XMessage::GetClientStatus()->client_state == XMessage::CLIENT_GUEST)
+            g_config.netplay_enable.m_set = ConfigSetLevel::speedrun;
+
+        g_config.netplay_server.m_set = ConfigSetLevel::speedrun;
+#endif
     }
 
     if(g_config.compatibility_mode)

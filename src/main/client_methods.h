@@ -30,9 +30,8 @@
 
 #include "message.h"
 
-extern std::string g_netplayServer;
-extern std::string g_netplayNickname;
-
+// a temporary measure, will be removed
+extern bool g_hideNetplay;
 
 namespace XMessage
 {
@@ -106,6 +105,7 @@ void Connect(const char* host = nullptr);
 void Disconnect();
 void NetStartup();
 void NetShutdown();
+void SyncReqStatus();
 const ClientStatus* GetClientStatus();
 bool CompleteRequest();
 

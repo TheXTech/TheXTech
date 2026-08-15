@@ -228,8 +228,6 @@ void initMainMenu()
     g_mainMenu.netplayJoinRoom = "Join Room";
     g_mainMenu.netplayCreateRoom = "Create Room";
     g_mainMenu.netplayLeaveRoom = "Leave Room";
-    g_mainMenu.netplayServer = "Server:";
-    g_mainMenu.netplayNickname = "Nickname:";
 #endif
 
     // g_mainMenu.promptDeprecatedSetting = "This file uses a deprecated compatibility flag that will be removed in version 1.3.7.\n\nOld flag: \"{0}\"\nNew flag: \"{1}\"\n\n\nReplace it with the updated flag for version 1.3.6 and newer?";
@@ -1170,8 +1168,6 @@ bool mainMenuUpdate()
                     MenuCursor = 0;
 
                     s_PrepareContentSelect();
-
-                    XMessage::Connect();
                 }
 #endif
                 else if(g_config.enable_editor && MenuCursor == i++)
@@ -1340,10 +1336,6 @@ bool mainMenuUpdate()
                             menuLen = 18 * (int)g_mainMenu.netplayJoinRoom.size();
                         else if(A == i++)
                             menuLen = 18 * (int)g_mainMenu.netplayCreateRoom.size();
-                        else if(A == i++)
-                            menuLen = 18 * (int)g_mainMenu.netplayServer.size();
-                        else if(A == i++)
-                            menuLen = 18 * (int)g_mainMenu.netplayNickname.size();
                         else
                             break;
 
@@ -1369,8 +1361,6 @@ bool mainMenuUpdate()
                     netplayPos++;
                 if(!g_gameInfo.disableBattleMode)
                     netplayPos++;
-
-                XMessage::Disconnect();
 
                 MenuMode = MENU_MAIN;
                 MenuCursor = netplayPos;
@@ -1403,25 +1393,14 @@ bool mainMenuUpdate()
                     menuBattleMode = false;
                     MenuCursor = 0;
                 }
-                else if(MenuCursor == 2)
-                {
-                    PlaySoundMenu(SFX_Do);
-                    g_netplayServer = TextEntryScreen::Run(g_mainMenu.netplayServer);
-                    XMessage::Connect();
-                }
-                else if(MenuCursor == 3)
-                {
-                    PlaySoundMenu(SFX_Do);
-                    g_netplayNickname = TextEntryScreen::Run(g_mainMenu.netplayNickname);
-                }
             }
 
             if(MenuMode == MENU_NETPLAY)
             {
-                if(MenuCursor > 3)
+                if(MenuCursor > 1)
                     MenuCursor = 0;
                 else if(MenuCursor < 0)
-                    MenuCursor = 3;
+                    MenuCursor = 1;
             }
         }
 #endif
@@ -1999,10 +1978,36 @@ void drawGameVersion(bool disable_git, bool git_only)
     if(!git_only)
         SuperPrintRightAlign("v" V_LATEST_STABLE, 5, XRender::TargetW - XRender::TargetOverscanX - 2, 2);
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+    // show network status
+    if(g_config.netplay_enable && !disable_git)
+    {
+        const auto& status = *XMessage::GetClientStatus();
+
+        XTColor c = {200, 255, 200};
+        const std::string* server = &status.server_address;
+
+        if(status.client_state != XMessage::CLIENT_LOBBY)
+        {
+            c = {255, 200, 200};
+            server = &g_config.netplay_server.m_value;
+        }
+
+        int y = XRender::TargetH - 20;
+
+        if(show_branch)
+            y -= 18;
+        if(show_commit)
+            y -= 18;
+
+        SuperPrintRightAlign(*server, 5, XRender::TargetW - XRender::TargetOverscanX - 2, y, c);
+    }
+#endif // #ifdef THEXTECH_ENABLE_SDL_NET
+
     // show branch
     if(show_branch && !disable_git)
     {
-        int y = show_commit ? XRender::TargetH - 36 : XRender::TargetH - 18;
+        int y = show_commit ? XRender::TargetH - 38 : XRender::TargetH - 20;
 
         if(is_wip)
         {
@@ -2019,10 +2024,10 @@ void drawGameVersion(bool disable_git, bool git_only)
         if(is_dirty)
         {
             // only show -d, not -dirty
-            SuperPrintRightAlign(find_in_string(V_BUILD_VER, '-') + 2 + 1, "#" V_BUILD_VER, 5, XRender::TargetW - XRender::TargetOverscanX - 2, XRender::TargetH - 18);
+            SuperPrintRightAlign(find_in_string(V_BUILD_VER, '-') + 2 + 1, "#" V_BUILD_VER, 5, XRender::TargetW - XRender::TargetOverscanX - 2, XRender::TargetH - 20);
         }
         else
-            SuperPrintRightAlign("#" V_BUILD_VER, 5, XRender::TargetW - XRender::TargetOverscanX - 2, XRender::TargetH - 18);
+            SuperPrintRightAlign("#" V_BUILD_VER, 5, XRender::TargetW - XRender::TargetOverscanX - 2, XRender::TargetH - 20);
     }
 }
 
@@ -2401,20 +2406,13 @@ void mainMenuDraw()
     {
         int i = 0;
         XTColor c;
-        XTColor s;
 
-        if(XMessage::GetClientStatus() && XMessage::GetClientStatus()->client_state == XMessage::CLIENT_LOBBY)
-            s = {200, 255, 200};
+        if(XMessage::GetClientStatus() && XMessage::GetClientStatus()->client_state == XMessage::CLIENT_LOBBY);
         else
-        {
-            s = {255, 200, 200};
             c = {127, 127, 127};
-        }
 
         SuperPrint(g_mainMenu.netplayJoinRoom, 3, MenuX, MenuY+30*(i++), c);
         SuperPrint(g_mainMenu.netplayCreateRoom, 3, MenuX, MenuY+30*(i++), c);
-        SuperPrint(g_mainMenu.netplayServer + ' ' + g_netplayServer, 3, MenuX, MenuY+30*(i++), s);
-        SuperPrint(g_mainMenu.netplayNickname + ' ' + g_netplayNickname, 3, MenuX, MenuY+30*(i++));
         XRender::renderTextureBasic(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
 #endif

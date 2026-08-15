@@ -33,9 +33,9 @@
 #include "main/client.h"
 #include "main/client_methods.h"
 #include "main/screen_progress.h"
+#include "main/menu_main.h"
 
-std::string g_netplayServer = "thextech.link";
-std::string g_netplayNickname;
+bool g_hideNetplay = true;
 
 namespace XMessage
 {
@@ -113,7 +113,7 @@ void Connect(const char* host)
 {
     s_game_thread.status_req = ClientStatus();
     s_game_thread.status_req.client_state = CLIENT_LOBBY;
-    s_game_thread.status_req.server_address = (host) ? host : g_netplayServer;
+    s_game_thread.status_req.server_address = (host) ? host : g_config.netplay_server.m_value;
 
     s_game_thread.push_status_req();
 }
@@ -130,9 +130,46 @@ void Disconnect()
         UpdateConfig();
 }
 
+void SyncReqStatus()
+{
+    bool cur_guest = (s_game_thread.status_req.client_state == CLIENT_GUEST);
+    if(cur_guest)
+        return;
+
+    bool cur_host = (s_game_thread.status_req.client_state == CLIENT_HOST);
+
+    s_game_thread.status_req = ClientStatus();
+
+    if(g_config.netplay_enable)
+    {
+        if(cur_host)
+            s_game_thread.status_req.server_address = s_game_thread.status.server_address;
+        else
+            s_game_thread.status_req.server_address = g_config.netplay_server.m_value;
+
+        if(BattleMode || GameMenu || LevelEditor || !selWorld || SelectWorld[selWorld].lz4_content_hash == 0)
+            s_game_thread.status_req.client_state = CLIENT_LOBBY;
+        else
+        {
+            s_game_thread.status_req.client_state = (cur_host) ? CLIENT_HOST : CLIENT_HOST_IDLE;
+
+            // XMessage::RoomInfo room_info = RoomInfo();
+            // room_info.engine_hash = s_engineHash();
+            // room_info.asset_hash = s_assetPackHash();
+            // room_info.content_hash = SelectWorld[selWorld].lz4_content_hash;
+
+            s_game_thread.status_req.room_info = s_game_thread.status.room_info;
+        }
+    }
+
+    s_game_thread.push_status_req();
+    // need to figure out how to safely UpdateConfig when we suddenly disconnect
+}
+
 void NetStartup()
 {
     s_network_client.Startup();
+    SyncReqStatus();
 }
 
 void NetShutdown()

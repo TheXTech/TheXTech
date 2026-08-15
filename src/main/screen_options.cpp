@@ -48,6 +48,10 @@
 #include "control/controls_methods.h" // to cancel keyboard's double-click fullscreen
 #include "message.h"
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+#include "main/client_methods.h" // g_hideNetplay (will become outdated)
+#endif
+
 namespace OptionsScreen
 {
 
@@ -266,6 +270,11 @@ void RefreshVisibleItems()
 
             if(g_options.m_options[i] == &g_options.compat && !g_CheatEditYourFriends)
                 continue;
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+            if(g_options.m_options[i] == &g_options.network && (g_hideNetplay && !g_config.netplay_enable))
+                continue;
+#endif
 
             if(g_options.m_options[i]->m_scope & current_scope)
                 visible_items.push_back(i);

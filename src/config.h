@@ -461,6 +461,23 @@ public:
     section controls{this, Scope::Config, "controls", "Controls"};
 
 
+    /* ---- Network ----*/
+#ifdef THEXTECH_ENABLE_SDL_NET
+    section network{this, Scope::Config, "network", "Network", nullptr};
+
+    opt<bool> netplay_enable{this, defaults(false), {}, Scope::Config,
+        "enable", "Enable Netplay", nullptr,
+        config_netplay_update};
+
+    opt<std::string> netplay_server{this, defaults<std::string>("thextech.link"), {}, Scope::Config,
+        "server", "Server", nullptr,
+        config_netplay_update};
+
+    // opt<std::string> netplay_nickname{this, defaults<std::string>("Player"), {}, Scope::Config,
+    //     "nickname", "Nickname", nullptr,
+    //     config_netplay_update};
+#endif
+
     /* ---- Advanced ----*/
     section advanced{this, Scope::Config, "advanced", "Advanced", "Technical options for internal operations"};
 

@@ -83,6 +83,9 @@ void OpenConfig()
 
         config.beginGroup("main");
         config.read("release", FileRelease, curRelease);
+#ifdef THEXTECH_ENABLE_SDL_NET
+        config.read("hide-netplay", g_hideNetplay, g_hideNetplay);
+#endif
         config.endGroup();
 
         std::string asset_pack_prefix = g_AssetPackID;
@@ -91,10 +94,6 @@ void OpenConfig()
 
         config.beginGroup("recent");
         config.read("asset-pack", g_recentAssetPack, std::string());
-#ifdef THEXTECH_ENABLE_SDL_NET
-        config.read("server", g_netplayServer, g_netplayServer);
-        config.read("nickname", g_netplayNickname, std::string());
-#endif
         config.read((asset_pack_prefix + "episode-1p").c_str(), g_recentWorld1p, std::string());
         config.read((asset_pack_prefix + "episode-2p").c_str(), g_recentWorld2p, std::string());
         config.read((asset_pack_prefix + "episode-editor").c_str(), g_recentWorldEditor, std::string());
@@ -130,6 +129,10 @@ void SaveConfig()
     IniProcessing config(configPath);
     config.beginGroup("main");
     config.setValue("release", curRelease);
+#ifdef THEXTECH_ENABLE_SDL_NET
+    if(!g_hideNetplay)
+        config.setValue("hide-netplay", g_hideNetplay);
+#endif
     config.endGroup();
 
     config.beginGroup("logging");
@@ -146,10 +149,6 @@ void SaveConfig()
 
     config.beginGroup("recent");
     config.setValue("asset-pack", g_AssetPackID);
-#ifdef THEXTECH_ENABLE_SDL_NET
-    config.setValue("server", g_netplayServer);
-    config.setValue("nickname", g_netplayNickname);
-#endif
     config.setValue((asset_pack_prefix + "episode-1p").c_str(), g_recentWorld1p);
     config.setValue((asset_pack_prefix + "episode-2p").c_str(), g_recentWorld2p);
     config.setValue((asset_pack_prefix + "episode-editor").c_str(), g_recentWorldEditor);

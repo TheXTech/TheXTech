@@ -54,6 +54,10 @@
 #include "main/cheat_code.h"
 #endif
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+#include "main/client_methods.h"
+#endif
+
 
 // config_main.cpp
 extern bool g_configInTransaction;
@@ -197,3 +201,9 @@ void config_compat_changed()
         UpdateConfig();
 }
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+void config_netplay_update()
+{
+    XMessage::SyncReqStatus();
+}
+#endif
