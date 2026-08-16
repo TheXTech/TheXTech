@@ -391,6 +391,13 @@
             "statusLoadFile": "正在加載：{0}",
             "statusTranslations": "翻譯",
             "loading": "加載中……"
+        },
+        "warning": {
+            "settingsStorageOverflown": "儲存設定的數據已超出上限，\n請刪除不必要的遊戲存檔，\n否則您的數據可能將會丟失。",
+            "bitmaskEnforced": "SDL環境下始終模擬GIFs2PNG以載入帶蒙版的GIF影像",
+            "bitmaskFallback": "正在SDL環境下通過GIFs2PNG載入帶蒙版的GIF影像",
+            "simGIFS2PNGInact": "正在模擬GIFs2PNG（未執行）",
+            "simGIFS2PNGAct": "正在模擬GIFs2PNG（正在執行）"
         }
     },
     "languageName": "繁體中文",
@@ -513,7 +520,12 @@
                     "scaleButtons": "按鈕縮放",
                     "scaleDPad": "方向鍵縮放",
                     "scaleFactor": "按鍵全局縮放",
-                    "showCodeButton": "顯示作弊指令按鈕"
+                    "showCodeButton": "顯示作弊指令按鈕",
+                    "OffsetSStart": "選擇/開始鍵偏移",
+                    "OffsetDPadV": "十字鍵下偏移",
+                    "OffsetDPadH": "十字鍵左偏移",
+                    "OffsetButtonsV": "按鍵下偏移",
+                    "OffsetButtonsH": "按鍵右偏移"
                 },
                 "style": {
                     "ABXY": "ABXY",
