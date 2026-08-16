@@ -319,7 +319,7 @@ static int buttonA(int player_no, int style)
 
     default:
     case TouchScreenController::style_actions:
-        if(GamePaused != PauseCode::None || GameMenu)
+        if(GamePaused != PauseCode::None || GameMenu || ScreenAssetPack::g_LoopActive)
             return TouchScreenGFX_t::BUTTON_A_DO;
         else if(GameOutro)
             return TouchScreenGFX_t::BUTTON_A_BLANK;
@@ -342,7 +342,7 @@ static int buttonX(int player_no, int style)
 
     default:
     case TouchScreenController::style_actions:
-        if(GamePaused != PauseCode::None || GameMenu)
+        if(GamePaused != PauseCode::None || GameMenu || ScreenAssetPack::g_LoopActive)
             return TouchScreenGFX_t::BUTTON_X_BACK;
         else if(LevelSelect || GameOutro)
             return TouchScreenGFX_t::BUTTON_X_BLANK;
@@ -396,7 +396,7 @@ static int buttonB(int player_no, int style)
 
     default:
     case TouchScreenController::style_actions:
-        if(LevelSelect || GamePaused != PauseCode::None || GameMenu || GameOutro)
+        if(LevelSelect || GamePaused != PauseCode::None || GameMenu || GameOutro || ScreenAssetPack::g_LoopActive)
             return TouchScreenGFX_t::BUTTON_B_BLANK;
         else
         {
@@ -427,7 +427,7 @@ static int buttonY(int player_no, int style)
 
     default:
     case TouchScreenController::style_actions:
-        if(LevelSelect || GamePaused != PauseCode::None || GameMenu || GameOutro)
+        if(LevelSelect || GamePaused != PauseCode::None || GameMenu || GameOutro || ScreenAssetPack::g_LoopActive)
             return TouchScreenGFX_t::BUTTON_Y_BLANK;
         else
         {
