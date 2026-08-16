@@ -43,6 +43,7 @@
 #include "main/menu_main.h"
 #include "main/translate.h"
 #include "main/game_strings.h"
+#include "main/screen_asset_pack.h"
 #include "../graphics.h"
 #include "../frame_timer.h"
 
@@ -147,7 +148,7 @@ void Hotkeys::Activate(size_t i, int player)
         return;
 
     case Buttons::EnterCheats:
-        if(!GameMenu && !GameOutro && !LevelEditor && !BattleMode)
+        if(!GameMenu && !GameOutro && !LevelEditor && !BattleMode && !LoadingInProcess && !ScreenAssetPack::g_LoopActive)
             s_requestedPause = PauseCode::TextEntry;
         return;
 
