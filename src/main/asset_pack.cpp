@@ -571,3 +571,8 @@ const std::vector<AssetPack_t>& GetAssetPacks()
 
     return s_asset_packs;
 }
+
+uint32_t XT_assetPackHash()
+{
+    return 0;
+}

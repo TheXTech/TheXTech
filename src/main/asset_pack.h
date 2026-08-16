@@ -78,4 +78,6 @@ bool ReloadAssetsFrom(const AssetPack_t& pack);
 //! initalizes the AppPath and loads GFX from a desired asset pack
 bool InitUIAssetsFrom(const std::string& id, bool skip_gfx = false);
 
+uint32_t XT_assetPackHash();
+
 #endif // #ifndef ASSET_PACK_H

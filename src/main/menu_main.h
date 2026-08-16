@@ -252,4 +252,7 @@ extern int mainMenuPlaystyle();
 
 void GetMenuPos(int* MenuX, int* MenuY);
 
+uint32_t XT_engineHash();
+uint32_t XT_episodeHash();
+
 #endif // MENU_MAIN_H

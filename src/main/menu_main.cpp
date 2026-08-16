@@ -275,16 +275,6 @@ static void s_StartEpisodeOnline()
 
     StartEpisode();
 }
-
-uint32_t s_assetPackHash()
-{
-    return 0;
-}
-
-uint32_t s_engineHash()
-{
-    return md5::string_to_u32(V_BUILD_VER);
-}
 #endif
 
 // export it, let's hope for some nice LTO here
@@ -832,6 +822,20 @@ static void s_PrepareContentSelect()
 #endif
 }
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+uint32_t XT_engineHash()
+{
+    return md5::string_to_u32(V_BUILD_VER);
+}
+
+uint32_t XT_episodeHash()
+{
+    if(selWorld && selWorld < (int)SelectWorld.size())
+        return SelectWorld[selWorld].lz4_content_hash;
+
+    return 0;
+}
+#endif
 
 static void s_handleMouseMove(int items, int x, int y, int maxWidth, int itemHeight)
 {
@@ -1025,7 +1029,7 @@ bool mainMenuUpdate()
                     }
                 }
 
-                if(room_info.room_key == 0 || room_info.engine_hash != s_engineHash() || room_info.asset_hash != s_assetPackHash() || room_info.content_hash == 0 || selWorld == -1)
+                if(room_info.room_key == 0 || room_info.engine_hash != XT_engineHash() || room_info.asset_hash != XT_assetPackHash() || room_info.content_hash == 0 || selWorld == -1)
                     PlaySoundMenu(SFX_BlockHit);
                 else
                 {
@@ -1281,9 +1285,9 @@ bool mainMenuUpdate()
                     PreloadGame();
 
                     XMessage::RoomInfo room_info = XMessage::RoomInfo();
-                    room_info.engine_hash = s_engineHash();
-                    room_info.asset_hash = s_assetPackHash();
-                    room_info.content_hash = SelectWorld[selWorld].lz4_content_hash;
+                    room_info.engine_hash = XT_engineHash();
+                    room_info.asset_hash = XT_assetPackHash();
+                    room_info.content_hash = XT_episodeHash();
 
                     XMessage::JoinNewRoom(room_info);
                 }
@@ -1291,7 +1295,7 @@ bool mainMenuUpdate()
                 {
                     const XMessage::RoomInfo& room_info = *XMessage::GetRoomInfo();
 
-                    if(room_info.room_key == 0 || room_info.engine_hash != s_engineHash() || room_info.asset_hash != s_assetPackHash() || room_info.content_hash == 0)
+                    if(room_info.room_key == 0 || room_info.engine_hash != XT_engineHash() || room_info.asset_hash != XT_assetPackHash() || room_info.content_hash == 0)
                     {
                         PlaySoundMenu(SFX_BlockHit);
                     }
