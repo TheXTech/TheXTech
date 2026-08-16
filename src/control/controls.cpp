@@ -44,6 +44,7 @@
 #include "main/menu_main.h"
 #include "main/translate.h"
 #include "main/game_strings.h"
+#include "main/screen_asset_pack.h"
 #include "../graphics.h"
 #include "../frame_timer.h"
 
@@ -147,9 +148,12 @@ void Hotkeys::Activate(size_t i, int player)
         return;
 
     case Buttons::EnterCheats:
-        l_SharedControls.Pause = true;
-        l_SharedControls.ForcePause = true;
-        PauseScreen::UnlockCheats();
+        if(!GameMenu && !GameOutro && !ScreenAssetPack::g_LoopActive && !LoadingInProcess)
+        {
+            l_SharedControls.Pause = true;
+            l_SharedControls.ForcePause = true;
+            PauseScreen::UnlockCheats();
+        }
         return;
 
     case Buttons::ToggleHUD:
