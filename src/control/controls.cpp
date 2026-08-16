@@ -148,7 +148,7 @@ void Hotkeys::Activate(size_t i, int player)
         return;
 
     case Buttons::EnterCheats:
-        if(!GameMenu && !GameOutro && !ScreenAssetPack::g_LoopActive && !LoadingInProcess)
+        if(!GameMenu && !GameOutro && !LevelEditor && !BattleMode && !LoadingInProcess && !ScreenAssetPack::g_LoopActive)
         {
             l_SharedControls.Pause = true;
             l_SharedControls.ForcePause = true;
