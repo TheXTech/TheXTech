@@ -1199,7 +1199,7 @@ public:
 
         if(ftype == FT_BYTE) // byte hacking
         {
-            if(vtype != VT_BOOL && vtype != VT_UINT8 && vtype != VT_UNKNOWN)
+            if(vtype != VT_BOOL && vtype != VT_UINT8 && vtype != VT_LAMBDA && vtype != VT_UNKNOWN)
                 vtype = VT_BYTE_HACK;
         }
 
@@ -1341,7 +1341,7 @@ public:
 
         if(ftype == FT_BYTE) // byte hacking
         {
-            if(vtype != VT_BOOL && vtype != VT_UINT8 && vtype != VT_UNKNOWN)
+            if(vtype != VT_BOOL && vtype != VT_UINT8 && vtype != VT_LAMBDA && vtype != VT_UNKNOWN)
                 vtype = VT_BYTE_HACK;
         }
 
