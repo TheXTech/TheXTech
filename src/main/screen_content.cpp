@@ -105,10 +105,9 @@ void Prepare()
                 continue;
         }
 #ifdef THEXTECH_ENABLE_SDL_NET
-        else if(MenuMode == MENU_NETPLAY && !SelectorList[i].lz4_content_hash)
-        {
+        // skip the join room entry if NetPlay is disabled
+        else if(MenuMode != MENU_BATTLE_MODE && i == SelectorList.size() - 3 && (!g_config.netplay_enable || MenuMode == MENU_EDITOR))
             continue;
-        }
 #endif
         // skip the special editor worlds if not in editor
         else if(MenuMode != MENU_BATTLE_MODE && i >= editor_entries_start)
@@ -293,6 +292,11 @@ int Logic()
     if(menuControls.Home && MenuCursorCanMove && s_recent_item >= 0)
     {
         PlaySoundMenu(SFX_Camera);
+#ifdef THEXTECH_ENABLE_SDL_NET
+        if(SelectWorld.size() >= 3 && !SelectWorld[SelectWorld.size() - 3].disabled && s_current_item == s_recent_item)
+            s_current_item = SelectWorld.size() - 3;
+        else
+#endif
         s_current_item = s_recent_item;
         MenuCursorCanMove = false;
         dontWrap = true;
