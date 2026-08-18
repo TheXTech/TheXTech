@@ -261,9 +261,6 @@ private:
 
     bool WaitAndFill();
 
-    // misc lobby calls
-    void JoinNewRoom(const RoomInfo& room_info);
-
     // this is the primary loop for the client thread
     void client_loop();
 };

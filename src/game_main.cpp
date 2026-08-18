@@ -309,9 +309,6 @@ static void s_ExpandSectionForMenu()
 
 void ReportLoadFailure(const std::string& filename, bool isIPC)
 {
-#ifdef THEXTECH_ENABLE_SDL_NET
-    XMessage::Disconnect();
-#endif
 #if !defined(THEXTECH_INTERPROC_SUPPORTED)
     UNUSED(isIPC);
 #endif
@@ -1002,6 +999,7 @@ int GameMain(const CmdLineSetup_t &setup)
             Integrator::clearLevelName();
             Integrator::clearEditorFile();
             FontManager::clearAllCustomFonts();
+            XMessage::EndSession();
 
             BattleIntro = 0;
             BattleOutro = 0;
@@ -2483,6 +2481,14 @@ static void s_InitPlayersFromCharSelect()
 
 void StartEpisode()
 {
+    // Update controllers and game config
+    XMessage::InitSession();
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+    const auto& status = *XMessage::GetClientStatus();
+    l_screen = &Screens[status.client_index];
+#endif
+
     For(A, 1, numCharacters)
     {
         SavedChar[A] = Player_t();
@@ -2503,9 +2509,6 @@ void StartEpisode()
     LevelSelect = true;
     GameMenu = false;
     g_ShortDelay = false;
-
-    // Update controllers and game config
-    XMessage::InitSession();
 
     // Update local screen size and multiplayer prefs
     UpdateInternalRes();

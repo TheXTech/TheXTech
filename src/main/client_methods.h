@@ -114,7 +114,9 @@ void ClientFrameSync(std::vector<Message>& submit_queue, std::vector<Message>& m
 bool RequestFillRoomInfo(uint32_t room_key);
 const RoomInfo* GetRoomInfo();
 
-void JoinNewRoom(const RoomInfo& room_info);
+void Client_InitSession();
+void Client_EndSession();
+void PrepareSession();
 void JoinRoom(uint32_t room_key);
 void ActivateHost();
 uint32_t CurrentRoom();

@@ -262,19 +262,6 @@ static bool s_show_online()
 {
     return !g_gameInfo.disableTwoPlayer;
 }
-
-static void s_StartEpisodeOnline()
-{
-    if(!XMessage::GetClientStatus())
-        return;
-
-    const auto& status = *XMessage::GetClientStatus();
-
-    l_screen = &Screens[status.client_index];
-    seedRandom(XMessage::g_session.random_seed);
-
-    StartEpisode();
-}
 #endif
 
 // export it, let's hope for some nice LTO here
@@ -1011,7 +998,7 @@ bool mainMenuUpdate()
             {
                 // no longer need NetPlay flag (hack) because we are starting game
                 s_char_select_netplay = false;
-                s_StartEpisodeOnline();
+                StartEpisode();
                 return true;
             }
             else if(status && status->client_state == XMessage::CLIENT_LOBBY && XMessage::GetRoomInfo() && XMessage::GetRoomInfo()->room_key)
@@ -1280,18 +1267,7 @@ bool mainMenuUpdate()
                 }
 
 #ifdef THEXTECH_ENABLE_SDL_NET
-                if(s_char_select_netplay == 1)
-                {
-                    PreloadGame();
-
-                    XMessage::RoomInfo room_info = XMessage::RoomInfo();
-                    room_info.engine_hash = XT_engineHash();
-                    room_info.asset_hash = XT_assetPackHash();
-                    room_info.content_hash = XT_episodeHash();
-
-                    XMessage::JoinNewRoom(room_info);
-                }
-                else if(s_char_select_netplay == 2)
+                if(s_char_select_netplay == 2)
                 {
                     const XMessage::RoomInfo& room_info = *XMessage::GetRoomInfo();
 
@@ -1312,6 +1288,7 @@ bool mainMenuUpdate()
                     MenuCursor = 0;
 
 #ifdef THEXTECH_ENABLE_SDL_NET
+                    XMessage::PrepareSession();
                     PreloadGame();
 #endif
 

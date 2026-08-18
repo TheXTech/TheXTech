@@ -387,7 +387,7 @@ void NetworkClient::SyncData()
         return;
 
     auto session_access = get_session_access();
-    if(!session_access)
+    if(!session_access || !g_session.active)
         return;
 
     // checks if there was a new frame on the main thread's side
@@ -701,57 +701,59 @@ void NetworkClient::client_loop()
         if(status_req.client_state != status.client_state)
         {
             // always shift through lobby (in the future...)
-            if(status.client_state != CLIENT_LOBBY && status.client_state != CLIENT_SESSION_CONFIG && status.client_state != CLIENT_HOST_IDLE)
+            if(status.client_state != CLIENT_LOBBY && status.client_state != CLIENT_SESSION_CONFIG && !(status.client_state == CLIENT_HOST_IDLE && status_req.client_state == CLIENT_HOST))
             {
-                // request leave room, mark as pending
+                Disconnect();
+                if(status_req.client_state == CLIENT_LOBBY)
+                    Connect(status_req.server_address.c_str(), status_req.server_port);
                 return;
             }
 
-            if(status.client_state == CLIENT_SESSION_CONFIG || status.client_state == CLIENT_HOST_IDLE)
+            if(status_req.client_state == CLIENT_GUEST && status.client_state == CLIENT_SESSION_CONFIG)
             {
-                if(status_req.client_state == CLIENT_GUEST && status.client_state == CLIENT_SESSION_CONFIG)
+                std::array<uint8_t, 1> to_send =
                 {
-                    std::array<uint8_t, 1> to_send =
+                    HEADER_GET_SESSION,
+                };
+
+                SDLNet_TCP_Send(tcp_control.socket, to_send.data(), to_send.size());
+            }
+            else if(status_req.client_state == CLIENT_HOST && status.client_state == CLIENT_HOST_IDLE)
+            {
+                MutexSent session_access = get_session_access();
+
+                if(session_access)
+                {
+                    uint32_t session_size = 10 + g_session.save_data.size();
+                    uint32_t current_frame = g_session.current_frame;
+                    uint32_t history_size = g_session.history.size() * 4;
+
+                    temp_state.remote_frame = current_frame;
+                    temp_state.available_frame = current_frame;
+
+                    // encode session here
+                    std::array<uint8_t, 22> to_send_a =
                     {
-                        HEADER_GET_SESSION,
+                        HEADER_PUT_SESSION,
+                        uint8_t(current_frame >> 16), uint8_t(current_frame >> 8), uint8_t(current_frame >> 0),
+                        uint8_t(session_size >> 24), uint8_t(session_size >> 16), uint8_t(session_size >> 8), uint8_t(session_size >> 0),
+                        uint8_t(history_size >> 24), uint8_t(history_size >> 16), uint8_t(history_size >> 8), uint8_t(history_size >> 0),
+                        uint8_t(g_session.random_seed  >> 24), uint8_t(g_session.random_seed  >> 16), uint8_t(g_session.random_seed  >> 8), uint8_t(g_session.random_seed  >> 0),
+                        g_session.init_char_select[0], g_session.init_char_select[1], g_session.init_char_select[2], g_session.init_char_select[3],
+                        g_session.save_present, g_session.init_save_configs,
                     };
 
-                    SDLNet_TCP_Send(tcp_control.socket, to_send.data(), to_send.size());
+                    // FIXME: blocking while lock is held
+                    SDLNet_TCP_Send(tcp_control.socket, to_send_a.data(), to_send_a.size());
+                    SDLNet_TCP_Send(tcp_control.socket, g_session.save_data.data(), g_session.save_data.size());
+                    SDLNet_TCP_Send(tcp_control.socket, g_session.history.data(), history_size);
+
+                    pLogDebug("Activating hosting, sending session to server (frame %d, save size %d, history size %d)...", (int)current_frame, (int)g_session.save_data.size(), (int)(g_session.history.size() * 4));
                 }
-                else if(status_req.client_state == CLIENT_HOST && status.client_state == CLIENT_HOST_IDLE)
+                else
                 {
-                    MutexSent session_access = get_session_access();
-
-                    if(session_access)
-                    {
-                        uint32_t session_size = 10 + g_session.save_data.size();
-                        uint32_t current_frame = g_session.current_frame;
-                        uint32_t history_size = g_session.history.size() * 4;
-
-                        temp_state.remote_frame = current_frame;
-                        temp_state.available_frame = current_frame;
-
-                        // encode session here
-                        std::array<uint8_t, 22> to_send_a =
-                        {
-                            HEADER_PUT_SESSION,
-                            uint8_t(current_frame >> 16), uint8_t(current_frame >> 8), uint8_t(current_frame >> 0),
-                            uint8_t(session_size >> 24), uint8_t(session_size >> 16), uint8_t(session_size >> 8), uint8_t(session_size >> 0),
-                            uint8_t(history_size >> 24), uint8_t(history_size >> 16), uint8_t(history_size >> 8), uint8_t(history_size >> 0),
-                            uint8_t(g_session.random_seed  >> 24), uint8_t(g_session.random_seed  >> 16), uint8_t(g_session.random_seed  >> 8), uint8_t(g_session.random_seed  >> 0),
-                            g_session.init_char_select[0], g_session.init_char_select[1], g_session.init_char_select[2], g_session.init_char_select[3],
-                            g_session.save_present, g_session.init_save_configs,
-                        };
-
-                        // FIXME: blocking while lock is held
-                        SDLNet_TCP_Send(tcp_control.socket, to_send_a.data(), to_send_a.size());
-                        SDLNet_TCP_Send(tcp_control.socket, g_session.save_data.data(), g_session.save_data.size());
-                        SDLNet_TCP_Send(tcp_control.socket, g_session.history.data(), history_size);
-
-                        pLogDebug("Activating hosting, sending session to server (frame %d, save size %d, history size %d)...", (int)current_frame, (int)g_session.save_data.size(), (int)(g_session.history.size() * 4));
-                    }
-                    else
-                        Disconnect();
+                    Disconnect();
+                    return;
                 }
             }
             else if(status_req.client_state == CLIENT_GUEST)

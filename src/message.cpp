@@ -124,6 +124,7 @@ void Handle(const Message& m)
         if(m.type == Type::add_player_dead)
         {
             Player[numPlayers].Dead = true;
+            Player[numPlayers].Effect = PLREFF_NORMAL; // disable PLREFF_COOP_WINGS if it was enabled
 
             // initialize ghost logic for player
             int living = CheckNearestLiving(numPlayers);
@@ -202,51 +203,49 @@ void InitSession()
         s_last_controls[A] = Controls_t();
 
 #ifdef THEXTECH_ENABLE_SDL_NET
-    if(g_session.init_save_configs >= 128)
-    {
-        if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
-        {
-            g_config.speedrun_mode.m_value = 256 - g_session.init_save_configs;
-            g_config.speedrun_mode.m_set = ConfigSetLevel::ep_config;
-        }
-    }
-    else
-    {
-        g_config.playstyle.m_value = g_session.init_save_configs - 1;
-        g_config.speedrun_mode.m_set = ConfigSetLevel::ep_config;
-    }
+    Client_InitSession();
 #endif
 
     UpdateConfig();
 }
 
+void EndSession()
+{
+#ifdef THEXTECH_ENABLE_SDL_NET
+    Client_EndSession();
+#endif
+}
+
 void Tick()
 {
 #ifdef THEXTECH_ENABLE_SDL_NET
-    const auto* status = GetClientStatus();
-    if(status->client_state == CLIENT_HOST_IDLE && status->knock_knock)
-        ActivateHost();
-
-    // sync state with other clients here
-    if(XMessage::GetStatus() != XMessage::Status::local)
-        ClientFrameSync(s_message_submit_queue, s_message_vector);
-    // log state for future saving or syncing
-    else
+    if(g_session.active)
     {
-        g_session.current_frame++;
+        const auto* status = GetClientStatus();
+        if(status->client_state == CLIENT_HOST_IDLE && status->knock_knock)
+            ActivateHost();
 
-        if(!s_message_submit_queue.empty())
+        // sync state with other clients here
+        if(XMessage::GetStatus() != XMessage::Status::local)
+            ClientFrameSync(s_message_submit_queue, s_message_vector);
+        // log state for future saving or syncing
+        else
         {
-            g_session.history.push_back(msg_from_frame_no(Type::frame_begin, g_session.current_frame));
+            g_session.current_frame++;
 
-            for(Message m : s_message_submit_queue)
+            if(!s_message_submit_queue.empty())
             {
-                g_session.history.push_back(m);
-                s_message_vector.push_back(m);
-            }
+                g_session.history.push_back(msg_from_frame_no(Type::frame_begin, g_session.current_frame));
 
-            g_session.next_message = g_session.history.size();
-            s_message_submit_queue.clear();
+                for(Message m : s_message_submit_queue)
+                {
+                    g_session.history.push_back(m);
+                    s_message_vector.push_back(m);
+                }
+
+                g_session.next_message = g_session.history.size();
+                s_message_submit_queue.clear();
+            }
         }
     }
 #endif
@@ -269,10 +268,14 @@ void Tick()
 void PushMessage_Direct(Message message)
 {
 #ifdef THEXTECH_ENABLE_SDL_NET
-    s_message_submit_queue.push_back(message);
-#else
-    s_message_vector.push_back(message);
+    if(g_session.active)
+    {
+        s_message_submit_queue.push_back(message);
+        return;
+    }
 #endif
+
+    s_message_vector.push_back(message);
 }
 
 void PushMessage(Message message)

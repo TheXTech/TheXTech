@@ -502,14 +502,6 @@ int main(int argc, char**argv)
 
         TCLAP::UnlabeledMultiArg<std::string> inputFileNames("levelpath", "Path to level file or replay data to run the test", false, std::string(), "path to file");
 
-#ifdef THEXTECH_ENABLE_SDL_NET
-        TCLAP::ValueArg<std::string> server(std::string(), "server", "Server address", false, "", "");
-        cmd.add(&server);
-
-        TCLAP::ValueArg<std::string> room_key(std::string(), "room-key", "Room key", false, "", "");
-        cmd.add(&room_key);
-#endif
-
         cmd.add(&switchFrameSkip);
         cmd.add(&switchDisableFrameSkip);
         cmd.add(&switchNoSound);
@@ -779,19 +771,6 @@ int main(int argc, char**argv)
 
         if(lang.isSet())
             g_config.language = lang;
-
-#ifdef THEXTECH_ENABLE_SDL_NET
-        if(!setup.testLevel.empty() && server.isSet())
-        {
-            XMessage::Connect(server.getValue().c_str());
-
-            uint32_t room_key_int = XMessage::RoomFromString(room_key.getValue());
-            if(!room_key_int)
-                XMessage::JoinNewRoom(XMessage::RoomInfo{});
-            else
-                XMessage::JoinRoom(room_key_int);
-        }
-#endif
     }
     catch(TCLAP::ArgException &e)   // catch any exceptions
     {

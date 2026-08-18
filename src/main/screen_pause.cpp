@@ -237,10 +237,6 @@ static bool s_SaveAndContinue()
 
 static bool s_Quit()
 {
-#ifdef THEXTECH_ENABLE_SDL_NET
-    XMessage::Disconnect();
-#endif
-
     bool CanSave = (LevelSelect || IsHubLevel) && !Cheater;
 
     if(CanSave)
