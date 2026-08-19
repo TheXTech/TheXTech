@@ -102,6 +102,18 @@ int Mix_PlayChannel(int channel, Mix_Chunk* chunk, int loops)
     return 0;
 }
 
+int Mix_Pause(int channel)
+{
+    UNUSED(channel);
+    return 0;
+}
+
+int Mix_Resume(int channel)
+{
+    UNUSED(channel);
+    return 0;
+}
+
 #ifndef Mix_PlayChannelVol
 int Mix_PlayChannelVol(int channel, Mix_Chunk* chunk, int loops, int volume)
 {

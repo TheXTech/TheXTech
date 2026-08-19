@@ -1375,7 +1375,7 @@ void Autocode::DoPredicate(int target, int predicate)
     }
 
     // Else, do predicate
-    auto pred = (AutocodePredicate)predicate;
+    int pred = predicate;
     short tempint = 1;
 
     switch(pred)

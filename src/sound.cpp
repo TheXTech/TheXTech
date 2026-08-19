@@ -224,6 +224,7 @@ static const double c_max_chunk_duration = 1.25; // max length of an in-memory c
 static const double c_max_chunk_duration = 5.0;  // max length of an in-memory chunk in seconds
 #endif
 
+#ifndef THEXTECH_NO_SDL_BUILD
 static const char *audio_format_to_string(SDL_AudioFormat f)
 {
     switch(f)
@@ -252,6 +253,7 @@ static const char *audio_format_to_string(SDL_AudioFormat f)
         return "F32-BE";
     }
 }
+#endif
 
 static void clear_sfx(SFX_t &s)
 {

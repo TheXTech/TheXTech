@@ -18,10 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "sound_msgsnd.h"
+
+#ifndef CUSTOM_AUDIO
 #include "sdl_proxy/mixer.h"
 
 #include "../sound.h"
-#include "sound_msgsnd.h"
 
 extern bool g_mixerLoaded;
 
@@ -96,7 +98,6 @@ static unsigned char s_sndMsg[] =
     0x00
 };
 
-#ifndef CUSTOM_AUDIO
 void playFallbackSfx(int sfxId, int loops, int volume)
 {
     if(!g_mixerLoaded)
