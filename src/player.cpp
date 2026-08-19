@@ -1638,7 +1638,7 @@ void CheckSection(const int A)
                             //        return;
                             //}
 
-                            UpdateSoundFX(B);
+                            UpdateAudioSection(B);
 
                             if(curMusic >= 0 && !GameMenu) // Dont interupt boss / switch music
                             {
@@ -1700,7 +1700,7 @@ void CheckSection(const int A)
                             if(oldSection != B)
                             {
                                 ClearBuffer = true;
-                                UpdateSoundFX(B);
+                                UpdateAudioSection(B);
 
                                 if(curMusic != 6 && curMusic >= 0 && curMusic != 15) // Dont interupt boss / switch music
                                 {

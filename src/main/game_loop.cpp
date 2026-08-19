@@ -329,12 +329,16 @@ void GameLoop()
                         if(FreezeNPCs)
                         {
                             FreezeNPCs = false;
+                            SuspendExtSound(false);
+
                             if(PSwitchTime > 0)
                                 ResumeMusic();
                         }
                         else
                         {
                             FreezeNPCs = true;
+                            SuspendExtSound(true);
+
                             if(PSwitchTime > 0)
                                 PauseMusic();
                         }
@@ -516,6 +520,8 @@ int PauseGame(PauseCode code, int plr)
 
     SyncSysCursorDisplay();
 
+    SuspendExtSound(true);
+
     if(PSwitchTime > 0)
         PauseMusic();
 
@@ -651,6 +657,8 @@ int PauseGame(PauseCode code, int plr)
     MenuCursorCanMove = false;
 
     SyncSysCursorDisplay();
+
+    SuspendExtSound(false);
 
     if(PSwitchTime > 0 && GamePaused == PauseCode::None)
         ResumeMusic();

@@ -258,10 +258,14 @@ void UnloadCustomSound();
 
 void UpdateMusicVolume();
 
+void UpdateAudioSection(int recentSection);
+
 void PreloadExtSound(const std::string &path);
 void UnloadExtSounds();
-void PlayExtSound(const std::string &path, int loops = 0, int volume = 128);
+void PlayExtSound(const std::string &path, int loops = 0, int volume = 128, bool pausable = false, int section = -1);
 void StopExtSound(const std::string &path);
+void SuspendExtSound(bool pause);
+void UpdateExtSoundSections(void);
 void StopAllExtSounds();
 void StopAllSounds();
 

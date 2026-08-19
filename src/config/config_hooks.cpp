@@ -141,7 +141,7 @@ void config_audiofx_set()
         return;
 
     if(!LevelSelect && !LevelEditor)
-        UpdateSoundFX(Player[1].Section);
+        UpdateAudioSection(Player[1].Section);
 }
 
 void config_audio_set()
@@ -152,7 +152,7 @@ void config_audio_set()
     RestartMixerX();
 
     if(GameMenu || !LevelSelect)
-        UpdateSoundFX(Player[1].Section);
+        UpdateAudioSection(Player[1].Section);
 }
 
 void config_music_volume_set()
