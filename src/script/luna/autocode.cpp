@@ -31,6 +31,7 @@
 #include "lunamisc.h"
 #include "sprite_funcs.h"
 #include "csprite.h"
+#include "effect.h"
 #include "globals.h"
 #include "global_dirs.h"
 #include "player.h"
@@ -1239,6 +1240,29 @@ void Autocode::Do(bool init)
             break;
         }
 
+        case AT_SpawnEffect:
+        {
+            if(this->Length <= 1) // Play once when delay runs out
+            {
+                vbint_t id = (vbint_t)Target;
+
+                if(id < 0 || id >= maxEffectType)
+                {
+                    expire();
+                    return; // Invalid!
+                }
+
+                Location_t target;
+                target.Width = EffectWidth[id];
+                target.Height = EffectHeight[id];
+                target.X = Param1;
+                target.Y = Param2;
+                NewEffect((int)Target, target, (int)Param3);
+                expire();
+            }
+            break;
+        }
+
         // SPRITE FUNCTIONS
         case AT_LoadImage:
         {
@@ -1658,6 +1682,7 @@ static const std::unordered_map<std::string, AutocodeType> s_commandMap =
     {"CollisionScan", AT_CollisionScan},
 
     {"ShakeScreen", AT_ShakeScreen},
+    {"SpawnEffect", AT_SpawnEffect},
 
     {"LoadImage", AT_LoadImage},
     {"SpriteBlueprint", AT_SpriteBlueprint},
