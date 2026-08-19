@@ -370,7 +370,7 @@ void Autocode::Do(bool init)
                         std::string full_path = g_dirCustom.resolveFileCaseAbs(GetS(MyString));
                         PlayExtSound(full_path,
                                     (int)Param2,
-                                    (int)(Param3 <= 0.0 ? 128 : Param3),
+                                    (int)(Param3 <= 0.0_n ? 128 : Param3),
                                     m_Type == AT_PlaySFXPausable || m_Type == AT_PlaySFXSctPausable,
                                     (m_Type == AT_PlaySFXSection || m_Type == AT_PlaySFXSctPausable) ? (int)Target : -1
                         );
@@ -1241,8 +1241,13 @@ void Autocode::Do(bool init)
             if(this->Length >= 1)
             {
                 int section = SDL_atoi(GetS(MyString).data());
-                UNUSED(section); // TODO: Use in the 1.8
-                doShakeScreen((int)Target, (int)Param1, (int)Param2, (int)this->Length, Param3);
+                const auto &s = level[section >= 0 && section <= maxSections ? section : 0];
+                Location_t e;
+                e.X = s.X + 2;
+                e.Y = s.Y + 2;
+                e.Width = (s.Width - s.X) - 4;
+                e.Height = (s.Height - s.Y) - 4;
+                doShakeScreen((int)Target, (int)Param1, (int)Param2, (int)this->Length, (int)((double)Param3 * 1000.0), e);
                 expire();
             }
             break;
@@ -1265,7 +1270,7 @@ void Autocode::Do(bool init)
                 target.Height = EffectHeight[id];
                 target.X = Param1;
                 target.Y = Param2;
-                NewEffect((int)Target, target, (int)Param3);
+                NewEffect((EFFID)(int)Target, target, (int)Param3);
                 expire();
             }
             break;

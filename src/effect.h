@@ -24,6 +24,8 @@
 
 #include "global_constants.h"
 #include "location.h"
+#include "eff_id.h"
+#include "npc.h"
 
 // Public Sub UpdateEffects() 'Updates the effects
 // Updates the effects
