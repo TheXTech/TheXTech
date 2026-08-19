@@ -1230,6 +1230,18 @@ void Autocode::Do(bool init)
             break;
         }
 
+        case AT_ShakeScreen:
+        {
+            if(this->Length >= 1)
+            {
+                int section = SDL_atoi(GetS(MyString).data());
+                UNUSED(section); // TODO: Use in the 1.8
+                doShakeScreen((int)Target, (int)Param1, (int)Param2, (int)this->Length, Param3);
+                expire();
+            }
+            break;
+        }
+
         // SPRITE FUNCTIONS
         case AT_LoadImage:
         {
@@ -1651,6 +1663,8 @@ static const std::unordered_map<std::string, AutocodeType> s_commandMap =
     {"DebugWindow", AT_DebugWindow},
 
     {"CollisionScan", AT_CollisionScan},
+
+    {"ShakeScreen", AT_ShakeScreen},
 
     {"LoadImage", AT_LoadImage},
     {"SpriteBlueprint", AT_SpriteBlueprint},

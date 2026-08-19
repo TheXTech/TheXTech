@@ -144,6 +144,8 @@ enum AutocodeType
 
     AT_CollisionScan,           //1:        2:              3:              4:          5: Active time  6:
 
+    AT_ShakeScreen,             //1: X rate 2: Y rate       3: Type         4: Decay    5: Duration     6: Section (in new builds!)
+
     /// Sprite stuff ///
     AT_LoadImage,               //1: Code   2: TransColor   3:              4:          5:              6: File name
     AT_SpriteBlueprint,         //0: $RefName, others empty
