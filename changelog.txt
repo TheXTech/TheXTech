@@ -35,6 +35,7 @@ Changelog for 1.3.7.4-dev
 -Fixed broken user directory handling on the Haiku (@Wohlstand)
 -Added support for the iOS platform (@Wohlstand)
 -Added support for the tvOS platform (@Wohlstand)
+-LunaScript: Added the "ShakeScreen" command to trigger the screen shaking without using of boom blocks (@Wohlstand)
 
 Changelog for 1.3.7.3
 -Update LVLX/WLDX/SAVX loader to use new MDX file parser by ds-sloth (speeds up level/world loads on slow devices) (@ds-sloth, @Wohlstand)
