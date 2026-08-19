@@ -424,12 +424,16 @@ resume_UpdateEvents:
                         if(FreezeNPCs)
                         {
                             FreezeNPCs = false;
+                            SuspendExtSound(false);
+
                             if(PSwitchTime > 0)
                                 ResumeMusic();
                         }
                         else
                         {
                             FreezeNPCs = true;
+                            SuspendExtSound(true);
+
                             if(PSwitchTime > 0)
                                 PauseMusic();
                         }
@@ -607,6 +611,8 @@ void PauseInit(PauseCode code, int plr, void (*callback)())
                 SavedChar[Player[A].Character] = Player[A];
         }
 
+        SuspendExtSound(true);
+
         if(PSwitchTime > 0)
             PauseMusic();
     }
@@ -781,6 +787,8 @@ static void s_PauseFinish(int stack_level)
     else
     {
         GamePaused = PauseCode::None;
+        
+        SuspendExtSound(false);
 
         if(PSwitchTime > 0)
             ResumeMusic();

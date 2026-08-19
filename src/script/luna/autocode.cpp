@@ -352,6 +352,9 @@ void Autocode::Do(bool init)
         }
 
         case AT_PlaySFX:
+        case AT_PlaySFXPausable:
+        case AT_PlaySFXSection:
+        case AT_PlaySFXSctPausable:
         {
             if(this->Length <= 1) // Play once when delay runs out
             {
@@ -365,7 +368,12 @@ void Autocode::Do(bool init)
                     {
                         //char* dbg = "CUSTOM SOUND PLAY DBG";
                         std::string full_path = g_dirCustom.resolveFileCaseAbs(GetS(MyString));
-                        PlayExtSound(full_path, (int)Param2, (int)(Param3 <= 0 ? 128 : Param3));
+                        PlayExtSound(full_path,
+                                    (int)Param2,
+                                    (int)(Param3 <= 0.0 ? 128 : Param3),
+                                    m_Type == AT_PlaySFXPausable || m_Type == AT_PlaySFXSctPausable,
+                                    (m_Type == AT_PlaySFXSection || m_Type == AT_PlaySFXSctPausable) ? (int)Target : -1
+                        );
                     }
 
                 }
@@ -1659,6 +1667,9 @@ static const std::unordered_map<std::string, AutocodeType> s_commandMap =
 
     {"SFX", AT_SFX},
     {"PlaySFX", AT_PlaySFX},
+    {"PlaySFXPausable", AT_PlaySFXPausable},
+    {"PlaySFXSection", AT_PlaySFXSection},
+    {"PlaySFXSctPausable", AT_PlaySFXSctPausable},
     {"StopSFX", AT_StopSFX},
     {"SFXPreLoad", AT_SFXPreLoad},
     {"SetMusic", AT_SetMusic},

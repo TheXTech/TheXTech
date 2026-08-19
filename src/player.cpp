@@ -1707,7 +1707,7 @@ void CheckSection(const int A)
     {
         int B = p.Section;
 
-        UpdateSoundFX(B);
+        UpdateAudioSection(B);
 
         bool boss_track = (curMusic == 6 || curMusic == 15);
 
