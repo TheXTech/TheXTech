@@ -546,6 +546,9 @@ static inline int s_round2int(num_t d)
 void ChangeScreen()
 {
 #ifndef RENDER_FULLSCREEN_ALWAYS
+    if(g_config.disable_fullscreen_toggle)
+        return;
+
     // shouldn't be possible
     if(g_config.fullscreen.m_set > ConfigSetLevel::user_config)
     {
