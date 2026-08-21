@@ -30,6 +30,8 @@ else()
     option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." OFF)
 endif()
 
+set(AUDIOCODECS_BUILD_OGG_VORBIS OFF)
+
 set(MIXER_USE_OGG_VORBIS_FILE OFF)
 set(MIXER_USE_OGG_VORBIS_STB ON)
 set(MIXER_USE_OGG_VORBIS_TREMOR OFF)
@@ -39,6 +41,10 @@ if(NINTENDO_3DS)
     set(MIXER_USE_OGG_VORBIS_STB OFF)
     set(MIXER_USE_OGG_VORBIS_TREMOR ON)
     set(AUDIOCODECS_OGG_UNSAFE_DISABLE_CRC ON)
+endif()
+
+if(MIXER_USE_OGG_VORBIS_FILE OR MIXER_USE_OGG_VORBIS_TREMOR OR PGE_VIDEO_REC_WEBM_SUPPORTED)
+    set(AUDIOCODECS_BUILD_OGG_VORBIS ON)
 endif()
 
 #if(WIN32)
@@ -126,6 +132,13 @@ set(MixerX_CodecLibs
     "${AC_FLUIDLITE}"
 )
 
+set(MixerX_CodecLibsShared)
+
+
+if(PGE_FFMPEG_AVAILABLE AND PGE_VIDEO_REC_WEBM_SUPPORTED)
+    list(APPEND MixerX_CodecLibs ${AC_VORBISENC})
+    list(APPEND MixerX_CodecLibsShared ${AC_VORBISENC})
+endif()
 
 if(MIXER_USE_OGG_VORBIS_FILE)
     list(APPEND MixerX_CodecLibs ${AC_VORBISFILE})
@@ -133,6 +146,9 @@ endif()
 
 if(MIXER_USE_OGG_VORBIS_FILE OR PGE_VIDEO_REC_WEBM_SUPPORTED)
     list(APPEND MixerX_CodecLibs ${AC_VORBIS})
+    if(PGE_VIDEO_REC_WEBM_SUPPORTED)
+        list(APPEND MixerX_CodecLibsShared ${AC_VORBIS} ${AC_OGG})
+    endif()
 endif()
 
 if(MIXER_USE_OGG_VORBIS_TREMOR)
@@ -142,7 +158,8 @@ endif()
 list(APPEND MixerX_CodecLibs
     "${AC_OPUSFILE}"
     "${AC_OPUS}"
-    "${AC_OGG}")
+    "${AC_OGG}"
+)
 
 if(MIXERX_ENABLE_WAVPACK)
     list(APPEND MixerX_CodecLibs "${AC_WAVPACK}")
@@ -214,7 +231,6 @@ endif()
 
 set(MixerX_Deps)
 set(AudioCodecs_Deps)
-set(AUDIO_CODECS_BUILD_ARGS)
 set(MIXERX_CMAKE_FLAGS)
 
 if(THEXTECH_NO_MIXER_X)
@@ -240,19 +256,13 @@ if(THEXTECH_NO_MIXER_X)
     endif()
 else()
     list(APPEND XTECH_PLATFORM_AUDIOCODECS_CMAKE_FLAGS
-        "-DBUILD_OGG_VORBIS=${MIXER_USE_OGG_VORBIS_TREMOR}"
+        "-DBUILD_OGG_VORBIS=${AUDIOCODECS_BUILD_OGG_VORBIS}"
         "-DOGG_UNSAFE_DISABLE_CRC=${AUDIOCODECS_OGG_UNSAFE_DISABLE_CRC}"
         "-DBUILD_FLAC=OFF"
         "-DBUILD_MPG123=OFF"
         "-DBUILD_GME_SYSTEM_ZLIB=${USE_SYSTEM_ZLIB}"
         "-DBUILD_WAVPACK=${MIXERX_ENABLE_WAVPACK}"
     )
-
-    if(PGE_VIDEO_REC_WEBM_SUPPORTED)
-        list(APPEND AUDIO_CODECS_BUILD_ARGS "-DBUILD_OGG_VORBIS=ON")
-    else()
-        list(APPEND AUDIO_CODECS_BUILD_ARGS "-DBUILD_OGG_VORBIS=${MIXER_USE_OGG_VORBIS_TREMOR}")
-    endif()
 endif()
 
 if(NINTENDO_WII OR NINTENDO_DS OR NINTENDO_3DS)
@@ -412,7 +422,11 @@ endif()
 
 if(NOT THEXTECH_CLI_BUILD AND NOT THEXTECH_NO_MIXER_X)
     target_link_libraries(PGE_SDLMixerX_static INTERFACE ${MixerX_CodecLibs})
+    if(NOT MixerX_CodecLibsShared STREQUAL "")
+        target_link_libraries(PGE_SDLMixerX INTERFACE ${MixerX_CodecLibsShared})
+    endif()
 endif()
+
 
 if(USE_SYSTEM_SDL2)
     target_link_libraries(PGE_SDLMixerX_static INTERFACE ${SDL2_LIBRARIES})
