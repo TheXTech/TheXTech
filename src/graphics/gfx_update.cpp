@@ -70,6 +70,10 @@
 #    include "core/opengl/gl_program_bank.h"
 #endif
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+#    include "main/client_methods.h"
+#endif
+
 #include <fmt_format_ne.h>
 
 struct ScreenShake_t
@@ -3127,6 +3131,14 @@ void UpdateGraphicsMeta()
 
     if(PrintFPS > 0 && g_config.show_fps)
         SuperPrint(std::to_string(PrintFPS), 1, XRender::TargetOverscanX + 8, 8, {0, 255, 0});
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+    if(XMessage::GetStatus() == XMessage::Status::connected && g_config.show_fps)
+    {
+        const auto& stat = *XMessage::GetClientStatus();
+        SuperPrint(std::to_string(stat.latency_frames), 1, XRender::TargetOverscanX + 8, 28, (stat.udp_active) ? XTColor{0, 255, 0} : XTColor{255, 255, 0});
+    }
+#endif
 
     if(g_VanillaCam && (XRender::TargetW > 800 || XRender::TargetH > 600) && GFX.Camera.inited)
         XRender::renderTextureBasic(XRender::TargetW - XRender::TargetOverscanX - GFX.Camera.w - 4, XRender::TargetH - GFX.Camera.h - 4, GFX.Camera);

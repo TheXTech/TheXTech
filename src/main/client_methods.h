@@ -72,6 +72,9 @@ struct ClientStatus
     RoomInfo room_info;
     int client_index = 0;
     bool knock_knock = false;
+    int latency_frames = -1;
+    int latency_ms = -1;
+    bool udp_active = false;
 };
 
 struct GameThread

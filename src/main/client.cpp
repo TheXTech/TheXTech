@@ -623,10 +623,11 @@ void NetworkClient::ReceiveData()
 
                 if(acked_frame >= ping_send_frame && ping_send_frame != 0)
                 {
-                    latency_ms = SDL_GetTicks() - ping_send_ms;
-                    latency_frames = temp_state.current_frame - ping_send_frame;
+                    status.latency_ms = SDL_GetTicks() - ping_send_ms;
+                    status.latency_frames = temp_state.current_frame - ping_send_frame;
+                    status.udp_active = true;
                     ping_send_frame = 0;
-                    pLogDebug("UDP latency: %u ms, %d ticks", latency_ms, latency_frames);
+                    push_status();
                 }
                 break;
             case(XMessage::Type::frame_end):
@@ -1024,10 +1025,11 @@ void NetworkClient::client_loop()
 
             if(acked_frame >= ping_send_frame && ping_send_frame != 0)
             {
-                latency_ms = SDL_GetTicks() - ping_send_ms;
-                latency_frames = temp_state.current_frame - ping_send_frame;
+                status.latency_ms = SDL_GetTicks() - ping_send_ms;
+                status.latency_frames = temp_state.current_frame - ping_send_frame;
+                status.udp_active = false;
                 ping_send_frame = 0;
-                pLogDebug("TCP latency: %u ms, %d ticks", latency_ms, latency_frames);
+                push_status();
             }
 
             tcp_control.ShiftBuffer(4);
