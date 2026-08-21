@@ -27,6 +27,10 @@
 #include "message.h"
 #include "main/client.h"
 
+#ifdef __WII__
+#include "network.h"
+#endif
+
 static constexpr bool max_debug = false;
 
 namespace XMessage
@@ -270,6 +274,19 @@ MutexSent NetworkClient::get_session_access()
 void NetworkClient::Connect(const char* host, int port)
 {
     Disconnect();
+
+#if defined(__WII__)
+    if(!net_gethostip())
+    {
+        char localip[16] = {0};
+        char gateway[16] = {0};
+        char netmask[16] = {0};
+
+        // Configure the network interface
+        int if_ret = if_config( localip, netmask, gateway, true, 20);
+        pLogInfo("Wii network init: %d %s", if_ret, localip);
+    }
+#endif
 
     IPaddress addr;
     if(SDLNet_ResolveHost(&addr, host, port) != 0)
