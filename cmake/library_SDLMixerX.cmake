@@ -45,6 +45,10 @@ endif()
 
 if(MIXER_USE_OGG_VORBIS_FILE OR MIXER_USE_OGG_VORBIS_TREMOR OR PGE_VIDEO_REC_WEBM_SUPPORTED)
     set(AUDIOCODECS_BUILD_OGG_VORBIS ON)
+    set(MIXER_USE_OGG_VORBIS_STB OFF)
+    if(PGE_VIDEO_REC_WEBM_SUPPORTED)
+        set(MIXER_USE_OGG_VORBIS_FILE ON)
+    endif()
 endif()
 
 #if(WIN32)
@@ -146,9 +150,10 @@ endif()
 
 if(MIXER_USE_OGG_VORBIS_FILE OR PGE_VIDEO_REC_WEBM_SUPPORTED)
     list(APPEND MixerX_CodecLibs ${AC_VORBIS})
-    if(PGE_VIDEO_REC_WEBM_SUPPORTED)
-        list(APPEND MixerX_CodecLibsShared ${AC_VORBIS} ${AC_OGG})
-    endif()
+endif()
+
+if(PGE_VIDEO_REC_WEBM_SUPPORTED)
+    list(APPEND MixerX_CodecLibsShared ${AC_VORBIS})
 endif()
 
 if(MIXER_USE_OGG_VORBIS_TREMOR)
@@ -160,6 +165,10 @@ list(APPEND MixerX_CodecLibs
     "${AC_OPUS}"
     "${AC_OGG}"
 )
+
+if(PGE_VIDEO_REC_WEBM_SUPPORTED)
+    list(APPEND MixerX_CodecLibsShared ${AC_OGG})
+endif()
 
 if(MIXERX_ENABLE_WAVPACK)
     list(APPEND MixerX_CodecLibs "${AC_WAVPACK}")
@@ -231,7 +240,6 @@ endif()
 
 set(MixerX_Deps)
 set(AudioCodecs_Deps)
-set(MIXERX_CMAKE_FLAGS)
 
 if(THEXTECH_NO_MIXER_X)
     # Disable everything except of SDL2
@@ -272,7 +280,7 @@ if(NINTENDO_WII OR NINTENDO_DS OR NINTENDO_3DS)
 endif()
 
 if(PGE_FFMPEG_AVAILABLE)
-    list(APPEND XTECH_PLATFORM_AUDIOCODECS_CMAKE_FLAGS
+    list(APPEND XTECH_PLATFORM_MIXERX_CMAKE_FLAGS
         "-DUSE_FFMPEG=ON"
         "-DFFMPEG_INCLUDE_DIRS=${FFMPEG_INCLUDE_DIRS}"
         "-DFFMPEG_avcodec_LIBRARY=${AVCODEC_LIBRARY}"
@@ -379,7 +387,7 @@ if(NOT THEXTECH_NO_MIXER_X)
             "-DAUDIO_CODECS_SDL2_GIT_BRANCH=${SDL_GIT_BRANCH}"
             "-DMIXERX_ENABLE_GPL=ON"
             "-DWITH_SDL2_WASAPI=ON"
-            "-DUSE_MIDI_FLUIDLITE_OGG_STB=ON"
+            "-DUSE_MIDI_FLUIDLITE_OGG_STB=${MIXER_USE_OGG_VORBIS_STB}"
             "-DUSE_DRFLAC=ON"
             "-DUSE_FLAC=OFF"
             "-DUSE_WAVPACK=${MIXERX_ENABLE_WAVPACK}"
@@ -422,9 +430,6 @@ endif()
 
 if(NOT THEXTECH_CLI_BUILD AND NOT THEXTECH_NO_MIXER_X)
     target_link_libraries(PGE_SDLMixerX_static INTERFACE ${MixerX_CodecLibs})
-    if(NOT MixerX_CodecLibsShared STREQUAL "")
-        target_link_libraries(PGE_SDLMixerX INTERFACE ${MixerX_CodecLibsShared})
-    endif()
 endif()
 
 
