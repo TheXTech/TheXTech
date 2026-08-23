@@ -5,10 +5,10 @@ set(VITA_TITLEID "THEXTECH0")
 set(VITA_VERSION "${THEXTECH_VERSION_1}${THEXTECH_VERSION_2}.${THEXTECH_VERSION_3}${THEXTECH_VERSION_4}")
 
 # the next two variables are used by template.xml.in
-set(XTECH_VITA_AUTHORS "By Wohlstand and ds-sloth. Ported by Axiom.")
+set(XTECH_VITA_AUTHORS "By Wohlstand and ds-sloth")
 
 if(NOT "${THEXTECH_VERSION_REL}" STREQUAL "")
-    set(XTECH_VITA_SHORT_DESC "git ${GIT_BRANCH} #${GIT_COMMIT_HASH}")
+    set(XTECH_VITA_SHORT_DESC "v${THEXTECH_VERSION_STRING}\ngit ${GIT_BRANCH} #${GIT_COMMIT_HASH}\n(${GIT_COMMIT_DATE})")
 else()
     set(XTECH_VITA_SHORT_DESC "Based on SMBX 1.3 by Redigit")
 endif()
@@ -29,7 +29,7 @@ vita_create_vpk(${THEXTECH_EXECUTABLE_NAME}.vpk ${VITA_TITLEID} ${THEXTECH_EXECU
     VERSION ${VITA_VERSION}
     NAME ${VITA_APP_NAME}
     FILE    ${CMAKE_SOURCE_DIR}/resources/vita/sce_sys/icon0.png sce_sys/icon0.png
-            ${CMAKE_SOURCE_DIR}/resources/vita/sce_sys/livearea/contents/bg.png sce_sys/livearea/contents/bg.png
+            ${CMAKE_SOURCE_DIR}/resources/vita/sce_sys/livearea/contents/bg0.png sce_sys/livearea/contents/bg0.png
             ${CMAKE_SOURCE_DIR}/resources/vita/sce_sys/livearea/contents/startup.png sce_sys/livearea/contents/startup.png
             ${CMAKE_BINARY_DIR}/template.xml sce_sys/livearea/contents/template.xml
 )

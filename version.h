@@ -37,6 +37,12 @@
 #define V_BUILD_BRANCH "<unknown>"
 #endif
 
+#ifdef GIT_DATE
+#define V_BUILD_COMMIT_DATE GIT_DATE
+#else
+#define V_BUILD_COMMIT_DATE "<unknown>"
+#endif
+
 #ifdef THEXTECH_VERSION_1
 #   define V_VF1 THEXTECH_VERSION_1
 #else

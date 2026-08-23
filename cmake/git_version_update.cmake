@@ -26,6 +26,14 @@ execute_process(
         OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+# Get the commit date of the working branch
+execute_process(
+        COMMAND git log -1 --format=%cs
+        WORKING_DIRECTORY ${SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_COMMIT_DATE
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
 # Check if the git index is dirty
 execute_process(
         COMMAND git diff-index HEAD --
@@ -57,9 +65,15 @@ else()
     set(THEXTECH_GIT_BRANCH "${GIT_BRANCH}")
 endif()
 
-message("=== git info: commit ${THEXTECH_GIT_VERSION}, branch ${THEXTECH_GIT_BRANCH}")
+if(NOT GIT_COMMIT_DATE)
+    set(THEXTECH_GIT_DATE "unknown")
+else()
+    set(THEXTECH_GIT_DATE "${GIT_COMMIT_DATE}")
+endif()
+
+message("=== git info: commit ${THEXTECH_GIT_VERSION}, branch ${THEXTECH_GIT_BRANCH}, date ${THEXTECH_GIT_DATE}")
 
 file(MAKE_DIRECTORY generated-include)
-file(WRITE generated-include/git_version.h.txt "#define GIT_VERSION \"${THEXTECH_GIT_VERSION}\"\n#define GIT_BRANCH \"${THEXTECH_GIT_BRANCH}\"\n")
+file(WRITE generated-include/git_version.h.txt "#define GIT_VERSION \"${THEXTECH_GIT_VERSION}\"\n#define GIT_BRANCH \"${THEXTECH_GIT_BRANCH}\"\n#define GIT_DATE \"${THEXTECH_GIT_DATE}\"\n")
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different generated-include/git_version.h.txt generated-include/git_version.h)

@@ -43,6 +43,14 @@ execute_process(
         OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+# Get the commit date of the working branch
+execute_process(
+        COMMAND git log -1 --format=%cs
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_COMMIT_DATE
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
 # flatpak-builder breaks any commands that check the git tree,
 # and fdroid applies local autochanges such as gradle wrapper removal and build.gradle patching
 if(NOT "${GIT_DIRTY_STRING}" STREQUAL "" AND NOT FLATPAK_BUILD AND NOT FDROID_BUILD)
