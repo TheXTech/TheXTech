@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <livearea style="a1" format-ver="01.00" content-rev="1">
-	<!-- <livearea-background> -->
-		<!-- <image>bg.png</image> -->
-	<!-- </livearea-background> -->
+	<livearea-background>
+		<image>bg0.png</image>
+	</livearea-background>
 	
 	<gate>
 		<startup-image>startup.png</startup-image>
@@ -11,8 +11,8 @@
 	
 	<frame id="frame1">
 		<liveitem>
-			<text>
-				<str size="20" color="#ffffff" shadow="on">@XTECH_VITA_AUTHORS@</str>
+			<text text-align="right">
+				<str size="20" color="#000000" shadow="on">@XTECH_VITA_AUTHORS@</str>
 			</text>
 		</liveitem>
 	</frame>
@@ -20,7 +20,7 @@
 	<frame id="frame2">
 		<liveitem>
 			<text>
-				<str size="20" color="#ffffff" shadow="on">@XTECH_VITA_SHORT_DESC@</str>
+				<str size="20" color="#000000" shadow="on">@XTECH_VITA_SHORT_DESC@</str>
 			</text>
 		</liveitem>
 	</frame>

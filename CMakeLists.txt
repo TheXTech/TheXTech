@@ -1329,7 +1329,7 @@ set(THEXTECH_EXTRA_RESOURCES
     resources/vita/frag.cgf
     resources/vita/vert.cgv
     resources/vita/sce_sys/icon0.png
-    resources/vita/sce_sys/livearea/contents/bg.png
+    resources/vita/sce_sys/livearea/contents/bg0.png
     resources/vita/sce_sys/livearea/contents/startup.png
     resources/vita/sce_sys/livearea/contents/template.xml.in
     resources/nds/icon.bmp
