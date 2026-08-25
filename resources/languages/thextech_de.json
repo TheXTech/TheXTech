@@ -66,19 +66,19 @@
                 "controls": "Steuerung",
                 "endGame": "Spiel beenden",
                 "layerSmoke": "Rauch",
-                "autostart": "",
+                "autostart": "Autostart",
                 "sound": ""
             },
             "sections": {
                 "actionKeep": "Behalten",
                 "actionReset": "Zurücksetzen",
-                "propBounds": "",
-                "propMusic": "",
-                "propBackground": "",
+                "propBounds": "Rahmen",
+                "propMusic": "Musik",
+                "propBackground": "Hint.bild",
                 "actionSet": "",
-                "phraseAllSections": ""
+                "phraseAllSections": "Alle Sektionen"
             },
-            "settingsForEvent": ""
+            "settingsForEvent": "Einstellungen für das Ereignis {0}"
         },
         "block": {
             "canBreak": "Zerstörbar",
@@ -153,29 +153,29 @@
         "letterRight": "",
         "wordHeight": "",
         "file": {
-            "commandSave": "",
+            "commandSave": "Speichern",
             "convert": {
                 "descNew": ""
             },
             "formatLegacy": "",
-            "commandOpen": "",
+            "commandOpen": "Öffnen...",
             "labelFormat": "",
-            "actionOpen": "",
+            "actionOpen": "Öffnen",
             "optionCancelAction": "",
-            "commandSaveAs": "",
-            "actionRevert": "",
+            "commandSaveAs": "Speichern unter...",
+            "actionRevert": "umkehren",
             "optionYesSaveThenAction": "",
             "optionActionWithoutSave": "",
-            "confirmConvertFormatTo": "",
+            "confirmConvertFormatTo": "Format in \"{0}\" konvertieren?",
             "sectionWorld": "",
-            "commandNew": "",
+            "commandNew": "Neu",
             "actionClearWorld": "",
             "optionProceedWithConversion": "",
-            "confirmConfirmAction": "",
+            "confirmConfirmAction": "Sind Sie sicher, dass Sie {0} wollen?",
             "confirmSaveBeforeAction": "",
             "optionCancelConversion": "",
             "actionClearLevel": "",
-            "actionExit": "",
+            "actionExit": "Verlassen",
             "sectionLevel": "",
             "labelCurrentFile": "",
             "formatModern": ""
@@ -481,7 +481,7 @@
             "gameBattleRandom": "",
             "gameTargetSlot": "",
             "gameSlotContinue": "",
-            "gameSlotNew": "",
+            "gameSlotNew": "SLOT {0} ... NEU SPIEL",
             "phraseScore": "",
             "gameNoEpisodesToPlay": "",
             "phraseTime": "",
@@ -746,10 +746,10 @@
             "mainEditor": "",
             "main1PlayerGame": "",
             "mainMultiplayerGame": "",
-            "mainBattleGame": "",
-            "mainPlayEpisode": "",
-            "mainOptions": "",
-            "mainExit": ""
+            "mainBattleGame": "Kampfspiel",
+            "mainPlayEpisode": "Episode spielen",
+            "mainOptions": "Einstellungen",
+            "mainExit": "Beenden"
         },
         "editor": {
             "makeFor": "",
@@ -806,7 +806,7 @@
         },
         "pause": {
             "playerSetup": "",
-            "restartLevel": "",
+            "restartLevel": "Level neu starten",
             "quit": "",
             "enterCode": "",
             "saveAndContinue": "",
