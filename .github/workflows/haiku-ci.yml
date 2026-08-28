@@ -1,7 +1,7 @@
 name: Haiku CI
 
 on:
-  workflow_dispatch:
+#  workflow_dispatch:
   push:
     branches:
 #      - main
@@ -37,7 +37,8 @@ jobs:
             -DUSE_SHARED_FREEIMAGE=OFF \
             -DPGE_SHARED_SDLMIXER=OFF",
 
-            deps_cmdline: "pkgman install -y libsdl2 libsdl2_devel cmake ninja git lftp",
+            # pkgman install -y libsdl2 libsdl2_devel cmake ninja git lftp
+            deps_cmdline: "echo 'Everything is already installed'",
 
             executable_name: "thextech",
             generator: "Ninja",
@@ -89,7 +90,7 @@ jobs:
         operating_system: haiku
         architecture: x86-64
         version: r1beta6
-        image_url: https://github.com/cross-platform-actions/haiku-builder/releases/download/v0.2.0/haiku-r1beta6-x86-64.qcow2
+        image_url: https://github.com/WohlSoft/haiku-builder/releases/download/v2026-08-28/haiku-r1beta6-x86-64.qcow2
 
     - name: Install host dependencies
       shell: bash
