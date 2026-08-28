@@ -4,8 +4,8 @@ on:
 #  workflow_dispatch:
   push:
     branches:
-#      - main
-#      - stable*
+      - main
+      - stable*
 #      - versus-ci
       - versus-ci-haiku
   pull_request:
