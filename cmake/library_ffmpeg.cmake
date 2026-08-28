@@ -40,13 +40,56 @@ if(USE_SYSTEM_LIBS)
 
     set(FFMPEG_Libs ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVUTIL_LIBRARY} ${SWSCALE_LIBRARY} ${SWRESAMPLE_LIBRARY})
 else()
+    if(PGE_SHARED_SDLMIXER)
+        set(PGE_SHARED_FFMPEG_FORCE_ON ON)
+        set(PGE_SHARED_FFMPEG_FORCE_OFF OFF)
+    elseif(APPLE)
+        set(PGE_SHARED_FFMPEG_DEFAULT OFF)
+    elseif(EMSCRIPTEN OR ANDROID OR IOS OR TVOS OR VITA OR NINTENDO_SWITCH OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_3DS)
+        set(PGE_SHARED_FFMPEG_FORCE_ON OFF)
+        set(PGE_SHARED_FFMPEG_FORCE_OFF ON)
+    else()
+        set(PGE_SHARED_FFMPEG_DEFAULT ON)
+    endif()
+
+    if(NOT PGE_SHARED_FFMPEG_FORCE_OFF AND NOT PGE_SHARED_FFMPEG_FORCE_ON)
+        option(PGE_SHARED_FFMPEG "Build and link the FFMPEG libraries as a shared libraries (dll/so/dylib)" ${PGE_SHARED_FFMPEG_DEFAULT})
+    elseif(PGE_SHARED_FFMPEG_FORCE_ON)
+        set(PGE_SHARED_FFMPEG ON CACHE BOOL "" FORCE)
+    else()
+        set(PGE_SHARED_FFMPEG OFF CACHE BOOL "" FORCE)
+    endif()
+
     set(FFMPEG_Libs)
 
-    set(AVFORMAT_LIBRARY    "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}avformatmixerx${CMAKE_STATIC_LIBRARY_SUFFIX}")
-    set(AVCODEC_LIBRARY     "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}avcodecmixerx${CMAKE_STATIC_LIBRARY_SUFFIX}")
-    set(AVUTIL_LIBRARY      "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}avutilmixerx${CMAKE_STATIC_LIBRARY_SUFFIX}")
-    set(SWRESAMPLE_LIBRARY  "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}swresamplemixerx${CMAKE_STATIC_LIBRARY_SUFFIX}")
-    set(SWSCALE_LIBRARY     "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}swscalemixerx${CMAKE_STATIC_LIBRARY_SUFFIX}")
+    set_static_lib(libavformat_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/" avformatmixerx)
+    set_shared_lib(libavformat_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/" avformatmixerx)
+
+    set_static_lib(libavcodec_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/" avcodecmixerx)
+    set_shared_lib(libavcodec_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/" avcodecmixerx)
+
+    set_static_lib(libavutil_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/" avutilmixerx)
+    set_shared_lib(libavutil_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/" avutilmixerx)
+
+    set_static_lib(libswresample_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/" swresamplemixerx)
+    set_shared_lib(libswresample_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/" swresamplemixerx)
+
+    set_static_lib(libswscale_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/" swscalemixerx)
+    set_shared_lib(libswscale_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/" swscalemixerx)
+
+    if(PGE_SHARED_FFMPEG)
+        set(AVFORMAT_LIBRARY    "${libavformat_SO_Lib}")
+        set(AVCODEC_LIBRARY     "${libavcodec_SO_Lib}")
+        set(AVUTIL_LIBRARY      "${libavutil_SO_Lib}")
+        set(SWRESAMPLE_LIBRARY  "${libswresample_SO_Lib}")
+        set(SWSCALE_LIBRARY     "${libswscale_SO_Lib}")
+    else()
+        set(AVFORMAT_LIBRARY    "${libavformat_A_Lib}")
+        set(AVCODEC_LIBRARY     "${libavcodec_A_Lib}")
+        set(AVUTIL_LIBRARY      "${libavutil_A_Lib}")
+        set(SWRESAMPLE_LIBRARY  "${libswresample_A_Lib}")
+        set(SWSCALE_LIBRARY     "${libswscale_A_Lib}")
+    endif()
 
     list(APPEND FFMPEG_Libs ${AVFORMAT_LIBRARY} ${AVCODEC_LIBRARY} ${SWRESAMPLE_LIBRARY})
 
@@ -142,6 +185,12 @@ else()
         set(FFMPEG_LD_FLAGS --extra-ldflags=-Wl,--no-undefined)
     endif()
 
+    if(PGE_SHARED_FFMPEG)
+        set(FFMPEG_ARG_LIBTYPE --enable-shared --disable-static)
+    else()
+        set(FFMPEG_ARG_LIBTYPE --disable-shared --enable-static)
+    endif()
+
     ExternalProject_Add(
         FFMPEG_Local
         PREFIX ${CMAKE_BINARY_DIR}/external/ffmpeg
@@ -152,7 +201,7 @@ else()
             "${CMAKE_CURRENT_LIST_DIR}/../3rdparty/ffmpeg/configure"
             "--prefix=${DEPENDENCIES_INSTALL_DIR}"
             --enable-rpath
-            --build-suffix=mixerx
+            --build-suffix=mixerx${PGE_LIBS_DEBUG_SUFFIX}
             --disable-all
             --disable-autodetect
             --disable-hwaccels
@@ -171,7 +220,7 @@ else()
 
             --disable-bzlib
             --disable-zlib
-            --enable-static
+            ${FFMPEG_ARG_LIBTYPE}
 
             --disable-cuvid --disable-d3d11va --disable-dxva2 --disable-ffnvcodec --disable-vaapi --disable-vdpau
 

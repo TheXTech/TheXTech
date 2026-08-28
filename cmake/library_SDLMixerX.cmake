@@ -18,7 +18,7 @@ endif()
 if(NOT PGE_SHARED_SDLMIXER_FORCE_OFF)
     option(PGE_SHARED_SDLMIXER "Link MixerX as a shared library (dll/so/dylib)" ${PGE_SHARED_SDLMIXER_DEFAULT})
 else()
-    set(PGE_SHARED_SDLMIXER OFF)
+    set(PGE_SHARED_SDLMIXER OFF CACHE BOOL "" FORCE)
 endif()
 
 option(MIXERX_ENABLE_WAVPACK "Enable the WavPack codec support [Support is experimental, doesn't builds on some platforms]" OFF)
