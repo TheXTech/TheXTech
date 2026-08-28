@@ -16,7 +16,34 @@ if(USE_SYSTEM_LIBS)
 
     set(libVPX_Libs "${LIBVPX_LIBRARIES}")
 else()
-    set(libVPX_Libs "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}vpx${CMAKE_STATIC_LIBRARY_SUFFIX}")
+    if(PGE_SHARED_SDLMIXER)
+        set(PGE_SHARED_LIBVPX_FORCE_ON ON)
+        set(PGE_SHARED_LIBVPX_FORCE_OFF OFF)
+    elseif(APPLE)
+        set(PGE_SHARED_LIBVPX_DEFAULT OFF)
+    elseif(EMSCRIPTEN OR ANDROID OR IOS OR TVOS OR VITA OR NINTENDO_SWITCH OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_3DS)
+        set(PGE_SHARED_LIBVPX_FORCE_ON OFF)
+        set(PGE_SHARED_LIBVPX_FORCE_OFF ON)
+    else()
+        set(PGE_SHARED_LIBVPX_DEFAULT ON)
+    endif()
+
+    if(NOT PGE_SHARED_LIBVPX_FORCE_OFF AND NOT PGE_SHARED_LIBVPX_FORCE_ON)
+        option(PGE_SHARED_LIBVPX "Build and link the FFMPEG libraries as a shared libraries (dll/so/dylib)" ${PGE_SHARED_LIBVPX_DEFAULT})
+    elseif(PGE_SHARED_LIBVPX_FORCE_ON)
+        set(PGE_SHARED_LIBVPX ON CACHE BOOL "" FORCE)
+    else()
+        set(PGE_SHARED_LIBVPX OFF CACHE BOOL "" FORCE)
+    endif()
+
+    set_static_lib_np(libVPX_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/" vpx)
+    set_shared_lib_np(libVPX_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/" vpx)
+
+    if(PGE_SHARED_LIBVPX)
+        set(libVPX_Libs ${libVPX_SO_Lib})
+    else()
+        set(libVPX_Libs ${libVPX_A_Lib})
+    endif()
 
     if(CMAKE_BUILD_TYPE_LOWER STREQUAL "debug")
         set(LIBVPX_DEBUG_ARGS --enable-debug)
@@ -39,6 +66,12 @@ else()
         set(LIBVPX_PICARGS --disable-pic)
     endif()
 
+    if(PGE_SHARED_LIBVPX)
+        set(LIBVPX_ARG_LIBTYPE "--enable-shared")
+    else()
+        set(LIBVPX_ARG_LIBTYPE "--disable-shared --enable-static")
+    endif()
+
     ExternalProject_Add(
         LIBVPX_Local
         PREFIX ${CMAKE_BINARY_DIR}/external/libvpx
@@ -49,8 +82,7 @@ else()
             "${CMAKE_CURRENT_LIST_DIR}/../3rdparty/libvpx/configure"
             "--prefix=${DEPENDENCIES_INSTALL_DIR}"
             --as=yasm
-            --disable-shared
-            --enable-static
+            ${LIBVPX_ARG_LIBTYPE}
             --disable-examples
             --disable-tools
             --disable-docs
