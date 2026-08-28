@@ -81,7 +81,7 @@ jobs:
         git submodule update --init --recursive
 
     - name: Start Haiku VM
-      uses: cross-platform-actions/action@v1
+      uses: cross-platform-actions/action@v1.4.0
       env:
         BRANCH_NAME: ${BRANCH_NAME}
       with:
