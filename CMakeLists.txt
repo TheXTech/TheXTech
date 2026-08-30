@@ -282,6 +282,13 @@ option(THEXTECH_FIXED_POINT "Experimental: use fixed-point arithmetic for gamepl
 
 option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
 
+if(THEXTECH_NO_SDL_BUILD)
+    if(THEXTECH_ENABLE_SDL_NET)
+        message("== Warning: cannot build SDL_net due to conflicting option THEXTECH_NO_SDL_BUILD ==")
+        set(THEXTECH_ENABLE_SDL_NET OFF CACHE BOOL "" FORCE)
+    endif()
+endif()
+
 # ============ Customization ==============
 set(LIB_SRC_EXTRA)
 
@@ -733,9 +740,7 @@ if(THEXTECH_BUILD_GL_DESKTOP_MODERN AND THEXTECH_USE_ANGLE_TRANSLATOR)
     target_link_libraries(A2XT_Int INTERFACE angle_shader_translator)
 endif()
 
-if(THEXTECH_ENABLE_SDL_NET AND THEXTECH_NO_SDL_BUILD)
-    message("== Warning: cannot build SDL_net due to conflicting option THEXTECH_NO_SDL_BUILD ==")
-elseif(THEXTECH_ENABLE_SDL_NET)
+if(THEXTECH_ENABLE_SDL_NET)
     message("== Building SDL_net... but it doesn't do anything! ==")
     set(SDL_NET_PGE_DEPENDENT_BUILD ON)
     add_subdirectory(3rdparty/SDL_net EXCLUDE_FROM_ALL)
