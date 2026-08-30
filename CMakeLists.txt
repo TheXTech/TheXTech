@@ -237,6 +237,13 @@ else()
     set(THEXTECH_BUILD_GL_ES_MODERN_DEFAULT ON)
 endif()
 
+# only test SDL_Net build on supported platforms
+if((APPLE AND NOT XTECH_MACOSX_TIGER) OR WIN32 OR (CMAKE_SYSTEM_NAME STREQUAL "Linux") OR ANDROID OR PORTMASTER OR NINTENDO_3DS OR NINTENDO_WII OR VITA OR PORTMASTER)
+    set(THEXTECH_ENABLE_SDL_NET_DEFAULT ON)
+else()
+    set(THEXTECH_ENABLE_SDL_NET_DEFAULT OFF)
+endif()
+
 option(THEXTECH_BUILD_GL_DESKTOP_MODERN "On SDL builds, include the OpenGL 2.0+ Core/Compatibility renderer" ${THEXTECH_BUILD_GL_DESKTOP_DEFAULT})
 option(THEXTECH_BUILD_GL_ES_MODERN "On SDL builds, include the OpenGL ES 2.0+ renderer" ${THEXTECH_BUILD_GL_ES_MODERN_DEFAULT})
 option(THEXTECH_BUILD_GL_DESKTOP_LEGACY "On SDL builds, include the OpenGL 1.1+ renderer" ${THEXTECH_BUILD_GL_DESKTOP_DEFAULT})
@@ -255,7 +262,7 @@ option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 option(THEXTECH_ENABLE_LUAU "Enable luau build testing" OFF)
 option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
 
-option(THEXTECH_ENABLE_SDL_NET "Enable SDL_net build testing" OFF)
+option(THEXTECH_ENABLE_SDL_NET "Enable SDL_net build testing" THEXTECH_ENABLE_SDL_NET_DEFAULT)
 
 option(THEXTECH_ENABLE_EDITOR "Enable runtime support for editor features" ON)
 
