@@ -749,6 +749,10 @@ if(THEXTECH_ENABLE_SDL_NET)
     target_compile_definitions(A2XT_Int INTERFACE
         -DTHEXTECH_ENABLE_SDL_NET
     )
+
+    if(ANDROID)
+        set_property(TARGET SDL2_net PROPERTY POSITION_INDEPENDENT_CODE ON)
+    endif()
 endif()
 
 if(THEXTECH_ENABLE_LUAU)
