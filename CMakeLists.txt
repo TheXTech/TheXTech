@@ -238,7 +238,7 @@ else()
 endif()
 
 # only test SDL_Net build on supported platforms
-if((APPLE AND NOT XTECH_MACOSX_TIGER) OR WIN32 OR (CMAKE_SYSTEM_NAME STREQUAL "Linux") OR ANDROID OR PORTMASTER OR NINTENDO_3DS OR NINTENDO_WII OR VITA OR PORTMASTER)
+if((APPLE AND NOT XTECH_MACOSX_TIGER) OR WIN32 OR ((CMAKE_SYSTEM_NAME STREQUAL "Linux") AND NOT FLATPAK_BUILD) OR ANDROID OR PORTMASTER OR NINTENDO_3DS OR NINTENDO_WII OR VITA OR PORTMASTER)
     set(THEXTECH_ENABLE_SDL_NET_DEFAULT ON)
 else()
     set(THEXTECH_ENABLE_SDL_NET_DEFAULT OFF)
@@ -733,11 +733,14 @@ if(THEXTECH_BUILD_GL_DESKTOP_MODERN AND THEXTECH_USE_ANGLE_TRANSLATOR)
     target_link_libraries(A2XT_Int INTERFACE angle_shader_translator)
 endif()
 
-if(THEXTECH_ENABLE_SDL_NET)
+if(THEXTECH_ENABLE_SDL_NET AND THEXTECH_NO_SDL_BUILD)
+    message("== Warning: cannot build SDL_net due to conflicting option THEXTECH_NO_SDL_BUILD ==")
+elseif(THEXTECH_ENABLE_SDL_NET)
     message("== Building SDL_net... but it doesn't do anything! ==")
     set(SDL_NET_PGE_DEPENDENT_BUILD ON)
     add_subdirectory(3rdparty/SDL_net EXCLUDE_FROM_ALL)
-    target_link_libraries(SDL2_net PRIVATE A2XT_Int)
+    add_dependencies(SDL2_net AudioCodecs_Local)
+    target_include_directories(SDL2_net PRIVATE ${A2XT_INCS})
     target_compile_definitions(A2XT_Int INTERFACE
         -DTHEXTECH_ENABLE_SDL_NET
     )
