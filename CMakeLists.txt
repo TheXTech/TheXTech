@@ -262,7 +262,7 @@ option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 option(THEXTECH_ENABLE_LUAU "Enable luau build testing" OFF)
 option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
 
-option(THEXTECH_ENABLE_SDL_NET "Enable SDL_net build testing" THEXTECH_ENABLE_SDL_NET_DEFAULT)
+option(THEXTECH_ENABLE_SDL_NET "Enable SDL_net build testing" ${THEXTECH_ENABLE_SDL_NET_DEFAULT})
 
 option(THEXTECH_ENABLE_EDITOR "Enable runtime support for editor features" ON)
 
