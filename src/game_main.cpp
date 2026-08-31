@@ -2536,6 +2536,12 @@ void StartEpisode()
     std::string recentWorldIntroPrev = g_recentWorldIntro;
     bool doSaveConfig = false;
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+    if(status.client_state >= XMessage::CLIENT_GUEST)
+    {
+        // don't change anything if joining a game
+    } else
+#endif
     if((numPlayers == 1 || g_config.compatibility_mode != Config_t::COMPAT_SMBX13) && g_recentWorld1p != wPath)
     {
         g_recentWorld1p = wPath;
