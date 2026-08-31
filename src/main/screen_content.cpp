@@ -337,10 +337,10 @@ void Render()
         maxShow = minShow + 5;
 
         if(s_current_item <= minShow)
-            worldCurs -= 1;
+            worldCurs -= 1 + (minShow - s_current_item) / 8;
 
         if(s_current_item >= maxShow - 1)
-            worldCurs += 1;
+            worldCurs += 1 + (s_current_item - (maxShow - 1)) / 8;
 
         if(worldCurs < 0)
             worldCurs = 0;
