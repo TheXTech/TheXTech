@@ -42,7 +42,11 @@
 //  Get the screen position
 void GetvScreen(vScreen_t& vscreen)
 {
-    auto &p = Player[vscreen.player];
+    int plr_index = vscreen.player;
+    if(Player[plr_index].Effect == PLREFF_COOP_WINGS && Player[plr_index].Effect2)
+        plr_index = Player[plr_index].Effect2;
+
+    auto &p = Player[plr_index];
     auto &pLoc = p.Location;
 
     if(p.Mount == 2)
@@ -438,25 +442,28 @@ void SharedScreenAvoidJump_Post(Screen_t& screen, int Delay)
         return;
 
     auto& vscreen = screen.vScreen(1);
+    vScreenAvoidJump(vscreen);
+    vscreen.TempDelay = Delay;
 
+    if(!screen.is_canonical())
+        SharedScreenAvoidJump_Post(screen.canonical_screen(), Delay);
+}
+
+void vScreenAvoidJump(vScreen_t& vscreen)
+{
     num_t curX = vscreen.X;
     num_t curY = vscreen.Y;
 
     vscreen.tempX = 0;
     vscreen.TempY = 0;
 
-    GetvScreenAverage3(vscreen);
+    GetvScreenAuto(vscreen);
 
     vscreen.tempX = vscreen.X - curX;
     vscreen.TempY = vscreen.Y - curY;
 
     vscreen.X = curX;
     vscreen.Y = curY;
-
-    vscreen.TempDelay = Delay;
-
-    if(!screen.is_canonical())
-        SharedScreenAvoidJump_Post(screen.canonical_screen(), Delay);
 }
 
 void SharedScreenResetTemp(Screen_t& screen)

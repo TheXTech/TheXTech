@@ -207,8 +207,8 @@ void UpdatePlayerDead(int A)
                 Player[A].Effect2 = 0;
                 B = 0;
 
-                // put player back in TimeToLive state if there are still other players
-                if(CheckNearestLiving(A))
+                // put player back in TimeToLive state if there are still other players (and we are not in dynamic screen)
+                if(CheckNearestLiving(A) && ScreenByPlayer(A).Type != ScreenTypes::Dynamic)
                 {
                     Player[A].Dead = false;
                     Player[A].TimeToLive = 200;

@@ -71,6 +71,9 @@ void SharedScreenAvoidJump_Pre(Screen_t& screen);
 //  Sets TempX and TempY to avoid a jump for a Screen's shared vScreen, and TempDelay as requested.
 void SharedScreenAvoidJump_Post(Screen_t& screen, int TempDelay);
 
+//  Sets TempX and TempY to avoid a jump for a vScreen
+void vScreenAvoidJump(vScreen_t& vscreen);
+
 //  Resets variables set by above
 void SharedScreenResetTemp(Screen_t& screen);
 

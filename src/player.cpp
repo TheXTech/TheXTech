@@ -4350,7 +4350,7 @@ void RespawnPlayerTo(int A, int TargetPlayer)
             Player[A].Location.Y -= 100;
             Player[A].Dead = true;
             Player[A].Effect = PLREFF_COOP_WINGS;
-            Player[A].Effect2 = 0;
+            Player[A].Effect2 = TargetPlayer;
             Player[A].RespawnY = 0;
         }
         // respawn them to the target player's warp otherwise
@@ -5778,7 +5778,7 @@ void PlayerEffects(const int A)
                 SharedScreenAvoidJump_Pre(s);
                 p.Dead = true;
                 p.Effect = PLREFF_COOP_WINGS;
-                p.Effect2 = 0;
+                p.Effect2 = O;
                 SizeCheck(p);
                 SharedScreenAvoidJump_Post(s, 0);
                 return;
