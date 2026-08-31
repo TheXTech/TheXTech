@@ -1306,7 +1306,7 @@ MenuControls_t GetMenuControls(int limit_player)
 // player is 1-indexed :(
 void Rumble(int player, int ms, float strength)
 {
-    if(GameMenu || GameOutro)
+    if(GameMenu || GameOutro || XMessage::GetStatus() == XMessage::Status::replay)
         return;
 
     const Screen_t& screen = ScreenByPlayer(player);
