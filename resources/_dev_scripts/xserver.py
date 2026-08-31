@@ -100,6 +100,8 @@ class Connection:
         self.udp_dest = None
         self.udp_recv = []
         self.udp_send = b''
+        self.udp_okay = False
+        self.udp_transmissions = 0 # UDP transmissions (send 16 of these before first UDP ack)
 
     def set_room(self, room, id):
         self.providing_session = False
@@ -465,7 +467,7 @@ class Room:
             # print('Sending', list(client.udp_send))
 
         # send TCP
-        if client.data_conn and (client.tcp_send_start < client.tcp_send_end or (not client.udp_dest and client.tcp_send_end == len(self.sent_history))):
+        if client.data_conn and (client.tcp_send_start < client.tcp_send_end or (not client.udp_okay and client.tcp_send_end == len(self.sent_history))):
             try:
                 client.tcp_send_start += client.data_conn.send(self.sent_history[client.tcp_send_start:client.tcp_send_end])
                 if client.tcp_send_start == len(self.sent_history):
@@ -511,6 +513,9 @@ class Room:
 
             got = client.udp_recv
             client.udp_recv = []
+
+            if got:
+                client.udp_okay = True
 
             for msg in got:
                 client.read_data_udp(msg)
@@ -599,21 +604,25 @@ class Room:
                         client.acked_to += 4
 
                 MTU_size = 250
-                if client.udp_dest and len(self.sent_history) - client.acked_to <= MTU_size - 8:
+                can_send_udp = (client.udp_dest and len(self.sent_history) - client.acked_to <= MTU_size - 8)
+                if can_send_udp and (client.udp_okay or client.udp_transmissions < 16):
                     start = max(client.acked_frame, client.tcp_sent_frame + 1)
                     if start >= 0:
                         ack = bytes([MESSAGE_TRANSMIT_START, start // (256 * 256), (start // 256) % 256, start % 256])
                     else:
                         ack = bytes()
                     client.udp_send = ack + self.sent_history[client.acked_to:] + bytes([MESSAGE_FRAME_END, self.frame_no // (256 * 256), (self.frame_no // 256) % 256, self.frame_no % 256])
+                    client.udp_transmissions += 1
+
                 # add the tail of the room history to the TCP send queue
-                else:
+                if not can_send_udp or not client.udp_okay:
                     if client.tcp_send_start == client.tcp_send_end:
                         client.tcp_send_start = client.acked_to
                     client.tcp_send_end = len(self.sent_history)
                     client.acked_to = client.tcp_send_end
                     client.tcp_sent_frame = self.frame_no
-                    client.udp_send = bytes()
+                    if not can_send_udp:
+                        client.udp_send = bytes()
 
                 self.transmit(client)
 
@@ -804,7 +813,7 @@ class Server:
         if addr in self.udp_connections and data[0] < 128:
             self.udp_connections[addr].udp_recv.append(data)
         elif len(data) == 4 and not addr in self.udp_connections:
-            print(data, addr)
+            print('UDP connection', addr, 'session', data)
             client = self.find_session(data)
             if client:
                 self.udp_connections[addr] = client
