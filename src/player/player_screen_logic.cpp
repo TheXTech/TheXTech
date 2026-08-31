@@ -266,6 +266,7 @@ void PlayerEffectWings(int A)
 
     // tag other players
     bool found_player = false;
+    bool is_below = false;
     for(int B = 1; B <= numPlayers; B++)
     {
         if(Player[B].Dead || Player[B].TimeToLive != 0 || Player[B].Effect != PLREFF_NORMAL)
@@ -274,12 +275,15 @@ void PlayerEffectWings(int A)
         if(!CheckCollision(Player[A].Location, Player[B].Location))
             continue;
 
+        if(Player[A].Location.Y + Player[A].Location.Height > Player[B].Location.Y + Player[B].Location.Height)
+            is_below = true;
+
         found_player = true;
         break;
     }
 
-    // just collided with player
-    if(found_player && !p.Effect2)
+    // just collided with player (not from below)
+    if(found_player && !p.Effect2 && !is_below)
     {
         // if we're inside a block, then we can't respawn yet
         bool hit_block = false;
