@@ -48,6 +48,7 @@
 #include "main/trees.h"
 #include "main/menu_main.h"
 #include "main/level_medals.h"
+#include "main/game_save.h"
 #include "core/render.h"
 #include "core/events.h"
 #include "script/luna/lunacounter.h"

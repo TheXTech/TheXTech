@@ -39,6 +39,7 @@
 #include "world_globals.h"
 #include "level_file.h"
 #include "speedrunner.h"
+#include "game_save.h"
 #include "screen_quickreconnect.h"
 #include "screen_connect.h"
 #include "main/game_strings.h"

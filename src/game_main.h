@@ -87,18 +87,6 @@ void LoadSingleWorld(const std::string wPath);
 
 void FindLevels();
 
-void FindSaves();
-
-extern std::string makeGameSavePath(std::string episode, std::string world, std::string saveFile);
-
-void SaveGame();
-
-void LoadGame();
-//! Removes gamesave file and restores initial state of all level objects
-void ClearGame(bool punnish = false);
-void DeleteSave(int world, int save);
-void CopySave(int world, int src, int dst);
-
 int PauseGame(PauseCode code, int plr = 0);
 
 // reload recent episodes from config (used when asset pack changes)
