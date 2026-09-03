@@ -831,6 +831,7 @@ void SetupPlayers()
         Player[A].FloatTime = 0;
         Player[A].CanFloat = false;
         Player[A].CurMazeZone = 0;
+        Player[A].NoPlayerCollide = false;
 
         if(Player[A].Character == 3)
             Player[A].CanFloat = true;
@@ -1244,6 +1245,7 @@ void PlayerDead(int A)
     p.HoldingNPC = 0;
     p.GroundPound = false;
     p.GroundPound2 = false;
+    p.NoPlayerCollide = false;
 
     PlayerDeathEffect(A);
 
@@ -4853,6 +4855,7 @@ void PlayerCollide(const int A)
     Location_t tempLocation3;
     int HitSpot = 0;
     auto &p1 = Player[A];
+    bool found_collision = false;
 
 // Check player collisions
     for(int B = 1; B <= numPlayers; B++)
@@ -4861,6 +4864,7 @@ void PlayerCollide(const int A)
 
         if(B != A && !p2.Dead && p2.TimeToLive == 0 &&
            (p2.Effect == PLREFF_NORMAL || p2.Effect == PLREFF_WARP_PIPE) &&
+           (!p2.NoPlayerCollide) &&
            !(p2.Mount == 2 || p1.Mount == 2) &&
            (!BattleMode || (p1.Immune == 0 && p2.Immune == 0)))
         {
@@ -4876,6 +4880,12 @@ void PlayerCollide(const int A)
 
             if(CheckCollision(tempLocation, tempLocation3))
             {
+                if(p1.NoPlayerCollide)
+                {
+                    found_collision = true;
+                    break;
+                }
+
                 HitSpot = FindCollision(tempLocation, tempLocation3);
                 if(HitSpot == 5)
                 {
@@ -5022,6 +5032,9 @@ void PlayerCollide(const int A)
             }
         }
     }
+
+    if(!found_collision)
+        p1.NoPlayerCollide = false;
 }
 
 void PlayerGrabCode(const int A, bool DontResetGrabTime)

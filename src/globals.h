@@ -847,6 +847,9 @@ struct Player_t
     // NEW: status field for maze zone (stores current direction and clearance to leave)
     uint8_t MazeZoneStatus = 0;
 
+    // NEW: disable player-player collisions (used for door warps)
+    bool NoPlayerCollide = false;
+
     Player_t() : GroundPound(false), GroundPound2(false), CanPound(false), AltRunRelease(false), DuckRelease(false), SlippyWall(false), JumpOffWall(false) {}
 };
 
