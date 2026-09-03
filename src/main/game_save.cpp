@@ -255,19 +255,10 @@ void FindSaves()
             }
 
             // load timer info for existing save
-            std::string savePath = makeGameSavePath(w.WorldFilePath,
-                                                     fmt::format_ne("timers{0}.ini", A));
-
-            if(Files::fileExists(savePath))
-            {
-                IniProcessing timer(savePath);
-                timer.beginGroup("timers");
-                timer.read("total", info.Time, 0);
-                timer.endGroup();
-            }
+            info.Time = f.speedrunTicks;
 
             // load fails for existing save
-            savePath = makeGameSavePath(w.WorldFilePath,
+            std::string savePath = makeGameSavePath(w.WorldFilePath,
                                         fmt::format_ne("fails-{0}.rip", A));
 
             if(Files::fileExists(savePath))
@@ -323,6 +314,10 @@ void SaveGame()
     sav.points = uint32_t(Score);
     sav.worldPosX = (int)WorldPlayer[1].Location.X;
     sav.worldPosY = (int)WorldPlayer[1].Location.Y;
+
+    sav.speedrunTicks = g_speedrunTicks;
+    sav.speedrunWinTicks = g_speedrunWinTicks;
+    g_speedrunTicksSaved = g_speedrunTicks;
 
     for(A = 1; A <= 5; A++)
     {
@@ -505,6 +500,10 @@ void LoadGame()
     WorldPlayer[1].Location.X = sav.worldPosX;
     WorldPlayer[1].Location.Y = sav.worldPosY;
 
+    g_speedrunTicks = sav.speedrunTicks;
+    g_speedrunTicksSaved = sav.speedrunTicks;
+    g_speedrunWinTicks = sav.speedrunWinTicks;
+
     if(Lives > 99)
         Lives = 99;
     if(Coins > 99)
@@ -660,6 +659,9 @@ void ClearGame(bool punnish)
     numStars = 0;
 
     LevelSaveEntries.clear();
+
+    // Clear the speed-runner timer
+    speedRun_resetTotal();
 
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
     gLunaVarBank = saveUserData::DataSection();

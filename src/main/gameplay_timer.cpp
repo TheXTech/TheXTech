@@ -113,12 +113,13 @@ GameplayTimer::GameplayTimer() = default;
 
 void GameplayTimer::reset()
 {
+    g_speedrunTicks = -1;
+    g_speedrunTicksSaved = -1;
+    g_speedrunWinTicks = 0;
+
     m_invalidContinue = false;
-    m_cyclesInt = false;
-    m_cyclesAtWin = 0;
     m_cyclesAtWinDisplay = 0;
     m_cyclesCurrent = 0;
-    m_cyclesTotal = 0;
     m_levelBlinkActive = false;
     m_worldBlinkActive = false;
     m_blinkingFactor = 0;
@@ -134,64 +135,72 @@ void GameplayTimer::resetCurrent()
 
 void GameplayTimer::load()
 {
+    if(g_speedrunTicks != -1)
+    {
+        // already loaded from gamesave
+        return;
+    }
+
     if(TestLevel || selSave == 0)
     {
         reset();
         return;
     }
 
+    // load legacy speedrun ini
     IniProcessing o;
     std::string savePath = makeGameSavePath(SelectWorld[selWorld].WorldFilePath,
                                             fmt::format_ne("timers{0}.ini", selSave));
     o.open(savePath);
 
     o.beginGroup("timers");
-    o.read("int", m_cyclesInt, false);
-    o.read("total", m_cyclesTotal, 0);
+    bool cyclesInt = false;
+    o.read("int", cyclesInt, false);
+    o.read("total", g_speedrunTicks, -1);
 
     // no longer permanently stop the timer following credits roll, but do store the cycles at first win for future display
     bool legacy_fin = false;
     o.read("fin", legacy_fin, false);
-    int64_t cyclesAtWin_default = (legacy_fin) ? m_cyclesTotal : 0;
+    int64_t cyclesAtWin_default = (legacy_fin) ? g_speedrunTicks : 0;
 
-    o.read("win", m_cyclesAtWin, cyclesAtWin_default);
+    o.read("win", g_speedrunWinTicks, cyclesAtWin_default);
     m_cyclesCurrent = 0; // Reset the counter
     m_cyclesAtWinDisplay = 0;
     o.endGroup();
 
-    if(!m_cyclesInt)
+    if(!cyclesInt)
         m_invalidContinue = true;
 }
 
 void GameplayTimer::save()
 {
     // should Cheater also be a condition here?
-    if(TestLevel || !selSave || m_invalidContinue)
+    if(TestLevel || !selSave || m_invalidContinue || g_speedrunTicks == g_speedrunTicksSaved)
         return;
 
-    IniProcessing o;
-    std::string savePath = makeGameSavePath(SelectWorld[selWorld].WorldFilePath,
-                                            fmt::format_ne("timers{0}.ini", selSave));
-    o.open(savePath);
+    g_speedrunTicksSaved = g_speedrunTicks;
 
-    o.beginGroup("timers");
-    o.setValue("int", m_cyclesInt);
-    o.setValue("total", m_cyclesTotal);
-    o.setValue("win", m_cyclesAtWin);
-    o.endGroup();
+    GamesaveAccess save_access;
+    if(save_access.savefile)
+    {
+        char buf[64];
+        int size = snprintf(buf, 64, "SAVE_HEADER\nSR:%ld;\nSAVE_HEADER_END\n", g_speedrunTicks);
+        if((int)SDL_RWwrite(save_access.savefile, buf, 1, size) != size)
+            pLogCritical("Could not append speedrun timer to save file.");
+    }
 
-    o.writeIniFile();
+    // Maybe also delete legacy speedrun ini? Not sure...
 }
 
 void GameplayTimer::tick()
 {
     // initialize timer
-    if(!m_cyclesInt)
+    if(g_speedrunTicks == -1)
     {
-        m_cyclesInt = true;
+        g_speedrunTicks = 0;
+        g_speedrunWinTicks = 0;
+
         m_cyclesCurrent = 0;
-        m_cyclesTotal = 0;
-        m_cyclesAtWin = 0;
         m_cyclesAtWinDisplay = 0;
         m_levelBlinkActive = false;
         m_worldBlinkActive = false;
@@ -206,7 +215,7 @@ void GameplayTimer::tick()
     else if(!in_leveltest_restart_screen && g_config.show_playtime_counter == Config_t::PLAYTIME_COUNTER_ANIMATED)
         m_levelBlinkActive = true;
 
-    m_cyclesTotal += 1;
+    g_speedrunTicks += 1;
 
     if(m_levelBlinkActive)
         updateColorSpin(5);
@@ -221,10 +230,10 @@ void GameplayTimer::tick()
 
 void GameplayTimer::onBossDead()
 {
-    m_cyclesAtWinDisplay = m_cyclesTotal;
+    m_cyclesAtWinDisplay = g_speedrunTicks;
 
-    if(m_cyclesAtWin == 0)
-        m_cyclesAtWin = m_cyclesTotal;
+    if(g_speedrunWinTicks == 0)
+        g_speedrunWinTicks = g_speedrunTicks;
 
     if(g_config.show_playtime_counter == Config_t::PLAYTIME_COUNTER_ANIMATED)
         m_worldBlinkActive = true;
@@ -245,7 +254,7 @@ void GameplayTimer::render()
         SuperPrintScreenCenter(g_mainMenu.caseNone,         3, y - 18, XTColor(127, 127, 127, a));
     else if(!TestLevel)
     {
-        int64_t use_total = m_cyclesTotal;
+        int64_t use_total = g_speedrunTicks;
         if(m_cyclesAtWinDisplay)
             use_total = m_cyclesAtWinDisplay;
 
