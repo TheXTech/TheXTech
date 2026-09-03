@@ -190,11 +190,9 @@ SDL_RWops *Files::open_file(const char *filePath, const char *modes)
     return SDL_RWFromFile(filePath, modes);
 }
 
-Files::Data Files::load_file(const char *filePath)
+Files::Data Files::load_file(SDL_RWops *in, const char *filePath)
 {
     Files::Data ret;
-
-    SDL_RWops *in = Files::open_file(filePath, "rb");
     if(!in)
         return ret;
 
@@ -205,10 +203,7 @@ Files::Data Files::load_file(const char *filePath)
     off_t to_read = size;
 
     if(!target)
-    {
-        SDL_RWclose(in);
         return ret;
-    }
 
     ret.m_free_me = true;
     ret.m_data = target;
@@ -220,7 +215,6 @@ Files::Data Files::load_file(const char *filePath)
         if(!bytes_read)
         {
             pLogCritical("I/O error when reading [%s]", filePath);
-            SDL_RWclose(in);
 
             // resets the return value and frees the malloc'd buffer
             ret = Files::Data();
@@ -235,7 +229,15 @@ Files::Data Files::load_file(const char *filePath)
     // set null terminator
     *target = 0;
 
-    SDL_RWclose(in);
+    return ret;
+}
+
+Files::Data Files::load_file(const char *filePath)
+{
+    SDL_RWops *in = Files::open_file(filePath, "rb");
+    Files::Data ret = load_file(in, filePath);
+    if(in)
+        SDL_RWclose(in);
 
     return ret;
 }
