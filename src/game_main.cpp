@@ -76,6 +76,7 @@
 #include "editor.h"
 #include "editor/new_editor.h"
 #include "custom.h"
+#include "main/game_save.h"
 #include "main/world_globals.h"
 #include "main/cheat_code.h"
 #include "main/game_globals.h"

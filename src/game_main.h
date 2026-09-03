@@ -87,21 +87,6 @@ void LoadSingleWorld(const std::string wPath);
 
 void FindLevels();
 
-void FindSaves();
-
-extern std::string makeGameSavePath(std::string episode, std::string saveFile);
-
-void SaveGame();
-
-#ifdef THEXTECH_ENABLE_SDL_NET
-void PreloadGame();
-#endif
-void LoadGame();
-//! Removes gamesave file and restores initial state of all level objects
-void ClearGame(bool punnish = false);
-void DeleteSave(int world, int save);
-void CopySave(int world, int src, int dst);
-
 void PauseInit(PauseCode code, int plr = 0, void (*callback)() = nullptr);
 void PauseLoop();
 void PauseGame(PauseCode code, int plr = 0);

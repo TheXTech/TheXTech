@@ -44,6 +44,7 @@
 
 #include "../game_main.h"
 #include "menu_main.h"
+#include "main/game_save.h"
 #include "main/screen_pause.h"
 #include "main/screen_textentry.h"
 #include "main/screen_connect.h"

@@ -82,6 +82,7 @@
 #include "load_gfx.h"
 
 #include "screen_textentry.h"
+#include "main/game_save.h"
 #include "main/asset_pack.h"
 #include "main/screen_asset_pack.h"
 #include "main/screen_content.h"

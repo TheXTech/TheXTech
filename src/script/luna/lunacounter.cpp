@@ -34,6 +34,7 @@
 #include "config.h"
 #include "game_main.h"
 #include "core/render.h"
+#include "main/game_save.h"
 #include "main/game_info.h"
 #include "main/menu_main.h"
 

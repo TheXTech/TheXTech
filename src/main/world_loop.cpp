@@ -40,6 +40,7 @@
 #include "main/world_globals.h"
 #include "main/level_file.h"
 #include "main/speedrunner.h"
+#include "main/game_save.h"
 #include "main/screen_quickreconnect.h"
 #include "main/screen_connect.h"
 #include "main/screen_pause.h"

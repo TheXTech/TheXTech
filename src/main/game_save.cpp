@@ -37,6 +37,7 @@
 #include <script/luna/lunacounter.h>
 #include <Logger/logger.h>
 
+#include "main/game_save.h"
 #include "main/level_save_info.h"
 #include "menu_main.h"
 #include "saved_layers.h"

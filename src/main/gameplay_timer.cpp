@@ -26,7 +26,9 @@
 
 #include "core/render.h"
 
-#include "gameplay_timer.h"
+#include "main/game_save.h"
+#include "main/gameplay_timer.h"
+#include "main/speedrunner.h"
 #include "graphics.h"
 #include "game_main.h"
 #include "globals.h"
