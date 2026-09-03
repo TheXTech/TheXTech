@@ -1044,8 +1044,8 @@ struct LevelSaveInfo_t
     }
 };
 
-//! NEW: stores LevelSaveInfo for levels without WorldLevels
-struct LevelWarpSaveEntry_t
+//! NEW: stores LevelSaveInfo in an array with filenames
+struct LevelSaveEntry_t
 {
     std::string levelPath;
     LevelSaveInfo_t save_info;
@@ -1095,8 +1095,8 @@ struct WorldLevel_t
     int8_t starsShowPolicy = -1;
     uint8_t curStars = 0;
 
-    //! NEW: info about collected / available medals / stars (replaces maxStars)
-    LevelSaveInfo_t save_info;
+    //! NEW: index into LevelSaveEntries array -- info about collected / available medals / stars (replaces maxStars)
+    uint16_t save_info_idx = 0xFFFF;
 
     // NEW: returns graphical location extent (based on whether GFXLevelBig is set)
     //   defined in graphics.cpp
@@ -1105,6 +1105,9 @@ struct WorldLevel_t
     // NEW: returns location extent, including big background paths, for onscreen checks
     //   defined in graphics.cpp
     Location_t LocationOnscreen();
+
+    //! NEW: get the warp's LevelSaveInfo_t (based on save_info_idx)
+    inline const LevelSaveInfo_t save_info() const;
 };
 
 //Public Type Warp 'warps such as pipes and doors
@@ -1151,8 +1154,8 @@ struct Warp_t
 //    curStars As Integer
     uint8_t curStars = 0;
 //    maxStars As Integer
-    //! NEW: index into either LevelWarpSaveEntries (<0x7fff) or WorldLevel (>0x8000)
-    uint16_t save_info_idx = 0x8000;
+    //! NEW: index into LevelSaveEntries -- stores information about level
+    uint16_t save_info_idx = 0xFFFF;
 //EXTRA:
     bool twoWay = false;
     bool noPrintStars = false;
@@ -1346,8 +1349,8 @@ struct Checkpoint_t
 // List of taken checkpoints, spawn player at last of them
 extern std::vector<Checkpoint_t> CheckpointsList;
 
-//! List of stars / medal info entries for the levels NOT on the world map
-extern std::vector<LevelWarpSaveEntry_t> LevelWarpSaveEntries;
+//! List of stars / medal info entries for the levels in the episode
+extern std::vector<LevelSaveEntry_t> LevelSaveEntries;
 
 //Public MagicHand As Boolean 'true if playing a level in the editor while not in fullscreen mode
 extern bool MagicHand;
@@ -1592,13 +1595,18 @@ extern int numWorldAreas;
 extern RangeArr<WorldLevel_t, 1, maxWorldLevels> WorldLevel;
 DECLREF_T(WorldLevel);
 
+inline const LevelSaveInfo_t WorldLevel_t::save_info() const
+{
+    if(save_info_idx < LevelSaveEntries.size())
+        return LevelSaveEntries[save_info_idx].save_info;
+
+    return LevelSaveInfo_t();
+}
+
 inline const LevelSaveInfo_t Warp_t::save_info() const
 {
-    if(save_info_idx < 0x7FFF && save_info_idx < LevelWarpSaveEntries.size())
-        return LevelWarpSaveEntries[save_info_idx].save_info;
-
-    if(save_info_idx > 0x8000 && save_info_idx - 0x8000 <= numWorldLevels)
-        return WorldLevel[save_info_idx - 0x8000].save_info;
+    if(save_info_idx < LevelSaveEntries.size())
+        return LevelSaveEntries[save_info_idx].save_info;
 
     return LevelSaveInfo_t();
 }

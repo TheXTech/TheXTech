@@ -64,13 +64,13 @@ struct SaveInfoInit
 LevelSaveInfo_t InitLevelSaveInfo(const std::string& fullPath, LevelData& tempData);
 
 /**
- * \brief import all level save info into WorldLevel and LevelWarpSaveEntries from a GamesaveData object
+ * \brief import all level save info into WorldLevel and LevelSaveEntries from a GamesaveData object
  * \param s a PGE-FL GamesaveData object from which level save info will be loaded to global arrays
  */
 void ImportLevelSaveInfo(const GamesaveData& s);
 
 /**
- * \brief export all level save info from WorldLevel and LevelWarpSaveEntries to a GamesaveData object
+ * \brief export all level save info from WorldLevel and LevelSaveEntries to a GamesaveData object
  * \param s a mutable PGE-FL GamesaveData object to which level save info will be stored from global arrays
  */
 void ExportLevelSaveInfo(GamesaveData& s);

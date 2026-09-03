@@ -480,12 +480,13 @@ void UpdateGraphics2(bool skipRepaint)
             int p_center_x = camX + s_round2int(WorldPlayer[1].Location.X + (WorldPlayer[1].Location.Width / 2));
             int info_y = camY + s_round2int(WorldPlayer[1].Location.Y) - 32;
 
-            if(l.save_info.inited() && l.save_info.max_stars > 0 && policy > Config_t::MAP_STARS_HIDE)
+            const auto si = l.save_info();
+            if(si.inited() && si.max_stars > 0 && policy > Config_t::MAP_STARS_HIDE)
             {
                 std::string label;
 
                 if(policy >= Config_t::MAP_STARS_SHOW)
-                    label = fmt::format_ne("{0}/{1}", l.curStars, l.save_info.max_stars);
+                    label = fmt::format_ne("{0}/{1}", l.curStars, si.max_stars);
                 else
                     label = fmt::format_ne("{0}", l.curStars);
 
@@ -499,11 +500,11 @@ void UpdateGraphics2(bool skipRepaint)
                 info_y -= 20;
             }
 
-            if(l.save_info.inited() && l.save_info.max_medals > 0 && true)
+            if(si.inited() && si.max_medals > 0 && true)
             {
                 uint8_t ckpt = (Checkpoint == FileNamePathWorld + l.FileName) ? g_curLevelMedals.checkpoint : 0;
 
-                DrawMedals(p_center_x, info_y, true, l.save_info.max_medals, 0, ckpt, l.save_info.medals_got, l.save_info.medals_best);
+                DrawMedals(p_center_x, info_y, true, si.max_medals, 0, ckpt, si.medals_got, si.medals_best);
             }
         }
 

@@ -2568,7 +2568,7 @@ void zTestLevel(bool magicHand, bool interProcess)
     FontManager::clearAllCustomFonts();
 
     // this clears the cached medals and stars data from the level
-    LevelWarpSaveEntries.clear();
+    LevelSaveEntries.clear();
 
     // dead code, TestFullscreen never set
 #if 0

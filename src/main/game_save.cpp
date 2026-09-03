@@ -601,7 +601,7 @@ void ClearGame(bool punnish)
     for(int A = 1; A <= maxWorldLevels; ++A)
     {
         WorldLevel[A].Active = false;
-        WorldLevel[A].save_info = LevelSaveInfo_t();
+        WorldLevel[A].save_info_idx = 0xFFFF;
     }
 
     for(int A = 1; A <= maxScenes; ++A)
@@ -611,7 +611,7 @@ void ClearGame(bool punnish)
     Star.clear();
     numStars = 0;
 
-    LevelWarpSaveEntries.clear();
+    LevelSaveEntries.clear();
 
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
     gLunaVarBank = saveUserData::DataSection();

@@ -771,17 +771,48 @@ void FindWldStars()
             bool level_must_show_stars = (l.starsShowPolicy == Config_t::MAP_STARS_SHOW);
             bool level_can_show_stars = (world_must_show_stars && l.starsShowPolicy == Config_t::MAP_STARS_UNSPECIFIED);
 
-            // skip check for max stars and medals if it's already been inited, OR if the star count isn't needed
-            if(l.save_info.inited() || !(level_must_show_stars || level_can_show_stars))
-                continue;
+            // set the level's save info index
 
             std::string lFile = l.FileName;
             addMissingLvlSuffix(lFile);
 
+            // check existing level save entries
+            for(uint16_t idx = 0; idx != 0xFFFF && idx < LevelSaveEntries.size(); ++idx)
+            {
+                const auto& e = LevelSaveEntries[idx];
+
+                if(e.levelPath == lFile)
+                {
+                    l.save_info_idx = idx;
+                    break;
+                }
+            }
+
+            // skip check for max stars and medals if it's already been inited, OR if the star count isn't needed
+            if(l.save_info().inited() || !(level_must_show_stars || level_can_show_stars))
+                continue;
+
+            // don't overflow the LevelSaveEntries array
+            if(l.save_info_idx == 0xFFFF && LevelSaveEntries.size() >= 0xFFFF)
+                continue;
+
             std::string fullPath = g_dirEpisode.resolveFileCaseExistsAbs(lFile);
 
             if(!fullPath.empty())
-                l.save_info = InitLevelSaveInfo(fullPath, tempData);
+            {
+                LevelSaveInfo_t info = InitLevelSaveInfo(fullPath, tempData);
+
+                if(info.inited())
+                {
+                    if(l.save_info_idx != 0XFFFF)
+                        LevelSaveEntries[l.save_info_idx].save_info = info;
+                    else
+                    {
+                        l.save_info_idx = LevelSaveEntries.size();
+                        LevelSaveEntries.push_back({lFile, info});
+                    }
+                }
+            }
         }
     }
 }

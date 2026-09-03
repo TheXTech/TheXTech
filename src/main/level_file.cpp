@@ -1911,30 +1911,12 @@ void FindStars()
                     warp.curStars++;
             }
 
-            if(warp.save_info().inited())
-                continue;
-
             // set the warp's save info index
 
-            // check world levels
-            for(uint16_t idx = 1; idx != 0x7FFF && idx <= numWorldLevels; ++idx)
+            // check existing level save entries
+            for(uint16_t idx = 0; idx != 0xFFFF && idx < LevelSaveEntries.size(); ++idx)
             {
-                const auto& l = WorldLevel[idx];
-
-                if(l.FileName == lFile)
-                {
-                    warp.save_info_idx = 0x8000 + idx;
-                    break;
-                }
-            }
-
-            if(warp.save_info().inited())
-                continue;
-
-            // check existing level warp save entries
-            for(uint16_t idx = 0; idx != 0x7FFF && idx < LevelWarpSaveEntries.size(); ++idx)
-            {
-                const auto& e = LevelWarpSaveEntries[idx];
+                const auto& e = LevelSaveEntries[idx];
 
                 if(e.levelPath == lFile)
                 {
@@ -1946,8 +1928,8 @@ void FindStars()
             if(warp.save_info().inited())
                 continue;
 
-            // don't overflow the LevelWarpSaveEntries array
-            if(LevelWarpSaveEntries.size() >= 0x7FFF)
+            // don't overflow the LevelSaveEntries array
+            if(warp.save_info_idx == 0xFFFF && LevelSaveEntries.size() >= 0xFFFF)
                 continue;
 
             // add a new save entry if the file exists
@@ -1959,8 +1941,13 @@ void FindStars()
 
                 if(info.inited())
                 {
-                    warp.save_info_idx = LevelWarpSaveEntries.size();
-                    LevelWarpSaveEntries.push_back({lFile, info});
+                    if(warp.save_info_idx != 0XFFFF)
+                        LevelSaveEntries[warp.save_info_idx].save_info = info;
+                    else
+                    {
+                        warp.save_info_idx = LevelSaveEntries.size();
+                        LevelSaveEntries.push_back({lFile, info});
+                    }
                 }
             }
         }

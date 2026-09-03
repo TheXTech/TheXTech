@@ -44,7 +44,7 @@ protected:
      * Must be called during OpenLevelData after FileNameFull is set
      *
      * The resulting pointer may be used by a SaveInfoInit object during level load,
-     * and remains valid until the next time LevelWarpSaveEntries is modified
+     * and remains valid until the next time LevelSaveEntries is modified
      * by this method or by FindStars()
      *
      * \param loadedLevel the loaded LevelData object, used to initialize level save info if needed

@@ -100,14 +100,9 @@ void ImportLevelSaveInfo(const GamesaveData& s)
 {
     // reset all world levels' save info
     for(int A = 1; A <= numWorldLevels; A++)
-    {
-        if(WorldLevel[A].FileName.empty())
-            continue;
+        WorldLevel[A].save_info_idx = 0xFFFF;
 
-        WorldLevel[A].save_info = LevelSaveInfo_t();
-    }
-
-    LevelWarpSaveEntries.clear();
+    LevelSaveEntries.clear();
 
     for(const saveLevelInfo& e : s.levelInfo)
     {
@@ -118,33 +113,21 @@ void ImportLevelSaveInfo(const GamesaveData& s)
 
         D_pLogDebug("Loaded save info (stars %d, medals %d - got %x, best %x) for level [%s]", (int)info.max_stars, (int)info.max_medals, (int)info.medals_got, (int)info.medals_best, e.level_filename.c_str());
 
-        // see if it applies to a world level
-        bool worldLevelHit = false;
+        // see if it is a duplicate
+        bool is_duplicate = false;
 
-        for(int A = 1; A <= numWorldLevels; A++)
+        for(auto& ent : LevelSaveEntries)
         {
-            WorldLevel_t& l = WorldLevel[A];
-
-            // can skip the string comparison if the level has already been initialized and we are no longer checking whether this save info has any level
-            if(l.save_info.inited() && worldLevelHit)
-                continue;
-
-            if(l.FileName == e.level_filename)
+            if(ent.levelPath == e.level_filename)
             {
-                // update level save info if not yet initialized
-                if(!l.save_info.inited())
-                    l.save_info = info;
-
-                // mark save info as paired with a level
-                worldLevelHit = true;
-
-                // don't break, in case another level has the same filename
+                is_duplicate = true;
+                break;
             }
         }
 
-        // otherwise, add a new level warp save entry
-        if(!worldLevelHit)
-            LevelWarpSaveEntries.push_back(LevelWarpSaveEntry_t{e.level_filename, info});
+        // otherwise, add a new level save entry
+        if(!is_duplicate)
+            LevelSaveEntries.push_back(LevelSaveEntry_t{e.level_filename, info});
     }
 }
 
@@ -152,16 +135,7 @@ void ExportLevelSaveInfo(GamesaveData& s)
 {
     saveLevelInfo tempInfo;
 
-    for(int A = 1; A <= numWorldLevels; A++)
-    {
-        if(s_exportSingleSaveInfo(tempInfo, WorldLevel[A].save_info))
-        {
-            tempInfo.level_filename = WorldLevel[A].FileName;
-            s.levelInfo.push_back(tempInfo);
-        }
-    }
-
-    for(const auto& e : LevelWarpSaveEntries)
+    for(const auto& e : LevelSaveEntries)
     {
         if(s_exportSingleSaveInfo(tempInfo, e.save_info))
         {
