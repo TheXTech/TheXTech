@@ -52,6 +52,8 @@
 static constexpr int plr_warp_scroll_speed = 8; // 8px / frame
 static constexpr int plr_warp_scroll_max_frames = 260; // 4 seconds
 
+static constexpr int PLREFF2_WAITING_DOOR = 199; // was previously 131, but this doesn't change any logic
+
 static void s_TriggerDoorEffects(const Location_t& loc, bool do_big_door = true)
 {
     for(Background_t& bgo : treeBackgroundQuery(loc, SORTMODE_ID))
@@ -1064,7 +1066,7 @@ void PlayerEffectWarpDoor(int A)
                     CheckSection(o_A);
 
                     o_p.Effect = PLREFF_WAITING;
-                    o_p.Effect2 = 131;
+                    o_p.Effect2 = PLREFF2_WAITING_DOOR;
                     o_p.WarpCD = 40;
 
                     if(warp.NoYoshi)
@@ -1145,44 +1147,60 @@ void PlayerEffectWarpWait(int A)
 {
     Player_t& p = Player[A];
 
-    // door exit holding pattern (exit blocked)
-    if(p.Effect2 == 131)
+    // door exit holding pattern
+    if(p.Effect2 <= PLREFF2_WAITING_DOOR)
     {
-        bool tempBool = false;
-        for(int B = 1; B <= numPlayers; B++)
+        // exit blocked
+        if(p.Effect2 == PLREFF2_WAITING_DOOR)
         {
-            // Was previously only B != A. New conditions only apply in >2P
-            bool check_coll = B != A && !Player[B].Dead && (Player[B].Effect != PLREFF_WAITING || B < A) && (Player[B].Effect != PLREFF_PET_INSIDE);
-            if(check_coll && CheckCollision(p.Location, Player[B].Location))
-                tempBool = true;
+            bool player_present = false;
+            bool fully_block = false;
+            for(int B = 1; B <= numPlayers; B++)
+            {
+                // Was previously only B != A. New conditions only apply in >2P
+                bool check_coll = B != A && !Player[B].Dead && (Player[B].Effect != PLREFF_WAITING || B < A) && (Player[B].Effect != PLREFF_PET_INSIDE);
+                if(check_coll && CheckCollision(p.Location, Player[B].Location))
+                {
+                    player_present = true;
+
+                    bool allow_double_spawn = (ScreenIdxByPlayer(A) != ScreenIdxByPlayer(B)); // || numPlayers > 2 // consider always enabling in >2P, but not yet
+                    if(!allow_double_spawn || Player[B].Effect == PLREFF_WAITING)
+                        fully_block = true;
+                }
+            }
+
+            if(!fully_block)
+                p.Effect2 = (player_present) ? 198 : 130;
+        }
+        // door exit wait
+        else
+        {
+            p.Effect2 -= 1;
+            if(p.Effect2 == 100)
+            {
+                Screen_t& screen = ScreenByPlayer(A);
+
+                SharedScreenAvoidJump_Pre(screen);
+
+                p.Effect = PLREFF_NORMAL;
+                p.Effect2 = 0;
+
+                if(g_config.multiplayer_pause_controls)
+                    p.NoPlayerCollide = true;
+
+                SharedScreenAvoidJump_Post(screen, 0);
+            }
         }
 
-        if(!tempBool)
+        // door exit animation
+        if(p.Effect2 == 130)
         {
-            p.Effect2 = 130;
-
             const auto& warp_exit = p.WarpBackward ? Warp[p.Warp].Entrance : Warp[p.Warp].Exit;
 
             s_TriggerDoorEffects(static_cast<Location_t>(warp_exit), false);
 
             SoundPause[SFX_Door] = 0;
             PlaySoundSpatial(SFX_Door, p.Location);
-        }
-    }
-    // door exit wait
-    else if(p.Effect2 <= 130)
-    {
-        p.Effect2 -= 1;
-        if(p.Effect2 == 100)
-        {
-            Screen_t& screen = ScreenByPlayer(A);
-
-            SharedScreenAvoidJump_Pre(screen);
-
-            p.Effect = PLREFF_NORMAL;
-            p.Effect2 = 0;
-
-            SharedScreenAvoidJump_Post(screen, 0);
         }
     }
     // 2P holding condition for start warp (pipe exit)
@@ -1242,7 +1260,7 @@ void PlayerEffectWarpWait(int A)
             if(A >= 2 && !g_ClonedPlayerMode)
             {
                 p.Effect = PLREFF_WAITING;
-                p.Effect2 = 131;
+                p.Effect2 = PLREFF2_WAITING_DOOR;
             }
             else
                 PlaySoundSpatial(SFX_Door, p.Location);
