@@ -97,11 +97,12 @@ public:
             return m_length <= 0;
         }
 
-        friend Data load_file(const char *filePath);
+        friend Data load_file(SDL_RWops *, const char *);
     };
 
     FILE *utf8_fopen(const char *filePath, const char *modes);
     SDL_RWops *open_file(const char *filePath, const char *modes);
+    Data load_file(SDL_RWops *f, const char *filePath = "");
     Data load_file(const char *filePath);
 
     inline SDL_RWops *open_file(const std::string& filePath, const char *modes)
