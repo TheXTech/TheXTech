@@ -42,6 +42,23 @@
 #include "menu_main.h"
 #include "saved_layers.h"
 
+
+static SDL_RWops* s_open_gamesave = nullptr;
+static bool s_preloaded = false;
+
+GamesaveAccess::GamesaveAccess()
+{
+    savefile = s_open_gamesave;
+    // TODO: lock here so that we can use threading to help with 3DS hang issues
+}
+
+GamesaveAccess::~GamesaveAccess()
+{
+    if(savefile)
+        Files::flush_file(savefile);
+    // TODO: unlock here
+}
+
 std::string makeGameSavePath(std::string epPath, std::string saveFile)
 {
     std::string gameSaveDir = AppPathManager::gameSaveRootDir() + Files::basename(Files::dirname(epPath));
@@ -274,6 +291,8 @@ void SaveGame()
     if(Cheater || !selSave)
         return;
 
+    CloseSave();
+
     for(A = numPlayers; A >= 1; A--)
         SavedChar[Player[A].Character] = Player[A];
 
@@ -364,7 +383,12 @@ void SaveGame()
 
     ExportLevelSaveInfo(sav);
 
-    FileFormats::WriteExtendedSaveFileF(savePath, sav);
+    FILE* gamesave = Files::utf8_fopen(savePath.c_str(), "w+");
+    PGE_FileFormats_misc::TextFileOutput output(gamesave);
+    FileFormats::WriteExtendedSaveFile(output, sav);
+
+    s_open_gamesave = SDL_RWFromFP(gamesave, SDL_TRUE);
+    Files::flush_file(s_open_gamesave);
 
     if(Files::fileExists(legacyGamesaveLocker))
         Files::deleteFile(legacyGamesaveLocker); // Remove the gamesave locker of legacy file
@@ -378,6 +402,8 @@ void SaveGame()
 #ifdef THEXTECH_ENABLE_SDL_NET
 void PreloadGame()
 {
+    CloseSave();
+
     XMessage::g_session.save_present = 0;
     XMessage::g_session.save_data.clear();
 
@@ -397,18 +423,29 @@ void PreloadGame()
     std::string legacySaveLocker = makeGameSavePath(w.WorldFilePath,
                                                     fmt::format_ne("save{0}.nosave", selSave));
 
+    Files::Data temp_save_data;
+
     if(Files::fileExists(savePath))
+    {
         XMessage::g_session.save_present = 2;
+
+        s_preloaded = true;
+        s_open_gamesave = Files::open_file(savePath, "r+");
+        temp_save_data = Files::load_file(s_open_gamesave);
+    }
     else if(!Files::fileExists(legacySaveLocker) && Files::fileExists(savePathOld))
+    {
         XMessage::g_session.save_present = 1;
+        temp_save_data = Files::load_file(savePathOld);
+    }
     else
     {
         pLogDebug("Game save file not found: %s", savePath.c_str());
         return;
     }
 
-    Files::Data temp_save_data = Files::load_file((XMessage::g_session.save_present == 2) ? savePath : savePathOld);
     XMessage::g_session.save_data.assign(temp_save_data.c_str(), temp_save_data.size());
+
 }
 #endif // #ifdef THEXTECH_ENABLE_SDL_NET
 
@@ -427,6 +464,8 @@ void LoadGame()
     else
         return;
 #else // #ifdef THEXTECH_ENABLE_SDL_NET
+    CloseSave();
+
     const auto &w = SelectWorld[selWorld];
 
     std::string savePath = makeGameSavePath(w.WorldFilePath,
@@ -436,7 +475,10 @@ void LoadGame()
                                                     fmt::format_ne("save{0}.nosave", selSave));
 
     if(Files::fileExists(savePath))
-        FileFormats::ReadExtendedSaveFileF(savePath, sav);
+    {
+        s_open_gamesave = Files::open_file(savePath, "r+");
+        FileFormats::ReadExtendedSaveFileF(s_open_gamesave, sav);
+    }
     else if(!Files::fileExists(legacySaveLocker) && Files::fileExists(savePathOld))
         FileFormats::ReadSMBX64SavFileF(savePathOld, sav);
     else
@@ -573,6 +615,12 @@ void LoadGame()
 
 void ClearGame(bool punnish)
 {
+    // allow a single call to ClearGame when preloaded
+    if(s_preloaded)
+        s_preloaded = false;
+    else
+        CloseSave();
+
     curWorldMusic = 0;
     curWorldMusicFile.clear();
 
@@ -717,4 +765,15 @@ void CopySave(int world, int src, int dst)
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();
 #endif
+}
+
+void CloseSave()
+{
+    s_preloaded = false;
+
+    if(s_open_gamesave)
+    {
+        SDL_RWclose(s_open_gamesave);
+        s_open_gamesave = nullptr;
+    }
 }
