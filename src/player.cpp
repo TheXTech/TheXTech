@@ -6533,6 +6533,10 @@ void PlayerEffects(const int A)
         p.Location.X = Player[p.Effect2].Location.X + (Player[p.Effect2].Location.Width - p.Location.Width) / 2;
         p.Location.Y = Player[p.Effect2].Location.Y + (Player[p.Effect2].Location.Height - p.Location.Height) / 2;
 
+        // fixes ghost NPC targeting
+        if(g_config.fix_multiplayer_targeting)
+            p.Direction = Player[p.Effect2].Direction;
+
         if(Player[p.Effect2].YoshiPlayer != A)
         {
             p.Effect = PLREFF_NORMAL;
