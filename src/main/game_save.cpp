@@ -466,7 +466,7 @@ void LoadGame()
     if(Files::fileExists(savePath))
     {
         s_open_gamesave = Files::open_file(savePath, "r+");
-        PGE_FileFormats_misc::RWopsTextInput inp = inp(s_open_gamesave);
+        PGE_FileFormats_misc::RWopsTextInput inp(s_open_gamesave);
         FileFormats::ReadExtendedSaveFile(inp, sav);
     }
     else if(!Files::fileExists(legacySaveLocker) && Files::fileExists(savePathOld))
