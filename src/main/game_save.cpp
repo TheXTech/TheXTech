@@ -254,22 +254,13 @@ void FindSaves()
                     info.ConfigDefaults = Config_t::MODE_CLASSIC + 1;
             }
 
+            // (these are just previews, so it's okay if we miss legacy files here)
+
             // load timer info for existing save
             info.Time = f.speedrunTicks;
 
             // load fails for existing save
-            std::string savePath = makeGameSavePath(w.WorldFilePath,
-                                        fmt::format_ne("fails-{0}.rip", A));
-
-            if(Files::fileExists(savePath))
-            {
-                gDeathCounter.counterFile = savePath;
-                gDeathCounter.TryLoadStats();
-                gDeathCounter.Recount();
-                info.FailsEnabled = true;
-                info.Fails = gDeathCounter.mCurTotalDeaths;
-                gDeathCounter.quit();
-            }
+            info.Fails = f.totalFails;
         }
     }
 }
@@ -318,6 +309,8 @@ void SaveGame()
     sav.speedrunTicks = g_speedrunTicks;
     sav.speedrunWinTicks = g_speedrunWinTicks;
     g_speedrunTicksSaved = g_speedrunTicks;
+
+    sav.totalFails = g_totalFails;
 
     for(A = 1; A <= 5; A++)
     {
@@ -504,6 +497,8 @@ void LoadGame()
     g_speedrunTicksSaved = sav.speedrunTicks;
     g_speedrunWinTicks = sav.speedrunWinTicks;
 
+    g_totalFails = sav.totalFails;
+
     if(Lives > 99)
         Lives = 99;
     if(Coins > 99)
@@ -610,6 +605,13 @@ void LoadGame()
 #endif
 
     ImportLevelSaveInfo(sav);
+
+    // import legacy fail counter data
+    if(g_totalFails == -1)
+    {
+        if(gDeathCounter.TryLoadStats())
+            SaveGame();
+    }
 }
 
 void ClearGame(bool punnish)
@@ -658,6 +660,7 @@ void ClearGame(bool punnish)
     Star.clear();
     numStars = 0;
 
+    g_totalFails = 0;
     LevelSaveEntries.clear();
 
     // Clear the speed-runner timer
