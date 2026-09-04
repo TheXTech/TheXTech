@@ -87,10 +87,9 @@ static int s_file_close(SDL_RWops* stream)
     return fclose(stream->hidden.unknown.data1);
 }
 
-SDL_RWops* SDL_RWFromFile(const char* pathname, const char* mode)
+SDL_RWops* SDL_RWFromFP(FILE* f, int autoclose)
 {
-    FILE* f = utf8_fopen(pathname, mode);
-    if(!f)
+    if(!f || !autoclose)
         return NULL;
 
     SDL_RWops* ret = SDL_AllocRW();
@@ -111,4 +110,10 @@ SDL_RWops* SDL_RWFromFile(const char* pathname, const char* mode)
     ret->hidden.unknown.data1 = f;
 
     return ret;
+}
+
+SDL_RWops* SDL_RWFromFile(const char* pathname, const char* mode)
+{
+    FILE* f = utf8_fopen(pathname, mode);
+    return SDL_RWFromFP(f, SDL_TRUE);
 }
