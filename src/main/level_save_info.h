@@ -75,4 +75,9 @@ void ImportLevelSaveInfo(const GamesaveData& s);
  */
 void ExportLevelSaveInfo(GamesaveData& s);
 
+/**
+ * \brief get the LevelSaveInfo for the current level (if it exists), otherwise nullptr
+ */
+LevelSaveInfo_t* CurSaveInfo();
+
 #endif // #ifndef LEVEL_SAVE_INFO_H

@@ -306,3 +306,14 @@ LevelSaveInfo_t InitLevelSaveInfo(const std::string& fullPath, LevelData& tempDa
     return ret;
 }
 #endif // #else // #ifdef PGEFL_CALLBACK_API
+
+LevelSaveInfo_t* CurSaveInfo()
+{
+    for(auto& e : LevelSaveEntries)
+    {
+        if(e.levelPath == FileNameFull)
+            return &e.save_info;
+    }
+
+    return nullptr;
+}
