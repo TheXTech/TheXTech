@@ -15,6 +15,7 @@ Changelog for 1.3.7.4-dev
 -LunaScript: Added the "SpawnEffect" command to spawn a simple static graphical effect (@Wohlstand)
 -LunaScript: Added SFX commands "PlaySFXPausable", "PlaySFXSection", and "PlaySFXSctPausable" to allow pause during dialogues and pause menu, and lock at the specific section. (@Wohlstand)
 -Vita / PSTV: fix TheXTech bug where multiplayer splitscreen could be rendered incorrectly. (@ds-sloth, thanks to @birtkyle-cell for the report)
+-Fix TheXTech 1.3.7 bug where ghosts could follow the direction of an eaten player instead of the active player. [Modern Mode] (@ds-sloth)
 
 Changelog for 1.3.7.3
 -Update LVLX/WLDX/SAVX loader to use new MDX file parser by ds-sloth (speeds up level/world loads on slow devices) (@ds-sloth, @Wohlstand)
