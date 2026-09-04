@@ -21,6 +21,7 @@
 
 #include <fmt_format_ne.h>
 #include <IniProcessor/ini_processing.h>
+#include <SDL2/SDL_rwops.h>
 
 #include "sdl_proxy/sdl_stdinc.h"
 
@@ -184,7 +185,7 @@ void GameplayTimer::save()
     if(save_access.savefile)
     {
         char buf[64];
-        int size = snprintf(buf, 64, "SAVE_HEADER\nSR:%ld;\nSAVE_HEADER_END\n", g_speedrunTicks);
+        int size = snprintf(buf, 64, "SAVE_HEADER\nSR:%ld;\nSAVE_HEADER_END\n", (long)g_speedrunTicks);
         if((int)SDL_RWwrite(save_access.savefile, buf, 1, size) != size)
             pLogCritical("Could not append speedrun timer to save file.");
     }

@@ -34,6 +34,7 @@
 #include <PGE_File_Formats/file_formats.h>
 #include <fmt_format_ne.h>
 #include <IniProcessor/ini_processing.h>
+#include <SDL2/SDL_rwops.h>
 #include <script/luna/lunacounter.h>
 #include <Logger/logger.h>
 
@@ -465,7 +466,8 @@ void LoadGame()
     if(Files::fileExists(savePath))
     {
         s_open_gamesave = Files::open_file(savePath, "r+");
-        FileFormats::ReadExtendedSaveFileF(s_open_gamesave, sav);
+        PGE_FileFormats_misc::RWopsTextInput inp = inp(s_open_gamesave);
+        FileFormats::ReadExtendedSaveFile(inp, sav);
     }
     else if(!Files::fileExists(legacySaveLocker) && Files::fileExists(savePathOld))
         FileFormats::ReadSMBX64SavFileF(savePathOld, sav);
