@@ -2925,6 +2925,9 @@ void NPCSpecial(int A)
         {
             auto &p = Player[i];
 
+            if(g_config.multiplayer_pause_controls && p.Effect == PLREFF_PET_INSIDE)
+                continue;
+
             if(p.Section == npc.Section)
             {
                 if(p.Location.Y + npc.Location.Height <= npc.SpecialY)
