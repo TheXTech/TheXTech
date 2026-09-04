@@ -6544,7 +6544,7 @@ void PlayerEffects(const int A)
         }
 
         // new logic: allow escape!
-        if(BattleMode && g_config.multiplayer_pause_controls)
+        if(g_config.multiplayer_pause_controls)
         {
             if(p.Effect == PLREFF_NORMAL)
             {
