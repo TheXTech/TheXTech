@@ -332,12 +332,19 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                         // tells the NPC that it's supported
                                         NPC[A].Special5 = 0;
 
+                                        // Don't treat the current wall (the one that set the NPC's X coordinate last frame) as a floor.
+                                        // This could be cleaner -- the 0.01_n magic number is scary, but safe in fixed-point land.
+                                        // (The old VB6 code specified 0.99_n which was not safe because 0.01_n + 0.99_n != 1.00_n.)
+                                        // The +1 magic number is referring to the NPC's speed.
                                         if(HitSpot == 1)
                                         {
-                                            if(NPC[A].Special == 4 && NPC[A].Location.X + 0.99_n == Block[B].Location.X + Block[B].Location.Width)
+                                            // if(NPC[A].Special == 4 && NPC[A].Location.X + 0.99_n == Block[B].Location.X + Block[B].Location.Width)
+                                            // the above line led to a wall climber getting stuck on Burt's Fortress (SRW2:YA W1 Boss)
+                                            if(NPC[A].Special == 4 && NPC[A].Location.X + 1 == Block[B].Location.X + Block[B].Location.Width + 0.01_n)
                                                 HitSpot = 0;
 
-                                            if(NPC[A].Special == 2 && NPC[A].Location.X + NPC[A].Location.Width - 0.99_n == Block[B].Location.X)
+                                            // I'm pretty sure this is wrong (though it matches VB6). This line doesn't seem nearly as critical to the game's logic.
+                                            if(NPC[A].Special == 2 && NPC[A].Location.X + NPC[A].Location.Width - 1 == Block[B].Location.X + 0.01_n)
                                                 HitSpot = 0;
                                         }
 
