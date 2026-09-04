@@ -35,18 +35,6 @@
 
 CurLevelMedals_t g_curLevelMedals;
 
-// find the LevelSaveInfo for the current level
-static inline LevelSaveInfo_t* s_findSaveInfo()
-{
-    for(auto& e : LevelSaveEntries)
-    {
-        if(e.levelPath == FileNameFull)
-            return &e.save_info;
-    }
-
-    return nullptr;
-}
-
 void CurLevelMedals_t::get(uint8_t idx)
 {
     if(idx < c_max_track_medals && idx < max)
@@ -103,7 +91,7 @@ void CurLevelMedals_t::reset_lvl()
 LevelSaveInfo_t* CurLevelMedals_t::should_initialize() const
 {
     // find the level save info
-    LevelSaveInfo_t* info = s_findSaveInfo();
+    LevelSaveInfo_t* info = CurSaveInfo();
 
     // if it can't be found in the world map / previously warped locations, initialize it and add to LevelSaveEntries
     if(!info && LevelSaveEntries.size() != 0xFFFF)
@@ -131,7 +119,7 @@ void CurLevelMedals_t::prepare_lvl()
     life = 0;
 
     // find the level save info
-    LevelSaveInfo_t* info = s_findSaveInfo();
+    LevelSaveInfo_t* info = CurSaveInfo();
 
     // if save info isn't ready, just reset level info
     if(!info || !info->inited())
@@ -147,7 +135,7 @@ void CurLevelMedals_t::prepare_lvl()
 
 void CurLevelMedals_t::commit()
 {
-    LevelSaveInfo_t* info = s_findSaveInfo();
+    LevelSaveInfo_t* info = CurSaveInfo();
 
     if(!info)
         return;
@@ -175,7 +163,7 @@ void CommitBeatCode(int beat_code)
     if(beat_code <= 0 || beat_code > 16)
         return;
 
-    LevelSaveInfo_t* info = s_findSaveInfo();
+    LevelSaveInfo_t* info = CurSaveInfo();
     if(!info)
         return;
 
