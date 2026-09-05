@@ -249,29 +249,32 @@ void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
     target.origPath = path;
 #endif
 
-    if(!GraphicsHelps::getImageMetrics(path, &tSize))
+    target.l.raw = Files::load_file(path);
+
+    if(!GraphicsHelps::getImageMetrics(target.l.raw, &tSize))
     {
         pLogWarning("Error loading of image file:\n"
                     "%s\n"
                     "Reason: %s.",
                     path.c_str(),
-                    (Files::fileExists(path) ? "wrong image format" : "file not exist"));
+                    (!target.l.raw.empty() ? "wrong image format" : "file not exist"));
         // target = g_renderer->getDummyTexture();
+        target.l.raw = Files::Data();
         return;
     }
 
     target.w = tSize.w() * scaleFactor;
     target.h = tSize.h() * scaleFactor;
 
-    target.l.raw = Files::load_file(path);
-
     //Apply Alpha mask
-    if(!maskPath.empty() && Files::fileExists(maskPath))
+    if(!maskPath.empty())
     {
         target.l.rawMask = Files::load_file(maskPath);
         target.l.isMaskPng = false; //-V1048
     }
-    else if(!maskFallbackPath.empty())
+
+    // try loading from fallback path if needed
+    if(target.l.rawMask.empty() && !maskFallbackPath.empty())
     {
         target.l.rawMask = Files::load_file(maskFallbackPath);
         target.l.isMaskPng = true;
