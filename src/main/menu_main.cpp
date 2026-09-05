@@ -2071,7 +2071,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
         int row_2 = infobox_y + 42;
         int row_c = infobox_y + 26;
 
-        bool hasFails = (g_config.enable_fails_tracking || info.FailsEnabled);
+        bool hasFails = (info.Fails != -1);
         bool show_timer = info.Time > 0 && (g_config.enable_playtime_tracking || info.ConfigDefaults < 0);
         bool show_score = (s_episode_playstyle != Config_t::MODE_VANILLA);
 
