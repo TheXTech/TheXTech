@@ -3046,7 +3046,8 @@ void NPCSpecial(int A)
         {
             auto &p = Player[i];
 
-            if(g_config.multiplayer_pause_controls && p.Effect == PLREFF_PET_INSIDE)
+            // fix SMBX 1.3 bug where players disappeared if P1 was eaten, and critical bug where players died if P1 was dead
+            if(g_config.multiplayer_pause_controls && (p.Effect == PLREFF_PET_INSIDE || p.Dead || p.TimeToLive))
                 continue;
 
             if(p.Section == npc.Section)
