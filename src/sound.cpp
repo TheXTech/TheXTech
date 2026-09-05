@@ -1583,6 +1583,14 @@ void PlaySoundSpatial(int A, int l, int t, int r, int b, int loops, int volume)
         if(g_config.sfx_spatial_audio)
             Sound_ResolveSpatialMod(left, right, l, t, r, b);
 
+        // Properly handling sound volumes isn't easy at all.
+        // We'd probably want to maintain a "tentative loudest" instance of the sound on the frame when SoundPause == 0,
+        // and play that loudest instance at the end of the frame during UpdateSound.
+        // We'd also allow mid-cycle interruptions (when SoundPause > 0) by louder sounds.
+        // For now, this is a start that prevents fully offscreen sounds messing with onscreen ones.
+        if(left < 16 && right < 16)
+            return;
+
         int alias = A;
         PlaySfx(alias, loops, volume, left, right);
         s_resetSoundDelay(A);
