@@ -189,20 +189,21 @@ void DeathCounter::MarkDeath(bool write_save)
 
             // update total fail count
             int size = snprintf(buf.data(), 384, "SAVE_HEADER\nTF:%d;\nSAVE_HEADER_END\n", g_totalFails);
-            if((int)SDL_RWwrite(save_access.savefile, buf.data(), 1, size) != size)
+            if((int)SDL_RWwrite(save_access.savefile, &buf[0], 1, size) != size)
                 failed = true;
 
             if(!failed && info)
             {
                 strcpy(buf.data(), "LEVEL_INFO\nL:\"");
-                char* dest = buf.data() + 14;
-                dest = s_escaped_strcpy(dest, buf.end(), FileNameFull);
+                char* dest = &buf[14];
+                char* buf_end = &buf[0] + buf.size();
+                dest = s_escaped_strcpy(dest, buf_end, FileNameFull);
                 if(dest)
-                    dest += snprintf(dest, buf.end() - dest, "\";F:%d;\nLEVEL_INFO_END\n", info->fails);
-                size = dest - buf.data();
+                    dest += snprintf(dest, buf_end - dest, "\";F:%d;\nLEVEL_INFO_END\n", info->fails);
+                size = dest - &buf[0];
             }
 
-            if(failed || (int)SDL_RWwrite(save_access.savefile, buf.data(), 1, size) != size)
+            if(failed || (int)SDL_RWwrite(save_access.savefile, &buf[0], 1, size) != size)
                 pLogCritical("Could not append fail to save file.");
         }
     }
