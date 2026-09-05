@@ -510,6 +510,26 @@ void GraphicsHelps::replaceColor(FIBITMAP* image, const PGE_Pix& src, const PGE_
     }
 }
 
+bool GraphicsHelps::getImageMetrics(const Files::Data &imageData, PGE_Size* imgSize)
+{
+    if(!imgSize)
+        return false;
+
+    SDL_RWops* rwops = SDL_RWFromConstMem(imageData.begin(), imageData.size());
+    if(!rwops)
+        return false;
+
+    int errorCode;
+    uint32_t w, h;
+
+    // the below call closes rwops internally -- unusual design, but we'll use it
+    if(!PGE_ImageInfo::getImageSizeRW(rwops, &w, &h, &errorCode))
+        return false;
+
+    imgSize->setSize(int(w), int(h));
+    return true;
+}
+
 bool GraphicsHelps::getImageMetrics(const std::string &imageFile, PGE_Size* imgSize)
 {
     if(!imgSize)

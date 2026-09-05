@@ -152,6 +152,7 @@ public:
      * \param [__out] imgSize Pointer to PGE_Size value
      */
     static bool getImageMetrics(const std::string &imageFile, PGE_Size *imgSize);
+    static bool getImageMetrics(const Files::Data &imageData, PGE_Size *imgSize);
     static void getMaskedImageInfo(const std::string &rootDir,
                                    const std::string &in_imgName,
                                    std::string &out_maskName,
