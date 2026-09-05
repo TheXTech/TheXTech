@@ -152,17 +152,20 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
             if(vscreen.small_screen_features.offset_y_hold == 0 && vscreen.small_screen_features.offset_y < -max_offsetY + 40 && (vscreen.small_screen_features.last_buttons_held & 1) == 0 && p.Controls.Down)
             {
                 vscreen.small_screen_features.offset_y_hold = -max_offsetY;
-                PlaySoundSpatial(SFX_Camera, p.Location);
+                if(&screen == l_screen)
+                    PlaySound(SFX_Camera);
             }
             else if(vscreen.small_screen_features.offset_y_hold == 0 && vscreen.small_screen_features.offset_y > max_offsetY - 40 && (vscreen.small_screen_features.last_buttons_held & 2) == 0 && p.Controls.Up)
             {
                 vscreen.small_screen_features.offset_y_hold = max_offsetY;
-                PlaySoundSpatial(SFX_Camera, p.Location);
+                if(&screen == l_screen)
+                    PlaySound(SFX_Camera);
             }
             else if(vscreen.small_screen_features.offset_y_hold != 0 && vscreen.small_screen_features.offset_y > -60 && vscreen.small_screen_features.offset_y < 60)
             {
                 vscreen.small_screen_features.offset_y_hold = 0;
-                PlaySoundSpatial(SFX_Camera, p.Location);
+                if(&screen == l_screen)
+                    PlaySound(SFX_Camera);
             }
 
             vscreen.small_screen_features.last_buttons_held = (int8_t)p.Controls.Down | (int8_t)p.Controls.Up << 1;
