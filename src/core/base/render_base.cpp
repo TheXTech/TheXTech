@@ -238,7 +238,6 @@ void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
                                        const std::string &maskFallbackPath)
 {
     PGE_Size tSize;
-    bool useMask = true;
 
     if(!GameIsActive)
         return; // do nothing when game is closed
@@ -249,10 +248,6 @@ void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
 #ifdef DEBUG_BUILD
     target.origPath = path;
 #endif
-
-    // Don't load mask if PNG image is used
-    if(Files::hasSuffix(path, ".png"))
-        useMask = false;
 
     if(!GraphicsHelps::getImageMetrics(path, &tSize))
     {
@@ -271,12 +266,12 @@ void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
     target.l.raw = Files::load_file(path);
 
     //Apply Alpha mask
-    if(useMask && !maskPath.empty() && Files::fileExists(maskPath))
+    if(!maskPath.empty() && Files::fileExists(maskPath))
     {
         target.l.rawMask = Files::load_file(maskPath);
         target.l.isMaskPng = false; //-V1048
     }
-    else if(useMask && !maskFallbackPath.empty())
+    else if(!maskFallbackPath.empty())
     {
         target.l.rawMask = Files::load_file(maskFallbackPath);
         target.l.isMaskPng = true;
