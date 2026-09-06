@@ -885,7 +885,10 @@ void InputMethodType_Keyboard::UpdateControlsPost()
             last_p = p;
 
             if(allow_move)
+            {
                 SharedCursor.Move = true;
+                SharedCursor.SDLCursorMove = true;
+            }
 
             SharedCursor.X = p.x;
             SharedCursor.Y = p.y;

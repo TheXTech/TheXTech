@@ -51,8 +51,12 @@ struct MenuControls_t
 // Each player has one; there is also a shared fallback mouse
 struct CursorControls_t
 {
+#ifndef THEXTECH_NO_SDL_BUILD
     // using direct touch device; affects rendering
     bool Touch = false;
+    // using SDL cursor device; prevents moving cursor
+    bool SDLCursorMove = false;
+#endif
     // moved this frame
     bool Move = false;
     // position of cursor in screen coordinates

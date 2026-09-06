@@ -928,6 +928,12 @@ bool Update(bool check_lost_devices)
     // sync any messages, and reset player controls to raw controls
     XMessage::Tick();
 
+#ifndef THEXTECH_NO_SDL_BUILD
+    // never warp the system cursor if it was moved this frame
+    if(SharedCursor.SDLCursorMove)
+        SharedCursor.SDLCursorMove = false;
+    else
+#endif
     if(SharedCursor.Move)
     {
         if(SharedCursor.X >= 0 && SharedCursor.Y >= 0)
