@@ -921,6 +921,10 @@ void NetworkClient::client_loop()
             temp_state.available_frame = -1;
             temp_state.new_history.clear();
 
+            acked_frame = -1;
+            ping_send_frame = 0;
+            ping_send_ms = 0;
+
             pLogInfo("NetPlay: joining room %s", DisplayRoom(status.room_info.room_key).room_name);
 
             if(status_req.client_state == CLIENT_HOST || status_req.client_state == CLIENT_HOST_IDLE)

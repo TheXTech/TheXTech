@@ -235,7 +235,7 @@ private:
     // ping info
     int ping_send_frame = -1;
     uint32_t ping_send_ms = 0;
-    int acked_frame = 0;
+    int acked_frame = -1;
 
     uint32_t latency_ms = 0;
     int latency_frames = 0;
