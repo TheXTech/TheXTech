@@ -838,7 +838,11 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
         if(Player[A].State == PLR_STATE_POLAR)
         {
             if(!BlockIsBreakable(Block[wallBlock]))
+            {
                 hitWall = true;
+                Player[A].Rolling = false;
+                Player[A].Slide = false;
+            }
         }
     }
 
