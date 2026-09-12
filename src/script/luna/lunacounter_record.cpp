@@ -25,21 +25,6 @@
 #include "sdl_proxy/sdl_stdinc.h"
 
 
-void DeathRecord::Save(SDL_RWops *openfile)
-{
-    // Write character count
-    auto tempint = (uint32_t)m_levelName.size();
-    LunaCounterUtil::writeUIntLE(openfile, tempint);
-
-    // Write string data
-    int16_t nullt = 0;
-    SDL_RWwrite(openfile, m_levelName.data(), 1, tempint);
-    SDL_RWwrite(openfile, &nullt, 1, sizeof(int16_t));
-
-    // Write death count
-    LunaCounterUtil::writeIntLE(openfile, m_deaths);
-}
-
 bool DeathRecord::Load(SDL_RWops *openfile)
 {
     size_t got;
@@ -74,7 +59,7 @@ bool DeathRecord::Load(SDL_RWops *openfile)
     if(skip > 0)
         SDL_RWseek(openfile, skip, RW_SEEK_CUR);
 
-    m_levelName = std::string(buf);
+    m_levelName = buf;
     SDL_RWseek(openfile, 2, RW_SEEK_CUR);
 
     // Read death count

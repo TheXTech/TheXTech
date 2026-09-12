@@ -29,7 +29,6 @@
 
 struct DeathRecord
 {
-    void Save(SDL_RWops *openfile);
     bool Load(SDL_RWops *openfile);
 
     std::string m_levelName;

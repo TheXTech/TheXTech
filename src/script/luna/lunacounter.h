@@ -31,6 +31,8 @@
 
 struct SDL_RWops;
 
+extern int g_totalFails;
+
 struct DeathCounter
 {
     DeathCounter() noexcept;
@@ -43,7 +45,6 @@ struct DeathCounter
     // Marks a death on the current level
     void MarkDeath(bool write_save = true);
     void AddDeath(const std::string &, int amount);
-    void TrySave();
     void Draw(int screenZ);
     void Recount();
     void ClearRecords();
@@ -66,26 +67,13 @@ struct DeathCounter
     } m_print;
 
 private:
-    SDL_RWops* m_openFile = nullptr;
-
     friend struct DeathRecord;
-    static void InitStatsFile(SDL_RWops *openfile);
-    static void WriteHeader(SDL_RWops *openfile);
-    void WriteRecords(SDL_RWops *statsfile);
     void ReadRecords(SDL_RWops *openfile);
-    void Save(SDL_RWops *openfile);
 
     // Members
 public:
-    bool mStatFileOK = false;
     bool mEnabled = false;
-
-    int mCurTotalDeaths = 0;
     int mCurLevelDeaths = 0;
-
-    std::list<DeathRecord> mDeathRecords;
-
-    std::string counterFile;
 };
 
 extern DeathCounter	gDeathCounter;

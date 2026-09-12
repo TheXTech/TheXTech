@@ -24,6 +24,10 @@
 
 #include "control_types.h"
 
+extern int64_t g_speedrunTicks;
+extern int64_t g_speedrunTicksSaved;
+extern int64_t g_speedrunWinTicks;
+
 namespace XPower { struct StatusInfo; }
 
 enum
