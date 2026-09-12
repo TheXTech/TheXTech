@@ -1324,6 +1324,54 @@ void PlayerEffectWarpWait(int A)
     }
 }
 
+// Warp point collisions
+static bool WarpCollision(const Player_t &p, const SpeedlessLocation_t &entrance, int direction)
+{
+    const Location_t& Loc1 = p.Location;
+
+    bool hasCollision = false;
+
+    num_t X2 = 0;
+    num_t Y2 = 0;
+
+    if(direction == 3)
+    {
+        X2 = 0;
+        Y2 = 32;
+    }
+    else if(direction == 1)
+    {
+        X2 = 0;
+        Y2 = -30;
+    }
+    else if(direction == 2)
+    {
+        X2 = -31;
+        Y2 = 32;
+    }
+    else if(direction == 4)
+    {
+        X2 = 31;
+        Y2 = 32;
+    }
+
+    if(Loc1.X <= entrance.X + entrance.Width + X2)
+    {
+        if(Loc1.X + Loc1.Width >= entrance.X + X2)
+        {
+            if(Loc1.Y <= entrance.Y + entrance.Height + Y2)
+            {
+                if(Loc1.Y + Loc1.Height >= entrance.Y + Y2)
+                {
+                    hasCollision = true;
+                }
+            }
+        }
+    }
+
+    return hasCollision;
+}
+
 static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool backward)
 {
     bool onGround = !warp.stoodRequired || (plr.Pinched.Bottom1 == 2 || plr.Slope != 0 || plr.StandingOnNPC != 0);
@@ -1360,22 +1408,22 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         canWarp = true;
     else if(direction == 1 && plr.Controls.Up) // Pipe
     {
-        if(WarpCollision(plr.Location, entrance, direction) && (warp.Effect != 2 || onGround))
+        if(WarpCollision(plr, entrance, direction) && (warp.Effect != 2 || onGround))
             canWarp = true;
     }
     else if(direction == 2 && plr.Controls.Left)
     {
-        if(WarpCollision(plr.Location, entrance, direction) && onGround)
+        if(WarpCollision(plr, entrance, direction) && onGround)
             canWarp = true;
     }
     else if(direction == 3 && plr.Controls.Down)
     {
-        if(WarpCollision(plr.Location, entrance, direction) && onGround)
+        if(WarpCollision(plr, entrance, direction) && onGround)
             canWarp = true;
     }
     else if(direction == 4 && plr.Controls.Right)
     {
-        if(WarpCollision(plr.Location, entrance, direction) && onGround)
+        if(WarpCollision(plr, entrance, direction) && onGround)
             canWarp = true;
     }
     // NOTE: Would be correct to move this up, but leave this here for a compatibility to keep the same behavior

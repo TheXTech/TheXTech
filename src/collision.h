@@ -56,8 +56,8 @@ bool n00bCollision(const Location_t &Loc1, const Location_t &Loc2);
 // Used when a NPC is activated to see if it should spawn
 // bool NPCStartCollision(const Location_t &Loc1, const Location_t &Loc2);
 // Public Function WarpCollision(Loc1 As Location, A As Integer) As Boolean  'Warp point collisions
-// Warp point collisions
-bool WarpCollision(const Location_t &Loc1, const SpeedlessLocation_t &entrance, int direction);
+// Warp point collisions (moved to static function in player_warp_logic.cpp)
+// bool WarpCollision(const Location_t &Loc1, const SpeedlessLocation_t &entrance, int direction);
 // Public Function FindCollision(Loc1 As Location, Loc2 As Location) As Integer 'Whats side the collision happened
 // Whats side the collision happened
 int FindCollision(const Location_t &Loc1, const Location_t &Loc2);

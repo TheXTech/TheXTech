@@ -104,52 +104,6 @@ bool NPCStartCollision(const Location_t &Loc1, const Location_t &Loc2)
 }
 #endif
 
-// Warp point collisions
-bool WarpCollision(const Location_t &Loc1, const SpeedlessLocation_t &entrance, int direction)
-{
-    bool hasCollision = false;
-
-    num_t X2 = 0;
-    num_t Y2 = 0;
-
-    if(direction == 3)
-    {
-        X2 = 0;
-        Y2 = 32;
-    }
-    else if(direction == 1)
-    {
-        X2 = 0;
-        Y2 = -30;
-    }
-    else if(direction == 2)
-    {
-        X2 = -31;
-        Y2 = 32;
-    }
-    else if(direction == 4)
-    {
-        X2 = 31;
-        Y2 = 32;
-    }
-
-    if(Loc1.X <= entrance.X + entrance.Width + X2)
-    {
-        if(Loc1.X + Loc1.Width >= entrance.X + X2)
-        {
-            if(Loc1.Y <= entrance.Y + entrance.Height + Y2)
-            {
-                if(Loc1.Y + Loc1.Height >= entrance.Y + Y2)
-                {
-                    hasCollision = true;
-                }
-            }
-        }
-    }
-
-    return hasCollision;
-}
-
 // Whats side the collision happened
 int FindCollision(const Location_t &Loc1, const Location_t &Loc2)
 {
