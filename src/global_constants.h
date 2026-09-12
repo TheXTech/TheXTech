@@ -116,7 +116,7 @@ const int maxBackgroundType = 200;
 //Public Const maxSceneType As Integer = 100 'Maximum number of scenetypes
 const int maxSceneType = 100;
 //Public Const maxNPCType As Integer = 300 'Maximum number of NPC types
-const int maxNPCType = 306;
+const int maxNPCType = 307;
 //Public Const maxEffectType As Integer = 200 'Maximum number of effect types
 const int maxEffectType = 200;
 
@@ -132,7 +132,7 @@ const int numBackground2 = 100;
 //Public Const numCharacters As Integer = 5 'Maximum number of player characters
 const int numCharacters = 5;
 //Public Const numStates As Integer = 7   'Maximum number of player states
-const int numStates = 11;
+const int numStates = 12;
 //Public Const maxPlayerFrames As Integer = 750 'Maximum number of player frames
 const int maxPlayerFrames = 100 * numStates + 50;
 //Public Const maxWater As Integer = 1000

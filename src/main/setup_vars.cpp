@@ -1485,6 +1485,9 @@ void SetupVars()
     NPCTraits[NPCID_CYCLONE_POWER].NoGravity = true;
     NPCTraits[NPCID_CYCLONE_POWER].NoClipping = true;
     NPCTraits[NPCID_SHELL_POWER].IsABonus = true;
+    NPCTraits[NPCID_TINY_POWER].IsABonus = true;
+    NPCTraits[NPCID_TINY_POWER].TWidth = 16;
+    NPCTraits[NPCID_TINY_POWER].THeight = 16;
     NPCTraits[NPCID_COIN_S3].IsACoin = true;
     NPCTraits[NPCID_COIN_S4].IsACoin = true;
     NPCTraits[NPCID_COIN_5].IsACoin = true;

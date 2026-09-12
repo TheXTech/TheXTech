@@ -1225,7 +1225,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         UpdateNPCGrid(mode, 40, 340, p7_smb2, sizeof(p7_smb2)/sizeof(int), 5);
 
         SuperPrintR(mode, "X", 3, 40 + 10, 380);
-        static const int p7_misc[] = {NPCID_RING, NPCID_POWER_S5, NPCID_FLY_POWER, NPCID_GEM_1, NPCID_GEM_5, NPCID_GEM_20, NPCID_INVINCIBILITY_POWER, NPCID_AQUATIC_POWER, NPCID_POLAR_POWER, NPCID_CYCLONE_POWER, NPCID_SHELL_POWER};
+        static const int p7_misc[] = {NPCID_RING, NPCID_POWER_S5, NPCID_FLY_POWER, NPCID_GEM_1, NPCID_GEM_5, NPCID_GEM_20, NPCID_INVINCIBILITY_POWER, NPCID_AQUATIC_POWER, NPCID_POLAR_POWER, NPCID_CYCLONE_POWER, NPCID_SHELL_POWER, NPCID_TINY_POWER};
         UpdateNPCGrid(mode, 40, 400, p7_misc, sizeof(p7_misc)/sizeof(int) - (FileFormat != FileFormats::LVL_PGEX) * 5, 10);
     }
 }
@@ -2236,8 +2236,8 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
     if(testPlayer[m_special_subpage].State == 0)
         testPlayer[m_special_subpage].State = 2;
 
-    constexpr int NPC_for_state[] = {0, NPCID_POWER_S3, NPCID_FIRE_POWER_S3, NPCID_LEAF_POWER, NPCID_STATUE_POWER, NPCID_HEAVY_POWER, NPCID_ICE_POWER_S3, NPCID_AQUATIC_POWER, NPCID_POLAR_POWER, NPCID_CYCLONE_POWER, NPCID_SHELL_POWER};
-    int max_state = (g_gameInfo.contentFeatureLevel >= 1030790) ? 11 : 7;
+    constexpr int NPC_for_state[] = {0, NPCID_POWER_S3, NPCID_FIRE_POWER_S3, NPCID_LEAF_POWER, NPCID_STATUE_POWER, NPCID_HEAVY_POWER, NPCID_ICE_POWER_S3, NPCID_AQUATIC_POWER, NPCID_POLAR_POWER, NPCID_CYCLONE_POWER, NPCID_SHELL_POWER, NPCID_TINY_POWER};
+    int max_state = (g_gameInfo.contentFeatureLevel >= 1030790) ? 12 : 7;
     for(int state = 1; state <= max_state; state++)
     {
         bool pActive = testPlayer[m_special_subpage].State == state;

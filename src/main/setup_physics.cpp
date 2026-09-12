@@ -105,6 +105,13 @@ void SetupPhysics()
         Physics.PlayerGrabSpotY[5][i] = 16;     // ---------
     }
 
+    for(int i = 1; i <= numCharacters; i++)
+    {
+        Physics.PlayerHeight[i][12] = 16;
+        Physics.PlayerDuckHeight[i][12] = 16;
+        Physics.PlayerWidth[i][12] = 14;
+    }
+
     Physics.NPCTimeOffScreen = 180;                     // How long NPCs are active offscreen before being reset
     Physics.NPCShellSpeed = (num_t)7.1_nf;              // Speed of kicked shells
     Physics.NPCShellSpeedY = 11;                        // Vertical Speed of kicked shells

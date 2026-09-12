@@ -1829,6 +1829,21 @@ void SetupPlayerFrames()
         base++;
     }
 
+    // this fills the tiny power frames with a fixed offset
+    for(int A = 1151; A <= 1250; A++)
+    {
+        MarioFrameX[A] = -8;
+        MarioFrameY[A] = -16;
+        LuigiFrameX[A] = -8;
+        LuigiFrameY[A] = -16;
+        PeachFrameX[A] = -8;
+        PeachFrameY[A] = -16;
+        ToadFrameX[A] = -8;
+        ToadFrameY[A] = -16;
+        LinkFrameX[A] = -8;
+        LinkFrameY[A] = -16;
+    }
+
     // special power corrections
     for(int D = -1; D <= 1; D += 2)
     {

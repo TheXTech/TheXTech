@@ -379,6 +379,7 @@ enum NPCID : vbint_t
     NPCID_CYCLONE_POWER = 304,
     NPCID_SHELL_POWER = 305,
     NPCID_FLAG_EXIT = 306,
+    NPCID_TINY_POWER = 307,
 };
 
 

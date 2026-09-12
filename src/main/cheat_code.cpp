@@ -517,6 +517,11 @@ static void sushiTime()
     grantPowerup(NPCID_AQUATIC_POWER, PLR_STATE_AQUATIC);
 }
 
+static void shrinkflation()
+{
+    grantPowerup(NPCID_TINY_POWER, PLR_STATE_TINY);
+}
+
 static void grantItemBox(NPCID npcid)
 {
     PlaySound(SFX_GotItem);
@@ -1756,6 +1761,7 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"canttouchthis", cantTouchThis, true},
     {"waypastcool", wayPastCool, true},
     {"sushitime", sushiTime, true},
+    {"shrinkflation", shrinkflation, true},
 
     {"holytrinity", holyTrinity, true}, {"passerby", holyTrinity, true},
     {"essentials", essentials, true}, {"holyfour", essentials, true},

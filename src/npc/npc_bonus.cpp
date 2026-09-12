@@ -461,7 +461,8 @@ void TouchBonus(int A, int B)
         || NPC[B].Type == NPCID_ICE_POWER_S3 || NPC[B].Type == NPCID_ICE_POWER_S4
         || NPC[B].Type == NPCID_LEAF_POWER || NPC[B].Type == NPCID_STATUE_POWER || NPC[B].Type == NPCID_HEAVY_POWER
         || NPC[B].Type == NPCID_AQUATIC_POWER || NPC[B].Type == NPCID_POLAR_POWER
-        || NPC[B].Type == NPCID_CYCLONE_POWER || NPC[B].Type == NPCID_SHELL_POWER)
+        || NPC[B].Type == NPCID_CYCLONE_POWER || NPC[B].Type == NPCID_SHELL_POWER
+        || NPC[B].Type == NPCID_TINY_POWER)
     {
         int target_state = PLR_STATE_BIG;
         PlayerEffect target_effect = PLREFF_TURN_TO_STATE;
@@ -505,6 +506,8 @@ void TouchBonus(int A, int B)
             target_state = PLR_STATE_POLAR;
         else if(NPC[B].Type == NPCID_SHELL_POWER)
             target_state = PLR_STATE_SHELL;
+        else if(NPC[B].Type == NPCID_TINY_POWER)
+            target_state = PLR_STATE_TINY;
 
         UpdatePlayerBonus(A, NPC[B].Type);
         Player[A].StateNPC = NPC[B].Type;

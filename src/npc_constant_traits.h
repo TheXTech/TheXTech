@@ -352,7 +352,8 @@ constexpr inline bool NPCLongLife(NPCID Type)
         // || Type == NPCID_PLATFORM_S3 // exclusive to UpdateGraphics
         // TheXTech-exclusive Types with long lives
         || Type == NPCID_INVINCIBILITY_POWER || Type == NPCID_AQUATIC_POWER
-        || Type == NPCID_POLAR_POWER || Type == NPCID_CYCLONE_POWER || Type == NPCID_SHELL_POWER);
+        || Type == NPCID_POLAR_POWER || Type == NPCID_CYCLONE_POWER || Type == NPCID_SHELL_POWER
+        || Type == NPCID_TINY_POWER);
 }
 
 #endif // #ifndef NPC_CONSTANT_TRAITS_H

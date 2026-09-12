@@ -2930,6 +2930,8 @@ void UpdatePlayerBonus(const int A, const NPCID B)
                 p.HeldBonus = NPCID_CYCLONE_POWER;
             else if(p.State == PLR_STATE_SHELL || effect_state == PLR_STATE_SHELL)
                 p.HeldBonus = NPCID_SHELL_POWER;
+            else if(p.State == PLR_STATE_TINY || effect_state == PLR_STATE_TINY)
+                p.HeldBonus = NPCID_TINY_POWER;
         }
     }
 

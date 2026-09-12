@@ -38,6 +38,7 @@ enum PlayerState : vbint_t
     PLR_STATE_POLAR = 9,
     PLR_STATE_CYCLONE = 10,
     PLR_STATE_SHELL = 11,
+    PLR_STATE_TINY = 12,
 };
 
 enum PlayerEffect : vbint_t
