@@ -1595,6 +1595,10 @@ void UnDuck(Player_t &p)
     if(p.AquaticSwim)
         return;
 
+    // if antizip is desired, it can be implemented with a compat flag here
+    // if(g_compat.antizip && !p.UnDuckSafe)
+    //     return;
+
     if(p.Rolling)
     {
         p.Rolling = false;

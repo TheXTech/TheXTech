@@ -672,6 +672,8 @@ struct Player_t
     bool SlippyWall : 1;
     // Is the player's current jump a wall-jump?
     bool JumpOffWall : 1;
+    // NEW: can the player safely unduck?
+    bool UnDuckSafe : 1;
 
 //'yoshi powers
 //    YoshiYellow As Boolean
@@ -850,7 +852,7 @@ struct Player_t
     // NEW: disable player-player collisions (used for door warps)
     bool NoPlayerCollide = false;
 
-    Player_t() : GroundPound(false), GroundPound2(false), CanPound(false), AltRunRelease(false), DuckRelease(false), SlippyWall(false), JumpOffWall(false) {}
+    Player_t() : GroundPound(false), GroundPound2(false), CanPound(false), AltRunRelease(false), DuckRelease(false), SlippyWall(false), JumpOffWall(false), UnDuckSafe(true) {}
 };
 
 //Public Type Background  'Background objects

@@ -58,6 +58,8 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
     // This was previously shared between players, but is safe unless Block[wallBlock] satisfies certain properties before wallBlock gets set
     num_t preWallX = 0; // The old X before player was moved -- was previously called tempSlope2X
 
+    Player[A].UnDuckSafe = true;
+
     if(Player[A].Character == 5 && Player[A].Duck && (Player[A].Location.SpeedY == Physics.PlayerGravity || Player[A].StandingOnNPC != 0 || Player[A].Slope != 0))
         Player[A].Location.set_height_floor(30);
 
@@ -67,7 +69,12 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
     // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
     // blockTileGet(Player[A].Location, fBlock, lBlock);
 
-    UpdatableQuery<BlockRef_t> q(Player[A].Location, SORTMODE_COMPAT, QUERY_FLBLOCK);
+    Location_t unducked_loc = Player[A].Location;
+    // to keep track of whether unducking would be safe
+    if(Player[A].Duck && Physics.PlayerHeight[Player[A].Character][Player[A].State] > num_t::floor(unducked_loc.Height))
+        unducked_loc.set_height_floor(Physics.PlayerHeight[Player[A].Character][Player[A].State]);
+
+    UpdatableQuery<BlockRef_t> q(unducked_loc, SORTMODE_COMPAT, QUERY_FLBLOCK);
 
     for(auto it = q.begin(); it != q.end(); ++it)
     {
@@ -753,6 +760,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
                                     if(hasFloor)
                                     {
+                                        Player[A].UnDuckSafe = false;
                                         Player[A].CanJump = false;
                                         Player[A].Jump = 0;
                                         Player[A].Location.X += -4 * Player[A].Direction;
@@ -766,6 +774,8 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                             }
                         }
                     }
+                    else if(unducked_loc.Y <= Block[B].Location.Y + Block[B].Location.Height)
+                        Player[A].UnDuckSafe = false;
                 }
             }
         }
@@ -1114,6 +1124,9 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
             if(Player[A].Mount != 2 && Block[ceilingBlock].Type != 293)
                 BlockHitHard(ceilingBlock);
         }
+
+        if(Player[A].Duck)
+            Player[A].UnDuckSafe = false;
     }
 
     if(Player[A].StandingOnNPC != 0)

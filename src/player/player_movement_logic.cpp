@@ -78,7 +78,7 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
     }
 
     // special logic for shell: just keep going!
-    if(((Player[A].State == PLR_STATE_SHELL && !Player[A].Wet) || Player[A].State == PLR_STATE_POLAR) && Player[A].Controls.Run && !Player[A].HoldingNPC && !Player[A].Mount)
+    if(((Player[A].State == PLR_STATE_SHELL && !Player[A].Wet) || Player[A].State == PLR_STATE_POLAR) && (Player[A].Controls.Run || !Player[A].UnDuckSafe) && !Player[A].HoldingNPC && !Player[A].Mount)
     {
         // 7.1 is the NPC shellspeed
         num_t shell_speed = (num_t)speedVar * 7.1_r;
