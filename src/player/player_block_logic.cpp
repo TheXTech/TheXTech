@@ -225,7 +225,12 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                 if(Slope > 1)
                                     Slope = 1;
 
-                                if(Player[A].Location.Y <= Block[B].Location.Y + Block[B].Location.Height - ((int_ok)Block[B].Location.Height * Slope))
+                                num_t ceiling_y = Block[B].Location.Y + Block[B].Location.Height - ((int_ok)Block[B].Location.Height * Slope);
+
+                                if(unducked_loc.Y <= ceiling_y)
+                                    Player[A].UnDuckSafe = false;
+
+                                if(Player[A].Location.Y <= ceiling_y)
                                 {
                                     if(BlockKills[Block[B].Type] && !(Player[A].Rolling && Player[A].Character == 5 && Player[A].State == PLR_STATE_SHELL))
                                     {
@@ -840,8 +845,11 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
             if(!BlockIsBreakable(Block[wallBlock]))
             {
                 hitWall = true;
-                Player[A].Rolling = false;
-                Player[A].Slide = false;
+                if(Player[A].UnDuckSafe && !hitCeiling)
+                {
+                    Player[A].Rolling = false;
+                    Player[A].Slide = false;
+                }
             }
         }
     }
