@@ -227,6 +227,12 @@ void NPCHit(int A, int B, int C)
     if(B == 1 && NPC[A]->JumpHurt && NPC[A].Type != NPCID_ITEM_BUBBLE) // Things that don't die from jumping
         return;
 
+    if(B == 1 && Player[C].State == PLR_STATE_TINY) // Can't damage things by jumping when tiny
+    {
+        PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
+        return;
+    }
+
     if(B == 10 && NPC[A].Type == NPCID_KEY)
     {
         if(Player[C].Character == 5 && !Player[C].HasKey)

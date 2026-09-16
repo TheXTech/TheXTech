@@ -678,6 +678,8 @@ void SetupPlayers()
                 Player[A].State = 2;
             if(Player[A].Hearts > 3)
                 Player[A].Hearts = 3;
+            if(Player[A].State == PLR_STATE_TINY)
+                Player[A].Hearts = 1;
             if(Player[A].Mount == 3)
                 Player[A].Mount = 0;
         }
@@ -839,9 +841,9 @@ void SetupPlayers()
 
         if(Player[A].Character == 3 || Player[A].Character == 4)
         {
-            if(Player[A].State == 1)
+            if(Player[A].State == 1 || Player[A].State == PLR_STATE_TINY)
                 Player[A].Hearts = 1;
-            if(Player[A].State > 1 && Player[A].Hearts < 2)
+            else if(Player[A].Hearts < 2)
                 Player[A].Hearts = 2;
         }
 
@@ -1081,7 +1083,7 @@ void PlayerHurt(const int A)
                     }
                 }
 
-                if(p.State > 1)
+                if(p.State > 1 && p.State != PLR_STATE_TINY)
                 {
                     PlaySoundSpatial(SFX_PlayerShrink, p.Location);
                     p.StateNPC = NPCID_NULL;
@@ -2136,9 +2138,9 @@ void PlayerFrame(Player_t &p)
     }
     else
     {
-        if(p.State == 1 && (p.Character == 1 || p.Character == 2)) // Small Mario & Luigi
+        if((p.State == 1 || p.State == PLR_STATE_TINY) && (p.Character == 1 || p.Character == 2)) // Small Mario & Luigi
         {
-            if(p.HoldingNPC == 0) // not holding anything
+            if(p.HoldingNPC == 0 || (p.State == PLR_STATE_TINY && p.HoldingNPC < 0)) // not holding anything
             {
                 if(wetframe && !grounded && !p.Duck && p.Quicksand == 0) // swimming
                 {
@@ -2340,7 +2342,7 @@ void PlayerFrame(Player_t &p)
         }
         else // Large Mario, Luigi, and Peach
         {
-            if(p.HoldingNPC == 0 || (p.Effect == PLREFF_WARP_PIPE && p.Character >= 3))
+            if(p.HoldingNPC == 0 || p.State == PLR_STATE_TINY || (p.Effect == PLREFF_WARP_PIPE && p.Character >= 3))
             {
                 if(wetframe && !grounded && !p.Duck && p.Quicksand == 0)
                 {
@@ -2872,6 +2874,9 @@ void UpdatePlayerBonus(const int A, const NPCID B)
         effect_state = p.Effect - PLREFF_GROW_TO_STATE;
     else if(p.Effect == PLREFF_TURN_BIG)
         effect_state = PLR_STATE_BIG;
+
+    if(effect_state == PLR_STATE_TINY || p.State == PLR_STATE_TINY)
+        return;
 
     if(p.State != PLR_STATE_SMALL || (effect_state == PLR_STATE_BIG || effect_state == PLR_STATE_FIRE || effect_state == PLR_STATE_LEAF))
     {
@@ -3852,11 +3857,11 @@ void PlayerPush(const int A, int HitSpot)
                     }
                     else if(HitSpot == 3)
                         p.Location.Y = b.Location.Y + b.Location.Height + 0.01_n;
-                    else if(HitSpot == 4)
+                    else if(HitSpot == 4 || (HitSpot == 6 && !b.Location.to_right_of(p.Location))) // push right, or "push horizontally" when the block is to the left of the player
                         p.Location.X = b.Location.X + b.Location.Width + 0.01_n;
                     else if(HitSpot == 1) // new-added
                         p.Location.Y = b.Location.Y - p.Location.Height - 0.01_n;
-                    else if(HitSpot == 5) // non-bugged 2
+                    else if(HitSpot == 5 || HitSpot == 6) // non-bugged 2 (push left), or "push horizontally"
                         p.Location.X = b.Location.X - p.Location.Width - 0.01_n;
 
                     q.update(p.Location, it);

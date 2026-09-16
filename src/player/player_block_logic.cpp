@@ -1005,7 +1005,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
             }
 
             // smash turn blocks
-            if(Player[A].SpinJump && (Block[floorBlock].Type == 90 || Block[floorBlock].Type == 526) && Player[A].State > 1 && Block[floorBlock].Special == 0)
+            if(Player[A].SpinJump && (Block[floorBlock].Type == 90 || Block[floorBlock].Type == 526) && (Player[A].State > 1 && Player[A].State != PLR_STATE_TINY) && Block[floorBlock].Special == 0)
             {
                 Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
                 Block[floorBlock].Kill = true;
@@ -1131,7 +1131,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
         if(Block[ceilingBlock].Type == 55) // If it is a bouncy block the knock the player down
             Player[A].Location.SpeedY = 3;
 
-        if(Player[A].State > 1 && (Player[A].Character != 5 || Player[A].Rolling)) // If the player was big ask the block nicely to die
+        if(Player[A].State > 1 && Player[A].State != PLR_STATE_TINY && (Player[A].Character != 5 || Player[A].Rolling)) // If the player was big ask the block nicely to die
         {
             if(Player[A].Mount != 2 && Block[ceilingBlock].Type != 293)
                 BlockHitHard(ceilingBlock);

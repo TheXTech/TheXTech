@@ -230,6 +230,26 @@ void CollectMedal(const NPC_t& medal)
         g_curLevelMedals.get(medal.Variant - 1);
 }
 
+// convert a tiny player to small, with appropriate resizes and state changes
+static void s_TinyToSmall(int A)
+{
+    if(Player[A].State != PLR_STATE_TINY)
+        return;
+
+    Player[A].State = PLR_STATE_SMALL;
+    Player[A].HoldingNPC = 0;
+
+    // resize width first
+    if(Player[A].Location.Width < Physics.PlayerWidth[Player[A].Character][PLR_STATE_SMALL])
+    {
+        Player[A].Location.set_width_center(Physics.PlayerWidth[Player[A].Character][PLR_STATE_SMALL]);
+        PlayerPush(A, 6); // a new "push X"
+    }
+
+    // now fully resize
+    SizeCheck(Player[A]);
+}
+
 void TouchBonus(int A, int B)
 {
     // INCORRECT NOTE: the only way to reach this code in SMBX 1.3 when Player[A].Effect is not PLREFF_NORMAL is if NPC[B]->IsACoin is true and NPC[B] is on Char4's boomerang
@@ -376,10 +396,14 @@ void TouchBonus(int A, int B)
     {
         RumbleForPowerup(A);
 
+        if(Player[A].State == PLR_STATE_TINY && Player[A].HeldBonus == 0)
+            Player[A].HeldBonus = NPCID_POWER_S3;
+        else if(Player[A].Hearts == 1)
+            Player[A].Hearts = 2;
+
         if(Player[A].State == 1)
             Player[A].State = 2;
-        if(Player[A].Hearts == 1)
-            Player[A].Hearts = 2;
+
         SizeCheck(Player[A]);
 
         PlaySoundSpatial(SFX_Checkpoint, NPC[B].Location);
@@ -420,7 +444,7 @@ void TouchBonus(int A, int B)
 
         UpdatePlayerBonus(A, NPC[B].Type);
 
-        if(Player[A].State == 1 && Player[A].Character != 5)
+        if((Player[A].State == 1 || Player[A].State == PLR_STATE_TINY) && Player[A].Character != 5)
         {
             RumbleForPowerup(A);
 
@@ -433,6 +457,8 @@ void TouchBonus(int A, int B)
             // force UnDuck to work, fixes a vanilla downwards clip while ducking
             if(g_config.fix_player_grab_clip && Player[A].Character >= 3)
                 Player[A].GrabTime = 0;
+
+            s_TinyToSmall(A);
 
             UnDuck(Player[A]);
 
@@ -514,6 +540,8 @@ void TouchBonus(int A, int B)
 
         if(Player[A].State != target_state)
         {
+            s_TinyToSmall(A);
+
             RumbleForPowerup(A);
 
             // fixes a vanilla downwards clip that happens even if the player is just ducking (not even digging)

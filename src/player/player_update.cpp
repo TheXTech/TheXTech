@@ -145,7 +145,7 @@ bool UpdatePlayer()
         if(Player[A].Dismount > 0) // count down to being able to hop in a shoe or yoshi
             Player[A].Dismount -= 1;
 
-        if(Player[A].Mount != 0 || Player[A].Stoned || Player[A].Fairy) // if .holdingnpc is -1 then the player can't grab anything. this stops the player from grabbing things while on a yoshi/shoe
+        if(Player[A].Mount != 0 || Player[A].Stoned || Player[A].Fairy || Player[A].State == PLR_STATE_TINY) // if .holdingnpc is -1 then the player can't grab anything. this stops the player from grabbing things while on a yoshi/shoe
             Player[A].HoldingNPC = -1;
         else if(Player[A].HoldingNPC == -1)
             Player[A].HoldingNPC = 0;
@@ -206,7 +206,7 @@ bool UpdatePlayer()
                 if(Player[A].Rolling)
                     Player[A].Slide = true;
                 else if(Player[A].Slope > 0 && Player[A].Controls.Down &&
-                   Player[A].Mount == 0 && Player[A].HoldingNPC == 0 &&
+                   Player[A].Mount == 0 && (Player[A].HoldingNPC == 0 || Player[A].State == PLR_STATE_TINY) &&
                    !(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5) &&
                    Player[A].GrabTime == 0)
                 {
@@ -414,7 +414,7 @@ bool UpdatePlayer()
                     if(Player[A].Hearts == 1 && Player[A].State > 1)
                         Player[A].Hearts = 2;
 
-                    if(Player[A].Hearts > 1 && Player[A].State == 1)
+                    if(Player[A].Hearts > 1 && (Player[A].State == 1 || Player[A].State == PLR_STATE_TINY))
                         Player[A].Hearts = 1;
 
                     if(Player[A].Hearts == 0)

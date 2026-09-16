@@ -194,7 +194,7 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
                 }
                 else // normal duck
                 {
-                    if((Player[A].State > 1 && Player[A].HoldingNPC <= 0) || (Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5))
+                    if(((Player[A].State > 1 && Player[A].HoldingNPC <= 0) || (Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)) && Player[A].State != PLR_STATE_TINY)
                     {
                         if(!Player[A].Duck && Player[A].TailCount == 0) // Player ducks
                         {
@@ -621,7 +621,7 @@ void PlayerMovementY(int A)
     if(Player[A].Wet > 0 || Player[A].WetFrame)
         Player[A].CanFloat = false;
 
-    bool has_wall_traction = CanWallJump && (Player[A].Pinched.Left2 == 2 || Player[A].Pinched.Right4 == 2) && !Player[A].SpinJump && (!Player[A].SlippyWall || Player[A].State == PLR_STATE_POLAR) && Player[A].HoldingNPC == 0 && Player[A].Mount == 0 && !Player[A].Duck && !(Player[A].State == PLR_STATE_CYCLONE && !Player[A].DoubleJump);
+    bool has_wall_traction = CanWallJump && (Player[A].Pinched.Left2 == 2 || Player[A].Pinched.Right4 == 2) && !Player[A].SpinJump && (!Player[A].SlippyWall || Player[A].State == PLR_STATE_POLAR) && Player[A].HoldingNPC <= 0 && Player[A].Mount == 0 && !Player[A].Duck && !(Player[A].State == PLR_STATE_CYCLONE && !Player[A].DoubleJump);
 
     // handles the regular jump
     if(Player[A].Controls.Jump || (Player[A].Controls.AltJump &&
@@ -1028,6 +1028,8 @@ void PlayerMovementY(int A)
                 if(Player[A].Location.SpeedY > Physics.PlayerTerminalVelocity / 2)
                     Player[A].Location.SpeedY = Physics.PlayerTerminalVelocity / 2;
             }
+            else if(Player[A].State == PLR_STATE_TINY && (Player[A].Controls.Jump || Player[A].Controls.AltJump) && !Player[A].Mount)
+                Player[A].Location.SpeedY += Physics.PlayerGravity * 0.625_rb;
             else if(Player[A].Character == 2)
                 Player[A].Location.SpeedY += Physics.PlayerGravity * 0.9_r;
             else

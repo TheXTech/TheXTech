@@ -1356,7 +1356,9 @@ static bool WarpCollision(const Player_t &p, const SpeedlessLocation_t &entrance
     }
 
     if(p.AquaticSwim && Y2 > 0)
-        Y2 -= 2;
+        Y2 = 30;
+    else if(p.State == PLR_STATE_TINY && Y2 < 0)
+        Y2 = -16;
 
     if(Loc1.X <= entrance.X + entrance.Width + X2)
     {
