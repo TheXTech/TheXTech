@@ -1028,11 +1028,8 @@ void NPCHit(int A, int B, int C)
         if(B == 6)
             NPC[A].Killed = B;
     }
-    // Zelda NPCs
-    else if(NPC[A].Type == NPCID_KNIGHT)
-        NPC[A].Killed = B;
-    // Zelda Bots
-    else if(NPCIsABot(NPC[A]))
+    // Auto-kill NPCs
+    else if(NPC[A].Type == NPCID_KNIGHT || NPCIsABot(NPC[A]) || NPC[A].Type == NPCID_HEAVY_THROWER)
         NPC[A].Killed = B;
     // Switch Platforms
     else if(NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM)
@@ -1183,43 +1180,22 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Location.SpeedX = 2 * NPC[B].Direction;
         }
     }
-    // SMB3 Red Paragoomba
-    else if(NPC[A].Type == NPCID_RED_FLY_FODDER)
+    // Flying fodder enemies (combined)
+    else if(NPC[A].Type == NPCID_RED_FLY_FODDER || NPC[A].Type == NPCID_FLY_FODDER_S5 || NPC[A].Type == NPCID_FLY_FODDER_S3)
     {
         if(B == 1)
         {
             PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
             if(NPC[A].Location.SpeedY < 0)
                 NPC[A].Location.SpeedY = 0;
-            NPC[A].Type = NPCID_RED_FODDER;
-            NPC[A].Frame = 0;
-        }
-        else
-            NPC[A].Killed = B;
-    }
-    // SML2 Paragoomba
-    else if(NPC[A].Type == NPCID_FLY_FODDER_S5)
-    {
-        if(B == 1)
-        {
-            PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
-            if(NPC[A].Location.SpeedY < 0)
-                NPC[A].Location.SpeedY = 0;
-            NPC[A].Type = NPCID_FODDER_S5;
-            NPC[A].Frame = 0;
-        }
-        else
-            NPC[A].Killed = B;
-    }
-    // SMB3 Brown Paragoomba
-    else if(NPC[A].Type == NPCID_FLY_FODDER_S3)
-    {
-        if(B == 1)
-        {
-            PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
-            if(NPC[A].Location.SpeedY < 0)
-                NPC[A].Location.SpeedY = 0;
-            NPC[A].Type = NPCID_FODDER_S3;
+
+            if(NPC[A].Type == NPCID_RED_FLY_FODDER)
+                NPC[A].Type = NPCID_RED_FODDER;
+            else if(NPC[A].Type == NPCID_FLY_FODDER_S5)
+                NPC[A].Type = NPCID_FODDER_S5;
+            else
+                NPC[A].Type = NPCID_FODDER_S3;
+
             NPC[A].Frame = 0;
         }
         else
@@ -1688,9 +1664,6 @@ void NPCHit(int A, int B, int C)
             NPC[A].Killed = B;
         }
     }
-    // Hammer Bros.
-    else if(NPC[A].Type == NPCID_HEAVY_THROWER)
-        NPC[A].Killed = B;
     // Hammer Bros. Hammer
     else if(NPC[A].Type == NPCID_HEAVY_THROWN)
     {
