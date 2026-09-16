@@ -625,7 +625,8 @@ void PlayerMovementY(int A)
 
     // handles the regular jump
     if(Player[A].Controls.Jump || (Player[A].Controls.AltJump &&
-       ((Player[A].Character > 2 && Player[A].Character != 4) || Player[A].Quicksand > 0 || Player[A].Rolling || aquatic_jumps || g_config.disable_spin_jump) &&
+       ((Player[A].Character > 2 && Player[A].Character != 4 && (Player[A].State != PLR_STATE_TINY || Player[A].Character == 5))
+        || Player[A].Quicksand > 0 || Player[A].Rolling || aquatic_jumps || g_config.disable_spin_jump) &&
        Player[A].CanAltJump))
     {
         num_t tempSpeed;
@@ -866,7 +867,7 @@ void PlayerMovementY(int A)
 
     // START ALT JUMP - this code does the player's spin jump
     if(Player[A].Controls.AltJump && (Player[A].Character == 1 || Player[A].Character == 2 || Player[A].Character == 4 ||
-                                      (g_config.fix_char3_escape_shell_surf && Player[A].Character == 3 && Player[A].ShellSurf))
+                                      (g_config.fix_char3_escape_shell_surf && Player[A].Character == 3 && Player[A].ShellSurf) || Player[A].State == PLR_STATE_TINY)
                                   && (!g_config.disable_spin_jump || Player[A].ShellSurf))
     {
         num_t tempSpeed;
@@ -1083,8 +1084,10 @@ void PlayerMovementY(int A)
             if(Player[A].Jump == 0 && ((Player[A].Controls.Jump && Player[A].FloatRelease) ||
               (Player[A].Controls.AltJump && Player[A].Location.SpeedY > 0)))
             {
+                if(Player[A].State == PLR_STATE_TINY && Player[A].SpinJump)
+                    Player[A].FloatTime = 0;
                 // float time is longer during glide
-                if(Player[A].State == 4 || Player[A].State == 5)
+                else if(Player[A].State == 4 || Player[A].State == 5)
                 {
                     Player[A].FloatTime = 100;
                     Player[A].FlySparks = true;
