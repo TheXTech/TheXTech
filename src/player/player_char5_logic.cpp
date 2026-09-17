@@ -149,7 +149,7 @@ void PlayerChar5Logic(int A)
         // Link ducks when jumping
         // Holding Up cancels this and allows upwards stab
         if(!Player[A].Duck && Player[A].Location.SpeedY < Physics.PlayerGravity && Player[A].StandingOnNPC == 0 &&
-            Player[A].Slope == 0 && !Player[A].Controls.Up && !Player[A].Stoned)
+            Player[A].Slope == 0 && !Player[A].Controls.Up && !Player[A].Stoned && Player[A].State != PLR_STATE_TINY)
         {
             Player[A].SwordPoke = 0;
             Player[A].Duck = true;
@@ -190,7 +190,7 @@ void PlayerChar5StabLogic(int A)
         {
             if(p.Wet == 0 && !p.WetFrame)
             {
-                if(p.Controls.Down && !p.Duck && p.Mount == 0)
+                if(p.Controls.Down && !p.Duck && p.Mount == 0 && p.State != PLR_STATE_TINY)
                 {
                     p.Duck = true;
                     p.Location.set_height_floor(Physics.PlayerDuckHeight[p.Character][p.State]);

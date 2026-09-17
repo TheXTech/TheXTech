@@ -2996,6 +2996,13 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                 tailLoc.Width = 38;
                 tailLoc.Height = 6;
                 tailLoc.Y = p.Location.Y + p.Location.Height - 42;
+
+                if(p.State == PLR_STATE_TINY)
+                {
+                    tailLoc.Width = 16;
+                    tailLoc.Y += 32;
+                }
+
                 if(p.Direction == 1)
                     tailLoc.X = p.Location.X + p.Location.Width;
                 else
@@ -3063,7 +3070,9 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                         //    BlockHit(A, false, plr);
                         //}
 
-                        BlockHitHard(A);
+                        if(p.State != PLR_STATE_TINY)
+                            BlockHitHard(A);
+
                         if(!Stab)
                         {
                             // if(block.ShakeY != 0)
@@ -3086,6 +3095,9 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                                 {
                                     if(BlockHurts[block.Type])
                                         PlaySoundSpatial(SFX_Spring, block.Location);
+                                    else if(p.State == PLR_STATE_TINY)
+                                        PlaySoundSpatial(SFX_BlockHit, block.Location);
+
                                     p.Location.Y -= 0.1_n;
                                     p.Location.SpeedY = Physics.PlayerJumpVelocity;
                                     p.StandingOnNPC = 0;

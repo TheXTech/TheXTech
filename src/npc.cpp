@@ -3383,11 +3383,18 @@ void SpecialNPC(int A)
                !(NPC[A].Type == NPCID_PLR_HEAVY && NPC[A].CantHurtPlayer == B))
             {
                 Location_t tempLocation;
-                if(!Player[B].Duck)
-                    tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height - 52;
-                else
-                    tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height - 28;
                 tempLocation.Height = 24;
+
+                int offset = 52;
+                if(Player[B].State == PLR_STATE_TINY)
+                {
+                    tempLocation.Height = 14;
+                    offset = 14;
+                }
+                else if(Player[B].Duck)
+                    offset = 28;
+
+                tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height - offset;
                 tempLocation.Width = 6;
                 if(Player[B].Direction == 1)
                     tempLocation.X = Player[B].Location.X + Player[B].Location.Width - 2;

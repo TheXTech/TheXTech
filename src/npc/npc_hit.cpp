@@ -40,6 +40,26 @@
 
 #include <Logger/logger.h>
 
+inline void s_TossNPC(int A, int C)
+{
+    if((NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_CANNONITEM)
+    {
+        NPC[A].Location.SpeedX = 3 * Player[C].Direction;
+        NPC[A].Location.SpeedY = -5;
+    }
+    else
+    {
+        NPC[A].Location.SpeedX = 4 * Player[C].Direction;
+        NPC[A].Location.SpeedY = -4;
+    }
+    NPC[A].Projectile = true;
+    NPC[A].CantHurt = 30;
+    NPC[A].CantHurtPlayer = C;
+    NPC[A].BattleOwner = C;
+    if(NPC[A].Type == NPCID_CANNONITEM)
+        NPC[A].Direction = Player[C].Direction;
+}
+
 void NPCHit(int A, int B, int C)
 {
     // NPC_t tempNPC;
@@ -306,22 +326,7 @@ void NPCHit(int A, int B, int C)
     {
         PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
         NPC[A].Bouce = true;
-        if((NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_CANNONITEM)
-        {
-            NPC[A].Location.SpeedX = 3 * Player[C].Direction;
-            NPC[A].Location.SpeedY = -5;
-        }
-        else
-        {
-            NPC[A].Location.SpeedX = 4 * Player[C].Direction;
-            NPC[A].Location.SpeedY = -4;
-        }
-        NPC[A].Projectile = true;
-        NPC[A].CantHurt = 30;
-        NPC[A].CantHurtPlayer = C;
-        NPC[A].BattleOwner = C;
-        if(NPC[A].Type == NPCID_CANNONITEM)
-            NPC[A].Direction = Player[C].Direction;
+        s_TossNPC(A, C);
     }
     // SMB2 Grass
     else if(B == 10 && (NPC[A].Type == NPCID_ITEM_BURIED || NPCIsVeggie(NPC[A].Type)))
@@ -2157,7 +2162,17 @@ void NPCHit(int A, int B, int C)
         if(tempBool)
             MoreScore(NPC[A]->Score, NPC[A].Location, NPC[C].Multiplier);
         else
-            MoreScore(NPC[A]->Score, NPC[A].Location, Player[C].Multiplier);
+        {
+            // cancel non-downstabs in tiny state
+            if(Player[C].State == PLR_STATE_TINY && (Player[C].SwordPoke != 0 || !Player[C].Controls.Down) && NPC[A].Damage == 0)
+            {
+                NPC[A].Killed = 0;
+                PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
+                s_TossNPC(A, C);
+            }
+            else
+                MoreScore(NPC[A]->Score, NPC[A].Location, Player[C].Multiplier);
+        }
     }
     // Calculate Score
     Player[0].Multiplier = 0;
