@@ -239,6 +239,10 @@ static void s_TinyToSmall(int A)
     Player[A].State = PLR_STATE_SMALL;
     Player[A].HoldingNPC = 0;
 
+    // reset walk on water counter
+    if(!Player[A].Mount)
+        Player[A].MountSpecial = 0;
+
     // resize width first
     if(Player[A].Location.Width < Physics.PlayerWidth[Player[A].Character][PLR_STATE_SMALL])
     {

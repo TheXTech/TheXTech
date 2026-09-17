@@ -1837,6 +1837,13 @@ void PlayerFrame(Player_t &p)
     if(p.State == PLR_STATE_CYCLONE && !p.DoubleJump && (p.Jump || (p.Controls.Down && p.Location.SpeedY > Physics.PlayerTerminalVelocity * 0.9_n)))
         s_makeDust(p, 2, tempLocation);
 
+    // walk on water
+    if(p.State == PLR_STATE_TINY && p.Mount == 0 && p.MountSpecial)
+    {
+        s_makeDust(p, -4, tempLocation);
+        grounded = true;
+    }
+
     if(LevelMacro == LEVELMACRO_FLAG_EXIT && p.Location.SpeedY == 2)
     {
         p.Direction = 1;
@@ -3921,6 +3928,10 @@ void SizeCheck(Player_t &p)
             if(p.Location.Height != Physics.PlayerDuckHeight[p.Character][2])
                 p.Location.set_height_floor(Physics.PlayerDuckHeight[p.Character][2]);
         }
+        else if(p.State == PLR_STATE_TINY)
+        {
+            p.Location.set_height_floor(44);
+        }
         else if(p.Character == 2 && p.State > 1)
         {
             if(p.Location.Height != Physics.PlayerHeight[1][2])
@@ -3945,6 +3956,12 @@ void SizeCheck(Player_t &p)
             {
                 if(p.Location.Height != Physics.PlayerHeight[1][2])
                     p.Location.set_height_floor(Physics.PlayerHeight[1][2]);
+            }
+            else if(p.State == PLR_STATE_TINY)
+            {
+                if(p.Location.Height != Physics.PlayerHeight[2][2] - 16)
+                    p.Location.set_height_floor(Physics.PlayerHeight[2][2] - 16);
+                p.MountOffsetY += 16;
             }
             else
             {
@@ -4702,6 +4719,8 @@ void WaterCheck(const int A)
     if(p.AquaticSwim)
         query_loc.set_height_floor(Physics.PlayerHeight[p.Character][p.State]);
 
+    bool water_contact = false;
+
     for(int B : treeWaterQuery(query_loc, SORTMODE_NONE))
     {
         if(!Water[B].Hidden)
@@ -4733,8 +4752,34 @@ void WaterCheck(const int A)
                     continue;
                 }
 
+                water_contact = true;
+
                 if(p.Wet == 0 && p.Mount != 2)
                 {
+                    if(p.Mount == 0 && p.State == PLR_STATE_TINY && !p.Pinched.Top3 && Water[B].Type != PHYSID_QUICKSAND)
+                    {
+                        bool controls_press = (p.Controls.Left || p.Controls.Right);
+                        if(controls_press && num_t::abs(p.Location.SpeedX - (num_t)Layer[Water[B].Layer].SpeedX) >= 3_n && p.Location.Y + p.Location.Height - p.Location.SpeedY <= Water[B].Location.Y - (num_t)Layer[Water[B].Layer].SpeedY)
+                            p.MountSpecial = 60;
+
+                        if(p.MountSpecial > 0)
+                        {
+                            if(!controls_press)
+                                p.MountSpecial -= 2;
+                            p.MountSpecial--;
+                        }
+
+                        if(p.MountSpecial > 0)
+                        {
+                            p.WetFrame = false;
+                            p.Location.Y = Water[B].Location.Y - p.Location.Height;
+                            p.Location.SpeedY = 0;
+                            continue;
+                        }
+                        else
+                            p.MountSpecial = 0;
+                    }
+
                     p.FlyCount = 0;
                     p.CanFly = false;
                     p.CanFly2 = false;
@@ -4778,6 +4823,9 @@ void WaterCheck(const int A)
             }
         }
     }
+
+    if((!water_contact || p.Wet) && p.State == PLR_STATE_TINY && !p.Mount)
+        p.MountSpecial = 0;
 
     if(p.Mount == 2)
     {
@@ -5567,6 +5615,9 @@ void LinkFrame(Player_t &p)
 
     bool grounded = (p.Location.SpeedY == 0) || (p.StandingOnNPC != 0) || (p.Slope > 0);
     //auto &p = Player[A];
+
+    if(p.State == PLR_STATE_TINY && p.Mount == 0 && p.MountSpecial)
+        grounded = true;
 
     p.MountOffsetY = 0;
 
