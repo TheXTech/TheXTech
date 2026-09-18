@@ -212,9 +212,19 @@ void PlayerMovementX(int A, tempf_t& cursed_value_C)
                         {
                             Player[A].Duck = true;
                             Player[A].Location.Height = Physics.PlayerDuckHeight[1][2];
-                            Player[A].Location.Y += -Physics.PlayerDuckHeight[1][2] + Physics.PlayerHeight[1][2];
+                            // Player[A].Location.Y += -Physics.PlayerDuckHeight[1][2] + Physics.PlayerHeight[1][2];
+
+                            int shift = -Physics.PlayerDuckHeight[1][2];
+
+                            // 44 is the height of a tiny player in a boot
+                            if(Player[A].State == PLR_STATE_TINY)
+                                shift += 44;
+                            else
+                                shift += Physics.PlayerHeight[1][2];
 //                                            if(nPlay.Online == true && A == nPlay.MySlot + 1)
 //                                                Netplay::sendData "1q" + std::to_string(A) + LB;
+
+                            Player[A].Location.Y += shift;
                         }
                     }
                 }

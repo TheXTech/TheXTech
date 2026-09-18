@@ -2650,6 +2650,9 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     break;
                 }
 
+                if(Player[A].State == PLR_STATE_TINY)
+                    Y = 10;
+
                 int sX = num_t::floor(camX + Player[A].Location.X);
                 int sY = num_t::floor(camY + Player[A].Location.Y);
                 int pW = s_round2int(Player[A].Location.Width);

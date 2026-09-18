@@ -1199,7 +1199,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
         {
             if(Player[A].Controls.Down && Player[A].Mount == 0 &&
                !NPC[B].playerTemp && Player[A].DuckRelease &&
-               (Player[A].HoldingNPC == 0 || Player[A].Character == 5))
+               (Player[A].HoldingNPC == 0 || Player[A].Character == 5 || Player[A].State == PLR_STATE_TINY))
             {
                 UnDuck(Player[A]);
 
