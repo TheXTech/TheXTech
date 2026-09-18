@@ -548,7 +548,7 @@ void PlayerCockpitMovementX(int A)
 
 void PlayerMovementY(int A)
 {
-    bool aquatic_jumps = (Player[A].State == PLR_STATE_AQUATIC && Player[A].Character != 5 && !Player[A].Mount && !Player[A].HoldingNPC);
+    bool aquatic_jumps = (Player[A].State == PLR_STATE_AQUATIC && Player[A].Character != 5 && !Player[A].Mount && !Player[A].HoldingNPC && !Player[A].Vine);
 
     if(aquatic_jumps && Player[A].SwimCount > 0)
         Player[A].SwimCount--;
