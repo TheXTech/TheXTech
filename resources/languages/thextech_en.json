@@ -252,6 +252,7 @@
             "lvlWarp": "Lvl Warp",
             "needFloor": "Need Floor",
             "needKey": "Need Key",
+            "needTiny": "Need Tiny",
             "needStarCount": "Need {0} {1}",
             "out": "Out",
             "placing": "Placing:",
