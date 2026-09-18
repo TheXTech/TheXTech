@@ -93,6 +93,9 @@ void DropBonus(int A)
     NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
     NPC[numNPCs].Location.Height = 32;
 
+    if(Player[A].HeldBonus == NPCID_TINY_POWER)
+        NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+
     // need to find a position to place the bonus -- look for ths HUD
     const Screen_t& screen = ScreenByPlayer(A);
     bool is_shared = (screen.player_count > 1) && (screen.Type != 6) && (screen.active_end() == screen.active_begin() + 1);
