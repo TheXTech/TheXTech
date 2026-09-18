@@ -1147,6 +1147,7 @@ bool OpenLevel_Warp(void* userdata, LevelDoor& w)
         warp.noEntranceScene = w.hide_entering_scene;
 
         warp.stoodRequired = w.stood_state_required;
+        warp.tinyRequired = w.special_state_required;
         warp.transitEffect = w.transition_effect;
 
         warp.Entrance.Height = w.height_i;

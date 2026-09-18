@@ -1165,6 +1165,7 @@ struct Warp_t
     bool cannonExit = false;
     vbint_t cannonExitSpeed = 10;
     bool stoodRequired = false; // Require player stood on the ground to enter this warp
+    bool tinyRequired = false; // Require player to have tiny power to enter this warp
     eventindex_t eventEnter = EVENT_NONE;
     eventindex_t eventExit = EVENT_NONE;
     stringindex_t StarsMsg = STRINGINDEX_NONE;

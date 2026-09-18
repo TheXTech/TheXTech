@@ -60,6 +60,7 @@ struct EditorContent
     std::string warpNeedStarCount;
     std::string warpNeedKey;
     std::string warpNeedFloor;
+    std::string warpNeedTiny;
     std::string warpStarLockMessage;
     std::string warpToMap;
     std::string warpLvlWarp;

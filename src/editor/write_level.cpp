@@ -346,6 +346,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         warp.hide_entering_scene = w.noEntranceScene;
 
         warp.stood_state_required = w.stoodRequired;
+        warp.special_state_required = w.tinyRequired;
         warp.transition_effect = w.transitEffect;
 
         // fix this to update as needed

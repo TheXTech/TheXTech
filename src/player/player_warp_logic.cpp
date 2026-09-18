@@ -1411,6 +1411,9 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
     if(plr.CurMazeZone && (warp.Effect == 1 || warp.Effect == 2))
         return false;
 
+    if(warp.tinyRequired && plr.State != PLR_STATE_TINY)
+        return false;
+
     bool canWarp = false;
 
     if(warp.Effect == 3) // Portal

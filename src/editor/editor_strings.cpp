@@ -57,6 +57,7 @@ void initEditorStrings()
     g_editorStrings.warpNeedStarCount = "Need {0} {1}";
     g_editorStrings.warpNeedKey = "Need Key";
     g_editorStrings.warpNeedFloor = "Need Floor";
+    g_editorStrings.warpNeedTiny = "Need Tiny";
     g_editorStrings.warpStarLockMessage = "Star lock msg";
     g_editorStrings.warpToMap = "To Map";
     g_editorStrings.warpLvlWarp = "Lvl Warp";

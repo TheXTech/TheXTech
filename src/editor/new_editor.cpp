@@ -3974,6 +3974,10 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             SuperPrintR(mode, g_editorStrings.warpNeedFloor, 3, 6, 314);
             if(UpdateCheckBox(mode, 220 + 4, 300 + 4, EditorCursor.Warp.stoodRequired))
                 EditorCursor.Warp.stoodRequired = !EditorCursor.Warp.stoodRequired;
+
+            SuperPrintR(mode, g_editorStrings.warpNeedTiny, 3, 6, 354);
+            if(UpdateCheckBox(mode, 220 + 4, 340 + 4, EditorCursor.Warp.tinyRequired))
+                EditorCursor.Warp.tinyRequired = !EditorCursor.Warp.tinyRequired;
         }
     }
 

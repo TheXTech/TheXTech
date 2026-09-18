@@ -569,6 +569,7 @@ XTechTranslate::XTechTranslate()
     insert(m_engineMap, "editor.warp.needStarCount",       &g_editorStrings.warpNeedStarCount);
     insert(m_engineMap, "editor.warp.needKey",             &g_editorStrings.warpNeedKey);
     insert(m_engineMap, "editor.warp.needFloor",           &g_editorStrings.warpNeedFloor);
+    insert(m_engineMap, "editor.warp.needTiny",            &g_editorStrings.warpNeedTiny);
     insert(m_engineMap, "editor.warp.starLockMessage",     &g_editorStrings.warpStarLockMessage);
     insert(m_engineMap, "editor.warp.toMap",               &g_editorStrings.warpToMap);
     insert(m_engineMap, "editor.warp.lvlWarp",             &g_editorStrings.warpLvlWarp);
