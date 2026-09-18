@@ -1133,6 +1133,8 @@ struct Warp_t
     bool PlacedEnt = false;
 //    PlacedExit As Boolean
     bool PlacedExit = false;
+//    curStars As Integer
+    uint8_t curStars = 0;
 //    Stars As Integer 'number of stars required to enter
     vbint_t Stars = 0;
 //    Effect As Integer 'style of warp. door/
@@ -1153,8 +1155,6 @@ struct Warp_t
     vbint_t MapX = 0;
 //    MapY As Integer
     vbint_t MapY = 0;
-//    curStars As Integer
-    uint8_t curStars = 0;
 //    maxStars As Integer
     //! NEW: index into LevelSaveEntries -- stores information about level
     uint16_t save_info_idx = 0xFFFF;
