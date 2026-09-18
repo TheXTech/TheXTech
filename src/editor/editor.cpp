@@ -1884,15 +1884,15 @@ int EditorNPCFrame(const NPCID A, vbint_t& C, int N)
 
     if(!LevelEditor)
         C = B;
-    if(A == 241)
+    if(A == NPCID_EARTHQUAKE_BLOCK)
         ret = 4;
-    if(A == 195)
+    if(A == NPCID_FLIPPED_RAINBOW_SHELL)
         ret = 3;
 
     // suits
     if(N > 0)
     {
-        if(A == 169 || A == 170)
+        if(A == NPCID_STATUE_POWER || A == NPCID_HEAVY_POWER)
         {
             E = 0;
             for(D = 1; D <= numPlayers; D++)
@@ -1919,12 +1919,22 @@ int EditorNPCFrame(const NPCID A, vbint_t& C, int N)
     }
 
 
-    if(A == 135 || A == 4 || A == 6 || A == 19 || A == 20 || A == 23 || A == 25 || A == 28 || A == 36 || A == 38 ||
-       A == 42 || A == 43 || A == 44 || A == 193 || A == 35 || A == 191 || A == 52 || A == 72 || A == 77 || A == 108 ||
-       (A >= 109 && A <= 112) || (A >= 121 && A <= 124) || A == 125 || (A >= 129 && A <= 132) || A == 136 || A == 158 ||
-        A == 164 || A == 163 || A == 162 || A == 165 || A == 166 || A == 189 || A == 199 || A == 209 || A == 207 ||
-        A == 229 || A == 230 || A == 232 || A == 236 || A == 233 || A == 173 || A == 175 || A == 177 ||
-        A == 178 || A == 176) // Koopa troopas / Shy guy
+    if(A == NPCID_WALK_BOMB_S2 || A == NPCID_GRN_TURTLE_S3 || A == NPCID_RED_TURTLE_S3
+        || A == NPCID_BLU_GUY || A == NPCID_RED_GUY || A == NPCID_GLASS_TURTLE
+        || A == NPCID_JUMPER_S3 || A == NPCID_RED_FISH_S1 || A == NPCID_SPIKY_S3
+        || A == NPCID_GHOST_S3 || A == NPCID_GHOST_FAST || A == NPCID_GHOST_S4
+        || A == NPCID_BIG_GHOST || A == NPCID_BLU_BOOT || A == NPCID_GRN_BOOT
+        || A == NPCID_RED_BOOT || A == NPCID_SIDE_PLANT || A == NPCID_BIG_TURTLE
+        || A == NPCID_JUMPER_S4 || A == NPCID_PET_FIRE || (A >= NPCID_GRN_TURTLE_S4 && A <= NPCID_YEL_TURTLE_S4)
+        || (A >= NPCID_GRN_FLY_TURTLE_S4 && A <= NPCID_YEL_FLY_TURTLE_S4) || A == NPCID_KNIGHT
+        || (A >= NPCID_BIRD && A <= NPCID_GRY_SPIT_GUY) || A == NPCID_WALK_BOMB_S3
+        || A == NPCID_CARRY_BUDDY || A == NPCID_BIG_GUY || A == NPCID_BRUTE_SQUISHED
+        || A == NPCID_BRUTE || A == NPCID_CARRY_FODDER || A == NPCID_HIT_CARRY_FODDER
+        || A == NPCID_SKELETON || A == NPCID_LAVA_MONSTER || A == NPCID_BOSS_FRAGILE
+        || A == NPCID_WALL_TURTLE || A == NPCID_GRN_FISH_S3 || A == NPCID_RED_FISH_S3
+        || A == NPCID_GRN_FISH_S4 || A == NPCID_YEL_FISH_S4 || A == NPCID_GRN_FISH_S1
+        || A == NPCID_GRN_TURTLE_S1 || A == NPCID_RED_TURTLE_S1 || A == NPCID_RED_FLY_TURTLE_S1
+        || A == NPCID_AXE || A == NPCID_GRN_FLY_TURTLE_S1) // Koopa troopas / Shy guy
     {
         if(int(B) == -1)
             ret = 0;
@@ -1933,8 +1943,10 @@ int EditorNPCFrame(const NPCID A, vbint_t& C, int N)
     }
 
     // Bullet Bills
-    if(A == 17 || A == 18 || A == 29 || A == 31 || A == 84 || A == 94 || A == 198 ||
-       NPCIsYoshi(A) || A == 101 || A == 102 || A == 181 || A == 81)
+    if(A == NPCID_BULLET || A == NPCID_BIG_BULLET || A == NPCID_HEAVY_THROWER
+        || A == NPCID_KEY || A == NPCID_STATUE_S3 || A == NPCID_CIVILIAN
+        || A == NPCID_CHAR3 || NPCIsYoshi(A) || A == NPCID_CHAR2 || A == NPCID_CHAR5
+        || A == NPCID_STATUE_S4 || A == NPCID_SLANT_WOOD_L)
     {
         if(int(B) == -1)
             ret = 0;
@@ -1943,7 +1955,8 @@ int EditorNPCFrame(const NPCID A, vbint_t& C, int N)
     }
 
     // Hammer Bros.
-    if(A == 29 || A == 55 || A == 75 || A == 78 || A == 168 || A == 234)
+    if(A == NPCID_HEAVY_THROWER || A == NPCID_EXT_TURTLE || A == NPCID_CIVILIAN_SCARED
+        || A == NPCID_TANK_TREADS || A == NPCID_CHASER || A == NPCID_BONE_FISH)
     {
         if(int(B) == -1)
             ret = 0;
@@ -1951,7 +1964,7 @@ int EditorNPCFrame(const NPCID A, vbint_t& C, int N)
             ret = 3;
     }
 
-    if(A == 34)
+    if(A == NPCID_LEAF_POWER)
     {
         if(int(B) == -1)
             ret = 1;
@@ -1959,7 +1972,7 @@ int EditorNPCFrame(const NPCID A, vbint_t& C, int N)
             ret = 0;
     }
 
-    if(A == 201)
+    if(A == NPCID_SICK_BOSS)
     {
         if(int(B) == -1)
             ret = 0;
@@ -1967,7 +1980,7 @@ int EditorNPCFrame(const NPCID A, vbint_t& C, int N)
             ret = 8;
     }
 
-    if(A == 137)
+    if(A == NPCID_LIT_BOMB_S3)
     {
         if(int(B) == -1)
             ret = 0;
@@ -1975,7 +1988,7 @@ int EditorNPCFrame(const NPCID A, vbint_t& C, int N)
             ret = 6;
     }
 
-    if(A == 86 || (A >= 117 && A <= 120) || A == 200)
+    if(A == NPCID_VILLAIN_S3 || (A >= NPCID_GRN_HIT_TURTLE_S4 && A <= NPCID_YEL_HIT_TURTLE_S4) || A == NPCID_VILLAIN_S1)
     {
         if(int(B) == -1)
             ret = 0;
@@ -1984,7 +1997,8 @@ int EditorNPCFrame(const NPCID A, vbint_t& C, int N)
     }
 
     // winged koopa / bob-omb buddy
-    if(A == 76 || A == 107 || A == 160 || A == 161 || A == 167 || A == 203 || A == 204)
+    if(A == NPCID_GRN_FLY_TURTLE_S3 || A == NPCID_PINK_CIVILIAN || A == NPCID_ROCKET_WOOD
+        || A == NPCID_RED_FLY_TURTLE_S3 || A == NPCID_FLY_CARRY_FODDER || A == NPCID_FLIER || A == NPCID_ROCKET_FLIER)
     {
         if(int(B) == -1)
             ret = 0;
@@ -1993,7 +2007,7 @@ int EditorNPCFrame(const NPCID A, vbint_t& C, int N)
     }
 
     // Birdo
-    if(A == 39 || A == 208)
+    if(A == NPCID_SPIT_BOSS || A == NPCID_BOSS_CASE)
     {
         if(int(B) == -1)
             ret = 0;
@@ -2001,17 +2015,17 @@ int EditorNPCFrame(const NPCID A, vbint_t& C, int N)
             ret = 5;
     }
 
-    if(A == 45)
+    if(A == NPCID_SLIDE_BLOCK)
         ret = BlockFrame[4];
 
-    if(A == 56)
+    if(A == NPCID_VEHICLE)
     {
         ret = SpecialFrame[2];
         if(int(B) == 1)
             ret += 4;
     }
 
-    if(A == 57) // smb3 belt
+    if(A == NPCID_CONVEYOR) // smb3 belt
     {
         if(int(B) == -1)
             ret = SpecialFrame[4];
@@ -2019,7 +2033,7 @@ int EditorNPCFrame(const NPCID A, vbint_t& C, int N)
             ret = 3 - SpecialFrame[4];
     }
 
-    if(A == 60 || A == 62 || A == 64 || A == 66)
+    if(A == NPCID_YEL_PLATFORM || A == NPCID_BLU_PLATFORM || A == NPCID_GRN_PLATFORM || A == NPCID_RED_PLATFORM)
     {
         if(int(B) == -1)
             ret = 1;
