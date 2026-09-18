@@ -1052,7 +1052,7 @@ void PlayerHurt(const int A)
                     else if(p.Hearts == 0)
                         p.State = 1;
                     // 1 heart (or invalid state) -> shrink to small
-                    else
+                    else if(p.State != PLR_STATE_AQUATIC)
                         p.State = 2;
                 }
                 else if(p.Character == 5)
@@ -1089,7 +1089,19 @@ void PlayerHurt(const int A)
                     p.StateNPC = NPCID_NULL;
                     p.Effect = PLREFF_TURN_SMALL;
 
-                    if(p.State > 2 && g_config.alt_powerdown)
+                    if(p.State == PLR_STATE_AQUATIC)
+                    {
+                        p.State = 2;
+                        p.StandUp = true;
+                        SizeCheck(p);
+
+                        if(p.Character <= 2 && g_config.alt_powerdown)
+                        {
+                            p.Effect = (PlayerEffect)(PLREFF_TURN_TO_STATE + PLR_STATE_BIG);
+                            p.Effect2 = 0;
+                        }
+                    }
+                    else if(p.State > 2 && g_config.alt_powerdown)
                     {
                         p.Effect = (PlayerEffect)(PLREFF_STATE_TO_BIG + p.State);
                         p.Effect2 = 0;
@@ -3924,8 +3936,17 @@ void SizeCheck(Player_t &p)
     {
         if(!p.Duck)
         {
-            if(p.Location.Height != Physics.PlayerHeight[p.Character][p.State])
+            if(p.State == PLR_STATE_AQUATIC && p.HoldingNPC == 0 && p.Character != 5)
+            {
+                if(p.Location.Height != Physics.PlayerHeight[p.Character][p.State] - 12)
+                    p.Location.set_height_floor(Physics.PlayerHeight[p.Character][p.State] - 12);
+            }
+            else if(p.Location.Height != Physics.PlayerHeight[p.Character][p.State])
+            {
                 p.Location.set_height_floor(Physics.PlayerHeight[p.Character][p.State]);
+                if(p.State == PLR_STATE_AQUATIC)
+                    p.StandUp = true;
+            }
         }
         else
         {

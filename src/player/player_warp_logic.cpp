@@ -496,6 +496,10 @@ void PlayerEffectWarpPipe(int A)
 
         if(warp_dir_exit == LevelDoor::EXIT_DOWN || warp_dir_exit == LevelDoor::EXIT_UP)
         {
+            // don't use crouch height when exiting vertical pipe
+            if(p.State == PLR_STATE_AQUATIC)
+                p.Location.Height = Physics.PlayerHeight[p.Character][PLR_STATE_AQUATIC];
+
             if(warp_dir_exit == LevelDoor::EXIT_DOWN)
                 p.Location.Y = warp_exit.Y - p.Location.Height - 8;
             else
@@ -1653,6 +1657,10 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 
         if(g_config.fix_fairy_stuck_in_pipe)
             plr.Effect2 = 0;
+
+        // don't use crouch height during door warp
+        if(plr.State == PLR_STATE_AQUATIC)
+            plr.Location.Height = Physics.PlayerHeight[plr.Character][PLR_STATE_AQUATIC];
 
         plr.Warp = B;
         plr.WarpBackward = backward;
