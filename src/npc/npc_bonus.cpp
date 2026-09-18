@@ -448,7 +448,7 @@ void TouchBonus(int A, int B)
 
         UpdatePlayerBonus(A, NPC[B].Type);
 
-        if((Player[A].State == 1 || Player[A].State == PLR_STATE_TINY) && Player[A].Character != 5)
+        if((Player[A].State == 1 && Player[A].Character != 5) || Player[A].State == PLR_STATE_TINY)
         {
             RumbleForPowerup(A);
 
@@ -472,11 +472,14 @@ void TouchBonus(int A, int B)
             Player[A].Frame = 1;
             Player[A].Effect = PLREFF_TURN_BIG;
 
+            if(Player[A].Character == 5)
+                Player[A].Effect = (PlayerEffect)(PLREFF_TURN_TO_STATE + PLR_STATE_BIG);
+
             // Duck already unset above
             // if(Player[A].Mount > 0)
             //     UnDuck(Player[A]);
 
-            PlaySoundSpatial(SFX_PlayerGrow, NPC[B].Location);
+            PlaySoundSpatial(sfx_grow_item, NPC[B].Location);
         }
         else if(NPC[B].Type == NPCID_POWER_S5)
             PlaySoundSpatial(SFX_HeroHeart, NPC[B].Location);
