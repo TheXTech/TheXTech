@@ -566,6 +566,8 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                         PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
                                     }
 
+                                    YoshiPound(A, Player[A].Mount);
+
                                     player_drill = false;
                                 }
 
