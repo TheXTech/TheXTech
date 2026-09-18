@@ -5536,6 +5536,12 @@ void CharStuff(int WhatNPC, bool CheckEggs)
                     NPCQueues::Unchecked.push_back(A);
                     treeNPCUpdate(A);
                 }
+                // turn tiny power into static tiny power, and 38A suits into masks
+                else if(NPC[A].Type == NPCID_TINY_POWER || NPC[A].Type == NPCID_AQUATIC_POWER || NPC[A].Type == NPCID_POLAR_POWER || NPC[A].Type == NPCID_SHELL_POWER)
+                {
+                    NPC[A].Stuck = true;
+                    NPC[A].Frame = 1;
+                }
             }
 
             if(WhatNPC != 0)
