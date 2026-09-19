@@ -499,7 +499,8 @@ void TurnNPCsIntoCoins()
                    NPC[A].Type != NPCID_CHAR3_HEAVY && NPC[A].Type != NPCID_CHAR4_HEAVY && NPC[A].Type != NPCID_SWORDBEAM &&
                    NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_METALBARREL &&
                    !(NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M) &&
-                   NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_FIRE_CHAIN && NPC[A].Type != NPCID_FIRE_DISK)
+                   NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_FIRE_CHAIN && NPC[A].Type != NPCID_FIRE_DISK &&
+                   NPC[A].Type != NPCID_HOMING_BULLET)
                 {
                     NPC[A].Location.Y += 32;
                     NewEffect(EFFID_COIN_BLOCK_S3, NPC[A].Location);
@@ -3345,6 +3346,82 @@ void NPCSpecial(int A)
                 npc.Special = 2;
                 SkullRide(A, true);
             }
+        }
+    }
+    else if(npc.Type == NPCID_HOMING_BULLET)
+    {
+        npc.Projectile = true;
+        if(npc.TimeLeft > 10)
+            npc.TimeLeft = 10;
+
+        if(npc.Location.SpeedX == 0 && npc.Location.SpeedY == 0)
+            npc.Location.SpeedX = 6 * npc.Direction;
+
+        // ALL of this logic is fully self-contained to the below:
+
+        // targeting routine
+        if(npc.Special > 0)
+        {
+            // check that target is still valid
+            const NPC_t& target = NPC[npc.Special];
+            if(npc.Special > numNPCs || !target.Active || target.HoldingPlayer || target->WontHurt
+                || num_t::abs(target.Location.X - npc.SpecialX) > 64 || num_t::abs(target.Location.Y - npc.SpecialY) > 64)
+            {
+                npc.Special = 0;
+            }
+            else
+            {
+                npc.SpecialX = target.Location.X;
+                npc.SpecialY = target.Location.Y;
+
+                // want a speed of 2, aimed at the other NPC
+                num_t dx = target.Location.minus_center_x(npc.Location);
+                num_t dy = target.Location.minus_center_y(npc.Location);
+                num_t dist = num_t::sqrt(num_t::dist2(dx, dy));
+                num_t target_SpeedX = 6 * dx.divided_by(dist);
+                num_t target_SpeedY = 6 * dy.divided_by(dist);
+
+                npc.Location.SpeedX = (31 * npc.Location.SpeedX + target_SpeedX) / 32;
+                npc.Location.SpeedY = (31 * npc.Location.SpeedY + target_SpeedY) / 32;
+            }
+        }
+        else if(npc.Special < 0)
+            npc.Special += 1;
+
+        // target finding routine, written for speed
+        if(npc.Special == 0)
+        {
+            int target_x = num_t::floor(npc.Location.X) + (num_t::floor(npc.Location.Width) >> 1);
+            int target_y = num_t::floor(npc.Location.Y) + (num_t::floor(npc.Location.Height) >> 1);
+
+            int best_dist = -1;
+
+            for(int B : NPCQueues::Active.no_change)
+            {
+                if(!NPC[B].Active || NPC[B].HoldingPlayer || NPC[B]->WontHurt || NPC[B]->IsABonus)
+                    continue;
+
+                const NPC_t& npc_b = NPC[B];
+                int npc_b_x = num_t::floor(npc_b.Location.X) + (num_t::floor(npc_b.Location.Width) >> 1);
+                int npc_b_y = num_t::floor(npc_b.Location.Y) + (num_t::floor(npc_b.Location.Height) >> 1);
+
+                // never turn around to target an NPC
+                if((npc_b_x - target_x) * npc.Location.SpeedX + (npc_b_y - target_y) * npc.Location.SpeedY <= 0)
+                    continue;
+
+                int dist = (npc_b_x - target_x) * (npc_b_x - target_x) + (npc_b_y - target_y) * (npc_b_y - target_y);
+                if(best_dist != -1 && dist >= best_dist)
+                    continue;
+
+                best_dist = dist;
+
+                npc.Special = B;
+                npc.SpecialX = npc_b.Location.X;
+                npc.SpecialY = npc_b.Location.Y;
+            }
+
+            if(npc.Special == 0)
+                npc.Special = -128;
         }
     }
 }

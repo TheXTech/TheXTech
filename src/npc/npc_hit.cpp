@@ -1653,7 +1653,7 @@ void NPCHit(int A, int B, int C)
         {
             if(B == 3 || B == 4)
             {
-                if(NPC[C].Type != NPCID_PLR_HEAVY)
+                if(NPC[C].Type != NPCID_PLR_HEAVY && NPC[C].Type != NPCID_HOMING_BULLET)
                 {
                     // if(B != 6) // Always true
                     if(NPC[A].Special == 5 && HasSound(SFX_HeroFireRod))
@@ -1826,7 +1826,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Indestructable Objects
-    else if(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT || NPC[A].Type == NPCID_GRN_BOOT || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == NPCID_TOOTHYPIPE || NPCIsYoshi(NPC[A].Type) || NPC[A].Type == NPCID_ITEM_POD || (NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_EARTHQUAKE_BLOCK || NPC[A].Type == NPCID_FLY_BLOCK || NPC[A].Type == NPCID_FLY_CANNON)
+    else if(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT || NPC[A].Type == NPCID_GRN_BOOT || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == NPCID_TOOTHYPIPE || NPCIsYoshi(NPC[A].Type) || NPC[A].Type == NPCID_ITEM_POD || (NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_EARTHQUAKE_BLOCK || NPC[A].Type == NPCID_FLY_BLOCK || NPC[A].Type == NPCID_FLY_CANNON || NPC[A].Type == NPCID_HOMING_CANNON)
     {
         if(NPC[A].Type == NPCID_EARTHQUAKE_BLOCK && (B == 4 || B == 5 || B == 10))
         {
@@ -2118,7 +2118,7 @@ void NPCHit(int A, int B, int C)
         // B == 6 - old behavior, access index C as an NPC
         else if(B == 6 || B == 5 || B == 4)
         {
-            if(!(NPC[C].Type == NPCID_PLR_FIREBALL || NPC[C].Type == NPCID_PET_FIRE || NPC[C].Type == NPCID_PLR_HEAVY || NPCIsVeggie(NPC[C].Type)))
+            if(!(NPC[C].Type == NPCID_PLR_FIREBALL || NPC[C].Type == NPCID_PET_FIRE || NPC[C].Type == NPCID_PLR_HEAVY || NPCIsVeggie(NPC[C].Type) || NPC[C].Type == NPCID_HOMING_BULLET))
                 NPC[A].Killed = B;
         }
         else if(B == 7)
@@ -2268,6 +2268,12 @@ void NPCHit(int A, int B, int C)
                 NPC[C].Multiplier = NPC[A].Multiplier;
             MoreScore(NPC[A]->Score, NPC[A].Location, NPC[C].Multiplier);
         }
+        else if(NPC[C].Type == NPCID_HOMING_BULLET)
+        {
+            NPC[C].Killed = 3;
+            NPCQueues::Killed.push_back(C);
+        }
+
         if(NPC[A].Type != NPCID_BOSS_CASE && NPC[A].Type != NPCID_BOSS_FRAGILE)
         {
             Location_t tempLocation = NPC[C].Location;

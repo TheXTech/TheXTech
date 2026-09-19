@@ -99,7 +99,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                         if(!NPC[B].Inert)
                         {
                             // battlemode stuff
-                            if(NPC[B].Type == NPCID_PLR_FIREBALL || NPC[B].Type == NPCID_PLR_HEAVY || NPC[B].Type == NPCID_PLR_ICEBALL || NPC[B].Type == NPCID_SWORDBEAM || NPC[B].Type == NPCID_PET_FIRE || NPC[B].Type == NPCID_CHAR3_HEAVY || NPC[B].Type == NPCID_CHAR4_HEAVY)
+                            if(NPC[B].Type == NPCID_PLR_FIREBALL || NPC[B].Type == NPCID_PLR_HEAVY || NPC[B].Type == NPCID_PLR_ICEBALL || NPC[B].Type == NPCID_SWORDBEAM || NPC[B].Type == NPCID_PET_FIRE || NPC[B].Type == NPCID_CHAR3_HEAVY || NPC[B].Type == NPCID_CHAR4_HEAVY || NPC[B].Type == NPCID_HOMING_BULLET)
                             {
                                 if(BattleMode && NPC[B].CantHurtPlayer != A)
                                 {
@@ -499,6 +499,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                             }
                             else if(NPC[B].Type == NPCID_CANNONITEM || NPC[B].Type == NPCID_KEY ||
                                     NPC[B].Type == NPCID_TOOTHYPIPE || NPC[B].Type == NPCID_TOOTHY ||
+                                    NPC[B].Type == NPCID_HOMING_CANNON ||
                                     ((Player[A].SlideKill || InvincibilityTime) && !NPC[B]->WontHurt)) // NPCs that cannot be walked on
                             {
                                 // cancel jump
@@ -631,7 +632,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 {
                                     if((HitSpot == 2 && Player[A].Direction == -1) ||
                                        (HitSpot == 4 && Player[A].Direction == 1) ||
-                                       (NPC[B].Type == NPCID_CANNONITEM || NPC[B].Type == NPCID_TOOTHYPIPE || NPC[B].Effect == NPCEFF_DROP_ITEM || (NPCIsVeggie(NPC[B]) && NPC[B].CantHurtPlayer != A)))
+                                       (NPC[B].Type == NPCID_CANNONITEM || NPC[B].Type == NPCID_TOOTHYPIPE || NPC[B].Type == NPCID_HOMING_CANNON
+                                        || NPC[B].Effect == NPCEFF_DROP_ITEM || (NPCIsVeggie(NPC[B]) && NPC[B].CantHurtPlayer != A)))
                                     {
                                         if(NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Projectile != 0)
                                         {

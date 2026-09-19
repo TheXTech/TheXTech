@@ -61,7 +61,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
        !(NPC[A].Type == NPCID_SPIT_BOSS_BALL && NPC[A].Projectile) && NPC[A].Type != NPCID_TOOTHY &&
         NPC[A].vehiclePlr == 0 && !(NPCIsVeggie(NPC[A]) && NPC[A].Projectile) &&
        NPC[A].Type != NPCID_HEAVY_THROWN && NPC[A].Type != NPCID_BIG_BULLET && NPC[A].Type != NPCID_PET_FIRE &&
-       !(NPC[A]->IsFish && NPC[A].Special == 2) && NPC[A].Type != NPCID_VINE_BUG)
+       NPC[A].Type != NPCID_HOMING_BULLET && !(NPC[A]->IsFish && NPC[A].Special == 2) && NPC[A].Type != NPCID_VINE_BUG)
     {
         for(int bCheck = 1; bCheck <= 2; bCheck++)
         {
@@ -221,7 +221,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                     }
                                     else if(NPC[A].Type == NPCID_SPIKY_BALL_S3)
                                     {
-                                        if(Block[B].tempBlockNpcType == NPCID_CANNONITEM || Block[B].tempBlockNpcType == NPCID_TOOTHYPIPE) // spiney eggs don't walk on special items
+                                        if(Block[B].tempBlockNpcType == NPCID_CANNONITEM || Block[B].tempBlockNpcType == NPCID_TOOTHYPIPE || Block[B].tempBlockNpcType == NPCID_HOMING_CANNON) // spiney eggs don't walk on special items
                                             HitSpot = 0;
                                     }
                                     else if(NPC[A].Type == NPCID_RAFT) // Skull raft
@@ -1163,7 +1163,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                            NPC[A].Type != NPCID_GRN_BOOT &&
                                            // Duplicated segment [PVS Studio]
                                            // NPC[A].Type != NPCID_RED_BOOT &&
-                                           NPC[A].Type != NPCID_BLU_BOOT && NPC[A].Type != NPCID_TOOTHYPIPE &&
+                                           NPC[A].Type != NPCID_BLU_BOOT && NPC[A].Type != NPCID_TOOTHYPIPE && NPC[A].Type != NPCID_HOMING_CANNON &&
                                            NPC[A].Type != NPCID_BOMB && NPC[A].Type != NPCID_CARRY_BUDDY && NPC[A].Type != NPCID_FLIPPED_RAINBOW_SHELL && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK &&
                                            !((NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D))) // walldeath stuff
                                         {

@@ -337,7 +337,7 @@ public:
         else if(NPC[A].Effect == NPCEFF_NORMAL && NPC[A].HoldingPlayer == 0 &&
             (NPC[A].vehiclePlr > 0 || NPC[A].Type == NPCID_VEHICLE || NPC[A].Type == NPCID_CANNONITEM ||
                 NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_ITEM_BURIED || NPC[A].Type == NPCID_ROCKET_WOOD ||
-                NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPC[A]->IsACoin))
+                NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPC[A]->IsACoin || NPC[A].Type == NPCID_HOMING_CANNON))
         {
             if(Low_n == sizeof(Low) / sizeof(uint16_t))
                 return;
@@ -1153,7 +1153,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
 
         if(NPC[A].Effect == NPCEFF_NORMAL && ((NPC[A].HoldingPlayer == 0 && (NPC[A].vehiclePlr > 0 || NPC[A].Type == NPCID_VEHICLE ||
                                    NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_ITEM_BURIED || NPC[A].Type == NPCID_ROCKET_WOOD ||
-                                   NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPC[A]->IsACoin) && (!NPC[A].Generator || LevelEditor))))
+                                   NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPC[A]->IsACoin || NPC[A].Type == NPCID_HOMING_CANNON) && (!NPC[A].Generator || LevelEditor))))
         {
             npcALoc = newLoc(NPC[A].Location.X - (NPC[A]->WidthGFX - NPC[A].Location.Width) / 2,
                                   NPC[A].Location.Y,
@@ -1180,7 +1180,8 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
             if(!(NPC[A].HoldingPlayer > 0 || NPC[A]->IsAVine || NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_FIRE_BOSS_FIRE ||
                  NPC[A].Type == NPCID_JUMP_PLANT || NPC[A].Type == NPCID_ROCKET_WOOD || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_FIRE_PLANT ||
                  NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_LONG_PLANT_UP ||
-                 NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == NPCID_VEHICLE || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_ITEM_BURIED) &&
+                 NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == NPCID_VEHICLE || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_HOMING_CANNON
+                 || NPC[A].Type == NPCID_ITEM_BURIED) &&
                !(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0) && NPC[A].vehiclePlr == 0 &&
                !NPC[A]->Foreground && (!NPC[A].Generator || LevelEditor) &&
                NPC[A].Type != NPCID_SAW && NPC[A].Type != NPCID_ICE_CUBE)

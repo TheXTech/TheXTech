@@ -574,6 +574,11 @@ static void needAGun()
     grantItemBox(NPCID_CANNONITEM);
 }
 
+static void deadeye()
+{
+    grantItemBox(NPCID_HOMING_CANNON);
+}
+
 static void needASwitch()
 {
     grantItemBox(NPCID_COIN_SWITCH);
@@ -1695,6 +1700,7 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"needanegg", needANegg, true},
     {"needaplant", needAPlant, true},
     {"needagun", needAGun, true},
+    {"deadeye", deadeye, true},
     {"needaswitch", needASwitch, true},
     {"needaclock", needAClock, true},
     {"needabomb", needABomb, true},

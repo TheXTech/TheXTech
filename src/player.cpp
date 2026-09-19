@@ -3770,16 +3770,14 @@ void PlayerDismount(const int A)
                     NPC[B].Projectile = true;
 
                 NPC[B].vehicleYOffset = 0;
-                if(NPC[B].Type == NPCID_CANNONITEM)
+                if(NPC[B].Type == NPCID_CANNONITEM || NPC[B].Type == NPCID_HOMING_CANNON || NPC[B].Type == NPCID_TOOTHYPIPE)
                     NPC[B].Special = 0;
-                if(NPC[B].Type == NPCID_TOOTHY)
+                else if(NPC[B].Type == NPCID_TOOTHY)
                 {
                     NPC[B].Killed = 9;
                     NPC[B].Special = 0;
                     NPCQueues::Killed.push_back(B);
                 }
-                else if(NPC[B].Type == NPCID_TOOTHYPIPE)
-                    NPC[B].Special = 0;
             }
         }
     }

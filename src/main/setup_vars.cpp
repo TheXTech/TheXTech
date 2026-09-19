@@ -1246,6 +1246,17 @@ void SetupVars()
     NPCTraits[NPCID_PLR_HEAVY].NoClipping = true;
     NPCTraits[NPCID_PLR_HEAVY].NoYoshi = true;
 
+    NPCTraits[NPCID_HOMING_BULLET].TWidth = 26; // player's homing bullet
+    NPCTraits[NPCID_HOMING_BULLET].THeight = 26;
+    NPCTraits[NPCID_HOMING_BULLET].WontHurt = true;
+    NPCTraits[NPCID_HOMING_BULLET].NoClipping = true;
+    NPCTraits[NPCID_HOMING_BULLET].NoYoshi = true;
+    NPCTraits[NPCID_HOMING_BULLET].Foreground = true;
+    NPCTraits[NPCID_HOMING_BULLET].NoIceBall = true;
+    NPCTraits[NPCID_HOMING_BULLET].FrameStyle = 1;
+    NPCTraits[NPCID_HOMING_BULLET].TFrames = 3;
+    NPCTraits[NPCID_HOMING_BULLET].FrameSpeed = 8;
+
     NPCTraits[NPCID_GRN_SHELL_S1].THeight = 28; //  Green SMB1 Shell
     NPCTraits[NPCID_GRN_SHELL_S1].IsAShell = true;
     NPCTraits[NPCID_RED_SHELL_S1].THeight = 28; //  Red SMB1 Shell
@@ -1488,6 +1499,14 @@ void SetupVars()
     NPCTraits[NPCID_TINY_POWER].IsABonus = true;
     NPCTraits[NPCID_TINY_POWER].TWidth = 16;
     NPCTraits[NPCID_TINY_POWER].THeight = 16;
+    NPCTraits[NPCID_HOMING_CANNON].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_HOMING_CANNON].WontHurt = true;
+    NPCTraits[NPCID_HOMING_CANNON].IsGrabbable = true;
+    NPCTraits[NPCID_HOMING_CANNON].IsAHit1Block = true;
+    NPCTraits[NPCID_HOMING_CANNON].StandsOnPlayer = true;
+    NPCTraits[NPCID_HOMING_CANNON].TFrames = 5;
+    NPCTraits[NPCID_HOMING_CANNON].FrameSpeed = 3;
+    NPCTraits[NPCID_HOMING_CANNON].FrameStyle = 1;
     NPCTraits[NPCID_COIN_S3].IsACoin = true;
     NPCTraits[NPCID_COIN_S4].IsACoin = true;
     NPCTraits[NPCID_COIN_5].IsACoin = true;
