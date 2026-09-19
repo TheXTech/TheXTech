@@ -1722,6 +1722,12 @@ int GameMain(const CmdLineSetup_t &setup)
 
 void EditorLoop()
 {
+    if(GamePaused != PauseCode::None)
+    {
+        PauseLoop();
+        return;
+    }
+
     Controls::Update();
     Integrator::sync();
     UpdateEditor();
