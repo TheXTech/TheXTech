@@ -277,7 +277,8 @@
                 "name4": "水平翻转",
                 "name5": "垂直翻转"
             },
-            "twoWay": "双向传送"
+            "twoWay": "双向传送",
+            "needTiny": "需要迷你形态"
         },
         "water": {
             "title": "流体"
