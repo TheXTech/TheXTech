@@ -82,14 +82,18 @@ int menuControls_Do()
     else if(s_profileTab == Controls::ControlsClass::None)
     {
         Controls::InputMethodType* type = Controls::g_InputMethodTypes[s_curType];
-        Controls::InputMethodProfile* profile = type->GetProfiles()[s_curProfile];
+        static Controls::InputMethodProfile* profile = type->GetProfiles()[s_curProfile];
 
         if(MenuCursor == 0) // Rename Profile
         {
             PlaySoundMenu(SFX_Do);
             MenuCursorCanMove = false;
-            profile->Name = TextEntryScreen::Run(g_mainMenu.controlsRenameProfile, profile->Name);
-            MenuCursorCanMove = false;
+
+            TextEntryScreen::Init(g_mainMenu.controlsRenameProfile, [](){
+                profile->Name = TextEntryScreen::Text;
+                MenuCursorCanMove = false;
+            }, profile->Name);
+
             return 0;
         }
         else if(MenuCursor == 1) // Delete Profile

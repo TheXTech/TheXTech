@@ -517,6 +517,13 @@ void MenuLoop()
     // ConnectScreen and ControlsSettings screens handles its own input method polling
     if(MenuMode != MENU_CHARACTER_SELECT_NEW && MenuMode != MENU_INPUT_SETTINGS && !g_pollingInput)
         Controls::PollInputMethod();
+
+    if(GamePaused != PauseCode::None)
+    {
+        PauseLoop();
+        return;
+    }
+
     Controls::Update();
     if(!SharedCursor.Primary && !SharedCursor.Secondary)
         MenuMouseRelease = true;

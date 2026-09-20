@@ -1316,41 +1316,43 @@ bool mainMenuUpdate()
                     if(selWorld == (int)SelectWorld.size() - 1)
                     {
                         ClearWorld(true);
-                        WorldName = TextEntryScreen::Run(g_mainMenu.editorPromptNewWorldName);
-                        if(!WorldName.empty())
-                        {
-                            std::string fn = WorldName;
-                            // eliminate bad characters
-                            std::replace(fn.begin(), fn.end(), '/', '_');
-                            std::replace(fn.begin(), fn.end(), '\\', '_');
-                            std::replace(fn.begin(), fn.end(), '.', '_');
-                            std::replace(fn.begin(), fn.end(), ':', '_');
-                            std::replace(fn.begin(), fn.end(), '<', '_');
-                            std::replace(fn.begin(), fn.end(), '>', '_');
-                            std::replace(fn.begin(), fn.end(), '"', '_');
-                            std::replace(fn.begin(), fn.end(), '|', '_');
-                            std::replace(fn.begin(), fn.end(), '?', '_');
-                            std::replace(fn.begin(), fn.end(), '*', '_');
-                            // ensure uniqueness (but still case-sensitive for now)
-                            while(DirMan::exists(AppPathManager::userWorldsRootDir() + fn))
-                                fn += "2";
-                            DirMan::mkAbsPath(AppPathManager::userWorldsRootDir() + fn);
+                        TextEntryScreen::Init(g_mainMenu.editorPromptNewWorldName, [](){
+                            WorldName = TextEntryScreen::Text;
+                            if(!WorldName.empty())
+                            {
+                                std::string fn = WorldName;
+                                // eliminate bad characters
+                                std::replace(fn.begin(), fn.end(), '/', '_');
+                                std::replace(fn.begin(), fn.end(), '\\', '_');
+                                std::replace(fn.begin(), fn.end(), '.', '_');
+                                std::replace(fn.begin(), fn.end(), ':', '_');
+                                std::replace(fn.begin(), fn.end(), '<', '_');
+                                std::replace(fn.begin(), fn.end(), '>', '_');
+                                std::replace(fn.begin(), fn.end(), '"', '_');
+                                std::replace(fn.begin(), fn.end(), '|', '_');
+                                std::replace(fn.begin(), fn.end(), '?', '_');
+                                std::replace(fn.begin(), fn.end(), '*', '_');
+                                // ensure uniqueness (but still case-sensitive for now)
+                                while(DirMan::exists(AppPathManager::userWorldsRootDir() + fn))
+                                    fn += "2";
+                                DirMan::mkAbsPath(AppPathManager::userWorldsRootDir() + fn);
 
-                            std::string wPath = AppPathManager::userWorldsRootDir() + fn + "/world.wld";
-                            if(ContentSelectScreen::editor_target_thextech)
-                                wPath += "x";
-                            g_recentWorldEditor = wPath;
+                                std::string wPath = AppPathManager::userWorldsRootDir() + fn + "/world.wld";
+                                if(ContentSelectScreen::editor_target_thextech)
+                                    wPath += "x";
+                                g_recentWorldEditor = wPath;
 
-                            SaveWorld(wPath, (ContentSelectScreen::editor_target_thextech) ? FileFormats::WLD_PGEX : FileFormats::WLD_SMBX64);
+                                SaveWorld(wPath, (ContentSelectScreen::editor_target_thextech) ? FileFormats::WLD_PGEX : FileFormats::WLD_SMBX64);
 
 #ifdef PGE_NO_THREADING
-                            FindWorlds();
+                                FindWorlds();
 #else
-                            SDL_AtomicSet(&loading, 1);
-                            loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
-                            SDL_DetachThread(loadingThread);
+                                SDL_AtomicSet(&loading, 1);
+                                loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
+                                SDL_DetachThread(loadingThread);
 #endif
-                        }
+                            }
+                        });
                     }
                     else if(!g_gameInfo.disableBattleMode && selWorld == (int)SelectWorld.size() - 2)
                     {
@@ -1435,13 +1437,15 @@ bool mainMenuUpdate()
                 // NetPlay Join Room
                 else if(selWorld == (int)SelectWorld.size() - 3)
                 {
-                    uint32_t room_key = XMessage::RoomFromString(TextEntryScreen::Run(g_mainMenu.netplayRoomKey));
+                    TextEntryScreen::Init(g_mainMenu.netplayRoomKey, [](){
+                        uint32_t room_key = XMessage::RoomFromString(TextEntryScreen::Text);
 
-                    if(room_key && XMessage::RequestFillRoomInfo(room_key))
-                    {
-                    }
-                    else
-                        PlaySoundMenu(SFX_BlockHit);
+                        if(room_key && XMessage::RequestFillRoomInfo(room_key))
+                        {
+                        }
+                        else
+                            PlaySoundMenu(SFX_BlockHit);
+                    });
                 }
 #endif
                 // enter save select

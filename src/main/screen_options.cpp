@@ -84,6 +84,7 @@ size_t cur_scroll = 0;
 int8_t mouse_scroll_cooldown = -1;
 bool controls_ready = false;
 bool cur_item_changed = false;
+static bool s_pending_change_item = false;
 
 bool global_dirty = false;
 
@@ -463,8 +464,9 @@ void Do()
         }
         else if(opt && opt->change())
         {
-            s_change_item();
             PlaySoundMenu(SFX_Do);
+            // defer update because (for strings) we go through a text entry screen here
+            s_pending_change_item = true;
         }
         else
         {
@@ -987,6 +989,12 @@ void Render()
 
 bool Logic()
 {
+    if(s_pending_change_item)
+    {
+        s_change_item();
+        s_pending_change_item = false;
+    }
+
     size_t num_items = get_num_items();
 
     MenuControls_t menuControls = Controls::GetMenuControls();

@@ -1576,38 +1576,39 @@ static void setResDyn()
     setRes(0, 0);
 }
 
+static int s_custom_width, s_custom_height;
+
+static void s_heightCallback()
+{
+    if(TextEntryScreen::Text.empty())
+        return;
+
+    s_custom_height = 0; // just to suppress an unneeded warning
+
+    if((s_custom_height = (int)atol(TextEntryScreen::Text.c_str())) > 0)
+    {
+        setRes(s_custom_width, s_custom_height);
+    }
+    else
+        TextEntryScreen::Init("Invalid input. Game height:", s_heightCallback);
+}
+
+static void s_widthCallback()
+{
+    if(TextEntryScreen::Text.empty())
+        return;
+
+    s_custom_width = 0; // just to suppress an unneeded warning
+
+    if(TextEntryScreen::Text == "dyn" || (s_custom_width = (int)atol(TextEntryScreen::Text.c_str())) > 0)
+        TextEntryScreen::Init("Game height:", s_heightCallback);
+    else
+        TextEntryScreen::Init("Invalid input. Game width:", s_widthCallback);
+}
+
 static void setResCustom()
 {
-    int w, h;
-
-    std::string s = TextEntryScreen::Run("Game width:");
-    if(s.empty())
-        return;
-
-    w = 0; // just to suppress an unneeded warning
-
-    while(s != "dyn" && (w = (int)atol(s.c_str())) <= 0)
-    {
-        s = TextEntryScreen::Run("Invalid input. Game width:");
-        if(s.empty())
-            return;
-    }
-
-    if(s == "dyn")
-        w = 0;
-
-    s = TextEntryScreen::Run("Game height:");
-    if(s.empty())
-        return;
-
-    while((h = (int)atol(s.c_str())) <= 0)
-    {
-        s = TextEntryScreen::Run("Invalid input. Game height:");
-        if(s.empty())
-            return;
-    }
-
-    setRes(w, h);
+    TextEntryScreen::Init("Game width:", s_widthCallback);
 }
 
 

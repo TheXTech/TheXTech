@@ -242,12 +242,16 @@ bool ConfigOption_t<true, std::string>::change()
     if(!m_base)
         return false;
 
-    m_value = TextEntryScreen::Run(m_base->m_display_name, m_value);
+    static auto* changed_opt = this;
 
-    if(!is_set())
-        m_set = ConfigSetLevel::set;
+    TextEntryScreen::Init(m_base->m_display_name, [](){
+        changed_opt->m_value = TextEntryScreen::Text;
 
-    _on_change();
+        if(!changed_opt->is_set())
+            changed_opt->m_set = ConfigSetLevel::set;
+
+        changed_opt->_on_change();
+    }, m_value);
 
     return true;
 }

@@ -660,17 +660,6 @@ bool Init(const std::string& Prompt, void (*callback)(), const std::string Value
     return true;
 }
 
-const std::string& Run(const std::string& Prompt, const std::string Value)
-{
-    bool using_pause_loop = Init(Prompt, nullptr, Value);
-
-    // wait for pause loop to finish
-    if(using_pause_loop)
-        PauseGame(PauseCode::None);
-
-    return Text;
-}
-
 void Render()
 {
     KeyboardMouseRender(false, true);
