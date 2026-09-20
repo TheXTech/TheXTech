@@ -99,6 +99,41 @@ static uint16_t s_InitScreensLeft()
     return ScreensLeft;
 }
 
+bool BlockColorHit(int Type)
+{
+    // note: these four cases were previously handled using separate code
+    NPCID switch_npc = NPCID_NULL;
+
+    if(Type == BLKID_YEL_SWITCH)
+        switch_npc = NPCID_YEL_PLATFORM;
+    else if(Type == BLKID_BLU_SWITCH)
+        switch_npc = NPCID_BLU_PLATFORM;
+    else if(Type == BLKID_GRN_SWITCH)
+        switch_npc = NPCID_GRN_PLATFORM;
+    else if(Type == BLKID_RED_SWITCH)
+        switch_npc = NPCID_RED_PLATFORM;
+    else
+        return false;
+
+    // switch blocks
+    for(auto B = 1; B <= numBlock; B++)
+    {
+        if(Block[B].Type == Type + 1)
+            Block[B].Type = Type + 2;
+        else if(Block[B].Type == Type + 2)
+            Block[B].Type = Type + 1;
+    }
+
+    // switch platform directions
+    for(auto B = 1; B <= numNPCs; B++)
+    {
+        if(NPC[B].Type == switch_npc)
+            NPC[B].Direction = -NPC[B].Direction;
+    }
+
+    return true;
+}
+
 void BlockHit(int A, bool HitDown, int whatPlayer)
 {
     // int tempPlayer = 0;
@@ -251,36 +286,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
     }
 
-
-    // note: these four cases were previously handled using separate code
-    NPCID switch_npc = NPCID_NULL;
-
-    if(b.Type == BLKID_YEL_SWITCH)
-        switch_npc = NPCID_YEL_PLATFORM;
-    else if(b.Type == BLKID_BLU_SWITCH)
-        switch_npc = NPCID_BLU_PLATFORM;
-    else if(b.Type == BLKID_GRN_SWITCH)
-        switch_npc = NPCID_GRN_PLATFORM;
-    else if(b.Type == BLKID_RED_SWITCH)
-        switch_npc = NPCID_RED_PLATFORM;
-
-    if(switch_npc != NPCID_NULL) // switch blocks
-    {
+    if(BlockColorHit(b.Type))
         PlaySoundSpatial(SFX_PSwitch, b.Location);
-        for(auto B = 1; B <= numBlock; B++)
-        {
-            if(Block[B].Type == b.Type + 1)
-                Block[B].Type = b.Type + 2;
-            else if(Block[B].Type == b.Type + 2)
-                Block[B].Type = b.Type + 1;
-        }
-
-        for(auto B = 1; B <= numNPCs; B++)
-        {
-            if(NPC[B].Type == switch_npc)
-                NPC[B].Direction = -NPC[B].Direction;
-        }
-    }
 
     // Find out what the block should turn into
     if(b.Type == 88 || b.Type == 90 || b.Type == 89 || b.Type == 171 || b.Type == 174 || b.Type == 177 || b.Type == 180) // SMW

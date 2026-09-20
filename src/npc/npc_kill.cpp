@@ -31,6 +31,7 @@
 #include "config.h"
 #include "../controls.h"
 #include "../layers.h"
+#include "blocks.h"
 
 #include "npc_traits.h"
 
@@ -138,70 +139,15 @@ bool KillNPC(int A, int B)
 
         if(!tempBool)
         {
+            PlaySoundSpatial(SFX_PSwitch, NPC[A].Location);
             if(NPC[A].Type == NPCID_YELSWITCH_FODDER || NPC[A].DefaultType == NPCID_YELSWITCH_FODDER)
-            {
-                PlaySoundSpatial(SFX_PSwitch, NPC[A].Location);
-                for(C = 1; C <= numBlock; C++)
-                {
-                    if(Block[C].Type == BLKID_YEL_BLOCK_ON)
-                        Block[C].Type = BLKID_YEL_BLOCK_OFF;
-                    else if(Block[C].Type == BLKID_YEL_BLOCK_OFF)
-                        Block[C].Type = BLKID_YEL_BLOCK_ON;
-                }
-                for(C = 1; C <= numNPCs; C++)
-                {
-                    if(NPC[C].Type == NPCID_YEL_PLATFORM)
-                        NPC[C].Direction = -NPC[C].Direction;
-                }
-            }
+                BlockColorHit(BLKID_YEL_SWITCH);
             else if(NPC[A].Type == NPCID_BLUSWITCH_FODDER || NPC[A].DefaultType == NPCID_BLUSWITCH_FODDER)
-            {
-                PlaySoundSpatial(SFX_PSwitch, NPC[A].Location);
-                for(C = 1; C <= numBlock; C++)
-                {
-                    if(Block[C].Type == BLKID_BLU_BLOCK_ON)
-                        Block[C].Type = BLKID_BLU_BLOCK_OFF;
-                    else if(Block[C].Type == BLKID_BLU_BLOCK_OFF)
-                        Block[C].Type = BLKID_BLU_BLOCK_ON;
-                }
-                for(C = 1; C <= numNPCs; C++)
-                {
-                    if(NPC[C].Type == NPCID_BLU_PLATFORM)
-                        NPC[C].Direction = -NPC[C].Direction;
-                }
-            }
+                BlockColorHit(BLKID_BLU_SWITCH);
             else if(NPC[A].Type == NPCID_GRNSWITCH_FODDER || NPC[A].DefaultType == NPCID_GRNSWITCH_FODDER)
-            {
-                PlaySoundSpatial(SFX_PSwitch, NPC[A].Location);
-                for(C = 1; C <= numBlock; C++)
-                {
-                    if(Block[C].Type == BLKID_GRN_BLOCK_ON)
-                        Block[C].Type = BLKID_GRN_BLOCK_OFF;
-                    else if(Block[C].Type == BLKID_GRN_BLOCK_OFF)
-                        Block[C].Type = BLKID_GRN_BLOCK_ON;
-                }
-                for(C = 1; C <= numNPCs; C++)
-                {
-                    if(NPC[C].Type == NPCID_GRN_PLATFORM)
-                        NPC[C].Direction = -NPC[C].Direction;
-                }
-            }
+                BlockColorHit(BLKID_GRN_SWITCH);
             else if(NPC[A].Type == NPCID_REDSWITCH_FODDER || NPC[A].DefaultType == NPCID_REDSWITCH_FODDER)
-            {
-                PlaySoundSpatial(SFX_PSwitch, NPC[A].Location);
-                for(C = 1; C <= numBlock; C++)
-                {
-                    if(Block[C].Type == BLKID_RED_BLOCK_ON)
-                        Block[C].Type = BLKID_RED_BLOCK_OFF;
-                    else if(Block[C].Type == BLKID_RED_BLOCK_OFF)
-                        Block[C].Type = BLKID_RED_BLOCK_ON;
-                }
-                for(C = 1; C <= numNPCs; C++)
-                {
-                    if(NPC[C].Type == NPCID_RED_PLATFORM)
-                        NPC[C].Direction = -NPC[C].Direction;
-                }
-            }
+                BlockColorHit(BLKID_RED_SWITCH);
         }
     }
 
