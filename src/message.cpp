@@ -38,11 +38,8 @@
 namespace XMessage
 {
 
-#ifdef THEXTECH_ENABLE_SDL_NET
 static std::vector<Message> s_message_submit_queue;
-#endif
-
-static std::vector<Message> s_message_vector;
+static std::vector<Message> s_message_run_queue;
 Session g_session;
 
 static Controls_t s_last_controls[maxNetplayPlayers + 1];
@@ -227,7 +224,7 @@ void Tick()
 
         // sync state with other clients here
         if(XMessage::GetStatus() != XMessage::Status::local)
-            ClientFrameSync(s_message_submit_queue, s_message_vector);
+            ClientFrameSync(s_message_submit_queue, s_message_run_queue);
         // log state for future saving or syncing
         else
         {
@@ -240,7 +237,7 @@ void Tick()
                 for(Message m : s_message_submit_queue)
                 {
                     g_session.history.push_back(m);
-                    s_message_vector.push_back(m);
+                    s_message_run_queue.push_back(m);
                 }
 
                 g_session.next_message = g_session.history.size();
@@ -248,12 +245,16 @@ void Tick()
             }
         }
     }
+    else
+        std::swap(s_message_submit_queue, s_message_run_queue);
+#else
+    std::swap(s_message_submit_queue, s_message_run_queue);
 #endif
 
     // update player controls based on message queue
-    for(Message m : s_message_vector)
+    for(Message m : s_message_run_queue)
         Handle(m);
-    s_message_vector.clear();
+    s_message_run_queue.clear();
 
     int numPlayers_p = numPlayers;
 
@@ -267,15 +268,7 @@ void Tick()
 
 void PushMessage_Direct(Message message)
 {
-#ifdef THEXTECH_ENABLE_SDL_NET
-    if(g_session.active)
-    {
-        s_message_submit_queue.push_back(message);
-        return;
-    }
-#endif
-
-    s_message_vector.push_back(message);
+    s_message_submit_queue.push_back(message);
 }
 
 void PushMessage(Message message)
