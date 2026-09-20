@@ -133,7 +133,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                     InvincibilityTime ||
                                    (
                                        ((HitSpot == 1 && Player[A].Mount) || (Player[A].Rolling && Player[A].State == PLR_STATE_SHELL)) &&
-                                       Block[B].Type != 598
+                                       Block[B].Type != BLKID_PET_HURT
                                    )
                                  )
                                 {}
@@ -148,7 +148,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                         PlayerHurt(A);
                                     }
 
-                                    if(Block[B].Type == 598)
+                                    if(Block[B].Type == BLKID_PET_HURT)
                                     {
                                         if(Player[A].Mount > 0 && HitSpot == 1)
                                         {
@@ -192,7 +192,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                             }
 
                             // destroy some blocks if the player is touching it as a statue
-                            if(Block[B].Type == 457 && Player[A].Stoned)
+                            if(Block[B].Type == BLKID_GRY_BRICK && Player[A].Stoned)
                             {
                                 HitSpot = 0;
                                 SafelyKillBlock(B);
@@ -554,7 +554,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                 }
 
                                 bool player_drill = (Player[A].State == PLR_STATE_CYCLONE && !Player[A].DoubleJump && Player[A].Controls.Down && Player[A].Location.SpeedY > Physics.PlayerTerminalVelocity * 0.9_n);
-                                if(player_drill && BlockIsBreakable(Block[B]) && Block[B].Type != 90)
+                                if(player_drill && BlockIsBreakable(Block[B]) && Block[B].Type != BLKID_SPIN_BLOCK)
                                 {
                                     BlockHitHard(B);
                                 }
@@ -869,7 +869,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
         }
 
         // diggable dirt
-        if(Block[floorBlock].Type == 370 && Player[A].StandingOnNPC <= 0) // dig dirt
+        if(Block[floorBlock].Type == BLKID_DIG_SAND && Player[A].StandingOnNPC <= 0) // dig dirt
         {
             DontResetGrabTime = true;
             // B = floorBlock;
@@ -983,7 +983,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
             }
 #endif
 
-            if(Block[floorBlock].Type == 55 && !FreezeNPCs) // Make the player jump if the block is bouncy
+            if(Block[floorBlock].Type == BLKID_BOUNCE_BLOCK && !FreezeNPCs) // Make the player jump if the block is bouncy
             {
                 BlockHit(floorBlock, true);
 
@@ -1007,7 +1007,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
             }
 
             // smash turn blocks
-            if(Player[A].SpinJump && (Block[floorBlock].Type == 90 || Block[floorBlock].Type == 526) && (Player[A].State > 1 && Player[A].State != PLR_STATE_TINY) && Block[floorBlock].Special == 0)
+            if(Player[A].SpinJump && (Block[floorBlock].Type == BLKID_SPIN_BLOCK || Block[floorBlock].Type == BLKID_SPACE_BRICK) && (Player[A].State > 1 && Player[A].State != PLR_STATE_TINY) && Block[floorBlock].Special == 0)
             {
                 Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
                 Block[floorBlock].Kill = true;
@@ -1130,12 +1130,12 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
         if(Player[A].Mount != 2) // Tell the block it was hit
             BlockHit(ceilingBlock, false, A);
 
-        if(Block[ceilingBlock].Type == 55) // If it is a bouncy block the knock the player down
+        if(Block[ceilingBlock].Type == BLKID_BOUNCE_BLOCK) // If it is a bouncy block the knock the player down
             Player[A].Location.SpeedY = 3;
 
         if(Player[A].State > 1 && Player[A].State != PLR_STATE_TINY && (Player[A].Character != 5 || Player[A].Rolling)) // If the player was big ask the block nicely to die
         {
-            if(Player[A].Mount != 2 && Block[ceilingBlock].Type != 293)
+            if(Player[A].Mount != 2 && Block[ceilingBlock].Type != BLKID_BOMB_DIRT_S2)
                 BlockHitHard(ceilingBlock);
         }
 

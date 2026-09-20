@@ -61,6 +61,7 @@
 
 #include "pseudo_vb.h"
 #include "npc_traits.h"
+#include "blk_id.h"
 #include "npc_id.h"
 #include "eff_id.h"
 
@@ -1100,7 +1101,7 @@ void UpdateEditor()
                     last_EC_loc.Height -= 2;
                 }
 
-                if(!BlockIsSizable[EditorCursor.Block.Type] && EditorCursor.Block.Type != 370 && CanPlace)
+                if(!BlockIsSizable[EditorCursor.Block.Type] && EditorCursor.Block.Type != BLKID_DIG_SAND && CanPlace)
                 {
                     for(A = 1; A <= numNPCs; A++)
                     {

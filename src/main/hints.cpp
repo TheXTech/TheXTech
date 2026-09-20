@@ -48,6 +48,7 @@
 #include "graphics.h"
 #include "gfx.h"
 #include "eff_id.h"
+#include "blk_id.h"
 
 
 namespace XHints
@@ -335,7 +336,7 @@ static uint8_t s_gray_bricks_applies()
     const vScreen_t& vscreen = vScreenByPlayer(found);
     for(const Block_t& b : treeBlockQuery(newLoc(-vscreen.X, -vscreen.Y, vscreen.Width, vscreen.Height), SORTMODE_NONE))
     {
-        if(b.Type == 457 && !b.Hidden && !b.Invis)
+        if(b.Type == BLKID_GRY_BRICK && !b.Hidden && !b.Invis)
             return 106;
     }
 #endif

@@ -31,6 +31,7 @@
 #include "editor/magic_block.h"
 #include "editor/editor_custom.h"
 #include "editor.h"
+#include "blk_id.h"
 
 #include "rand.h"
 
@@ -620,14 +621,8 @@ void s_apply_type(ItemRef_t B, int type)
 template<>
 void s_apply_type(BlockRef_t B, int type)
 {
-    if(B->Slippy ==
-        (B->Type == 189 || B->Type == 190 || B->Type == 191
-            || B->Type == 270 || B->Type == 271 || B->Type == 272
-            || B->Type == 620 || B->Type == 621 || B->Type == 633
-            || B->Type == 634 || B->Type == 241 || B->Type == 242))
-    {
-        B->Slippy = (type == 189 || type == 190 || type == 191 || type == 270 || type == 271 || type == 272 || type == 620 || type == 621 || type == 633 || type == 634 || type == 241 || type == 242);
-    }
+    if(B->Slippy == BlockTypeSlippy(B->Type))
+        B->Slippy = BlockTypeSlippy(type);
 
     B->Type = type;
 }

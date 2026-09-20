@@ -20,6 +20,7 @@
 
 #include "../globals.h"
 #include "../npc.h"
+#include "blk_id.h"
 #include "../npc_id.h"
 #include "../eff_id.h"
 #include "../sound.h"
@@ -142,10 +143,10 @@ bool KillNPC(int A, int B)
                 PlaySoundSpatial(SFX_PSwitch, NPC[A].Location);
                 for(C = 1; C <= numBlock; C++)
                 {
-                    if(Block[C].Type == 171)
-                        Block[C].Type = 172;
-                    else if(Block[C].Type == 172)
-                        Block[C].Type = 171;
+                    if(Block[C].Type == BLKID_YEL_BLOCK_ON)
+                        Block[C].Type = BLKID_YEL_BLOCK_OFF;
+                    else if(Block[C].Type == BLKID_YEL_BLOCK_OFF)
+                        Block[C].Type = BLKID_YEL_BLOCK_ON;
                 }
                 for(C = 1; C <= numNPCs; C++)
                 {
@@ -158,10 +159,10 @@ bool KillNPC(int A, int B)
                 PlaySoundSpatial(SFX_PSwitch, NPC[A].Location);
                 for(C = 1; C <= numBlock; C++)
                 {
-                    if(Block[C].Type == 174)
-                        Block[C].Type = 175;
-                    else if(Block[C].Type == 175)
-                        Block[C].Type = 174;
+                    if(Block[C].Type == BLKID_BLU_BLOCK_ON)
+                        Block[C].Type = BLKID_BLU_BLOCK_OFF;
+                    else if(Block[C].Type == BLKID_BLU_BLOCK_OFF)
+                        Block[C].Type = BLKID_BLU_BLOCK_ON;
                 }
                 for(C = 1; C <= numNPCs; C++)
                 {
@@ -174,10 +175,10 @@ bool KillNPC(int A, int B)
                 PlaySoundSpatial(SFX_PSwitch, NPC[A].Location);
                 for(C = 1; C <= numBlock; C++)
                 {
-                    if(Block[C].Type == 177)
-                        Block[C].Type = 178;
-                    else if(Block[C].Type == 178)
-                        Block[C].Type = 177;
+                    if(Block[C].Type == BLKID_GRN_BLOCK_ON)
+                        Block[C].Type = BLKID_GRN_BLOCK_OFF;
+                    else if(Block[C].Type == BLKID_GRN_BLOCK_OFF)
+                        Block[C].Type = BLKID_GRN_BLOCK_ON;
                 }
                 for(C = 1; C <= numNPCs; C++)
                 {
@@ -190,10 +191,10 @@ bool KillNPC(int A, int B)
                 PlaySoundSpatial(SFX_PSwitch, NPC[A].Location);
                 for(C = 1; C <= numBlock; C++)
                 {
-                    if(Block[C].Type == 180)
-                        Block[C].Type = 181;
-                    else if(Block[C].Type == 181)
-                        Block[C].Type = 180;
+                    if(Block[C].Type == BLKID_RED_BLOCK_ON)
+                        Block[C].Type = BLKID_RED_BLOCK_OFF;
+                    else if(Block[C].Type == BLKID_RED_BLOCK_OFF)
+                        Block[C].Type = BLKID_RED_BLOCK_ON;
                 }
                 for(C = 1; C <= numNPCs; C++)
                 {

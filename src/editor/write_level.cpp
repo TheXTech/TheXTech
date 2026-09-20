@@ -26,6 +26,7 @@
 #include "sound.h"
 #include "npc.h"
 #include "npc_id.h"
+#include "blk_id.h"
 #include "npc_traits.h"
 #include "npc_special_data.h"
 #include <PGE_File_Formats/file_formats.h>
@@ -185,7 +186,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         block.event_emptylayer = GetE(b.TriggerLast);
 
         // NEW: legacy behavior for spin block
-        if(b.Type == 90)
+        if(b.Type == BLKID_SPIN_BLOCK)
             block.special_data = (int)b.forceSmashable;
 
         block.meta.array_id = (out.blocks_array_id++);

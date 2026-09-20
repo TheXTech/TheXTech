@@ -32,6 +32,7 @@
 #include "graphics.h"
 #include "collision.h"
 #include "npc.h"
+#include "blk_id.h"
 #include "npc_id.h"
 #include "eff_id.h"
 #include "npc_traits.h"
@@ -3057,14 +3058,14 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
             Block_t& block = *block_p;
             int A = (int)block_p;
 
-            if(!BlockIsSizable[block.Type] && !block.Hidden && (block.Type != 293 || Stab) && !block.Invis && !BlockNoClipping[block.Type])
+            if(!BlockIsSizable[block.Type] && !block.Hidden && (block.Type != BLKID_BOMB_DIRT_S2 || Stab) && !block.Invis && !BlockNoClipping[block.Type])
             {
                 if(CheckCollision(tailLoc, block.Location))
                 {
                     // if(block.ShakeY == 0 && block.ShakeY2 == 0 && block.ShakeY3 == 0)
                     if(block.ShakeCounter == 0)
                     {
-                        if(block.Special > 0 || block.Type == 55 || block.Type == 159 || block.Type == 90)
+                        if(block.Special > 0 || block.Type == BLKID_BOUNCE_BLOCK || block.Type == BLKID_HITTABLE_BLOCK || block.Type == BLKID_SPIN_BLOCK)
                             PlaySoundSpatial(SFX_BlockHit, block.Location);
 //                        if(nPlay.Online && plr - 1 == nPlay.MySlot)
 //                            Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1g" + std::to_string(plr) + "|" + p.TailCount - 1;
@@ -3100,7 +3101,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                         {
                             if(StabDir == 2)
                             {
-                                if(block.Type == 293 || block.Type == 370
+                                if(block.Type == BLKID_BOMB_DIRT_S2 || block.Type == BLKID_DIG_SAND
                                     /* || block.ShakeY != 0 || block.ShakeY2 != 0 || block.ShakeY3 != 0 */
                                     || block.ShakeCounter != 0
                                     || block.Hidden || BlockHurts[block.Type])
@@ -3118,7 +3119,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                                 }
                             }
 
-                            if(block.Type == 370)
+                            if(block.Type == BLKID_DIG_SAND)
                             {
                                 PlaySoundSpatial(SFX_HeroGrass, block.Location);
                                 block.Hidden = true;
@@ -3130,7 +3131,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                             }
 
                             // allow Char5 to stab gray bricks when it has heavy power
-                            if(block.Type == 457 && p.State == 6)
+                            if(block.Type == BLKID_GRY_BRICK && p.State == PLR_STATE_HEAVY)
                                 SafelyKillBlock(A);
                         }
                     }
@@ -3628,7 +3629,7 @@ void YoshiPound(const int A, int mount, bool BreakBlocks)
                     continue;
 
                 if(g_config.fix_vehicle_char_switch && mount == 2 &&
-                    ((b.Type >= 622 && b.Type <= 625) || b.Type == 631))
+                    ((b.Type >= BLKID_TO_CHAR1 && b.Type <= BLKID_TO_CHAR4) || b.Type == BLKID_TO_CHAR5))
                     continue; // Forbid playable character switch when riding a clown car
 
                 if(!CheckCollision(p.Location, b.Location))

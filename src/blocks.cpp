@@ -120,7 +120,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     //     Controls::Rumble(whatPlayer, 10, .1);
 
     // character switch blocks
-    if((b.Type >= 622 && b.Type <= 625) || b.Type == 631)
+    if((b.Type >= BLKID_TO_CHAR1 && b.Type <= BLKID_TO_CHAR4) || b.Type == BLKID_TO_CHAR5)
     {
         if(whatPlayer == 0)
         {
@@ -138,11 +138,11 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             {
                 switch(Player[B].Character)
                 {
-                case 1: BlockFrame[622] = 4; break;
-                case 2: BlockFrame[623] = 4; break;
-                case 3: BlockFrame[624] = 4; break;
-                case 4: BlockFrame[625] = 4; break;
-                case 5: BlockFrame[631] = 4; break;
+                case 1: BlockFrame[BLKID_TO_CHAR1] = 4; break;
+                case 2: BlockFrame[BLKID_TO_CHAR2] = 4; break;
+                case 3: BlockFrame[BLKID_TO_CHAR3] = 4; break;
+                case 4: BlockFrame[BLKID_TO_CHAR4] = 4; break;
+                case 5: BlockFrame[BLKID_TO_CHAR5] = 4; break;
                 default: break;
                 }
             }
@@ -155,11 +155,11 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
                 switch(b.Type)
                 {
-                case 622: transform_to = 1; break;
-                case 623: transform_to = 2; break;
-                case 624: transform_to = 3; break;
-                case 625: transform_to = 4; break;
-                case 631: transform_to = 5; break;
+                case BLKID_TO_CHAR1: transform_to = 1; break;
+                case BLKID_TO_CHAR2: transform_to = 2; break;
+                case BLKID_TO_CHAR3: transform_to = 3; break;
+                case BLKID_TO_CHAR4: transform_to = 4; break;
+                case BLKID_TO_CHAR5: transform_to = 5; break;
                 default: break;
                 }
 
@@ -222,7 +222,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
        b.Type == 169 || b.Type == 170 || b.Type == 173 ||
        b.Type == 176 || b.Type == 179 || b.Type == 188 ||
        b.Type == 226 || b.Type == 281 || b.Type == 282 ||
-       b.Type == 283 || (b.Type >= 622 && b.Type <= 625))
+       b.Type == 283 || (b.Type >= BLKID_TO_CHAR1 && b.Type <= BLKID_TO_CHAR4))
     {
         if(!HitDown)
             BlockShakeUp(A);
@@ -231,7 +231,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     }
 
 
-    if(b.Type == 169)
+    if(b.Type == BLKID_CONVEYOR_SWITCH)
     {
         PlaySoundSpatial(SFX_PSwitch, b.Location);
         BeltDirection = -BeltDirection; // for the blet direction changing block
@@ -255,13 +255,13 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     // note: these four cases were previously handled using separate code
     NPCID switch_npc = NPCID_NULL;
 
-    if(b.Type == 170)
+    if(b.Type == BLKID_YEL_SWITCH)
         switch_npc = NPCID_YEL_PLATFORM;
-    else if(b.Type == 173)
+    else if(b.Type == BLKID_BLU_SWITCH)
         switch_npc = NPCID_BLU_PLATFORM;
-    else if(b.Type == 176)
+    else if(b.Type == BLKID_GRN_SWITCH)
         switch_npc = NPCID_GRN_PLATFORM;
-    else if(b.Type == 179)
+    else if(b.Type == BLKID_RED_SWITCH)
         switch_npc = NPCID_RED_PLATFORM;
 
     if(switch_npc != NPCID_NULL) // switch blocks
@@ -284,15 +284,15 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     // Find out what the block should turn into
     if(b.Type == 88 || b.Type == 90 || b.Type == 89 || b.Type == 171 || b.Type == 174 || b.Type == 177 || b.Type == 180) // SMW
-        newBlock = 89;
+        newBlock = BLKID_HIT_BLOCK_S4;
     else if(b.Type == 188 || b.Type == 192 || b.Type == 193 || b.Type == 60 || b.Type == 369) // SMB1
-        newBlock = 192;
+        newBlock = BLKID_HIT_BLOCK_S1;
     else if(b.Type == 224 || b.Type == 225 || b.Type == 226) // Large SMB3 blocks
-        newBlock = 225;
-    else if(b.Type == 159) // SMB3 Battle Block
-        newBlock = 159;
+        newBlock = BLKID_BIG_HIT_BLOCK_S3;
+    else if(b.Type == BLKID_HITTABLE_BLOCK) // SMB3 Battle Block
+        newBlock = BLKID_HITTABLE_BLOCK;
     else // Everything else defaults to SMB3
-        newBlock = 2;
+        newBlock = BLKID_HIT_BLOCK_S3;
 
     if(b.Special > 0 && b.Special < 100) // Block has coins
     {
@@ -335,9 +335,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     nn.Active = true;
                     nn.TimeLeft = 100;
 
-                    if(newBlock == 89)
+                    if(newBlock == BLKID_HIT_BLOCK_S4)
                         nn.Type = NPCID_COIN_S4;
-                    else if(newBlock == 192)
+                    else if(newBlock == BLKID_HIT_BLOCK_S1)
                         nn.Type = NPCID_COIN_S1;
                     else
                         nn.Type = NPCID_COIN_S3;
@@ -452,7 +452,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             b.Special -= 1;
         }
 
-        if(b.Special == 0 && b.Type != 55)
+        if(b.Special == 0 && b.Type != BLKID_BOUNCE_BLOCK)
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -538,7 +538,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         {
             b.Special = 0;
 
-            if(b.Type != 55) // 55 is the bouncy note block
+            if(b.Type != BLKID_BOUNCE_BLOCK) // 55 is the bouncy note block
             {
                 b.Type = newBlock;
                 b.Location.Height = BlockHeight[newBlock];
@@ -797,7 +797,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         // syncLayersTrees_Block(A);
     }
 
-    if(b.Type == 90)
+    if(b.Type == BLKID_SPIN_BLOCK)
         BlockHitHard(A);
 }
 
@@ -887,7 +887,7 @@ void BlockHitHard(int A)
     if(Block[A].Hidden)
         return;
 
-    if(Block[A].Type == 90 && !Block[A].forceSmashable)
+    if(Block[A].Type == BLKID_SPIN_BLOCK && !Block[A].forceSmashable)
     {
         // Block(A).Hidden = True
         // NewEffect 82, Block(A).Location, , A
@@ -954,23 +954,23 @@ bool KillBlock(int A, bool Splode)
 
     if(Splode)
     {
-        if(Block[A].Type == 526)
+        if(Block[A].Type == BLKID_SPACE_BRICK)
             PlaySoundSpatial(SFX_SMBlockHit, b.Location);
-        else if(Block[A].Type == 186)
+        else if(Block[A].Type == BLKID_RED_BRICK)
             PlaySoundSpatial(SFX_Fireworks, b.Location);
         else
             PlaySoundSpatial(SFX_BlockSmashed, b.Location); // Block smashed
 
         // Create the break effect
-        if(Block[A].Type == 60)
+        if(Block[A].Type == BLKID_BLU_BRICK_S1)
             NewEffect(EFFID_BLU_BLOCK_SMASH, Block[A].Location);
-        else if(Block[A].Type == 188)
+        else if(Block[A].Type == BLKID_BRICK_S1)
             NewEffect(EFFID_BLOCK_S1_SMASH, Block[A].Location);
-        else if(Block[A].Type == 457)
+        else if(Block[A].Type == BLKID_GRY_BRICK)
             NewEffect(EFFID_GRY_BLOCK_SMASH, Block[A].Location);
-        else if(Block[A].Type == 526)
+        else if(Block[A].Type == BLKID_SPACE_BRICK)
             NewEffect(EFFID_SPACE_BLOCK_SMASH, Block[A].Location);
-        else if(Block[A].Type == 293)
+        else if(Block[A].Type == BLKID_BOMB_DIRT_S2)
             NewEffect(EFFID_DIRT_BLOCK_SMASH, Block[A].Location);
         else
             NewEffect(EFFID_BLOCK_SMASH, Block[A].Location);
@@ -1501,13 +1501,13 @@ resume_TriggerHit:
                 }
 
                 // on/off block
-                if(ib.Type == 282)
-                    ib.Type = 283;
-                else if(ib.Type == 283)
-                    ib.Type = 282;
+                if(ib.Type == BLKID_SWITCH_ON)
+                    ib.Type = BLKID_SWITCH_OFF;
+                else if(ib.Type == BLKID_SWITCH_OFF)
+                    ib.Type = BLKID_SWITCH_ON;
 
                 // spin block
-                if(ib.Type == 90 && (ib.ShakeCounter == SHAKE_DOWNUP12_MID || ib.Special == 0) && !ib.forceSmashable)
+                if(ib.Type == BLKID_SPIN_BLOCK && (ib.ShakeCounter == SHAKE_DOWNUP12_MID || ib.Special == 0) && !ib.forceSmashable)
                 {
                     ib.Hidden = true;
                     invalidateDrawBlocks();
@@ -1566,7 +1566,7 @@ resume_TriggerHit:
             {
                 if(!Player[B].Dead)
                 {
-                    if(Player[B].Effect == PLREFF_NORMAL && ib.Type != 55)
+                    if(Player[B].Effect == PLREFF_NORMAL && ib.Type != BLKID_BOUNCE_BLOCK)
                     {
                         if(ShakeCollision(Player[B].Location, ib))
                         {
@@ -1724,15 +1724,15 @@ bool PSwitch(bool enabled)
                         NPC[A].Type = NPC[A].DefaultType;
 
                     if(NPC[A].Type == NPCID_COIN_S4 || NPC[A].Type == NPCID_COIN_5)
-                        nb.Type = 89;
+                        nb.Type = BLKID_HIT_BLOCK_S4;
                     else if(NPC[A].Type == NPCID_COIN_S1)
-                        nb.Type = 188;
+                        nb.Type = BLKID_BRICK_S1;
                     else if(NPC[A].Type == NPCID_RED_COIN)
-                        nb.Type = 280;
+                        nb.Type = BLKID_RED_HIT_BLOCK;
                     else if(NPC[A].Type == NPCID_COIN_S2)
-                        nb.Type = 293;
+                        nb.Type = BLKID_BOMB_DIRT_S2;
                     else
-                        nb.Type = 4;
+                        nb.Type = BLKID_BRICK_S3;
 
                     nb.TriggerDeath = NPC[A].TriggerDeath;
                     nb.TriggerLast = NPC[A].TriggerLast;
@@ -1782,13 +1782,13 @@ bool PSwitch(bool enabled)
                     nn.Active = true;
                     nn.TimeLeft = 1;
 
-                    if(Block[A].Type == 89)
+                    if(Block[A].Type == BLKID_HIT_BLOCK_S4)
                         nn.Type = NPCID_COIN_S4;
-                    else if(Block[A].Type == 188 || Block[A].Type == 60)
+                    else if(Block[A].Type == BLKID_BRICK_S1 || Block[A].Type == BLKID_BLU_BRICK_S1)
                         nn.Type = NPCID_COIN_S1;
-                    else if(Block[A].Type == 280)
+                    else if(Block[A].Type == BLKID_RED_HIT_BLOCK)
                         nn.Type = NPCID_RED_COIN;
-                    else if(Block[A].Type == 293)
+                    else if(Block[A].Type == BLKID_BOMB_DIRT_S2)
                         nn.Type = NPCID_COIN_S2;
                     else
                         nn.Type = NPCID_COIN_S3;
@@ -2121,15 +2121,15 @@ bool BlockCheckPlayerFilter(int blockIdx, int playerIdx)
 
     switch(block)
     {
-    case 626:
+    case BLKID_CHAR1_PASS:
         return (player == 1);
-    case 627:
+    case BLKID_CHAR2_PASS:
         return (player == 2);
-    case 628:
+    case BLKID_CHAR3_PASS:
         return (player == 3);
-    case 629:
+    case BLKID_CHAR4_PASS:
         return (player == 4);
-    case 632:
+    case BLKID_CHAR5_PASS:
         return (player == 5);
     }
 

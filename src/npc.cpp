@@ -33,6 +33,7 @@
 #include "config.h"
 #include "main/trees.h"
 #include "core/events.h"
+#include "blk_id.h"
 #include "npc_id.h"
 #include "eff_id.h"
 #include "npc_traits.h"
@@ -419,7 +420,7 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
             {
                 BlockHit(i);
                 BlockHitHard(i);
-                if(Game == 0 && Block[i].Type == 457)
+                if(Game == 0 && Block[i].Type == BLKID_GRY_BRICK)
                     SafelyKillBlock(i);
             }
         }

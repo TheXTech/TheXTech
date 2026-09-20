@@ -201,7 +201,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                     }
                                     else if(NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_SWORDBEAM || NPC[A].Type == NPCID_CHAR4_HEAVY)
                                     {
-                                        if(Block[B].Type == 457)
+                                        if(Block[B].Type == BLKID_GRY_BRICK)
                                             SafelyKillBlock(B);
 
                                         HitSpot = 0;
@@ -251,15 +251,15 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                             // NEW: bugfix to make ice balls properly respect char blocks
                                             int special = (g_config.fix_char_pass_balls) ? NPC[A].Variant : NPC[A].Special;
 
-                                            if(Block[B].Type == 626 && special == 1)
+                                            if(Block[B].Type == BLKID_CHAR1_PASS && special == 1)
                                                 HitSpot = 0;
-                                            if(Block[B].Type == 627 && special == 2)
+                                            if(Block[B].Type == BLKID_CHAR2_PASS && special == 2)
                                                 HitSpot = 0;
-                                            if(Block[B].Type == 628 && special == 3)
+                                            if(Block[B].Type == BLKID_CHAR3_PASS && special == 3)
                                                 HitSpot = 0;
-                                            if(Block[B].Type == 629 && special == 4)
+                                            if(Block[B].Type == BLKID_CHAR4_PASS && special == 4)
                                                 HitSpot = 0;
-                                            if(Block[B].Type == 632 && special == 5 && g_config.fix_char_pass_balls) // NEW
+                                            if(Block[B].Type == BLKID_CHAR5_PASS && special == 5 && g_config.fix_char_pass_balls) // NEW
                                                 HitSpot = 0;
 
                                             if(NPCTraits[Block[B].tempBlockNpcType].IsABonus)
@@ -271,10 +271,10 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
 
                                         if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PET_FIRE)
                                         {
-                                            if(Block[B].Type == 621 || Block[B].Type == 620)
+                                            if(Block[B].Type == BLKID_ICE_PLANT || Block[B].Type == BLKID_ICE_COIN)
                                             {
                                                 NPCHit(A, 3, A);
-                                                if(Block[B].Type == 621)
+                                                if(Block[B].Type == BLKID_ICE_PLANT)
                                                     Block[B].Type = 109;
                                                 else
                                                 {
@@ -1238,7 +1238,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                             if(NPC[A]->IsAShell || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1) || NPC[A].Type == NPCID_ICE_CUBE)
                                             {
                                                 BlockHitHard(B);
-                                                if(Block[B].Type == 4 || Block[B].Type == 188 || Block[B].Type == 60 || Block[B].Type == 90)
+                                                if(Block[B].Type == BLKID_BRICK_S3 || Block[B].Type == BLKID_BRICK_S1 || Block[B].Type == BLKID_BLU_BRICK_S1 || Block[B].Type == BLKID_SPIN_BLOCK)
                                                     NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
                                             }
                                         }

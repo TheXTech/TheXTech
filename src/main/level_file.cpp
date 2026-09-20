@@ -845,7 +845,7 @@ bool OpenLevel_Block(void* userdata, LevelBlock& b)
         block.TriggerHit = load.FindEvent(b.event_hit);
         block.TriggerLast = load.FindEvent(b.event_emptylayer);
 
-        if((block.Type == 186 || block.Type == 457) && (block.TriggerDeath != EVENT_NONE || block.TriggerLast != EVENT_NONE))
+        if((block.Type == BLKID_RED_BRICK || block.Type == BLKID_GRY_BRICK) && (block.TriggerDeath != EVENT_NONE || block.TriggerLast != EVENT_NONE))
         {
             pLogWarningS(s_destroy_event_warning);
 

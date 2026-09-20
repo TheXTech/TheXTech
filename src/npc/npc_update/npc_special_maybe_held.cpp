@@ -21,6 +21,7 @@
 #include "globals.h"
 #include "npc.h"
 #include "npc_traits.h"
+#include "blk_id.h"
 #include "npc/npc_queues.h"
 #include "npc/section_overlap.h"
 #include "sound.h"
@@ -442,7 +443,7 @@ void NPCSpecialMaybeHeld(int A)
                     for(BlockRef_t block : treeFLBlockQuery(tempLocation, false))
                     {
                         int B = block;
-                        if(Block[B].Type == 186 && CheckCollision(tempLocation, Block[B].Location) && !Block[B].Hidden)
+                        if(Block[B].Type == BLKID_RED_BRICK && CheckCollision(tempLocation, Block[B].Location) && !Block[B].Hidden)
                             SafelyKillBlock(B);
                     }
 

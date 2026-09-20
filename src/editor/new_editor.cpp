@@ -44,6 +44,7 @@
 
 #include "config.h"
 #include "npc.h"
+#include "blk_id.h"
 #include "npc_id.h"
 #include "npc_traits.h"
 #include "npc_special_data.h"
@@ -380,14 +381,8 @@ void SetEditorBlockType(int type)
     }
 
     // only update slipperiness if it is currently what you would expect.
-    if(EditorCursor.Block.Slippy ==
-        (EditorCursor.Block.Type == 189 || EditorCursor.Block.Type == 190 || EditorCursor.Block.Type == 191
-            || EditorCursor.Block.Type == 270 || EditorCursor.Block.Type == 271 || EditorCursor.Block.Type == 272
-            || EditorCursor.Block.Type == 620 || EditorCursor.Block.Type == 621 || EditorCursor.Block.Type == 633
-            || EditorCursor.Block.Type == 634 || EditorCursor.Block.Type == 241 || EditorCursor.Block.Type == 242))
-    {
-        EditorCursor.Block.Slippy = (type == 189 || type == 190 || type == 191 || type == 270 || type == 271 || type == 272 || type == 620 || type == 621 || type == 633 || type == 634 || type == 241 || type == 242);
-    }
+    if(EditorCursor.Block.Slippy == BlockTypeSlippy(EditorCursor.Block.Type))
+        EditorCursor.Block.Slippy = BlockTypeSlippy(type);
 
     EditorCursor.Block.Type = type;
 }
@@ -3389,7 +3384,7 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     }
 
     // Legacy for Spin Block
-    if(FileFormat == FileFormats::LVL_PGEX && EditorCursor.Block.Type == 90)
+    if(FileFormat == FileFormats::LVL_PGEX && EditorCursor.Block.Type == BLKID_SPIN_BLOCK)
     {
         SuperPrintR(mode, g_editorStrings.blockCanBreak, 3, e_ScreenW - 160, 106);
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 120 + 4, GFXBlock[188], EditorCursor.Block.forceSmashable, 0, 0, 32, 32, g_editorStrings.blockTooltipCanBreak.c_str()))
@@ -3437,7 +3432,7 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     SuperPrintRightR(mode, g_editorStrings.eventsHeader, 3, e_ScreenW - 40, 334);
     SuperPrintR(mode, g_editorStrings.eventsLetterHit + GetE(EditorCursor.Block.TriggerHit), 3, e_ScreenW - 160, 360);
 
-    if(EditorCursor.Block.Type != 186 && EditorCursor.Block.Type != 457)
+    if(EditorCursor.Block.Type != BLKID_RED_BRICK && EditorCursor.Block.Type != BLKID_GRY_BRICK)
     {
         SuperPrintR(mode, g_editorStrings.eventsLetterDestroy + GetE(EditorCursor.Block.TriggerDeath), 3, e_ScreenW - 160, 380);
         SuperPrintR(mode, g_editorStrings.eventsLetterLayerClear + GetE(EditorCursor.Block.TriggerLast), 3, e_ScreenW - 160, 400);
