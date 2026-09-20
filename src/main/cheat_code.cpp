@@ -1614,11 +1614,12 @@ static void setResCustom()
 
 
 
+static const uint8_t LOCAL_TWEAK = 2;
 struct CheatCodeDefault_t
 {
-    const char*key;
+    const char* key;
     void (*call)();
-    bool isCheat;
+    uint8_t isCheat; // special value 2 is for local-only tweaks
 };
 
 struct CheatCode_t
@@ -1626,7 +1627,7 @@ struct CheatCode_t
     char key[25];
     size_t keyLen;
     void (*call)();
-    bool isCheat;
+    uint8_t isCheat;
 };
 
 static const CheatCodeDefault_t s_cheatsListGlobalDefault[] =
@@ -1638,31 +1639,26 @@ static const CheatCodeDefault_t s_cheatsListGlobalDefault[] =
 #endif
     {"\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74", redigitIsCool, false},
 
-    {"gifs2png", gifs2png, false},
+    {"gifs2png", gifs2png, LOCAL_TWEAK},
 
     // cheat to show the logical screens
-    {"logicscreen", logicScreen, false},
+    {"logicscreen", logicScreen, LOCAL_TWEAK},
 
     // cheat to allow editing any setting
-    {"edityourfriends", editYourFriends, false},
+    {"edityourfriends", editYourFriends, LOCAL_TWEAK},
 
     // resolution cheats
-    {"gameboyview", setResGb, false},
-    {"tinyview", setResGba, false},
-    {"gbaview", setResGba, false},
-    {"superbdemoadvance", setResGba, false},
-    {"ndsview", setResNds, false},
-    {"snesview", setResSnes, false},
-    {"vgaview", setResVga, false},
-    {"helloview", setResHello, false},
-    {"3dsview", setRes3ds, false},
-    {"smbxview", setResClassic, false},
-    {"aodview", setResClassic, false},
-    {"classicview", setResClassic, false},
-    {"hdview", setResHD, false},
-    {"dynview", setResDyn, false},
-    {"debugview", setResCustom, false},
-    {"customview", setResCustom, false},
+    {"gameboyview", setResGb, LOCAL_TWEAK},
+    {"gbaview", setResGba, LOCAL_TWEAK},
+    {"ndsview", setResNds, LOCAL_TWEAK},
+    {"snesview", setResSnes, LOCAL_TWEAK},
+    {"vgaview", setResVga, LOCAL_TWEAK},
+    {"helloview", setResHello, LOCAL_TWEAK},
+    {"3dsview", setRes3ds, LOCAL_TWEAK},
+    {"smbxview", setResClassic, LOCAL_TWEAK},
+    {"hdview", setResHD, LOCAL_TWEAK},
+    {"dynview", setResDyn, LOCAL_TWEAK},
+    {"customview", setResCustom, LOCAL_TWEAK},
 
     {nullptr, nullptr, false}
 };
@@ -1757,8 +1753,8 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"wingman", wingMan, true},
     {"tooslow", tooSlow, true},
     {"ahippinandahoppin", ahippinAndAHopping, true}, {"jumpman", ahippinAndAHopping, true},
-    {"framerate", frameRate, false},
-    {"speeddemon", speedDemon, false},
+    {"framerate", frameRate, LOCAL_TWEAK},
+    {"speeddemon", speedDemon, LOCAL_TWEAK},
 
     {"getmeouttahere", getMeOuttaHere, true},
     {"newleaf", newLeaf, true},
@@ -2158,7 +2154,7 @@ void run_cheat(XMessage::Message message)
 
     c.call();
 
-    if(c.isCheat)
+    if(c.isCheat == 1)
     {
         pLogDebug("Cheating detected!!! [%s]\n", c.key);
         Cheater = true;
@@ -2185,7 +2181,7 @@ static void processCheats(bool instant)
 
             XMessage::Message cheat_message{XMessage::Type::enter_code, set, (uint8_t)i};
 
-            if(instant)
+            if(instant || c.isCheat == LOCAL_TWEAK)
                 run_cheat(cheat_message);
             else
                 XMessage::PushMessage(cheat_message);
