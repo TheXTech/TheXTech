@@ -228,8 +228,6 @@ void Input::CheckSpecialCheats()
         else if(cheats_contains(DELETE_ALL_RECORDS_CHT))
         {
             gDeathCounter.ClearRecords();
-            gDeathCounter.TrySave();
-            gDeathCounter.Recount();
             PlaySound(SFX_Smash);
             cheats_clearBuffer();
             return;

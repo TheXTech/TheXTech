@@ -1040,6 +1040,9 @@ struct LevelSaveInfo_t
     // BITMASK
     uint16_t exits_got = 0;
 
+    // Fails count
+    uint16_t fails = 0;
+
     inline bool inited() const
     {
         return max_medals != 255;
