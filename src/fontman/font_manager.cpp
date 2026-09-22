@@ -192,6 +192,10 @@ static void restoreWorldFontMaps()
     if(s_fontMapsWorld)
         return; // Don't restore if already default
 
+    // if there were never any world font backups, just restore defaults instead
+    if(s_lastWorldFontsPath.empty())
+        return restoreDefaultFontMaps();
+
     SDL_memcpy(s_smbxFontsMap, s_smbxFontsMapWorld, sizeof(s_smbxFontsMap));
     SDL_memcpy(s_smbxFontsSizesMap, s_smbxFontsSizesMapWorld, sizeof(s_smbxFontsSizesMap));
     g_anyFonts = g_anyFontsBackupWorld;
