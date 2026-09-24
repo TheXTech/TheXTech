@@ -379,16 +379,18 @@ void RenderGL::close()
 
 #ifdef RENDERGL_HAS_SHADERS
     m_standard_program.reset();
+    m_no_tint_program.reset();
     m_bitmask_program.reset();
     m_output_program.reset();
-    m_program_circle.reset();
-    m_program_circle_hole.reset();
     m_program_rect_filled.reset();
     m_program_rect_unfilled.reset();
-    m_lighting_calc_program.reset();
-    m_lighting_apply_program.reset();
+    m_program_circle.reset();
+    m_program_circle_hole.reset();
+
     m_distance_field_1_program.reset();
     m_distance_field_2_program.reset();
+    m_lighting_calc_program.reset();
+    m_lighting_apply_program.reset();
 #endif
 
     for(int i = BUFFER_GAME; i < BUFFER_MAX; i++)
