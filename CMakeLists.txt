@@ -496,6 +496,11 @@ if(EMSCRIPTEN)
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions") # bump to -fwasm-exceptions once widely supported
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fexceptions") # bump to -fwasm-exceptions once widely supported
+
+    # allow exceptions in PGE-FL routines that use them for interrupts
+    set(_EXC_FUNCS_FLAG "-sEXCEPTION_CATCHING_ALLOWED=['_ZN12MDX_BaseFile9load_fileERN20PGE_FileFormats_misc9TextInputERKNS0_13LoadCallbacksE','_ZN11FileFormats17ReadSMBX64LvlFileERN20PGE_FileFormats_misc9TextInputERK18LevelLoadCallbacks','_ZN11FileFormats17ReadSMBX64WldFileERN20PGE_FileFormats_misc9TextInputERK18WorldLoadCallbacks']")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_EXC_FUNCS_FLAG}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${_EXC_FUNCS_FLAG}")
 endif()
 
 # ============ Platform-conf ==end=========
