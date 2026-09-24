@@ -34,8 +34,7 @@ jobs:
             -DTHEXTECH_CREDITS_TITLE=\"Adventures of Demo\" \
             -DTHEXTECH_MANIFEST_NAME=\"AoD on TheXTech ${THEXTECH_VERSION_STRING}\" \
             -DTHEXTECH_MANIFEST_ID=\"wohlsoft-aod-thextech\" \
-            -DTHEXTECH_MANIFEST_DESC=\"Play AoD on TheXTech ${THEXTECH_VERSION_STRING}\" \
-            -DTHEXTECH_DEPLOY_URL=\"https://wohlsoft.ru/projects/TheXTech/aod-on-web-debug/\"",
+            -DTHEXTECH_MANIFEST_DESC=\"Play AoD on TheXTech ${THEXTECH_VERSION_STRING}\"",
 
             deps_cmdline: "sudo apt-get update -qq \
             && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp",
@@ -47,7 +46,8 @@ jobs:
             subdir_name: "thextech-adventures-of-demo",
             package_filename_game: "adventures-of-demo",
             upload_directory: "www/webassembly/",
-            deploy_directory: "www/webassembly/debug-deploy/aod-on-web-debug"
+            deploy_url_prefix: "https://wohlsoft.ru/projects/TheXTech/aod-on-web-debug",
+            deploy_directory_prefix: "www/webassembly/debug-deploy/aod-on-web-debug"
           }
 
         # ======================================= Super Mario Bros. X - a fan-game =======================================
@@ -62,8 +62,7 @@ jobs:
             -DTHEXTECH_CREDITS_TITLE=\"Super Mario Bros. X\" \
             -DTHEXTECH_MANIFEST_NAME=\"SMBX on TheXTech ${THEXTECH_VERSION_STRING}\" \
             -DTHEXTECH_MANIFEST_ID=\"wohlsoft-smbx-thextech\" \
-            -DTHEXTECH_MANIFEST_DESC=\"Play SMBX on TheXTech ${THEXTECH_VERSION_STRING}\" \
-            -DTHEXTECH_DEPLOY_URL=\"https://wohlsoft.ru/projects/TheXTech/smbx-on-web-debug/\"",
+            -DTHEXTECH_MANIFEST_DESC=\"Play SMBX on TheXTech ${THEXTECH_VERSION_STRING}\"",
 
             deps_cmdline: "sudo apt-get update -qq \
             && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp",
@@ -75,7 +74,8 @@ jobs:
             subdir_name: "thextech-super-mario-bros-x",
             package_filename_game: "super-mario-bros-x",
             upload_directory: "www/webassembly/",
-            deploy_directory: "www/webassembly/debug-deploy/smbx-on-web-debug"
+            deploy_url_prefix: "https://wohlsoft.ru/projects/TheXTech/smbx-on-web-debug",
+            deploy_directory_prefix: "www/webassembly/debug-deploy/smbx-on-web-debug",
           }
 
     steps:
@@ -103,6 +103,25 @@ jobs:
 
     - uses: TheXTech/branch-name@v0.1
 
+    - name: Resolve Destination
+      id: destination-check
+      shell: bash
+      run: |
+        if [[ $BRANCH_NAME == 'main' ]]; then
+          echo "DEPLOY_URL=${{ matrix.config.deploy_url_prefix }}/" >> $GITHUB_ENV;
+          echo "DEPLOY_DIRECTORY=${{ matrix.config.deploy_directory_prefix }}" >> $GITHUB_ENV;
+          echo "available=true" >> $GITHUB_OUTPUT;
+          echo "Development upload";
+        elif [[ $BRANCH_NAME == stable* ]]; then
+          echo "DEPLOY_URL=${{ matrix.config.deploy_url_prefix }}-stable/" >> $GITHUB_ENV;
+          echo "DEPLOY_DIRECTORY=${{ matrix.config.deploy_directory_prefix }}-stable" >> $GITHUB_ENV;
+          echo "available=true" >> $GITHUB_OUTPUT;
+          echo "Stable upload";
+        else
+          echo "DEPLOY_URL=${{ matrix.config.deploy_url_prefix }}/" >> $GITHUB_ENV;
+          echo "available=false" >> $GITHUB_OUTPUT;
+          echo "Skipping upload";
+        fi
 
     - name: Pull submodules
       shell: bash
@@ -145,6 +164,7 @@ jobs:
         source ../emsdk/emsdk_env.sh
         emcmake cmake -B build -G "${{ matrix.config.generator }}" \
             -DPGE_PRELOAD_ENVIRONMENT="`pwd`/assets" \
+            -DTHEXTECH_DEPLOY_URL="${DEPLOY_URL}" \
             -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
 
     - name: Build
@@ -180,7 +200,7 @@ jobs:
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
-      if: success() && github.event_name != 'pull_request' && steps.upload-check.outputs.available == 'true'
+      if: success() && github.event_name != 'pull_request' && steps.upload-check.outputs.available == 'true' && steps.destination-check.outputs.available == 'true'
       continue-on-error: true
       shell: bash
       run: |
@@ -192,16 +212,16 @@ jobs:
             UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
         done
 
-        UPLOAD_LIST="${UPLOAD_LIST} rm -rf ${{ matrix.config.deploy_directory }}-next;"
-        UPLOAD_LIST="${UPLOAD_LIST} mkdir ${{ matrix.config.deploy_directory }}-next;"
+        UPLOAD_LIST="${UPLOAD_LIST} rm -rf ${DEPLOY_DIRECTORY}-next;"
+        UPLOAD_LIST="${UPLOAD_LIST} mkdir ${DEPLOY_DIRECTORY}-next;"
         for q in ./build/output/bin/*; do
-            UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.deploy_directory }}-next/ $q;"
+            UPLOAD_LIST="${UPLOAD_LIST} put -O ${DEPLOY_DIRECTORY}-next/ $q;"
         done
 
-        UPLOAD_LIST="${UPLOAD_LIST} rm -rf ${{ matrix.config.deploy_directory }}-prev;"
-        UPLOAD_LIST="${UPLOAD_LIST} mv ${{ matrix.config.deploy_directory }} ${{ matrix.config.deploy_directory }}-prev;"
-        UPLOAD_LIST="${UPLOAD_LIST} mv ${{ matrix.config.deploy_directory }}-next ${{ matrix.config.deploy_directory }};"
-        UPLOAD_LIST="${UPLOAD_LIST} rm -rf ${{ matrix.config.deploy_directory }}-prev;"
+        UPLOAD_LIST="${UPLOAD_LIST} rm -rf ${DEPLOY_DIRECTORY}-prev;"
+        UPLOAD_LIST="${UPLOAD_LIST} mv ${DEPLOY_DIRECTORY} ${DEPLOY_DIRECTORY}-prev;"
+        UPLOAD_LIST="${UPLOAD_LIST} mv ${DEPLOY_DIRECTORY}-next ${DEPLOY_DIRECTORY};"
+        UPLOAD_LIST="${UPLOAD_LIST} rm -rf ${DEPLOY_DIRECTORY}-prev;"
 
         lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 
