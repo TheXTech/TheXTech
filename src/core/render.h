@@ -754,6 +754,19 @@ E_INLINE void renderSizableBlock(int xDst, int yDst, int wDst, int hDst, StdPict
 #endif
 
 /*!
+ * \brief Draws a grid over the full screen
+ * \param size grid size (in pixels)
+ * \param xOff left x coordinate of some grid cell (in viewport coordinates)
+ * \param yOff top y coordinate of some grid cell (in viewport coordinates)
+ */
+E_INLINE void renderGrid(int size, int xOff, int yOff) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->renderGrid(size, xOff, yOff);
+}
+#endif
+
+/*!
  * \brief Draws the particle system at a particular camera offset
  * \param tx Source particle system
  *

@@ -446,6 +446,10 @@ void renderSizableBlock(int, int, int, int, StdPicture&)
 {
 }
 
+void renderGrid(int, int, int)
+{
+}
+
 void splitFrame()
 {
 }

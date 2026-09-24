@@ -639,6 +639,10 @@ void renderSizableBlock(int bLeftOnscreen, int bTopOnscreen, int wDst, int hDst,
 }
 #endif
 
+void renderGrid(int, int, int)
+{
+}
+
 
 size_t lazyLoadedBytes()
 {

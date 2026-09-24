@@ -865,6 +865,39 @@ void AbstractRender_t::renderSizableBlock(int bLeftOnscreen, int bTopOnscreen, i
     }
 }
 
+void AbstractRender_t::renderGrid(int size, int xOff, int yOff)
+{
+    if(!m_gridTexture.inited || m_gridTexture.w != size)
+    {
+        unloadTexture(m_gridTexture);
+
+        // load the grid image
+        std::vector<uint32_t> pixels(32 * 32);
+        uint32_t white = 0xFFFFFFFF;
+        uint32_t black = 0x00000000;
+        ((uint8_t*)(&black))[3] = 0xFF;
+        for(int i = 0; i < 32; i++)
+        {
+            uint32_t col = (i & 8) ? black : white;
+            pixels[i] = col;
+            pixels[32 * i] = col;
+        }
+
+        m_gridTexture.w = size;
+        m_gridTexture.h = size;
+        loadTexture(m_gridTexture, size, size, (uint8_t*)pixels.data(), 32 * 4);
+    }
+
+    int startX = xOff % 32 - 32;
+    int startY = yOff % 32 - 32;
+
+    for(int x = startX; x < XRender::TargetW; x += size)
+    {
+        for(int y = startY; y < XRender::TargetH; y += size)
+            renderTextureScale(x, y, size, size, m_gridTexture, XTAlpha(96));
+    }
+}
+
 void AbstractRender_t::renderParticleSystem(StdPicture &tx)
 {
     // no-op

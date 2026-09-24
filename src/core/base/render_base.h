@@ -56,6 +56,8 @@ protected:
     static bool m_blockRender;
 #endif
 
+    StdPicture m_gridTexture;
+
     virtual void getViewportSize(int* viewport_w, int* viewport_h) = 0;
 
     virtual void compileShaders(StdPicture &target);
@@ -320,6 +322,8 @@ public:
                                XTColor color = XTColor()) = 0;
 
     void renderSizableBlock(int xDst, int yDst, int wDst, int hDst, StdPicture &tx);
+
+    virtual void renderGrid(int size, int xOff, int yOff);
 
     virtual void renderParticleSystem(StdPicture &tx);
     virtual void setCameraPos(int camX, int camY);
