@@ -531,6 +531,12 @@ if(EMSCRIPTEN)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --shell-file '${CMAKE_CURRENT_SOURCE_DIR}/resources/emscripten/shell_minimal.html'")
     # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --use-preload-cache")
     # set(LINK_FLAGS "${LINK_FLAGS} -DIS_LINK -s USE_PTHREADS=1 -s FORCE_FILESYSTEM=1 --embed-file '${CMAKE_CURRENT_SOURCE_DIR}/@languages'")
+
+    # allow exceptions in PGE-FL routines that use them for interrupts
+    set(_EXC_FUNCS_FLAG "-sEXCEPTION_CATCHING_ALLOWED=['_ZN12MDX_BaseFile9load_fileERN20PGE_FileFormats_misc9TextInputERKNS0_13LoadCallbacksE','_ZN11FileFormats17ReadSMBX64LvlFileERN20PGE_FileFormats_misc9TextInputERK18LevelLoadCallbacks','_ZN11FileFormats17ReadSMBX64WldFileERN20PGE_FileFormats_misc9TextInputERK18WorldLoadCallbacks']")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_EXC_FUNCS_FLAG}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${_EXC_FUNCS_FLAG}")
+    target_compile_options(pgefl PRIVATE "${_EXC_FUNCS_FLAG}")
 endif()
 
 set(A2XT_LIBS pgefl ${UTILS_LIBS})
