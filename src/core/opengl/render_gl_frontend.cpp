@@ -434,6 +434,65 @@ void RenderGL::close()
     m_gContext = nullptr;
 }
 
+void RenderGL::drawTouchPreview()
+{
+    int hardware_w, hardware_h;
+    getRenderSize(&hardware_w, &hardware_h);
+
+    SDL_Rect sourceRect = SDL_Rect{(int)SharedCursor.X - 64, (int)SharedCursor.Y - 64, 128, 128};
+    if(sourceRect.x < 0)
+        sourceRect.x = 0;
+    if(sourceRect.x > XRender::TargetW - 128)
+        sourceRect.x = XRender::TargetW - 128;
+    if(sourceRect.y < 0)
+        sourceRect.y = 0;
+    if(sourceRect.y > XRender::TargetH - 128)
+        sourceRect.y = XRender::TargetH - 128;
+
+    float scale_x = m_phys_w / float(XRender::TargetW);
+    float scale_y = m_phys_h / float(XRender::TargetH);
+    int off_x = m_phys_x;
+    int off_y = m_phys_y;
+
+    SDL_Rect destRect = SDL_Rect{(int)(scale_x * (int)SharedCursor.X + off_x - 192 * 2 * scale_x), (int)(scale_y * (int)SharedCursor.Y + off_y - 192 * 2 * scale_y), (int)(128 * 2 * scale_x), (int)(128 * 2 * scale_y)};
+    if(destRect.y < 0)
+    {
+        int transition_y = (int)(192 * scale_y);
+        if(destRect.x < 0)
+        {
+            destRect.x *= 4;
+            if(-destRect.y < transition_y)
+                destRect.x = destRect.x * -destRect.y / transition_y;
+        }
+        destRect.y = 0;
+    }
+    else if(destRect.x < 0)
+        destRect.x = 0;
+
+    RectF draw_source = RectF{sourceRect.x / (float)XRender::TargetW, sourceRect.y / (float)XRender::TargetH, (sourceRect.x + sourceRect.w) / (float)XRender::TargetW, (sourceRect.y + sourceRect.h) / (float)XRender::TargetH};
+    RectI draw_loc = RectI{destRect.x, destRect.y, destRect.x + destRect.w, destRect.y + destRect.h};
+    Vertex_t::Tint tint = {255, 255, 255, 255};
+
+    std::array<Vertex_t, 4> vertex_attribs = genTriangleStrip(draw_loc, draw_source, 0, tint);
+    fillVertexBuffer(vertex_attribs.data(), 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    if(draw_loc.tl.x < 0)
+    {
+        draw_loc.tl.x += hardware_w;
+        draw_loc.br.x += hardware_w;
+        if(draw_loc.br.x < hardware_w)
+        {
+            draw_loc.tl.x += hardware_w - draw_loc.br.x;
+            draw_loc.br.x += hardware_w - draw_loc.br.x;
+        }
+
+        vertex_attribs = genTriangleStrip(draw_loc, draw_source, 0, tint);
+        fillVertexBuffer(vertex_attribs.data(), 4);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+}
+
 void RenderGL::repaint()
 {
 #ifdef USE_RENDER_BLOCKING
@@ -479,9 +538,6 @@ void RenderGL::repaint()
     {
         clearBuffer();
 
-        int hardware_w, hardware_h;
-        getRenderSize(&hardware_w, &hardware_h);
-
         // draw screen at correct physical coordinates
         RectI draw_loc = RectI(m_phys_x, m_phys_y, m_phys_x + m_phys_w, m_phys_y + m_phys_h);
         RectF draw_source = RectF(0.0, 0.0, 1.0, 1.0);
@@ -502,6 +558,17 @@ void RenderGL::repaint()
 #endif
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        static int touch_preview_counter = 0;
+        if(LevelEditor && SharedCursor.Primary && SharedCursor.Touch)
+        {
+            touch_preview_counter += 1;
+
+            if(touch_preview_counter > 20)
+                drawTouchPreview();
+        }
+        else
+            touch_preview_counter = 0;
 
         glBindTexture(GL_TEXTURE_2D, 0);
     }

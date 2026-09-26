@@ -101,6 +101,10 @@ public:
      */
     virtual void close();
 
+protected:
+    virtual void drawTouchPreview() = 0;
+
+public:
     /*!
      * \brief Call the repaint
      */

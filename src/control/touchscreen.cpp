@@ -1759,6 +1759,7 @@ bool InputMethod_TouchScreen::Update(int player, Controls_t& c, CursorControls_t
     {
         m.GoOffscreen();
         m.Move = true;
+        m.Touch = true;
     }
     else if(allowed && t->m_controller.m_cursorActive)
     {
@@ -1792,8 +1793,6 @@ bool InputMethod_TouchScreen::Update(int player, Controls_t& c, CursorControls_t
             m.X = t->m_controller.m_cursorX;
             m.Y = t->m_controller.m_cursorY;
         }
-
-        m.Touch = true;
     }
 
     // update editor scroll

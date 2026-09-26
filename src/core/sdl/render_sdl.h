@@ -111,6 +111,10 @@ public:
      */
     void close() override;
 
+protected:
+    void drawTouchPreview() override;
+
+public:
     /*!
      * \brief Call the repaint
      */

@@ -253,6 +253,58 @@ void RenderSDL::close()
     m_gRenderer = nullptr;
 }
 
+void RenderSDL::drawTouchPreview()
+{
+    int w, h, off_x, off_y, wDst, hDst;
+
+    // Get the size of surface where to draw the scene
+    SDL_GetRendererOutputSize(m_gRenderer, &w, &h);
+
+    // Calculate the size difference factor
+    wDst = int(m_scale_x * ScaleWidth);
+    hDst = int(m_scale_y * ScaleHeight);
+
+    // Align the rendering scene to the center of screen
+    off_x = (w - wDst) / 2;
+    off_y = (h - hDst) / 2;
+
+    SDL_Rect sourceRect = SDL_Rect{(int)SharedCursor.X - 64, (int)SharedCursor.Y - 64, 128, 128};
+    if(sourceRect.x < 0)
+        sourceRect.x = 0;
+    if(sourceRect.x > ScaleWidth - 128)
+        sourceRect.x = ScaleWidth - 128;
+    if(sourceRect.y < 0)
+        sourceRect.y = 0;
+    if(sourceRect.y > ScaleHeight - 128)
+        sourceRect.y = ScaleHeight - 128;
+
+    SDL_Rect destRect = SDL_Rect{(int)(m_scale_x * (int)SharedCursor.X + off_x - 192 * 2 * m_scale_x), (int)(m_scale_y * (int)SharedCursor.Y + off_y - 192 * 2 * m_scale_y), (int)(128 * 2 * m_scale_x), (int)(128 * 2 * m_scale_y)};
+    if(destRect.y < 0)
+    {
+        int transition_y = (int)(192 * m_scale_y);
+        if(destRect.x < 0)
+        {
+            destRect.x *= 4;
+            if(-destRect.y < transition_y)
+                destRect.x = destRect.x * -destRect.y / transition_y;
+        }
+        destRect.y = 0;
+    }
+    else if(destRect.x < 0)
+        destRect.x = 0;
+    SDL_RenderCopyEx(m_gRenderer, m_tBuffer, &sourceRect, &destRect, 0.0, nullptr, SDL_FLIP_NONE);
+
+
+    if(destRect.x < 0)
+    {
+        destRect.x += w;
+        if(destRect.x < w - destRect.w)
+            destRect.x = w - destRect.w;
+
+        SDL_RenderCopyEx(m_gRenderer, m_tBuffer, &sourceRect, &destRect, 0.0, nullptr, SDL_FLIP_NONE);
+    }
+}
+
 void RenderSDL::repaint()
 {
 #ifdef USE_RENDER_BLOCKING
@@ -320,6 +372,17 @@ void RenderSDL::repaint()
     SDL_SetTextureColorMod(m_tBuffer, 255, 255, 255);
     SDL_SetTextureAlphaMod(m_tBuffer, 255);
     SDL_RenderCopyEx(m_gRenderer, m_tBuffer, &sourceRect, &destRect, 0.0, nullptr, SDL_FLIP_NONE);
+
+    static int touch_preview_counter = 0;
+    if(LevelEditor && SharedCursor.Primary && SharedCursor.Touch)
+    {
+        touch_preview_counter += 1;
+
+        if(touch_preview_counter > 20)
+            drawTouchPreview();
+    }
+    else
+        touch_preview_counter = 0;
 
     Controls::RenderTouchControls();
 

@@ -852,6 +852,9 @@ bool Update(bool check_lost_devices)
     SharedCursor.Tertiary = false;
     SharedCursor.ScrollUp = false;
     SharedCursor.ScrollDown = false;
+#ifndef THEXTECH_NO_SDL_BUILD
+    SharedCursor.Touch = false;
+#endif
     // reset l_SharedControls
     l_SharedControls = SharedControls_t();
 
