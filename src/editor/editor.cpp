@@ -1249,7 +1249,7 @@ void UpdateEditor()
                 {
                     for(A = 1; A <= numBlock; A++)
                     {
-                        if(!BlockIsSizable[Block[A].Type] && !Block[A].Hidden && BlockSlope[Block[A].Type] == 0 && BlockSlope2[Block[A].Type] == 0)
+                        if(!BlockIsSizable[Block[A].Type] && !Block[A].Hidden && BlockSlope[Block[A].Type] == 0 && BlockSlope2[Block[A].Type] == 0 && !BlockOnlyHitspot1[Block[A].Type])
                         {
                             if(CursorCollision(EditorCursor.Location, Block[A].Location))
                             {
