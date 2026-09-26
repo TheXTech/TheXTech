@@ -1770,15 +1770,10 @@ bool InputMethod_TouchScreen::Update(int player, Controls_t& c, CursorControls_t
             {
                 m.Primary = true;
             }
-            else if(t->m_controller.m_lastCursorX == -42
-                || (t->m_controller.m_cursorX - t->m_controller.m_lastCursorX > -10
-                && t->m_controller.m_cursorX - t->m_controller.m_lastCursorX < 10
-                && t->m_controller.m_cursorY - t->m_controller.m_lastCursorY > -10
-                && t->m_controller.m_cursorY - t->m_controller.m_lastCursorY < 10))
+            else
             {
                 m.Primary = true;
-                // special value to allow drags
-                t->m_controller.m_lastCursorX = -42;
+                m.Touch = true;
             }
         }
         else

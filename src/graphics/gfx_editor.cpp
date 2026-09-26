@@ -247,6 +247,11 @@ void DrawEditorLevel(int Z)
     int camX_i = num_t::floor(camX);
     int camY_i = num_t::floor(camY);
 
+    int vScreenX = (camX_i >> 5) * 32;
+    int vScreenY = ((camY_i + 8) >> 5) * 32;
+
+    XRender::renderGrid(32, camX_i - vScreenX, camY_i - vScreenY);
+
 #ifdef __3DS__
     XRender::setTargetLayer(2);
 #endif
@@ -555,6 +560,11 @@ void DrawEditorWorld()
 
     int camX = vScreen[Z].CameraAddX_i() + XRender::TargetOverscanX;
     int camY = vScreen[Z].CameraAddY_i();
+
+    int vScreenX = (camX >> 5) * 32;
+    int vScreenY = (camY >> 5) * 32;
+
+    XRender::renderGrid(32, camX - vScreenX, camY - vScreenY);
 
 #ifdef __3DS__
     // disable cursor rendering on inactive screen of 3DS

@@ -52,6 +52,9 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
     int B = 0;
     int C = 0;
 
+    // this one puts Coins first and was previously called when placing NPCs
+    NPCSort();
+
     // put NPC types 60, 62, 64, 66, and 78-83 first. (why?)
     for(A = 1; A <= numNPCs; A++)
     {
