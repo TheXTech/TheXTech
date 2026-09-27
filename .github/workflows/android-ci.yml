@@ -76,7 +76,9 @@ jobs:
       # IMPORTANT NOTE: The SDK r23b is REQUIRED to support Android 4.1, 4.2, and 4.3, and to support non-Neon hardware
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
 
       # Without NDK not compile and not normal error message. NDK is required
       #- name: Install NDK
@@ -124,19 +126,25 @@ jobs:
         run: |
           mv thextech/build/outputs/apk/apk/release/thextech-apk-release-unsigned.apk thextech-android-${BRANCH_NAME}-unsigned.apk
 
+      - name: Prepare APK filename
+        id: apk-filename
+        shell: bash
+        run: |
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT;
+
       - name: Upload APK
-        if: success() && ${{ steps.signing-check.outputs.available == 'true' }}
+        if: success() && steps.signing-check.outputs.available == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: thextech-android-${BRANCH_NAME}
+          name: thextech-android-${{steps.apk-filename.outputs.branch_name}}
           path: android-project/thextech-android-*.apk
 
       - name: Upload APK (unsigned)
-        if: success() && ${{ steps.signing-check.outputs.available != 'true' }}
+        if: success() && steps.signing-check.outputs.available != 'true'
         uses: actions/upload-artifact@v4
         continue-on-error: true
         with:
-          name: thextech-android-${BRANCH_NAME}-unsigned
+          name: thextech-android-${{steps.apk-filename.outputs.branch_name}}-unsigned
           path: android-project/thextech-android-*.apk
 
       - name: Deploy to builds.wohlsoft.ru
