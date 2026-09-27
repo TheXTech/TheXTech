@@ -82,7 +82,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: 'cmdline-tools platform-tools'
+          packages: 'platform-tools'
 
       # Without NDK not compile and not normal error message. NDK is required
       #- name: Install NDK
