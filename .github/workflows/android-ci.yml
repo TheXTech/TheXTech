@@ -76,7 +76,7 @@ jobs:
       # IMPORTANT NOTE: The SDK r23b is REQUIRED to support Android 4.1, 4.2, and 4.3, and to support non-Neon hardware
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
+        uses: android-actions/setup-android@v3
         with:
           packages: 'cmdline-tools platform-tools'
 
