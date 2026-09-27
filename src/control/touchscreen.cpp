@@ -1401,6 +1401,9 @@ void TouchScreenController::processTouchDevice(TouchDevice_t& dev)
         m_scrollActive = true;
     }
 
+    if(n_real_fingers > 0 && m_wasScrolling)
+        m_wasScrolling = 2;
+
     // Merge per-device states into common states:
     for(int key = key_BEGIN; key < key_END; ++key)
         m_keysHeld[key] |= keysHeld[key];
@@ -1545,13 +1548,16 @@ void TouchScreenController::update()
         m_lastScrollY = m_scrollY;
     }
 
-    m_wasScrolling = m_scrollActive;
+    if(m_scrollActive)
+        m_wasScrolling = 1;
+    else if(m_wasScrolling > 0)
+        m_wasScrolling--;
 
     if(!m_scrollActive && m_scrollMomentumX != 0)
     {
         m_scrollMomentumX *= 0.97_r;
         m_scrollX += m_scrollMomentumX;
-        if(m_scrollMomentumX > -0.1_n && m_scrollMomentumX < 0.1_n)
+        if(m_scrollMomentumX > -2_n && m_scrollMomentumX < 2_n)
             m_scrollMomentumX = 0;
     }
 
@@ -1559,7 +1565,7 @@ void TouchScreenController::update()
     {
         m_scrollMomentumY *= 0.97_r;
         m_scrollY += m_scrollMomentumY;
-        if(m_scrollMomentumY > -0.1_n && m_scrollMomentumY < 0.1_n)
+        if(m_scrollMomentumY > -2_n && m_scrollMomentumY < 2_n)
             m_scrollMomentumY = 0;
     }
 

@@ -244,7 +244,7 @@ public:
     int m_lastCursorY = -32;
 
     bool m_scrollActive = false;
-    bool m_wasScrolling = false;
+    int m_wasScrolling = 0;
     int m_lastMeanX = 0, m_lastMeanY = 0;
     num_t m_scrollX = 0, m_scrollY = 0;
     // needed because of an SDL bug where the frame a finger it is lifted its finger still exists at its old location
