@@ -80,7 +80,9 @@ jobs:
       # IMPORTANT NOTE: The SDK r23b is REQUIRED to support Android 4.1, 4.2, and 4.3, and to support non-Neon hardware
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
 
       # Without NDK not compile and not normal error message. NDK is required
       #- name: Install NDK
@@ -125,14 +127,14 @@ jobs:
           mv thextech/build/outputs/apk/fdroid/release/thextech-fdroid-release-unsigned.apk thextech-android-fdroid-${{ steps.extract-version.outputs.ver_name }}-unsigned.apk
 
       - name: Upload APK
-        if: success() && ${{ steps.signing-check.outputs.available == 'true' }}
+        if: success() && steps.signing-check.outputs.available == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: thextech-android-${{ steps.extract-version.outputs.ver_name }}
           path: android-project/thextech-android-*.apk
 
       - name: Upload APK (unsigned)
-        if: success() && ${{ steps.signing-check.outputs.available != 'true' }}
+        if: success() && steps.signing-check.outputs.available != 'true'
         uses: actions/upload-artifact@v4
         continue-on-error: true
         with:
