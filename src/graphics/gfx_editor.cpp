@@ -88,14 +88,21 @@ void s_drawBlockExtra(int Z, num_t camX, num_t camY, const Block_t& b)
     }
 
     // new: indicate that blocks have events
-    if(b.TriggerHit != EVENT_NONE || b.TriggerDeath != EVENT_NONE || b.TriggerLast != EVENT_NONE)
+    bool b_has_event = b.TriggerHit != EVENT_NONE || b.TriggerDeath != EVENT_NONE || b.TriggerLast != EVENT_NONE;
+    if(b_has_event || b.Slippy)
     {
         if(vScreenCollision(Z, b.Location))
         {
-            int sX = num_t::floor(camX + b.Location.X + b.Location.Width / 2) - GFX.Chat.w / 2;
-            int sY = num_t::floor(camY + b.Location.Y) - GFX.Chat.h - 8;
+            int sX = num_t::floor(camX + b.Location.X);
+            int sY = num_t::floor(camY + b.Location.Y);
 
-            XRender::renderTextureBasic(sX, sY, GFX.Chat, XTColorF(1.0_n, 0.0_n, 0.0_n, 0.7_n));
+            int w = num_t::floor(b.Location.Width);
+
+            if(b.Slippy)
+                XRender::renderRect(sX, sY, w, 4, XTColor{127, 127, 255});
+
+            if(b_has_event)
+                XRender::renderTextureBasic(sX + (w - GFX.Chat.w) / 2, sY - GFX.Chat.h - 8, GFX.Chat, XTColorF(1.0_n, 0.0_n, 0.0_n, 0.7_n));
         }
     }
 }
