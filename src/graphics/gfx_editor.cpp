@@ -254,10 +254,13 @@ void DrawEditorLevel(int Z)
     int camX_i = num_t::floor(camX);
     int camY_i = num_t::floor(camY);
 
-    int vScreenX = (camX_i >> 5) * 32;
-    int vScreenY = ((camY_i + 8) >> 5) * 32;
+    if(!MagicHand || (EditorCursor.Mode != OptCursor_t::LVL_SELECT && EditorCursor.Mode != OptCursor_t::LVL_ERASER))
+    {
+        int vScreenX = (camX_i >> 5) * 32;
+        int vScreenY = ((camY_i + 8) >> 5) * 32;
 
-    XRender::renderGrid(32, camX_i - vScreenX, camY_i - vScreenY);
+        XRender::renderGrid(32, camX_i - vScreenX, camY_i - vScreenY);
+    }
 
 #ifdef __3DS__
     XRender::setTargetLayer(2);
