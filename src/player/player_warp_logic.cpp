@@ -1353,7 +1353,8 @@ void PlayerEffectWarpWait(int A)
                     WorldPlayer[1].Location.X = w.MapX;
                     WorldPlayer[1].Location.Y = w.MapY;
 
-                    // don't need to reset FileRecentSubHubLevel here -- it will be checked and reset in GameLoop (#1187)
+                    // Forget about sub-hub -- it's an explicit target to the world map!
+                    FileRecentSubHubLevel.clear();
 
                     for(int l = 1; l <= numWorldLevels; ++l)
                     {
