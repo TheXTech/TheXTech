@@ -297,9 +297,9 @@ resume_IntroEvents:
                 ReturnWarp = 0;
                 ReturnWarpSaved = 0;
             }
-            // New logic: otherwise, reset beat code if hub level
+            // New logic: otherwise, reset beat code if hub level in hub world
             // (Safe because SMBX 1.3 only uses LevelBeatCode on the world map)
-            else if(IsHubLevel)
+            else if(NoMap && IsHubLevel)
             {
                 LevelBeatCode = BEATCODE_NONE;
             }
