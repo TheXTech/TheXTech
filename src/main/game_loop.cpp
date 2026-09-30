@@ -290,16 +290,17 @@ resume_IntroEvents:
                 g_curLevelMedals.reset_checkpoint();
             }
 
-            // Quit to world map when finishing the sub-hub
+            // Quit to world map when finishing the sub-hub in a non-hub world (#1187)
             if(!NoMap && IsHubLevel && !FileRecentSubHubLevel.empty() && GoToLevel.empty())
             {
                 FileRecentSubHubLevel.clear();
                 ReturnWarp = 0;
                 ReturnWarpSaved = 0;
             }
-            // New logic: otherwise, reset beat code if hub level in hub world
+            // New logic: otherwise, reset beat code after beating / ending a hub (including warping out of the hub)
+            // This fixes a bug where checkpoint medals were mistakenly recorded after death
             // (Safe because SMBX 1.3 only uses LevelBeatCode on the world map)
-            else if(NoMap && IsHubLevel)
+            else if(IsHubLevel)
             {
                 LevelBeatCode = BEATCODE_NONE;
             }
