@@ -207,13 +207,13 @@ void GameLoop()
                 g_curLevelMedals.reset_checkpoint();
             }
 
-            // Quit to world map when finishing the sub-hub in a non-hub world (#1187)
-            if(!NoMap && (IsHubLevel || QuitToWorldMap) && !FileRecentSubHubLevel.empty() && GoToLevel.empty())
+            // IsHubLevel: go to map when finishing a sub-hub in a non-hub world
+            // QuitToWorldMap: reset subhub (and go to map) when taking a map warp in a non-hub world (#1187)
+            if(!NoMap && (IsHubLevel || QuitToWorldMap) && GoToLevel.empty())
             {
                 FileRecentSubHubLevel.clear();
                 ReturnWarp = 0;
                 ReturnWarpSaved = 0;
-                QuitToWorldMap = false;
             }
             // New logic: otherwise, reset beat code after beating / ending a hub (including warping out of the hub)
             // This fixes a bug where checkpoint medals were mistakenly recorded after death
@@ -222,6 +222,8 @@ void GameLoop()
             {
                 LevelBeatCode = BEATCODE_NONE;
             }
+
+            QuitToWorldMap = false;
         }
 
         if(SwapCharAllowed())
