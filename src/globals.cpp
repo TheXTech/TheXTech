@@ -315,6 +315,7 @@ bool LevelSelect = false;
 bool LevelRestartRequested = false;
 RangeArr<WorldPlayer_t, 0, 1> WorldPlayer;
 LevelBeatCode_t LevelBeatCode = BEATCODE_NONE;
+bool QuitToWorldMap = false;
 int curWorldLevel = 0;
 int curWorldMusic = 0;
 std::string curWorldMusicFile;
