@@ -208,11 +208,12 @@ void GameLoop()
             }
 
             // Quit to world map when finishing the sub-hub in a non-hub world (#1187)
-            if(!NoMap && IsHubLevel && !FileRecentSubHubLevel.empty() && GoToLevel.empty())
+            if(!NoMap && (IsHubLevel || QuitToWorldMap) && !FileRecentSubHubLevel.empty() && GoToLevel.empty())
             {
                 FileRecentSubHubLevel.clear();
                 ReturnWarp = 0;
                 ReturnWarpSaved = 0;
+                QuitToWorldMap = false;
             }
             // New logic: otherwise, reset beat code after beating / ending a hub (including warping out of the hub)
             // This fixes a bug where checkpoint medals were mistakenly recorded after death

@@ -1352,9 +1352,9 @@ void PlayerEffectWarpWait(int A)
                 {
                     WorldPlayer[1].Location.X = w.MapX;
                     WorldPlayer[1].Location.Y = w.MapY;
-
-                    // Forget about sub-hub -- it's an explicit target to the world map!
-                    FileRecentSubHubLevel.clear();
+                    // Explicitly mark the quit to the world map, and don't clear the FileRecentSubHubLevel list:
+                    // it will be checked and reset in GameLoop (#1187)
+                    QuitToWorldMap = true;
 
                     for(int l = 1; l <= numWorldLevels; ++l)
                     {

@@ -1940,6 +1940,8 @@ enum LevelBeatCode_t
 };
 //Public LevelBeatCode As Integer ' code for the way the plauer beat the level
 extern LevelBeatCode_t LevelBeatCode;
+//! Explicit mark that the world map is a destination
+extern bool QuitToWorldMap;
 //Public curWorldLevel As Integer
 extern int curWorldLevel;
 //Public curWorldMusic As Integer
