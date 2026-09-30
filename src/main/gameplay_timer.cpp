@@ -184,13 +184,14 @@ void GameplayTimer::save()
     GamesaveAccess save_access;
     if(save_access.savefile)
     {
+        // TODO: move this string processing code into PGE-FL/MDX in some efficient way
         char buf[64];
         int size = snprintf(buf, 64, "SAVE_HEADER\nSR:%ld;\nSAVE_HEADER_END\n", (long)g_speedrunTicks);
         if((int)SDL_RWwrite(save_access.savefile, buf, 1, size) != size)
             pLogCritical("Could not append speedrun timer to save file.");
     }
 
-    // Maybe also delete legacy speedrun ini? Not sure...
+    // After this point, the original timers<i>.ini will be ignored, because it's only loaded if gamesave data is missing
 }
 
 void GameplayTimer::tick()

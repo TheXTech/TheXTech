@@ -187,6 +187,7 @@ void DeathCounter::MarkDeath(bool write_save)
             bool failed = false;
             std::array<char, 384> buf;
 
+            // TODO: move this string processing code into PGE-FL/MDX in some efficient way
             // update total fail count
             int size = snprintf(buf.data(), 384, "SAVE_HEADER\nTF:%d;\nSAVE_HEADER_END\n", g_totalFails);
             if((int)SDL_RWwrite(save_access.savefile, &buf[0], 1, size) != size)
