@@ -56,6 +56,8 @@ static bool s_exportSingleSaveInfo(saveLevelInfo& s, const LevelSaveInfo_t& info
         s.medals_best[i] = (info.medals_best & (1 << i));
     }
 
+    s.fails = info.fails;
+
     return true;
 }
 
@@ -93,6 +95,8 @@ static bool s_importSingleSaveInfo(LevelSaveInfo_t& info, const saveLevelInfo& s
             info.medals_best |= (1 << i);
     }
 
+    info.fails = s.fails;
+
     return true;
 }
 
@@ -121,6 +125,9 @@ void ImportLevelSaveInfo(const GamesaveData& s)
             if(ent.levelPath == e.level_filename)
             {
                 is_duplicate = true;
+                // update fails counter
+                if(e.fails > ent.save_info.fails)
+                    ent.save_info.fails = e.fails;
                 break;
             }
         }
