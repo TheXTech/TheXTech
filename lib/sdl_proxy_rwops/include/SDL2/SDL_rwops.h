@@ -34,6 +34,9 @@ extern "C" {
 #define SDL_RWOPS_UNKNOWN   0U  /**< Unknown stream type */
 #define SDL_RWOPS_STDFILE   2U  /**< Stdio file */
 
+#define SDL_TRUE 1
+#define SDL_FALSE 0
+
 #define RW_SEEK_CUR SEEK_CUR
 #define RW_SEEK_SET SEEK_SET
 #define RW_SEEK_END SEEK_END
@@ -93,6 +96,7 @@ typedef struct SDL_RWops
 SDL_RWops* SDL_AllocRW();
 void SDL_FreeRW(SDL_RWops * area);
 SDL_RWops* SDL_RWFromFile(const char* pathname, const char* mode);
+SDL_RWops* SDL_RWFromFP(FILE* f, int autoclose);
 
 #ifdef __cplusplus
 } // extern "C"

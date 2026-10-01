@@ -33,6 +33,7 @@
 #include "main/game_info.h"
 #include "main/asset_pack.h"
 #include "main/translate.h"
+#include "main/game_save.h"
 #include "core/language.h"
 #include "config.h"
 #include "controls.h"
@@ -813,6 +814,8 @@ int main(int argc, char**argv)
     Controls::LoadConfig();
 
     int ret = GameMain(setup);
+
+    CloseSave();
 
 #ifdef ENABLE_XTECH_LUA
     if(!xtech_lua_quit())
