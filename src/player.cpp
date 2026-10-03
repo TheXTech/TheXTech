@@ -4415,6 +4415,7 @@ void RespawnPlayerTo(int A, int TargetPlayer)
             Player[A].Effect = PLREFF_COOP_WINGS;
             Player[A].Effect2 = TargetPlayer;
             Player[A].RespawnY = 0;
+            Player[A].Vine = 0;
         }
         // respawn them to the target player's warp otherwise
         else
