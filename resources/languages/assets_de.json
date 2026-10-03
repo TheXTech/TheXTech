@@ -36,7 +36,7 @@
                 "bg2-13": "Wolken",
                 "bg2-14": "Wüste",
                 "bg2-1": "Blöcke",
-                "bg2-15": "Dungeon 2",
+                "bg2-15": "Kerker 2",
                 "bg2-17": "Schiff",
                 "bg2-2": "Hügel",
                 "bg2-20": "Wald",
@@ -54,8 +54,8 @@
                 "bg2-4": "Röhren",
                 "bg2-56": "Unterwasser",
                 "header": "",
-                "bg2-6": "",
-                "bg2-3": ""
+                "bg2-6": "Bonus",
+                "bg2-3": "Kerker"
             },
             "auto": {
                 "bg2-0": "Keine"
@@ -68,15 +68,15 @@
                 "bg2-29": "Nacht",
                 "bg2-30": "Höhle",
                 "bg2-31": "Wolken",
-                "bg2-28": "",
-                "bg2-32": "",
+                "bg2-28": "Bonus",
+                "bg2-32": "Hügel 2",
                 "header": "",
-                "bg2-33": "",
-                "bg2-55": "",
-                "bg2-58": "",
-                "bg2-42": "",
-                "bg2-43": "",
-                "bg2-34": ""
+                "bg2-33": "Hügel 4",
+                "bg2-55": "Unterwasser",
+                "bg2-58": "Wüste Nacht",
+                "bg2-42": "Schloss",
+                "bg2-43": "Schloss 2",
+                "bg2-34": "Hügel 3"
             }
         },
         "worldMusic": {

@@ -8,7 +8,7 @@
     <string name="touchPadStyle2">PlayStation Stil (X/O/D/A)</string>
     <string name="touchPadStyle0">Aktionen im Spiel</string>
     <string name="batteryStatusShow0">Niemals anzeigen</string>
-    <string name="batteryStatusShow1">Anzeigen wenn schwaches Batterie</string>
+    <string name="batteryStatusShow1">Anzeigen wenn Akku zu schwach</string>
     <string name="batteryStatusShow2">Immer anzeigen</string>
     <string name="rendererDefault">Standard</string>
     <string name="touchscreenControllerType0">Immer aktiviert</string>
