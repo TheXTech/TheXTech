@@ -1081,8 +1081,22 @@ void UpdateEditor()
             }
             else if(EditorCursor.Mode == OptCursor_t::LVL_BLOCKS) // Blocks
             {
+                if(BlockIsSizable[EditorCursor.Block.Type])
+                {
+                    if(!MouseRelease_New)
+                        CanPlace = false;
+                }
+                else
+                {
+                    if(MouseRelease_New)
+                        CanPlace = false;
+                }
+
                 for(A = numBlock; A >= 1; A--)
                 {
+                    if(!CanPlace)
+                        break;
+
                     if(!MouseRelease || (!BlockIsSizable[Block[A].Type] && !BlockIsSizable[EditorCursor.Block.Type]))
                     {
                         // ignore sizable background blocks in Magic Block mode
@@ -1148,18 +1162,6 @@ void UpdateEditor()
                         }
                     }
                 }
-
-                if(BlockIsSizable[EditorCursor.Block.Type])
-                {
-                    if(!MouseRelease_New)
-                        CanPlace = false;
-                }
-                else
-                {
-                    if(MouseRelease_New)
-                        CanPlace = false;
-                }
-
 
                 if(CanPlace) // Nothing is in the way
                 {
