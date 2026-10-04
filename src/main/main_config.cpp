@@ -59,6 +59,16 @@ void ConfigReloadRecentEpisodes()
         config.read((asset_pack_prefix + "episode-custom-intro").c_str(), g_recentWorldIntro, std::string());
         config.endGroup();
 
+#if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
+        char app_home[1024];
+        strcpy(app_home, getenv("HOME"));
+        // Replace invalid sandbox paths with a valid to prevent recents being lost after app reinstall/update
+        Strings::replaceInAll(g_recentWorld1p, "{s}", std::string(app_home));
+        Strings::replaceInAll(g_recentWorld2p, "{s}", std::string(app_home));
+        Strings::replaceInAll(g_recentWorldEditor, "{s}", std::string(app_home));
+        Strings::replaceInAll(g_recentWorldIntro, "{s}", std::string(app_home));
+#endif
+
         pLogDebug("Loaded recent episodes for asset pack [id: %s] from [%s]", g_AssetPackID.c_str(), configPath.c_str());
     }
 }
@@ -92,6 +102,16 @@ void OpenConfig()
         config.read((asset_pack_prefix + "episode-editor").c_str(), g_recentWorldEditor, std::string());
         config.read((asset_pack_prefix + "episode-custom-intro").c_str(), g_recentWorldIntro, std::string());
         config.endGroup();
+
+#if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
+        char app_home[1024];
+        strcpy(app_home, getenv("HOME"));
+        // Replace invalid sandbox paths with a valid to prevent recents being lost after app reinstall/update
+        Strings::replaceInAll(g_recentWorld1p, "{s}", std::string(app_home));
+        Strings::replaceInAll(g_recentWorld2p, "{s}", std::string(app_home));
+        Strings::replaceInAll(g_recentWorldEditor, "{s}", std::string(app_home));
+        Strings::replaceInAll(g_recentWorldIntro, "{s}", std::string(app_home));
+#endif
 
         config.beginGroup("logging");
         config.read("log-path", g_pLogGlobalSetup.logPathCustom, std::string());
@@ -138,10 +158,24 @@ void SaveConfig()
 
     config.beginGroup("recent");
     config.setValue("asset-pack", g_AssetPackID);
+#if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
+    char app_home[1024];
+    strcpy(app_home, getenv("HOME"));
+
+    std::string save_recentWorld1p = Strings::replaceAll(g_recentWorld1p, std::string(app_home), "{s}");
+    std::string save_recentWorld2p = Strings::replaceAll(g_recentWorld2p, std::string(app_home), "{s}");
+    std::string save_recentWorldEditor = Strings::replaceAll(g_recentWorldEditor, std::string(app_home), "{s}");
+    std::string save_recentWorldIntro = Strings::replaceAll(g_recentWorldIntro, std::string(app_home), "{s}");
+    config.setValue((asset_pack_prefix + "episode-1p").c_str(), save_recentWorld1p);
+    config.setValue((asset_pack_prefix + "episode-2p").c_str(), save_recentWorld2p);
+    config.setValue((asset_pack_prefix + "episode-editor").c_str(), save_recentWorldEditor);
+    config.setValue((asset_pack_prefix + "episode-custom-intro").c_str(), save_recentWorldIntro);
+#else
     config.setValue((asset_pack_prefix + "episode-1p").c_str(), g_recentWorld1p);
     config.setValue((asset_pack_prefix + "episode-2p").c_str(), g_recentWorld2p);
     config.setValue((asset_pack_prefix + "episode-editor").c_str(), g_recentWorldEditor);
     config.setValue((asset_pack_prefix + "episode-custom-intro").c_str(), g_recentWorldIntro);
+#endif
     config.endGroup();
 
     g_config_game_user.SaveToIni(&config);
