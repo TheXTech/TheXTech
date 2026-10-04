@@ -210,6 +210,12 @@ double ios_get_screen_diagonal(double *ow, double *oh)
         // iPhone 17e
         @"iPhone18,5": @6.1,
 
+        // iPhone 18 Pro
+        @"iPhone19,2": @6.3,
+        // iPhone 18 Pro Max (A3473)
+        @"iPhone19,3": @6.9,
+        // iPhone 18 Pro Max (A3716, A3718, A3717)
+        @"iPhone19,7": @6.9,
 
         // iPad 1 WiFi/GSM/CDMA
         @"iPad1,1":  @9.7,
@@ -663,6 +669,12 @@ int ios_get_overscan_pix_size(void)
         @"iPhone18,2": @50,
         // 17e
         @"iPhone18,5": @50,
+        // iPhone 18 Pro
+        @"iPhone19,2": @50,
+        // iPhone 18 Pro Max (A3473)
+        @"iPhone19,3": @50,
+        // iPhone 18 Pro Max (A3716, A3718, A3717)
+        @"iPhone19,7": @50,
     };
 
     uname(&systemInfo);
