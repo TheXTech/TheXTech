@@ -1,6 +1,7 @@
 name: Bug Report
 description: Create a report of the issue ocurred with the game during its use
 labels: ["NEW-BUG"]
+type: bug
 projects: ["TheXTech/1"]
 
 body:
@@ -71,6 +72,8 @@ body:
         - Windows
         - macOS
         - Android
+        - iOS (iPhone/iPad/iPod Touch)
+        - tvOS (Apple TV)
         - Haiku
         - xBSD
         - Web-browser (Emscripten)
@@ -94,6 +97,8 @@ body:
         * On **Linux** / **xBSD**, you can open the terminal and run the `uname -m` command to get the exact processor architecture.
         * On **macOS**, just can open the "About this Mac" to see the architecture in the description. If you see in description such as 32-bit "Power PC" (PPC G3, PPC G4) or PPC G5 which is 64-bit Power PC, **Intel Core Solo, Core Duo (not 2 Duo!)** which are 32-bit i386, **Intel Core 2 Duo, Quad-Core, i3/i5/i7** which are 64-bit x86_64, and the **Apple M1/M2/M3/etc.** which is an ARM64).
         * On **Android** you might want to use program such as AIDA64 where you can open the "CPU" list, and find the "Instructions set" paragraph where you can see exact processor architecture that your device runs.
+        * The **iOS** devices - all iPhone models since the 5S and iPad since 5, Air, and Pro, iPod Touch 6 and 7 has the ARM64 architecture; iPhone 5 and older, iPad 4 and older, iPad Mini 1, iPod Touch 5 and older has the ARM32 architecture.
+        * All supported tvOS devices has the ARM64 architecture.
 
         **Note:** Some platforms do have one single architecture only, for example:
         * **PSP** has the MIPS32.

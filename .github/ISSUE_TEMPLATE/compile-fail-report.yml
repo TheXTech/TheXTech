@@ -1,6 +1,7 @@
 name: Build/Compilation failure report
 description: Create a report of the problems to compile the game from the source code
 labels: ["NEW-BUG"]
+type: bug
 projects: ["TheXTech/1"]
 
 body:
@@ -56,6 +57,8 @@ body:
         - Windows
         - macOS
         - Android
+        - iOS
+        - tvOS
         - Haiku
         - xBSD
         - Web-browser (Emscripten)
