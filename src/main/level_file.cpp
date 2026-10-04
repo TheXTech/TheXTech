@@ -558,65 +558,75 @@ bool OpenLevel_PlayerStart(void* userdata, PlayerPoint& p)
 {
     LevelLoad& load = *static_cast<LevelLoad*>(userdata);
 
-    if(load.numPlayerStart == 2)
-        return false;
+    int A = p.id;
 
+    if(A > 2)
     {
-        // TODO: should try to use the startpoint's ID field if possible
-        load.numPlayerStart++;
-        int A = load.numPlayerStart;
-
-        PlayerStart[A].X = p.x;
-        PlayerStart[A].Y = p.y;
-        PlayerStart[A].Width = p.w;
-        PlayerStart[A].Height = p.h;
-
-        // don't allow improper rects
-        if(PlayerStart[A].Width < 0)
-        {
-            pLogWarning(s_improper_rect_warning, "PlayerStart", A, "Width", (int)p.w);
-            PlayerStart[A].Width = 0;
-        }
-
-        if(PlayerStart[A].Height < 0)
-        {
-            pLogWarning(s_improper_rect_warning, "PlayerStart", A, "Height", (int)p.h);
-            PlayerStart[A].Height = 0;
-        }
-
-        // Width and height are zero in LVLX files
-        // This indicates SMBX-based values for height, not the values of the actual asset pack
-        if(PlayerStart[A].Width == 0)
-            PlayerStart[A].Width = 24;
-
-        if(PlayerStart[A].Height == 0)
-        {
-            if(A == 1)
-                PlayerStart[A].Height = 54;
-            else if(A == 2)
-                PlayerStart[A].Height = 60;
-            else
-                PlayerStart[A].Height = 32;
-        }
-
-        // turn into size compatible with in-game editor UI
-        if(LevelEditor)
-        {
-            PlayerStart[A].X += PlayerStart[A].Width / 2;
-            PlayerStart[A].Y += PlayerStart[A].Height;
-
-            PlayerStart[A].Width = Physics.PlayerWidth[A][2];
-            PlayerStart[A].Height = Physics.PlayerHeight[A][2];
-
-            PlayerStart[A].X -= PlayerStart[A].Width / 2;
-            PlayerStart[A].Y -= PlayerStart[A].Height;
-        }
-
-        PlayerStart[A].Direction = p.direction;
-
-        if(load.numPlayerStart == 2)
+        // If player 1 is not set, forward this extra point to Player 1
+        if(PlayerStart[1].Width != 0 || PlayerStart[1].Height != 0)
             return false;
+
+        // Set data to first player
+        A = 1;
     }
+
+    // Set maximum of A
+    if(A > load.numPlayerStart)
+        load.numPlayerStart = A;
+
+    auto &plr = PlayerStart[A];
+
+    plr.X = p.x;
+    plr.Y = p.y;
+    plr.Width = p.w;
+    plr.Height = p.h;
+
+    // don't allow improper rects
+    if(plr.Width < 0)
+    {
+        pLogWarning(s_improper_rect_warning, "PlayerStart", A, "Width", (int)p.w);
+        plr.Width = 0;
+    }
+
+    if(plr.Height < 0)
+    {
+        pLogWarning(s_improper_rect_warning, "PlayerStart", A, "Height", (int)p.h);
+        plr.Height = 0;
+    }
+
+    // Width and height are zero in LVLX files
+    // This indicates SMBX-based values for height, not the values of the actual asset pack
+    if(plr.Width == 0)
+        plr.Width = 24;
+
+    if(plr.Height == 0)
+    {
+        if(p.id == 1)
+            plr.Height = 54;
+        else if(p.id == 2)
+            plr.Height = 60;
+        else
+            plr.Height = 32;
+    }
+
+    // turn into size compatible with in-game editor UI
+    if(LevelEditor)
+    {
+        plr.X += plr.Width / 2;
+        plr.Y += plr.Height;
+
+        plr.Width = Physics.PlayerWidth[A][2];
+        plr.Height = Physics.PlayerHeight[A][2];
+
+        plr.X -= plr.Width / 2;
+        plr.Y -= plr.Height;
+    }
+
+    plr.Direction = p.direction;
+
+    // If Player 1 was not yet set, copy player 2's value to Player 1 (A fallback for levels where Player 2 is only set)
+    if(A == 2 && PlayerStart[1].Width == 0 && PlayerStart[1].Height == 0)
+        PlayerStart[1] = PlayerStart[2];
 
     return true;
 }
