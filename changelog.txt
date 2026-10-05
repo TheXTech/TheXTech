@@ -1,5 +1,8 @@
 TheXTech Changelog.
 
+Changelog for 1.7.5-dev
+-<comming soon>
+
 Changelog for 1.7.4
 -Versioning system has been changed, now next releases will be done without the ".3." midfix (@Wohlstand)
 -Fix SMBX 1.3 bug where items on top of a vehicle could be lost when entering it, guarded by compat flag "fix-vehicle-item-loss" [Modern/Classic Mode] (@ds-sloth)
