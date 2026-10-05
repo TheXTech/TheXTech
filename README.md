@@ -14,6 +14,7 @@ SMBX engine, rewritten into C++ from VisualBasic 6.
 
 
 # Frequently Asked Questions
+TODO: Refresh this list, or even better, rewrite entire ReadMe to make it match the present state. And this one just preserve for the history.
 
 ## What is this?
 This is a direct continuation of the SMBX 1.3 engine. Originally it was written in VB6 for Windows, and later, it got ported/rewritten into C++ and became a cross-platform engine. It completely reproduces the old SMBX 1.3 engine (aside from its Editor), includes many of its logical bugs (critical bugs that lead the game to crash or freeze got fixed), and also adds a lot of new updates and features.
