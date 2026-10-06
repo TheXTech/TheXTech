@@ -58,7 +58,7 @@ static void s_TriggerDoorEffects(const Location_t& loc, bool do_big_door = true)
 {
     for(Background_t& bgo : treeBackgroundQuery(loc, SORTMODE_ID))
     {
-        if(CheckCollision(loc, bgo.Location))
+        if(CheckCollision(loc, bgo))
         {
             if(bgo.Type == 88)
                 NewEffect(EFFID_DOOR_S2_OPEN, static_cast<Location_t>(bgo.Location));
@@ -1511,8 +1511,8 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         {
             if(Background[C].Type == 98)
             {
-                if(CheckCollision(entrance, Background[C].Location) ||
-                   (warp.twoWay && CheckCollision(exit, Background[C].Location)))
+                if(CheckCollision(entrance, Background[C]) ||
+                   (warp.twoWay && CheckCollision(exit, Background[C])))
                 {
                     // this makes Background[C] disappear and never reappear
                     Background[C].Layer = LAYER_NONE;

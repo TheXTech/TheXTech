@@ -158,7 +158,7 @@ bool PlayerFairyOnVine(int A)
 
         if(BackgroundFence[Background[B].Type] && !Background[B].Hidden)
         {
-            if(CheckCollision(tempLocation, Background[B].Location))
+            if(CheckCollision(tempLocation, Background[B]))
                 return true;
         }
     }

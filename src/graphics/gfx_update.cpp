@@ -1069,7 +1069,7 @@ void GraphicsLazyPreLoad()
         for(BackgroundRef_t bgo : s_drawBGOs[Z - 1])
         {
             Background_t& b = bgo;
-            if(vScreenCollision(Z, b.Location) && !b.Hidden && IF_INRANGE(b.Type, 1, maxBackgroundType))
+            if(vScreenCollision(Z, b) && !b.Hidden && IF_INRANGE(b.Type, 1, maxBackgroundType))
                 XRender::lazyPreLoad(GFXBackgroundBMP[b.Type]);
         }
 
@@ -2260,7 +2260,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     break;
 
                 g_stats.checkedBGOs++;
-                if(vScreenCollision(Z, bgo.Location) && !bgo.Hidden)
+                if(vScreenCollision(Z, bgo) && !bgo.Hidden)
                 {
                     g_stats.renderedBGOs++;
 
@@ -2353,7 +2353,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     break;
 
                 g_stats.checkedBGOs++;
-                if(vScreenCollision(Z, bgo.Location) && !bgo.Hidden)
+                if(vScreenCollision(Z, bgo) && !bgo.Hidden)
                 {
                     g_stats.renderedBGOs++;
 
@@ -2721,7 +2721,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     continue;
 
                 g_stats.checkedBGOs++;
-                if(vScreenCollision(Z, bgo.Location) && !bgo.Hidden)
+                if(vScreenCollision(Z, bgo) && !bgo.Hidden)
                 {
                     auto &bgoGfx = GFXBackgroundBMP[bgo.Type];
                     const vbint_t bgoHeight = BackgroundHeight[bgo.Type];

@@ -992,7 +992,7 @@ void NPCSpecial(int A)
                         continue;
 
                     Background_t &b = i;
-                    if(!b.Hidden && ((b.Type >= 174 && b.Type <= 186) || b.Type == 63) && CheckCollision(tempLocation, b.Location))
+                    if(!b.Hidden && ((b.Type >= 174 && b.Type <= 186) || b.Type == 63) && CheckCollision(tempLocation, b))
                     {
                         tempBool = true;
                         break;
@@ -2570,7 +2570,7 @@ void NPCSpecial(int A)
                     // Not hidden
                     if(!Background[i].Hidden)
                     {
-                        if(CheckCollision(tempLocation, Background[i].Location))
+                        if(CheckCollision(tempLocation, Background[i]))
                         {
                             if(bgo_type > 0)
                             {
