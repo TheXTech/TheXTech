@@ -1268,7 +1268,7 @@ void UpdateEditor()
                     }
                 }
 
-                if((EditorCursor.Background.Location.Width > 32 || EditorCursor.Background.Location.Height > 32) && !BackgroundMultiPlace(EditorCursor.Background.Type))
+                if((EditorCursor.Background.Width() > 32 || EditorCursor.Background.Height() > 32) && !BackgroundMultiPlace(EditorCursor.Background.Type))
                 {
                     if(!MouseRelease_New)
                         CanPlace = false;
@@ -2322,8 +2322,8 @@ void SetCursor()
         EditorCursor.Background.Location.Y = EditorCursor.Location.Y;
         EditorCursor.Background.Location.Width = BackgroundWidth[EditorCursor.Background.Type];
         EditorCursor.Background.Location.Height = BackgroundHeight[EditorCursor.Background.Type];
-        EditorCursor.Location.Width = EditorCursor.Background.Location.Width;
-        EditorCursor.Location.Height = EditorCursor.Background.Location.Height;
+        EditorCursor.Location.Width = EditorCursor.Background.Width();
+        EditorCursor.Location.Height = EditorCursor.Background.Height();
     }
     else if(EditorCursor.Mode == OptCursor_t::LVL_NPCS) // NPCs
     {

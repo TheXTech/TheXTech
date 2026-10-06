@@ -1820,8 +1820,8 @@ void OpenLevelDataPost()
                 bgo.Hidden = w.Hidden;
                 bgo.Location.Width = 24;
                 bgo.Location.Height = 24;
-                bgo.Location.Y = w.Entrance.Y - bgo.Location.Height;
-                bgo.Location.X = w.Entrance.X + (w.Entrance.Width - bgo.Location.Width) / 2;
+                bgo.Location.Y = w.Entrance.Y - 24;
+                bgo.Location.X = w.Entrance.X + (w.Entrance.Width - 24) / 2;
                 bgo.Type = 160;
                 syncLayers_BGO(B);
 
@@ -1832,8 +1832,8 @@ void OpenLevelDataPost()
                     auto &bgo2 = Background[B];
                     bgo2 = bgo;
                     bgo2.Location = bgo.Location;
-                    bgo2.Location.Y = w.Exit.Y - bgo2.Location.Height;
-                    bgo2.Location.X = w.Exit.X + (w.Exit.Width - bgo2.Location.Width) / 2;
+                    bgo2.Location.Y = w.Exit.Y - 24;
+                    bgo2.Location.X = w.Exit.X + (w.Exit.Width - 24) / 2;
                     syncLayers_BGO(B);
                 }
             }

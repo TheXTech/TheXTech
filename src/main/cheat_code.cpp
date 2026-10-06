@@ -1477,8 +1477,8 @@ static void foundMyCarKey()
 
         bgo.Location.Width = BackgroundWidth[35];
         bgo.Location.Height = BackgroundHeight[35];
-        bgo.Location.X = pLoc.X + (pLoc.Width - bgo.Location.Width) / 2;
-        bgo.Location.Y = pLoc.Y + pLoc.Height - bgo.Location.Height;
+        bgo.Location.X = pLoc.X + (num_t::floor(pLoc.Width) - bgo.Width()) / 2;
+        bgo.Location.Y = pLoc.Y + pLoc.Height - bgo.Height();
 
         LevelMacroWhich = numBackground + numLocked + 1;
     }

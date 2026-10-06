@@ -2597,7 +2597,7 @@ void NPCSpecial(int A)
                                     npc.Location.SpeedX = 0;
 
                                     if(centered)
-                                        speed_x = -(npc.Location.X + (npc.Location.Width / 2)) + (Background[i].Location.X + (Background[i].Location.Width / 2));
+                                        speed_x = -(npc.Location.X + (npc.Location.Width / 2)) + (Background[i].Location.X + ((num_t)Background[i].Width() / 2));
                                     else
                                         speed_x = -npc.Location.X + Background[i].Location.X - 32;
                                 }
@@ -2612,7 +2612,7 @@ void NPCSpecial(int A)
                                     npc.Location.SpeedY = 0;
 
                                     if(centered)
-                                        speed_y = -(npc.Location.Y + (npc.Location.Height / 2)) + (Background[i].Location.Y + (Background[i].Location.Height / 2));
+                                        speed_y = -(npc.Location.Y + (npc.Location.Height / 2)) + (Background[i].Location.Y + ((num_t)Background[i].Height() / 2));
                                     else
                                         speed_y = -npc.Location.Y + Background[i].Location.Y;
                                 }
