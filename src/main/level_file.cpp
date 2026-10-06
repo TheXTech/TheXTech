@@ -980,12 +980,12 @@ bool OpenLevel_Block(void* userdata, LevelBlock& b)
 
                     if(t == BLKID_MAZE_TRAVEL_DL || t == BLKID_MAZE_TRAVEL_UL || t == BLKID_MAZE_TRAVEL_ULR || t == BLKID_MAZE_TRAVEL_DLR || t == BLKID_MAZE_TRAVEL_UDL || t == BLKID_MAZE_TRAVEL_UDLR)
                     {
-                        water.Location.X -= 18;
-                        water.Location.Width += 18;
+                        water.Location.X -= 16;
+                        water.Location.Width += 16;
                     }
 
                     if(t == BLKID_MAZE_TRAVEL_DR || t == BLKID_MAZE_TRAVEL_UR || t == BLKID_MAZE_TRAVEL_ULR || t == BLKID_MAZE_TRAVEL_DLR || t == BLKID_MAZE_TRAVEL_UDR || t == BLKID_MAZE_TRAVEL_UDLR)
-                        water.Location.Width += 18;
+                        water.Location.Width += 16;
 
                     // 2 pixels entry zone to the left/right of the block
                     if(t == BLKID_MAZE_ENTER_LR)
@@ -1010,12 +1010,12 @@ bool OpenLevel_Block(void* userdata, LevelBlock& b)
 
                     if(t == BLKID_MAZE_TRAVEL_UL || t == BLKID_MAZE_TRAVEL_UR || t == BLKID_MAZE_TRAVEL_ULR || t == BLKID_MAZE_TRAVEL_UDL || t == BLKID_MAZE_TRAVEL_UDR || t == BLKID_MAZE_TRAVEL_UDLR)
                     {
-                        water.Location.Y -= 18;
-                        water.Location.Height += 18;
+                        water.Location.Y -= 16;
+                        water.Location.Height += 16;
                     }
 
                     if(t == BLKID_MAZE_TRAVEL_DL || t == BLKID_MAZE_TRAVEL_DR || t == BLKID_MAZE_TRAVEL_DLR || t == BLKID_MAZE_TRAVEL_UDL || t == BLKID_MAZE_TRAVEL_UDR || t == BLKID_MAZE_TRAVEL_UDLR)
-                        water.Location.Height += 18;
+                        water.Location.Height += 16;
 
                     // asymmetric -- 6 pixels entry zone above the block, 2 below
                     if(t == BLKID_MAZE_ENTER_UD)
