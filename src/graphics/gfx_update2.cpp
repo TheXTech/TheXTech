@@ -275,14 +275,14 @@ void UpdateGraphics2(bool skipRepaint)
             SDL_assert(IF_INRANGE(tile.Type, 1, maxTileType));
 
             g_stats.checkedTiles++;
-            if(CheckCollision(sView, tile.Location))
+            if(CheckCollision(sView, tile.FullLocation()))
             {
                 g_stats.renderedTiles++;
 //                XRender::renderTexture(camX + Tile[A].Location.X, camY + Tile[A].Location.Y, Tile[A].Location.Width, Tile[A].Location.Height, GFXTile[Tile[A].Type], 0, TileHeight[Tile[A].Type] * TileFrame[Tile[A].Type]);
                 XRender::renderTextureBasic(camX + tile.Location.X,
                                       camY + tile.Location.Y,
-                                      tile.Location.Width,
-                                      tile.Location.Height,
+                                      TileWidth[tile.Type],
+                                      TileHeight[tile.Type],
                                       GFXTileBMP[tile.Type], 0, TileHeight[tile.Type] * TileFrame[tile.Type]);
             }
         }

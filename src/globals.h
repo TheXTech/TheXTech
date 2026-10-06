@@ -1190,12 +1190,14 @@ struct Warp_t
 struct Tile_t
 {
 //    Location As Location
-    TinyLocation_t Location;
+    TinyPosition_t Location;
 //    Type As Integer
     vbint_t Type = 0;
 //End Type
 
     bool Active = true;
+
+    TinyLocation_t FullLocation() const;
 
     // int64_t Z = 0;
 };

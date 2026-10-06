@@ -302,6 +302,12 @@ Location_t s_get_loc(ItemRef_t A)
 }
 
 template<>
+Location_t s_get_loc(TileRef_t A)
+{
+    return static_cast<Location_t>(A->FullLocation());
+}
+
+template<>
 Location_t s_get_loc(BackgroundRef_t A)
 {
     return static_cast<Location_t>(A->FullLocation());

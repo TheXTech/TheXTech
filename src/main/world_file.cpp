@@ -324,8 +324,8 @@ bool OpenWorld_Tile(void*, WorldTerrainTile& t)
         terra.Location.X = (int32_t)t.x;
         terra.Location.Y = (int32_t)t.y;
         terra.Type = int(t.id);
-        terra.Location.Width = TileWidth[terra.Type];
-        terra.Location.Height = TileHeight[terra.Type];
+        // terra.Location.Width = TileWidth[terra.Type];
+        // terra.Location.Height = TileHeight[terra.Type];
         // terra.Z = zCounter++;
         treeWorldTileAdd(&terra);
 

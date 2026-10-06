@@ -309,7 +309,7 @@ static void FancyKillBackground(int ia)
 
 static void KillTile(int ia)
 {
-    Location_t loc = static_cast<Location_t>(Tile[ia].Location);
+    Location_t loc = static_cast<Location_t>(Tile[ia].FullLocation());
     int type = Tile[ia].Type;
 
     if(ia != numTiles)
@@ -864,7 +864,7 @@ void UpdateEditor()
                     int ia = EditorCursor.InteractIndex;
                     PlaySound(SFX_Grab);
                     EditorCursor.Mode = OptCursor_t::WLD_TILES;
-                    EditorCursor.Location = static_cast<Location_t>(Tile[ia].Location);
+                    EditorCursor.Location = static_cast<Location_t>(Tile[ia].FullLocation());
                     EditorCursor.Tile = Tile[ia];
                     SetCursor();
 
@@ -1042,7 +1042,7 @@ void UpdateEditor()
                 if(EditorCursor.InteractMode == OptCursor_t::WLD_TILES)
                 {
                     int ia = EditorCursor.InteractIndex;
-                    Location_t loc = static_cast<Location_t>(Tile[ia].Location);
+                    Location_t loc = static_cast<Location_t>(Tile[ia].FullLocation());
                     NewEffect(EFFID_SMOKE_S3_CENTER, loc);
                     PlaySound(SFX_ShellHit);
 
@@ -1477,28 +1477,15 @@ void UpdateEditor()
             {
                 for(A = numTiles; A >= 1; A--)
                 {
-                    if(CursorCollision(EditorCursor.Location, Tile[A].Location))
+                    if(CursorCollision(EditorCursor.Location, Tile[A].FullLocation()))
                     {
-                        if(!(MagicBlock::enabled && MagicBlock::replace_existing) || (!MouseRelease && CheckCollision(Tile[A].Location, last_EC_loc)))
+                        if(!(MagicBlock::enabled && MagicBlock::replace_existing) || (!MouseRelease && CheckCollision(Tile[A].FullLocation(), last_EC_loc)))
                         {
                             CanPlace = false;
                             break;
                         }
                         else
-                        {
-                            Location_t loc = static_cast<Location_t>(Tile[A].Location);
-                            int type = Tile[A].Type;
-
-                            if(A != numTiles)
-                            {
-                                Tile[A] = Tile[numTiles];
-                                treeWorldTileUpdate(&Tile[A]);
-                            }
-                            treeWorldTileRemove(&Tile[numTiles]);
-                            numTiles--;
-
-                            MagicBlock::MagicTile(type, loc);
-                        }
+                            KillTile(A);
                     }
                 }
 
@@ -2390,7 +2377,8 @@ void SetCursor()
             EditorCursor.Tile.Type = 1;
         EditorCursor.Location.Width = TileWidth[EditorCursor.Tile.Type];
         EditorCursor.Location.Height = TileHeight[EditorCursor.Tile.Type];
-        EditorCursor.Tile.Location = static_cast<TinyLocation_t>(EditorCursor.Location);
+        EditorCursor.Tile.Location.X = static_cast<int32_t>(EditorCursor.Location.X);
+        EditorCursor.Tile.Location.Y = static_cast<int32_t>(EditorCursor.Location.Y);
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_SCENES) // Scene
     {
@@ -3155,7 +3143,7 @@ void UpdateInteract()
         {
             for(int A : treeWorldTileQuery(static_cast<TinyLocation_t>(EditorCursor.Location), SORTMODE_NONE))
             {
-                if(CursorCollision(EditorCursor.Location, Tile[A].Location))
+                if(CursorCollision(EditorCursor.Location, Tile[A].FullLocation()))
                 {
                     EditorCursor.InteractMode = OptCursor_t::WLD_TILES;
                     EditorCursor.InteractFlags = 0;
