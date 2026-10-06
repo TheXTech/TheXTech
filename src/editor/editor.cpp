@@ -285,7 +285,7 @@ static void FancyKillBlock(int A, bool Splode = true)
 
 static void FancyKillBackground(int ia)
 {
-    Location_t loc = static_cast<Location_t>(Background[ia].Location);
+    Location_t loc = static_cast<Location_t>(Background[ia].FullLocation());
     int type = Background[ia].Type;
     NewEffect(EFFID_SMOKE_S3_CENTER, loc);
 
@@ -1260,7 +1260,7 @@ void UpdateEditor()
 
                     if(same_type)
                     {
-                        if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
+                        if(CursorCollision(EditorCursor.Location, Background[A].FullLocation()) && !Background[A].Hidden)
                         {
                             CanPlace = false;
                             break;
@@ -2963,7 +2963,7 @@ void UpdateInteract()
             {
                 int A = *(--i);
 
-                if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
+                if(CursorCollision(EditorCursor.Location, Background[A].FullLocation()) && !Background[A].Hidden)
                 {
                     EditorCursor.InteractMode = OptCursor_t::LVL_BGOS;
                     EditorCursor.InteractFlags = 0;

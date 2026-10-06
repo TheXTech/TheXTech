@@ -565,7 +565,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
         if(Background[A].Hidden)
         {
             if(!NoEffect)
-                NewEffect(EFFID_SMOKE_S3_CENTER, static_cast<Location_t>(Background[A].Location));
+                NewEffect(EFFID_SMOKE_S3_CENTER, static_cast<Location_t>(Background[A].FullLocation()));
         }
         Background[A].Hidden = false;
     }
@@ -642,7 +642,7 @@ void HideLayer(layerindex_t L, bool NoEffect)
         if(!Background[A].Hidden)
         {
             if(!NoEffect)
-                NewEffect(EFFID_SMOKE_S3_CENTER, static_cast<Location_t>(Background[A].Location));
+                NewEffect(EFFID_SMOKE_S3_CENTER, static_cast<Location_t>(Background[A].FullLocation()));
         }
         Background[A].Hidden = true;
     }

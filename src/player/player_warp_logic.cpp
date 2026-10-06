@@ -60,17 +60,17 @@ static void s_TriggerDoorEffects(const Location_t& loc, bool do_big_door = true)
     {
         if(CheckCollision(loc, bgo))
         {
+            auto bgo_loc = static_cast<Location_t>(bgo.FullLocation());
             if(bgo.Type == 88)
-                NewEffect(EFFID_DOOR_S2_OPEN, static_cast<Location_t>(bgo.Location));
+                NewEffect(EFFID_DOOR_S2_OPEN, bgo_loc);
             else if(bgo.Type == 87)
-                NewEffect(EFFID_DOOR_DOUBLE_S3_OPEN, static_cast<Location_t>(bgo.Location));
+                NewEffect(EFFID_DOOR_DOUBLE_S3_OPEN, bgo_loc);
             else if(bgo.Type == 107)
-                NewEffect(EFFID_DOOR_SIDE_S3_OPEN, static_cast<Location_t>(bgo.Location));
+                NewEffect(EFFID_DOOR_SIDE_S3_OPEN, bgo_loc);
             else if(do_big_door && bgo.Type == 141)
             {
-                Location_t bLoc = static_cast<Location_t>(bgo.Location);
-                bLoc.set_width_center(104);
-                NewEffect(EFFID_BIG_DOOR_OPEN, bLoc);
+                bgo_loc.set_width_center(104);
+                NewEffect(EFFID_BIG_DOOR_OPEN, bgo_loc);
             }
         }
     }

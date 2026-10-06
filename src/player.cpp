@@ -6923,7 +6923,7 @@ void KeyholeCheck(const int A, const Location_t& loc)
 
         if(Background[B].Type == 35)
         {
-            SpeedlessLocation_t tempLocation = Background[B].Location;
+            SpeedlessLocation_t tempLocation = Background[B].FullLocation();
             tempLocation.Width = 16;
             tempLocation.X += 8;
             tempLocation.Height = 26;

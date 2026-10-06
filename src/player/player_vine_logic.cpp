@@ -119,7 +119,7 @@ void PlayerVineLogic(int A)
         {
             // if(CheckCollision(Player[A].Location, Background[B].Location))
             //{
-            SpeedlessLocation_t tempLocation = Background[B].Location;
+            SpeedlessLocation_t tempLocation = Background[B].FullLocation();
             tempLocation.Height -= 16;
             tempLocation.Width -= 20;
             tempLocation.X += 10;
