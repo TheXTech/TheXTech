@@ -902,6 +902,7 @@ struct Water_t
     layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean
     bool Hidden = false;
+    bool AutoConv = false;
 //End Type
 };
 

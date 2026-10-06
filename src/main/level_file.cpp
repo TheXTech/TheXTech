@@ -783,6 +783,80 @@ bool OpenLevel_Event(void* userdata, LevelSMBX64Event& e)
     return true;
 }
 
+static void CoalesceMaze()
+{
+    std::swap(Water[1], Water[numWater]);
+    Water_t& target = Water[1];
+    bool target_horiz = (num_t::floor(target.Location.Height) == 32);
+
+    for(int i = 2; i <= numWater; i++)
+    {
+        Water_t& water_i = Water[i];
+
+        if(water_i.Layer != target.Layer)
+            continue;
+
+        if(water_i.Type != PHYSID_MAZE || !water_i.AutoConv)
+            continue;
+
+        if(num_t::floor(water_i.Location.Height) == 32)
+        {
+            if(!target_horiz)
+                continue;
+            if(num_t::floor(water_i.Location.Y) != num_t::floor(target.Location.Y))
+                continue;
+
+            if(num_t::floor(water_i.Location.X) < num_t::floor(target.Location.X))
+            {
+                if(num_t::floor(water_i.Location.X) + num_t::floor(water_i.Location.Width) + 4 >= num_t::floor(target.Location.X))
+                {
+                    target.Location.Width = num_t::floor(target.Location.X) - num_t::floor(water_i.Location.X) + num_t::floor(target.Location.Width);
+                    target.Location.X = water_i.Location.X;
+                }
+                else
+                    continue;
+            }
+            else
+            {
+                if(num_t::floor(target.Location.X) + num_t::floor(target.Location.Width) + 4 >= num_t::floor(water_i.Location.X))
+                    target.Location.Width = num_t::floor(water_i.Location.X) + num_t::floor(water_i.Location.Width) - num_t::floor(target.Location.X);
+                else
+                    continue;
+            }
+        }
+        else
+        {
+            if(target_horiz)
+                continue;
+
+            if(num_t::floor(water_i.Location.X) != num_t::floor(target.Location.X))
+                continue;
+
+            if(num_t::floor(water_i.Location.Y) < num_t::floor(target.Location.Y))
+            {
+                if(num_t::floor(water_i.Location.Y) + num_t::floor(water_i.Location.Height) + 4 >= num_t::floor(target.Location.Y))
+                {
+                    target.Location.Height = num_t::floor(target.Location.Y) - num_t::floor(water_i.Location.Y) + num_t::floor(target.Location.Height);
+                    target.Location.Y = water_i.Location.Y;
+                }
+                else
+                    continue;
+            }
+            else
+            {
+                if(num_t::floor(target.Location.Y) + num_t::floor(target.Location.Height) + 4 >= num_t::floor(water_i.Location.Y))
+                    target.Location.Height = num_t::floor(water_i.Location.Y) + num_t::floor(water_i.Location.Height) - num_t::floor(target.Location.Y);
+                else
+                    continue;
+            }
+        }
+
+        water_i = Water[numWater];
+        i--;
+        numWater--;
+    }
+}
+
 bool OpenLevel_Block(void* userdata, LevelBlock& b)
 {
     LevelLoad& load = *static_cast<LevelLoad*>(userdata);
@@ -866,7 +940,105 @@ bool OpenLevel_Block(void* userdata, LevelBlock& b)
             }
         }
 
-        if(IF_OUTRANGE(block.Type, 0, maxBlockType) || block.Type == BLKID_CONVEYOR_L_CONV || block.Type == BLKID_CONVEYOR_R_CONV) // Drop ID to 1 for blocks of out of range IDs
+        if(block.Type >= BLKID_MAZE_START && block.Type <= BLKID_MAZE_END && !LevelEditor)
+        {
+            // 0 is horizontal, 1 is vertical
+            for(int i = 0; i < 2; i++)
+            {
+                if(BlockHeight[block.Type] == 32 && i == 0)
+                    continue;
+                else if(BlockWidth[block.Type] == 32 && i == 1)
+                    continue;
+
+                numWater++;
+                if(numWater > maxWater)
+                {
+                    numWater = maxWater;
+                    return false;
+                }
+
+                auto &water = Water[numWater];
+
+                water = Water_t();
+
+                num_t water_x = block.Location.X + (BlockWidth[block.Type] / 2 - 16);
+                num_t water_y = block.Location.Y + (BlockHeight[block.Type] / 2 - 16);
+                water.Location.X = water_x;
+                water.Location.Y = water_y;
+                water.Location.Width = 32;
+                water.Location.Height = 32;
+
+                water.Type = PHYSID_MAZE;
+                water.Layer = block.Layer;
+                water.AutoConv = true;
+
+                int t = block.Type;
+                if(i == 0)
+                {
+                    water.Location.Width -= 4;
+                    water.Location.X += 2;
+
+                    if(t == BLKID_MAZE_TRAVEL_DL || t == BLKID_MAZE_TRAVEL_UL || t == BLKID_MAZE_TRAVEL_ULR || t == BLKID_MAZE_TRAVEL_DLR || t == BLKID_MAZE_TRAVEL_UDL || t == BLKID_MAZE_TRAVEL_UDLR)
+                    {
+                        water.Location.X -= 18;
+                        water.Location.Width += 18;
+                    }
+
+                    if(t == BLKID_MAZE_TRAVEL_DR || t == BLKID_MAZE_TRAVEL_UR || t == BLKID_MAZE_TRAVEL_ULR || t == BLKID_MAZE_TRAVEL_DLR || t == BLKID_MAZE_TRAVEL_UDR || t == BLKID_MAZE_TRAVEL_UDLR)
+                        water.Location.Width += 18;
+
+                    // 2 pixels entry zone to the left/right of the block
+                    if(t == BLKID_MAZE_ENTER_LR)
+                    {
+                        water.Location.X -= 4;
+                        water.Location.Width += 8;
+                    }
+
+                    if(t == BLKID_MAZE_EXIT_L)
+                    {
+                        water.Location.X -= 2;
+                        water.Location.Width += 2;
+                    }
+
+                    if(t == BLKID_MAZE_EXIT_R)
+                        water.Location.Width += 2;
+                }
+                else
+                {
+                    water.Location.Height -= 4;
+                    water.Location.Y += 2;
+
+                    if(t == BLKID_MAZE_TRAVEL_UL || t == BLKID_MAZE_TRAVEL_UR || t == BLKID_MAZE_TRAVEL_ULR || t == BLKID_MAZE_TRAVEL_UDL || t == BLKID_MAZE_TRAVEL_UDR || t == BLKID_MAZE_TRAVEL_UDLR)
+                    {
+                        water.Location.Y -= 18;
+                        water.Location.Height += 18;
+                    }
+
+                    if(t == BLKID_MAZE_TRAVEL_DL || t == BLKID_MAZE_TRAVEL_DR || t == BLKID_MAZE_TRAVEL_DLR || t == BLKID_MAZE_TRAVEL_UDL || t == BLKID_MAZE_TRAVEL_UDR || t == BLKID_MAZE_TRAVEL_UDLR)
+                        water.Location.Height += 18;
+
+                    // asymmetric -- 6 pixels entry zone above the block, 2 below
+                    if(t == BLKID_MAZE_ENTER_UD)
+                    {
+                        water.Location.Y -= 8;
+                        water.Location.Height += 12;
+                    }
+
+                    if(t == BLKID_MAZE_EXIT_U)
+                    {
+                        water.Location.Y -= 2;
+                        water.Location.Height += 2;
+                    }
+
+                    if(t == BLKID_MAZE_EXIT_D)
+                        water.Location.Height += 2;
+                }
+
+                CoalesceMaze();
+            }
+        }
+
+        if(IF_OUTRANGE(block.Type, 0, BLKID_NORMAL_END)) // Drop ID to 1 for blocks of out of range IDs
         {
             pLogWarning("Block-%d ID is out of range (max types %d), reset to Block-1", block.Type, maxBlockType);
             block.Type = 1;
