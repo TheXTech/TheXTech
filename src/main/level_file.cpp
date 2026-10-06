@@ -1075,8 +1075,8 @@ bool OpenLevel_Background(void* userdata, LevelBGO& b)
         }
 
         bgo.Layer = load.FindLayer(b.layer);
-        bgo.Location.Width = GFXBackground[bgo.Type].w;
-        bgo.Location.Height = BackgroundHeight[bgo.Type];
+        // bgo.Location.Width = GFXBackground[bgo.Type].w;
+        // bgo.Location.Height = BackgroundHeight[bgo.Type];
 
         bgo.SetSortPriority(b.z_mode, std::round(b.z_offset));
     }
@@ -1818,8 +1818,8 @@ void OpenLevelDataPost()
                 bgo = Background_t();
                 bgo.Layer = w.Layer;
                 bgo.Hidden = w.Hidden;
-                bgo.Location.Width = 24;
-                bgo.Location.Height = 24;
+                // bgo.Location.Width = 24;
+                // bgo.Location.Height = 24;
                 bgo.Location.Y = w.Entrance.Y - 24;
                 bgo.Location.X = w.Entrance.X + (w.Entrance.Width - 24) / 2;
                 bgo.Type = 160;
@@ -1845,9 +1845,10 @@ void OpenLevelDataPost()
                 bgo = Background_t();
                 bgo.Layer = w.Layer;
                 bgo.Hidden = w.Hidden;
-                bgo.Location = w.Entrance;
+                bgo.Location.X = w.Entrance.X;
+                bgo.Location.Y = w.Entrance.Y;
                 bgo.Type = 98;
-                bgo.Location.Width = 16;
+                // bgo.Location.Width = 16;
                 syncLayers_BGO(B);
 
                 if(w.twoWay)
@@ -1856,8 +1857,9 @@ void OpenLevelDataPost()
                     numLocked++;
                     auto &bgo2 = Background[B];
                     bgo2 = bgo;
-                    bgo2.Location = w.Exit;
-                    bgo2.Location.Width = 16;
+                    bgo2.Location.X = w.Exit.X;
+                    bgo2.Location.Y = w.Exit.Y;
+                    // bgo2.Location.Width = 16;
                     syncLayers_BGO(B);
                 }
             }

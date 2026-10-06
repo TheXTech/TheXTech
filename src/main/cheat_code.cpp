@@ -1475,8 +1475,8 @@ static void foundMyCarKey()
 
         bgo.Type = 35;
 
-        bgo.Location.Width = BackgroundWidth[35];
-        bgo.Location.Height = BackgroundHeight[35];
+        // bgo.Location.Width = BackgroundWidth[35];
+        // bgo.Location.Height = BackgroundHeight[35];
         bgo.Location.X = pLoc.X + (num_t::floor(pLoc.Width) - bgo.Width()) / 2;
         bgo.Location.Y = pLoc.Y + pLoc.Height - bgo.Height();
 

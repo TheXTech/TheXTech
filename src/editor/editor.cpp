@@ -2320,8 +2320,8 @@ void SetCursor()
         EditorCursor.Background.Layer = EditorCursor.Layer;
         EditorCursor.Background.Location.X = EditorCursor.Location.X;
         EditorCursor.Background.Location.Y = EditorCursor.Location.Y;
-        EditorCursor.Background.Location.Width = BackgroundWidth[EditorCursor.Background.Type];
-        EditorCursor.Background.Location.Height = BackgroundHeight[EditorCursor.Background.Type];
+        // EditorCursor.Background.Location.Width = BackgroundWidth[EditorCursor.Background.Type];
+        // EditorCursor.Background.Location.Height = BackgroundHeight[EditorCursor.Background.Type];
         EditorCursor.Location.Width = EditorCursor.Background.Width();
         EditorCursor.Location.Height = EditorCursor.Background.Height();
     }
