@@ -736,8 +736,8 @@ void DrawEditorWorld()
     {
         XRender::renderTexture(camX + EditorCursor.Tile.Location.X,
             camY + EditorCursor.Tile.Location.Y,
-            EditorCursor.Tile.Location.Width,
-            EditorCursor.Tile.Location.Height,
+            TileWidth[EditorCursor.Tile.Type],
+            TileHeight[EditorCursor.Tile.Type],
             GFXTile[EditorCursor.Tile.Type],
             0,
             TileHeight[EditorCursor.Tile.Type] * TileFrame[EditorCursor.Tile.Type]);

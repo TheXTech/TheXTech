@@ -21,6 +21,16 @@
 #include "globals.h"
 #include "collision.h"
 
+TinyLocation_t Tile_t::FullLocation() const
+{
+    TinyLocation_t ret;
+    ret.X = Location.X;
+    ret.Y = Location.Y;
+    ret.Width = TileWidth[this->Type];
+    ret.Height = TileHeight[this->Type];
+    return ret;
+}
+
 // Intersect collisions
 bool CheckCollisionIntersect(const Location_t &Loc1, const Location_t &Loc2)
 {

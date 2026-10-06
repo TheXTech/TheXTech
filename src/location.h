@@ -42,6 +42,16 @@ struct Location_t
 //End Type
 };
 
+//NEW: 'Holds location information for an object without speed at integer coordinates
+struct TinyPosition_t
+{
+    int32_t X = 0;
+    int32_t Y = 0;
+
+    inline TinyPosition_t() = default;
+    inline TinyPosition_t(int32_t X, int32_t Y) : X(X), Y(Y) {}
+};
+
 //NEW: 'Holds location information for an object without speed at integer coordinates, with width / height values below 32767
 struct TinyLocation_t
 {

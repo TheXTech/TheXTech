@@ -827,20 +827,4 @@ void MagicBackground(BackgroundRef_t A)
     MagicItem(A);
 }
 
-void MagicTile(int Type, Location_t loc)
-{
-    if(!enabled)
-        return;
-
-    MagicItem<TileRef_t>(Type, loc);
-}
-
-void MagicTile(TileRef_t A)
-{
-    if(!enabled)
-        return;
-
-    MagicItem(A);
-}
-
 } // namespace MagicBlock

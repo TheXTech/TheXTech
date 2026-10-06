@@ -51,9 +51,6 @@ void MagicBlock(int Type, Location_t loc);
 void MagicBackground(BackgroundRef_t A);
 void MagicBackground(int Type, Location_t loc);
 
-void MagicTile(TileRef_t A);
-void MagicTile(int Type, Location_t loc);
-
 } // namespace MagicBlock
 
 #endif // MAGIC_BLOCK_H
