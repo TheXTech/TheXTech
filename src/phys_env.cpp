@@ -50,6 +50,7 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
     int direction = maze_state % 4;
     bool cleared_to_exit = maze_state & MAZE_CAN_EXIT;
     bool do_cancel = false;
+    bool controls_active = false;
 
     num_t center_x = loc.X + loc.Width / 2;
     num_t center_y = loc.Y + loc.Height / 2;
@@ -97,6 +98,8 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
             loc.SpeedX = 0;
             target_speed_x = 0;
         }
+
+        controls_active = controls[MAZE_DIR_LEFT] || controls[MAZE_DIR_RIGHT];
     }
     else
     {
@@ -135,6 +138,8 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
             loc.SpeedY = 0;
             target_speed_y = 0;
         }
+
+        controls_active = controls[MAZE_DIR_UP] || controls[MAZE_DIR_DOWN];
     }
 
     if(space_left > space_to_cancel + 128 || space_left < -128 || do_cancel)
@@ -143,6 +148,8 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
         exit_check_x = center_x;
         exit_check_y = center_y;
     }
+
+    bool need_new_maze = space_left < 32 || do_cancel;
 
     if(cleared_to_exit && !do_cancel)
     {
@@ -155,8 +162,14 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
         if(direction == MAZE_DIR_UP)
             target_speed_y *= 2;
     }
-    else if(space_left < 32 || do_cancel)
+    else if(need_new_maze || (cur_maze.AutoConv && controls_active))
     {
+        if(!need_new_maze)
+        {
+            exit_check_x = center_x;
+            exit_check_y = center_y;
+        }
+
         // need to find a new direction
         Location_t edgeLoc;
         edgeLoc.X = exit_check_x - 15 + target_speed_x * 4;
@@ -166,38 +179,41 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
 
         cleared_to_exit = true;
 
-        for(int B : treeBlockQuery(edgeLoc, SORTMODE_NONE))
+        if(need_new_maze)
         {
-            const Block_t& b = Block[B];
-
-            if((!npc_A || b.tempBlockNpcIdx != npc_A) && (!plr_A || !BlockCheckPlayerFilter(B, plr_A)) && !b.Hidden && !b.Invis && !BlockOnlyHitspot1[b.Type] && !BlockIsSizable[b.Type] && !BlockNoClipping[b.Type])
+            for(int B : treeBlockQuery(edgeLoc, SORTMODE_NONE))
             {
-                if(CheckCollision(edgeLoc, b.Location))
-                {
-                    cleared_to_exit = false;
-                    break;
-                }
-            }
-        }
+                const Block_t& b = Block[B];
 
-        if(!npc_A && cleared_to_exit)
-        {
-            for(int N : treeNPCQuery(edgeLoc, SORTMODE_NONE))
-            {
-                const NPC_t& n = NPC[N];
-
-                if(n.Active && !n.Generator && n->IsABlock && (!plr_A || N != Player[plr_A].HoldingNPC))
+                if((!npc_A || b.tempBlockNpcIdx != npc_A) && (!plr_A || !BlockCheckPlayerFilter(B, plr_A)) && !b.Hidden && !b.Invis && !BlockOnlyHitspot1[b.Type] && !BlockIsSizable[b.Type] && !BlockNoClipping[b.Type])
                 {
-                    if(CheckCollision(edgeLoc, n.Location))
+                    if(CheckCollision(edgeLoc, b.Location))
                     {
                         cleared_to_exit = false;
                         break;
                     }
                 }
             }
+
+            if(!npc_A && cleared_to_exit)
+            {
+                for(int N : treeNPCQuery(edgeLoc, SORTMODE_NONE))
+                {
+                    const NPC_t& n = NPC[N];
+
+                    if(n.Active && !n.Generator && n->IsABlock && (!plr_A || N != Player[plr_A].HoldingNPC))
+                    {
+                        if(CheckCollision(edgeLoc, n.Location))
+                        {
+                            cleared_to_exit = false;
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
-        if(cleared_to_exit && !do_cancel)
+        if(need_new_maze && cleared_to_exit && !do_cancel)
             maze_state |= MAZE_CAN_EXIT;
         else
         {
@@ -205,6 +221,13 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
 
             edgeLoc.X = exit_check_x - 15;
             edgeLoc.Y = exit_check_y - 15;
+            if(!need_new_maze)
+            {
+                edgeLoc.X = exit_check_x;
+                edgeLoc.Y = exit_check_y;
+                edgeLoc.Width = 0;
+                edgeLoc.Height = 0;
+            }
 
             for(int W : treeWaterQuery(edgeLoc, SORTMODE_NONE))
             {
@@ -214,15 +237,25 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
                 {
                     if(CheckCollision(edgeLoc, w.Location))
                     {
-                        if(w.Location.Height > w.Location.Width)
+                        // vertical maze zone
+                        if(w.Location.Height != 32)
                         {
+                            // don't turn into a maze zone unless you're approaching (but relatively far) from its center
+                            if(!need_new_maze && ((direction == MAZE_DIR_RIGHT && center_x > w.Location.X + 4) || (direction == MAZE_DIR_LEFT && center_x < w.Location.X + 28)))
+                                continue;
+
                             if(w.Location.Y <= exit_check_y - 32 && new_maze[MAZE_DIR_UP] < W)
                                 new_maze[MAZE_DIR_UP] = W;
                             if(w.Location.Y + w.Location.Height >= exit_check_y + 32 && new_maze[MAZE_DIR_DOWN] < W)
                                 new_maze[MAZE_DIR_DOWN] = W;
                         }
+                        // horizontal maze zone
                         else
                         {
+                            // don't turn into a maze zone unless you're approaching (but relatively far) from its center
+                            if(!need_new_maze && ((direction == MAZE_DIR_DOWN && center_y > w.Location.Y + 4) || (direction == MAZE_DIR_UP && center_y < w.Location.Y + 28)))
+                                continue;
+
                             if(w.Location.X <= exit_check_x - 32 && new_maze[MAZE_DIR_LEFT] < W)
                                 new_maze[MAZE_DIR_LEFT] = W;
                             if(w.Location.X + w.Location.Width >= exit_check_x + 32 && new_maze[MAZE_DIR_RIGHT] < W)
@@ -231,6 +264,10 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
                     }
                 }
             }
+
+            // if only here due to controls, keep on the same segment if requested direction is impossible
+            if(!need_new_maze)
+                new_maze[direction] = maze_index;
 
             // if things are normal, return to the same maze segment if the other directions are blocked
             if(!do_cancel)
