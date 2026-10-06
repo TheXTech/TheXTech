@@ -26,6 +26,7 @@
 
 struct NPC_t;
 struct Block_t;
+struct Background_t;
 
 enum CollisionSpot
 {
@@ -47,6 +48,10 @@ bool CheckCollision(const T1 &Loc1, const T2 &Loc2)
            (Loc1.X <= Loc2.X + Loc2.Width) &&
            (Loc1.X + Loc1.Width >= Loc2.X);
 }
+
+template<class T1>
+bool CheckCollision(const T1 &Loc1, const Background_t &bgo);
+
 // Intersect collision
 bool CheckCollisionIntersect(const Location_t &Loc1, const Location_t &Loc2);
 // Public Function n00bCollision(Loc1 As Location, Loc2 As Location) As Boolean 'Make the game easier for the people who whine about the detection being 'off'
@@ -86,6 +91,7 @@ bool ShakeCollision(const Location_t &Loc1, const Block_t &b);
 bool vScreenCollision(int A, const Location_t &Loc2);
 bool vScreenCollision(int A, const SpeedlessLocation_t &Loc2);
 bool vScreenCollision(int A, const TinyLocation_t &Loc2);
+bool vScreenCollision(int A, const Background_t &bgo);
 // Public Function vScreenCollision2(A As Integer, Loc2 As Location) As Boolean  'vScreen collisions 2
 // vScreen collisions 2
 // bool vScreenCollision2(int A, const Location_t &Loc2);

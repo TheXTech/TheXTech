@@ -885,6 +885,12 @@ struct Background_t
     void SetSortPriority(int layer, int offset);
     //! updates SortPriority based on current type, custom layer, and custom offset
     void UpdateSortPriority();
+    //! NEW: Get a full location
+    SpeedlessLocation_t FullLocation() const;
+
+    //! NEW: get width / height
+    vbint_t Width() const;
+    vbint_t Height() const;
 
 //End Type
 };
@@ -2568,6 +2574,17 @@ extern RangeArr<StdPicture, 1, numCharacters> GFXPlayerBMP;
 // extern RangeArrI<vbint_t, 1, numCharacters, 0> GFXPlayerHeight;
 //Public GFXPlayerWidth(1 To numCharacters) As Integer
 // extern RangeArrI<vbint_t, 1, numCharacters, 0> GFXPlayerWidth;
+
+// Background dimensions were always initialized to these values in OpenLevel (since SMBX 1.3)
+inline vbint_t Background_t::Width() const
+{
+    return GFXBackgroundBMP[this->Type].w;
+}
+
+inline vbint_t Background_t::Height() const
+{
+    return BackgroundHeight[this->Type];
+}
 
 //Public PlayerCharacter As Integer
 // extern int PlayerCharacter;

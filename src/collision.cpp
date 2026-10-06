@@ -21,6 +21,28 @@
 #include "globals.h"
 #include "collision.h"
 
+SpeedlessLocation_t Background_t::FullLocation() const
+{
+    SpeedlessLocation_t ret;
+    ret.X = Location.X;
+    ret.Y = Location.Y;
+    ret.Width = this->Width();
+    ret.Height = this->Height();
+    return ret;
+}
+
+template<class T1>
+bool CheckCollision(const T1 &Loc1, const Background_t &bgo)
+{
+    return (Loc1.Y + Loc1.Height >= bgo.Location.Y) &&
+           (Loc1.Y <= bgo.Location.Y + bgo.Height()) &&
+           (Loc1.X + Loc1.Width >= bgo.Location.X) &&
+           (Loc1.X <= bgo.Location.X + bgo.Width());
+}
+
+template bool CheckCollision<Location_t>(const Location_t &Loc1, const Background_t &bgo);
+template bool CheckCollision<SpeedlessLocation_t>(const SpeedlessLocation_t &Loc1, const Background_t &bgo);
+
 // Intersect collisions
 bool CheckCollisionIntersect(const Location_t &Loc1, const Location_t &Loc2)
 {
@@ -395,6 +417,17 @@ bool vScreenCollision(int A, const TinyLocation_t &Loc2)
            (-vScreen[A].X + vScreen[A].Width >= Loc2.X) &&
            (-vScreen[A].Y <= Loc2.Y + Loc2.Height) &&
            (-vScreen[A].Y + vScreen[A].Height >= Loc2.Y);
+}
+
+bool vScreenCollision(int A, const Background_t &bgo)
+{
+    if(A == 0)
+        return true;
+
+    return (-vScreen[A].X + vScreen[A].Width >= bgo.Location.X) &&
+           (-vScreen[A].X <= bgo.Location.X + bgo.Width()) &&
+           (-vScreen[A].Y + vScreen[A].Height >= bgo.Location.Y) &&
+           (-vScreen[A].Y <= bgo.Location.Y + bgo.Height());
 }
 
 #if 0
