@@ -23,6 +23,7 @@
 #include "../custom.h"
 #include "npc_traits.h"
 #include "npc_id.h"
+#include "blk_id.h"
 
 void SetupVars()
 {
@@ -2140,6 +2141,22 @@ void SetupVars()
         BlockWidth[A] = 32;
         BlockHeight[A] = 32;
     }
+
+    for(int A = BLKID_MAZE_START; A <= BLKID_MAZE_END; A++)
+    {
+        BlockWidth[A] = 64;
+        BlockHeight[A] = 64;
+    }
+
+    BlockWidth[BLKID_MAZE_ENTER_LR] = 32;
+    BlockWidth[BLKID_MAZE_TRAVEL_LR] = 32;
+    BlockWidth[BLKID_MAZE_EXIT_L] = 32;
+    BlockWidth[BLKID_MAZE_EXIT_R] = 32;
+
+    BlockHeight[BLKID_MAZE_ENTER_UD] = 32;
+    BlockHeight[BLKID_MAZE_TRAVEL_UD] = 32;
+    BlockHeight[BLKID_MAZE_EXIT_U] = 32;
+    BlockHeight[BLKID_MAZE_EXIT_D] = 32;
 
     BlockWidth[571] = 64;
     BlockWidth[572] = 64;
