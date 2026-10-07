@@ -28,7 +28,7 @@ Changelog for 1.8-dev
 -Editor: in touch mode, show a preview of items covered by the user's finger (@ds-sloth)
 
 Changelog for 1.7.5-dev
--<comming soon>
+-Game saves now use a single file (".savx"), which includes timer and retry counters (@ds-sloth)
 
 Changelog for 1.7.4
 -Versioning system has been changed, now next releases will be done without the ".3." midfix (@Wohlstand)
