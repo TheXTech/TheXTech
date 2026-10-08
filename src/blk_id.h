@@ -101,7 +101,15 @@ enum BLKID
     BLKID_MAZE_EXIT_R = 717,
     BLKID_MAZE_END = 717,
 
-    BLKID_NORMAL_END = 717,
+    BLKID_TINY_SLIPPY = 697,
+    BLKID_TINY_HIT_BLOCK_S1 = 718,
+    BLKID_TINY_HIT_BLOCK_S4 = 719,
+    BLKID_TINY_HIT_BLOCK_S3 = 720,
+    BLKID_TINY_BRICK = 721,
+    BLKID_TINY_HITTABLE = 722,
+    BLKID_TINY_PASSTHROUGH = 723,
+
+    BLKID_NORMAL_END = 723,
 
     // these can be expanded into user-modifiable ranges in the future.
     // currently the "CONV" blocks can't be placed or modified in any way by the user
@@ -119,7 +127,8 @@ inline bool BlockTypeSlippy(int type)
     return (type == 189 || type == 190 || type == 191
         || type == 270 || type == 271 || type == 272
         || type == 620 || type == 621 || type == 633
-        || type == 634 || type == 241 || type == 242);
+        || type == 634 || type == 241 || type == 242
+        || type == BLKID_TINY_SLIPPY);
 }
 
 inline bool BlockTypeBreakable(int Type)
@@ -127,7 +136,7 @@ inline bool BlockTypeBreakable(int Type)
     return (Type == BLKID_BRICK_S3 || Type == BLKID_BLU_BRICK_S1 ||
        Type == BLKID_SPIN_BLOCK || Type == BLKID_BRICK_S1 ||
        Type == BLKID_BIG_BRICK_S3 || Type == BLKID_BOMB_DIRT_S2 ||
-       Type == BLKID_SPACE_BRICK);
+       Type == BLKID_SPACE_BRICK || Type == BLKID_TINY_BRICK);
 }
 
 inline bool BlockIsBreakable(const Block_t& block)

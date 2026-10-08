@@ -110,13 +110,13 @@ const int maxNPCs = 5000;
 //Public Const maxBackgrounds As Integer = 8000    'Max # of background objects
 const int maxBackgrounds = 8000;
 //Public Const maxBlockType As Integer = 700 'Maximum number of block types
-const int maxBlockType = 719;
+const int maxBlockType = 725;
 //Public Const maxBackgroundType As Integer = 200 'Maximum number of background types
 const int maxBackgroundType = 200;
 //Public Const maxSceneType As Integer = 100 'Maximum number of scenetypes
 const int maxSceneType = 100;
 //Public Const maxNPCType As Integer = 300 'Maximum number of NPC types
-const int maxNPCType = 309;
+const int maxNPCType = 310;
 //Public Const maxEffectType As Integer = 200 'Maximum number of effect types
 const int maxEffectType = 200;
 

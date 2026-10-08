@@ -375,7 +375,7 @@ void SetEditorBlockType(int type)
         && type != 55 && type != 90 && type != 170 && type != 171 && type != 172 && type != 173
         && type != 174 && type != 175 && type != 176 && type != 177 && type != 178 && type != 179 && type != 180
         && type != 181 && type != 622 && type != 623 && type != 624 && type != 625 && type != 626 && type != 627
-        && type != 628 && type != 629 && type != 631 && type != 632)
+        && type != 628 && type != 629 && type != 631 && type != 632 && type != BLKID_TINY_BRICK)
     {
         EditorCursor.Block.Special = 0;
     }

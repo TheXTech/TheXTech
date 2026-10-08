@@ -1508,6 +1508,12 @@ void SetupVars()
     NPCTraits[NPCID_HOMING_CANNON].TFrames = 5;
     NPCTraits[NPCID_HOMING_CANNON].FrameSpeed = 3;
     NPCTraits[NPCID_HOMING_CANNON].FrameStyle = 1;
+
+    NPCTraits[NPCID_TINY_COIN].TWidth = 16; // tiny coin
+    NPCTraits[NPCID_TINY_COIN].THeight = 16;
+    NPCTraits[NPCID_TINY_COIN].IsABonus = true;
+    NPCTraits[NPCID_TINY_COIN].IsACoin = true;
+
     NPCTraits[NPCID_COIN_S3].IsACoin = true;
     NPCTraits[NPCID_COIN_S4].IsACoin = true;
     NPCTraits[NPCID_COIN_5].IsACoin = true;
@@ -2245,6 +2251,27 @@ void SetupVars()
     {
         BlockHeight[A] = 64;
     }
+
+    For(A, 690, 699)
+    {
+        BlockWidth[A] = 16;
+        BlockHeight[A] = 16;
+    }
+
+    BlockWidth[700] = 16;
+
+    For(A, 718, 723)
+    {
+        BlockWidth[A] = 16;
+        BlockHeight[A] = 16;
+    }
+
+    BlockPSwitch[BLKID_TINY_HIT_BLOCK_S1] = true;
+    BlockPSwitch[BLKID_TINY_HIT_BLOCK_S4] = true;
+    BlockPSwitch[BLKID_TINY_HIT_BLOCK_S3] = true;
+    BlockPSwitch[BLKID_TINY_BRICK] = true;
+    BlockOnlyHitspot1[BLKID_TINY_PASSTHROUGH] = true;
+
     BlockWidth[301] = 128;
     BlockWidth[302] = 128;
     BlockWidth[303] = 128;

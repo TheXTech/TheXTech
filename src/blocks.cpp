@@ -253,11 +253,12 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     // Shake the block
     if(b.Type == 4 || b.Type == 615 || b.Type == 55 ||
-       b.Type == 60 || b.Type == 90 || b.Type == 159 ||
+       b.Type == 60 || b.Type == 90 || b.Type == BLKID_HITTABLE_BLOCK ||
        b.Type == 169 || b.Type == 170 || b.Type == 173 ||
        b.Type == 176 || b.Type == 179 || b.Type == 188 ||
        b.Type == 226 || b.Type == 281 || b.Type == 282 ||
-       b.Type == 283 || (b.Type >= BLKID_TO_CHAR1 && b.Type <= BLKID_TO_CHAR4))
+       b.Type == 283 || (b.Type >= BLKID_TO_CHAR1 && b.Type <= BLKID_TO_CHAR4) ||
+       b.Type == BLKID_TINY_BRICK || b.Type == BLKID_TINY_HITTABLE)
     {
         if(!HitDown)
             BlockShakeUp(A);
@@ -298,6 +299,10 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         newBlock = BLKID_BIG_HIT_BLOCK_S3;
     else if(b.Type == BLKID_HITTABLE_BLOCK) // SMB3 Battle Block
         newBlock = BLKID_HITTABLE_BLOCK;
+    else if(b.Type == BLKID_TINY_BRICK)
+        newBlock = BLKID_TINY_HIT_BLOCK_S3;
+    else if(b.Type >= BLKID_TINY_HIT_BLOCK_S1 && b.Type <= BLKID_TINY_HITTABLE)
+        newBlock = b.Type;
     else // Everything else defaults to SMB3
         newBlock = BLKID_HIT_BLOCK_S3;
 
@@ -346,6 +351,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                         nn.Type = NPCID_COIN_S4;
                     else if(newBlock == BLKID_HIT_BLOCK_S1)
                         nn.Type = NPCID_COIN_S1;
+                    else if(newBlock == BLKID_TINY_HIT_BLOCK_S3)
+                        nn.Type = NPCID_TINY_COIN;
                     else
                         nn.Type = NPCID_COIN_S3;
 
@@ -1738,6 +1745,8 @@ bool PSwitch(bool enabled)
                         nb.Type = BLKID_RED_HIT_BLOCK;
                     else if(NPC[A].Type == NPCID_COIN_S2)
                         nb.Type = BLKID_BOMB_DIRT_S2;
+                    else if(NPC[A].Type == NPCID_TINY_COIN)
+                        nb.Type = BLKID_TINY_HIT_BLOCK_S3;
                     else
                         nb.Type = BLKID_BRICK_S3;
 
@@ -1797,6 +1806,8 @@ bool PSwitch(bool enabled)
                         nn.Type = NPCID_RED_COIN;
                     else if(Block[A].Type == BLKID_BOMB_DIRT_S2)
                         nn.Type = NPCID_COIN_S2;
+                    else if(Block[A].Type == BLKID_TINY_HIT_BLOCK_S1 || Block[A].Type == BLKID_TINY_HIT_BLOCK_S4 || Block[A].Type == BLKID_TINY_HIT_BLOCK_S3 || Block[A].Type == BLKID_TINY_BRICK)
+                        nn.Type = NPCID_TINY_COIN;
                     else
                         nn.Type = NPCID_COIN_S3;
 

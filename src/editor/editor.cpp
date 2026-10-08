@@ -2446,6 +2446,9 @@ void PositionCursor()
     if(EditorCursor.Mode == OptCursor_t::LVL_PLAYERSTART)
         EditorCursor.Location.X -= 14;
 
+    if(EditorCursor.Mode == OptCursor_t::LVL_NPCS && EditorCursor.NPC.Type == NPCID_TINY_COIN)
+        return;
+
     if(EditorCursor.Mode == OptCursor_t::LVL_PLAYERSTART || EditorCursor.Mode == OptCursor_t::LVL_NPCS)
     {
         if(!(EditorCursor.Mode == OptCursor_t::LVL_NPCS && EditorCursor.NPC.Type == 52))
@@ -3346,7 +3349,8 @@ void MouseMove(int X, int Y, bool /*nCur*/)
         if(
             (EditorCursor.Mode == OptCursor_t::LVL_BLOCKS &&
             (EditorCursor.Block.Type == 534 || EditorCursor.Block.Type == 535 ||
-             EditorCursor.Block.Type == 536 || EditorCursor.Block.Type == 537)) ||
+             EditorCursor.Block.Type == 536 || EditorCursor.Block.Type == 537 ||
+             BlockWidth[EditorCursor.Block.Type] == 16)) ||
 
              EditorCursor.Mode == OptCursor_t::LVL_WARPS ||
 
@@ -3365,7 +3369,8 @@ void MouseMove(int X, int Y, bool /*nCur*/)
               (EditorCursor.Mode == OptCursor_t::LVL_NPCS &&
                (EditorCursor.NPC.Generator ||
                 EditorCursor.NPC.Type == 209 || EditorCursor.NPC.Type == 256 ||
-                EditorCursor.NPC.Type == 257 || EditorCursor.NPC.Type == 260))
+                EditorCursor.NPC.Type == 257 || EditorCursor.NPC.Type == 260 ||
+                EditorCursor.NPC.Type == NPCID_TINY_COIN))
         )
         {
             if(!(ffEqual(EditorCursor.Location.X, (X / 16) * 16 - vScreenX) &&
