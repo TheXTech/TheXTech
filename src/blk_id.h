@@ -107,9 +107,18 @@ enum BLKID
     BLKID_TINY_HIT_BLOCK_S3 = 720,
     BLKID_TINY_BRICK = 721,
     BLKID_TINY_HITTABLE = 722,
-    BLKID_TINY_PASSTHROUGH = 723,
+    BLKID_TINY_SEMISOLID = 723,
 
-    BLKID_NORMAL_END = 723,
+    BLKID_KAIZO_HURT = 724,
+    BLKID_KAIZO_KILL = 725,
+    BLKID_PLAYERPASS = 726,
+    BLKID_PLAYERPASS_SEMISOLID = 727,
+    BLKID_NPCPASS = 728,
+    BLKID_NPCPASS_SEMISOLID = 729,
+    BLKID_TRANSPARENT = 689,
+    BLKID_TRANSPARENT_SEMISOLID = 730,
+
+    BLKID_NORMAL_END = 730,
 
     // these can be expanded into user-modifiable ranges in the future.
     // currently the "CONV" blocks can't be placed or modified in any way by the user

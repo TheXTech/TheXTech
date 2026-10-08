@@ -2227,7 +2227,7 @@ void NPCSpecial(int A)
 
         for(Block_t& block : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
         {
-            if(!block.Hidden && !BlockNoClipping[block.Type] && !BlockIsSizable[block.Type] && !BlockOnlyHitspot1[block.Type])
+            if(!block.Hidden && !BlockNoClipping[block.Type] && !BlockIsSizable[block.Type] && !BlockOnlyHitspot1[block.Type] && block.Type != BLKID_NPCPASS)
             {
                 if(npc.Special == 1 && BlockSlope[block.Type])
                     continue;
@@ -2313,7 +2313,7 @@ void NPCSpecial(int A)
         {
             Block_t& block = *block_p;
 
-            if(!block.Hidden && !BlockNoClipping[block.Type] && !BlockIsSizable[block.Type] && !BlockOnlyHitspot1[block.Type])
+            if(!block.Hidden && !BlockNoClipping[block.Type] && !BlockIsSizable[block.Type] && !BlockOnlyHitspot1[block.Type] && block.Type != BLKID_NPCPASS)
             {
                 if(CheckCollision(tempLocation, block.Location))
                 {
@@ -3330,7 +3330,7 @@ void NPCSpecial(int A)
 
                 if(npc.tempBlock == B || Block[B].tempBlockNoProjClipping() ||
                    BlockOnlyHitspot1[Block[B].Type] || BlockIsSizable[Block[B].Type] ||
-                   BlockNoClipping[Block[B].Type] || Block[B].Hidden)
+                   BlockNoClipping[Block[B].Type] || Block[B].Hidden || Block[B].Type == BLKID_NPCPASS)
                 {
                     continue;
                 }
@@ -4929,7 +4929,7 @@ void SpecialNPC(int A)
                         }
                     }
 
-                    if(CheckCollision(tempLocation, Block[Ei].Location) && !BlockNoClipping[Block[Ei].Type])
+                    if(CheckCollision(tempLocation, Block[Ei].Location) && !BlockNoClipping[Block[Ei].Type] && Block[Ei].Type != BLKID_NPCPASS && Block[Ei].Type != BLKID_NPCPASS_SEMISOLID)
                     {
                         do_not_throw = true;
                         break;
@@ -5693,6 +5693,9 @@ bool npcHasFloor(const struct NPC_t &npc)
             continue; // Skip collision check to self
 
         if(BlockNoClipping[sb->Type] || sb->Hidden || sb->Invis || (npc.Projectile && sb->tempBlockNoProjClipping()))
+            continue;
+
+        if(sb->Type == BLKID_NPCPASS || sb->Type == BLKID_NPCPASS_SEMISOLID)
             continue;
 
         if(CheckCollision(checkLoc, sb->Location))

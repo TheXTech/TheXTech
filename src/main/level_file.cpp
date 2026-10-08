@@ -1787,6 +1787,9 @@ void OpenLevelDataPost()
 
     if(LevelEditor)
     {
+        BlockFrame[BLKID_TRANSPARENT] = 1;
+        BlockFrame[BLKID_TRANSPARENT_SEMISOLID] = 1;
+
         if(numSections < 21)
             numSections = 21;
 
@@ -1795,6 +1798,9 @@ void OpenLevelDataPost()
     }
     else
     {
+        BlockFrame[BLKID_TRANSPARENT] = 0;
+        BlockFrame[BLKID_TRANSPARENT_SEMISOLID] = 0;
+
         FindStars();
         LevelMacro = LEVELMACRO_OFF;
         for(int A = 0; A < numSections; A++) // Automatically correct 608 section height to 600

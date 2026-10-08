@@ -129,11 +129,18 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                             // for blocks that hurt the player
                             if(BlockHurts[Block[B].Type])
                             {
-                                if(Player[A].Mount == 2 ||
+                                // block that kills the player
+                                if(Block[B].Type == BLKID_KAIZO_KILL && !GodMode)
+                                {
+                                    PlayerDead(A);
+                                    break;
+                                }
+
+                                if((Player[A].Mount == 2 && Block[B].Type != BLKID_KAIZO_HURT) ||
                                     InvincibilityTime ||
                                    (
                                        ((HitSpot == 1 && Player[A].Mount) || (Player[A].Rolling && Player[A].State == PLR_STATE_SHELL)) &&
-                                       Block[B].Type != BLKID_PET_HURT
+                                       (Block[B].Type != BLKID_PET_HURT && Block[B].Type != BLKID_KAIZO_HURT)
                                    )
                                  )
                                 {}
@@ -148,7 +155,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                         PlayerHurt(A);
                                     }
 
-                                    if(Block[B].Type == BLKID_PET_HURT)
+                                    if(Block[B].Type == BLKID_PET_HURT || Block[B].Type == BLKID_KAIZO_HURT)
                                     {
                                         if(Player[A].Mount > 0 && HitSpot == 1)
                                         {

@@ -21,6 +21,7 @@
 #include "globals.h"
 #include "player.h"
 #include "npc.h"
+#include "blk_id.h"
 #include "npc_traits.h"
 #include "config.h"
 #include "collision.h"
@@ -184,6 +185,9 @@ void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, tempf_t
                 if(g_config.fix_npc247_collapse && isPokeyHead && Block[B].tempBlockNpcType != NPCID_STACKER)
                     continue;
 
+                if(Block[B].Type == BLKID_NPCPASS || Block[B].Type == BLKID_NPCPASS_SEMISOLID)
+                    continue;
+
                 if((tempLocation.X + tempLocation.Width >= Block[B].Location.X) &&
                    (tempLocation.X <= Block[B].Location.X + Block[B].Location.Width) &&
                    (tempLocation.Y + tempLocation.Height >= Block[B].Location.Y) &&
@@ -261,6 +265,10 @@ void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, tempf_t
             for(BlockRef_t block : collBlockSentinel2)
             {
                 int B = block;
+
+                if(Block[B].Type == BLKID_NPCPASS || Block[B].Type == BLKID_NPCPASS_SEMISOLID)
+                    continue;
+
                 if(!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 3))
                 {
                     if(CheckCollision(tempLocation, Block[B].Location))
@@ -309,6 +317,10 @@ void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, tempf_t
             for(BlockRef_t block : collBlockSentinel2)
             {
                 int B = block;
+
+                if(Block[B].Type == BLKID_NPCPASS || Block[B].Type == BLKID_NPCPASS_SEMISOLID)
+                    continue;
+
                 if(!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 1))
                 {
                     if(CheckCollision(tempLocation, Block[B].Location))

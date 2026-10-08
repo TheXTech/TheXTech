@@ -1345,6 +1345,11 @@ void BlockFrames()
         else
             BlockFrame2[458] = 0;
     }
+
+    BlockFrame[BLKID_PLAYERPASS] = SpecialFrame[8];
+    BlockFrame[BLKID_PLAYERPASS_SEMISOLID] = SpecialFrame[8];
+    BlockFrame[BLKID_NPCPASS] = SpecialFrame[8];
+    BlockFrame[BLKID_NPCPASS_SEMISOLID] = SpecialFrame[8];
 }
 
 bool PSwitch(bool enabled);
@@ -2149,6 +2154,9 @@ bool BlockCheckPlayerFilter(int blockIdx, int playerIdx)
         return (player == 4);
     case BLKID_CHAR5_PASS:
         return (player == 5);
+    case BLKID_PLAYERPASS:
+    case BLKID_PLAYERPASS_SEMISOLID:
+        return true;
     }
 
     return false;

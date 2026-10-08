@@ -23,6 +23,7 @@
 #include "blocks.h"
 #include "layers.h"
 #include "npc_traits.h"
+#include "blk_id.h"
 
 #include "main/trees.h"
 
@@ -185,7 +186,7 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
             {
                 const Block_t& b = Block[B];
 
-                if((!npc_A || b.tempBlockNpcIdx != npc_A) && (!plr_A || !BlockCheckPlayerFilter(B, plr_A)) && !b.Hidden && !b.Invis && !BlockOnlyHitspot1[b.Type] && !BlockIsSizable[b.Type] && !BlockNoClipping[b.Type])
+                if((!npc_A || (b.tempBlockNpcIdx != npc_A && b.Type != BLKID_NPCPASS)) && (!plr_A || !BlockCheckPlayerFilter(B, plr_A)) && !b.Hidden && !b.Invis && !BlockOnlyHitspot1[b.Type] && !BlockIsSizable[b.Type] && !BlockNoClipping[b.Type])
                 {
                     if(CheckCollision(edgeLoc, b.Location))
                     {

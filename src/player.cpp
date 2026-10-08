@@ -3101,7 +3101,11 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                         {
                             if(StabDir == 2)
                             {
-                                if(block.Type == BLKID_BOMB_DIRT_S2 || block.Type == BLKID_DIG_SAND
+                                if(block.Type == BLKID_KAIZO_HURT || block.Type == BLKID_KAIZO_KILL)
+                                {
+                                    // don't pogo these blocks
+                                }
+                                else if(block.Type == BLKID_BOMB_DIRT_S2 || block.Type == BLKID_DIG_SAND
                                     /* || block.ShakeY != 0 || block.ShakeY2 != 0 || block.ShakeY3 != 0 */
                                     || block.ShakeCounter != 0
                                     || block.Hidden || BlockHurts[block.Type])

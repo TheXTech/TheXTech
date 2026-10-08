@@ -2270,7 +2270,14 @@ void SetupVars()
     BlockPSwitch[BLKID_TINY_HIT_BLOCK_S4] = true;
     BlockPSwitch[BLKID_TINY_HIT_BLOCK_S3] = true;
     BlockPSwitch[BLKID_TINY_BRICK] = true;
-    BlockOnlyHitspot1[BLKID_TINY_PASSTHROUGH] = true;
+    BlockOnlyHitspot1[BLKID_TINY_SEMISOLID] = true;
+
+    BlockOnlyHitspot1[BLKID_TRANSPARENT_SEMISOLID] = true;
+    BlockOnlyHitspot1[BLKID_PLAYERPASS_SEMISOLID] = true;
+    BlockOnlyHitspot1[BLKID_NPCPASS_SEMISOLID] = true;
+
+    BlockHurts[BLKID_KAIZO_HURT] = true;
+    BlockHurts[BLKID_KAIZO_KILL] = true;
 
     BlockWidth[301] = 128;
     BlockWidth[302] = 128;

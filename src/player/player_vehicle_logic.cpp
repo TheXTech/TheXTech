@@ -24,6 +24,7 @@
 #include "config.h"
 #include "sound.h"
 #include "npc_traits.h"
+#include "blk_id.h"
 
 #include "main/trees.h"
 
@@ -57,7 +58,7 @@ void PlayerVehicleDismountCheck(int A)
         for(int B : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
         {
             if(!Block[B].Invis && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type] &&
-               !BlockNoClipping[Block[B].Type] && !Block[B].Hidden)
+               !BlockNoClipping[Block[B].Type] && !Block[B].Hidden && Block[B].Type != BLKID_PLAYERPASS)
             {
                 if(CheckCollision(tempLocation, Block[B].Location))
                 {
