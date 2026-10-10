@@ -4706,105 +4706,94 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
         return;
     }
 
-    SuperPrintR(mode, g_editorStrings.fileLabelCurrentFile + FileNameFull, 3, 10, 50);
+    // open level
+    SuperPrintR(mode, g_editorStrings.fileSectionLevel, 3, 110, 50);
+
+    SuperPrintR(mode, g_editorStrings.fileCommandNew, 3, 54, 80);
+    if(UpdateButton(mode, 10 + 4, 70 + 4, GFX.EIcons, false, 0, 32*Icon::newf, 32, 32))
+    {
+        m_special_page = SPECIAL_PAGE_FILE_CONFIRM;
+        m_special_subpage = 1;
+    }
+
+    SuperPrintR(mode, g_editorStrings.fileCommandOpen, 3, 54, 120);
+    if(UpdateButton(mode, 10 + 4, 110 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
+    {
+        m_special_page = SPECIAL_PAGE_FILE_CONFIRM;
+        m_special_subpage = 2;
+    }
+
+    // open world
+    SuperPrintR(mode, g_editorStrings.fileSectionWorld, 3, e_ScreenW/2 + 110, 50);
+
+    SuperPrintR(mode, g_editorStrings.fileCommandNew, 3, e_ScreenW/2 + 54, 80);
+    if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 70 + 4, GFX.EIcons, false, 0, 32*Icon::newf, 32, 32))
+    {
+        m_special_page = SPECIAL_PAGE_FILE_CONFIRM;
+        m_special_subpage = 11;
+    }
+
+    SuperPrintR(mode, g_editorStrings.fileCommandOpen, 3, e_ScreenW/2 + 54, 120);
+    if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 110 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
+    {
+        m_special_page = SPECIAL_PAGE_FILE_CONFIRM;
+        m_special_subpage = 12;
+    }
+
+    // current file info
+    SuperPrintR(mode, g_editorStrings.fileLabelCurrentFile + FileNameFull, 3, 10, 180);
 
     if(selWorld == 0)
     {
-        SuperPrintR(mode, g_editorStrings.fileLabelFormat, 3, 150, 90);
+        SuperPrintR(mode, g_editorStrings.fileLabelFormat, 3, 40, 210);
 
-        if(UpdateButton(mode, 320 + 4, 80 + 4, GFXNPC[NPCID_POWER_S3], FileFormat == FileFormats::LVL_SMBX64, 0, 0, 32, 32, g_editorStrings.fileFormatLegacy.c_str()) && FileFormat != FileFormats::LVL_SMBX64)
+        if(UpdateButton(mode, 210 + 4, 200 + 4, GFXNPC[NPCID_POWER_S3], FileFormat == FileFormats::LVL_SMBX64, 0, 0, 32, 32, g_editorStrings.fileFormatLegacy.c_str()) && FileFormat != FileFormats::LVL_SMBX64)
         {
             m_special_page = SPECIAL_PAGE_FILE_CONVERT;
             m_special_subpage = FileFormats::LVL_SMBX64;
         }
 
-        if(UpdateButton(mode, 360 + 4, 80 + 4, GFX.EIcons, FileFormat == FileFormats::LVL_PGEX, 0, 32*Icon::thextech, 32, 32, g_editorStrings.fileFormatModern.c_str()) && FileFormat != FileFormats::LVL_PGEX)
+        if(UpdateButton(mode, 250 + 4, 200 + 4, GFX.EIcons, FileFormat == FileFormats::LVL_PGEX, 0, 32*Icon::thextech, 32, 32, g_editorStrings.fileFormatModern.c_str()) && FileFormat != FileFormats::LVL_PGEX)
         {
             m_special_page = SPECIAL_PAGE_FILE_CONVERT;
             m_special_subpage = FileFormats::LVL_PGEX;
         }
     }
 
-    SuperPrintR(mode, g_editorStrings.fileSectionLevel, 3, 110, 140);
-
-    SuperPrintR(mode, g_editorStrings.fileCommandNew, 3, 54, 170);
-    if(UpdateButton(mode, 10 + 4, 160 + 4, GFX.EIcons, false, 0, 32*Icon::newf, 32, 32))
+    // save current file
+    SuperPrintR(mode, g_editorStrings.fileCommandSave, 3, 54, 250);
+    if(UpdateButton(mode, 10 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::save, 32, 32))
     {
-        m_special_page = SPECIAL_PAGE_FILE_CONFIRM;
-        m_special_subpage = 1;
-    }
-
-    SuperPrintR(mode, g_editorStrings.fileCommandOpen, 3, 54, 210);
-    if(UpdateButton(mode, 10 + 4, 200 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
-    {
-        m_special_page = SPECIAL_PAGE_FILE_CONFIRM;
-        m_special_subpage = 2;
-    }
-
-    if(!WorldEditor)
-    {
-        SuperPrintR(mode, g_editorStrings.fileCommandSave, 3, 54, 250);
-        if(UpdateButton(mode, 10 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::save, 32, 32))
-        {
+        if(WorldEditor)
+            SaveWorld(FullFileName, FileFormat);
+        else
             SaveLevel(FullFileName, FileFormat);
-        }
+    }
 
-        SuperPrintR(mode, g_editorStrings.fileCommandSaveAs, 3, 54, 290);
-        if(UpdateButton(mode, 10 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::save, 32, 32))
+    SuperPrintR(mode, g_editorStrings.fileCommandSaveAs, 3, 54, 290);
+    if(UpdateButton(mode, 10 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::save, 32, 32))
+    {
+        if(WorldEditor)
+        {
+            if(FileFormat == 1 || FileFormat == 2)
+                StartFileBrowser(&FullFileName, "", FileNamePath, {".wld"}, BROWSER_MODE_SAVE, BROWSER_CALLBACK_SAVE_WORLD);
+            else
+                StartFileBrowser(&FullFileName, "", FileNamePath, {".wldx"}, BROWSER_MODE_SAVE, BROWSER_CALLBACK_SAVE_WORLD);
+
+        }
         {
             if(FileFormat == 1 || FileFormat == 2)
                 StartFileBrowser(&FullFileName, "", FileNamePath, {".lvl"}, BROWSER_MODE_SAVE, BROWSER_CALLBACK_SAVE_LEVEL);
             else
                 StartFileBrowser(&FullFileName, "", FileNamePath, {".lvlx"}, BROWSER_MODE_SAVE, BROWSER_CALLBACK_SAVE_LEVEL);
         }
-
-        SuperPrintR(mode, g_editorStrings.fileActionRevert, 3, 54, 330);
-        if(UpdateButton(mode, 10 + 4, 320 + 4, GFX.EIcons, false, 0, 32*Icon::hop, 32, 32))
-        {
-            m_special_page = SPECIAL_PAGE_FILE_CONFIRM;
-            m_special_subpage = 3;
-        }
     }
 
-    SuperPrintR(mode, g_editorStrings.fileSectionWorld, 3, e_ScreenW/2 + 110, 140);
-
-    SuperPrintR(mode, g_editorStrings.fileCommandNew, 3, e_ScreenW/2 + 54, 170);
-    if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 160 + 4, GFX.EIcons, false, 0, 32*Icon::newf, 32, 32))
+    SuperPrintR(mode, g_editorStrings.fileActionRevert, 3, 54, 330);
+    if(UpdateButton(mode, 10 + 4, 320 + 4, GFX.EIcons, false, 0, 32*Icon::hop, 32, 32))
     {
         m_special_page = SPECIAL_PAGE_FILE_CONFIRM;
-        m_special_subpage = 11;
-    }
-
-    SuperPrintR(mode, g_editorStrings.fileCommandOpen, 3, e_ScreenW/2 + 54, 210);
-    if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 200 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
-    {
-        m_special_page = SPECIAL_PAGE_FILE_CONFIRM;
-        m_special_subpage = 12;
-    }
-
-    if(WorldEditor)
-    {
-        SuperPrintR(mode, g_editorStrings.fileCommandSave, 3, e_ScreenW/2 + 54, 250);
-        if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::save, 32, 32))
-        {
-            SaveWorld(FullFileName, FileFormat);
-        }
-
-        SuperPrintR(mode, g_editorStrings.fileCommandSaveAs, 3, e_ScreenW/2 + 54, 290);
-        if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::save, 32, 32))
-        {
-            if(FileFormat == 1 || FileFormat == 2)
-                StartFileBrowser(&FullFileName, "", FileNamePath, {".wld"}, BROWSER_MODE_SAVE, BROWSER_CALLBACK_SAVE_WORLD);
-            else
-                StartFileBrowser(&FullFileName, "", FileNamePath, {".wldx"}, BROWSER_MODE_SAVE, BROWSER_CALLBACK_SAVE_WORLD);
-        }
-
-        SuperPrintR(mode, g_editorStrings.fileActionRevert, 3, e_ScreenW/2 + 54, 330);
-        if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 320 + 4, GFX.EIcons, false, 0, 32*Icon::hop, 32, 32))
-        {
-            m_special_page = SPECIAL_PAGE_FILE_CONFIRM;
-            m_special_subpage = 13;
-        }
+        m_special_subpage = 3;
     }
 
     SuperPrintR(mode, g_editorStrings.fileActionExit, 3, 54, 410);
