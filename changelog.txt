@@ -2,6 +2,7 @@ TheXTech Changelog.
 
 Changelog for 1.7.5-dev
 -Game saves now use a single file (".savx"), which includes timer and retry counters (@ds-sloth)
+-Fix TheXTech 1.3.7.1 bug where a stack of static NPCs would only partially despawn, causing the upper NPCs to fall (@ds-sloth, thanks to @Liebning for the report)
 
 Changelog for 1.7.4
 -Versioning system has been changed, now next releases will be done without the ".3." midfix (@Wohlstand)
