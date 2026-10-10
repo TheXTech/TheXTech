@@ -2371,6 +2371,12 @@ void SetCursor()
         // EditorCursor.Warp is now the canonical Warp object.
         // It stores the warp's entrance and exit until the warp is placed,
         // overwriting most portions of the target warp.
+
+        if(EditorCursor.Warp.tinyRequired)
+        {
+            EditorCursor.Location.Width = 16;
+            EditorCursor.Location.Height = 16;
+        }
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_TILES) // Tiles
     {
@@ -2928,6 +2934,13 @@ void UpdateInteract()
 
                 int entr_flags = (start_resize) ? s_find_flags(Warp[A].Entrance) : 0;
                 int exit_flags = (start_resize) ? s_find_flags(Warp[A].Exit) : 0;
+
+                if(Warp[A].tinyRequired)
+                {
+                    entr_flags = 0;
+                    exit_flags = 0;
+                }
+
                 if(entr_flags || (EditorCursor.InteractMode == 0 && CursorCollision(EditorCursor.Location, Warp[A].Entrance)))
                 {
                     EditorCursor.InteractMode = OptCursor_t::LVL_WARPS;
@@ -3346,8 +3359,18 @@ void MouseMove(int X, int Y, bool /*nCur*/)
         X += (int)(vScreenX - vScreen[A].X);
         Y += (int)(vScreenY - vScreen[A].Y);
 
+        // 8x8 alignment
+        if(EditorCursor.Mode == OptCursor_t::LVL_PLAYERSTART || (EditorCursor.Mode == OptCursor_t::LVL_WARPS && EditorCursor.Warp.tinyRequired))
+        {
+            if(!(EditorCursor.Location.X == (X / 8) * 8 - vScreenX && EditorCursor.Location.Y == (Y / 8) * 8 - vScreenY))
+            {
+                EditorCursor.Location.X = (X / 8) * 8 - vScreenX;
+                EditorCursor.Location.Y = (Y / 8) * 8 - vScreenY;
+                PositionCursor();
+            }
+        }
         // 16x16 alignment
-        if(
+        else if(
             (EditorCursor.Mode == OptCursor_t::LVL_BLOCKS &&
             (EditorCursor.Block.Type == 534 || EditorCursor.Block.Type == 535 ||
              EditorCursor.Block.Type == 536 || EditorCursor.Block.Type == 537 ||
@@ -3382,22 +3405,7 @@ void MouseMove(int X, int Y, bool /*nCur*/)
                 PositionCursor();
             }
         }
-        else if(EditorCursor.Mode == OptCursor_t::LVL_PLAYERSTART)
-        {
-            if(!(EditorCursor.Location.X == (X / 8) * 8 - vScreenX && EditorCursor.Location.Y == (Y / 8) * 8 - vScreenY))
-            {
-                EditorCursor.Location.X = (X / 8) * 8 - vScreenX;
-                EditorCursor.Location.Y = (Y / 8) * 8 - vScreenY;
-                PositionCursor();
-            }
-        }
-        else if(EditorCursor.Mode == OptCursor_t::WLD_SCENES)
-        {
-            EditorCursor.Location.X = (X / 16) * 16 - vScreenX;
-            EditorCursor.Location.Y = ((Y + 8) / 16) * 16 - vScreenY - 8;
-            PositionCursor();
-        }
-        else if(EditorCursor.Mode == OptCursor_t::LVL_WATER)
+        else if(EditorCursor.Mode == OptCursor_t::WLD_SCENES || EditorCursor.Mode == OptCursor_t::LVL_WATER)
         {
             EditorCursor.Location.X = (X / 16) * 16 - vScreenX;
             EditorCursor.Location.Y = ((Y + 8) / 16) * 16 - vScreenY - 8;
