@@ -6337,7 +6337,12 @@ void PlayerEffects(const int A)
 
         if(p.Effect2 == 0)
         {
-            if(p.State == 1 && p.Mount == 0)
+            if(target_state == PLR_STATE_TINY)
+            {
+                p.State = target_state;
+                SizeCheck(p);
+            }
+            else if(p.State == 1 && p.Mount == 0)
             {
                 p.Location.X += (-Physics.PlayerWidth[p.Character][2] + Physics.PlayerWidth[p.Character][1]) / 2;
                 p.Location.Y += -Physics.PlayerHeight[p.Character][2] + Physics.PlayerHeight[p.Character][1];
