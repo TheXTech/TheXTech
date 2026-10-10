@@ -495,11 +495,11 @@ void UpdateEditor()
         UpdateInteract();
 
         // affect the world when holding the mouse, or when you've just released the mouse if not resizing something
-        if((MouseClick_Current || (MouseRelease_New && EditorCursor.InteractFlags == 0)) && !editorScreen.active && EditorCursor.Y > 40)
+        if((MouseClick_Current || (MouseRelease_New && EditorCursor.InteractFlags <= 1)) && !editorScreen.active && EditorCursor.Y > 40)
         {
             CanPlace = true;
-            // for the select cursor, only pick things up (InteractFlags == 0) on release
-            if(EditorCursor.Mode == OptCursor_t::LVL_SELECT && (MouseRelease_New || EditorCursor.InteractFlags != 0))
+            // for the select cursor, only pick things up (InteractFlags <= 1) on release
+            if(EditorCursor.Mode == OptCursor_t::LVL_SELECT && (MouseRelease_New || EditorCursor.InteractFlags > 1))
             {
                 if(EditorCursor.InteractMode == OptCursor_t::LVL_PLAYERSTART && MouseRelease_New) // Player start points
                 {
@@ -659,7 +659,7 @@ void UpdateEditor()
                     SpeedlessLocation_t& iLoc = (EditorCursor.InteractFlags & IF_AltMode) ? Warp[EditorCursor.InteractIndex].Exit : Warp[EditorCursor.InteractIndex].Entrance;
                     InteractResize(iLoc, 32, 32);
                 }
-                else if(EditorCursor.InteractMode == OptCursor_t::LVL_WARPS) // Warps
+                else if(EditorCursor.InteractMode == OptCursor_t::LVL_WARPS && MouseRelease_New) // Warps
                 {
                     int ia = EditorCursor.InteractIndex;
                     PlaySound(SFX_Grab);
@@ -1425,7 +1425,7 @@ void UpdateEditor()
                 else if(Warp[A].PlacedExit)
                     EditorCursor.Warp.Exit = Warp[A].Exit;
 
-                if(EditorCursor.SubMode == 1 || EditorCursor.Warp.level != STRINGINDEX_NONE || EditorCursor.Warp.LevelEnt || EditorCursor.Warp.MapWarp)
+                if(EditorCursor.SubMode != 2 || EditorCursor.Warp.level != STRINGINDEX_NONE || EditorCursor.Warp.LevelEnt || EditorCursor.Warp.MapWarp)
                 {
                     EditorCursor.Warp.Entrance = static_cast<SpeedlessLocation_t>(EditorCursor.Location);
                     MouseCancel = true;
@@ -2838,7 +2838,7 @@ void UpdateInteract()
     bool erase_mode = EditorCursor.Mode == OptCursor_t::LVL_ERASER;
     bool start_resize = select_mode && !mouse_held;
 
-    if(select_mode && EditorCursor.InteractFlags != 0)
+    if(select_mode && EditorCursor.InteractFlags > 1)
     {
         if(mouse_held)
             return;
@@ -2919,7 +2919,7 @@ void UpdateInteract()
         }
 
         // warps (now sizable)
-        if(!MagicHand && ((select_mode && EditorCursor.InteractFlags < 2) || EditorCursor.InteractMode == 0) && (!need_class || need_class == OptCursor_t::LVL_WARPS))
+        if(!MagicHand && ((select_mode && EditorCursor.InteractFlags <= 1) || EditorCursor.InteractMode == 0) && (!need_class || need_class == OptCursor_t::LVL_WARPS))
         {
             for(int A = 1; A <= numWarps; A++)
             {
