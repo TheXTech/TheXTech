@@ -878,7 +878,7 @@ void AbstractRender_t::renderGrid(int size, int xOff, int yOff)
         ((uint8_t*)(&black))[3] = 0xFF;
         for(int i = 0; i < 32; i++)
         {
-            uint32_t col = (i & 8) ? black : white;
+            uint32_t col = (i & (size / 4)) ? black : white;
             pixels[i] = col;
             pixels[32 * i] = col;
         }

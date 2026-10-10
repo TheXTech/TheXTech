@@ -1271,6 +1271,12 @@ struct EditorCursor_t
     int InteractX = 0;
     int InteractY = 0;
 
+    int ForceGrid = -1;
+    int CurrentGrid = 32;
+    bool ShowGrid = true;
+    bool Paintbrush = false;
+    // bool Paintbrush = false;
+
 //    Location As Location
     Location_t Location;
 //    Layer As String 'current layer

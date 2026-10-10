@@ -2212,6 +2212,9 @@ void GetEditorControls()
 
 void SetCursor()
 {
+    int DefaultGrid = 32;
+    EditorCursor.Paintbrush = false;
+
 //    EditorCursor.Layer = frmLayers::lstLayer::List(frmLayers::lstLayer::ListIndex);
     if(EditorCursor.Mode == OptCursor_t::LVL_ERASER) // Eraser
     {
@@ -2241,6 +2244,7 @@ void SetCursor()
             // EditorCursor.Water.Quicksand = false;
 //        else
 //            EditorCursor.Water.Quicksand = false;
+        DefaultGrid = 16;
     }
     else if(EditorCursor.Mode == OptCursor_t::LVL_BLOCKS) // Blocks
     {
@@ -2284,9 +2288,13 @@ void SetCursor()
 
         EditorCursor.Location.Width = EditorCursor.Block.Location.Width;
         EditorCursor.Location.Height = EditorCursor.Block.Location.Height;
+
+        if((BlockWidth[EditorCursor.Block.Type] & 16) || (BlockHeight[EditorCursor.Block.Type] & 16))
+            DefaultGrid = 16;
     }
     else if(EditorCursor.Mode == OptCursor_t::LVL_PLAYERSTART) // Level
     {
+        DefaultGrid = 8;
         if(EditorCursor.SubMode == 4)
         {
             EditorCursor.Location.Width = Physics.PlayerWidth[1][2]; // Mario
@@ -2312,6 +2320,17 @@ void SetCursor()
         // EditorCursor.Background.Location.Height = BackgroundHeight[EditorCursor.Background.Type];
         EditorCursor.Location.Width = EditorCursor.Background.Width();
         EditorCursor.Location.Height = EditorCursor.Background.Height();
+
+        if(EditorCursor.Background.Type == 71 ||
+          EditorCursor.Background.Type == 72 ||
+          EditorCursor.Background.Type == 73 ||
+          EditorCursor.Background.Type == 141 ||
+          EditorCursor.Background.Type == 74 ||
+          EditorCursor.Background.Type == 70 ||
+          EditorCursor.Background.Type == 100)
+        {
+            DefaultGrid = 16;
+        }
     }
     else if(EditorCursor.Mode == OptCursor_t::LVL_NPCS) // NPCs
     {
@@ -2355,6 +2374,15 @@ void SetCursor()
 
         EditorCursor.NPC.Frame = EditorNPCFrame(EditorCursor.NPC.Type, EditorCursor.NPC.Direction);
         EditorCursor.NPC.Active = true;
+
+        if(EditorCursor.NPC.Generator ||
+            EditorCursor.NPC.Type == 209 || EditorCursor.NPC.Type == 256 ||
+            EditorCursor.NPC.Type == 257 || EditorCursor.NPC.Type == 260 ||
+            EditorCursor.NPC.Type == 52 ||
+            EditorCursor.NPC.Type == NPCID_TINY_COIN)
+        {
+            DefaultGrid = 16;
+        }
     }
     else if(EditorCursor.Mode == OptCursor_t::LVL_WARPS) // Warps
     {
@@ -2372,10 +2400,13 @@ void SetCursor()
         // It stores the warp's entrance and exit until the warp is placed,
         // overwriting most portions of the target warp.
 
+        DefaultGrid = 16;
+
         if(EditorCursor.Warp.tinyRequired)
         {
             EditorCursor.Location.Width = 16;
             EditorCursor.Location.Height = 16;
+            DefaultGrid = 8;
         }
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_TILES) // Tiles
@@ -2394,6 +2425,8 @@ void SetCursor()
         EditorCursor.Location.Width = SceneWidth[EditorCursor.Scene.Type];
         EditorCursor.Location.Height = SceneHeight[EditorCursor.Scene.Type];
         EditorCursor.Scene.Location = static_cast<TinyLocation_t>(EditorCursor.Location);
+
+        DefaultGrid = 16;
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_LEVELS) // Levels
     {
@@ -2433,6 +2466,11 @@ void SetCursor()
         if(EditorCursor.WorldArea.Location.Height < 32)
             EditorCursor.WorldArea.Location.Height = 32;
     }
+
+    if(EditorCursor.ForceGrid == -1)
+        EditorCursor.CurrentGrid = DefaultGrid;
+    else
+        EditorCursor.CurrentGrid = EditorCursor.ForceGrid;
 }
 
 void PositionCursor()
@@ -2443,7 +2481,7 @@ void PositionCursor()
     if(EditorCursor.Mode == OptCursor_t::LVL_SELECT)
         return;
 
-    if(!enableAutoAlign)
+    if(EditorCursor.CurrentGrid == 0)
     {
         EditorCursor.Location.X += -EditorCursor.Location.Width + 4;
         EditorCursor.Location.Y += -EditorCursor.Location.Height + 12;
@@ -2458,7 +2496,7 @@ void PositionCursor()
 
     if(EditorCursor.Mode == OptCursor_t::LVL_PLAYERSTART || EditorCursor.Mode == OptCursor_t::LVL_NPCS)
     {
-        if(!(EditorCursor.Mode == OptCursor_t::LVL_NPCS && EditorCursor.NPC.Type == 52))
+        if(!(EditorCursor.Mode == OptCursor_t::LVL_NPCS && EditorCursor.NPC.Type == NPCID_SIDE_PLANT))
         {
             num_t odd_width = EditorCursor.Location.Width - num_t::floor(EditorCursor.Location.Width / 32) * 32;
             num_t odd_height = EditorCursor.Location.Height - num_t::floor(EditorCursor.Location.Height / 32) * 32;
@@ -3359,64 +3397,13 @@ void MouseMove(int X, int Y, bool /*nCur*/)
         X += (int)(vScreenX - vScreen[A].X);
         Y += (int)(vScreenY - vScreen[A].Y);
 
-        // 8x8 alignment
-        if(EditorCursor.Mode == OptCursor_t::LVL_PLAYERSTART || (EditorCursor.Mode == OptCursor_t::LVL_WARPS && EditorCursor.Warp.tinyRequired))
+        if(EditorCursor.CurrentGrid != 0)
         {
-            if(!(EditorCursor.Location.X == (X / 8) * 8 - vScreenX && EditorCursor.Location.Y == (Y / 8) * 8 - vScreenY))
-            {
-                EditorCursor.Location.X = (X / 8) * 8 - vScreenX;
-                EditorCursor.Location.Y = (Y / 8) * 8 - vScreenY;
-                PositionCursor();
-            }
+            EditorCursor.Location.X = (X / EditorCursor.CurrentGrid) * EditorCursor.CurrentGrid - vScreenX;
+            EditorCursor.Location.Y = ((Y + 8) / EditorCursor.CurrentGrid) * EditorCursor.CurrentGrid - vScreenY - 8;
         }
-        // 16x16 alignment
-        else if(
-            (EditorCursor.Mode == OptCursor_t::LVL_BLOCKS &&
-            (EditorCursor.Block.Type == 534 || EditorCursor.Block.Type == 535 ||
-             EditorCursor.Block.Type == 536 || EditorCursor.Block.Type == 537 ||
-             BlockWidth[EditorCursor.Block.Type] == 16)) ||
 
-             EditorCursor.Mode == OptCursor_t::LVL_WARPS ||
-
-            (EditorCursor.Mode == OptCursor_t::LVL_NPCS &&
-             EditorCursor.NPC.Type == 52) ||
-
-            (EditorCursor.Mode == OptCursor_t::LVL_BGOS &&
-             (EditorCursor.Background.Type == 71 ||
-              EditorCursor.Background.Type == 72 ||
-              EditorCursor.Background.Type == 73 ||
-              EditorCursor.Background.Type == 141 ||
-              EditorCursor.Background.Type == 74 ||
-              EditorCursor.Background.Type == 70 ||
-              EditorCursor.Background.Type == 100)) ||
-
-              (EditorCursor.Mode == OptCursor_t::LVL_NPCS &&
-               (EditorCursor.NPC.Generator ||
-                EditorCursor.NPC.Type == 209 || EditorCursor.NPC.Type == 256 ||
-                EditorCursor.NPC.Type == 257 || EditorCursor.NPC.Type == 260 ||
-                EditorCursor.NPC.Type == NPCID_TINY_COIN))
-        )
-        {
-            if(!(ffEqual(EditorCursor.Location.X, (X / 16) * 16 - vScreenX) &&
-                 ffEqual(EditorCursor.Location.Y, ((Y + 8) / 16) * 16 - vScreenY - 8)) )
-            {
-                EditorCursor.Location.X = (X / 16) * 16 - vScreenX;
-                EditorCursor.Location.Y = ((Y + 8) / 16) * 16 - vScreenY - 8;
-                PositionCursor();
-            }
-        }
-        else if(EditorCursor.Mode == OptCursor_t::WLD_SCENES || EditorCursor.Mode == OptCursor_t::LVL_WATER)
-        {
-            EditorCursor.Location.X = (X / 16) * 16 - vScreenX;
-            EditorCursor.Location.Y = ((Y + 8) / 16) * 16 - vScreenY - 8;
-            PositionCursor();
-        }
-        else // Everything also align as 32x32
-        {
-            EditorCursor.Location.X = (X / 32) * 32 - vScreenX;
-            EditorCursor.Location.Y = ((Y + 8) / 32) * 32 - vScreenY - 8;
-            PositionCursor();
-        }
+        PositionCursor();
     }
 //    if(nPlay.Online == true && nCur == true)
 //    {
