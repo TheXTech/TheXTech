@@ -377,6 +377,10 @@ void PlayerEffectWarpPipe(int A)
                 NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
                 NPC[p.HoldingNPC].Location.X = p.Location.X + (p.Location.Width - NPC[p.HoldingNPC].Location.Width) / 2;
             }
+
+            // synchronizes tiny state with other states
+            if(p.State == PLR_STATE_TINY)
+                leftToGoal_end = -24;
         }
         else if(warp_dir_enter == LevelDoor::ENTRANCE_LEFT || warp_dir_enter == LevelDoor::ENTRANCE_RIGHT)
         {
