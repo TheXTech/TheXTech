@@ -66,6 +66,7 @@ extern "C"
 #include "pge_video_rec.h"
 
 #define HAS_CHANNELLAYOUT (LIBAVUTIL_VERSION_MAJOR >= 58)
+#define HAS_SUPPORTEDCONFIG (LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100))
 
 #undef av_err2str
 
@@ -393,19 +394,29 @@ static bool open_audio(const PGE_VideoRecording_VP8* THIS,
     int ret;
     AVDictionary* opt = NULL;
 
+#if HAS_SUPPORTEDCONFIG
+    const enum AVSampleFormat* sample_fmts = nullptr;
+    const int* supported_samplerates = nullptr;
+    avcodec_get_supported_config(nullptr, codec, AV_CODEC_CONFIG_SAMPLE_FORMAT, 0, (const void**)&sample_fmts, nullptr);
+    avcodec_get_supported_config(nullptr, codec, AV_CODEC_CONFIG_SAMPLE_RATE, 0, (const void**)&supported_samplerates, nullptr);
+#else
+    const enum AVSampleFormat* sample_fmts = codec->sample_fmts;
+    const int* supported_samplerates = codec->supported_samplerates;
+#endif
+
     // fill parameters
-    ost->enc->sample_fmt  = codec->sample_fmts ? codec->sample_fmts[0] : AV_SAMPLE_FMT_FLTP;
+    ost->enc->sample_fmt  = sample_fmts ? sample_fmts[0] : AV_SAMPLE_FMT_FLTP;
     ost->enc->bit_rate    = 64000;
     ost->enc->sample_rate = THIS->spec.audio_sample_rate;
 
     // restrict sample rate to supported list
-    if(codec->supported_samplerates)
+    if(supported_samplerates)
     {
         bool sample_rate_supported = false;
 
-        for(int i = 0; codec->supported_samplerates[i]; i++)
+        for(int i = 0; supported_samplerates[i]; i++)
         {
-            if(codec->supported_samplerates[i] == THIS->spec.audio_sample_rate)
+            if(supported_samplerates[i] == THIS->spec.audio_sample_rate)
             {
                 sample_rate_supported = true;
                 break;
@@ -413,7 +424,7 @@ static bool open_audio(const PGE_VideoRecording_VP8* THIS,
         }
 
         if(!sample_rate_supported)
-            ost->enc->sample_rate = codec->supported_samplerates[0];
+            ost->enc->sample_rate = supported_samplerates[0];
     }
 
 #if HAS_CHANNELLAYOUT
