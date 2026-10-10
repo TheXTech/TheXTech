@@ -3377,11 +3377,12 @@ void MouseMove(int X, int Y, bool /*nCur*/)
         X += (int)(vScreenX - vScreen[A].X);
         Y += (int)(vScreenY - vScreen[A].Y);
 
-        if(EditorCursor.CurrentGrid != 0)
-        {
-            EditorCursor.Location.X = (X / EditorCursor.CurrentGrid) * EditorCursor.CurrentGrid - vScreenX;
-            EditorCursor.Location.Y = ((Y + 8) / EditorCursor.CurrentGrid) * EditorCursor.CurrentGrid - vScreenY - 8;
-        }
+        int use_grid = EditorCursor.CurrentGrid;
+        if(EditorCursor.CurrentGrid == 0)
+            use_grid = 2;
+
+        EditorCursor.Location.X = (X / use_grid) * use_grid - vScreenX;
+        EditorCursor.Location.Y = ((Y + 8) / use_grid) * use_grid - vScreenY - 8;
 
         PositionCursor();
     }
