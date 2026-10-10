@@ -283,11 +283,12 @@ static void FancyKillBlock(int A, bool Splode = true)
     MagicBlock::MagicBlock(type, loc);
 }
 
-static void FancyKillBackground(int ia)
+static void FancyKillBackground(int ia, bool Effect = true)
 {
     Location_t loc = static_cast<Location_t>(Background[ia].FullLocation());
     int type = Background[ia].Type;
-    NewEffect(EFFID_SMOKE_S3_CENTER, loc);
+    if(Effect)
+        NewEffect(EFFID_SMOKE_S3_CENTER, loc);
 
     Background[ia] = Background[numBackground];
     numBackground--;
@@ -371,7 +372,7 @@ void UpdateEditor()
             FancyKillBlock(JustPlacedBlock, false);
 
         if(JustPlacedBackground)
-            FancyKillBackground(JustPlacedBackground);
+            FancyKillBackground(JustPlacedBackground, false);
 
         if(JustPlacedNPC)
             KillNPC(JustPlacedNPC, 9);
@@ -712,7 +713,7 @@ void UpdateEditor()
                     EditorCursor.Location.Y = Background[ia].Location.Y;
                     SetCursor();
 
-                    FancyKillBackground(ia);
+                    FancyKillBackground(ia, false);
 
                     editorScreen.FocusBGO();
 
