@@ -867,7 +867,8 @@ void AbstractRender_t::renderSizableBlock(int bLeftOnscreen, int bTopOnscreen, i
 
 void AbstractRender_t::renderGrid(int size, int xOff, int yOff)
 {
-    if(!m_gridTexture.inited || m_gridTexture.w != size)
+    static int last_grid = 0;
+    if(!m_gridTexture.inited || last_grid != size)
     {
         unloadTexture(m_gridTexture);
 
@@ -883,18 +884,30 @@ void AbstractRender_t::renderGrid(int size, int xOff, int yOff)
             pixels[32 * i] = col;
         }
 
-        m_gridTexture.w = size;
-        m_gridTexture.h = size;
-        loadTexture(m_gridTexture, size, size, (uint8_t*)pixels.data(), 32 * 4);
+        m_gridTexture.w = 32;
+        m_gridTexture.h = 32;
+        loadTexture(m_gridTexture, 32, 32, (uint8_t*)pixels.data(), 32 * 4);
+        last_grid = size;
     }
 
     int startX = xOff % 32 - 32;
     int startY = yOff % 32 - 32;
 
-    for(int x = startX; x < XRender::TargetW; x += size)
+    for(int x = startX; x < XRender::TargetW; x += 32)
     {
-        for(int y = startY; y < XRender::TargetH; y += size)
-            renderTextureScale(x, y, size, size, m_gridTexture, XTAlpha(96));
+        for(int y = startY; y < XRender::TargetH; y += 32)
+        {
+            renderTextureScale(x, y, 32, 32, m_gridTexture, XTAlpha(96));
+
+            if(size <= 16)
+                renderTextureScale(x + 16, y + 16, 32, 32, m_gridTexture, XTAlpha(32));
+
+            if(size <= 8)
+            {
+                renderTextureScale(x + 8, y + 8, 32, 32, m_gridTexture, XTAlpha(16));
+                renderTextureScale(x + 24, y + 24, 32, 32, m_gridTexture, XTAlpha(16));
+            }
+        }
     }
 }
 

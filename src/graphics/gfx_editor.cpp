@@ -260,7 +260,7 @@ void DrawEditorLevel(int Z)
         int vScreenY = ((camY_i + 8) >> 5) * 32;
 
         if(EditorCursor.CurrentGrid && EditorCursor.ShowGrid)
-            XRender::renderGrid(32, camX_i - vScreenX, camY_i - vScreenY);
+            XRender::renderGrid(EditorCursor.CurrentGrid, camX_i - vScreenX, camY_i - vScreenY);
     }
 
 #ifdef __3DS__
@@ -576,7 +576,7 @@ void DrawEditorWorld()
     int vScreenY = (camY >> 5) * 32;
 
     if(EditorCursor.CurrentGrid && EditorCursor.ShowGrid)
-        XRender::renderGrid(32, camX - vScreenX, camY - vScreenY);
+        XRender::renderGrid(EditorCursor.CurrentGrid, camX - vScreenX, camY - vScreenY);
 
 #ifdef __3DS__
     // disable cursor rendering on inactive screen of 3DS
