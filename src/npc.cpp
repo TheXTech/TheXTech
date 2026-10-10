@@ -242,8 +242,8 @@ void Deactivate(int A)
             // prevent instantly respawning, unless the animation will be totally seamless
             if(!g_config.fix_npc_camera_logic
                 || !NPC_InactiveRender(NPC[A])
-                || num_t::floor(NPC[A].Location.X) != num_t::floor(NPC[A].DefaultLocationX)
-                || num_t::floor(NPC[A].Location.Y) != num_t::floor(NPC[A].DefaultLocationY))
+                || (int)(NPC[A].Location.X - NPC[A].DefaultLocationX) != 0
+                || (int)(NPC[A].Location.Y - NPC[A].DefaultLocationY) != 0)
             {
                 NPC[A].Reset[1] = false;
                 NPC[A].Reset[2] = false;

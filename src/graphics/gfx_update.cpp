@@ -1470,8 +1470,8 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
             // if it will look different after resetting, don't reset it
             if(!cannot_reset && render &&
                     (!NPC_InactiveRender(NPC[A])
-                        || num_t::floor(NPC[A].Location.X) != num_t::floor(NPC[A].DefaultLocationX)
-                        || num_t::floor(NPC[A].Location.Y) != num_t::floor(NPC[A].DefaultLocationY)
+                        || (int)(NPC[A].Location.X - NPC[A].DefaultLocationX) != 0
+                        || (int)(NPC[A].Location.Y - NPC[A].DefaultLocationY) != 0
                         || (!NPC[A].Active && !NPC[A].Reset[2])
                     )
                 )
