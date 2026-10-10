@@ -1338,31 +1338,32 @@ static bool WarpCollision(const Player_t &p, const SpeedlessLocation_t &entrance
     num_t X2 = 0;
     num_t Y2 = 0;
 
+    // these values were previously hardcoded
     if(direction == 3)
     {
         X2 = 0;
-        Y2 = 32;
+        Y2 = entrance.Height; // 32
     }
     else if(direction == 1)
     {
         X2 = 0;
-        Y2 = -30;
+        Y2 = -(entrance.Height - 2); // 30
     }
     else if(direction == 2)
     {
-        X2 = -31;
-        Y2 = 32;
+        X2 = -(entrance.Width - 1); // 31
+        Y2 = entrance.Height; // 32
     }
     else if(direction == 4)
     {
-        X2 = 31;
-        Y2 = 32;
+        X2 = (entrance.Width - 1); // 31
+        Y2 = entrance.Height; // 32
     }
 
     if(p.AquaticSwim && Y2 > 0)
-        Y2 = 30;
+        Y2 -= 2;
     else if(p.State == PLR_STATE_TINY && Y2 < 0)
-        Y2 = -16;
+        Y2 += 2;
 
     if(Loc1.X <= entrance.X + entrance.Width + X2)
     {
