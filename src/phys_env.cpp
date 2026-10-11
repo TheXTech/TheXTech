@@ -171,17 +171,47 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
             exit_check_y = center_y;
         }
 
-        // need to find a new direction
         Location_t edgeLoc;
-        edgeLoc.X = exit_check_x - 15 + target_speed_x * 4;
-        edgeLoc.Y = exit_check_y - 15 + target_speed_y * 4;
-        edgeLoc.Width = 30;
-        edgeLoc.Height = 30;
 
         cleared_to_exit = true;
 
         if(need_new_maze)
         {
+            // need to check whether exit is blocked
+
+            // Known issues:
+            // - the exit can become blocked after the player enters the maze zone, locking the player in the maze zone
+            // - it is possible (by ducking or changing state while in the maze zone) to enter a maze zone you cannot exit
+
+            // Potential fix: allow the player to "force" their way out of the maze zone by holding the jump button,
+            // which will lead to them clipping through whatever exists outside of the maze zone.
+
+            edgeLoc.X = exit_check_x;
+            edgeLoc.Y = exit_check_y;
+            edgeLoc.Width = loc.Width - 2;
+            edgeLoc.Height = loc.Height - 2;
+
+            if(direction == MAZE_DIR_UP)
+            {
+                edgeLoc.Y += 5;
+                edgeLoc.Y -= loc.Height;
+                edgeLoc.Height -= 4;
+            }
+            else if(direction == MAZE_DIR_DOWN)
+                edgeLoc.Y += 2;
+            else
+                edgeLoc.Y -= loc.Height / 2;
+
+            if(direction == MAZE_DIR_LEFT)
+            {
+                edgeLoc.X -= 2;
+                edgeLoc.X -= loc.Width;
+            }
+            else if(direction == MAZE_DIR_RIGHT)
+                edgeLoc.X += 2;
+            else
+                edgeLoc.X -= loc.Width / 2;
+
             for(int B : treeBlockQuery(edgeLoc, SORTMODE_NONE))
             {
                 const Block_t& b = Block[B];
@@ -222,6 +252,9 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
 
             edgeLoc.X = exit_check_x - 15;
             edgeLoc.Y = exit_check_y - 15;
+            edgeLoc.Width = 30;
+            edgeLoc.Height = 30;
+
             if(!need_new_maze)
             {
                 edgeLoc.X = exit_check_x;
