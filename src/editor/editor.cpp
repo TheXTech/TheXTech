@@ -2450,7 +2450,7 @@ void SetCursor()
     {
         EditorCursor.CurrentGrid = EditorCursor.ForceGrid;
 
-        if(EditorCursor.CurrentGrid < 32)
+        if(EditorCursor.CurrentGrid < 32 && EditorCursor.Mode != OptCursor_t::LVL_ERASER)
             EditorCursor.Paintbrush = false;
     }
 }
