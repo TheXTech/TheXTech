@@ -1001,17 +1001,19 @@ public:
     opt<bool> fix_warp_exit_checkpoints{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-warp-exit-checkpoints", "Fix warp exit checkpoints", "Fixes the problem when checkpoints weren't been reset when player correctly exits level via warps."};
 
-    // 1.3.7.4
+    // 1.7.4
     opt<bool> fix_vehicle_item_loss{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-vehicle-item-loss", "Fix vehicle item loss", "Prevents risk of losing items when entering vehicle"};
 
-    // 1.3.8
+    // 1.7.5
     opt<bool> new_conveyor_belts{this, defaults(true), {CompatClass::standard_update, false}, Scope::Creator,
         "new-conveyor-belts", "New conveyor belts", "Update belts to faster and more stable logic"};
     opt<bool> optimize_coins{this, defaults(true), {CompatClass::critical_update, false}, Scope::Creator,
         "optimize-coins", "Optimize coins", "Speed up the game when many coins are onscreen"};
     opt<bool> fix_timestop_respawn{this, defaults(true), {CompatClass::standard_update, false}, Scope::Creator,
         "fix-timestop-respawn", "Fix timestop respawn", "Allow NPCs to respawn during timestop"};
+
+    // 1.8 (future)
 
     /* ---- Compatibility - Speedrun ----*/
 
