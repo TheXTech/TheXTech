@@ -1285,7 +1285,7 @@ void UpdateEditor()
                 {
                     for(A = 1; A <= numBlock; A++)
                     {
-                        if(!BlockIsSizable[Block[A].Type] && !Block[A].Hidden && BlockSlope[Block[A].Type] == 0 && BlockSlope2[Block[A].Type] == 0 && !BlockOnlyHitspot1[Block[A].Type])
+                        if(!BlockIsSizable[Block[A].Type] && !Block[A].Hidden && BlockSlope[Block[A].Type] == 0 && BlockSlope2[Block[A].Type] == 0 && !BlockOnlyHitspot1[Block[A].Type] && Block[A].Type != BLKID_NPCPASS)
                         {
                             if(CursorCollision(EditorCursor.Location, Block[A].Location))
                             {
@@ -1300,16 +1300,15 @@ void UpdateEditor()
                 {
                     if(CursorCollision(EditorCursor.Location, NPC[A].Location) && !NPC[A].Hidden && NPC[A].Active && (NPC[A].Type != NPCID_LIFT_SAND || EditorCursor.NPC.Type == NPCID_LIFT_SAND))
                     {
-                        if(!NPC[A].Generator || NPC[A].Type == EditorCursor.NPC.Type)
+                        // always block placement of NPC on top of itself, but otherwise, allow NPCs on top of generators and vines
+                        if(NPC[A].Type == EditorCursor.NPC.Type || (!NPC[A].Generator && !NPC[A]->IsAVine))
                         {
-                            if((EditorCursor.NPC.Type != NPCID_BOSS_CASE && NPC[A].Type != NPCID_BOSS_CASE) || (EditorCursor.NPC.Type == NPCID_BOSS_CASE && NPC[A].Type == NPCID_BOSS_CASE))
-                            {
-                                if(!NPC[A]->IsAVine)
-                                {
-                                    CanPlace = false;
-                                    break;
-                                }
-                            }
+                            // allow placing non-case on top of case, and vice-versa
+                            if((EditorCursor.NPC.Type == NPCID_BOSS_CASE) != (NPC[A].Type == NPCID_BOSS_CASE))
+                                continue;
+
+                            CanPlace = false;
+                            break;
                         }
                     }
                 }
@@ -2353,10 +2352,13 @@ void SetCursor()
         if((EditorCursor.NPC->IsACoin && EditorCursor.NPC.Type != NPCID_MEDAL) || EditorCursor.NPC->IsAVine
             || EditorCursor.NPC.Type == NPCID_SLIDE_BLOCK || EditorCursor.NPC.Type == NPCID_FALL_BLOCK_RED
             || EditorCursor.NPC.Type == NPCID_FALL_BLOCK_BROWN || EditorCursor.NPC.Type == NPCID_CONVEYOR
-            || EditorCursor.NPC.Type == NPCID_LIFT_SAND)
+            || EditorCursor.NPC.Type == NPCID_LIFT_SAND || EditorCursor.NPC.Type == NPCID_ITEM_BURIED)
         {
             EditorCursor.Paintbrush = true;
         }
+
+        if(EditorCursor.NPC.Generator)
+            EditorCursor.Paintbrush = false;
     }
     else if(EditorCursor.Mode == OptCursor_t::LVL_WARPS) // Warps
     {
