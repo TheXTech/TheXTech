@@ -591,6 +591,13 @@ std::vector<ItemFamily*>::iterator make_page(std::vector<ItemFamily*>::iterator 
     {
         ItemFamily& family = **unplaced;
 
+        // skip empty families
+        if(family.types.empty())
+        {
+            ++unplaced;
+            continue;
+        }
+
         if(page_category == -1)
             page_category = family.category;
         else if(family.category != page_category)
