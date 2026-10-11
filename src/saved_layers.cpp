@@ -43,6 +43,9 @@ bool LoadDefaultSavedLayers()
 {
     ClearSavedLayers();
 
+    // disable saved layers on v1.7.x release series
+    return true;
+
     std::string savedlayers_ini_path = g_dirEpisode.resolveFileCaseExistsAbs("savedlayers.ini");
     if(savedlayers_ini_path.empty())
         return true;
