@@ -1174,7 +1174,9 @@ bool RenderGL::depthTestSupported()
 
 bool RenderGL::userShadersSupported()
 {
-    return m_use_shaders && m_buffer_texture[BUFFER_FB_READ] && m_buffer_texture[BUFFER_INT_PASS_1];
+    // user shaders still disabled in 1.7.x release branch
+    return false;
+    // return m_use_shaders && m_buffer_texture[BUFFER_FB_READ] && m_buffer_texture[BUFFER_INT_PASS_1];
 }
 
 void RenderGL::unloadTexture(StdPicture &tx)

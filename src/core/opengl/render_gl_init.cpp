@@ -500,8 +500,8 @@ bool RenderGL::initShaders()
         output_contents.empty() ? s_es2_standard_frag_src : output_contents.data()
     );
 
-    // initialize the lighting program
-    if(m_has_es3_shaders)
+    // initialize the lighting program (disabled in the 1.7.x release series)
+    if(m_has_es3_shaders && false)
     {
         // code to support a jump flooding algorithm to calculate a distance field
         m_distance_field_1_program = GLProgramObject(
