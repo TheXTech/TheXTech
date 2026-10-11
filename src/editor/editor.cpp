@@ -2955,7 +2955,8 @@ void UpdateInteract()
                 int entr_flags = (start_resize) ? s_find_flags(Warp[A].Entrance) : 0;
                 int exit_flags = (start_resize) ? s_find_flags(Warp[A].Exit) : 0;
 
-                if(Warp[A].tinyRequired)
+                // warp resizing is v1.8-exclusive
+                if(true || Warp[A].tinyRequired)
                 {
                     entr_flags = 0;
                     exit_flags = 0;

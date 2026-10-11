@@ -1008,7 +1008,7 @@ void Load(XTechTranslate* translate)
             block_families.emplace_back();
             f_ptr = &block_families[block_families.size() - 1];
             prefix = "blk";
-            max_item_type = maxBlockType;
+            max_item_type = 700;
             has_slope = true;
             block_family_keys.push_back(group.c_str() + prefix_length);
         }
@@ -1025,7 +1025,7 @@ void Load(XTechTranslate* translate)
             npc_families.emplace_back();
             f_ptr = &npc_families[npc_families.size() - 1];
             prefix = "npc";
-            max_item_type = maxNPCType;
+            max_item_type = NPCID_RESERVED_300;
             npc_family_keys.push_back(group.c_str() + prefix_length);
         }
         else if(SDL_strncasecmp(group.c_str(), "tilefam", 7) == 0)

@@ -677,7 +677,8 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             }
         }
 
-        if(FileFormat == FileFormats::LVL_PGEX && UpdateButton(mode, e_ScreenW - 40 + 4, 180 + 4, GFXNPC[NPCID_SPIT_BOSS], (EditorCursor.NPC.Type == NPCID_SPIT_BOSS && EditorCursor.NPC.Special), 0, 0, NPCWidthGFX(NPCID_SPIT_BOSS), NPCHeightGFX(NPCID_SPIT_BOSS)))
+        // PGEX-exclusive
+        if(false && FileFormat == FileFormats::LVL_PGEX && UpdateButton(mode, e_ScreenW - 40 + 4, 180 + 4, GFXNPC[NPCID_SPIT_BOSS], (EditorCursor.NPC.Type == NPCID_SPIT_BOSS && EditorCursor.NPC.Special), 0, 0, NPCWidthGFX(NPCID_SPIT_BOSS), NPCHeightGFX(NPCID_SPIT_BOSS)))
         {
             if(EditorCursor.NPC.Type == NPCID_SPIT_BOSS && EditorCursor.NPC.Special)
             {
@@ -697,7 +698,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
         if(AllowBubble())
         {
-            if(UpdateButton(mode, e_ScreenW - 40 + 4, ((FileFormat == FileFormats::LVL_PGEX) ? 220 : 180) + 4, GFXNPC[NPCID_ITEM_BUBBLE], EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE, 0, 0, NPCWidthGFX(NPCID_ITEM_BUBBLE), NPCHeightGFX(NPCID_ITEM_BUBBLE)))
+            if(UpdateButton(mode, e_ScreenW - 40 + 4, 180 + 4, GFXNPC[NPCID_ITEM_BUBBLE], EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE, 0, 0, NPCWidthGFX(NPCID_ITEM_BUBBLE), NPCHeightGFX(NPCID_ITEM_BUBBLE)))
             {
                 if(EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE)
                 {
@@ -804,8 +805,8 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             }
         }
 
-        // Wings
-        if(FileFormat == FileFormats::LVL_PGEX && !NPCBansWings(EditorCursor.NPC))
+        // Wings (v1.8-exclusive)
+        if(FileFormat == FileFormats::LVL_PGEX && !NPCBansWings(EditorCursor.NPC) && false)
         {
             int icon = 32;
 
@@ -844,8 +845,8 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         if(UpdateButton(mode, e_ScreenW - 120 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.Generator, 0, 32*Icon::subscreen, 32, 32))
             m_NPC_page = -2;
 
-        // GFX slot
-        if(FileFormat == FileFormats::LVL_PGEX)
+        // GFX slot (v1.8-exclusive)
+        if(FileFormat == FileFormats::LVL_PGEX && false)
         {
             int GFX_type = (EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE) ? EditorCursor.NPC.Special : (int)EditorCursor.NPC.Type;
             int gw = NPCTraits[GFX_type].WidthGFX;
@@ -1198,7 +1199,8 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.Block.Special ++;
         }
 
-        if(FileFormat == FileFormats::LVL_PGEX)
+        // v1.8-exclusive
+        if(FileFormat == FileFormats::LVL_PGEX && false)
         {
             if(UpdateButton(mode, 60 + 4, 60 + 4, (CommonFrame & 32) ? GFXNPC[NPCID_INVINCIBILITY_POWER] : GFXNPC[NPCID_COIN_S3], EditorCursor.Block.Special == 110, 0, 0, 32, 32))
                 EditorCursor.Block.Special = 110;
@@ -1225,7 +1227,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         UpdateNPCGrid(mode, 40, 340, p7_smb2, sizeof(p7_smb2)/sizeof(int), 5);
 
         SuperPrintR(mode, "X", 3, 40 + 10, 380);
-        static const int p7_misc[] = {NPCID_RING, NPCID_POWER_S5, NPCID_FLY_POWER, NPCID_GEM_1, NPCID_GEM_5, NPCID_GEM_20, NPCID_INVINCIBILITY_POWER, NPCID_AQUATIC_POWER, NPCID_POLAR_POWER, NPCID_CYCLONE_POWER, NPCID_SHELL_POWER, NPCID_TINY_POWER, NPCID_HOMING_CANNON};
+        static const int p7_misc[] = {NPCID_RING, NPCID_POWER_S5, NPCID_FLY_POWER, NPCID_GEM_1, NPCID_GEM_5, NPCID_GEM_20}; // v1.8-exclusive: NPCID_INVINCIBILITY_POWER, NPCID_AQUATIC_POWER, NPCID_POLAR_POWER, NPCID_CYCLONE_POWER, NPCID_SHELL_POWER, NPCID_TINY_POWER, NPCID_HOMING_CANNON};
         UpdateNPCGrid(mode, 40, 400, p7_misc, sizeof(p7_misc)/sizeof(int) - (FileFormat != FileFormats::LVL_PGEX) * 5, 10);
     }
 }
@@ -2247,7 +2249,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
         testPlayer[m_special_subpage].State = 2;
 
     constexpr int NPC_for_state[] = {0, NPCID_POWER_S3, NPCID_FIRE_POWER_S3, NPCID_LEAF_POWER, NPCID_STATUE_POWER, NPCID_HEAVY_POWER, NPCID_ICE_POWER_S3, NPCID_AQUATIC_POWER, NPCID_POLAR_POWER, NPCID_CYCLONE_POWER, NPCID_SHELL_POWER, NPCID_TINY_POWER};
-    int max_state = (g_gameInfo.contentFeatureLevel >= 1030790) ? 12 : 7;
+    int max_state = 7;
     for(int state = 1; state <= max_state; state++)
     {
         bool pActive = testPlayer[m_special_subpage].State == state;
@@ -3726,7 +3728,8 @@ void EditorScreen::UpdateWaterScreen(CallMode mode)
     if(UpdateButton(mode, 380 + 4, 160 + 4, GFXBackgroundBMP[188], EditorCursor.Water.Type == PHYSID_QUICKSAND, 0, 0, 32, 32))
         EditorCursor.Water.Type = PHYSID_QUICKSAND;
 
-    if(FileFormat == FileFormats::LVL_PGEX && UpdateButton(mode, 420 + 4, 160 + 4, GFXBlock[294], EditorCursor.Water.Type == PHYSID_MAZE, 0, 0, 32, 32))
+    // v1.8-exclusive
+    if(false && FileFormat == FileFormats::LVL_PGEX && UpdateButton(mode, 420 + 4, 160 + 4, GFXBlock[294], EditorCursor.Water.Type == PHYSID_MAZE, 0, 0, 32, 32))
         EditorCursor.Water.Type = PHYSID_MAZE;
 
     // layers
@@ -3996,9 +3999,10 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             if(UpdateCheckBox(mode, 220 + 4, 300 + 4, EditorCursor.Warp.stoodRequired))
                 EditorCursor.Warp.stoodRequired = !EditorCursor.Warp.stoodRequired;
 
-            SuperPrintR(mode, g_editorStrings.warpNeedTiny, 3, 6, 354);
-            if(UpdateCheckBox(mode, 220 + 4, 340 + 4, EditorCursor.Warp.tinyRequired))
-                EditorCursor.Warp.tinyRequired = !EditorCursor.Warp.tinyRequired;
+            // v1.8-exclusive
+            // SuperPrintR(mode, g_editorStrings.warpNeedTiny, 3, 6, 354);
+            // if(UpdateCheckBox(mode, 220 + 4, 340 + 4, EditorCursor.Warp.tinyRequired))
+            //     EditorCursor.Warp.tinyRequired = !EditorCursor.Warp.tinyRequired;
         }
     }
 
