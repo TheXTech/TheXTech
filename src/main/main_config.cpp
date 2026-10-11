@@ -93,9 +93,6 @@ void OpenConfig()
 
         config.beginGroup("main");
         config.read("release", FileRelease, curRelease);
-#ifdef THEXTECH_ENABLE_SDL_NET
-        config.read("hide-netplay", g_hideNetplay, g_hideNetplay);
-#endif
         config.endGroup();
 
         std::string asset_pack_prefix = g_AssetPackID;

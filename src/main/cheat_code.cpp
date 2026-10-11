@@ -497,6 +497,7 @@ static void needALeaf()
     grantPowerup(NPCID_LEAF_POWER, PLR_STATE_LEAF);
 }
 
+#if 0
 static void needACyclone()
 {
     grantPowerup(NPCID_CYCLONE_POWER, PLR_STATE_CYCLONE);
@@ -521,6 +522,7 @@ static void shrinkflation()
 {
     grantPowerup(NPCID_TINY_POWER, PLR_STATE_TINY);
 }
+#endif
 
 static void grantItemBox(NPCID npcid)
 {
@@ -1209,10 +1211,12 @@ static void rainbowRider()
     grantItemHeld(NPCID_FLIPPED_RAINBOW_SHELL, NPCEFF_DROP_ITEM);
 }
 
+#if 0
 static void cantTouchThis()
 {
     grantItemHeld(NPCID_INVINCIBILITY_POWER);
 }
+#endif
 
 static void greenEgg()
 {
@@ -1363,11 +1367,13 @@ static void editYourFriends()
     PauseScreen::RequestForcedPause(PauseCode::Options);
 }
 
+#if 0
 static void bornToClimb()
 {
     CanWallJump = !CanWallJump;
     PlaySound(CanWallJump ? SFX_PlayerGrow : SFX_PlayerShrink);
 }
+#endif
 
 static void newLeaf()
 {
@@ -1758,13 +1764,14 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
 
     {"getmeouttahere", getMeOuttaHere, true},
     {"newleaf", newLeaf, true},
-    {"borntoclimb", bornToClimb, true},
-    {"needacyclone", needACyclone, true},
-    {"goodtimesroll", goodTimesRoll, true},
-    {"canttouchthis", cantTouchThis, true},
-    {"waypastcool", wayPastCool, true},
-    {"sushitime", sushiTime, true},
-    {"shrinkflation", shrinkflation, true},
+    // cheats held back from 1.7.x release series
+    // {"borntoclimb", bornToClimb, true},
+    // {"needacyclone", needACyclone, true},
+    // {"goodtimesroll", goodTimesRoll, true},
+    // {"canttouchthis", cantTouchThis, true},
+    // {"waypastcool", wayPastCool, true},
+    // {"sushitime", sushiTime, true},
+    // {"shrinkflation", shrinkflation, true},
 
     {"holytrinity", holyTrinity, true}, {"passerby", holyTrinity, true},
     {"essentials", essentials, true}, {"holyfour", essentials, true},
