@@ -107,6 +107,11 @@ using callback_error = std::runtime_error;
     throw callback_error(MessageText.c_str());
 }
 
+[[ noreturn ]] void priv_UnsupportedFeature()
+{
+    priv_FeatureLevelError(g_gameStrings.errorTooOldEngine, 1080000, V_FEATURE_LEVEL);
+}
+
 void addMissingLvlSuffix(std::string &fileName)
 {
     if(!fileName.empty() && !Files::hasSuffix(fileName, ".lvl") && !Files::hasSuffix(fileName, ".lvlx") && !Files::hasSuffix(fileName, "tst"))
@@ -899,6 +904,8 @@ bool OpenLevel_Block(void* userdata, LevelBlock& b)
             pLogWarning("Block contents %d is out of range (max NPC type %d), reset to 1 coin", (int)b.npc_id, maxNPCType);
             b.npc_id = -1;
         }
+        else if(b.npc_id > NPCID_RESERVED_300)
+            priv_UnsupportedFeature();
 
         block.Special = int(b.npc_id > 0 ? b.npc_id + 1000 : -1 * b.npc_id);
 
@@ -1042,7 +1049,10 @@ bool OpenLevel_Block(void* userdata, LevelBlock& b)
         {
             pLogWarning("Block-%d ID is out of range (max types %d), reset to Block-1", block.Type, maxBlockType);
             block.Type = 1;
+            block.DefaultType = 1;
         }
+        else if(block.Type >= BLKID_MAZE_START)
+            priv_UnsupportedFeature();
     }
 
     return true;
@@ -1111,20 +1121,23 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
             pLogWarning("NPC-%d ID is out of range (max types %d), reset to NPC-1", (int)n.id, maxNPCType);
             n.id = 1;
         }
+        else if(n.id > NPCID_RESERVED_300)
+            priv_UnsupportedFeature();
 
         if(n.contents > maxNPCType) // Drop contents to 0 for NPCs of out of range contents
         {
             pLogWarning("NPC contents %d is out of range (max types %d), reset to 0", (int)n.contents, maxNPCType);
             n.contents = 0;
         }
+        else if(n.contents > NPCID_RESERVED_300)
+            priv_UnsupportedFeature();
 
         npc.Type = NPCID(n.id);
 
         bool force_variant = false;
 
         if(npc.Type == NPCID_ITEM_BURIED || npc.Type == NPCID_ITEM_POD ||
-           npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_THROWER ||
-           (NPCNewContainerType(npc.Type) && FileFormat == FileFormats::LVL_PGEX))
+           npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_THROWER)
         {
             npc.Special = (vbint_t)n.contents;
             npc.DefaultSpecial = npc.Special;
@@ -1192,6 +1205,8 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
 
         // NEW: GFX expansion
         npc.GFXSlot = (uint8_t)n.gfx_dx;
+        if(npc.GFXSlot != 0)
+            priv_UnsupportedFeature();
 
         npc.Generator = n.generator;
         if(npc.Generator)
@@ -1214,11 +1229,8 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
         npc.Stuck = n.nomove;
         npc.DefaultStuck = npc.Stuck;
 
-        if(n.wings_type && !NPCBansWings(npc))
-        {
-            npc.DefaultWings = (WingBehaviors)n.wings_type;
-            npc.Wings = npc.DefaultWings;
-        }
+        if(n.wings_type)
+            priv_UnsupportedFeature();
 
         npc.Legacy = n.is_boss;
 
@@ -1332,6 +1344,10 @@ bool OpenLevel_Warp(void* userdata, LevelDoor& w)
         warp.tinyRequired = w.special_state_required;
         warp.transitEffect = w.transition_effect;
 
+        // shouldn't be reachable due to feature level check, but just making certain
+        if(w.height_i != 32 || w.height_o != 32 || w.length_i != 32 || w.length_o != 32)
+            priv_UnsupportedFeature();
+
         warp.Entrance.Height = w.height_i;
         warp.Entrance.Width = w.length_i;
         warp.Exit.Height = w.height_o;
@@ -1382,6 +1398,8 @@ bool OpenLevel_Water(void* userdata, LevelPhysEnv& w)
         // water.Buoy = w.buoy;
         water.Type = (PHYSID)w.env_type;
         water.Layer = load.FindLayer(w.layer);
+        if(water.Type == PHYSID_MAZE)
+            priv_UnsupportedFeature();
     }
 
     return true;
