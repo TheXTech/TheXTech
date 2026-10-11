@@ -4802,6 +4802,40 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
         m_special_page = SPECIAL_PAGE_FILE_CONFIRM;
         m_special_subpage = 4;
     }
+
+    // quick settings
+    SuperPrintCenterR(mode, g_editorStrings.gridSize, 3, e_ScreenW - 50 - 100, 380);
+    SuperPrintCenterR(mode, (EditorCursor.ForceGrid == 0) ? g_mainMenu.caseNone
+        : (EditorCursor.ForceGrid == -1) ? g_editorStrings.layersLayerDefault
+        : std::to_string(EditorCursor.ForceGrid), 3, e_ScreenW - 50 - 100, 400);
+
+    if(EditorCursor.ForceGrid != 0 && UpdateButton(mode, e_ScreenW - 50 - 200 - 40 + 4, 380 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+    {
+        if(EditorCursor.ForceGrid == -1)
+            EditorCursor.ForceGrid = 32;
+        else
+        {
+            EditorCursor.ForceGrid /= 2;
+            if(EditorCursor.ForceGrid == 4)
+                EditorCursor.ForceGrid = 0;
+        }
+    }
+
+    if(EditorCursor.ForceGrid != -1 && UpdateButton(mode, e_ScreenW - 50 + 4, 380 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+    {
+        if(EditorCursor.ForceGrid == 0)
+            EditorCursor.ForceGrid = 8;
+        else
+        {
+            EditorCursor.ForceGrid *= 2;
+            if(EditorCursor.ForceGrid == 64)
+                EditorCursor.ForceGrid = -1;
+        }
+    }
+
+    SuperPrintRightR(mode, g_editorStrings.tooltipShow, 3, e_ScreenW - 50 - 4, 430);
+    if(UpdateCheckBox(mode, e_ScreenW - 50 + 4, 420 + 4, EditorCursor.ShowGrid))
+        EditorCursor.ShowGrid = !EditorCursor.ShowGrid;
 }
 
 void EditorScreen::StartFileBrowser(std::string* file_target,

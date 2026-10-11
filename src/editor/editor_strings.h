@@ -134,6 +134,7 @@ struct EditorContent
     std::string letterCoordY;
 
     std::string toggleMagicBlock;
+    std::string gridSize;
 
     std::string testMagicHand;
     std::string testChar;

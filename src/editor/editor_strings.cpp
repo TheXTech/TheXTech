@@ -131,6 +131,7 @@ void initEditorStrings()
     g_editorStrings.letterCoordY = "Y";
 
     g_editorStrings.toggleMagicBlock = "Magic Block";
+    g_editorStrings.gridSize = "Grid size:";
 
     g_editorStrings.testMagicHand = "Magic Hand";
     g_editorStrings.testChar = "Char";

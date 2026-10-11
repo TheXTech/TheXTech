@@ -645,6 +645,7 @@ XTechTranslate::XTechTranslate()
     insert(m_engineMap, "editor.letterCoordY",             &g_editorStrings.letterCoordY);
 
     insert(m_engineMap, "editor.toggleMagicBlock",         &g_editorStrings.toggleMagicBlock);
+    insert(m_engineMap, "editor.gridSize",                 &g_editorStrings.gridSize);
 
     insert(m_engineMap, "editor.testPlay.magicHand",       &g_editorStrings.testMagicHand);
     insert(m_engineMap, "editor.testPlay.char",            &g_editorStrings.testChar);
