@@ -518,6 +518,9 @@ void PlayerLevelEdgeCheck(int A, bool check_X)
                 Player[A].Pinched.Moving = 2;
                 Player[A].Pinched.MovingLR = true;
             }
+
+            if(Player[A].CurMazeZone && (Player[A].MazeZoneStatus % 4) == MAZE_DIR_LEFT)
+                Player[A].MazeZoneStatus |= MAZE_PLAYER_FLIP;
         }
         else if(Player[A].Location.X + Player[A].Location.Width > level[Player[A].Section].Width)
         {
@@ -533,6 +536,9 @@ void PlayerLevelEdgeCheck(int A, bool check_X)
                 Player[A].Pinched.Moving = 2;
                 Player[A].Pinched.MovingLR = true;
             }
+
+            if(Player[A].CurMazeZone && (Player[A].MazeZoneStatus % 4) == MAZE_DIR_RIGHT)
+                Player[A].MazeZoneStatus |= MAZE_PLAYER_FLIP;
         }
     }
 
@@ -545,6 +551,9 @@ void PlayerLevelEdgeCheck(int A, bool check_X)
             Player[A].Pinched.Moving = 3;
             Player[A].Pinched.MovingUD = true;
         }
+
+        if(Player[A].CurMazeZone && (Player[A].MazeZoneStatus % 4) == MAZE_DIR_UP)
+            Player[A].MazeZoneStatus |= MAZE_PLAYER_FLIP;
     }
 }
 
