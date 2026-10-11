@@ -1,21 +1,5 @@
 TheXTech Changelog.
 
-Changelog for 1.8-dev
--Unstable changes will go here for testing during the 1.7.x release lifespan...
--Add experimental support for maze physics zones to the game and editor (@ds-sloth)
--Add experimental cheat "borntoclimb" (@ds-sloth)
--Add experimental support for attaching wings to NPCs to the game and editor (@ds-sloth)
--Add powerups from SMBX-38A (@ds-sloth)
--Add invincibility powerup (@ds-sloth)
--Add support for saved layers (@ds-sloth)
--Add flag exit from SMBX-38A (@ds-sloth)
--Add support for resizing warps (@ds-sloth)
--Add support for alternative graphics for NPCs (@ds-sloth)
--NPCs can now be stored in the spit boss (NPC ID 39) (@ds-sloth)
--A new homing weapon has been added to complement the melee (toothy) and ranged (billy gun) weapons (@ds-sloth)
--A set of tiny blocks have been added (@ds-sloth, thanks to @ChristianSilvermoon for the suggestion and sprites)
--Several popular functional blocks have been added from SMBX2 (invisible block, player/NPC passthrough blocks, and kaizo harm/kill blocks) (@ds-sloth)
-
 Changelog for 1.7.5-dev
 -3DS/Wii: disable partial support for loading SMBX-38A content (@ds-sloth)
 -Technical update: reduce mainloop nesting to improve engine flexibility (@ds-sloth)
