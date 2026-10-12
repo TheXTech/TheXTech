@@ -2170,6 +2170,14 @@ void GetEditorControls()
     }
 }
 
+static bool s_NPCIsPlant()
+{
+    return EditorCursor.NPC.Type == 245 || EditorCursor.NPC.Type == 8 ||
+               EditorCursor.NPC.Type == 270 || EditorCursor.NPC.Type == 93 ||
+               EditorCursor.NPC.Type == 180 || EditorCursor.NPC.Type == 179 ||
+               EditorCursor.NPC.Type == 37 || EditorCursor.NPC.Type == 51;
+}
+
 void SetCursor()
 {
     int DefaultGrid = 32;
@@ -2341,9 +2349,9 @@ void SetCursor()
         EditorCursor.NPC.Active = true;
 
         if(EditorCursor.NPC.Generator ||
-            EditorCursor.NPC.Type == 209 || EditorCursor.NPC.Type == 256 ||
-            EditorCursor.NPC.Type == 257 || EditorCursor.NPC.Type == 260 ||
-            EditorCursor.NPC.Type == 52 ||
+            EditorCursor.NPC.Type == NPCID_BOSS_FRAGILE || EditorCursor.NPC.Type == NPCID_LONG_PLANT_UP ||
+            EditorCursor.NPC.Type == NPCID_LONG_PLANT_DOWN || EditorCursor.NPC.Type == NPCID_FIRE_CHAIN ||
+            EditorCursor.NPC.Type == NPCID_SIDE_PLANT ||
             EditorCursor.NPC.Type == NPCID_TINY_COIN)
         {
             DefaultGrid = 16;
@@ -2509,12 +2517,9 @@ void PositionCursor()
 
     else if(EditorCursor.Mode == OptCursor_t::LVL_NPCS)
     {
-        if(EditorCursor.NPC.Type == 245 || EditorCursor.NPC.Type == 8 ||
-           EditorCursor.NPC.Type == 270 || EditorCursor.NPC.Type == 93 ||
-           EditorCursor.NPC.Type == 180 || EditorCursor.NPC.Type == 179 ||
-           EditorCursor.NPC.Type == 37 || EditorCursor.NPC.Type == 51) // Piranha Plants
+        if(s_NPCIsPlant() && EditorCursor.CurrentGrid > 16) // Piranha Plants
             EditorCursor.Location.X += 16;
-        else if(EditorCursor.NPC.Type == 197)
+        else if(EditorCursor.NPC.Type == NPCID_GOALTAPE)
         {
             EditorCursor.Location.X -= 8;
             EditorCursor.Location.Y += 16;
@@ -2528,11 +2533,11 @@ void PositionCursor()
             else
                 EditorCursor.Location.Y += 16/*32*/;
         }
-        else if(EditorCursor.NPC.Type == 105)
+        else if(EditorCursor.NPC.Type == NPCID_CHECKER_PLATFORM)
             EditorCursor.Location.Y += 22;
-        else if(EditorCursor.NPC.Type == 106)
+        else if(EditorCursor.NPC.Type == NPCID_PLATFORM_S1)
             EditorCursor.Location.Y += 16;
-        else if(EditorCursor.NPC.Type == 260)
+        else if(EditorCursor.NPC.Type == NPCID_FIRE_CHAIN)
             EditorCursor.Location.Y -= 8;
     }
 
