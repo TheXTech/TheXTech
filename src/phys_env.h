@@ -33,6 +33,8 @@ enum PhysEnv_Maze_Status
     MAZE_DIR_RIGHT = 2,
     MAZE_DIR_DOWN = 3,
     MAZE_CAN_EXIT = 4,
+    MAZE_EXIT_LEFTSIDE = 8,
+    MAZE_EXIT_RIGHTSIDE = 16,
     MAZE_PLAYER_FLIP = 128,
     MAZE_DIR_FLIP_BIT = 2,
 };

@@ -86,7 +86,14 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
 
         num_t maze_center_x = cur_maze.Location.X + cur_maze.Location.Width / 2;
         exit_check_x = maze_center_x;
-        target_speed_x = (maze_center_x - center_x) / 8;
+
+        num_t target_x = maze_center_x;
+        if(cleared_to_exit && (maze_state & MAZE_EXIT_LEFTSIDE))
+            target_x -= (16 + loc.Width / 2);
+        else if(cleared_to_exit && (maze_state & MAZE_EXIT_RIGHTSIDE))
+            target_x += (16 + loc.Width / 2);
+
+        target_speed_x = (target_x - center_x) / 8;
 
         if(num_t::abs(target_speed_x) > 8_n)
         {
@@ -95,7 +102,7 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
         }
         else if(num_t::abs(target_speed_x) < 0.25_n)
         {
-            loc.X = maze_center_x - loc.Width / 2;
+            loc.X = target_x - loc.Width / 2;
             loc.SpeedX = 0;
             target_speed_x = 0;
         }
@@ -126,7 +133,13 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
         if(plr_A && Player[plr_A].Mount == 3)
             maze_center_y += 8;
 
-        target_speed_y = (maze_center_y - center_y) / 8;
+        num_t target_y = maze_center_y;
+        if(cleared_to_exit && (maze_state & MAZE_EXIT_LEFTSIDE))
+            target_y -= (16 + loc.Height / 2);
+        else if(cleared_to_exit && (maze_state & MAZE_EXIT_RIGHTSIDE))
+            target_y += (16 + loc.Height / 2);
+
+        target_speed_y = (target_y - center_y) / 8;
 
         if(num_t::abs(target_speed_y) > 8_n)
         {
@@ -135,7 +148,7 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
         }
         else if(num_t::abs(target_speed_y) < 0.25_n)
         {
-            loc.Y = maze_center_y - loc.Height / 2;
+            loc.Y = target_y - loc.Height / 2;
             loc.SpeedY = 0;
             target_speed_y = 0;
         }
@@ -183,22 +196,26 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
             // - the exit can become blocked after the player enters the maze zone, locking the player in the maze zone
             // - it is possible (by ducking or changing state while in the maze zone) to enter a maze zone you cannot exit
 
-            // Potential fix: allow the player to "force" their way out of the maze zone by holding the jump button,
-            // which will lead to them clipping through whatever exists outside of the maze zone.
-
             edgeLoc.X = exit_check_x;
             edgeLoc.Y = exit_check_y;
             edgeLoc.Width = loc.Width - 2;
             edgeLoc.Height = loc.Height - 2;
 
+            // DON'T allow exiting in spots where you couldn't unduck
+            if(plr_A && Player[plr_A].Mount == 3)
+                edgeLoc.Height += 2;
+
             if(direction == MAZE_DIR_UP)
             {
                 edgeLoc.Y += 5;
                 edgeLoc.Y -= loc.Height;
-                edgeLoc.Height -= 4;
+                edgeLoc.Height -= 6;
             }
             else if(direction == MAZE_DIR_DOWN)
+            {
                 edgeLoc.Y += 2;
+                edgeLoc.Height -= 2;
+            }
             else
                 edgeLoc.Y -= loc.Height / 2;
 
@@ -212,34 +229,82 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
             else
                 edgeLoc.X -= loc.Width / 2;
 
-            for(int B : treeBlockQuery(edgeLoc, SORTMODE_NONE))
+            for(int round = 0; round < 5; round++)
             {
-                const Block_t& b = Block[B];
+                cleared_to_exit = true;
 
-                if((!npc_A || (b.tempBlockNpcIdx != npc_A && b.Type != BLKID_NPCPASS)) && (!plr_A || !BlockCheckPlayerFilter(B, plr_A)) && !b.Hidden && !b.Invis && !BlockOnlyHitspot1[b.Type] && !BlockIsSizable[b.Type] && !BlockNoClipping[b.Type])
+                // check center and both edges
+                if(direction == MAZE_DIR_UP || direction == MAZE_DIR_DOWN)
                 {
-                    if(CheckCollision(edgeLoc, b.Location))
+                    if(round == 1)
                     {
-                        cleared_to_exit = false;
-                        break;
+                        edgeLoc.X -= loc.Width / 2 + 1;
+                        edgeLoc.Width = loc.Width;
                     }
+                    else if(round == 2)
+                        edgeLoc.X += loc.Width + 2;
+                    else if(round == 3)
+                        edgeLoc.X -= loc.Width + 17;
+                    else if(round == 4)
+                        edgeLoc.X += loc.Width + 32;
                 }
-            }
-
-            if(!npc_A && cleared_to_exit)
-            {
-                for(int N : treeNPCQuery(edgeLoc, SORTMODE_NONE))
+                else
                 {
-                    const NPC_t& n = NPC[N];
-
-                    if(n.Active && !n.Generator && n->IsABlock && (!plr_A || N != Player[plr_A].HoldingNPC))
+                    if(round == 1)
                     {
-                        if(CheckCollision(edgeLoc, n.Location))
+                        edgeLoc.Y -= loc.Height / 2 + 1;
+                        edgeLoc.Height = loc.Height;
+                    }
+                    else if(round == 2)
+                        edgeLoc.Y += loc.Height + 2;
+                    else if(round == 3)
+                        edgeLoc.Y -= loc.Height + 17;
+                    else if(round == 4)
+                        edgeLoc.Y += loc.Height + 32;
+                }
+
+                for(int B : treeBlockQuery(edgeLoc, SORTMODE_NONE))
+                {
+                    const Block_t& b = Block[B];
+
+                    if((!npc_A || (b.tempBlockNpcIdx != npc_A && b.Type != BLKID_NPCPASS)) && (!plr_A || !BlockCheckPlayerFilter(B, plr_A)) && !b.Hidden && !b.Invis && !BlockOnlyHitspot1[b.Type] && !BlockIsSizable[b.Type] && !BlockNoClipping[b.Type])
+                    {
+                        if(CheckCollision(edgeLoc, b.Location))
                         {
                             cleared_to_exit = false;
                             break;
                         }
                     }
+                }
+
+                if(!npc_A && cleared_to_exit)
+                {
+                    for(int N : treeNPCQuery(edgeLoc, SORTMODE_NONE))
+                    {
+                        const NPC_t& n = NPC[N];
+
+                        if(n.Active && !n.Generator && n->IsABlock && (!plr_A || N != Player[plr_A].HoldingNPC))
+                        {
+                            if(CheckCollision(edgeLoc, n.Location))
+                            {
+                                cleared_to_exit = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if(!plr_A)
+                    break;
+
+                if(cleared_to_exit)
+                {
+                    if(round == 1 || round == 3)
+                        maze_state |= MAZE_EXIT_LEFTSIDE;
+                    else if(round == 2 || round == 4)
+                        maze_state |= MAZE_EXIT_RIGHTSIDE;
+
+                    break;
                 }
             }
         }

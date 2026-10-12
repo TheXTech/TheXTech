@@ -1523,7 +1523,10 @@ void PlayerMazeZoneMovement(int A)
         if(Player[A].MazeZoneStatus % 4 == MAZE_DIR_DOWN)
         {
             // make sure the player won't clip into blocks below the maze zone
-            PlayerPush(A, 1);
+            if(Player[A].MazeZoneStatus & (MAZE_EXIT_LEFTSIDE | MAZE_EXIT_RIGHTSIDE))
+                PlayerPush(A, 6);
+            else
+                PlayerPush(A, 1);
 
             // unduck the player now if they were on Mount 3, and then make sure they don't hit the top of the maze zone ceiling
             if(Player[A].Duck && !Player[A].Controls.Down && !Player[A].Rolling)
@@ -1535,6 +1538,9 @@ void PlayerMazeZoneMovement(int A)
         // help the player hit blocks above the maze zone
         else if(Player[A].MazeZoneStatus % 4 == MAZE_DIR_UP && !Player[A].Rolling)
         {
+            if(Player[A].MazeZoneStatus & (MAZE_EXIT_LEFTSIDE | MAZE_EXIT_RIGHTSIDE))
+                PlayerPush(A, 6);
+
             Player[A].StandUp = true;
             Player[A].StandUp2 = true;
             Player[A].ForceHitSpot3 = true;
