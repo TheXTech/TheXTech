@@ -717,7 +717,7 @@ resume_Activation_Chain:
                     // if(NPC[A]->CanWalkOn && !NPC[A]->IsAHit1Block && !NPC[A]->IsABlock)
                     //     Block[numBlock].noProjClipping = true;
 
-                    if(NPC[A].Type == NPCID_SPRING && Block[numBlock].Location.Height != 32)
+                    if((NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_RED_SPRING) && Block[numBlock].Location.Height != 32)
                     {
                         Block[numBlock].Location.Y -= 16;
                         Block[numBlock].Location.Height += 16;
@@ -1529,12 +1529,15 @@ interrupt_Activation:
                     if((NPC[A].Type < NPCID_TANK_TREADS || NPC[A].Type > NPCID_SLANT_WOOD_M) && NPC[A].Type != NPCID_SPRING)
                     {
                         Block[NPC[A].tempBlock].Location = NPC[A].Location;
+#if 0
+                        // checked to be false above
                         if(NPC[A].Type == NPCID_SPRING)
                         {
                             // the NPC tree accounts for this; no need to split tempBlock
                             Block[NPC[A].tempBlock].Location.Y -= 16;
                             Block[NPC[A].tempBlock].Location.Height += 16;
                         }
+#endif
 
                         // tempBlock comes back in sync with NPC
                         if(NPC[A].Location.X != prevX

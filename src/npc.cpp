@@ -501,7 +501,7 @@ void TurnNPCsIntoCoins()
                    NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_METALBARREL &&
                    !(NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M) &&
                    NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_FIRE_CHAIN && NPC[A].Type != NPCID_FIRE_DISK &&
-                   NPC[A].Type != NPCID_HOMING_BULLET)
+                   NPC[A].Type != NPCID_HOMING_BULLET && NPC[A].Type != NPCID_RED_SPRING)
                 {
                     NPC[A].Location.Y += 32;
                     NewEffect(EFFID_COIN_BLOCK_S3, NPC[A].Location);
@@ -5763,6 +5763,7 @@ void NPCUnbury(int A, int Callsite)
     else if(!(NPC[A].Type == NPCID_CANNONENEMY
         || NPC[A].Type == NPCID_CANNONITEM
         || NPC[A].Type == NPCID_SPRING
+        || NPC[A].Type == NPCID_RED_SPRING
         || NPC[A].Type == NPCID_KEY
         || NPC[A].Type == NPCID_COIN_SWITCH
         // || NPC[A].Type == NPCID_TIME_SWITCH

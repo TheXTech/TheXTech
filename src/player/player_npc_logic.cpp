@@ -517,7 +517,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     TouchBonus(A, B);
                                 else if(Player[A].Rolling && Player[A].State == PLR_STATE_SHELL)
                                 {
-                                    if(NPC[B].Type == NPCID_SPRING)
+                                    if(NPC[B].Type == NPCID_SPRING || NPC[B].Type == NPCID_RED_SPRING)
                                     {
                                         tempSpring = true;
                                         bounceNpc = B;
@@ -574,7 +574,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     NPCHit(B, 1, A); // NPC 'B' was jumped on '1' by player 'A'
                                 else if(NPC[B].Killed != 10 && !NPCIsBoot(NPC[B]) && !NPCIsYoshi(NPC[B]) && !(NPC[B]->IsAShell && NPC[B].CantHurtPlayer == A)) // Bounce off everything except Bonus and Piranha Plants
                                 {
-                                    if(NPC[B].Type == NPCID_SPRING)
+                                    if(NPC[B].Type == NPCID_SPRING || NPC[B].Type == NPCID_RED_SPRING)
                                         tempSpring = true;
 
                                     if(NPC[B]->IsAShell && NPC[B].Location.SpeedX == 0 && NPC[B].Location.SpeedY == 0)

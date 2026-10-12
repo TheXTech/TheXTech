@@ -366,7 +366,7 @@ inline Location_t extract_loc(NPCRef_t obj)
         ret.Width = 1;
 
     // for tempBlock queries
-    if(obj->Type == NPCID_SPRING)
+    if(obj->Type == NPCID_SPRING || obj->Type == NPCID_RED_SPRING)
     {
         ret.Y -= 16;
         ret.Height += 16;
