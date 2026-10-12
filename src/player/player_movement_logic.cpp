@@ -1497,7 +1497,7 @@ void PlayerAquaticSwimMovement(int A)
 
 void PlayerMazeZoneMovement(int A)
 {
-    if(Player[A].Mount == 3)
+    if(Player[A].Mount == 3 || (Player[A].Controls.Down && (Player[A].Mount || (!Player[A].Stoned && !Player[A].HoldingNPC && !(Player[A].Character < 3 && Player[A].State == PLR_STATE_SMALL)))))
     {
         Player[A].Duck = true;
         SizeCheck(Player[A]);
