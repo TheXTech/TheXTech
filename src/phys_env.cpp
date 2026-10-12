@@ -438,7 +438,8 @@ void PhysEnv_Maze(Location_t& loc, vbint_t& maze_index, uint8_t& maze_state, int
 
 void PhysEnv_Maze_PickDirection(const Location_t& loc, vbint_t maze_index, uint8_t& maze_state)
 {
-    if(Water[maze_index].Location.Width > Water[maze_index].Location.Height)
+    // horizontal maze zone
+    if(Water[maze_index].Location.Width != 32)
     {
         num_t dx = Water[maze_index].Location.X - loc.X + (Water[maze_index].Location.Width - loc.Width) / 2;
         if(dx > 0)
