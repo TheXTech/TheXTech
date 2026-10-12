@@ -3905,6 +3905,49 @@ void PlayerPush(const int A, int HitSpot)
     }
 }
 
+int CalcPlayerHeight(Player_t& p, bool Duck)
+{
+    if(p.Character == 5 && p.Rolling && Duck)
+        return 30;
+
+    if(p.Fairy)
+        return 26;
+
+    if(p.Mount == 1)
+    {
+        if(Duck)
+            return Physics.PlayerDuckHeight[p.Character][2];
+        else if(p.State == PLR_STATE_TINY)
+            return 44;
+        else if(p.Character == 2 && p.State > 1)
+            return Physics.PlayerHeight[p.Character][p.State];
+        else
+            return Physics.PlayerHeight[1][2];
+    }
+    else if(p.Mount == 2)
+        return 128;
+    else if(p.Mount == 3)
+    {
+        if(Duck)
+            return 31;
+        else if(p.State == PLR_STATE_SMALL)
+            return Physics.PlayerHeight[1][2];
+        else if(p.State == PLR_STATE_TINY)
+            return Physics.PlayerHeight[2][2] - 16;
+        else
+            return Physics.PlayerHeight[2][2];
+    }
+
+    if(Duck)
+        return Physics.PlayerDuckHeight[p.Character][p.State];
+
+    // aquatic power crouch
+    if(p.State == PLR_STATE_AQUATIC && p.HoldingNPC == 0 && p.Character != 5)
+        return Physics.PlayerHeight[p.Character][p.State] - 12;
+
+    return Physics.PlayerHeight[p.Character][p.State];
+}
+
 void SizeCheck(Player_t &p)
 {
 //On Error Resume Next
@@ -3916,102 +3959,32 @@ void SizeCheck(Player_t &p)
     if(p.Character == 0)
         p.Character = 1;
 
-    if(p.Character == 5 && p.Rolling)
-    {
-        p.Location.set_height_floor(30);
-        return;
-    }
-
+    // fairy can't duck
     if(p.Fairy)
     {
-        if(p.Duck)
-        {
-            UnDuck(p);
-        }
+        UnDuck(p);
 
-        if(p.Location.Width != 22)
-            p.Location.set_width_center(22);
+        // VB6 bug: this was always overridden by the code below, which sets Width without checking Fariy
+        // if(p.Location.Width != 22)
+        //     p.Location.set_width_center(22);
+    }
 
-        if(p.Location.Height != 26)
-            p.Location.set_height_floor(26);
-    }
-    else if(p.Mount == 0)
+    int new_height = CalcPlayerHeight(p, p.Duck);
+
+    if(p.Location.Height != new_height)
     {
-        if(!p.Duck)
-        {
-            if(p.State == PLR_STATE_AQUATIC && p.HoldingNPC == 0 && p.Character != 5)
-            {
-                if(p.Location.Height != Physics.PlayerHeight[p.Character][p.State] - 12)
-                    p.Location.set_height_floor(Physics.PlayerHeight[p.Character][p.State] - 12);
-            }
-            else if(p.Location.Height != Physics.PlayerHeight[p.Character][p.State])
-            {
-                p.Location.set_height_floor(Physics.PlayerHeight[p.Character][p.State]);
-                if(p.State == PLR_STATE_AQUATIC)
-                    p.StandUp = true;
-            }
-        }
-        else
-        {
-            if(p.Location.Height != Physics.PlayerDuckHeight[p.Character][p.State])
-                p.Location.set_height_floor(Physics.PlayerDuckHeight[p.Character][p.State]);
-        }
+        // fixes clips when the player exits the aquatic crouch
+        if(p.State == PLR_STATE_AQUATIC && p.Mount == 0 && !p.Duck && p.Character != 5 && p.HoldingNPC != 0)
+            p.StandUp = true;
+
+        p.Location.set_height_floor(new_height);
     }
-    else if(p.Mount == 1)
-    {
-        if(p.Duck)
-        {
-            if(p.Location.Height != Physics.PlayerDuckHeight[p.Character][2])
-                p.Location.set_height_floor(Physics.PlayerDuckHeight[p.Character][2]);
-        }
-        else if(p.State == PLR_STATE_TINY)
-        {
-            p.Location.set_height_floor(44);
-        }
-        else if(p.Character == 2 && p.State > 1)
-        {
-            if(p.Location.Height != Physics.PlayerHeight[1][2])
-                p.Location.set_height_floor(Physics.PlayerHeight[p.Character][p.State]);
-        }
-        else
-        {
-            if(p.Location.Height != Physics.PlayerHeight[1][2])
-                p.Location.set_height_floor(Physics.PlayerHeight[1][2]);
-        }
-    }
-    else if(p.Mount == 2)
-    {
-        if(p.Location.Height != 128)
-            p.Location.set_height_floor(128);
-    }
-    else if(p.Mount == 3)
-    {
-        if(!p.Duck)
-        {
-            if(p.State == 1)
-            {
-                if(p.Location.Height != Physics.PlayerHeight[1][2])
-                    p.Location.set_height_floor(Physics.PlayerHeight[1][2]);
-            }
-            else if(p.State == PLR_STATE_TINY)
-            {
-                if(p.Location.Height != Physics.PlayerHeight[2][2] - 16)
-                    p.Location.set_height_floor(Physics.PlayerHeight[2][2] - 16);
-                p.MountOffsetY += 16;
-            }
-            else
-            {
-                if(p.Location.Height != Physics.PlayerHeight[2][2])
-                    p.Location.set_height_floor(Physics.PlayerHeight[2][2]);
-            }
-        }
-        else
-        {
-            if(p.Location.Height != 31)
-                p.Location.set_height_floor(31);
-        }
-    }
-// width
+
+    // adjust drawing of tiny player on pet mount
+    if(p.State == PLR_STATE_TINY && p.Mount == 3 && !p.Duck)
+        p.MountOffsetY += 16;
+
+    // width
     if(p.Mount == 2)
     {
         if(p.Location.Width != 127.9_n)
