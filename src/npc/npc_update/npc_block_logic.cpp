@@ -1162,8 +1162,8 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                         // item was thrown into a wall this frame (or is a fish that just re-entered water)
                                         if(NPC[A].WallDeath >= 5 && !NPC[A]->IsABonus && NPC[A].Type != NPCID_FLY_BLOCK &&
                                            NPC[A].Type != NPCID_FLY_CANNON && NPC[A].Type != NPCID_RED_BOOT && NPC[A].Type != NPCID_CANNONENEMY && NPC[A].Type != NPCID_CANNONITEM &&
-                                           NPC[A].Type != NPCID_SPRING && NPC[A].Type != NPCID_HEAVY_THROWER && NPC[A].Type != NPCID_KEY && NPC[A].Type != NPCID_COIN_SWITCH &&
-                                           NPC[A].Type != NPCID_GRN_BOOT &&
+                                           NPC[A].Type != NPCID_SPRING && NPC[A].Type != NPCID_RED_SPRING && NPC[A].Type != NPCID_HEAVY_THROWER && NPC[A].Type != NPCID_KEY &&
+                                           NPC[A].Type != NPCID_COIN_SWITCH && NPC[A].Type != NPCID_GRN_BOOT &&
                                            // Duplicated segment [PVS Studio]
                                            // NPC[A].Type != NPCID_RED_BOOT &&
                                            NPC[A].Type != NPCID_BLU_BOOT && NPC[A].Type != NPCID_TOOTHYPIPE && NPC[A].Type != NPCID_HOMING_CANNON &&

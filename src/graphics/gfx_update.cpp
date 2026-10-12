@@ -614,7 +614,7 @@ void DrawNPCWings(const NPC_t& n, int sX, int sY, XTColor cn)
         sX += 8;
         w -= 16;
     }
-    else if(n.Type == NPCID_SPRING && !LevelEditor)
+    else if((n.Type == NPCID_SPRING || n.Type == NPCID_RED_SPRING) && !LevelEditor)
         sY -= 16;
 
     for(int direction = 0; direction < 2; direction++)

@@ -109,7 +109,7 @@ void NPCMovementLogic(int A, tempf_t& speedVar)
             NPC[A].Location.SpeedX = 2.5_n * NPC[A].Direction;
     }
     // Slow things down that shouldnt move
-    else if(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_JUMPER_S3 || NPC[A].Type == NPCID_SPRING ||
+    else if(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_JUMPER_S3 || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_RED_SPRING ||
             NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT ||
             NPC[A].Type == NPCID_GRN_BOOT || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == NPCID_HOMING_CANNON ||
             (NPC[A].Type == NPCID_SPIT_BOSS_BALL && NPC[A].Projectile) || NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_METALBARREL ||

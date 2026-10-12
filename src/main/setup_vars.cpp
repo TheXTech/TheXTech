@@ -1575,6 +1575,18 @@ void SetupVars()
     NPCTraits[NPCID_TINY_COIN].IsABonus = true;
     NPCTraits[NPCID_TINY_COIN].IsACoin = true;
 
+    NPCTraits[NPCID_RED_SPRING].TWidth = 32; // Spring
+    NPCTraits[NPCID_RED_SPRING].THeight = 32;
+    NPCTraits[NPCID_RED_SPRING].WidthGFX = 32;
+    NPCTraits[NPCID_RED_SPRING].HeightGFX = 32;
+    NPCTraits[NPCID_RED_SPRING].FrameOffsetY = 2;
+    NPCTraits[NPCID_RED_SPRING].WontHurt = true;
+    NPCTraits[NPCID_RED_SPRING].IsGrabbable = true;
+    NPCTraits[NPCID_RED_SPRING].IsAHit1Block = true;
+    NPCTraits[NPCID_RED_SPRING].StandsOnPlayer = true;
+    NPCTraits[NPCID_RED_SPRING].NoIceBall = true;
+    NPCTraits[NPCID_RED_SPRING].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+
     NPCTraits[NPCID_COIN_S3].IsACoin = true;
     NPCTraits[NPCID_COIN_S4].IsACoin = true;
     NPCTraits[NPCID_COIN_5].IsACoin = true;

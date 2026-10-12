@@ -1977,7 +1977,7 @@ void NPCFrames(int A)
         if(NPC[A].Direction == 1)
             NPC[A].Frame += 4;
     }
-    else if(NPC[A].Type == NPCID_SPRING) // Spring thing
+    else if(NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_RED_SPRING) // Spring thing
     {
         if(!LevelEditor)
         {

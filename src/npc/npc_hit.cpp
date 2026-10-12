@@ -322,7 +322,7 @@ void NPCHit(int A, int B, int C)
         NPC[A].Killed = 9;
         PlaySoundSpatial(SFX_HeroHeart, NPC[A].Location);
     }
-    else if(B == 10 && ((NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_EARTHQUAKE_BLOCK || NPC[A].Type == NPCID_ITEM_POD || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_BOMB))
+    else if(B == 10 && ((NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_RED_SPRING || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_EARTHQUAKE_BLOCK || NPC[A].Type == NPCID_ITEM_POD || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_BOMB))
     {
         PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
         NPC[A].Bouce = true;
@@ -1826,7 +1826,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Indestructable Objects
-    else if(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT || NPC[A].Type == NPCID_GRN_BOOT || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == NPCID_TOOTHYPIPE || NPCIsYoshi(NPC[A].Type) || NPC[A].Type == NPCID_ITEM_POD || (NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_EARTHQUAKE_BLOCK || NPC[A].Type == NPCID_FLY_BLOCK || NPC[A].Type == NPCID_FLY_CANNON || NPC[A].Type == NPCID_HOMING_CANNON)
+    else if(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_RED_SPRING || NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT || NPC[A].Type == NPCID_GRN_BOOT || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == NPCID_TOOTHYPIPE || NPCIsYoshi(NPC[A].Type) || NPC[A].Type == NPCID_ITEM_POD || (NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_EARTHQUAKE_BLOCK || NPC[A].Type == NPCID_FLY_BLOCK || NPC[A].Type == NPCID_FLY_CANNON || NPC[A].Type == NPCID_HOMING_CANNON)
     {
         if(NPC[A].Type == NPCID_EARTHQUAKE_BLOCK && (B == 4 || B == 5 || B == 10))
         {
@@ -1846,7 +1846,7 @@ void NPCHit(int A, int B, int C)
         }
         else
         {
-            if(B == 1 && NPC[A].Type == NPCID_SPRING)
+            if(B == 1 && (NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_RED_SPRING))
             {
                 PlaySoundSpatial(SFX_Spring, NPC[A].Location);
 
@@ -1892,7 +1892,7 @@ void NPCHit(int A, int B, int C)
                 }
                 else
                 {
-                    if(NPC[A].Type == NPCID_SPRING)
+                    if(NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_RED_SPRING)
                         NPC[A].Location.Y -= 16;
                     NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                     if(!NPC[A].NoLavaSplash)
