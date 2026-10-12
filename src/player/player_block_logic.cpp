@@ -70,9 +70,11 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
     // blockTileGet(Player[A].Location, fBlock, lBlock);
 
     Location_t unducked_loc = Player[A].Location;
+
     // to keep track of whether unducking would be safe
-    if(Player[A].Duck && Physics.PlayerHeight[Player[A].Character][Player[A].State] > num_t::floor(unducked_loc.Height))
-        unducked_loc.set_height_floor(Physics.PlayerHeight[Player[A].Character][Player[A].State]);
+    int unducked_height = CalcPlayerHeight(Player[A], false);
+    if(Player[A].Duck && unducked_height > num_t::floor(unducked_loc.Height))
+        unducked_loc.set_height_floor(unducked_height);
 
     UpdatableQuery<BlockRef_t> q(unducked_loc, SORTMODE_COMPAT, QUERY_FLBLOCK);
 

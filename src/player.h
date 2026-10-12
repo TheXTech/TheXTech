@@ -102,6 +102,8 @@ void SwapCoop();
 // Public Sub PlayerPush(A As Integer, HitSpot As Integer)
 void PlayerPush(const int A, int HitSpot);
 // Public Sub SizeCheck(A As Integer)
+int CalcPlayerHeight(Player_t& p, bool Duck);
+// Public Sub SizeCheck(A As Integer)
 void SizeCheck(struct Player_t &p);
 // Public Sub YoshiEatCode(A As Integer)
 void YoshiEatCode(const int A);
