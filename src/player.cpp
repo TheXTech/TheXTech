@@ -4742,7 +4742,7 @@ void WaterCheck(const int A)
                     if(p.CurMazeZone && (already_in_maze || p.CurMazeZone < B))
                         continue;
 
-                    if(p.Mount == 2 || p.Fairy)
+                    if(p.Mount == 2 || p.Fairy || !p.UnDuckSafe)
                         continue;
 
                     if(query_loc.Y + query_loc.Height - Physics.PlayerGravity < Water[B].Location.Y)
