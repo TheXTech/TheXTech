@@ -1173,6 +1173,16 @@ bool OpenLevel_Water(void* userdata, LevelPhysEnv& w)
 
 void OpenLevel_FixLayersEvents(const LevelLoad& load)
 {
+    // Add the blank section. In old versions of PGE-FL, numSections
+    // was automatically padded to 21. This meant that objects with
+    // position (0, 0) would go to the blank section (with the index
+    // one above the last real section).
+    // Fixes a bug where the music would not play properly in a level
+    // where the player has no start point, and initalizes to a Warps
+    // in Section 0.
+    if(numSections < 21)
+        numSections++;
+
     // Everything is loaded.
     // Now we fix the layers and events that got temporary indexes.
     // We also do some NPC logic that depends on the section boundaries.
