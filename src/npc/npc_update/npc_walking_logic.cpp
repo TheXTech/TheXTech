@@ -38,6 +38,16 @@ void NPCWalkingLogic(int A, const num_t tempHit, const int tempHitBlock, tempf_t
             tempSpeedA = 0;
     }
 
+    // type-based logic for the tempBlock supporting the NPC
+    if(Block[tempHitBlock].tempBlockNpcType == NPCID_RED_SPRING)
+    {
+        NPC[A].Location.SpeedY = -12;
+        if(NPC[A].Type != NPCID_RED_SPRING)
+            NPC[A].Location.SpeedY += Block[tempHitBlock].Location.SpeedY;
+        PlaySoundSpatial(SFX_Spring, NPC[A].Location);
+        return;
+    }
+
     if(NPC[A].Wings)
     {
         if(NPC[A].Wings == WING_JUMP)

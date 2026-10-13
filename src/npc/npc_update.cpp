@@ -717,7 +717,7 @@ resume_Activation_Chain:
                     // if(NPC[A]->CanWalkOn && !NPC[A]->IsAHit1Block && !NPC[A]->IsABlock)
                     //     Block[numBlock].noProjClipping = true;
 
-                    if((NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_RED_SPRING) && Block[numBlock].Location.Height != 32)
+                    if(NPC[A].Type == NPCID_SPRING && Block[numBlock].Location.Height != 32)
                     {
                         Block[numBlock].Location.Y -= 16;
                         Block[numBlock].Location.Height += 16;

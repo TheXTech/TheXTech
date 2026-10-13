@@ -1892,7 +1892,7 @@ void NPCHit(int A, int B, int C)
                 }
                 else
                 {
-                    if(NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_RED_SPRING)
+                    if(NPC[A].Type == NPCID_SPRING)
                         NPC[A].Location.Y -= 16;
                     NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                     if(!NPC[A].NoLavaSplash)
