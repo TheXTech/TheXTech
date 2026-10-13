@@ -29,11 +29,12 @@ void SetupVars()
 {
     //int A;
     SetupPlayerFrames();
-    for(int A = 1; A <= maxEffectType; A++)
-    {
-        EffectWidth[A] = 32;
-        EffectHeight[A] = 32;
-    }
+    // Effect sizes now calculated below
+    // for(int A = 1; A <= maxEffectType; A++)
+    // {
+    //     EffectWidth[A] = 32;
+    //     EffectHeight[A] = 32;
+    // }
     // now part of the default NPCTraits_t initializer'
     // for(int A = 1; A <= maxNPCType; ++A)
     //     NPCTraits[A].Speedvar = 1;
@@ -46,6 +47,8 @@ void SetupVars()
     GFXLevelBig[24] = true;
     GFXLevelBig[28] = true;
 
+    // Effect sizes now calculated from frame counts and graphics
+#if 0
     EffectWidth[145] = 32;
     EffectHeight[145] = 60;
 
@@ -301,6 +304,72 @@ void SetupVars()
     EffectWidth[46] = 48;
     EffectHeight[47] = 44;
     EffectWidth[47] = 44;
+#endif
+
+    // NEW: initialize effects from graphics and frame counts,
+    // instead of initializing frame counts from graphics and default sizes
+    const std::array<uint8_t, 148> effect_frames =
+    {
+        4, 1, 1, 2, 1, 1, 2, 1, 1, 4, // 1 - 10
+        7, 3, 3, 4, 2, 2, 8, 8, 1, 8, // 11 - 20
+        4, 2, 1, 8, 2, 4, 4, 1, 2, 4, // 21 - 30
+        2, 1, 2, 2, 1, 2, 1, 2, 1, 2, // 31 - 40
+        1, 2, 1, 2, 1, 2, 1, 1, 2, 2, // 41 - 50
+        4, 1, 2, 5, 5, 17, 4, 16, 5, 4, // 51 - 60
+       16, 4, 3, 8, 8, 8, 8, 1, 2, 1, // 61 - 70
+        4, 2, 4, 3, 2, 1, 15, 3, 13, 3, // 71 - 80
+        1, 4, 8, 2, 4, 4, 4, 4, 2, 1, // 81 - 90
+        4, 4, 4, 4, 1, 1, 4, 1, 2, 4, // 91 - 100
+        4, 4, 5, 2, 2, 2, 3, 7, 16, 2, // 101 - 110
+       14, 2, 2, 5, 4, 4, 2, 4, 4, 4, // 111 - 120
+        2, 4, 1, 1, 4, 1, 2, 6, 1, 1, // 121 - 130
+        4, 2, 4, 2, 4, 5, 4, 2, 3, 8, // 131 - 140
+        2, 2, 2, 1, 2, 4, 4, 4, // 141 - 148
+    };
+
+    for(size_t A = 1; A <= maxEffectType; A++)
+    {
+        if(A <= effect_frames.size())
+            EffectDefaults.EffectFrames[A] = effect_frames[A - 1];
+        else
+            EffectDefaults.EffectFrames[A] = 1;
+
+        const auto& eGfx = GFXEffectBMP[A];
+
+        if(eGfx.inited)
+        {
+            EffectWidth[A] = eGfx.w;
+            EffectHeight[A] = eGfx.h / EffectDefaults.EffectFrames[A];
+        }
+        else
+        {
+            EffectWidth[A] = 32;
+            EffectHeight[A] = 32;
+        }
+    }
+
+    // fix cases where SMBX 1.3 default size did not match graphics
+    if(EffectHeight[2] == 34)
+        EffectHeight[2] = 32;
+    if(EffectHeight[25] == 47)
+        EffectHeight[25] = 48;
+    if(EffectHeight[37] == 34)
+        EffectHeight[37] = 32;
+    if(EffectHeight[39] == 34)
+        EffectHeight[39] = 32;
+    if(EffectHeight[41] == 34)
+        EffectHeight[41] = 32;
+    if(EffectHeight[43] == 34)
+        EffectHeight[43] = 32;
+    if(EffectHeight[90] == 64)
+        EffectHeight[90] = 96;
+    // I guess these 98 and 99 got confused with each other
+    if(EffectWidth[98] == 48)
+        EffectWidth[98] = 64;
+    if(EffectWidth[99] == 64)
+        EffectWidth[99] = 48;
+    if(EffectWidth[103] == 104)
+        EffectWidth[103] = 120;
 
     // NEW: reset all variables to their original values (it will be nice to convert all NPC traits to a single struct)
     NPCTraits.fill(NPCTraits_t());
@@ -2908,14 +2977,16 @@ void SetupVars()
         if(NPCTraits[A].IsFish)
             NPCTraits[A].Foreground = true;
     }
+
+#ifndef LOW_MEM
+    // kept only for debugging that it's safe to remove them
     For(A, 1, maxEffectType)
     {
-#ifndef LOW_MEM
-        // kept only for debugging that it's safe to remove them
         EffectDefaults.EffectHeight[A] = EffectHeight[A];
         EffectDefaults.EffectWidth[A] = EffectWidth[A];
-#endif // #ifndef LOW_MEM
 
+        // old VB6 logic for calculating Frames from default size and graphics
+#if 0
         if(EffectHeight[A] > 0)
         {
             // EffectDefaults.EffectFrames[A] = vb6Round(double(GFXEffectBMP[A].h) / EffectHeight[A]);
@@ -2925,7 +2996,10 @@ void SetupVars()
         }
         else
             EffectDefaults.EffectFrames[A] = 1;
+#endif
     }
+#endif // #ifndef LOW_MEM
+
     SaveNPCDefaults();
     SavePlayerDefaults();
 }
