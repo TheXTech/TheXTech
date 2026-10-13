@@ -1576,7 +1576,7 @@ void SetupVars()
     NPCTraits[NPCID_TINY_COIN].IsACoin = true;
 
     NPCTraits[NPCID_RED_SPRING].TWidth = 32; // Spring
-    NPCTraits[NPCID_RED_SPRING].THeight = 32;
+    NPCTraits[NPCID_RED_SPRING].THeight = 16;
     NPCTraits[NPCID_RED_SPRING].WidthGFX = 32;
     NPCTraits[NPCID_RED_SPRING].HeightGFX = 32;
     NPCTraits[NPCID_RED_SPRING].FrameOffsetY = 2;

@@ -700,7 +700,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
 
                                             NPCHit(A, 3, A);
                                         }
-                                        else if(NPC[A].Type == NPCID_ICE_CUBE && (HitSpot == 1 || HitSpot == 3 /* || HitSpot == 5*/))
+                                        else if(NPC[A].Type == NPCID_ICE_CUBE && (HitSpot == 1 || HitSpot == 3 /* || HitSpot == 5*/) && Block[B].tempBlockNpcType != NPCID_RED_SPRING)
                                         {
                                             if(NPC[A].Location.SpeedX > -Physics.NPCShellSpeed * 0.8_r && NPC[A].Location.SpeedX < Physics.NPCShellSpeed * 0.8_r)
                                             {
@@ -1126,8 +1126,8 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                     }
                                     else if(HitSpot == 3) // Hitspot 3
                                     {
-                                        // ignore the hit if it is an NPC that a Winged Block NPC will be supporting
-                                        if(NPC[A].Wings && NPC[A].tempBlock && Block[B].tempBlockNpcIdx && !blk_npc_tr.NoGravity)
+                                        // ignore the hit if it is an NPC that a Winged Block NPC or Red Spring will be supporting
+                                        if((NPC[A].Wings || NPC[A].Type == NPCID_RED_SPRING) && NPC[A].tempBlock && Block[B].tempBlockNpcIdx && !blk_npc_tr.NoGravity)
                                             continue;
 
                                         if(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1)
@@ -1184,7 +1184,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                                 NPCQueues::Killed.push_back(A);
                                             }
                                         }
-                                        else if(NPC[A].Type != NPCID_SPIKY_BALL_S3 && !(NPC[A]->IsABlock && Block[B].tempBlockNpcType > 0) && block_is_not_conveyor)
+                                        else if(NPC[A].Type != NPCID_SPIKY_BALL_S3 && !((NPC[A]->IsABlock || NPC[A].Type == NPCID_RED_SPRING) && Block[B].tempBlockNpcType > 0) && block_is_not_conveyor)
                                         {
                                             addBelt = (tempf_t)NPC[A].Location.X;
 

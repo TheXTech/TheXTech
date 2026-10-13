@@ -1015,6 +1015,17 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
         {
             Player[A].Jump = Physics.PlayerSpringJumpHeight;
             Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - 4;
+
+            if(NPC[bounceNpc].Type == NPCID_RED_SPRING)
+            {
+                Player[A].Jump -= 20;
+
+                if(NPC[bounceNpc].Location.SpeedY < 0)
+                {
+                    Player[A].Location.SpeedY += NPC[bounceNpc].Location.SpeedY;
+                    Player[A].Jump += num_t::floor(-NPC[bounceNpc].Location.SpeedY * 3);
+                }
+            }
         }
         else
         {

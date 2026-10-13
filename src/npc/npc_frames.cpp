@@ -1986,36 +1986,57 @@ void NPCFrames(int A)
                 NPC[A].Location.Height = 16;
                 NPC[A].Location.Y += 16;
             }
+
             if(NPC[A].HoldingPlayer > 0)
                 NPC[A].Frame = 0;
             else
             {
                 int C = 0;
+
                 Location_t tempLocation = NPC[A].Location;
-                tempLocation.Height = 24;
-                tempLocation.Y -= 8;
+                tempLocation.Height = 32;
+                tempLocation.Y -= 16;
+
+                num_t frame2_Y = tempLocation.Y + 8;
+
                 for(int B = 1; B <= numPlayers; ++B)
                 {
                     if(CheckCollision(tempLocation, Player[B].Location) && Player[B].Mount != 2 && (Player[B].Location.SpeedY > 0 || Player[B].Location.SpeedY < Physics.PlayerJumpVelocity))
                     {
-                        C = 2;
-                        break;
+                        if(Player[B].Location.Y + Player[B].Location.Height >= frame2_Y)
+                        {
+                            C = 2;
+                            break;
+                        }
+                        else if(C != 2)
+                            C = 1;
                     }
                 }
-                if(C == 0)
+
+                if(C != 2 && NPC[A].Type == NPCID_RED_SPRING)
                 {
-                    tempLocation = NPC[A].Location;
-                    tempLocation.Height = 32;
-                    tempLocation.Y -= 16;
-                    for(int B = 1; B <= numPlayers; ++B)
+                    tempLocation.Height -= 12;
+                    tempLocation.X += 1;
+                    tempLocation.Width -= 2;
+                    for(NPCRef_t i : treeNPCQuery(tempLocation, SORTMODE_NONE))
                     {
-                        if(CheckCollision(tempLocation, Player[B].Location) && Player[B].Mount != 2 && (Player[B].Location.SpeedY > 0 || Player[B].Location.SpeedY < Physics.PlayerJumpVelocity))
+                        if(A == (int)i)
+                            continue;
+
+                        const NPC_t& n = i;
+                        if(n.Active && !n->NoClipping && !n.HoldingPlayer && !n.Effect && CheckCollision(tempLocation, n.Location) && (n.Location.SpeedY > 0 || n.Location.SpeedY < -8))
                         {
-                            C = 1;
-                            break;
+                            if(n.Location.Y + n.Location.Height >= frame2_Y)
+                            {
+                                C = 2;
+                                break;
+                            }
+                            else if(C != 2)
+                                C = 1;
                         }
                     }
                 }
+
                 NPC[A].Frame = C;
             }
         }
