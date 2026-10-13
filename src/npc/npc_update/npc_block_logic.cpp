@@ -262,6 +262,8 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                                 HitSpot = 0;
                                             if(Block[B].Type == BLKID_CHAR5_PASS && special == 5 && g_config.fix_char_pass_balls) // NEW
                                                 HitSpot = 0;
+                                            if(Block[B].Type == BLKID_PLAYERPASS && special != 0)
+                                                HitSpot = 0;
 
                                             if(NPCTraits[Block[B].tempBlockNpcType].IsABonus)
                                                 HitSpot = 0;
