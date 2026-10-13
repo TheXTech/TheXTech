@@ -347,28 +347,20 @@ void SetupVars()
         }
     }
 
-    // fix cases where SMBX 1.3 default size did not match graphics
-    if(EffectHeight[2] == 34)
-        EffectHeight[2] = 32;
-    if(EffectHeight[25] == 47)
-        EffectHeight[25] = 48;
-    if(EffectHeight[37] == 34)
-        EffectHeight[37] = 32;
-    if(EffectHeight[39] == 34)
-        EffectHeight[39] = 32;
-    if(EffectHeight[41] == 34)
-        EffectHeight[41] = 32;
-    if(EffectHeight[43] == 34)
-        EffectHeight[43] = 32;
-    if(EffectHeight[90] == 64)
-        EffectHeight[90] = 96;
-    // I guess these 98 and 99 got confused with each other
-    if(EffectWidth[98] == 48)
-        EffectWidth[98] = 64;
-    if(EffectWidth[99] == 64)
-        EffectWidth[99] = 48;
-    if(EffectWidth[103] == 104)
-        EffectWidth[103] = 120;
+    // Fix cases where SMBX 1.3 default size did not match graphics:
+    // (1) The heights for EFFID_FODDER_S3_SQUISH (2), EFFID_YELSWITCH_FODDER_SQUISH (37),
+    //     EFFID_BLUSWITCH_FODDER_SQUISH (39), EFFID_GRNSWITCH_FODDER_SQUISH (41),
+    //     and EFFID_REDSWITCH_FODDER_SQUISH (43) were 32, but the graphics are 34.
+    //     This does not affect gameplay because the heights were force-initialized to 34 in NewEffect,
+    //     so EffectHeight is not used for them.
+    // (2) The height for EFFID_STONE_S3_DIE (90) and the widths for EFFID_STONE_S4_DIE (98)
+    //     and EFFID_SAW_DIE (99) were incorrect. This does not affect gameplay, because
+    //     NewEffect force-uses the provided location for these types (ignoring EffectWidth/EffectHeight).
+    // (3) The width for EFFID_BIG_DOOR_OPEN (103) was incorrectly set to 120, but this did not affect
+    //     gameplay, because NewEffect force-uses the provided location (which had width 104) for doors.
+    // (4) The sprite for EFFID_HEAVY_THROWER_DIE (effect-25.gif) was accidentally missing one row in SMBX 1.3.
+    if(EffectHeight[EFFID_HEAVY_THROWER_DIE] == 47)
+        EffectHeight[EFFID_HEAVY_THROWER_DIE] = 48;
 
     // NEW: reset all variables to their original values (it will be nice to convert all NPC traits to a single struct)
     NPCTraits.fill(NPCTraits_t());
