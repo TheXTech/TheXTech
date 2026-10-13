@@ -359,8 +359,8 @@ void SetupVars()
     // (3) The width for EFFID_BIG_DOOR_OPEN (103) was incorrectly set to 120, but this did not affect
     //     gameplay, because NewEffect force-uses the provided location (which had width 104) for doors.
     // (4) The sprite for EFFID_HEAVY_THROWER_DIE (effect-25.gif) was accidentally missing one row in SMBX 1.3.
-    if(EffectHeight[EFFID_HEAVY_THROWER_DIE] == 47)
-        EffectHeight[EFFID_HEAVY_THROWER_DIE] = 48;
+    if(EffectHeight[25] == 47)
+        EffectHeight[25] = 48;
 
     // NEW: reset all variables to their original values (it will be nice to convert all NPC traits to a single struct)
     NPCTraits.fill(NPCTraits_t());
