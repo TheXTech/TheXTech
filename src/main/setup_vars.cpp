@@ -1319,6 +1319,11 @@ void SetupVars()
     NPCTraits[NPCID_HOMING_BULLET].TFrames = 3;
     NPCTraits[NPCID_HOMING_BULLET].FrameSpeed = 8;
 
+    NPCTraits[NPCID_TRANSPARENT_AXE].NoYoshi = true;
+    NPCTraits[NPCID_TRANSPARENT_AXE].IsABonus = true;
+    NPCTraits[NPCID_TRANSPARENT_AXE].NoIceBall = true;
+    NPCTraits[NPCID_TRANSPARENT_AXE].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+
     NPCTraits[NPCID_GRN_SHELL_S1].THeight = 28; //  Green SMB1 Shell
     NPCTraits[NPCID_GRN_SHELL_S1].IsAShell = true;
     NPCTraits[NPCID_RED_SHELL_S1].THeight = 28; //  Red SMB1 Shell

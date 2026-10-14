@@ -1947,6 +1947,14 @@ int EditorNPCFrame(const NPCID A, vbint_t& C, int N)
         }
     }
 
+    if(A == NPCID_TRANSPARENT_AXE)
+    {
+        if(LevelEditor)
+            ret = 1;
+        else
+            ret = 0;
+    }
+
 
     if(A == NPCID_WALK_BOMB_S2 || A == NPCID_GRN_TURTLE_S3 || A == NPCID_RED_TURTLE_S3
         || A == NPCID_BLU_GUY || A == NPCID_RED_GUY || A == NPCID_GLASS_TURTLE
