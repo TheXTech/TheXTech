@@ -47,6 +47,10 @@ void SetupVars()
     GFXLevelBig[24] = true;
     GFXLevelBig[28] = true;
 
+    // NEW: allow custom-range levels to be big
+    for(int A = 33; A <= maxLevelType; A++)
+        GFXLevelBig[A] = true;
+
     // Effect sizes now calculated from frame counts and graphics
 #if 0
     EffectWidth[145] = 32;
