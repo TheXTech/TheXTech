@@ -534,6 +534,8 @@ bool OpenWorld_Post(const WorldLoad& load)
 
     LoadCustomSound();
 
+    CalcWorldTileSize();
+
     // the version targeting below is from SMBX 1.3
     const int FileRelease = load.FileRelease;
 
@@ -616,6 +618,7 @@ void ClearWorld(bool quick)
         UnloadWorldCustomGFX();
         UnloadCustomSound();
         LoadPlayerDefaults();
+        ResetWorldTileSize();
     }
 
     MaxWorldStars = 0;

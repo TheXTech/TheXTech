@@ -50,6 +50,10 @@ void ReportLoadFailure(const std::string& filename, bool isIPC = false);
 void MainLoadAll();
 
 int GameMain(const CmdLineSetup_t &setup);
+//! Resets size for world map tiles to default
+void ResetWorldTileSize();
+//! Calculates size for world map tiles based on graphical dimensions
+void CalcWorldTileSize();
 //! Set up object sizes and frame offsets for blocks/npcs/effects
 void SetupVars();
 //! The loop for the game
