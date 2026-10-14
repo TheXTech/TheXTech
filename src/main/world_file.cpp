@@ -63,13 +63,8 @@ struct WorldLoad
     int FileRelease = 64;
 };
 
-#ifdef PGEFL_CALLBACK_API
 WorldLoadCallbacks OpenWorld_SetupCallbacks(WorldLoad& load);
 using callback_error = PGE_FileFormats_misc::callback_error;
-#else
-bool OpenWorld_Unpack(WorldLoad& load, WorldData& wld);
-using callback_error = std::runtime_error;
-#endif
 
 bool OpenWorld_Post(const WorldLoad& load);
 
@@ -137,36 +132,16 @@ bool OpenWorld(std::string FilePath)
         return false;
     }
 
-#ifdef PGEFL_CALLBACK_API
     WorldLoadCallbacks callbacks = OpenWorld_SetupCallbacks(load);
     if(!FileFormats::OpenWorldFileT(in, callbacks))
     {
         pLogDebug("Failed to load [%s]", FilePath.c_str());
         return false;
     }
-#else // #ifdef PGEFL_CALLBACK_API
-    {
-        WorldData wld;
-
-        if(!FileFormats::OpenWorldFileT(in, wld))
-        {
-            pLogWarning("Error of world \"%s\" file loading: %s (line %ld).",
-                        FilePath.c_str(),
-                        wld.meta.ERROR_info.c_str(),
-                        wld.meta.ERROR_linenum);
-            MessageText = std::move(wld.meta.ERROR_info);
-            return false;
-        }
-
-        if(!OpenWorld_Unpack(load, wld))
-            return false;
-    }
-#endif // #ifdef PGEFL_CALLBACK_API
 
     return OpenWorld_Post(load);
 }
 
-#ifdef PGEFL_CALLBACK_API
 void OpenWorld_Error(void*, FileFormatsError& e)
 {
     pLogWarning("Error of world file loading: %s (line %ld).",
@@ -175,29 +150,17 @@ void OpenWorld_Error(void*, FileFormatsError& e)
 
     MessageText = std::move(e.ERROR_info);
 }
-#endif
 
-#ifdef PGEFL_CALLBACK_API
 bool OpenWorld_Head(void* userdata, WorldHead& wld)
-#else
-bool OpenWorld_Head(void* userdata, WorldData& wld)
-#endif
 {
     WorldLoad& load = *static_cast<WorldLoad*>(userdata);
 
     constexpr unsigned int engineFeatureLevel = V_FEATURE_LEVEL;
 
-#ifdef PGEFL_CALLBACK_API
     FileFormat = wld.RecentFormat;
     unsigned int reqFeatureLevel = wld.engineFeatureLevel;
     if(wld.RecentFormat == LevelData::SMBX64)
         load.FileRelease = int(wld.RecentFormatVersion);
-#else
-    FileFormat = wld.meta.RecentFormat;
-    unsigned int reqFeatureLevel = wld.meta.engineFeatureLevel;
-    if(wld.meta.RecentFormat == LevelData::SMBX64)
-        load.FileRelease = int(wld.meta.RecentFormatVersion);
-#endif
 
     if(reqFeatureLevel > engineFeatureLevel)
         priv_FeatureLevelError(g_gameStrings.errorTooOldEngine, reqFeatureLevel, engineFeatureLevel);
@@ -529,7 +492,6 @@ bool OpenWorld_AreaRect(void*, WorldAreaRect& m)
     return true;
 }
 
-#ifdef PGEFL_CALLBACK_API
 
 WorldLoadCallbacks OpenWorld_SetupCallbacks(WorldLoad& load)
 {
@@ -549,60 +511,6 @@ WorldLoadCallbacks OpenWorld_SetupCallbacks(WorldLoad& load)
     return callbacks;
 }
 
-#else // #ifdef PGEFL_CALLBACK_API
-
-bool OpenWorld_Unpack(WorldLoad& load, WorldData& wld)
-{
-    try
-    {
-        OpenWorld_Head(&load, wld);
-    }
-    catch(const callback_error& e)
-    {
-        pLogWarning("Error of level \"%s\" file loading: %s.",
-                    wld.meta.filename.c_str(),
-                    e.what());
-
-        MessageText = e.what();
-
-        return false;
-    }
-
-    for(auto &t : wld.tiles)
-    {
-        if(!OpenWorld_Tile(&load, t))
-            break;
-    }
-    for(auto &s : wld.scenery)
-    {
-        if(!OpenWorld_Scene(&load, s))
-            break;
-    }
-    for(auto &p : wld.paths)
-    {
-        if(!OpenWorld_Path(&load, p))
-            break;
-    }
-    for(auto &l : wld.levels)
-    {
-        if(!OpenWorld_Level(&load, l))
-            break;
-    }
-    for(auto &m : wld.music)
-    {
-        if(!OpenWorld_Music(&load, m))
-            break;
-    }
-    for(auto &a : wld.arearects)
-    {
-        if(!OpenWorld_AreaRect(&load, a))
-            break;
-    }
-
-    return true;
-}
-
-#endif // #ifdef PGEFL_CALLBACK_API
 
 bool OpenWorld_Post(const WorldLoad& load)
 {

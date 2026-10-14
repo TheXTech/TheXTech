@@ -174,11 +174,7 @@ void SaveInfoInit::on_error()
         *target = LevelSaveInfo_t();
 }
 
-#ifdef PGEFL_CALLBACK_API
 void SaveInfoInit::check_head(const LevelHead& head)
-#else
-void SaveInfoInit::check_head(const LevelData& head)
-#endif
 {
     if(!target)
         return;
@@ -230,8 +226,6 @@ void SaveInfoInit::check_npc(const LevelNPC& npc)
     }
 }
 
-#ifdef PGEFL_CALLBACK_API
-
 static void InitLevelSaveInfo_on_error(void* userdata, FileFormatsError& e)
 {
     SaveInfoInit& si = *static_cast<SaveInfoInit*>(userdata);
@@ -281,38 +275,6 @@ LevelSaveInfo_t InitLevelSaveInfo(const std::string& fullPath, LevelData&)
 
     return ret;
 }
-
-#else // #ifdef PGEFL_CALLBACK_API
-LevelSaveInfo_t InitLevelSaveInfo(const LevelData& loadedLevel)
-{
-    LevelSaveInfo_t ret;
-
-    SaveInfoInit si;
-    si.begin(&ret);
-
-    si.check_head(loadedLevel);
-
-    for(const auto& n : loadedLevel.npc)
-        si.check_npc(n);
-
-    return ret;
-}
-
-LevelSaveInfo_t InitLevelSaveInfo(const std::string& fullPath, LevelData& tempData)
-{
-    if(!FileFormats::OpenLevelFile(fullPath, tempData))
-    {
-        pLogWarning("During save info init: failed to load [%s]", fullPath.c_str());
-        return LevelSaveInfo_t();
-    }
-
-    auto ret = InitLevelSaveInfo(tempData);
-
-    pLogDebug("Initing level save data at [%s] with %d stars and %d medals", fullPath.c_str(), (int)ret.max_stars, (int)ret.max_medals);
-
-    return ret;
-}
-#endif // #else // #ifdef PGEFL_CALLBACK_API
 
 LevelSaveInfo_t* CurSaveInfo()
 {
