@@ -1967,6 +1967,8 @@ extern std::string FileNamePath;
 extern std::string FileRecentSubHubLevel;
 //! EXTRA: The format of the current file
 extern int FileFormat;
+//! EXTRA: Does the currently loaded level target this engine (vs SMBX 1.3)?
+extern bool LevelTargetsEngine;
 
 //! EXTRA: World map preserved filename
 extern std::string FileNameWorld;
@@ -1976,6 +1978,8 @@ extern std::string FileNameFullWorld;
 extern std::string FileNamePathWorld;
 //! EXTRA: The format of the world file
 extern int FileFormatWorld;
+//! EXTRA: Does the currently loaded world target this engine (vs SMBX 1.3)?
+extern bool WorldTargetsEngine;
 
 //! EXTRA: Identify that episode is an intro level
 extern bool IsEpisodeIntro;

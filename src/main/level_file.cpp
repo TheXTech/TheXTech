@@ -374,6 +374,7 @@ bool OpenLevel_Head(void* userdata, LevelHead& head)
 
     FileFormat = head.RecentFormat;
     unsigned int reqFeatureLevel = head.engineFeatureLevel;
+    LevelTargetsEngine = (head.configPackId == "TheXTech" || head.configPackId == "SMBXT");
 
     if(reqFeatureLevel > engineFeatureLevel)
         priv_FeatureLevelError(g_gameStrings.errorTooOldEngine, reqFeatureLevel, engineFeatureLevel);
@@ -1832,6 +1833,7 @@ void ClearLevel()
     IsHubLevel = false;
     // default file format if level header is missing
     FileFormat = FileFormats::LVL_PGEX;
+    LevelTargetsEngine = true;
     // removed because the same logic is called inside of LoadCustomConfig()
     // ResetCustomConfig();
     SetupPhysics();

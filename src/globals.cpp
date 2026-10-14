@@ -308,6 +308,9 @@ std::string FileNameFullWorld;
 std::string FileNamePathWorld;
 int FileFormatWorld = 0;
 
+bool LevelTargetsEngine = false;
+bool WorldTargetsEngine = false;
+
 bool IsEpisodeIntro = false;
 bool IsHubLevel = false;
 int Coins = 0;
