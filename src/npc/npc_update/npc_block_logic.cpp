@@ -947,7 +947,7 @@ void NPCBlockLogic(int A, num_t& tempHit, int& tempHitBlock, tempf_t& tempSpeedA
                                             }
                                         }
 
-                                        if(tempHitBlock == B)
+                                        if(tempHitBlock == B && Block[B].tempBlockNpcType != NPCID_RED_SPRING)
                                         {
                                             if(NPC[A].Type == NPCID_SPIKY_BALL_S3)
                                             {
