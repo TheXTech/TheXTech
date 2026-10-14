@@ -25,6 +25,47 @@
 #include "npc_id.h"
 #include "blk_id.h"
 
+void ResetWorldTileSize()
+{
+    For(A, 1, maxTileType)
+    {
+        TileWidth[A] = 32;
+        TileHeight[A] = 32;
+    }
+
+    TileWidth[8] = 64;
+    TileHeight[8] = 64;
+    TileWidth[9] = 96;
+    TileHeight[9] = 96;
+    TileWidth[12] = 64;
+    TileHeight[12] = 64;
+    TileWidth[13] = 96;
+    TileHeight[13] = 96;
+    TileWidth[27] = 128;
+    TileHeight[27] = 128;
+    TileWidth[325] = 64;
+    TileHeight[325] = 64;
+}
+
+void CalcWorldTileSize()
+{
+    if(!WorldTargetsEngine)
+        return;
+
+    For(A, 1, maxTileType)
+    {
+        if(!GFXTile[A].inited)
+            continue;
+
+        TileWidth[A] = GFXTile[A].w;
+        TileHeight[A] = GFXTile[A].h;
+
+        // animated tiles, with 4 frames each
+        if(A == 14 || A == 27 || A == 241)
+            TileHeight[A] /= 4;
+    }
+}
+
 void SetupVars()
 {
     //int A;
@@ -2955,23 +2996,8 @@ void SetupVars()
     SceneWidth[61] = 64;
     SceneHeight[61] = 76;
 
-    For(A, 1, maxTileType)
-    {
-        TileWidth[A] = 32;
-        TileHeight[A] = 32;
-    }
-    TileWidth[8] = 64;
-    TileHeight[8] = 64;
-    TileWidth[9] = 96;
-    TileHeight[9] = 96;
-    TileWidth[12] = 64;
-    TileHeight[12] = 64;
-    TileWidth[13] = 96;
-    TileHeight[13] = 96;
-    TileWidth[27] = 128;
-    TileHeight[27] = 128;
-    TileWidth[325] = 64;
-    TileHeight[325] = 64;
+    ResetWorldTileSize();
+
     Points[1] = 10;
     Points[2] = 100;
     Points[3] = 200;
