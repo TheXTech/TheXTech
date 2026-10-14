@@ -161,6 +161,7 @@ bool OpenWorld_Head(void* userdata, WorldHead& wld)
     unsigned int reqFeatureLevel = wld.engineFeatureLevel;
     if(wld.RecentFormat == LevelData::SMBX64)
         load.FileRelease = int(wld.RecentFormatVersion);
+    WorldTargetsEngine = (wld.configPackId == "TheXTech" || wld.configPackId == "SMBXT");
 
     if(reqFeatureLevel > engineFeatureLevel)
         priv_FeatureLevelError(g_gameStrings.errorTooOldEngine, reqFeatureLevel, engineFeatureLevel);
@@ -627,7 +628,8 @@ void ClearWorld(bool quick)
     // Clear custom outro if that was presented
     g_recentWorldOutro.clear();
     // default file format if world header is missing
-    FileFormat = FileFormats::LVL_PGEX;
+    FileFormatWorld = FileFormats::LVL_PGEX;
+    WorldTargetsEngine = true;
 
     for(int i = 1; i <= maxWorldCredits; i++)
         WorldCredits[i].clear();
