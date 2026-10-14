@@ -94,11 +94,7 @@ static const char* s_improper_rect_warning = "Attempted to set %s %d %s to %d, s
 static const char* s_destroy_event_warning = "Block 186 or 457 has a destroy event. TheXTech does not match SMBX 1.3 logic in this case. A vanilla speedrun is not fully valid.";
 
 // used to signal a total failure in a callback
-#ifdef PGEFL_CALLBACK_API
 using callback_error = PGE_FileFormats_misc::callback_error;
-#else
-using callback_error = std::runtime_error;
-#endif
 
 [[ noreturn ]] void priv_FeatureLevelError(const std::string& errMsg, int reqFeatureLevel, int curFeatureLevel)
 {
@@ -284,11 +280,7 @@ struct LevelLoad
     }
 };
 
-#ifdef PGEFL_CALLBACK_API
 LevelLoadCallbacks OpenLevel_SetupCallbacks(LevelLoad& load);
-#else
-bool OpenLevel_Unpack(LevelLoad& load, LevelData& lvl);
-#endif
 
 void OpenLevel_FixLayersEvents(const LevelLoad& load);
 
@@ -348,7 +340,6 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
 
     load.si.begin(g_curLevelMedals.should_initialize());
 
-#ifdef PGEFL_CALLBACK_API
     LevelLoadCallbacks callbacks = OpenLevel_SetupCallbacks(load);
     if(!FileFormats::OpenLevelFileT(input, callbacks))
     {
@@ -356,28 +347,12 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
         load.si.on_error();
         return false;
     }
-#else
-    LevelData lvl;
-    if(!FileFormats::OpenLevelFileT(input, lvl))
-    {
-        pLogWarning("Error of level \"%s\" file loading: %s (line %ld).",
-                    FilePath.c_str(),
-                    lvl.meta.ERROR_info.c_str(),
-                    lvl.meta.ERROR_linenum);
-        load.si.on_error();
-        return false;
-    }
-
-    if(!OpenLevel_Unpack(load, lvl))
-        return false;
-#endif
 
     OpenLevel_FixLayersEvents(load);
 
     return true;
 }
 
-#ifdef PGEFL_CALLBACK_API
 void OpenLevel_Error(void*, FileFormatsError& e)
 {
     pLogWarning("Error of level file loading: %s (line %ld).",
@@ -386,13 +361,8 @@ void OpenLevel_Error(void*, FileFormatsError& e)
 
     MessageText = std::move(e.ERROR_info);
 }
-#endif
 
-#ifdef PGEFL_CALLBACK_API
 bool OpenLevel_Head(void* userdata, LevelHead& head)
-#else
-bool OpenLevel_Head(void* userdata, LevelData& head)
-#endif
 {
     LevelLoad& load = *static_cast<LevelLoad*>(userdata);
 
@@ -402,13 +372,8 @@ bool OpenLevel_Head(void* userdata, LevelData& head)
 
     constexpr unsigned int engineFeatureLevel = V_FEATURE_LEVEL;
 
-#ifdef PGEFL_CALLBACK_API
     FileFormat = head.RecentFormat;
     unsigned int reqFeatureLevel = head.engineFeatureLevel;
-#else
-    FileFormat = head.meta.RecentFormat;
-    unsigned int reqFeatureLevel = head.meta.engineFeatureLevel;
-#endif
 
     if(reqFeatureLevel > engineFeatureLevel)
         priv_FeatureLevelError(g_gameStrings.errorTooOldEngine, reqFeatureLevel, engineFeatureLevel);
@@ -1585,8 +1550,6 @@ void OpenLevel_FixLayersEvents(const LevelLoad& load)
     LAYER_USED_P_SWITCH = FindLayer(LAYER_USED_P_SWITCH_TITLE);
 }
 
-#ifdef PGEFL_CALLBACK_API
-
 LevelLoadCallbacks OpenLevel_SetupCallbacks(LevelLoad& load)
 {
     LevelLoadCallbacks callbacks;
@@ -1607,75 +1570,6 @@ LevelLoadCallbacks OpenLevel_SetupCallbacks(LevelLoad& load)
 
     return callbacks;
 }
-
-#else // #ifdef PGEFL_CALLBACK_API
-
-bool OpenLevel_Unpack(LevelLoad& load, LevelData& lvl)
-{
-    try
-    {
-        OpenLevel_Head(&load, lvl);
-
-        for(auto &s : lvl.sections)
-        {
-            if(!OpenLevel_Section(&load, s))
-                break;
-        }
-        for(auto &p : lvl.players)
-        {
-            if(!OpenLevel_PlayerStart(&load, p))
-                break;
-        }
-        for(auto &b : lvl.blocks)
-        {
-            if(!OpenLevel_Block(&load, b))
-                break;
-        }
-        for(auto &b : lvl.bgo)
-        {
-            if(!OpenLevel_Background(&load, b))
-                break;
-        }
-        for(auto &n : lvl.npc)
-        {
-            if(!OpenLevel_NPC(&load, n))
-                break;
-        }
-        for(auto &w : lvl.doors)
-        {
-            if(!OpenLevel_Warp(&load, w))
-                break;
-        }
-        for(auto &w : lvl.physez)
-        {
-            if(!OpenLevel_Water(&load, w))
-                break;
-        }
-        for(auto &l : lvl.layers)
-        {
-            if(!OpenLevel_Layer(&load, l))
-                break;
-        }
-        for(auto &e : lvl.events)
-        {
-            if(!OpenLevel_Event(&load, e))
-                break;
-        }
-    }
-    catch(const callback_error& e)
-    {
-        pLogWarning("Error of level \"%s\" file loading: %s.",
-                    lvl.meta.filename.c_str(),
-                    e.what());
-
-        MessageText = e.what();
-
-        return false;
-    }
-
-    return true;
-}
-#endif // #else // #ifdef PGEFL_CALLBACK_API
 
 void OpenLevelDataPost()
 {

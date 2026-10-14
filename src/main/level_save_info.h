@@ -41,13 +41,8 @@ struct SaveInfoInit
     // marks target as invalid on load error
     void on_error();
 
-#ifdef PGEFL_CALLBACK_API
     // updates star count from header
     void check_head(const LevelHead& head);
-#else
-    // updates star count from header
-    void check_head(const LevelData& head);
-#endif
 
     // updates medal count from NPC
     void check_npc(const LevelNPC& head);
