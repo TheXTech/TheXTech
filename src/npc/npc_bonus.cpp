@@ -426,7 +426,7 @@ void TouchBonus(int A, int B)
     {
         MoreScore(12, NPC[B].Location);
     }
-    else if(NPC[B].Type == NPCID_AXE)
+    else if(NPC[B].Type == NPCID_AXE || NPC[B].Type == NPCID_TRANSPARENT_AXE)
     {
         // go straight to code to kill NPC
     }

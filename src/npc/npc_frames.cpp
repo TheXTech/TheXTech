@@ -1434,6 +1434,13 @@ void NPCFrames(int A)
             }
         }
     }
+    else if(NPC[A].Type == NPCID_TRANSPARENT_AXE)
+    {
+        if(LevelEditor)
+            NPC[A].Frame = 1;
+        else
+            NPC[A].Frame = 0;
+    }
     else if(NPC[A].Type == NPCID_AXE)
     {
         NPC[A].FrameCount += 1;

@@ -527,7 +527,10 @@ bool EditorScreen::UpdateNPCButton(CallMode mode, int x, int y, NPCID type, bool
         draw_height = NPCHeightGFX(type);
     }
 
-    return UpdateButton(mode, x, y, GFXNPC[type], sel, 0, 0, draw_width, draw_height);
+    // vbint_t dir = -1;
+    // int frame = EditorNPCFrame(type, dir);
+    int frame = (type == NPCID_TRANSPARENT_AXE) ? 1 : 0;
+    return UpdateButton(mode, x, y, GFXNPC[type], sel, 0, draw_height * frame, draw_width, draw_height);
 }
 
 void EditorScreen::UpdateNPC(CallMode mode, int x, int y, NPCID type)
