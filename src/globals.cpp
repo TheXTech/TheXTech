@@ -253,13 +253,17 @@ RangeArrI<vbint_t, 1, maxBlockType, 0> BlockFrame2;
 // int sBlockNum = 0;
 
 RangeArrI<vbint_t, 1, maxSceneType, 0> SceneFrame;
-RangeArrI<vbint_t, 1, maxSceneType, 0> SceneFrame2;
+// RangeArrI<vbint_t, 1, maxSceneType, 0> SceneFrame2;
 RangeArrI<vbint_t, 1, maxTileType, 0> TileWidth;
 RangeArrI<vbint_t, 1, maxTileType, 0> TileHeight;
 RangeArrI<vbint_t, 1, maxTileType, 0> TileFrame;
-RangeArrI<vbint_t, 1, maxTileType, 0> TileFrame2;
+// RangeArrI<vbint_t, 1, maxTileType, 0> TileFrame2;
 RangeArrI<vbint_t, 1, 100, 0> LevelFrame;
-RangeArrI<vbint_t, 1, 100, 0> LevelFrame2;
+// RangeArrI<vbint_t, 1, 100, 0> LevelFrame2;
+
+// NEW: replaces previous redundant frames
+RangeArrI<vbint_t, 1, 4, 0> WorldFrame;
+
 RangeArrI<bool, 1, maxBlockType, false> BlockHasNoMask;
 // RangeArrI<bool, 1, 100, false> LevelHasNoMask;
 RangeArrI<bool, 0, maxBlockType, false> BlockOnlyHitspot1;
