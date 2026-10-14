@@ -1859,7 +1859,7 @@ extern RangeArrI<vbint_t, 1, maxBlockType, 0> BlockFrame2;
 //Public SceneFrame(1 To maxSceneType) As Integer 'What frame the scene is on
 extern RangeArrI<vbint_t, 1, maxSceneType, 0> SceneFrame;
 //Public SceneFrame2(1 To maxSceneType) As Integer 'Counter to update the scene frames
-extern RangeArrI<vbint_t, 1, maxSceneType, 0> SceneFrame2;
+// extern RangeArrI<vbint_t, 1, maxSceneType, 0> SceneFrame2;
 //Public SpecialFrame(100) As Integer 'misc frames for things like coins and the kurbi shoe
 extern RangeArrI<vbint_t, 0, 9, 0> SpecialFrame;
 //Public SpecialFrameCount(100) As Single
@@ -1871,11 +1871,15 @@ extern RangeArrI<vbint_t, 1, maxTileType, 0> TileHeight;
 //Public TileFrame(1 To maxTileType) As Integer
 extern RangeArrI<vbint_t, 1, maxTileType, 0> TileFrame;
 //Public TileFrame2(1 To maxTileType) As Integer
-extern RangeArrI<vbint_t, 1, maxTileType, 0> TileFrame2;
+// extern RangeArrI<vbint_t, 1, maxTileType, 0> TileFrame2;
 //Public LevelFrame(1 To 100) As Integer 'What frame the scene is on
 extern RangeArrI<vbint_t, 1, 100, 0> LevelFrame;
 //Public LevelFrame2(1 To 100) As Integer 'Counter to update the scene frames
-extern RangeArrI<vbint_t, 1, 100, 0> LevelFrame2;
+// extern RangeArrI<vbint_t, 1, 100, 0> LevelFrame2;
+
+// NEW: replaces previous redundant frames
+extern RangeArrI<vbint_t, 1, 4, 0> WorldFrame;
+
 //Public BlockHasNoMask(1 To maxBlockType) As Boolean
 extern RangeArrI<bool, 1, maxBlockType, false> BlockHasNoMask;
 //Public LevelHasNoMask(1 To 100) As Boolean

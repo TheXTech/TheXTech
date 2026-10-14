@@ -382,12 +382,16 @@ void LevelFramesAlways()
     }
 }
 
+#include <Logger/logger.h>
+
 void WorldFrames()
 {
-    SceneFrame2[1] += 1;
-    if(SceneFrame2[1] >= 12)
+    WorldFrame[1] += 1;
+    if(WorldFrame[1] >= 12)
     {
-        SceneFrame2[1] = 0;
+        WorldFrame[1] = 0;
+
+        // previously counted with SceneFrame2[1]
         SceneFrame[1] += 1;
         if(SceneFrame[1] >= 4)
             SceneFrame[1] = 0;
@@ -402,40 +406,54 @@ void WorldFrames()
         SceneFrame[53] = SceneFrame[1];
         SceneFrame[54] = SceneFrame[1];
         SceneFrame[55] = SceneFrame[1];
+
+        // previously counted with LevelFrame2[8]
+        LevelFrame[8] += 1;
+        if(LevelFrame[8] >= 4)
+            LevelFrame[8] = 0;
     }
-    SceneFrame2[27] += 1;
-    if(SceneFrame2[27] >= 8)
+
+    WorldFrame[2] += 1;
+    if(WorldFrame[2] >= 8)
     {
-        SceneFrame2[27] = 0;
+        WorldFrame[2] = 0;
+
+        // previously counted with SceneFrame2[27]
         SceneFrame[27] += 1;
         if(SceneFrame[27] >= 12)
             SceneFrame[27] = 0;
         SceneFrame[28] = SceneFrame[27];
         SceneFrame[29] = SceneFrame[27];
         SceneFrame[30] = SceneFrame[27];
-    }
-    SceneFrame2[33] += 1;
-    if(SceneFrame2[33] >= 4)
-    {
-        SceneFrame2[33] = 0;
+
+        // previously counted with SceneFrame2[33], but still copied from SceneFrame[27]
         SceneFrame[33] = SceneFrame[27] + 1;
-        if(SceneFrame[33] >= 14)
-            SceneFrame[33] = 0;
         SceneFrame[34] = SceneFrame[33];
-    }
-    SceneFrame2[62] += 1;
-    if(SceneFrame2[62] >= 8)
-    {
-        SceneFrame2[62] = 0;
+
+        // previously counted with SceneFrame2[62]
         SceneFrame[62] += 1;
         if(SceneFrame[62] >= 8)
             SceneFrame[62] = 0;
         SceneFrame[63] = SceneFrame[62];
+
+        // previously counted with LevelFrame2[12]
+        LevelFrame[12] += 1;
+        if(LevelFrame[12] >= 2)
+            LevelFrame[12] = 0;
+
+        // previously counted with LevelFrame2[25]
+        LevelFrame[25] += 1;
+        if(LevelFrame[25] >= 4)
+            LevelFrame[25] = 0;
+        LevelFrame[26] = LevelFrame[25];
     }
-    LevelFrame2[2] += 1;
-    if(LevelFrame2[2] >= 6)
+
+    WorldFrame[3] += 1;
+    if(WorldFrame[3] >= 6)
     {
-        LevelFrame2[2] = 0;
+        WorldFrame[3] = 0;
+
+        // previously counted with LevelFrame2[2]
         LevelFrame[2] += 1;
         if(LevelFrame[2] >= 6)
             LevelFrame[2] = 0;
@@ -446,35 +464,13 @@ void WorldFrames()
         LevelFrame[31] = LevelFrame[2];
         LevelFrame[32] = LevelFrame[2];
     }
-    LevelFrame2[8] += 1;
-    if(LevelFrame2[8] >= 12)
+
+    WorldFrame[4] += 1;
+    if(WorldFrame[4] >= 14)
     {
-        LevelFrame2[8] = 0;
-        LevelFrame[8] += 1;
-        if(LevelFrame[8] >= 4)
-            LevelFrame[8] = 0;
-    }
-    LevelFrame2[12] += 1;
-    if(LevelFrame2[12] >= 8)
-    {
-        LevelFrame2[12] = 0;
-        LevelFrame[12] += 1;
-        if(LevelFrame[12] >= 2)
-            LevelFrame[12] = 0;
-    }
-    LevelFrame2[25] += 1;
-    if(LevelFrame2[25] >= 8)
-    {
-        LevelFrame2[25] = 0;
-        LevelFrame[25] += 1;
-        if(LevelFrame[25] >= 4)
-            LevelFrame[25] = 0;
-        LevelFrame[26] = LevelFrame[25];
-    }
-    TileFrame2[14] += 1;
-    if(TileFrame2[14] >= 14)
-    {
-        TileFrame2[14] = 0;
+        WorldFrame[4] = 0;
+
+        // previously counted with TileFrame2[14]
         TileFrame[14] += 1;
         if(TileFrame[14] >= 4)
             TileFrame[14] = 0;
