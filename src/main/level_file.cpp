@@ -393,9 +393,11 @@ bool OpenLevel_Head(void* userdata, LevelData& head)
 #ifdef PGEFL_CALLBACK_API
     FileFormat = head.RecentFormat;
     unsigned int reqFeatureLevel = head.engineFeatureLevel;
+    LevelTargetsEngine = (head.configPackId == "TheXTech" || head.configPackId == "SMBXT");
 #else
     FileFormat = head.meta.RecentFormat;
     unsigned int reqFeatureLevel = head.meta.engineFeatureLevel;
+    LevelTargetsEngine = (head.meta.configPackId == "TheXTech" || head.meta.configPackId == "SMBXT");
 #endif
 
     if(reqFeatureLevel > engineFeatureLevel)
@@ -1613,6 +1615,7 @@ void ClearLevel()
     IsHubLevel = false;
     // default file format if level header is missing
     FileFormat = FileFormats::LVL_PGEX;
+    LevelTargetsEngine = true;
     // removed because the same logic is called inside of LoadCustomConfig()
     // ResetCustomConfig();
     SetupPhysics();

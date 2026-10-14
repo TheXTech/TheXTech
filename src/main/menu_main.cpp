@@ -479,7 +479,7 @@ static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName
         else if(is_wld38a)
             w.probably_incompatible = true;
         else
-            w.bugfixes_on_by_default = is_wldx;
+            w.bugfixes_on_by_default = (head.meta.configPackId == "TheXTech" || head.meta.configPackId == "SMBXT");
 
         w.blockChar[1] = head.nocharacter1;
         w.blockChar[2] = head.nocharacter2;
