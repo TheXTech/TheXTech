@@ -322,11 +322,10 @@ bool OpenWorld_Scene(void*, WorldScenery& s)
         scene.Type = int(s.id);
         scene.Location.X = (int32_t)s.x;
         scene.Location.Y = (int32_t)s.y;
-        scene.Location.Width = SceneWidth[scene.Type];
-        scene.Location.Height = SceneHeight[scene.Type];
+        // scene.Location.Width = SceneWidth[scene.Type];
+        // scene.Location.Height = SceneHeight[scene.Type];
         scene.Active = true;
         // scene.Z = zCounter++;
-        treeWorldSceneAdd(&scene);
 
         if(IF_OUTRANGE(scene.Type, 1, maxSceneType)) // Drop ID to 1 for Scenery of out of range IDs
         {
@@ -525,8 +524,11 @@ bool OpenWorld_Post(const WorldLoad& load)
     LoadCustomSound();
 
     CalcWorldTileSize();
+    CalcWorldSceneSize();
     for(int A = 1; A <= numTiles; A++)
         treeWorldTileAdd(A);
+    for(int A = 1; A <= numScenes; A++)
+        treeWorldSceneAdd(A);
 
     // the version targeting below is from SMBX 1.3
     const int FileRelease = load.FileRelease;
@@ -611,6 +613,7 @@ void ClearWorld(bool quick)
         UnloadCustomSound();
         LoadPlayerDefaults();
         ResetWorldTileSize();
+        ResetWorldSceneSize();
     }
 
     ClearSavedLayers();

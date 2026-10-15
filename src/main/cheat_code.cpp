@@ -174,7 +174,7 @@ static void moonWalk()
 
         for(int C = 1; C <= numScenes; C++)
         {
-            if(CheckCollision(tempLocation, Scene[C].Location))
+            if(CheckCollision(tempLocation, Scene[C].FullLocation()))
                 Scene[C].Active = false;
         }
     }

@@ -66,6 +66,76 @@ void CalcWorldTileSize()
     }
 }
 
+void ResetWorldSceneSize()
+{
+    For(A, 1, maxSceneType)
+    {
+        SceneWidth[A] = 32;
+        SceneHeight[A] = 32;
+        if((A >= 15 && A <= 18) || (A == 21) || (A == 24) || (A == 58) || (A == 59) || (A == 63))
+        {
+            SceneWidth[A] = 16;
+            SceneHeight[A] = 16;
+        }
+    }
+
+    SceneWidth[20] = 64;
+    SceneHeight[20] = 64;
+    SceneWidth[27] = 48;
+    SceneHeight[27] = 16;
+    SceneWidth[28] = 48;
+    SceneHeight[28] = 16;
+    SceneWidth[29] = 64;
+    SceneHeight[29] = 16;
+    SceneWidth[30] = 64;
+    SceneHeight[30] = 16;
+    SceneWidth[33] = 14;
+    SceneHeight[33] = 14;
+    SceneWidth[34] = 14;
+    SceneHeight[34] = 14;
+    SceneWidth[44] = 64;
+    SceneHeight[50] = 48;
+    SceneWidth[50] = 64;
+    SceneWidth[54] = 30;
+    SceneHeight[54] = 24;
+    SceneWidth[55] = 30;
+    SceneHeight[55] = 24;
+    SceneWidth[57] = 64;
+    SceneHeight[57] = 64;
+    SceneWidth[60] = 48;
+    SceneHeight[60] = 48;
+    SceneWidth[61] = 64;
+    SceneHeight[61] = 76;
+}
+
+void CalcWorldSceneSize()
+{
+    if(!WorldTargetsEngine)
+        return;
+
+    For(A, 1, maxSceneType)
+    {
+        if(!GFXScene[A].inited)
+            continue;
+
+        SceneWidth[A] = GFXScene[A].w;
+        SceneHeight[A] = GFXScene[A].h;
+
+        // animated scenes
+        if(A == 1 || A == 4 || A == 5 || A == 6 || A == 9 || A == 10 || A == 12
+            || A == 51 || A == 52 || A == 53 || A == 54 || A == 55)
+        {
+            SceneHeight[A] /= 4;
+        }
+        else if(A == 62 || A == 63)
+            SceneHeight[A] /= 8;
+        else if(A == 27 || A == 28 || A == 29 || A == 30)
+            SceneHeight[A] /= 12;
+        else if(A == 33 || A == 34)
+            SceneHeight[A] /= 14;
+    }
+}
+
 static void _CalcBGOSize(bool reset)
 {
     For(A, 1, maxBackgroundType)
@@ -3008,46 +3078,8 @@ void SetupVars()
 
     BackgroundHasNoMask[169] = true;
 
-
-    For(A, 1, maxSceneType)
-    {
-        SceneWidth[A] = 32;
-        SceneHeight[A] = 32;
-        if((A >= 15 && A <= 18) || (A == 21) || (A == 24) || (A == 58) || (A == 59) || (A == 63))
-        {
-            SceneWidth[A] = 16;
-            SceneHeight[A] = 16;
-        }
-    }
-    SceneWidth[20] = 64;
-    SceneHeight[20] = 64;
-    SceneWidth[27] = 48;
-    SceneHeight[27] = 16;
-    SceneWidth[28] = 48;
-    SceneHeight[28] = 16;
-    SceneWidth[29] = 64;
-    SceneHeight[29] = 16;
-    SceneWidth[30] = 64;
-    SceneHeight[30] = 16;
-    SceneWidth[33] = 14;
-    SceneHeight[33] = 14;
-    SceneWidth[34] = 14;
-    SceneHeight[34] = 14;
-    SceneWidth[44] = 64;
-    SceneHeight[50] = 48;
-    SceneWidth[50] = 64;
-    SceneWidth[54] = 30;
-    SceneHeight[54] = 24;
-    SceneWidth[55] = 30;
-    SceneHeight[55] = 24;
-    SceneWidth[57] = 64;
-    SceneHeight[57] = 64;
-    SceneWidth[60] = 48;
-    SceneHeight[60] = 48;
-    SceneWidth[61] = 64;
-    SceneHeight[61] = 76;
-
     ResetWorldTileSize();
+    ResetWorldSceneSize();
 
     Points[1] = 10;
     Points[2] = 100;

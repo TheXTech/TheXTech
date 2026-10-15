@@ -602,8 +602,8 @@ void DrawEditorWorld()
     {
         XRender::renderTextureBasic(camX + EditorCursor.Scene.Location.X,
             camY + EditorCursor.Scene.Location.Y,
-            EditorCursor.Scene.Location.Width,
-            EditorCursor.Scene.Location.Height,
+            SceneWidth[EditorCursor.Scene.Type],
+            SceneHeight[EditorCursor.Scene.Type],
             GFXScene[EditorCursor.Scene.Type],
             0,
             SceneHeight[EditorCursor.Scene.Type] * SceneFrame[EditorCursor.Scene.Type]);
