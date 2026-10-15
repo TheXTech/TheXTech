@@ -1206,12 +1206,14 @@ struct Tile_t
 struct Scene_t
 {
 //    Location As Location
-    TinyLocation_t Location;
+    TinyPosition_t Location;
 //    Type As Integer
     vbint_t Type = 0;
 //    Active As Boolean 'if false this won't be shown. used for paths that become available on a scene
     bool Active = false;
 //End Type
+
+    TinyLocation_t FullLocation() const;
 
     // int64_t Z = 0;
 };

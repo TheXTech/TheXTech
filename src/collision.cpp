@@ -41,6 +41,16 @@ TinyLocation_t Tile_t::FullLocation() const
     return ret;
 }
 
+TinyLocation_t Scene_t::FullLocation() const
+{
+    TinyLocation_t ret;
+    ret.X = Location.X;
+    ret.Y = Location.Y;
+    ret.Width = SceneWidth[this->Type];
+    ret.Height = SceneHeight[this->Type];
+    return ret;
+}
+
 template<class T1>
 bool CheckCollision(const T1 &Loc1, const Background_t &bgo)
 {
