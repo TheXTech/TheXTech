@@ -1676,6 +1676,8 @@ void OpenLevelDataPost()
     else
         qSortBackgrounds(1, numBackground, false);
 
+    CalcBGOSize();
+
     // FindBlocks();
     UpdateBackgrounds();
     // FindSBlocks();
@@ -1858,6 +1860,7 @@ void ClearLevel()
 #endif
 
     UnloadCustomGFX();
+    CalcBGOSize();
     doShakeScreenClear();
     ResetCameraPanning();
     treeLevelCleanAll();
