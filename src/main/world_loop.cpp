@@ -125,7 +125,7 @@ static inline bool s_worldUpdateMusic(const TinyLocation_t &loc)
     for(auto t : treeWorldMusicQuery(loc, false))
     {
         WorldMusic_t &mus = *t;
-        if(CheckCollision(loc, mus.Location))
+        if(CheckCollision(loc, mus.FullLocation()))
         {
             if(g_isWorldMusicNotSame(mus))
             {

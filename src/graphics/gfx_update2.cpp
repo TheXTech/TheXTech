@@ -394,7 +394,7 @@ void UpdateGraphics2(bool skipRepaint)
         for(WorldMusic_t* t : treeWorldMusicQuery(sLeft, sTop, sRight, sBottom, true))
         {
             WorldMusic_t &music = *t;
-            if(vScreenCollision(Z, music.Location))
+            if(vScreenCollision(Z, music.FullLocation()))
             {
                 XRender::renderRect(camX + music.Location.X, camY + music.Location.Y, 32, 32,
                     {255, 0, 255}, false);

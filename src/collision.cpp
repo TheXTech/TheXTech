@@ -61,6 +61,23 @@ TinyLocation_t WorldPath_t::FullLocation() const
     return ret;
 }
 
+TinyLocation_t WorldMusic_t::FullLocation() const
+{
+    TinyLocation_t ret;
+    ret.X = Location.X;
+    ret.Y = Location.Y;
+    ret.Width = 30;
+    ret.Height = 30;
+
+    if(LevelEditor)
+    {
+        ret.Width = 32;
+        ret.Height = 32;
+    }
+
+    return ret;
+}
+
 template<class T1>
 bool CheckCollision(const T1 &Loc1, const Background_t &bgo)
 {

@@ -786,7 +786,7 @@ void UpdateEditor()
                     int ia = EditorCursor.InteractIndex;
                     PlaySound(SFX_Grab);
                     EditorCursor.Mode = OptCursor_t::WLD_MUSIC;
-                    EditorCursor.Location = static_cast<Location_t>(WorldMusic[ia].Location);
+                    EditorCursor.Location = static_cast<Location_t>(WorldMusic[ia].FullLocation());
                     SetCursor();
                     EditorCursor.WorldMusic = WorldMusic[ia];
                     if(ia != numWorldMusic)
@@ -971,7 +971,7 @@ void UpdateEditor()
                 if(EditorCursor.InteractMode == OptCursor_t::WLD_MUSIC)
                 {
                     int ia = EditorCursor.InteractIndex;
-                    tempLocation = static_cast<Location_t>(WorldMusic[ia].Location);
+                    tempLocation = static_cast<Location_t>(WorldMusic[ia].FullLocation());
                     NewEffect(EFFID_SMOKE_S3_CENTER, tempLocation);
                     PlaySound(SFX_ShellHit);
                     if(ia != numWorldMusic)
@@ -1587,7 +1587,7 @@ void UpdateEditor()
             {
                 for(A = 1; A <= numWorldMusic; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location))
+                    if(CursorCollision(EditorCursor.Location, WorldMusic[A].FullLocation()))
                     {
                         CanPlace = false;
                         break;
@@ -1596,7 +1596,8 @@ void UpdateEditor()
 
                 if(CanPlace)
                 {
-                    EditorCursor.WorldMusic.Location = static_cast<TinyLocation_t>(EditorCursor.Location);
+                    EditorCursor.WorldMusic.Location.X = static_cast<int32_t>(EditorCursor.Location.X);
+                    EditorCursor.WorldMusic.Location.Y = static_cast<int32_t>(EditorCursor.Location.Y);
                     numWorldMusic++;
                     WorldMusic[numWorldMusic] = EditorCursor.WorldMusic;
                     // de-duplicate music file
@@ -2432,7 +2433,8 @@ void SetCursor()
     {
         EditorCursor.Location.Height = 32;
         EditorCursor.Location.Width = 32;
-        EditorCursor.WorldMusic.Location = static_cast<TinyLocation_t>(EditorCursor.Location);
+        EditorCursor.WorldMusic.Location.X = static_cast<int32_t>(EditorCursor.Location.X);
+        EditorCursor.WorldMusic.Location.Y = static_cast<int32_t>(EditorCursor.Location.Y);
         // make it play the music
         if(g_isWorldMusicNotSame(EditorCursor.WorldMusic))
             g_playWorldMusic(EditorCursor.WorldMusic);
@@ -3121,7 +3123,7 @@ void UpdateInteract()
         {
             for(int A : treeWorldMusicQuery(static_cast<TinyLocation_t>(EditorCursor.Location), SORTMODE_NONE))
             {
-                if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location))
+                if(CursorCollision(EditorCursor.Location, WorldMusic[A].FullLocation()))
                 {
                     EditorCursor.InteractMode = OptCursor_t::WLD_MUSIC;
                     EditorCursor.InteractFlags = 0;
