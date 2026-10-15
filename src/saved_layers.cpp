@@ -52,7 +52,7 @@ bool LoadDefaultSavedLayers()
 
     for(const std::string& k : savedlayers_ini.allKeys())
     {
-        if(numSavedLayers >= maxSavedLayers || k.size() > 22)
+        if(numSavedLayers >= maxSavedLayers || k.size() > sizeof(SavedLayer_t::Name))
             return false;
 
         auto& target = SavedLayers[numSavedLayers++];
@@ -70,7 +70,8 @@ bool LoadSavedLayer(const void* /*userdata*/, savedLayerSaveEntry& obj)
 {
     for(int i = 0; i < numSavedLayers; i++)
     {
-        if(SDL_strcmp(obj.first.c_str(), SavedLayers[i].Name.data()) != 0)
+        // SavedLayer_t::Name is a buffer but not necessarily a valid C string
+        if(obj.first.size() > sizeof(SavedLayer_t::Name) || SDL_strncmp(obj.first.c_str(), SavedLayers[i].Name.data(), sizeof(SavedLayer_t::Name)) != 0)
             continue;
 
         SavedLayers[i].Visible = obj.second;
@@ -86,7 +87,16 @@ bool ExportSavedLayer(const void* /*userdata*/, savedLayerSaveEntry& obj, pge_si
     if((int)index >= numSavedLayers)
         return false;
 
-    obj.first = SavedLayers[index].Name.data();
+    // SavedLayer_t::Name is a buffer but not necessarily a valid C string
+    // find correct length of string, with the possibility that the size is the full length (15)
+    size_t len = 0;
+    for(; len < sizeof(SavedLayer_t::Name); len++)
+    {
+        if(SavedLayers[index].Name[len] == '\0')
+            break;
+    }
+
+    obj.first.assign(SavedLayers[index].Name.data(), len);
     obj.second = SavedLayers[index].Visible;
 
     return true;

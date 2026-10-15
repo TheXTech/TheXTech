@@ -27,12 +27,14 @@
 #include <PGE_File_Formats/save_filedata.h>
 
 // NEW: saved layers. These are saved / loaded as an *unordered* lists of lower-cased strings corresponding to Visible and Hidden.
-const int maxSavedLayers = 32;
+const int maxSavedLayers = 128;
 
 struct SavedLayer_t
 {
-    std::array<char, 22> Name;
-    const char null_term = '\0';
+    // Name is a buffer but not necessarily a valid C string
+    // This decision was made to maximize the capacity of Name to 15 bytes (instead of 14)
+    std::array<char, 15> Name;
+    // const char null_term = '\0';
     bool Visible = false;
 };
 
