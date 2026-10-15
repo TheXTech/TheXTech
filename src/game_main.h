@@ -54,6 +54,8 @@ int GameMain(const CmdLineSetup_t &setup);
 void ResetWorldTileSize();
 //! Calculates size for world map tiles based on graphical dimensions
 void CalcWorldTileSize();
+//! Calculates / resets size for BGOs based on graphical dimensions
+void CalcBGOSize();
 //! Set up object sizes and frame offsets for blocks/npcs/effects
 void SetupVars();
 //! The loop for the game

@@ -65,6 +65,88 @@ void CalcWorldTileSize()
     }
 }
 
+void CalcBGOSize()
+{
+    For(A, 1, maxBackgroundType)
+    {
+        if(!GFXBackgroundBMP[A].inited)
+            continue;
+
+        if(!LevelTargetsEngine && GFXBackgroundCustom[A])
+            continue;
+
+        BackgroundWidth[A] = GFXBackground[A].w;
+        BackgroundHeight[A] = GFXBackground[A].h;
+
+        // animated backgrounds
+        if(A == 18 || A == 19 || A == 20 || A == 36 || A == 65 || A == 66 || A == 68
+            || A == 70 || A == 82 || A == 100 || A == 134 || A == 135 || A == 136
+            || A == 137 || A == 138 || A == 158 || A == 161 || A == 170 || A == 171
+            || A == 172 || A == 187 || A == 188 || A == 189 || A == 190)
+        {
+            BackgroundHeight[A] /= 4;
+        }
+        else if(A == 26 || A == 159 || A == 168)
+            BackgroundHeight[A] /= 8;
+        else if(A == 125 || A == 173)
+            BackgroundHeight[A] /= 2;
+    }
+
+
+    // SMBX 1.3 resets dimensions for animated backgrounds, and some non-animated
+    if(!LevelTargetsEngine)
+    {
+        // animated backgrounds
+        BackgroundHeight[158] = 32;
+        BackgroundHeight[159] = 32;
+
+        BackgroundHeight[187] = 32;
+        BackgroundHeight[188] = 32;
+        BackgroundHeight[189] = 32;
+        BackgroundHeight[190] = 32;
+
+        BackgroundHeight[170] = 32;
+        BackgroundHeight[171] = 32;
+        BackgroundHeight[172] = 32;
+
+        BackgroundHeight[26] = 64;
+        BackgroundHeight[18] = 32;
+        BackgroundHeight[19] = 32;
+        BackgroundHeight[20] = 32;
+        BackgroundHeight[36] = 96;
+        BackgroundHeight[65] = 96;
+
+        BackgroundHeight[66] = 32;
+
+        BackgroundHeight[68] = 64;
+        BackgroundHeight[70] = 32;
+        BackgroundHeight[82] = 32;
+        BackgroundHeight[100] = 32;
+        BackgroundHeight[125] = 64;
+        BackgroundHeight[134] = 32;
+        BackgroundHeight[135] = 32;
+        BackgroundHeight[136] = 32;
+        BackgroundHeight[137] = 32;
+        BackgroundHeight[138] = 32;
+
+        BackgroundHeight[161] = 48;
+        BackgroundHeight[168] = 32;
+        BackgroundHeight[173] = 120;
+
+        // non-animated backgrounds
+        BackgroundWidth[160] = 24;
+        BackgroundHeight[160] = 24;
+
+        BackgroundWidth[169] = 64;
+        BackgroundHeight[169] = 64;
+
+        BackgroundWidth[161] = 64;
+        BackgroundWidth[163] = 64;
+        BackgroundWidth[168] = 64;
+        BackgroundWidth[173] = 112;
+    }
+}
+
 void SetupVars()
 {
     //int A;
@@ -2797,58 +2879,9 @@ void SetupVars()
     Foreground[156] = true;
     Foreground[157] = true;
 
-    BackgroundHeight[158] = 32;
-    BackgroundHeight[159] = 32;
+    CalcBGOSize();
 
-    BackgroundHeight[187] = 32;
-    BackgroundHeight[188] = 32;
-    BackgroundHeight[189] = 32;
-    BackgroundHeight[190] = 32;
-
-
-
-    BackgroundHeight[170] = 32;
-    BackgroundHeight[171] = 32;
-
-    BackgroundHeight[26] = 64;
-    BackgroundHeight[18] = 32;
-    BackgroundHeight[19] = 32;
-    BackgroundHeight[20] = 32;
-    BackgroundHeight[36] = 96;
-    BackgroundHeight[65] = 96;
-
-    BackgroundHeight[66] = 32;
-
-    BackgroundHeight[68] = 64;
-    BackgroundHeight[70] = 32;
-    BackgroundHeight[172] = 32;
-    BackgroundHeight[82] = 32;
-    BackgroundHeight[100] = 32;
-    BackgroundHeight[125] = 64;
-    BackgroundHeight[134] = 32;
-    BackgroundHeight[135] = 32;
-    BackgroundHeight[136] = 32;
-    BackgroundHeight[137] = 32;
-    BackgroundHeight[138] = 32;
-    BackgroundWidth[163] = 64;
-
-    BackgroundWidth[173] = 112;
-    BackgroundHeight[173] = 120;
-
-
-    BackgroundWidth[160] = 24;
-    BackgroundHeight[160] = 24;
-
-    BackgroundWidth[161] = 64;
-    BackgroundHeight[161] = 48;
-
-    BackgroundHeight[168] = 32;
-    BackgroundWidth[168] = 64;
-
-    BackgroundHeight[169] = 64;
-    BackgroundWidth[169] = 64;
     BackgroundHasNoMask[169] = true;
-
 
 
     For(A, 1, maxSceneType)
