@@ -426,7 +426,7 @@ RangeArr<StdPicture, 0, maxNPCType> GFXNPCBMP;
 //RangeArr<StdPicture, 0, maxNPCType> GFXNPCMaskBMP;
 // RangeArrI<int, 1, maxNPCType, 0> GFXNPCHeight;
 // RangeArrI<int, 1, maxNPCType, 0> GFXNPCWidth;
-RangeArrI<bool, 1, maxEffectType, false> GFXEffectCustom;
+// RangeArrI<bool, 1, maxEffectType, false> GFXEffectCustom;
 //RangeArrI<long, 1, maxEffectType, 0> GFXEffect;
 //RangeArrI<long, 1, maxEffectType, 0> GFXEffectMask;
 RangeArr<StdPicture, 1, maxEffectType> GFXEffectBMP;

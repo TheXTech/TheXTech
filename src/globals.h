@@ -2381,7 +2381,7 @@ extern RangeArr<StdPicture, 0, maxNPCType> GFXNPCBMP;
 // extern RangeArrI<int, 1, maxNPCType, 0> GFXNPCWidth;
 
 //Public GFXEffectCustom(1 To maxEffectType) As Boolean
-extern RangeArrI<bool, 1, maxEffectType, false> GFXEffectCustom;
+// extern RangeArrI<bool, 1, maxEffectType, false> GFXEffectCustom;
 //Public GFXEffect(1 To maxEffectType) As Long
 //extern RangeArrI<long, 1, maxEffectType, 0> GFXEffect;
 #define GFXEffect GFXEffectBMP
