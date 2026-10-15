@@ -519,12 +519,6 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             loadImageFromList(in, line_buf, source_dir,
                 GFXBackgroundBMP[A], nullptr, nullptr, nullptr,
                 false, custom);
-
-            if(!custom)
-            {
-                BackgroundWidth[A] = GFXBackground[A].w;
-                BackgroundHeight[A] = GFXBackground[A].h;
-            }
         }
         else if(type_buf[0] == 'b')
         {
@@ -1003,15 +997,9 @@ void LoadGFX()
         s_find_image(p, CurDir, fmt::sprintf_ne("background-%d", A));
 
         if(!p.empty())
-        {
             XRender::lazyLoadPicture(GFXBackgroundBMP[A], p);
-            BackgroundWidth[A] = GFXBackgroundBMP[A].w;
-            BackgroundHeight[A] = GFXBackgroundBMP[A].h;
-        }
         else
-        {
             break;
-        }
 
         if(A % 20 == 0)
             UpdateLoad();
