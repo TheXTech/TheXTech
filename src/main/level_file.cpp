@@ -1695,7 +1695,11 @@ void OpenLevelDataPost()
         // check if layer is a saved layer
         for(int i = 0; i < numSavedLayers; i++)
         {
-            if(SDL_strcasecmp(Layer[A].Name.c_str(), SavedLayers[i].Name.data()) == 0)
+            // SavedLayer_t::Name is a buffer but not necessarily a valid C string
+            if(Layer[A].Name.size() > sizeof(SavedLayer_t::Name))
+                break;
+
+            if(SDL_strncasecmp(Layer[A].Name.c_str(), SavedLayers[i].Name.data(), sizeof(SavedLayer_t::Name)) == 0)
             {
                 Layer[A].SavedLayer = i + 1;
                 if(!LevelEditor)
