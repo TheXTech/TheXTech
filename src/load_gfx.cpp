@@ -35,6 +35,7 @@
 
 #include "gfx.h"
 #include "load_gfx.h"
+#include "game_main.h" // ResetEffectSize
 #include "graphics.h" // SuperPrint
 #include "graphics/gfx_frame.h" // FrameBorderInfo, loadFrameInfo
 #include "core/render.h"
@@ -235,7 +236,7 @@ SDL_FORCE_INLINE bool s_resolveFile(const char **extList,
  * \param world Is a world map
  * \param skipMask Don't even try to load a masked GIF sprite
  */
-static void loadCGFX(const char* subfolder,
+static bool loadCGFX(const char* subfolder,
                      const char* stem,
                      int index,
                      vbint_t *width, vbint_t *height, bool* isCustom, StdPicture &texture,
@@ -280,7 +281,7 @@ static void loadCGFX(const char* subfolder,
     std::string imgToUse;
 
     if(!s_resolveFile(extsList, extGif, fName, imgToUse, isGif))
-        return; // Nothing to do
+        return false; // Nothing to do
 
     if(isGif && !skipMask)
     {
@@ -341,6 +342,8 @@ static void loadCGFX(const char* subfolder,
         else
             g_defaultLevelGfxBackup.push_back(std::move(backup));
     }
+
+    return success;
 }
 
 /* load a single custom border */
@@ -572,12 +575,15 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             }
 
             loadImageFromList(in, line_buf, source_dir,
-                GFXEffectBMP[A], &EffectWidth[A], &EffectHeight[A], &GFXEffectCustom[A],
+                GFXEffectBMP[A], nullptr, nullptr, nullptr,
                 false, custom);
 
-            // update calculation (but still rely on backup made above)
-            if(GFXEffectCustom[A])
+            if(custom)
+            {
+                // recalculate effect size
+                EffectWidth[A] = GFXEffectBMP[A].w;
                 EffectHeight[A] = GFXEffectBMP[A].h / EffectDefaults.EffectFrames[A];
+            }
         }
         else if(type_buf[0] == 'y' && type_buf[5] == 't')
         {
@@ -753,22 +759,7 @@ static void s_UnloadPreviewPlayers()
     s_previewPlayersBegin = 0;
     s_previewPlayersEnd = 0;
 
-#ifndef LOW_MEM
-    // Restore default sizes of custom player effects (should no longer be required, now that backups are made directly)
-    for(int A = 1; A < maxEffectType; ++A)
-    {
-        if(GFXEffectCustom[A])
-        {
-            SDL_assert_release(EffectWidth[A] == GFXEffectBMP[A].w);
-            SDL_assert_release(EffectHeight[A] == GFXEffectBMP[A].h / EffectDefaults.EffectFrames[A]);
-        }
-        else
-        {
-            SDL_assert_release(EffectWidth[A] == EffectDefaults.EffectWidth[A]);
-            SDL_assert_release(EffectHeight[A] == EffectDefaults.EffectHeight[A]);
-        }
-    }
-#endif // #ifndef LOW_MEM
+    ResetEffectSize();
 }
 
 static void restoreLevelBackupTextures()
@@ -1369,12 +1360,13 @@ void LoadCustomGFX(bool include_world, const char* preview_players_from)
         if(preview_players_from && A != EFFID_CHAR1_DIE && A != EFFID_CHAR2_DIE && A != EFFID_CHAR3_DIE && A != EFFID_CHAR4_DIE && A != EFFID_CHAR5_DIE)
             continue;
 
-        loadCGFX("effect", "effect-", A,
-                 &EffectWidth[A], &EffectHeight[A], &GFXEffectCustom[A], GFXEffectBMP[A]);
-
-        // update calculation (but still rely on backup made above)
-        if(GFXEffectCustom[A])
+        if(loadCGFX("effect", "effect-", A,
+                    nullptr, nullptr, nullptr, GFXEffectBMP[A]))
+        {
+            // recalculate effect size
+            EffectWidth[A] = GFXEffectBMP[A].w;
             EffectHeight[A] = GFXEffectBMP[A].h / EffectDefaults.EffectFrames[A];
+        }
     }
 
 
@@ -1481,8 +1473,14 @@ void UnloadCustomGFX()
 
     restoreLevelBackupTextures();
 
+    // Recalculate sizes of effects from original GFX
+    ResetEffectSize();
+
 #ifndef LOW_MEM
-    // Restore default sizes of custom effects (should no longer be required, now that backups are made directly)
+    // don't check if an asset pack has never been loaded
+    if(!GFXEffectBMP[1].inited)
+        return;
+
     for(int A = 1; A < maxEffectType; ++A)
     {
         SDL_assert_release(EffectWidth[A] == EffectDefaults.EffectWidth[A]);
