@@ -165,7 +165,7 @@ static void moonWalk()
 
     for(int B = 1; B <= numWorldPaths; B++)
     {
-        tempLocation = WorldPath[B].Location;
+        tempLocation = WorldPath[B].FullLocation();
         tempLocation.X += 4;
         tempLocation.Y += 4;
         tempLocation.Width -= 8;

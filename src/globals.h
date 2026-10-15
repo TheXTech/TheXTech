@@ -1222,12 +1222,14 @@ struct Scene_t
 struct WorldPath_t
 {
 //    Location As Location
-    TinyLocation_t Location;
+    TinyPosition_t Location;
 //    Active As Boolean
     bool Active = false;
 //    Type As Integer
     vbint_t Type = 0;
 //End Type
+
+    TinyLocation_t FullLocation() const;
 
     // int64_t Z = 0;
 };

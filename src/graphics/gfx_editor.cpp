@@ -646,8 +646,8 @@ void DrawEditorWorld()
     {
         XRender::renderTextureBasic(camX + EditorCursor.WorldPath.Location.X,
             camY + EditorCursor.WorldPath.Location.Y,
-            EditorCursor.WorldPath.Location.Width,
-            EditorCursor.WorldPath.Location.Height,
+            32,
+            32,
             GFXPath[EditorCursor.WorldPath.Type],
             0, 0);
     }

@@ -354,8 +354,8 @@ bool OpenWorld_Path(void*, WorldPathTile& p)
         pp.Location.X = (int32_t)p.x;
         pp.Location.Y = (int32_t)p.y;
         pp.Type = int(p.id);
-        pp.Location.Width = 32;
-        pp.Location.Height = 32;
+        // pp.Location.Width = 32;
+        // pp.Location.Height = 32;
         pp.Active = false;
         // pp.Z = zCounter++;
         treeWorldPathAdd(&pp);

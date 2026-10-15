@@ -805,7 +805,7 @@ void UpdateEditor()
                     int ia = EditorCursor.InteractIndex;
                     PlaySound(SFX_Grab);
                     EditorCursor.Mode = OptCursor_t::WLD_PATHS;
-                    EditorCursor.Location = static_cast<Location_t>(WorldPath[ia].Location);
+                    EditorCursor.Location = static_cast<Location_t>(WorldPath[ia].FullLocation());
                     EditorCursor.WorldPath = WorldPath[ia];
                     SetCursor();
                     if(ia != numWorldPaths)
@@ -989,7 +989,7 @@ void UpdateEditor()
                 if(EditorCursor.InteractMode == OptCursor_t::WLD_PATHS)
                 {
                     int ia = EditorCursor.InteractIndex;
-                    tempLocation = static_cast<Location_t>(WorldPath[ia].Location);
+                    tempLocation = static_cast<Location_t>(WorldPath[ia].FullLocation());
                     NewEffect(EFFID_SMOKE_S3_CENTER, tempLocation);
                     PlaySound(SFX_ShellHit);
                     if(ia != numWorldPaths)
@@ -1514,7 +1514,7 @@ void UpdateEditor()
 
                 for(A = 1; A <= numWorldPaths; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, WorldPath[A].Location))
+                    if(CursorCollision(EditorCursor.Location, WorldPath[A].FullLocation()))
                     {
                         CanPlace = false;
                         break;
@@ -1557,7 +1557,7 @@ void UpdateEditor()
 
                 for(A = 1; A <= numWorldPaths; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, WorldPath[A].Location))
+                    if(CursorCollision(EditorCursor.Location, WorldPath[A].FullLocation()))
                     {
                         CanPlace = false;
                         break;
@@ -2425,7 +2425,8 @@ void SetCursor()
             EditorCursor.WorldPath.Type = 1;
         EditorCursor.Location.Width = 32;
         EditorCursor.Location.Height = 32;
-        EditorCursor.WorldPath.Location = static_cast<TinyLocation_t>(EditorCursor.Location);
+        EditorCursor.WorldPath.Location.X = static_cast<int32_t>(EditorCursor.Location.X);
+        EditorCursor.WorldPath.Location.Y = static_cast<int32_t>(EditorCursor.Location.Y);
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_MUSIC) // World Music
     {
@@ -3135,7 +3136,7 @@ void UpdateInteract()
         {
             for(int A : treeWorldPathQuery(static_cast<TinyLocation_t>(EditorCursor.Location), SORTMODE_NONE))
             {
-                if(CursorCollision(EditorCursor.Location, WorldPath[A].Location))
+                if(CursorCollision(EditorCursor.Location, WorldPath[A].FullLocation()))
                 {
                     EditorCursor.InteractMode = OptCursor_t::WLD_PATHS;
                     EditorCursor.InteractFlags = 0;

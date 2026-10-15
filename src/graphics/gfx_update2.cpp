@@ -317,14 +317,14 @@ void UpdateGraphics2(bool skipRepaint)
             SDL_assert(IF_INRANGE(path.Type, 1, maxPathType));
 
             g_stats.checkedPaths++;
-            if(CheckCollision(sView, path.Location) && (WorldEditor || path.Active))
+            if(CheckCollision(sView, path.FullLocation()) && (WorldEditor || path.Active))
             {
                 g_stats.renderedPaths++;
 //                XRender::renderTexture(camX + path.Location.X, camY + path.Location.Y, path.Location.Width, path.Location.Height, GFXPathMask[path.Type], 0, 0);
 //                XRender::renderTexture(camX + path.Location.X, camY + path.Location.Y, path.Location.Width, path.Location.Height, GFXPath[path.Type], 0, 0);
                 XRender::renderTextureBasic(camX + path.Location.X,
                                       camY + path.Location.Y,
-                                      path.Location.Width, path.Location.Height,
+                                      32, 32,
                                       GFXPathBMP[path.Type], 0, 0);
             }
         }
