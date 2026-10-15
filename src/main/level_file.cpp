@@ -1642,7 +1642,7 @@ void ClearLevel()
 #endif
 
     UnloadCustomGFX();
-    CalcBGOSize();
+    ResetBGOSize();
     doShakeScreenClear();
     ResetCameraPanning();
     treeLevelCleanAll();

@@ -65,14 +65,11 @@ void CalcWorldTileSize()
     }
 }
 
-void CalcBGOSize()
+static void _CalcBGOSize(bool reset)
 {
     For(A, 1, maxBackgroundType)
     {
         if(!GFXBackgroundBMP[A].inited)
-            continue;
-
-        if(!LevelTargetsEngine && GFXBackgroundCustom[A])
             continue;
 
         BackgroundWidth[A] = GFXBackground[A].w;
@@ -94,7 +91,7 @@ void CalcBGOSize()
 
 
     // SMBX 1.3 resets dimensions for animated backgrounds, and some non-animated
-    if(!LevelTargetsEngine)
+    if(reset)
     {
         // animated backgrounds
         BackgroundHeight[158] = 32;
@@ -145,6 +142,19 @@ void CalcBGOSize()
         BackgroundWidth[168] = 64;
         BackgroundWidth[173] = 112;
     }
+}
+
+void ResetBGOSize()
+{
+    _CalcBGOSize(true);
+}
+
+void CalcBGOSize()
+{
+    if(!LevelTargetsEngine)
+        return;
+
+    _CalcBGOSize(false);
 }
 
 void SetupVars()
@@ -2879,7 +2889,7 @@ void SetupVars()
     Foreground[156] = true;
     Foreground[157] = true;
 
-    CalcBGOSize();
+    ResetBGOSize();
 
     BackgroundHasNoMask[169] = true;
 
