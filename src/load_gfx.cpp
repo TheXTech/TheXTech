@@ -91,12 +91,8 @@ static const Sint64 c_gfxLoaderShowInterval = 500;
 
 struct GFXBackup_t
 {
-    vbint_t *remote_width = nullptr;
-    vbint_t *remote_height = nullptr;
     bool *remote_isCustom = nullptr;
     StdPicture *remote_texture = nullptr;
-    vbint_t width = 0;
-    vbint_t height = 0;
     bool isCustom = false;
     StdPicture_Sub texture_backup;
 };
@@ -239,7 +235,7 @@ SDL_FORCE_INLINE bool s_resolveFile(const char **extList,
 static bool loadCGFX(const char* subfolder,
                      const char* stem,
                      int index,
-                     vbint_t *width, vbint_t *height, bool* isCustom, StdPicture &texture,
+                     bool* isCustom, StdPicture &texture,
                      bool world = false,
                      bool skipMask = false)
 {
@@ -251,14 +247,8 @@ static bool loadCGFX(const char* subfolder,
     StdPicture_Sub newTexture;
 
     GFXBackup_t backup;
-    backup.remote_width = width;
-    backup.remote_height = height;
     backup.remote_isCustom = isCustom;
     backup.remote_texture = &texture;
-    if(width)
-        backup.width = *width;
-    if(height)
-        backup.height = *height;
     if(isCustom)
         backup.isCustom = *isCustom;
 
@@ -332,11 +322,6 @@ static bool loadCGFX(const char* subfolder,
         backup.texture_backup = std::move(static_cast<StdPicture_Sub&>(texture));
         static_cast<StdPicture_Sub&>(texture) = std::move(newTexture);
 
-        if(width)
-            *width = newTexture.w;
-        if(height)
-            *height = newTexture.h;
-
         if(world)
             g_defaultWorldGfxBackup.push_back(std::move(backup));
         else
@@ -351,7 +336,7 @@ static void loadCBorder(const char* stem,
     bool* isCustom,
     FrameBorder &border)
 {
-    loadCGFX("ui", stem, -1, nullptr, nullptr, isCustom, border.tex, false, true);
+    loadCGFX("ui", stem, -1, isCustom, border.tex, false, true);
 
     std::string fName = fmt::sprintf_ne("%s.ini", stem);
 
@@ -399,7 +384,6 @@ static void loadCBorder(const char* stem,
  */
 static void loadImageFromList(PGE_FileFormats_misc::TextInput& t, std::string& line_buf, const std::string& dir,
                     StdPicture &texture,
-                    vbint_t *width, vbint_t *height, bool *is_custom_loc,
                     bool world = false, bool this_is_custom = false)
 {
     StdPicture_Sub newTexture;
@@ -411,17 +395,8 @@ static void loadImageFromList(PGE_FileFormats_misc::TextInput& t, std::string& l
     if(this_is_custom)
     {
         GFXBackup_t backup;
-        backup.remote_width = width;
-        backup.remote_height = height;
-        backup.remote_isCustom = is_custom_loc;
         backup.remote_texture = &texture;
         XRender::unloadTexture(texture);
-        if(width)
-            backup.width = *width;
-        if(height)
-            backup.height = *height;
-        if(is_custom_loc)
-            backup.isCustom = *is_custom_loc;
         backup.texture_backup = static_cast<StdPicture_Sub&>(texture);
 
         if(world)
@@ -430,17 +405,7 @@ static void loadImageFromList(PGE_FileFormats_misc::TextInput& t, std::string& l
             g_defaultLevelGfxBackup.push_back(backup);
     }
 
-    if(this_is_custom && is_custom_loc)
-    {
-        // pLogDebug("Loaded custom GFX: %s", newTexture.l.path.c_str());
-        *is_custom_loc = true;
-    }
-
     static_cast<StdPicture_Sub&>(texture) = newTexture;
-    if(width)
-        *width = newTexture.w;
-    if(height)
-        *height = newTexture.h;
 }
 
 bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
@@ -508,7 +473,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             }
 
             loadImageFromList(in, line_buf, source_dir,
-                GFXBackground2BMP[A], nullptr, nullptr, nullptr,
+                GFXBackground2BMP[A],
                 false, custom);
         }
         else if(type_buf[9] == 'd')
@@ -520,7 +485,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             }
 
             loadImageFromList(in, line_buf, source_dir,
-                GFXBackgroundBMP[A], nullptr, nullptr, nullptr,
+                GFXBackgroundBMP[A],
                 false, custom);
         }
         else if(type_buf[0] == 'b')
@@ -532,7 +497,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             }
 
             loadImageFromList(in, line_buf, source_dir,
-                GFXBlockBMP[A], nullptr, nullptr, nullptr,
+                GFXBlockBMP[A],
                 false, custom);
         }
         else if(type_buf[0] == 'n')
@@ -544,7 +509,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             }
 
             loadImageFromList(in, line_buf, source_dir,
-                GFXNPCBMP[A], nullptr, nullptr, nullptr,
+                GFXNPCBMP[A],
                 false, custom);
 
             // load converted conveyer block graphics from conveyer NPC graphics
@@ -575,7 +540,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             }
 
             loadImageFromList(in, line_buf, source_dir,
-                GFXEffectBMP[A], nullptr, nullptr, nullptr,
+                GFXEffectBMP[A],
                 false, custom);
 
             if(custom)
@@ -594,7 +559,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             }
 
             loadImageFromList(in, line_buf, source_dir,
-                GFXYoshiTBMP[A], nullptr, nullptr, nullptr,
+                GFXYoshiTBMP[A],
                 false, custom);
         }
         else if(type_buf[0] == 'y')
@@ -606,7 +571,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             }
 
             loadImageFromList(in, line_buf, source_dir,
-                GFXYoshiBBMP[A], nullptr, nullptr, nullptr,
+                GFXYoshiBBMP[A],
                 false, custom);
         }
         else if(type_buf[0] == 'l' && type_buf[1] == 'e')
@@ -621,7 +586,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             }
 
             loadImageFromList(in, line_buf, source_dir,
-                GFXLevelBMP[A], nullptr, nullptr, nullptr,
+                GFXLevelBMP[A],
                 true, custom);
         }
         else if(type_buf[0] == 't' && type_buf[1] == 'i')
@@ -636,7 +601,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             }
 
             loadImageFromList(in, line_buf, source_dir,
-                GFXTileBMP[A], nullptr, nullptr, nullptr,
+                GFXTileBMP[A],
                 true, custom);
         }
         else if(type_buf[0] == 's')
@@ -651,7 +616,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             }
 
             loadImageFromList(in, line_buf, source_dir,
-                GFXSceneBMP[A], nullptr, nullptr, nullptr,
+                GFXSceneBMP[A],
                 true, custom);
         }
         else if(type_buf[0] == 'p' && type_buf[1] == 'l')
@@ -666,7 +631,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             }
 
             loadImageFromList(in, line_buf, source_dir,
-                GFXPlayerBMP[A], nullptr, nullptr, nullptr,
+                GFXPlayerBMP[A],
                 true, custom);
         }
         else if(type_buf[0] == 'p' && type_buf[1] == 'a')
@@ -681,7 +646,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             }
 
             loadImageFromList(in, line_buf, source_dir,
-                GFXPathBMP[A], nullptr, nullptr, nullptr,
+                GFXPathBMP[A],
                 true, custom);
         }
         // character graphics
@@ -711,7 +676,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             }
 
             loadImageFromList(in, line_buf, source_dir,
-                (*GFXCharacterBMP[c])[A], nullptr, nullptr, nullptr,
+                (*GFXCharacterBMP[c])[A],
                 false, custom);
         }
 
@@ -743,10 +708,6 @@ static void s_UnloadPreviewPlayers()
 
         auto &t = *it;
 
-        if(t.remote_width)
-            *t.remote_width = t.width;
-        if(t.remote_height)
-            *t.remote_height = t.height;
         if(t.remote_isCustom)
             *t.remote_isCustom = t.isCustom;
         SDL_assert_release(t.remote_texture);
@@ -768,10 +729,6 @@ static void restoreLevelBackupTextures()
     {
         auto &t = *it;
 
-        if(t.remote_width)
-            *t.remote_width = t.width;
-        if(t.remote_height)
-            *t.remote_height = t.height;
         if(t.remote_isCustom)
             *t.remote_isCustom = t.isCustom;
         SDL_assert_release(t.remote_texture);
@@ -789,10 +746,6 @@ static void restoreWorldBackupTextures()
     {
         auto &t = *it;
 
-        if(t.remote_width)
-            *t.remote_width = t.width;
-        if(t.remote_height)
-            *t.remote_height = t.height;
         if(t.remote_isCustom)
             *t.remote_isCustom = t.isCustom;
         SDL_assert_release(t.remote_texture);
@@ -1167,121 +1120,121 @@ static void loadCustomUIAssets()
     s_dirFallback.setCurDir(getGfxDir() + "fallback");
 
     loadCGFX("ui", "BMVs", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.BMVs, false, true);
+             &GFX.isCustom(ci++), GFX.BMVs, false, true);
 
     loadCGFX("ui", "BMWin", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.BMWin, false, true);
+             &GFX.isCustom(ci++), GFX.BMWin, false, true);
 
     For(i, 1, 3)
         loadCGFX("ui", "Boot", i,
-                 nullptr, nullptr, &GFX.isCustom(ci++), GFX.Boot[i], false, true);
+                 &GFX.isCustom(ci++), GFX.Boot[i], false, true);
 
     For(i, 1, 5)
         loadCGFX("ui", "CharacterName", i,
-                 nullptr, nullptr, &GFX.isCustom(ci++), GFX.CharacterName[i], false, true);
+                 &GFX.isCustom(ci++), GFX.CharacterName[i], false, true);
 
     loadCGFX("ui", "Chat", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.Chat, false, true);
+             &GFX.isCustom(ci++), GFX.Chat, false, true);
 
     For(i, 0, 2)
         loadCGFX("ui", "Container", i,
-                 nullptr, nullptr, &GFX.isCustom(ci++), GFX.Container[i], false, true);
+                 &GFX.isCustom(ci++), GFX.Container[i], false, true);
 
     For(i, 1, 3)
         loadCGFX("ui", "ECursor", i,
-                 nullptr, nullptr, &GFX.isCustom(ci++), GFX.ECursor[i], false, true);
+                 &GFX.isCustom(ci++), GFX.ECursor[i], false, true);
 
     For(i, 0, 9)
         loadCGFX("ui", "Font1_", i,
-                 nullptr, nullptr, &GFX.isCustom(ci++), GFX.Font1[i], false, true);
+                 &GFX.isCustom(ci++), GFX.Font1[i], false, true);
 
     For(i, 1, 3)
         loadCGFX("ui", "Font2_", i,
-                 nullptr, nullptr, &GFX.isCustom(ci++), GFX.Font2[i], false, true);
+                 &GFX.isCustom(ci++), GFX.Font2[i], false, true);
 
     loadCGFX("ui", "Font2S", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.Font2S, false, true);
+             &GFX.isCustom(ci++), GFX.Font2S, false, true);
 
     For(i, 1, 2)
         loadCGFX("ui", "Heart", i,
-                 nullptr, nullptr, &GFX.isCustom(ci++), GFX.Heart[i], false, true);
+                 &GFX.isCustom(ci++), GFX.Heart[i], false, true);
 
     For(i, 0, 8)
         loadCGFX("ui", "Interface", i,
-                 nullptr, nullptr, &GFX.isCustom(ci++), GFX.Interface[i], false, true);
+                 &GFX.isCustom(ci++), GFX.Interface[i], false, true);
 
     loadCGFX("ui", "LoadCoin", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.LoadCoin, false, true);
+             &GFX.isCustom(ci++), GFX.LoadCoin, false, true);
 
     loadCGFX("ui", "Loader", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.Loader, false, true);
+             &GFX.isCustom(ci++), GFX.Loader, false, true);
 
     For(i, 0, 3)
         loadCGFX("ui", "MCursor", i,
-                 nullptr, nullptr, &GFX.isCustom(ci++), GFX.MCursor[i], false, true);
+                 &GFX.isCustom(ci++), GFX.MCursor[i], false, true);
 
     For(i, 1, 4)
         loadCGFX("ui", "MenuGFX", i,
-                 nullptr, nullptr, &GFX.isCustom(ci++), GFX.MenuGFX[i], false, true);
+                 &GFX.isCustom(ci++), GFX.MenuGFX[i], false, true);
 
     loadCGFX("ui", "Mount", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.Mount[2], false, true);
+             &GFX.isCustom(ci++), GFX.Mount[2], false, true);
 
     For(i, 0, 7)
         loadCGFX("ui", "nCursor", i,
-                 nullptr, nullptr, &GFX.isCustom(ci++), GFX.nCursor[i], false, true);
+                 &GFX.isCustom(ci++), GFX.nCursor[i], false, true);
 
     loadCGFX("ui", "TextBox", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.TextBox, false, true);
+             &GFX.isCustom(ci++), GFX.TextBox, false, true);
 
     For(i, 1, 2)
         loadCGFX("ui", "Tongue", i,
-                 nullptr, nullptr, &GFX.isCustom(ci++), GFX.Tongue[i], false, true);
+                 &GFX.isCustom(ci++), GFX.Tongue[i], false, true);
 
     // loadCGFX("ui", "Warp", i,
-    //          nullptr, nullptr, &GFX.isCustom(ci++), GFX.Warp, false, true);
+    //          &GFX.isCustom(ci++), GFX.Warp, false, true);
 
     loadCGFX("ui", "YoshiWings", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.YoshiWings, false, true);
+             &GFX.isCustom(ci++), GFX.YoshiWings, false, true);
 
     loadCGFX("ui", "CycloneAcc", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.CycloneAcc, false, true);
+             &GFX.isCustom(ci++), GFX.CycloneAcc, false, true);
 
     loadCGFX("ui", "EditorIcons", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.EIcons, false, true);
+             &GFX.isCustom(ci++), GFX.EIcons, false, true);
 
     loadCGFX("ui", "PCursor", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.PCursor, false, true);
+             &GFX.isCustom(ci++), GFX.PCursor, false, true);
 
     loadCGFX("ui", "Medals", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.Medals, false, true);
+             &GFX.isCustom(ci++), GFX.Medals, false, true);
 
     loadCGFX("ui", "CharSelIcons", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.CharSelIcons, false, true);
+             &GFX.isCustom(ci++), GFX.CharSelIcons, false, true);
 
     loadCBorder("CharSelFrame",
              &GFX.isCustom(ci++), GFX.CharSelFrame);
 
     loadCGFX("ui", "Backdrop", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.Backdrop, false, true);
+             &GFX.isCustom(ci++), GFX.Backdrop, false, true);
 
     loadCBorder("Backdrop_Border",
              &GFX.isCustom(ci++), GFX.Backdrop_Border);
 
     loadCGFX("ui", "WorldMapFrame_Tile", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.WorldMapFrame_Tile, false, true);
+             &GFX.isCustom(ci++), GFX.WorldMapFrame_Tile, false, true);
 
     loadCBorder("WorldMapFrame_Border",
              &GFX.isCustom(ci++), GFX.WorldMapFrame_Border);
 
     loadCGFX("ui", "Camera", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.Camera, false, true);
+             &GFX.isCustom(ci++), GFX.Camera, false, true);
 
     loadCGFX("ui", "Balance", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.Balance, false, true);
+             &GFX.isCustom(ci++), GFX.Balance, false, true);
 
     loadCGFX("ui", "SaveIcons", -1,
-             nullptr, nullptr, &GFX.isCustom(ci++), GFX.SaveIcons, false, true);
+             &GFX.isCustom(ci++), GFX.SaveIcons, false, true);
 
     // Add new optional assets above this line. Also update gfx.cpp: GFX_t::load(), and gfx.h: GFX_t::m_isCustomVolume.
 }
@@ -1327,20 +1280,20 @@ void LoadCustomGFX(bool include_world, const char* preview_players_from)
         g_dirCustom.setCurDir("");
 
         loadCGFX("ui", "Interface5", -1,
-                 nullptr, nullptr, &GFX.isCustom(38), GFX.Interface[5], false, true);
+                 &GFX.isCustom(38), GFX.Interface[5], false, true);
     }
 
 
     for(int A = 1; A <= maxYoshiGfx; ++A)
     {
         loadCGFX("yoshi", "yoshib-", A,
-                 nullptr, nullptr, nullptr, GFXYoshiBBMP[A]);
+                 nullptr, GFXYoshiBBMP[A]);
     }
 
     for(int A = 1; A <= maxYoshiGfx; ++A)
     {
         loadCGFX("yoshi", "yoshit-", A,
-                 nullptr, nullptr, nullptr, GFXYoshiTBMP[A]);
+                 nullptr, GFXYoshiTBMP[A]);
     }
 
     for(int c = 0; c < numCharacters; ++c)
@@ -1350,7 +1303,6 @@ void LoadCustomGFX(bool include_world, const char* preview_players_from)
         for(int A = 1; A <= numStates; ++A)
         {
             loadCGFX(GFXPlayerNames[c], pstem.c_str(), A,
-                     nullptr, nullptr,
                      nullptr, (*GFXCharacterBMP[c])[A]);
         }
     }
@@ -1361,7 +1313,7 @@ void LoadCustomGFX(bool include_world, const char* preview_players_from)
             continue;
 
         if(loadCGFX("effect", "effect-", A,
-                    nullptr, nullptr, nullptr, GFXEffectBMP[A]))
+                    nullptr, GFXEffectBMP[A]))
         {
             // recalculate effect size
             EffectWidth[A] = GFXEffectBMP[A].w;
@@ -1383,37 +1335,37 @@ void LoadCustomGFX(bool include_world, const char* preview_players_from)
             continue;
 
         loadCGFX("block", "block-", A,
-                 nullptr, nullptr, nullptr, GFXBlockBMP[A],
+                 nullptr, GFXBlockBMP[A],
                  false, BlockHasNoMask[A]);
     }
 
     for(int A = 1; A <= numBackground2; ++A)
     {
         loadCGFX("background2", "background2-", A,
-                 nullptr, nullptr, nullptr, GFXBackground2BMP[A],
+                 nullptr, GFXBackground2BMP[A],
                  false, true);
     }
 
     for(int A = 1; A <= maxNPCType; ++A)
     {
         loadCGFX("npc", "npc-", A,
-                 nullptr, nullptr, nullptr, GFXNPCBMP[A]);
+                 nullptr, GFXNPCBMP[A]);
 
         // load converted conveyer block graphics from conveyer NPC graphics
         if(A == NPCID_CONVEYOR)
         {
             loadCGFX("npc", "npc-", A,
-                     nullptr, nullptr, nullptr, GFXBlockBMP[BLKID_CONVEYOR_L_CONV]);
+                     nullptr, GFXBlockBMP[BLKID_CONVEYOR_L_CONV]);
 
             loadCGFX("npc", "npc-", A,
-                     nullptr, nullptr, nullptr, GFXBlockBMP[BLKID_CONVEYOR_R_CONV]);
+                     nullptr, GFXBlockBMP[BLKID_CONVEYOR_R_CONV]);
         }
     }
 
     for(int A = 1; A <= maxBackgroundType; ++A)
     {
         loadCGFX("background", "background-", A,
-                 nullptr, nullptr, nullptr, GFXBackgroundBMP[A],
+                 nullptr, GFXBackgroundBMP[A],
                  false, BackgroundHasNoMask[A]);
     }
 
@@ -1425,31 +1377,31 @@ void LoadCustomGFX(bool include_world, const char* preview_players_from)
     for(int A = 1; A <= maxTileType; ++A)
     {
         loadCGFX("tile", "tile-", A,
-                 nullptr, nullptr, nullptr, GFXTileBMP[A], true);
+                 nullptr, GFXTileBMP[A], true);
     }
 
     for(int A = 0; A <= maxLevelType; ++A)
     {
         loadCGFX("level", "level-", A,
-                 nullptr, nullptr, nullptr, GFXLevelBMP[A], true);
+                 nullptr, GFXLevelBMP[A], true);
     }
 
     for(int A = 1; A <= maxSceneType; ++A)
     {
         loadCGFX("scene", "scene-", A,
-                 nullptr, nullptr, nullptr, GFXSceneBMP[A], true);
+                 nullptr, GFXSceneBMP[A], true);
     }
 
     for(int A = 1; A <= numCharacters; ++A)
     {
         loadCGFX("player", "player-", A,
-                 nullptr, nullptr, nullptr, GFXPlayerBMP[A], true);
+                 nullptr, GFXPlayerBMP[A], true);
     }
 
     for(int A = 1; A <= maxPathType; ++A)
     {
         loadCGFX("path", "path-", A,
-                 nullptr, nullptr, nullptr, GFXPathBMP[A], true);
+                 nullptr, GFXPathBMP[A], true);
     }
 }
 
