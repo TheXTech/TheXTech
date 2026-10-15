@@ -291,7 +291,9 @@ bool OpenWorld_Tile(void*, WorldTerrainTile& t)
         // terra.Location.Width = TileWidth[terra.Type];
         // terra.Location.Height = TileHeight[terra.Type];
         // terra.Z = zCounter++;
-        treeWorldTileAdd(&terra);
+
+        // moved to post-load, because size may change after confirming that we can use the GFX to set size
+        // treeWorldTileAdd(&terra);
 
         if(IF_OUTRANGE(terra.Type, 1, maxTileType)) // Drop ID to 1 for Tiles of out of range IDs
         {
@@ -523,6 +525,8 @@ bool OpenWorld_Post(const WorldLoad& load)
     LoadCustomSound();
 
     CalcWorldTileSize();
+    for(int A = 1; A <= numTiles; A++)
+        treeWorldTileAdd(A);
 
     // the version targeting below is from SMBX 1.3
     const int FileRelease = load.FileRelease;
