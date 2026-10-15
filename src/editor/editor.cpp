@@ -730,7 +730,7 @@ void UpdateEditor()
                     int A = EditorCursor.InteractIndex;
                     PlaySound(SFX_Grab);
                     EditorCursor.Mode = OptCursor_t::WLD_SCENES;
-                    EditorCursor.Location = static_cast<Location_t>(Scene[A].Location);
+                    EditorCursor.Location = static_cast<Location_t>(Scene[A].FullLocation());
                     EditorCursor.Scene = Scene[A];
                     SetCursor();
                     MouseMove(EditorCursor.X, EditorCursor.Y);
@@ -951,7 +951,7 @@ void UpdateEditor()
                 if(EditorCursor.InteractMode == OptCursor_t::WLD_SCENES)
                 {
                     int A = EditorCursor.InteractIndex;
-                    tempLocation = static_cast<Location_t>(Scene[A].Location);
+                    tempLocation = static_cast<Location_t>(Scene[A].FullLocation());
                     tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                     tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
                     NewEffect(EFFID_SMOKE_S3, tempLocation);
@@ -1423,16 +1423,13 @@ void UpdateEditor()
             {
                 for(A = 1; A <= numScenes; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, Scene[A].Location))
+                    if(EditorCursor.Scene.Type == Scene[A].Type)
                     {
-                        if(EditorCursor.Scene.Type == Scene[A].Type)
+                        if(ffEqual(EditorCursor.Scene.Location.X, Scene[A].Location.X) &&
+                           ffEqual(EditorCursor.Scene.Location.Y, Scene[A].Location.Y))
                         {
-                            if(ffEqual(EditorCursor.Scene.Location.X, Scene[A].Location.X) &&
-                               ffEqual(EditorCursor.Scene.Location.Y, Scene[A].Location.Y))
-                            {
-                                CanPlace = false;
-                                break;
-                            }
+                            CanPlace = false;
+                            break;
                         }
                     }
                 }
@@ -1471,7 +1468,7 @@ void UpdateEditor()
 
                 for(A = 1; A <= numScenes; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, Scene[A].Location))
+                    if(CursorCollision(EditorCursor.Location, Scene[A].FullLocation()))
                     {
                         CanPlace = false;
                         break;
@@ -2259,7 +2256,8 @@ void SetCursor()
             EditorCursor.Scene.Type = 1;
         EditorCursor.Location.Width = SceneWidth[EditorCursor.Scene.Type];
         EditorCursor.Location.Height = SceneHeight[EditorCursor.Scene.Type];
-        EditorCursor.Scene.Location = static_cast<TinyLocation_t>(EditorCursor.Location);
+        EditorCursor.Scene.Location.X = static_cast<int32_t>(EditorCursor.Location.X);
+        EditorCursor.Scene.Location.Y = static_cast<int32_t>(EditorCursor.Location.Y);
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_LEVELS) // Levels
     {
@@ -2974,7 +2972,7 @@ void UpdateInteract()
             {
                 int A = *(--i);
 
-                if(CursorCollision(EditorCursor.Location, Scene[A].Location))
+                if(CursorCollision(EditorCursor.Location, Scene[A].FullLocation()))
                 {
                     EditorCursor.InteractMode = OptCursor_t::WLD_SCENES;
                     EditorCursor.InteractFlags = 0;

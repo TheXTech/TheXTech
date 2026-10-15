@@ -1071,7 +1071,7 @@ void PathPath(WorldPath_t &Pth, bool Skp)
         Scene_t &scene = *t;
         if(scene.Active)
         {
-            if(CheckCollision(tempLocation, scene.Location))
+            if(CheckCollision(tempLocation, scene.FullLocation()))
                 scene.Active = false;
         }
     }

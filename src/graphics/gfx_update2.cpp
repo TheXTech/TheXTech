@@ -287,14 +287,14 @@ void UpdateGraphics2(bool skipRepaint)
             SDL_assert(IF_INRANGE(scene.Type, 1, maxSceneType));
 
             g_stats.checkedScenes++;
-            if(CheckCollision(sView, scene.Location) && (WorldEditor || scene.Active))
+            if(CheckCollision(sView, scene.FullLocation()) && (WorldEditor || scene.Active))
             {
                 g_stats.renderedScenes++;
 //                XRender::renderTexture(camX + scene.Location.X, camY + scene.Location.Y, scene.Location.Width, scene.Location.Height, GFXSceneMask[scene.Type], 0, SceneHeight[scene.Type] * SceneFrame[scene.Type]);
 //                XRender::renderTexture(camX + scene.Location.X, camY + scene.Location.Y, scene.Location.Width, scene.Location.Height, GFXScene[scene.Type], 0, SceneHeight[scene.Type] * SceneFrame[scene.Type]);
                 XRender::renderTextureBasic(camX + scene.Location.X,
                                       camY + scene.Location.Y,
-                                      scene.Location.Width, scene.Location.Height,
+                                      SceneWidth[scene.Type], SceneHeight[scene.Type],
                                       GFXSceneBMP[scene.Type], 0, SceneHeight[scene.Type] * SceneFrame[scene.Type]);
             }
         }

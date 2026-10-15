@@ -31,6 +31,16 @@ TinyLocation_t Tile_t::FullLocation() const
     return ret;
 }
 
+TinyLocation_t Scene_t::FullLocation() const
+{
+    TinyLocation_t ret;
+    ret.X = Location.X;
+    ret.Y = Location.Y;
+    ret.Width = SceneWidth[this->Type];
+    ret.Height = SceneHeight[this->Type];
+    return ret;
+}
+
 // Intersect collisions
 bool CheckCollisionIntersect(const Location_t &Loc1, const Location_t &Loc2)
 {

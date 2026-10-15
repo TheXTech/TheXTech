@@ -304,6 +304,12 @@ inline Location_t extract_loc(TileRef_t obj)
 }
 
 template<>
+inline Location_t extract_loc(SceneRef_t obj)
+{
+    return static_cast<Location_t>(obj->FullLocation());
+}
+
+template<>
 inline Location_t extract_loc(WorldLevelRef_t obj)
 {
     return obj->LocationOnscreen();

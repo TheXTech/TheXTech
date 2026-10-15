@@ -2511,7 +2511,7 @@ void StartEpisode()
 
             For(B, 1, numScenes)
             {
-                if(CheckCollision(tempLocation, Scene[B].Location))
+                if(CheckCollision(tempLocation, Scene[B].FullLocation()))
                     Scene[B].Active = false;
             }
         }

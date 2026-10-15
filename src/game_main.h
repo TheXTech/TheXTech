@@ -54,6 +54,10 @@ int GameMain(const CmdLineSetup_t &setup);
 void ResetWorldTileSize();
 //! Calculates size for world map tiles based on graphical dimensions
 void CalcWorldTileSize();
+//! Resets size for world map scenes to default
+void ResetWorldSceneSize();
+//! Calculates size for world map scenes based on graphical dimensions
+void CalcWorldSceneSize();
 //! Resets size for BGOs to default
 void ResetBGOSize();
 //! Calculates size for BGOs based on graphical dimensions
