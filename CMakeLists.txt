@@ -989,6 +989,7 @@ set(THEXTECH_SRC
     src/graphics/gfx_update2.cpp
     src/graphics/gfx_update.cpp
     src/graphics/gfx_background.cpp
+    src/graphics/gfx_background_xt.cpp
     src/graphics/gfx_print.cpp
     src/graphics/gfx_message.cpp
     src/graphics/gfx_editor.cpp
