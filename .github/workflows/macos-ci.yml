@@ -52,13 +52,13 @@ jobs:
           eval ${{ matrix.config.deps_cmdline }}
         fi
 
-    - name: CI Server's network meta-info
-      shell: bash
-      run: |
-        echo "CI server IP address:"
-        wget -q -O - ipinfo.io/ip
-        printf "\n"
-        wget -d ipinfo.io/ip -O/dev/null 2>&1 |grep ^User-Agent
+#    - name: CI Server's network meta-info
+#      shell: bash
+#      run: |
+#        echo "CI server IP address:"
+#        wget -q -O - ipinfo.io/ip
+#        printf "\n"
+#        wget -d ipinfo.io/ip -O/dev/null 2>&1 |grep ^User-Agent
 
     - uses: TheXTech/checkout@v0.1
 

@@ -118,13 +118,13 @@ jobs:
         sudo mkdir -p "${{ matrix.config.ios9_kit_install_dir }}"
         sudo tar -xf build-temp/ios9-kit.tar.bz2 -C "${{ matrix.config.ios9_kit_install_dir }}"
 
-    - name: CI Server's network meta-info
-      shell: bash
-      run: |
-        echo "CI server IP address:"
-        wget -q -O - ipinfo.io/ip
-        printf "\n"
-        wget -d ipinfo.io/ip -O/dev/null 2>&1 |grep ^User-Agent
+#    - name: CI Server's network meta-info
+#      shell: bash
+#      run: |
+#        echo "CI server IP address:"
+#        wget -q -O - ipinfo.io/ip
+#        printf "\n"
+#        wget -d ipinfo.io/ip -O/dev/null 2>&1 |grep ^User-Agent
 
     - uses: TheXTech/checkout@v0.1
 
