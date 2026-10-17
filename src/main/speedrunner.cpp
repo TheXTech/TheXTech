@@ -34,12 +34,11 @@
 
 static      GameplayTimer s_gamePlayTimer;
 
-int64_t g_speedrunTicks = -1;
-int64_t g_speedrunTicksSaved = -1;
-int64_t g_speedrunWinTicks = 0;
-
 void speedRun_loadStats()
 {
+    if(!g_config.enable_playtime_tracking)
+        return; // Do nothing
+
     s_gamePlayTimer.load();
 }
 
@@ -56,11 +55,17 @@ void speedRun_saveStats()
 
 void speedRun_resetCurrent()
 {
+    if(!g_config.enable_playtime_tracking)
+        return; // Do nothing
+
     s_gamePlayTimer.resetCurrent();
 }
 
 void speedRun_resetTotal()
 {
+    if(!g_config.enable_playtime_tracking)
+        return; // Do nothing
+
     s_gamePlayTimer.reset();
 }
 

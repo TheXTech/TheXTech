@@ -1114,6 +1114,8 @@ int GameMain(const CmdLineSetup_t &setup)
             // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
             GraphicsLazyPreLoad();
             resetFrameTimer();
+            // Clear the speed-runner timer
+            speedRun_resetTotal();
 
             lunaLoad();
 

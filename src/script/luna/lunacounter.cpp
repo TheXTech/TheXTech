@@ -37,54 +37,16 @@
 #include "main/game_save.h"
 #include "main/game_info.h"
 #include "main/menu_main.h"
-#include "main/level_save_info.h"
-
-static char* s_escaped_strcpy(char* dest, char* end, const std::string& src)
-{
-    for(char c : src)
-    {
-        if(dest == end - 1 || dest == end)
-            return nullptr;
-
-        switch(c)
-        {
-        case '\n':
-            *(dest++) = '\\';
-            *(dest++) = 'n';
-            break;
-        case '\r':
-            *(dest++) = '\\';
-            *(dest++) = 'r';
-            break;
-        case '\"':
-        case ';':
-        case ':':
-        case '[':
-        case ']':
-        case ',':
-        case '%':
-        case '\\':
-            *(dest++) = '\\';
-            *(dest++) = c;
-            break;
-        default:
-            *(dest++) = c;
-            break;
-        }
-    }
-
-    return dest;
-}
 
 
-int g_totalFails = 0;
 DeathCounter gDeathCounter;
 
 // CTOR
 DeathCounter::DeathCounter() noexcept
 {
+    mStatFileOK = false;
     mEnabled = false;
-    g_totalFails = 0;
+    mCurTotalDeaths = 0;
     mCurLevelDeaths = 0;
 
     // Print Demos counter with a font 3
@@ -93,77 +55,141 @@ DeathCounter::DeathCounter() noexcept
 
 DeathCounter::~DeathCounter() noexcept
 {
+    if(m_openFile)
+        SDL_RWclose(m_openFile);
 }
 
 void DeathCounter::init()
 {
-    mEnabled = (g_totalFails != -1);
+    if(counterFile.empty())
+    {
+        // prevent a segfault
+        if(TestLevel || selWorld < 0 || selWorld >= (int)SelectWorld.size() || BattleMode || LevelEditor || selSave <= 0)
+        {
+            mEnabled = false;
+            return;
+        }
+
+        std::string oldFile = makeGameSavePath(SelectWorld[selWorld].WorldPath,
+                                               SelectWorld[selWorld].WorldFile,
+                                               fmt::format_ne("demos-{0}.dmo", selSave));
+
+        std::string oldFile2 = makeGameSavePath(SelectWorld[selWorld].WorldPath,
+                                               SelectWorld[selWorld].WorldFile,
+                                               fmt::format_ne("deaths-{0}.rip", selSave));
+
+        counterFile = makeGameSavePath(SelectWorld[selWorld].WorldPath,
+                                       SelectWorld[selWorld].WorldFile,
+                                       fmt::format_ne("fails-{0}.rip", selSave));
+
+        if(Files::fileExists(oldFile)) // Rename old file ino the new name
+            Files::moveFile(counterFile, oldFile);
+        else if(Files::fileExists(oldFile2)) // Rename old file ino the new name
+            Files::moveFile(counterFile, oldFile2);
+
+        if(!TryLoadStats())
+            mEnabled = false;
+    }
 }
 
 void DeathCounter::quit()
 {
+    counterFile.clear();
+    mStatFileOK = false;
     mEnabled = false;
+    mCurTotalDeaths = 0;
     mCurLevelDeaths = 0;
+    mDeathRecords.clear();
+
+    if(m_openFile)
+    {
+        SDL_RWclose(m_openFile);
+        m_openFile = nullptr;
+    }
 }
 
-// TRY LOAD STATS - Attempts to load stats from legacy stats file.
+// TRY LOAD STATS - Attempts to load stats from stats file. Creates and inits the file if it doesn't exist.
 bool DeathCounter::TryLoadStats()
 {
-    if(g_totalFails != -1)
-        return true;
-
-    // prevent a segfault
-    if(TestLevel || selWorld < 0 || selWorld >= (int)SelectWorld.size() || BattleMode || LevelEditor || selSave <= 0)
-        return false;
-
-    std::string oldFile = makeGameSavePath(SelectWorld[selWorld].WorldPath,
-                                           SelectWorld[selWorld].WorldFile,
-                                           fmt::format_ne("demos-{0}.dmo", selSave));
-
-    std::string oldFile2 = makeGameSavePath(SelectWorld[selWorld].WorldPath,
-                                           SelectWorld[selWorld].WorldFile,
-                                           fmt::format_ne("deaths-{0}.rip", selSave));
-
-    std::string counterFile = makeGameSavePath(SelectWorld[selWorld].WorldPath,
-                                   SelectWorld[selWorld].WorldFile,
-                                   fmt::format_ne("fails-{0}.rip", selSave));
-
-    if(Files::fileExists(oldFile)) // Rename old file ino the new name
-        Files::moveFile(counterFile, oldFile);
-    else if(Files::fileExists(oldFile2)) // Rename old file ino the new name
-        Files::moveFile(counterFile, oldFile2);
-
     // Try to open the file
     int32_t tempint = 0;
     size_t got;
 
-    SDL_RWops* openFile = Files::open_file(counterFile, "rb");
+    // If file is not exist yet, try to create empty file
+    if(!Files::fileExists(counterFile))
+    {
+        SDL_RWops *statsfile = Files::open_file(counterFile, "wb");
+        if(!statsfile)
+        {
+            mStatFileOK = false;
+            mEnabled = false;
+            pLogWarning("Unable to initialize Demos counter: %s", counterFile.c_str());
+            return false;
+        }
+
+        SDL_RWwrite(statsfile, &tempint, 1, sizeof(int));
+        SDL_RWclose(statsfile);
+    }
+
+    // close old open file if present
+    if(m_openFile)
+    {
+        SDL_RWclose(m_openFile);
+        m_openFile = nullptr;
+    }
+
+    m_openFile = Files::open_file(counterFile, "r+b");
 
     // If create failed, disable death counter
-    if(!openFile)
+    if(!m_openFile)
     {
-        pLogWarning("Unable to restore from the legacy Demos counter: %s", counterFile.c_str());
+        pLogWarning("Unable to open the Demos counter: %s", counterFile.c_str());
+        mStatFileOK = false;
+        mEnabled = false;
         return false;
     }
 
+    // If size less than 100, init new file
+    int cursize = (int)SDL_RWsize(m_openFile);
+
+    if(cursize < 50)
+    {
+        InitStatsFile(m_openFile);
+        Files::flush_file(m_openFile);
+        mStatFileOK = true;
+        SDL_RWseek(m_openFile, 0, SEEK_SET);
+    }
+
+//    if(statsfile.good() == false)
+//    {
+//        mStatFileOK = false;
+//        mEnabled = false;
+//        return false;
+//    }
+
     // Check version
-    got = LunaCounterUtil::readIntLE(openFile, tempint);
+    got = LunaCounterUtil::readIntLE(m_openFile, tempint);
     if(got != sizeof(int32_t) || tempint < 5)
     {
         if(got != sizeof(int32_t))
             pLogWarning("Fails counter: Failed to read version number at the %s file", counterFile.c_str());
 
+        mStatFileOK = false;
         mEnabled = false;
 
-        SDL_RWclose(openFile);
-        openFile = nullptr;
+        SDL_RWclose(m_openFile);
+        m_openFile = nullptr;
 
         return false;
     }
 
-    ReadRecords(openFile);
+    mStatFileOK = true;
+    mEnabled = true;
 
-    return (g_totalFails != -1);
+    ClearRecords();
+    ReadRecords(m_openFile);
+
+    return true;
 }
 
 // mark that a death occurred in the current level
@@ -174,46 +200,65 @@ void DeathCounter::MarkDeath(bool write_save)
     if(!dcAllow)
         return;
 
-    LevelSaveInfo_t* info = CurSaveInfo();
-
-    if(info)
-        info->fails++;
-
-    g_totalFails++;
-    mCurLevelDeaths++;
+    AddDeath(FileNameFull, 1);
 
     if(write_save)
     {
-        GamesaveAccess save_access;
-        if(save_access.savefile)
-        {
-            bool failed = false;
-            std::array<char, 384> buf;
-
-            // TODO: move this string processing code into PGE-FL/MDX in some efficient way
-            // update total fail count
-            int size = snprintf(buf.data(), 384, "SAVE_HEADER\nTF:%d;\nSAVE_HEADER_END\n", g_totalFails);
-            if((int)SDL_RWwrite(save_access.savefile, &buf[0], 1, size) != size)
-                failed = true;
-
-            if(!failed && info)
-            {
-                strcpy(buf.data(), "LEVEL_INFO\nL:\"");
-                char* dest = &buf[14];
-                char* buf_end = &buf[0] + buf.size();
-                dest = s_escaped_strcpy(dest, buf_end, FileNameFull);
-                if(dest)
-                    dest += snprintf(dest, buf_end - dest, "\";F:%d;\nLEVEL_INFO_END\n", info->fails);
-                size = dest - &buf[0];
-            }
-
-            if(failed || (int)SDL_RWwrite(save_access.savefile, &buf[0], 1, size) != size)
-                pLogCritical("Could not append fail to save file.");
-        }
+        TrySave();
+        Recount();
     }
 }
 
-// READ RECORDS - Add death records from legacy file into death record list
+// ADD DEATH
+void DeathCounter::AddDeath(const std::string &lvlname, int amount)
+{
+    if(!mEnabled)
+        return;
+
+    for(auto &iter : mDeathRecords)
+    {
+        if(iter.m_levelName == lvlname)   // On first name match...
+        {
+            iter.m_deaths += amount;      // Inc death count
+            return;                        // and exit
+        }
+    }
+
+    // if no match, create new death record and add it to list
+    DeathRecord newrec;
+    newrec.m_levelName = lvlname;
+    newrec.m_deaths = amount;
+    mDeathRecords.push_back(newrec);
+}
+
+// INIT STATS FILE
+void DeathCounter::InitStatsFile(SDL_RWops *statsfile)
+{
+    WriteHeader(statsfile);
+}
+
+
+// WRITE HEADER - Write the death counter file header at beginning of file
+void DeathCounter::WriteHeader(SDL_RWops *statsfile)
+{
+    // Write dll version
+    SDL_RWseek(statsfile, 0, RW_SEEK_SET);
+    LunaCounterUtil::writeIntLE(statsfile, LUNA_VERSION);
+
+    // Init reserved
+    uint8_t writebyte = 0;
+    off_t offset = SDL_RWtell(statsfile);
+    while(offset < 100)
+    {
+        SDL_RWwrite(statsfile, &writebyte, 1, sizeof(writebyte));
+        offset = SDL_RWtell(statsfile);
+    }
+
+    // Write record count at 100 bytes (0 record count)
+    LunaCounterUtil::writeIntLE(statsfile, 0);
+}
+
+// READ RECORDS - Add death records from file into death record list
 void DeathCounter::ReadRecords(SDL_RWops *statsfile)
 {
     int32_t tempint = 0;
@@ -232,50 +277,85 @@ void DeathCounter::ReadRecords(SDL_RWops *statsfile)
     if(tempint == 0)
         return;
 
-    g_totalFails = 0;
-
-    DeathRecord newrec;
     for(int i = 0; i < tempint; i++)
     {
+        DeathRecord newrec;
         if(newrec.Load(statsfile))
-        {
-            g_totalFails += newrec.m_deaths;
-
-            for(auto& e : LevelSaveEntries)
-            {
-                if(e.levelPath == newrec.m_levelName)
-                    e.save_info.fails = newrec.m_deaths;
-            }
-        }
+            mDeathRecords.push_back(newrec);
     }
 }
 
 
-// CLEAR RECORDS - Reset the death records for every level
-void DeathCounter::ClearRecords()
+// WRITE RECORDS - Writes death record count at pos 100 in the file followed by each record
+void DeathCounter::WriteRecords(SDL_RWops *statsfile)
 {
-    g_totalFails = 0;
-    for(auto& e : LevelSaveEntries)
-        e.save_info.fails = 0;
+    int32_t reccount = (int32_t)mDeathRecords.size();
+    SDL_RWseek(statsfile, 100, RW_SEEK_SET);
+    LunaCounterUtil::writeIntLE(statsfile, reccount);
 
-    mCurLevelDeaths = 0;
-
-    // must save game to prevent conflicts with updates
-    SaveGame();
+    // Write each record, if any exist
+    if(!mDeathRecords.empty())
+    {
+        for(auto &mDeathRecord : mDeathRecords)
+            mDeathRecord.Save(statsfile);
+    }
 }
 
-// RECOUNT - Recount and relist the death count for the current level
+// TRY SAVE - Externally callable, safe auto-save function
+void DeathCounter::TrySave()
+{
+    if(mStatFileOK && mEnabled && m_openFile)
+    {
+        if(SDL_RWseek(m_openFile, 0, RW_SEEK_SET))
+        {
+            // attempt to reopen the file
+            SDL_RWclose(m_openFile);
+            m_openFile = Files::open_file(counterFile, "wb");
+        }
+
+        if(m_openFile)
+        {
+            Save(m_openFile);
+            Files::flush_file(m_openFile);
+        }
+    }
+}
+
+// SAVE
+void DeathCounter::Save(SDL_RWops *statsfile)
+{
+    if(mStatFileOK && mEnabled)
+    {
+        WriteHeader(statsfile);
+        WriteRecords(statsfile);
+    }
+}
+
+
+// CLEAR RECORDS - Clear the death record list and dealloc its records
+void DeathCounter::ClearRecords()
+{
+    mDeathRecords.clear();
+}
+
+// RECOUNT - Recount and relist the death count for the current level and the total deathcount
 void DeathCounter::Recount()
 {
     if(!mEnabled)
         return;
 
-    LevelSaveInfo_t* info = CurSaveInfo();
+    int total = 0;
+    mCurLevelDeaths = 0;
 
-    if(info)
-        mCurLevelDeaths = info->fails;
-    else
-        mCurLevelDeaths = 0;
+    for(const auto &iter : mDeathRecords)
+    {
+        total += iter.m_deaths;
+        if(iter.m_levelName == FileNameFull)
+            mCurLevelDeaths = iter.m_deaths;
+    }
+
+    mCurTotalDeaths = total;
+
 }
 
 // DRAW - Print the death counter in its current state
@@ -285,7 +365,7 @@ void DeathCounter::Draw(int screenZ)
         return;
 
     // Format string to print
-    m_print.syncCache(mCurLevelDeaths, g_totalFails);
+    m_print.syncCache(mCurLevelDeaths, mCurTotalDeaths);
     m_print.syncCache(g_gameInfo.fails_counter_title);
 
     const vScreen_t& vscreen = vScreen[screenZ];
@@ -338,12 +418,15 @@ void DeathCounter::PrintDebug() const
     if(!g_config.luna_enable_engine)
         return;
 
-    float y = 300;
-    for(const auto &iter : LevelSaveEntries)
+    if(!mDeathRecords.empty())
     {
-        Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("{0}", iter.save_info.fails), 2, 50, y));
-        Renderer::Get().AddOp(new RenderStringOp(iter.levelPath, 2, 80, y));
-        y += 30;
+        float y = 300;
+        for(const auto &iter : mDeathRecords)
+        {
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("{0}", iter.m_deaths), 2, 50, y));
+            Renderer::Get().AddOp(new RenderStringOp(iter.m_levelName, 2, 80, y));
+            y += 30;
+        }
     }
 }
 

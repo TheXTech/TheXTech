@@ -24,16 +24,6 @@
 
 #include <string>
 
-struct SDL_RWops;
-
-struct GamesaveAccess final
-{
-    SDL_RWops* savefile;
-
-    GamesaveAccess();
-    ~GamesaveAccess();
-};
-
 void FindSaves();
 
 extern std::string makeGameSavePath(std::string epPath, std::string world, std::string saveFile);
@@ -48,8 +38,5 @@ void LoadGame();
 void ClearGame(bool punnish = false);
 void DeleteSave(int world, int save);
 void CopySave(int world, int src, int dst);
-
-// close any open game save
-void CloseSave();
 
 #endif // GAME_SAVE_H

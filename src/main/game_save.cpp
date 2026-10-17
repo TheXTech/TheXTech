@@ -33,29 +33,12 @@
 #include <PGE_File_Formats/file_formats.h>
 #include <fmt_format_ne.h>
 #include <IniProcessor/ini_processing.h>
-#include <SDL2/SDL_rwops.h>
 #include <script/luna/lunacounter.h>
 #include <Logger/logger.h>
 
 #include "main/game_save.h"
 #include "main/level_save_info.h"
 #include "menu_main.h"
-
-
-static SDL_RWops* s_open_gamesave = nullptr;
-
-GamesaveAccess::GamesaveAccess()
-{
-    savefile = s_open_gamesave;
-    // TODO: lock here so that we can use threading to help with 3DS hang issues
-}
-
-GamesaveAccess::~GamesaveAccess()
-{
-    if(savefile)
-        Files::flush_file(savefile);
-    // TODO: unlock here
-}
 
 std::string makeGameSavePath(std::string episode, std::string world, std::string saveFile)
 {
@@ -247,13 +230,33 @@ void FindSaves()
                     info.ConfigDefaults = Config_t::MODE_CLASSIC + 1;
             }
 
-            // (these are just previews, so it's okay if we miss legacy files here)
-
             // load timer info for existing save
-            info.Time = f.speedrunTicks;
+            std::string savePath = makeGameSavePath(episode,
+                                                     w.WorldFile,
+                                                     fmt::format_ne("timers{0}.ini", A));
+
+            if(Files::fileExists(savePath))
+            {
+                IniProcessing timer(savePath);
+                timer.beginGroup("timers");
+                timer.read("total", info.Time, 0);
+                timer.endGroup();
+            }
 
             // load fails for existing save
-            info.Fails = f.totalFails;
+            savePath = makeGameSavePath(episode,
+                                        w.WorldFile,
+                                        fmt::format_ne("fails-{0}.rip", A));
+
+            if(Files::fileExists(savePath))
+            {
+                gDeathCounter.counterFile = savePath;
+                gDeathCounter.TryLoadStats();
+                gDeathCounter.Recount();
+                info.FailsEnabled = true;
+                info.Fails = gDeathCounter.mCurTotalDeaths;
+                gDeathCounter.quit();
+            }
         }
     }
 }
@@ -265,8 +268,6 @@ void SaveGame()
 
     if(Cheater || !selSave)
         return;
-
-    CloseSave();
 
     for(A = numPlayers; A >= 1; A--)
         SavedChar[Player[A].Character] = Player[A];
@@ -300,12 +301,6 @@ void SaveGame()
     sav.points = uint32_t(Score);
     sav.worldPosX = WorldPlayer[1].Location.X;
     sav.worldPosY = WorldPlayer[1].Location.Y;
-
-    sav.speedrunTicks = g_speedrunTicks;
-    sav.speedrunWinTicks = g_speedrunWinTicks;
-    g_speedrunTicksSaved = g_speedrunTicks;
-
-    sav.totalFails = g_totalFails;
 
     for(A = 1; A <= 5; A++)
     {
@@ -357,12 +352,7 @@ void SaveGame()
 
     ExportLevelSaveInfo(sav);
 
-    FILE* gamesave = Files::utf8_fopen(savePath.c_str(), "w+");
-    PGE_FileFormats_misc::TextFileOutput output(gamesave);
-    FileFormats::WriteExtendedSaveFile(output, sav);
-
-    s_open_gamesave = SDL_RWFromFP(gamesave, SDL_TRUE);
-    Files::flush_file(s_open_gamesave);
+    FileFormats::WriteExtendedSaveFileF(savePath, sav);
 
     if(Files::fileExists(legacyGamesaveLocker))
         Files::deleteFile(legacyGamesaveLocker); // Remove the gamesave locker of legacy file
@@ -380,9 +370,6 @@ void LoadGame()
 //    std::string newInput;
 
     GamesaveData sav;
-
-    CloseSave();
-
     std::string savePath = makeGameSavePath(w.WorldPath,
                                             w.WorldFile,
                                             fmt::format_ne("save{0}.savx", selSave));
@@ -392,12 +379,7 @@ void LoadGame()
                                                     fmt::format_ne("save{0}.nosave", selSave));
 
     if(Files::fileExists(savePath))
-    {
-        s_open_gamesave = Files::open_file(savePath, "r+");
-        PGE_FileFormats_misc::RWopsTextInput inp(s_open_gamesave);
-        inp.noClose();
-        FileFormats::ReadExtendedSaveFile(inp, sav);
-    }
+        FileFormats::ReadExtendedSaveFileF(savePath, sav);
     else if(!Files::fileExists(legacySaveLocker) && Files::fileExists(savePathOld))
         FileFormats::ReadSMBX64SavFileF(savePathOld, sav);
     else
@@ -422,12 +404,6 @@ void LoadGame()
     BeatTheGame = sav.gameCompleted;
     WorldPlayer[1].Location.X = double(sav.worldPosX);
     WorldPlayer[1].Location.Y = double(sav.worldPosY);
-
-    g_speedrunTicks = sav.speedrunTicks;
-    g_speedrunTicksSaved = sav.speedrunTicks;
-    g_speedrunWinTicks = sav.speedrunWinTicks;
-
-    g_totalFails = sav.totalFails;
 
     if(Lives > 99)
         Lives = 99;
@@ -532,20 +508,10 @@ void LoadGame()
 #endif
 
     ImportLevelSaveInfo(sav);
-
-    // import legacy fail counter data
-    if(g_totalFails == -1)
-    {
-        if(gDeathCounter.TryLoadStats())
-            SaveGame();
-    }
 }
 
 void ClearGame(bool punnish)
 {
-    // allow a single call to ClearGame when preloaded
-    CloseSave();
-
     curWorldMusic = 0;
     curWorldMusicFile.clear();
 
@@ -584,11 +550,7 @@ void ClearGame(bool punnish)
     Star.clear();
     numStars = 0;
 
-    g_totalFails = 0;
     LevelSaveEntries.clear();
-
-    // Clear the speed-runner timer
-    speedRun_resetTotal();
 
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
     gLunaVarBank = saveUserData::DataSection();
@@ -701,13 +663,4 @@ void CopySave(int world, int src, int dst)
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();
 #endif
-}
-
-void CloseSave()
-{
-    if(s_open_gamesave)
-    {
-        SDL_RWclose(s_open_gamesave);
-        s_open_gamesave = nullptr;
-    }
 }
