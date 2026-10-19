@@ -119,7 +119,7 @@
                 "header": "Espacio",
                 "music44": "Cuarto de Objeto",
                 "music12": "Cráter",
-                "music45": ""
+                "music45": "Jefe Final"
             },
             "fam-rpg": {
                 "music33": "Nubes",
@@ -127,14 +127,14 @@
                 "music30": "",
                 "music31": "",
                 "header": "",
-                "music21": "",
-                "music16": "",
+                "music21": "Batalla",
+                "music16": "Bosque",
                 "music32": ""
             },
             "fam-set2": {
                 "music43": "Jefe Final",
                 "music25": "Subterráneo",
-                "music15": "",
+                "music15": "Jefe",
                 "header": "",
                 "music5": ""
             },
@@ -156,14 +156,14 @@
                 "music9": ""
             },
             "fam-world": {
-                "music41": "",
+                "music41": "Calabozo",
                 "music10": "",
-                "header": "",
-                "music28": "",
-                "music51": "",
-                "music48": "",
-                "music29": "",
-                "music17": ""
+                "header": "Mundo",
+                "music28": "Cielo",
+                "music51": "Jefe",
+                "music48": "Agua",
+                "music29": "Cueva",
+                "music17": "Mansión"
             }
         },
         "block": {
@@ -198,13 +198,13 @@
             "fam-steampunk3": "",
             "fam-misc4": "",
             "fam-sized1": "",
-            "fam-pipes5-3": "",
+            "fam-pipes5-3": "Tuberías Largas",
             "fam-overworld2": "",
             "fam-overworld1": "",
             "fam-hurts3": "",
             "fam-sized4": "",
             "fam-bonus3": "",
-            "fam-switch4": "",
+            "fam-switch4": "Interruptor",
             "fam-misc2": "",
             "fam-char5": "",
             "fam-misc3": "",
@@ -254,8 +254,8 @@
             "2": "Orbe #16",
             "none": "Ninguno",
             "8": "Final de Barra",
-            "7": "",
-            "3": "",
+            "7": "Recoger",
+            "3": "Dejar",
             "9": ""
         },
         "worldMusic": {
@@ -422,13 +422,13 @@
         "npc": {
             "fam-sign4": "",
             "fam-plat3": "",
-            "fam-blocks2": "",
+            "fam-blocks2": "Bloques",
             "fam-enemies5": "",
             "fam-shell1": "",
-            "fam-boss5": "",
+            "fam-boss5": "Jefe",
             "fam-veg2": "",
-            "fam-boss1": "",
-            "fam-boss4": "",
+            "fam-boss1": "Jefe",
+            "fam-boss4": "Jefe",
             "fam-char3": "",
             "fam-warp2": "",
             "fam-shell3": "",
@@ -436,10 +436,10 @@
             "fam-vine1": "",
             "fam-items1": "",
             "fam-exit3": "",
-            "fam-boss2": "",
+            "fam-boss2": "Jefe",
             "fam-enemies3": "",
             "fam-exit4": "",
-            "fam-boss3": "",
+            "fam-boss3": "Jefe",
             "fam-vine3": "",
             "fam-plat4": "",
             "fam-plat1": "",
@@ -447,7 +447,7 @@
             "fam-pet4": "",
             "fam-items5": "",
             "fam-items3": "",
-            "fam-blocks3": "",
+            "fam-blocks3": "Bloques",
             "fam-enemies1": "",
             "fam-enemies2": "",
             "fam-ckpt4": "",
