@@ -71,7 +71,7 @@
             "props": {
                 "autostart": "Comenzar Automáticamente",
                 "controls": "Controles",
-                "endGame": "Final del Juego",
+                "endGame": "Finalizar Juego",
                 "sound": "Sonido",
                 "layerSmoke": "Humo"
             },
@@ -295,7 +295,7 @@
         "world": {
             "introLevel": "Nivel de Introducción",
             "name": "Nombre del Mundo",
-            "phraseCreditIndex": "Línea {0} de Créditos del Mundo:",
+            "phraseCreditIndex": "Créditos del Mundo (Línea {0}):",
             "retryOnFail": "Reintentar En Fallo",
             "allowChars": "Permitir Personajes",
             "totalStars": "Estrellas en total: ",
@@ -815,7 +815,7 @@
             "errorNoStartPoint": "Imposible empezar nivel debido a que no hay puntos de comienzo colocados ni pasajes de entrada especificados.\n\nArchivo: {0}",
             "errorTooOldGameAssets": "",
             "openIPCDataFailed": "",
-            "IPCTimeOut": "",
+            "IPCTimeOut": "No hay respuesta del Editor conectado. El juego se cerrará.",
             "errorTooOldEngine": ""
         },
         "pause": {
