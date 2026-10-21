@@ -41,7 +41,7 @@ void DrawBackgroundColor(int A, int Z, bool lower = false)
 }
 
 // draws backgrounds _, _, _, _, _
-void DrawTopAnchoredBackground(int S, int Z, int A, int offset = 32, int expected_height = 0, int tile_bottom = 0, int h_num = 2)
+void DrawTopAnchoredBackground(const XTBackgroundContext& context, int Z, int A, int offset = 32, int expected_height = 0, int tile_bottom = 0, int h_num = 2)
 {
     DrawBackgroundColor(A, Z, true);
 
@@ -50,14 +50,13 @@ void DrawTopAnchoredBackground(int S, int Z, int A, int offset = 32, int expecte
 
     if(GameMenu)
     {
-        int section_height = LevelREAL[S].Height - LevelREAL[S].Y;
-        int screen_offset = vScreen[Z].Height - section_height;
+        int screen_offset = vScreen[Z].Height - context.section_h;
         if(screen_offset > 0)
             offset = screen_offset;
     }
 
     layer.offsetY = -offset;
-    DrawXTBackgroundLayer(GFXBackground2[A], layer, S, Z);
+    DrawXTBackgroundLayer(GFXBackground2[A], layer, context);
 
     if(g_config.disable_background2_tiling)
         return;
@@ -76,10 +75,10 @@ void DrawTopAnchoredBackground(int S, int Z, int A, int offset = 32, int expecte
     }
 
     layer.flags |= XTBackgroundLayer::REPEAT_BOTTOM;
-    DrawXTBackgroundLayer(GFXBackground2[A], layer, S, Z);
+    DrawXTBackgroundLayer(GFXBackground2[A], layer, context);
 }
 
-void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, int tile_bottom = 0, int tile_top = 0, bool flip_tile = false, int h_num = 2, bool anim = false)
+void DrawCenterAnchoredBackground(const XTBackgroundContext& context, int Z, int A, int expected_height = 0, int tile_bottom = 0, int tile_top = 0, bool flip_tile = false, int h_num = 2, bool anim = false)
 {
     uint16_t center_anchor_layer_flags = (XTBackgroundLayer::ALIGN_CENTERY | XTBackgroundLayer::ALIGN_BOTTOM_OR_FITY
         | XTBackgroundLayer::FALLBACK_BOTTOM | XTBackgroundLayer::REPEAT_LEFT | XTBackgroundLayer::REPEAT_RIGHT);
@@ -139,12 +138,12 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
     if(bg42_workaround && SpecialFrame[3] == 3)
     {
         layer.sourceHeight = 1;
-        DrawXTBackgroundLayer(GFXBackground2[A], layer, S, Z);
+        DrawXTBackgroundLayer(GFXBackground2[A], layer, context);
         layer.inUnitOffsetY = 1;
         layer.sourceHeight = frameH - 1;
     }
 
-    DrawXTBackgroundLayer(GFXBackground2[A], layer, S, Z);
+    DrawXTBackgroundLayer(GFXBackground2[A], layer, context);
 
     // now, draw the top portion
     if(!no_tiling && tile_top)
@@ -161,7 +160,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
                 layer.sourceY += 1;
         }
 
-        DrawXTBackgroundLayer(GFXBackground2[A], layer, S, Z);
+        DrawXTBackgroundLayer(GFXBackground2[A], layer, context);
     }
 
     // now, draw the bottom portion
@@ -175,11 +174,11 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
         layer.inUnitOffsetY = (frameH - tile_bottom);
         layer.flags = center_anchor_layer_flags | XTBackgroundLayer::REPEAT_BOTTOM | XTBackgroundLayer::REPEAT_STRIPY;
 
-        DrawXTBackgroundLayer(GFXBackground2[A], layer, S, Z);
+        DrawXTBackgroundLayer(GFXBackground2[A], layer, context);
     }
 }
 
-void DrawBottomAnchoredBackground(int S, int Z, int A, int offset = 0, int expected_height = 0, int tile_top = 0, int h_parallax_num = 2, bool no_bg = false, bool anim = false)
+void DrawBottomAnchoredBackground(const XTBackgroundContext& context, int Z, int A, int offset = 0, int expected_height = 0, int tile_top = 0, int h_parallax_num = 2, bool no_bg = false, bool anim = false)
 {
     if(!no_bg)
         DrawBackgroundColor(A, Z, false);
@@ -193,7 +192,7 @@ void DrawBottomAnchoredBackground(int S, int Z, int A, int offset = 0, int expec
 
     layer.offsetY = -offset;
 
-    DrawXTBackgroundLayer(GFXBackground2[A], layer, S, Z);
+    DrawXTBackgroundLayer(GFXBackground2[A], layer, context);
 
     if(g_config.disable_background2_tiling)
         return;
@@ -215,42 +214,38 @@ void DrawBottomAnchoredBackground(int S, int Z, int A, int offset = 0, int expec
 
     layer.flags |= XTBackgroundLayer::REPEAT_TOP;
 
-    DrawXTBackgroundLayer(GFXBackground2[A], layer, S, Z);
+    DrawXTBackgroundLayer(GFXBackground2[A], layer, context);
 }
 
 void DrawBackground(int S, int Z)
 {
-    const Screen_t& screen = Screens[vScreen[Z].screen_ref];
-
-    int Eff_ScreenH = vScreen[Z].Height;
-    if(screen.Type == ScreenTypes::Dynamic && (screen.DType == DScreenTypes::TopBottom || screen.DType == DScreenTypes::BottomTop))
-        Eff_ScreenH *= 2;
+    const XTBackgroundContext context(S, Z);
 
     if(Background2[S] == 0)
         XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height, {0, 0, 0});
     else if(Background2[S] == 1)
     {
         // Clouds
-        DrawBottomAnchoredBackground(S, Z, 2, 500, 0, 0, 3);
+        DrawBottomAnchoredBackground(context, Z, 2, 500, 0, 0, 3);
         // Blocks
-        DrawBottomAnchoredBackground(S, Z, 1, 0, -1, 0, 2, true);
+        DrawBottomAnchoredBackground(context, Z, 1, 0, -1, 0, 2, true);
     }
     else if(Background2[S] == 13)
     {
         // Clouds
-        DrawCenterAnchoredBackground(S, Z, 2, 0, 0, 0, false, 3);
+        DrawCenterAnchoredBackground(context, Z, 2, 0, 0, 0, false, 3);
     }
     else if(Background2[S] == 2)
     {
         // Clouds
-        DrawBottomAnchoredBackground(S, Z, 2, 500, 0, 0, 3);
+        DrawBottomAnchoredBackground(context, Z, 2, 500, 0, 0, 3);
         // Hills
-        DrawBottomAnchoredBackground(S, Z, 3, 0, -1, 0, 2, true);
+        DrawBottomAnchoredBackground(context, Z, 3, 0, -1, 0, 2, true);
     }
     else if(Background2[S] == 3)
     {
         // Castle
-        DrawCenterAnchoredBackground(S, Z, 4);
+        DrawCenterAnchoredBackground(context, Z, 4);
     }
     else if(Background2[S] == 4)
     {
@@ -259,108 +254,108 @@ void DrawBackground(int S, int Z)
             | XTBackgroundLayer::REPEAT_TOP | XTBackgroundLayer::REPEAT_BOTTOM | XTBackgroundLayer::REPEAT_LEFT | XTBackgroundLayer::REPEAT_RIGHT);
         const XTBackgroundLayer bg4_layer{(uint16_t)(GFXBackground2[5].h & ~1), 0, 0, 0, 0, -32, 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, layer_flags};
 
-        DrawXTBackgroundLayer(GFXBackground2[5], bg4_layer, S, Z);
+        DrawXTBackgroundLayer(GFXBackground2[5], bg4_layer, context);
     }
     else if(Background2[S] == 5)
     {
         // Trees
-        DrawCenterAnchoredBackground(S, Z, 6, -1);
+        DrawCenterAnchoredBackground(context, Z, 6, -1);
     }
     else if(Background2[S] == 6)
     {
         // Bonus
-        DrawCenterAnchoredBackground(S, Z, 7);
+        DrawCenterAnchoredBackground(context, Z, 7);
     }
     else if(Background2[S] == 7)
     {
         // Underground (S1)
-        DrawTopAnchoredBackground(S, Z, 8);
+        DrawTopAnchoredBackground(context, Z, 8);
     }
     else if(Background2[S] == 8)
     {
         // Night
-        DrawCenterAnchoredBackground(S, Z, 9, -1, 0, 0, false, 3);
+        DrawCenterAnchoredBackground(context, Z, 9, -1, 0, 0, false, 3);
     }
     else if(Background2[S] == 9)
     {
         // Night
-        DrawCenterAnchoredBackground(S, Z, 9, -1, 0, 0, false, 3);
+        DrawCenterAnchoredBackground(context, Z, 9, -1, 0, 0, false, 3);
         // Night 2
-        DrawBottomAnchoredBackground(S, Z, 10, 0, -1, 0, 2, true);
+        DrawBottomAnchoredBackground(context, Z, 10, 0, -1, 0, 2, true);
     }
     else if(Background2[S] == 10)
     {
         // Overworld
-        DrawCenterAnchoredBackground(S, Z, 11, -1);
+        DrawCenterAnchoredBackground(context, Z, 11, -1);
     }
     else if(Background2[S] == 11)
     {
         // Hills (S4)
-        DrawCenterAnchoredBackground(S, Z, 12, -1);
+        DrawCenterAnchoredBackground(context, Z, 12, -1);
     }
     else if(Background2[S] == 12)
     {
         // Trees (S4)
-        DrawCenterAnchoredBackground(S, Z, 13, 800, 0, 0, true);
+        DrawCenterAnchoredBackground(context, Z, 13, 800, 0, 0, true);
     }
     else if(Background2[S] == 14)
     {
         // Desert (S3)
         // could possibly tile
-        DrawCenterAnchoredBackground(S, Z, 14, -1);
+        DrawCenterAnchoredBackground(context, Z, 14, -1);
     }
     else if(Background2[S] == 15)
     {
         // Dungeon (S3)
-        DrawCenterAnchoredBackground(S, Z, 15);
+        DrawCenterAnchoredBackground(context, Z, 15);
     }
     else if(Background2[S] == 16)
     {
         // Crateria
-        DrawCenterAnchoredBackground(S, Z, 16);
+        DrawCenterAnchoredBackground(context, Z, 16);
     }
     else if(Background2[S] == 17)
     {
         // S3 ship
         // top segment is 254px tall
-        DrawTopAnchoredBackground(S, Z, 17, 32, 858, 858-254);
+        DrawTopAnchoredBackground(context, Z, 17, 32, 858, 858-254);
     }
     else if(Background2[S] == 18)
     {
         // ghost house (S4)
-        DrawCenterAnchoredBackground(S, Z, 18, 0, 0, 0, false, 2, true);
+        DrawCenterAnchoredBackground(context, Z, 18, 0, 0, 0, false, 2, true);
     }
     else if(Background2[S] == 19)
     {
         // forest (S4)
-        DrawCenterAnchoredBackground(S, Z, 19, 1200, 0, 0, true);
+        DrawCenterAnchoredBackground(context, Z, 19, 1200, 0, 0, true);
     }
     else if(Background2[S] == 20)
     {
         // forest (S3)
-        DrawCenterAnchoredBackground(S, Z, 20, -1);
+        DrawCenterAnchoredBackground(context, Z, 20, -1);
     }
     else if(Background2[S] == 21)
     {
         // battle game (S3)
-        DrawCenterAnchoredBackground(S, Z, 21);
+        DrawCenterAnchoredBackground(context, Z, 21);
     }
     else if(Background2[S] == 22)
     {
         // Clouds
-        DrawBottomAnchoredBackground(S, Z, 2, 500, 0, 0, 3);
+        DrawBottomAnchoredBackground(context, Z, 2, 500, 0, 0, 3);
         // Waterfall (S3)
-        DrawBottomAnchoredBackground(S, Z, 22, 0, -1, 0, 2, true, true);
+        DrawBottomAnchoredBackground(context, Z, 22, 0, -1, 0, 2, true, true);
     }
     else if(Background2[S] == 23)
     {
         // Tank (S3)
-        DrawCenterAnchoredBackground(S, Z, 23, -1);
+        DrawCenterAnchoredBackground(context, Z, 23, -1);
     }
     else if(Background2[S] == 24)
     {
         // villain's castle (S3)
-        DrawTopAnchoredBackground(S, Z, 24, 32, 1504, 384);
+        DrawTopAnchoredBackground(context, Z, 24, 32, 1504, 384);
     }
     else if(Background2[S] == 25)
     {
@@ -369,84 +364,84 @@ void DrawBackground(int S, int Z)
             | XTBackgroundLayer::REPEAT_TOP | XTBackgroundLayer::REPEAT_BOTTOM | XTBackgroundLayer::REPEAT_LEFT | XTBackgroundLayer::REPEAT_RIGHT);
         static const XTBackgroundLayer bg25_layer{0, 0, 0, 0, 0, -32, 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, layer_flags};
 
-        DrawXTBackgroundLayer(GFXBackground2[25], bg25_layer, S, Z);
+        DrawXTBackgroundLayer(GFXBackground2[25], bg25_layer, context);
     }
     else if(Background2[S] == 26)
     {
         // Civilian's House
         // top segment is 244px tall
-        DrawTopAnchoredBackground(S, Z, 26, 32, 1396, 1396-244);
+        DrawTopAnchoredBackground(context, Z, 26, 32, 1396, 1396-244);
     }
     else if(Background2[S] == 27)
     {
         // Castle (S3)
         // can be tiled; top section is 1000px
-        DrawCenterAnchoredBackground(S, Z, 27, -1);
+        DrawCenterAnchoredBackground(context, Z, 27, -1);
     }
     else if(Background2[S] == 28)
     {
         // Bonus (S4)
-        DrawCenterAnchoredBackground(S, Z, 28);
+        DrawCenterAnchoredBackground(context, Z, 28);
     }
     else if(Background2[S] == 29)
     {
         // Night (S4)
-        DrawCenterAnchoredBackground(S, Z, 29, -1, 0, 0, false, 2, true);
+        DrawCenterAnchoredBackground(context, Z, 29, -1, 0, 0, false, 2, true);
     }
     else if(Background2[S] == 30)
     {
         // Cave (S4)
-        DrawCenterAnchoredBackground(S, Z, 30, 3456, 0, 0, true, 2, true);
+        DrawCenterAnchoredBackground(context, Z, 30, 3456, 0, 0, true, 2, true);
     }
     else if(Background2[S] == 31)
     {
         // Hills 2 (S4)
-        DrawCenterAnchoredBackground(S, Z, 31, -1);
+        DrawCenterAnchoredBackground(context, Z, 31, -1);
     }
     else if(Background2[S] == 32)
     {
         // Clouds (S4)
-        DrawCenterAnchoredBackground(S, Z, 32, -1);
+        DrawCenterAnchoredBackground(context, Z, 32, -1);
     }
     else if(Background2[S] == 33)
     {
         // Snow (S4)
-        DrawCenterAnchoredBackground(S, Z, 33, -1);
+        DrawCenterAnchoredBackground(context, Z, 33, -1);
     }
     else if(Background2[S] == 34)
     {
         // Hills 3 (S4)
-        DrawCenterAnchoredBackground(S, Z, 34, -1);
+        DrawCenterAnchoredBackground(context, Z, 34, -1);
     }
     else if(Background2[S] == 35)
     {
         // Snow Clouds
-        DrawBottomAnchoredBackground(S, Z, 36, 500, 0, 0, 3);
+        DrawBottomAnchoredBackground(context, Z, 36, 500, 0, 0, 3);
         // Snow Trees (S3)
-        DrawBottomAnchoredBackground(S, Z, 35, 0, -1, 0, 2, true);
+        DrawBottomAnchoredBackground(context, Z, 35, 0, -1, 0, 2, true);
     }
     else if(Background2[S] == 36)
     {
         // Snow Clouds
-        DrawCenterAnchoredBackground(S, Z, 36, 0, 0, 0, false, 3);
+        DrawCenterAnchoredBackground(context, Z, 36, 0, 0, 0, false, 3);
     }
     else if(Background2[S] == 37)
     {
         // Snow Clouds
-        DrawBottomAnchoredBackground(S, Z, 36, 500, 0, 0, 3);
+        DrawBottomAnchoredBackground(context, Z, 36, 500, 0, 0, 3);
         // Snow Hills (S3)
-        DrawBottomAnchoredBackground(S, Z, 37, 0, -1, 0, 2, true);
+        DrawBottomAnchoredBackground(context, Z, 37, 0, -1, 0, 2, true);
     }
     else if(Background2[S] == 38)
     {
         // Cave with Sky (S3)
         // each of the lower cave segments are 428px
-        DrawTopAnchoredBackground(S, Z, 38, 20, 1500, 428*2);
+        DrawTopAnchoredBackground(context, Z, 38, 20, 1500, 428*2);
     }
     else if(Background2[S] == 39)
     {
         // Cave no Sky (S3)
-        DrawCenterAnchoredBackground(S, Z, 39);
+        DrawCenterAnchoredBackground(context, Z, 39);
     }
     else if(Background2[S] == 40)
     {
@@ -481,49 +476,49 @@ void DrawBackground(int S, int Z)
         };
 
         for(const XTBackgroundLayer& layer : bg40_layers)
-            DrawXTBackgroundLayer(GFXBackground2[40], layer, S, Z);
+            DrawXTBackgroundLayer(GFXBackground2[40], layer, context);
 
     }
     else if(Background2[S] == 41)
     {
         // Castle (S1)
-        DrawCenterAnchoredBackground(S, Z, 41);
+        DrawCenterAnchoredBackground(context, Z, 41);
     }
     else if(Background2[S] == 42)
     {
         // Castle (S4)
         // safe to tile top 546px and bottom 160px of vanilla asset
-        DrawCenterAnchoredBackground(S, Z, 42, 3456, 160, 546, false, 2, true);
+        DrawCenterAnchoredBackground(context, Z, 42, 3456, 160, 546, false, 2, true);
     }
     else if(Background2[S] == 43)
     {
         // Castle 2 (S4)
-        DrawCenterAnchoredBackground(S, Z, 43);
+        DrawCenterAnchoredBackground(context, Z, 43);
     }
     else if(Background2[S] == 44)
     {
         // Castle (S2)
-        DrawCenterAnchoredBackground(S, Z, 44);
+        DrawCenterAnchoredBackground(context, Z, 44);
     }
     else if(Background2[S] == 45)
     {
         // "Brinstar"
-        DrawCenterAnchoredBackground(S, Z, 45);
+        DrawCenterAnchoredBackground(context, Z, 45);
     }
     else if(Background2[S] == 46)
     {
         // "Transport"
-        DrawCenterAnchoredBackground(S, Z, 46);
+        DrawCenterAnchoredBackground(context, Z, 46);
     }
     else if(Background2[S] == 47)
     {
         // "Transport"
-        DrawCenterAnchoredBackground(S, Z, 47);
+        DrawCenterAnchoredBackground(context, Z, 47);
     }
     else if(Background2[S] == 48)
     {
         // Blouds (S2)
-        DrawCenterAnchoredBackground(S, Z, 48, -1);
+        DrawCenterAnchoredBackground(context, Z, 48, -1);
     }
     else if(Background2[S] == 49)
     {
@@ -551,7 +546,7 @@ void DrawBackground(int S, int Z)
         };
 
         for(const XTBackgroundLayer& layer : bg49_layers)
-            DrawXTBackgroundLayer(GFXBackground2[49], layer, S, Z);
+            DrawXTBackgroundLayer(GFXBackground2[49], layer, context);
     }
     else if(Background2[S] == 50)
     {
@@ -574,7 +569,7 @@ void DrawBackground(int S, int Z)
         };
 
         for(const XTBackgroundLayer& layer : bg50_layers)
-            DrawXTBackgroundLayer(GFXBackground2[50], layer, S, Z);
+            DrawXTBackgroundLayer(GFXBackground2[50], layer, context);
     }
     else if(Background2[S] == 51)
     {
@@ -585,7 +580,7 @@ void DrawBackground(int S, int Z)
             GFXBackground2[51].ColorLower);
 
         uint16_t layer_flags = (XTBackgroundLayer::REPEAT_LEFT | XTBackgroundLayer::REPEAT_RIGHT);
-        if(GFXBackground2[51].h >= Eff_ScreenH)
+        if(GFXBackground2[51].h >= context.screenh)
             layer_flags |= (XTBackgroundLayer::ALIGN_CENTERY | XTBackgroundLayer::ALIGN_BOTTOM_OR_FITY | XTBackgroundLayer::FALLBACK_BOTTOM);
 
         const std::array<XTBackgroundLayer, 2> bg51_layers =
@@ -595,7 +590,7 @@ void DrawBackground(int S, int Z)
         };
 
         for(const XTBackgroundLayer& layer : bg51_layers)
-            DrawXTBackgroundLayer(GFXBackground2[51], layer, S, Z);
+            DrawXTBackgroundLayer(GFXBackground2[51], layer, context);
     }
     else if(Background2[S] == 52)
     {
@@ -628,22 +623,22 @@ void DrawBackground(int S, int Z)
         };
 
         for(const XTBackgroundLayer& layer : bg52_layers)
-            DrawXTBackgroundLayer(GFXBackground2[52], layer, S, Z);
+            DrawXTBackgroundLayer(GFXBackground2[52], layer, context);
     }
     else if(Background2[S] == 53)
     {
         // Cliffs
-        DrawCenterAnchoredBackground(S, Z, 53, -1);
+        DrawCenterAnchoredBackground(context, Z, 53, -1);
     }
     else if(Background2[S] == 54)
     {
         // Warehouse
-        DrawCenterAnchoredBackground(S, Z, 54);
+        DrawCenterAnchoredBackground(context, Z, 54);
     }
     else if(Background2[S] == 55)
     {
         // Water (S4)
-        DrawCenterAnchoredBackground(S, Z, 55, 0, 0, 0, false, 2, true);
+        DrawCenterAnchoredBackground(context, Z, 55, 0, 0, 0, false, 2, true);
     }
     else if(Background2[S] == 56)
     {
@@ -668,7 +663,7 @@ void DrawBackground(int S, int Z)
         };
 
         for(const XTBackgroundLayer& layer : bg56_layers)
-            DrawXTBackgroundLayer(GFXBackground2[56], layer, S, Z);
+            DrawXTBackgroundLayer(GFXBackground2[56], layer, context);
     }
     else if(Background2[S] == 57)
     {
@@ -677,12 +672,12 @@ void DrawBackground(int S, int Z)
         // in vanilla asset:
         // top: can loop top 672px
         // bottom: can loop bottom 64px
-        DrawCenterAnchoredBackground(S, Z, 57, 800, 64, 672);
+        DrawCenterAnchoredBackground(context, Z, 57, 800, 64, 672);
     }
     else if(Background2[S] == 58)
     {
         // Night (S4)
         // can loop top 600px and bottom 128px of vanilla asset
-        DrawCenterAnchoredBackground(S, Z, 58, 3584, 128, 600, false, 2, true);
+        DrawCenterAnchoredBackground(context, Z, 58, 3584, 128, 600, false, 2, true);
     }
 }

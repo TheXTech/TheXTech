@@ -78,7 +78,25 @@ struct XTBackground
     std::array<XTBackgroundLayer, 16> layers;
 };
 
-void DrawXTBackgroundLayer(StdPicture& source, const XTBackgroundLayer& layer, int S, int Z);
+struct XTBackgroundContext
+{
+    int vscreenw_minus1;
+    int vscreenh_minus1;
+
+    int camX_sectX;
+    int camY_sectY;
+    int section_w;
+    int section_h;
+
+    int screenx;
+    int screeny;
+    int screenw;
+    int screenh;
+
+    XTBackgroundContext(int S, int Z);
+};
+
+void DrawXTBackgroundLayer(StdPicture& source, const XTBackgroundLayer& layer, const XTBackgroundContext& context);
 
 // void DrawXTBackground(StdPicture& source, const XTBackground& bg, int S, int Z, bool FG);
 
