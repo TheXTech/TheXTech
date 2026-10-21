@@ -141,6 +141,8 @@ void PlayerEffects(const int A);
 bool PlayerNormal(const Player_t& p);
 // NEW: checks if all players have normal state (if false, layer movement and events get disabled)
 bool AllPlayersNormal();
+// NEW: checks if any onscreen player has invincibility
+bool OnscreenPlayerInvincible();
 
 // NEW: ensures the players on a screen are nearby if the screen is shared
 void PlayersEnsureNearby(const Screen_t& screen);

@@ -338,7 +338,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                         if(HitSpot == 1) // Player landed on a NPC
                         {
                             // the following code is for spin jumping and landing on things as yoshi/shoe
-                            if(!InvincibilityTime && (Player[A].Mount == 1 || Player[A].Mount == 3 || Player[A].SpinJump || (Player[A].Stoned && !NPC[B]->CanWalkOn)))
+                            if(!Player[A].InvincibilityTime && (Player[A].Mount == 1 || Player[A].Mount == 3 || Player[A].SpinJump || (Player[A].Stoned && !NPC[B]->CanWalkOn)))
                             {
                                 // these types were not hit during spin bounces in SMBX 1.3 (but may be vulnerable to stomps by mounts)
                                 bool dont_hit_spin_bounce = (NPC[B].Type == NPCID_FIRE_PLANT || NPC[B].Type == NPCID_QUAD_SPITTER || NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_LAVABUBBLE ||
@@ -500,7 +500,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                             else if(NPC[B].Type == NPCID_CANNONITEM || NPC[B].Type == NPCID_KEY ||
                                     NPC[B].Type == NPCID_TOOTHYPIPE || NPC[B].Type == NPCID_TOOTHY ||
                                     NPC[B].Type == NPCID_HOMING_CANNON ||
-                                    ((Player[A].SlideKill || InvincibilityTime) && !NPC[B]->WontHurt)) // NPCs that cannot be walked on
+                                    ((Player[A].SlideKill || Player[A].InvincibilityTime) && !NPC[B]->WontHurt)) // NPCs that cannot be walked on
                             {
                                 // cancel jump
                             }
@@ -749,14 +749,14 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 // someone's going to get hurt...
                                 else
                                 {
-                                    if(InvincibilityTime || (Player[A].SlideKill && !NPC[B]->JumpHurt) || (Player[A].Rolling && Player[A].State == PLR_STATE_SHELL))
+                                    if(Player[A].InvincibilityTime || (Player[A].SlideKill && !NPC[B]->JumpHurt) || (Player[A].Rolling && Player[A].State == PLR_STATE_SHELL))
                                     {
                                         if(Player[A].Rolling && (NPC[B].Type == NPCID_FIRE_BOSS_SHELL || NPC[B].Type == NPCID_MAGIC_BOSS_SHELL || NPC[B].Type == NPCID_HEAVY_THROWN || NPC[B].Type == NPCID_HOMING_BALL))
                                         {
                                             // be vulnerable to these NPCs while rolling
                                         }
                                         // DO cause damage to VILLAIN_S3 even though it's meant to be immune to this kind of damage.
-                                        else if(InvincibilityTime && NPC[B].Type == NPCID_VILLAIN_S3)
+                                        else if(Player[A].InvincibilityTime && NPC[B].Type == NPCID_VILLAIN_S3)
                                         {
                                             // But use fireball -- this will take ~6 rounds of invincibility power to kill the boss
                                             NPC[numNPCs + 1].Type = NPCID_PLR_FIREBALL;

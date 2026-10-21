@@ -33,6 +33,7 @@
 #include "core/msgbox.h"
 
 #include "sound.h"
+#include "player.h"
 #include "config.h"
 
 #include <SDL2/SDL_rwops.h>
@@ -534,7 +535,7 @@ void StartMusic(int A, int fadeInMs)
             s_playMusic(index, qoa, fadeInMs);
             musicName = "stmusic";
         }
-        else if(InvincibilityTime && !PSwitchTime && s_specialMusicMods.size() >= 4)
+        else if(OnscreenPlayerInvincible() && !PSwitchTime && s_specialMusicMods.size() >= 4)
         {
             pLogDebug("Starting special music [4]");
             int index = s_specialMusicMods[3];

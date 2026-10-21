@@ -386,7 +386,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
     XTColor s = (ShadowMode ? XTColor(64, 64, 64, color.a) : color);
 
     // color player during invincibility
-    if(InvincibilityTime)
+    if(p.InvincibilityTime)
     {
         switch(((unsigned)CommonFrame / 4) % 4)
         {

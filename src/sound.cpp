@@ -29,6 +29,7 @@
 #include "global_dirs.h"
 #include "frame_timer.h"
 #include "message.h"
+#include "player.h"
 
 #include "load_gfx.h"
 #include "core/msgbox.h"
@@ -960,7 +961,7 @@ void StartMusic(int A, int fadeInMs)
             PlayMusic("stmusic", fadeInMs);
             musicName = "stmusic";
         }
-        else if(InvincibilityTime && !PSwitchTime && g_totalMusicSpecial >= 4)
+        else if(OnscreenPlayerInvincible() && !PSwitchTime && g_totalMusicSpecial >= 4)
         {
             pLogDebug("Starting special music [smusic4]");
             PlayMusic("smusic4", fadeInMs);

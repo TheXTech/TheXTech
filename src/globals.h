@@ -753,6 +753,8 @@ struct Player_t
     PlayerEffect Effect = PLREFF_NORMAL;
 //    Effect2 As Double 'counter for the effects (was double)
     vbint_t Effect2 = 0;
+    // NEW: tracks period of player's invincibility to all damage except lava, offscreen, and crushing
+    vbint_t InvincibilityTime = 0;
 //    NEW: this previously used the same storage as Effect2
     num_t RespawnY = 0_n;
 //    Duck As Boolean 'true if ducking
@@ -2074,8 +2076,6 @@ extern int selSave;
 extern int PSwitchTime;
 //Public PSwitchStop As Integer
 extern int PSwitchStop;
-// NEW: tracks period of player's invincibility to all damage except lava, offscreen, and crushing
-extern int InvincibilityTime;
 //Public PSwitchPlayer As Integer
 extern int PSwitchPlayer;
 

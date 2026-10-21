@@ -496,7 +496,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
         else if(b.Special == 110)
         {
-            if(InvincibilityTime)
+            if(whatPlayer > 0 && Player[whatPlayer].InvincibilityTime)
                 C = NPCID_INVINCIBILITY_POWER;
             else
                 C = NPCID_NULL;
@@ -1680,7 +1680,7 @@ void SwitchEndResumeMusic()
 {
     StopMusic();
 
-    if(InvincibilityTime)
+    if(OnscreenPlayerInvincible())
     {
         StartMusic(-1);
         return;

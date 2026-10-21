@@ -578,7 +578,6 @@ void SetupPlayers()
     int B = 0;
 //    int C = 0;
 
-    InvincibilityTime = 0;
     FreezeNPCs = false;
     qScreen = false;
     qScreen_canonical = false;
@@ -793,6 +792,7 @@ void SetupPlayers()
         Player[A].Duck = false;
         Player[A].MountSpecial = 0;
         Player[A].YoshiTongueLength = 0;
+        Player[A].InvincibilityTime = 0;
 
 //        Player[A].Direction = 1; // Moved to above
         Player[A].Location.SpeedX = 0;
@@ -909,7 +909,7 @@ void PlayerHurt(const int A)
     Location_t tempLocation;
     int B = 0;
 
-    if(InvincibilityTime && !p.Pinched.Moving)
+    if(p.InvincibilityTime && !p.Pinched.Moving)
         return;
 
     if(p.Dead || p.TimeToLive > 0 || p.Stoned || p.Immune > 0 || p.Effect > 0)
@@ -1272,6 +1272,13 @@ void PlayerDead(int A)
         g_curLevelMedals.on_all_dead();
         StopMusic();
         FreezeNPCs = false;
+    }
+    else if(p.InvincibilityTime)
+    {
+        p.InvincibilityTime = 0;
+
+        if(!GameMenu && &ScreenByPlayer(A) == l_screen && !OnscreenPlayerInvincible())
+            SwitchEndResumeMusic();
     }
 
     if(A == SingleCoop)
@@ -4688,7 +4695,7 @@ void WaterCheck(const int A)
     if(p.Wet > 0)
     {
         p.Wet -= 1;
-        if(!InvincibilityTime)
+        if(!p.InvincibilityTime)
             p.Multiplier = 0;
     }
 
@@ -4967,12 +4974,12 @@ void PlayerCollide(const int A)
 
                 if(BattleMode)
                 {
-                    if(p2.SlideKill)
+                    if(p2.SlideKill || (p2.InvincibilityTime && !p1.InvincibilityTime))
                     {
                         HitSpot = 0;
                         PlayerHurt(A);
                     }
-                    if(p1.SlideKill)
+                    if(p1.SlideKill || (p1.InvincibilityTime && !p2.InvincibilityTime))
                     {
                         HitSpot = 0;
                         PlayerHurt(B);
@@ -4985,6 +4992,20 @@ void PlayerCollide(const int A)
                     {
                         PlayerHurt(A);
                     }
+                }
+                else if(p1.InvincibilityTime != p2.InvincibilityTime)
+                {
+                    bool was_onscreen_invincible = OnscreenPlayerInvincible();
+
+                    if(p1.InvincibilityTime > p2.InvincibilityTime)
+                        p2.InvincibilityTime = p1.InvincibilityTime;
+                    else
+                        p1.InvincibilityTime = p2.InvincibilityTime;
+
+                    PlaySoundSpatial(SFX_NewPath, p1.Location);
+
+                    if(!was_onscreen_invincible && OnscreenPlayerInvincible())
+                        StartMusic(-1);
                 }
 
                 if(p1.Stoned || p2.Stoned)
@@ -6721,6 +6742,17 @@ bool AllPlayersNormal()
     }
 
     return true;
+}
+
+bool OnscreenPlayerInvincible()
+{
+    for(int i = 0; i < l_screen->player_count; i++)
+    {
+        if(Player[l_screen->players[i]].InvincibilityTime)
+            return true;
+    }
+
+    return false;
 }
 
 // NEW: ensures the players on a screen are nearby if the screen is shared

@@ -62,30 +62,34 @@ void p_PlayerMakeFlySparkle(const Location_t& loc, int Frame)
 
 static void UpdateInvincibility()
 {
-    if(InvincibilityTime <= 0 || FreezeNPCs || LevelMacro != LEVELMACRO_OFF || !CheckLiving())
+    if(FreezeNPCs || LevelMacro != LEVELMACRO_OFF || !CheckLiving())
         return;
 
-    if(InvincibilityTime == Physics.NPCPSwitch && !GameMenu)
+    for(int A = 1; A <= numPlayers; A++)
     {
-        StopMusic();
-        StartMusic(-1);
-    }
+        Player_t& p = Player[A];
+        if(!p.InvincibilityTime)
+            continue;
 
-    InvincibilityTime--;
+        bool p_onscreen = &ScreenByPlayer(A) == l_screen;
 
-    if(InvincibilityTime == 195)
-        PlaySound(SFX_CoinSwitchTimeout);
-
-    if(InvincibilityTime == 0)
-    {
-        for(int A = 1; A <= numPlayers; A++)
+        if(p_onscreen && p.InvincibilityTime == Physics.NPCPSwitch && !GameMenu)
         {
-            if(!Player[A].Dead && Player[A].TimeToLive == 0)
-                Player[A].Immune += 120;
+            StopMusic();
+            StartMusic(-1);
         }
 
-        if(!GameMenu)
-            SwitchEndResumeMusic();
+        p.InvincibilityTime--;
+
+        if(p.InvincibilityTime == 195)
+            PlaySoundSpatial(SFX_CoinSwitchTimeout, p.Location);
+        else if(p.InvincibilityTime == 0)
+        {
+            p.Immune += 120;
+
+            if(!GameMenu && p_onscreen && !OnscreenPlayerInvincible())
+                SwitchEndResumeMusic();
+        }
     }
 }
 
@@ -448,7 +452,7 @@ bool UpdatePlayer()
                         (
                                 (!Player[A].YoshiBlue && (Player[A].CanFly || Player[A].CanFly2)) ||
                                 (Player[A].Mount == 3 && Player[A].CanFly2)
-                        ) || Player[A].FlySparks || InvincibilityTime
+                        ) || Player[A].FlySparks || Player[A].InvincibilityTime
                         )
                 {
                     if(iRand(4) == 0)
@@ -515,7 +519,7 @@ bool UpdatePlayer()
                 }
 
                 // reduce player's multiplier
-                if((Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0) && !Player[A].Slide && !FreezeNPCs && !InvincibilityTime)
+                if((Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0) && !Player[A].Slide && !FreezeNPCs && !Player[A].InvincibilityTime)
                     Player[A].Multiplier = 0;
 
                 if(Player[A].Mount == 2)

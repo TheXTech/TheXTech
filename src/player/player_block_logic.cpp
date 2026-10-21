@@ -139,7 +139,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                 }
 
                                 if((Player[A].Mount == 2 && Block[B].Type != BLKID_KAIZO_HURT) ||
-                                    InvincibilityTime ||
+                                    Player[A].InvincibilityTime ||
                                    (
                                        ((HitSpot == 1 && Player[A].Mount) || (Player[A].Rolling && Player[A].State == PLR_STATE_SHELL)) &&
                                        (Block[B].Type != BLKID_PET_HURT && Block[B].Type != BLKID_KAIZO_HURT)
