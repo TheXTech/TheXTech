@@ -1529,10 +1529,14 @@ void SetupVars()
     NPCTraits[NPCID_HOMING_BULLET].NoClipping = true;
     NPCTraits[NPCID_HOMING_BULLET].NoYoshi = true;
     NPCTraits[NPCID_HOMING_BULLET].Foreground = true;
+    NPCTraits[NPCID_HOMING_BULLET].NoFireBall = true;
     NPCTraits[NPCID_HOMING_BULLET].NoIceBall = true;
     NPCTraits[NPCID_HOMING_BULLET].FrameStyle = 1;
     NPCTraits[NPCID_HOMING_BULLET].TFrames = 3;
     NPCTraits[NPCID_HOMING_BULLET].FrameSpeed = 8;
+    NPCTraits[NPCID_HOMING_BULLET].Score = 0;
+    NPCTraits[NPCID_HOMING_BULLET].UseDefaultCam = true;
+    NPCTraits[NPCID_HOMING_BULLET].InactiveRender = NPCTraits_t::SMOKE;
 
     NPCTraits[NPCID_TRANSPARENT_AXE].NoYoshi = true;
     NPCTraits[NPCID_TRANSPARENT_AXE].IsABonus = true;

@@ -3351,33 +3351,52 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_HOMING_BULLET)
     {
-        npc.Projectile = true;
-        if(npc.TimeLeft > 10)
-            npc.TimeLeft = 10;
+        if(npc.CantHurt > 0)
+        {
+            npc.Projectile = true;
+            npc.CantHurt = 100;
+
+            if(npc.TimeLeft > 10)
+                npc.TimeLeft = 10;
+        }
+        else
+            npc.Projectile = false;
 
         if(npc.Location.SpeedX == 0 && npc.Location.SpeedY == 0)
             npc.Location.SpeedX = 6 * npc.Direction;
 
+        // ten second despawn timer
+        npc.Special3++;
+        if(npc.Special3 > 650)
+            NPCHit(A, 3, A);
+
         // ALL of this logic is fully self-contained to the below:
 
         // targeting routine
-        if(npc.Special > 0)
+        if(npc.Special != 0)
         {
             // check that target is still valid
             const NPC_t& target = NPC[npc.Special];
-            if(npc.Special > numNPCs || !target.Active || target.HoldingPlayer || target->WontHurt
-                || num_t::abs(target.Location.X - npc.SpecialX) > 64 || num_t::abs(target.Location.Y - npc.SpecialY) > 64)
+            const Player_t& plr_target = Player[(npc.Special < 0) ? -npc.Special : 0];
+            if(npc.Special > 0 && (npc.Special > numNPCs || !target.Active || target.HoldingPlayer || target->WontHurt
+                || num_t::abs(target.Location.X - npc.SpecialX) > 64 || num_t::abs(target.Location.Y - npc.SpecialY) > 64))
+            {
+                npc.Special = 0;
+            }
+            else if(npc.Special < 0 && (-npc.Special > numPlayers || plr_target.Dead || plr_target.TimeToLive || plr_target.Immune || plr_target.Section != npc.Section || !PlayerNormal(plr_target)))
             {
                 npc.Special = 0;
             }
             else
             {
-                npc.SpecialX = target.Location.X;
-                npc.SpecialY = target.Location.Y;
+                const Location_t& tLoc = (npc.Special < 0) ? plr_target.Location : target.Location;
+
+                npc.SpecialX = tLoc.X;
+                npc.SpecialY = tLoc.Y;
 
                 // want a speed of 2, aimed at the other NPC
-                num_t dx = target.Location.minus_center_x(npc.Location);
-                num_t dy = target.Location.minus_center_y(npc.Location);
+                num_t dx = tLoc.minus_center_x(npc.Location);
+                num_t dy = tLoc.minus_center_y(npc.Location);
                 num_t dist = num_t::sqrt(num_t::dist2(dx, dy));
                 num_t target_SpeedX = 6 * dx.divided_by(dist);
                 num_t target_SpeedY = 6 * dy.divided_by(dist);
@@ -3386,16 +3405,51 @@ void NPCSpecial(int A)
                 npc.Location.SpeedY = (31 * npc.Location.SpeedY + target_SpeedY) / 32;
             }
         }
-        else if(npc.Special < 0)
-            npc.Special += 1;
+        else if(npc.Special2 > 0)
+            npc.Special2--;
 
         // target finding routine, written for speed
-        if(npc.Special == 0)
+        if(npc.Special == 0 && npc.Special2 == 0)
         {
             int target_x = num_t::floor(npc.Location.X) + (num_t::floor(npc.Location.Width) >> 1);
             int target_y = num_t::floor(npc.Location.Y) + (num_t::floor(npc.Location.Height) >> 1);
 
             int best_dist = -1;
+
+            if(BattleMode || npc.CantHurtPlayer == 0)
+            {
+                for(int B = 1; B <= numPlayers; B++)
+                {
+                    if(B == npc.CantHurtPlayer)
+                        continue;
+
+                    const Player_t& plr = Player[B];
+                    if(plr.Dead || plr.TimeToLive || plr.Immune || plr.Section != npc.Section || !PlayerNormal(plr))
+                        continue;
+
+                    int plr_x = num_t::floor(plr.Location.X) + (num_t::floor(plr.Location.Width) >> 1);
+                    int plr_y = num_t::floor(plr.Location.Y) + (num_t::floor(plr.Location.Height) >> 1);
+
+                    // never turn around to target an Player
+                    if(npc.CantHurt && (plr_x - target_x) * npc.Location.SpeedX + (plr_y - target_y) * npc.Location.SpeedY <= 0)
+                        continue;
+
+                    int dist = (plr_x - target_x) * (plr_x - target_x) + (plr_y - target_y) * (plr_y - target_y);
+                    if(best_dist != -1 && dist >= best_dist)
+                        continue;
+
+                    best_dist = dist;
+                    npc.Special = -B;
+                }
+
+                if(npc.Special)
+                    return;
+                else if(npc.CantHurtPlayer == 0)
+                {
+                    npc.Special2 = 128;
+                    return;
+                }
+            }
 
             for(int B : NPCQueues::Active.no_change)
             {
@@ -3422,7 +3476,7 @@ void NPCSpecial(int A)
             }
 
             if(npc.Special == 0)
-                npc.Special = -128;
+                npc.Special2 = 128;
         }
     }
 }

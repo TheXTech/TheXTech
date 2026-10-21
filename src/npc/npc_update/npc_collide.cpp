@@ -195,7 +195,7 @@ void NPCCollide(int A)
             NPC[B].Type == NPCID_RED_BOOT || NPC[B].Type == NPCID_BLU_BOOT ||
             NPC[B].Type == NPCID_TIMER_S2 || NPC[B].Type == NPCID_FLY_BLOCK || NPC[B].Type == NPCID_FLY_CANNON || NPC[B].Type == NPCID_DOOR_MAKER ||
             NPC[B].Type == NPCID_MAGIC_DOOR || NPC[B].Type == NPCID_CHAR3_HEAVY || NPC[B].Type == NPCID_PLR_HEAVY || NPC[B].Type == NPCID_CHAR4_HEAVY ||
-            NPC[B].Type == NPCID_HPIPE_SHORT || NPC[B].Type == NPCID_YEL_PLATFORM || NPC[B].Type == NPCID_BLU_PLATFORM || NPC[B].Type == NPCID_HOMING_BULLET ||
+            NPC[B].Type == NPCID_HPIPE_SHORT || NPC[B].Type == NPCID_YEL_PLATFORM || NPC[B].Type == NPCID_BLU_PLATFORM ||
             NPC[B].Type == NPCID_GRN_PLATFORM || NPC[B].Type == NPCID_RED_PLATFORM || NPC[B].Type == NPCID_HPIPE_LONG ||
             NPC[B].Type == NPCID_VPIPE_SHORT || NPC[B].Type == NPCID_VPIPE_LONG || NPC[B].Type == NPCID_CONVEYOR || (NPC[B].Type >= NPCID_TANK_TREADS && NPC[B].Type <= NPCID_SLANT_WOOD_M) ||
             NPC[B].Type == NPCID_STATUE_S3 || NPC[B].Type == NPCID_STATUE_FIRE || NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPCID_PET_FIRE || NPC[B].Type == NPCID_PLANT_FIREBALL || NPC[B].Type == NPCID_QUAD_BALL ||
@@ -210,7 +210,7 @@ void NPCCollide(int A)
                 continue;
         }
         // bullet can't be collision target if just player-shot
-        else if(NPC[B].Type == NPCID_BULLET)
+        else if(NPC[B].Type == NPCID_BULLET || NPC[B].Type == NPCID_HOMING_BULLET)
         {
             if(NPC[B].CantHurt > 0)
                 continue;

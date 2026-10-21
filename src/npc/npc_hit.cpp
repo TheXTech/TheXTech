@@ -1686,7 +1686,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Hammer Bros. Hammer
-    else if(NPC[A].Type == NPCID_HEAVY_THROWN)
+    else if(NPC[A].Type == NPCID_HEAVY_THROWN || NPC[A].Type == NPCID_HOMING_BULLET)
     {
         if(B == 3)
             NPC[A].Killed = B;
@@ -2268,10 +2268,18 @@ void NPCHit(int A, int B, int C)
                 NPC[C].Multiplier = NPC[A].Multiplier;
             MoreScore(NPC[A]->Score, NPC[A].Location, NPC[C].Multiplier);
         }
-        else if(NPC[C].Type == NPCID_HOMING_BULLET)
+
+        if(NPC[C].Type == NPCID_HOMING_BULLET)
         {
-            NPC[C].Killed = 3;
-            NPCQueues::Killed.push_back(C);
+            // kill the bullet if it hits a boss
+            if(NPC[A].Damage)
+            {
+                NPC[C].Killed = 3;
+                NPCQueues::Killed.push_back(C);
+            }
+            // reset its despawn timer otherwise
+            else
+                NPC[C].Special3 = 0;
         }
 
         if(NPC[A].Type != NPCID_BOSS_CASE && NPC[A].Type != NPCID_BOSS_FRAGILE)

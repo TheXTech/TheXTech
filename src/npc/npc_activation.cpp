@@ -180,7 +180,7 @@ void NPCActivationLogic(int A)
 {
     if(NPC[A].Active)
     {
-        if((NPC[A]->IsFish && NPC[A].Special == 2) || NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || NPC[A].Type == NPCID_GHOST_FAST) // Special Start for Jumping Fish and Bullet Bills
+        if((NPC[A]->IsFish && NPC[A].Special == 2) || NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || NPC[A].Type == NPCID_GHOST_FAST || NPC[A].Type == NPCID_HOMING_BULLET) // Special Start for Jumping Fish and Bullet Bills
         {
             if(NPC[A].TimeLeft <= 1)
             {
@@ -207,7 +207,7 @@ void NPCActivationLogic(int A)
                     treeNPCSplitTempBlock(A);
             }
             else if(NPC[A].Type != NPCID_GHOST_FAST && !FreezeNPCs)
-                PlaySoundSpatial(SFX_Bullet, NPC[A].Location);
+                PlaySoundSpatial((NPC[A].Type == NPCID_HOMING_BULLET) ? SFX_FlameThrower : SFX_Bullet, NPC[A].Location);
         }
         else if(NPC[A].Type == NPCID_GOALTAPE)
         {

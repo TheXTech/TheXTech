@@ -101,7 +101,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                             // battlemode stuff
                             if(NPC[B].Type == NPCID_PLR_FIREBALL || NPC[B].Type == NPCID_PLR_HEAVY || NPC[B].Type == NPCID_PLR_ICEBALL || NPC[B].Type == NPCID_SWORDBEAM || NPC[B].Type == NPCID_PET_FIRE || NPC[B].Type == NPCID_CHAR3_HEAVY || NPC[B].Type == NPCID_CHAR4_HEAVY || NPC[B].Type == NPCID_HOMING_BULLET)
                             {
-                                if(BattleMode && NPC[B].CantHurtPlayer != A)
+                                if((BattleMode && NPC[B].CantHurtPlayer != A) || (NPC[B].Type == NPCID_HOMING_BULLET && NPC[B].CantHurtPlayer == 0))
                                 {
                                     // duck projectile-resistance in heavy suit
                                     if(Player[A].State == 6 && Player[A].Duck && Player[A].Character != 5)
