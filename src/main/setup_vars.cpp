@@ -2985,8 +2985,7 @@ void SetupVars()
             NPCTraits[A].Foreground = true;
     }
 
-#ifndef LOW_MEM
-    // kept only for debugging that it's safe to remove them
+    // STILL USED on the legacy stable branch
     For(A, 1, maxEffectType)
     {
         EffectDefaults.EffectHeight[A] = EffectHeight[A];
@@ -3004,7 +3003,6 @@ void SetupVars()
             EffectDefaults.EffectFrames[A] = 1;
 #endif
     }
-#endif // #ifndef LOW_MEM
 
     SaveNPCDefaults();
     SavePlayerDefaults();
