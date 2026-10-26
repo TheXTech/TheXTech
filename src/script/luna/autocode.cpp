@@ -966,13 +966,13 @@ void Autocode::Do(bool init)
                 deccel = num_t::abs(deccel);
                 if(layer->SpeedX > 0)
                 {
-                    layer->SpeedX = numf_t((num_t)layer->SpeedX - deccel);
+                    layer->SpeedX = tempf_t((num_t)layer->SpeedX - deccel);
                     if(layer->SpeedX < 0)
                         LayerF::Stop(layer);
                 }
                 else if(layer->SpeedX < 0)
                 {
-                    layer->SpeedX = numf_t((num_t)layer->SpeedX + deccel);
+                    layer->SpeedX = tempf_t((num_t)layer->SpeedX + deccel);
                     if(layer->SpeedX > 0)
                         LayerF::Stop(layer);
                 }
@@ -990,13 +990,13 @@ void Autocode::Do(bool init)
                 deccel = num_t::abs(deccel);
                 if(layer->SpeedY > 0)
                 {
-                    layer->SpeedY = numf_t((num_t)layer->SpeedY - deccel);
+                    layer->SpeedY = tempf_t((num_t)layer->SpeedY - deccel);
                     if(layer->SpeedY < 0)
                         LayerF::Stop(layer);
                 }
                 else if(layer->SpeedY < 0)
                 {
-                    layer->SpeedY = numf_t((num_t)layer->SpeedY + deccel);
+                    layer->SpeedY = tempf_t((num_t)layer->SpeedY + deccel);
                     if(layer->SpeedY > 0)
                         LayerF::Stop(layer);
                 }

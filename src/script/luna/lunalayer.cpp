@@ -31,8 +31,8 @@ Layer_t *LayerF::Get(int layerIdx)
 void LayerF::Stop(Layer_t *layer)
 {
     layer->EffectStop = false;
-    layer->SpeedX = 0.0001_nf;
-    layer->SpeedY = 0.0001_nf;
+    layer->SpeedX = (tempf_t)0.0001_n;
+    layer->SpeedY = (tempf_t)0.0001_n;
 
     // NOTE from ds-sloth: why non-zero? probably, to make sure all objects get updated.
     // It would be better to set all objects (Blocks, BGOs, NPCs) in layer to speed 0.
@@ -41,12 +41,12 @@ void LayerF::Stop(Layer_t *layer)
 
 void LayerF::SetYSpeed(Layer_t *layer, num_t setY)
 {
-    layer->SpeedY = (setY == 0 ?  0.0001_nf : (numf_t)setY);
+    layer->SpeedY = (setY == 0 ?  (tempf_t)0.0001_n : (tempf_t)setY);
     layer->EffectStop = true;
 }
 
 void LayerF::SetXSpeed(Layer_t *layer, num_t setX)
 {
-    layer->SpeedX = (setX == 0 ?  0.0001_nf : (numf_t)setX);
+    layer->SpeedX = (setX == 0 ?  (tempf_t)0.0001_n : (tempf_t)setX);
     layer->EffectStop = true;
 }

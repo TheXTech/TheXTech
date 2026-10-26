@@ -86,7 +86,7 @@ void AbstractAssaultCode()
 
         demo -> SpinJump = false;
 
-        layerDefault -> SpeedX = (numf_t) X_MAX((num_t)layerDefault -> SpeedX - 0.015_n, -2.5_n);
+        layerDefault -> SpeedX = (tempf_t) X_MAX((num_t)layerDefault -> SpeedX - 0.015_n, -2.5_n);
 
         if(demo -> Hearts > 1)
             powerup = 6;

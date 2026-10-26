@@ -59,10 +59,12 @@ struct Layer_t
     uint8_t join_timer = 0;
 //    Name As String
     std::string Name;
+    // tempf_t evaluates to num_t (64-bit) in fixed-point builds and float in floating-point builds
+    // these were Singles in VB6, but need the range of num_t in fixed-point builds
 //    SpeedX As Single
-    numf_t SpeedX = 0;
+    tempf_t SpeedX = 0;
 //    SpeedY As Single
-    numf_t SpeedY = 0;
+    tempf_t SpeedY = 0;
 
 // NEW: track the actual applied SpeedX and SpeedY during the last frame. Used for vines.
     numf_t ApplySpeedX = 0;

@@ -71,7 +71,7 @@ void TheFloorisLavaCode()
     if(demo->Slippy && secretExitFailedStage == 0)
     {
         secretExitFailedStage = 1;
-        layerSecretExit -> SpeedY = -0.4_nf;
+        layerSecretExit -> SpeedY = -(tempf_t)0.4_n;
     }
 
     //different movements to create the dropping off the world effect
@@ -82,21 +82,21 @@ void TheFloorisLavaCode()
         break;
 
     case 1:
-        layerSecretExit -> SpeedY -= 0.2_nf;
+        layerSecretExit -> SpeedY -= (tempf_t)0.2_n;
 
         if(layerSecretExit -> SpeedY < -4)
             secretExitFailedStage = 2;
         break;
 
     case 2:
-        layerSecretExit -> SpeedY += 0.4_nf;
+        layerSecretExit -> SpeedY += (tempf_t)0.4_n;
 
-        if(layerSecretExit -> SpeedY > -2.5_nf)
+        if(layerSecretExit -> SpeedY > -(tempf_t)2.5_n)
             secretExitFailedStage = 3;
         break;
 
     case 3:
-        layerSecretExit -> SpeedY += 1.5_nf;
+        layerSecretExit -> SpeedY += (tempf_t)1.5_n;
 
         if(layerSecretExit -> SpeedY > 50)
             secretExitFailedStage = 4;
@@ -123,7 +123,7 @@ void TheFloorisLavaCode()
         layerSinUpDown -> SpeedY = 3;
     }
 
-    layerSinUpDown -> SpeedY -= (numf_t)layerSinUpDown_displacement / 1000;
+    layerSinUpDown -> SpeedY -= (tempf_t)layerSinUpDown_displacement / 1000;
     layerSinUpDown_displacement += (num_t)layerSinUpDown -> SpeedY;
 
     layerSinUpDownAlternate -> SpeedY = -(layerSinUpDown -> SpeedY);
@@ -132,10 +132,10 @@ void TheFloorisLavaCode()
 
     //stop the initial trigger going off again
     if(layerSinUpDown -> SpeedY == 0)
-        layerSinUpDown -> SpeedY = 0.001_nf;
+        layerSinUpDown -> SpeedY = (tempf_t)0.001_n;
 
     //Right Left sine wave motion
-    layerSinRightLeft -> SpeedX -= (numf_t)layerSinRightLeft_displacement / 2000;
+    layerSinRightLeft -> SpeedX -= (tempf_t)layerSinRightLeft_displacement / 2000;
     layerSinRightLeft_displacement += (num_t)layerSinRightLeft -> SpeedX;
     layerSinRightLeftAlternate -> SpeedX = -(layerSinRightLeft -> SpeedX);
 }

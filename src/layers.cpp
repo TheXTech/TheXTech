@@ -393,8 +393,8 @@ void SetLayerSpeed(layerindex_t L, num_t SpeedX, num_t SpeedY, bool EffectStop, 
     // relatively simple code to set the layer's speed
     if(SpeedX != 0 || SpeedY != 0 || Defective)
     {
-        Layer[L].SpeedX = (numf_t)SpeedX;
-        Layer[L].SpeedY = (numf_t)SpeedY;
+        Layer[L].SpeedX = (tempf_t)SpeedX;
+        Layer[L].SpeedY = (tempf_t)SpeedY;
 
         if(!Defective)
             Layer[L].EffectStop = EffectStop;
@@ -1790,8 +1790,8 @@ void UpdateLayers()
                 Layer[A].OffsetX += SpeedX;
                 Layer[A].OffsetY += SpeedY;
 
-                Layer[A].ApplySpeedX = Layer[A].SpeedX;
-                Layer[A].ApplySpeedY = Layer[A].SpeedY;
+                Layer[A].ApplySpeedX = (numf_t)Layer[A].SpeedX;
+                Layer[A].ApplySpeedY = (numf_t)Layer[A].SpeedY;
 
                 // no longer needed thanks to block quadtree, but used to reproduce some buggy behaviors
                 // move the sort invalidation out of the loop over blocks
