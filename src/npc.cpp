@@ -2389,7 +2389,11 @@ void NPCSpecial(int A)
         if(npc.TimeLeft > 1)
             npc.TimeLeft = 100;
 
-        if(!npc.Wings)
+        int target_plr = 0;
+
+        if(npc.Wings == WING_CHASE || npc.Wings == WING_FLEE)
+            target_plr = NPCFaceNearestPlayer(npc);
+        else
             npc.Direction = npc.DefaultDirection;
 
         if(npc.Immune > 0 && npc.Special != 3)
@@ -2400,6 +2404,7 @@ void NPCSpecial(int A)
             if(npc.Special != 3)
                 PlaySoundSpatial(SFX_SickBossKilled, npc.Location);
             npc.Special = 3;
+            npc.Wings = WING_NONE;
         }
 
         if(npc.Special == 0)
@@ -2451,6 +2456,10 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Location.SpeedX = 7 * NPC[numNPCs].Direction;
                 NPC[numNPCs].Location.SpeedX *= (140 - npc.Special3);
                 NPC[numNPCs].Location.SpeedX /= 140;
+
+                // Wings mode: make them go more downwards if the target player is below the boss
+                if(target_plr)
+                    NPC[numNPCs].Location.SpeedY += (Player[target_plr].Location.Y - npc.Location.Y) / 128;
 
                 syncLayers_NPC(numNPCs);
             }
