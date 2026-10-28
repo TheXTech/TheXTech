@@ -8,8 +8,8 @@
                 "bg2-41": "Castillo",
                 "bg2-51": "Desierto",
                 "bg2-9": "Noche 2",
-                "bg2-10": "",
-                "header": ""
+                "bg2-10": "Mundo exterior",
+                "header": "Set 1"
             },
             "fam-set2": {
                 "bg2-25": "Subterráneo",
@@ -18,10 +18,10 @@
                 "bg2-57": "Calabozo",
                 "bg2-52": "Noche - Desierto",
                 "bg2-5": "Árboles",
-                "bg2-53": "",
-                "bg2-49": "",
-                "bg2-54": "",
-                "header": ""
+                "bg2-53": "Acantilado",
+                "bg2-49": "Noche - Colinas",
+                "bg2-54": "Bodega",
+                "header": "Set 2"
             },
             "fam-misc": {
                 "bg2-16": "Cráter espacial",
@@ -29,7 +29,7 @@
                 "bg2-47": "Base espacial",
                 "bg2-46": "Nave espacial",
                 "bg2-45": "Pantano espacial",
-                "header": ""
+                "header": "Misc."
             },
             "auto": {
                 "bg2-0": "Ninguno"
@@ -87,7 +87,7 @@
                 "music36": "Jefe",
                 "music49": "Agua",
                 "music27": "Tema central",
-                "header": ""
+                "header": "64"
             },
             "fam-misc": {
                 "music55": "Tema del título",
@@ -97,9 +97,9 @@
                 "music8": "¡Acorralado!",
                 "music37": "Montaña de Hielo",
                 "music23": "",
-                "music20": "",
-                "header": "",
-                "music13": ""
+                "music20": "Reactor de fusión",
+                "header": "Misc.",
+                "music13": "Mundo exterior nuevo"
             },
             "fam-fight": {
                 "music39": "Templo",
@@ -126,17 +126,17 @@
                 "music34": "Ciudad",
                 "music30": "",
                 "music31": "",
-                "header": "",
+                "header": "RPG",
                 "music21": "Batalla",
                 "music16": "Bosque",
-                "music32": ""
+                "music32": "Estanque"
             },
             "fam-set2": {
                 "music43": "Jefe Final",
                 "music25": "Subterráneo",
                 "music15": "Jefe",
-                "header": "",
-                "music5": ""
+                "header": "Set 2",
+                "music5": "Mundo exterior"
             },
             "fam-set3": {
                 "music2": "Cielo",
@@ -144,20 +144,20 @@
                 "music6": "Jefe",
                 "music4": "Subterráneo",
                 "music47": "Agua",
-                "music1": "",
+                "music1": "Mundo exterior",
                 "music54": "",
-                "header": ""
+                "header": "Set 3"
             },
             "fam-set1": {
                 "music46": "Agua",
                 "music42": "Calabozo",
                 "music7": "Subterráneo",
-                "header": "",
-                "music9": ""
+                "header": "Set 1",
+                "music9": "Mundo exterior"
             },
             "fam-world": {
                 "music41": "Calabozo",
-                "music10": "",
+                "music10": "Mundo exterior",
                 "header": "Mundo",
                 "music28": "Cielo",
                 "music51": "Jefe",
@@ -196,24 +196,24 @@
             "fam-underground2": "Subterráneo",
             "fam-underground1": "Subterráneo",
             "fam-steampunk3": "",
-            "fam-misc4": "",
+            "fam-misc4": "Misc",
             "fam-sized1": "",
             "fam-pipes5-3": "Tuberías Largas",
-            "fam-overworld2": "",
-            "fam-overworld1": "",
+            "fam-overworld2": "Mundo exterior",
+            "fam-overworld1": "Mundo exterior",
             "fam-hurts3": "",
             "fam-sized4": "",
-            "fam-bonus3": "",
+            "fam-bonus3": "Bonificación",
             "fam-switch4": "Interruptor",
-            "fam-misc2": "",
-            "fam-char5": "",
-            "fam-misc3": "",
-            "fam-metal5-3": "",
-            "fam-bonus4": "",
+            "fam-misc2": "Misc",
+            "fam-char5": "Pers",
+            "fam-misc3": "Misc 3",
+            "fam-metal5-3": "Misc",
+            "fam-bonus4": "Bonificación",
             "fam-sized3": "",
             "fam-lava4": "",
             "fam-metal5-1": "",
-            "fam-misc1": "",
+            "fam-misc1": "Misc",
             "fam-sized2": ""
         },
         "bgo": {
@@ -236,13 +236,13 @@
             "fam-fences1": "Cercas",
             "fam-fences4": "Cercas",
             "fam-doors2": "Puertas",
-            "fam-ghost4": "",
-            "fam-misc4": "",
-            "fam-sandbg3": "",
+            "fam-ghost4": "Fantasma",
+            "fam-misc4": "Misc",
+            "fam-sandbg3": "Arena BG",
             "fam-art2": "",
-            "fam-platform4": "",
+            "fam-platform4": "Plat",
             "fam-hut1": "",
-            "fam-space5": "",
+            "fam-space5": "Bicho Espacial",
             "fam-sandfg3": ""
         },
         "exit-codes": {
@@ -256,7 +256,7 @@
             "8": "Final de Barra",
             "7": "Recoger",
             "3": "Dejar",
-            "9": ""
+            "9": "código9"
         },
         "worldMusic": {
             "fam-world": {
@@ -423,41 +423,41 @@
             "fam-sign4": "",
             "fam-plat3": "",
             "fam-blocks2": "Bloques",
-            "fam-enemies5": "",
+            "fam-enemies5": "Enemigos",
             "fam-shell1": "",
             "fam-boss5": "Jefe",
             "fam-veg2": "",
             "fam-boss1": "Jefe",
             "fam-boss4": "Jefe",
-            "fam-char3": "",
+            "fam-char3": "Pers",
             "fam-warp2": "",
             "fam-shell3": "",
             "fam-plant3": "",
             "fam-vine1": "",
             "fam-items1": "",
-            "fam-exit3": "",
+            "fam-exit3": "Salida",
             "fam-boss2": "Jefe",
-            "fam-enemies3": "",
-            "fam-exit4": "",
+            "fam-enemies3": "Enemigos",
+            "fam-exit4": "Salida",
             "fam-boss3": "Jefe",
             "fam-vine3": "",
             "fam-plat4": "",
             "fam-plat1": "",
-            "fam-char5": "",
+            "fam-char5": "Pers",
             "fam-pet4": "",
             "fam-items5": "",
             "fam-items3": "",
             "fam-blocks3": "Bloques",
-            "fam-enemies1": "",
-            "fam-enemies2": "",
+            "fam-enemies1": "Enemigos",
+            "fam-enemies2": "Enemigos",
             "fam-ckpt4": "",
             "fam-vine4": "",
             "fam-switch5": "",
             "fam-vine2": "",
-            "fam-exit2": "",
+            "fam-exit2": "Salida",
             "fam-items2": "",
             "fam-items4": "",
-            "fam-enemies4": ""
+            "fam-enemies4": "Enemigos"
         }
     },
     "languageName": "Español",
@@ -468,10 +468,10 @@
         "wordStarAccusativeDualOrCounter": ""
     },
     "character": {
-        "name2": "",
-        "name5": "",
-        "name3": "",
-        "name1": "",
-        "name4": ""
+        "name2": "Pers2",
+        "name5": "Pers5",
+        "name3": "Pers3",
+        "name1": "Pers1",
+        "name4": "Pers4"
     }
 }
