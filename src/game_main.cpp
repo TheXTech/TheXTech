@@ -1002,6 +1002,8 @@ int GameMain(const CmdLineSetup_t &setup)
             FontManager::clearAllCustomFonts();
             XMessage::EndSession();
 
+            CloseSave();
+
             BattleIntro = 0;
             BattleOutro = 0;
             // AllCharBlock = 0;
