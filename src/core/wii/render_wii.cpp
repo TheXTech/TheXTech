@@ -572,7 +572,7 @@ void video_set_rmode()
     GX_SetDispCopyYScale(SDL_max(1.0f, (rmode.xfbHeight - 3.0f) / rmode.efbHeight));
 
     GX_SetDispCopyDst(rmode.fbWidth, rmode.xfbHeight);
-    GX_SetCopyFilter(rmode.aa, rmode.sample_pattern, GX_TRUE, rmode.vfilter);
+    GX_SetCopyFilter(GX_FALSE, rmode.sample_pattern, GX_FALSE, rmode.vfilter);
     GX_SetFieldMode(rmode.field_rendering, ((rmode.viHeight == 2 * rmode.xfbHeight) ? GX_ENABLE : GX_DISABLE));
 
     pLogInfo("RenderWii: initialized GX video with rMode %d x %d", (int)rmode.fbWidth, (int)rmode.efbHeight);
