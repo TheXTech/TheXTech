@@ -751,6 +751,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 QuickReconnectScreen::g_active = true;
 
+                XMessage::g_session.init_save_configs = (SelectWorld[selWorld].bugfixes_on_by_default) ? 1 : 2; // modern (1) or classic (2) depending on defaults
                 StartEpisode();
             }
         }
@@ -2656,6 +2657,7 @@ void StartEpisode()
 
 void StartBattleMode()
 {
+    XMessage::g_session.init_save_configs = 1; // init to modern mode
     XMessage::InitSession();
 
     int A = 0;
@@ -2669,6 +2671,10 @@ void StartBattleMode()
     }
 
     s_InitPlayersFromCharSelect();
+
+    // update resolution for session
+    UpdateInternalRes();
+    XMessage::PushMessage({XMessage::Type::multiplayer_prefs, (uint8_t)g_config.two_screen_mode.m_value, (uint8_t)g_config.four_screen_mode.m_value});
 
     for(int i = 1; i <= numPlayers; i++)
     {
