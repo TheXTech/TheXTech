@@ -860,7 +860,19 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         }
 
                                         float D = Player[A].Location.X;
-                                        if(Player[A].Location.X + Player[A].Location.Width / 2.0 < NPC[B].Location.X + NPC[B].Location.Width / 2.0)
+
+                                        bool push_left = (Player[A].Location.X + Player[A].Location.Width / 2.0 < NPC[B].Location.X + NPC[B].Location.Width / 2.0);
+
+                                        // special cases to prevent vanilla softlock
+                                        if(HitSpot == 5 && g_config.fix_player_clip_wall_at_npc)
+                                        {
+                                            if(Player[A].Pinched.Right4 && Player[A].Direction > 0)
+                                                push_left = true;
+                                            else if(Player[A].Pinched.Left2 && Player[A].Direction < 0)
+                                                push_left = false;
+                                        }
+
+                                        if(push_left)
                                         {
                                             Player[A].Pinched.Right4 = 2;
 
