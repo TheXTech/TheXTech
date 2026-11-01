@@ -39,6 +39,9 @@ Changelog for 1.7.5-dev
 -Editor: add a grid to aid the user in placing items (@ds-sloth)
 -Editor: in touch mode, show a preview of items covered by the user's finger (@ds-sloth)
 
+Changelog for 1.7.4.3-dev
+-Wii: disable smoothing filter on 480i TVs, improving image clarity (@ds-sloth, thanks to @mahougomi for the report)
+
 Changelog for 1.7.4.2 (hotfix)
 -3DS / Wii: fix TheXTech 1.7.4.1 bug where NPC death effects would not display incorrectly. (@ds-sloth, thanks to @Wohlstand for the report)
 
