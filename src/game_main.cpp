@@ -751,7 +751,9 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 QuickReconnectScreen::g_active = true;
 
+#ifdef THEXTECH_ENABLE_SDL_NET
                 XMessage::g_session.init_save_configs = (SelectWorld[selWorld].bugfixes_on_by_default) ? 1 : 2; // modern (1) or classic (2) depending on defaults
+#endif
                 StartEpisode();
             }
         }
@@ -2657,7 +2659,9 @@ void StartEpisode()
 
 void StartBattleMode()
 {
+#ifdef THEXTECH_ENABLE_SDL_NET
     XMessage::g_session.init_save_configs = 1; // init to modern mode
+#endif
     XMessage::InitSession();
 
     int A = 0;
