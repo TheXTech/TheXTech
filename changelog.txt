@@ -1,5 +1,8 @@
 TheXTech Changelog.
 
+Changelog for 1.7.4.3-dev
+-Wii: disable smoothing filter on 480i TVs, improving image clarity (@ds-sloth, thanks to @mahougomi for the report)
+
 Changelog for 1.7.4.2 (hotfix)
 -3DS / Wii: fix TheXTech 1.7.4.1 bug where NPC death effects would not display incorrectly. (@ds-sloth, thanks to @Wohlstand for the report)
 
