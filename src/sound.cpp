@@ -933,8 +933,8 @@ void StartMusic(int A, int fadeInMs)
             pLogDebug("Starting custom music [%s]", curWorldMusicFile.c_str());
             if(g_curMusic)
                 Mix_FreeMusic(g_curMusic);
-            std::string p = FileNamePath + "/" + curWorldMusicFile;
-            processPathArgs(p, FileNamePath + "/", FileName + "/");
+            std::string p = FileNamePath + curWorldMusicFile;
+            processPathArgs(p, FileNamePath, FileName + "/");
             g_curMusic = Mix_LoadMUS(p.c_str());
             s_musicHasYoshiMode = false;
             s_musicYoshiTrackNumber = -1;
