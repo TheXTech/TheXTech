@@ -1660,7 +1660,9 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
     }
     else if(warp.Effect == 2) // Door
     {
-        PlaySoundSpatial(SFX_Door, plr.Location);
+        if(LevelMacro != LEVELMACRO_FLAG_EXIT)
+            PlaySoundSpatial(SFX_Door, plr.Location);
+
         plr.Effect = PLREFF_WARP_DOOR;
 
         if(g_config.fix_fairy_stuck_in_pipe)
