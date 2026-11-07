@@ -1489,6 +1489,8 @@ void OpenLevelDataPost()
         qSortBackgrounds(1, numBackground, false);
 
     CalcBGOSize();
+    for(int A = 1; A <= numBackground; A++)
+        Background[A].Location.Height = BackgroundHeight[Background[A].Type];
 
     // FindBlocks();
     UpdateBackgrounds();
