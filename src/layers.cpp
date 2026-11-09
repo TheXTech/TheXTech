@@ -19,6 +19,7 @@
  */
 
 #include <set>
+#include <algorithm>
 
 #include "sdl_proxy/sdl_stdinc.h"
 #include "globals.h"
