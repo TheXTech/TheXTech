@@ -35,6 +35,7 @@
 #   endif
 #endif
 
+#include <new>
 #include <exception>
 #include <cstdlib>
 #include <signal.h>

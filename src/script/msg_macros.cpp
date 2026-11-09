@@ -20,6 +20,7 @@
 #include <cstring>
 #include <string>
 #include <climits>
+#include <cstdlib>
 #include <array>
 #include "msg_macros.h"
 
