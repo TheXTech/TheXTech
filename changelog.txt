@@ -1,6 +1,6 @@
 TheXTech Changelog.
 
-Changelog for 1.7.4.3-dev
+Changelog for 1.7.4.3
 -Wii: disable smoothing filter on 480i TVs, improving image clarity (@ds-sloth, thanks to @mahougomi for the report)
 -Fix SMBX 1.3 softlock caused by the player getting horizontally trapped between an NPC and a wall/other NPC, guarded by compat flag "fix-player-clip-wall-at-npc" [Modern/Classic Mode] (@ds-sloth)
 -3DS: Fixed an inability to play custom world map music on 3DS in ROMFS-packed episodes due to double-slash in the path (@Wohlstand)
