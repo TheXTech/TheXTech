@@ -2331,7 +2331,7 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
 
     // auto start level
     if(UpdateButton(mode, 10 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
-        StartFileBrowser(&StartLevel, FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN);
+        StartFileBrowser(&StartLevel, FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN_OPTIONAL);
 
     SuperPrintR(mode, g_editorStrings.worldIntroLevel, 3, 54, 102);
 
@@ -4331,7 +4331,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
     // map warp!
     SuperPrintR(mode, g_editorStrings.mapPos, 3, e_ScreenW - 240 + 44, 302);
 
-    if(EditorCursor.WorldLevel.WarpX != -1 || EditorCursor.WorldLevel.WarpY != -1)
+    if((EditorCursor.WorldLevel.WarpX != -1 || EditorCursor.WorldLevel.WarpY != -1) && EditorCursor.WorldLevel.FileName.empty())
     {
         SuperPrintR(mode, g_editorStrings.letterCoordX + ": " + std::to_string(EditorCursor.WorldLevel.WarpX), 3, e_ScreenW - 240 + 4, 320);
         SuperPrintR(mode, g_editorStrings.letterCoordY + ": " + std::to_string(EditorCursor.WorldLevel.WarpY), 3, e_ScreenW - 240 + 4, 340);
@@ -4351,6 +4351,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
         EditorCursor.WorldLevel.WarpY = 32*(EditorCursor.WorldLevel.WarpY/32 - 1);
         if(EditorCursor.WorldLevel.WarpX == -1)
             EditorCursor.WorldLevel.WarpX = 0.;
+        EditorCursor.WorldLevel.FileName.clear();
     }
 
     if(UpdateButton(mode, e_ScreenW - 240 + 40 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
@@ -4358,6 +4359,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
         EditorCursor.WorldLevel.WarpY = 32*(EditorCursor.WorldLevel.WarpY/32 + 1);
         if(EditorCursor.WorldLevel.WarpX == -1)
             EditorCursor.WorldLevel.WarpX = 0.;
+        EditorCursor.WorldLevel.FileName.clear();
     }
 
     if(UpdateButton(mode, e_ScreenW - 240 + 80 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
@@ -4365,6 +4367,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
         EditorCursor.WorldLevel.WarpX = 32*(EditorCursor.WorldLevel.WarpX/32 - 1);
         if(EditorCursor.WorldLevel.WarpY == -1)
             EditorCursor.WorldLevel.WarpY = 0.;
+        EditorCursor.WorldLevel.FileName.clear();
     }
 
     if(UpdateButton(mode, e_ScreenW - 240 + 120 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
@@ -4372,6 +4375,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
         EditorCursor.WorldLevel.WarpX = 32*(EditorCursor.WorldLevel.WarpX/32 + 1);
         if(EditorCursor.WorldLevel.WarpY == -1)
             EditorCursor.WorldLevel.WarpY = 0.;
+        EditorCursor.WorldLevel.FileName.clear();
     }
 
     // bottom pane: level filename, entrance and exits
@@ -4401,7 +4405,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
         SuperPrintR(mode, g_mainMenu.caseNone, 3, 10 + 44, e_ScreenH - 180 + 20);
 
     if(UpdateButton(mode, 10 + 4, e_ScreenH - 180 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
-        StartFileBrowser(&EditorCursor.WorldLevel.FileName, FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN);
+        StartFileBrowser(&EditorCursor.WorldLevel.FileName, FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN_OPTIONAL);
 
     if(!EditorCursor.WorldLevel.FileName.empty())
     {
@@ -5050,6 +5054,9 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
     else
     {
         SuperPrintR(mode, g_editorStrings.browserOpenFile, 3, 60, 40);
+
+        if(m_browser_mode == BROWSER_MODE_OPEN_OPTIONAL)
+            file_length ++; // "none", first file
     }
 
     // ignore directories
@@ -5155,9 +5162,19 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
                 });
             }
         }
+        else if(m_browser_mode == BROWSER_MODE_OPEN_OPTIONAL && l == dir_length)
+        {
+            SuperPrintR(mode, g_mainMenu.caseNone, 3, x + 44, y + 12);
+            if(UpdateButton(mode, x + 4, y + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
+            {
+                m_cur_file.clear();
+                FileBrowserSuccess();
+                return;
+            }
+        }
         else if(l < dir_length + file_length)
         {
-            if(m_browser_mode == BROWSER_MODE_SAVE || m_browser_mode == BROWSER_MODE_SAVE_NEW)
+            if(m_browser_mode == BROWSER_MODE_SAVE || m_browser_mode == BROWSER_MODE_SAVE_NEW || m_browser_mode == BROWSER_MODE_OPEN_OPTIONAL)
                 l -= dir_length + 1;
             else
                 l -= dir_length;
@@ -5173,7 +5190,7 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
             if(UpdateButton(mode, x + 4, y + 4, GFX.ECursor[2], false, 0, 0, 32, 32))
             {
                 m_cur_file = m_cur_path + m_cur_path_files[l];
-                if(m_browser_mode == BROWSER_MODE_OPEN)
+                if(m_browser_mode == BROWSER_MODE_OPEN || m_browser_mode == BROWSER_MODE_OPEN_OPTIONAL)
                 {
                     FileBrowserSuccess();
                     return;
