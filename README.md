@@ -9,9 +9,9 @@ Compared to the original Andrew Spink's engine, there are many new features adde
 
 It's a sister project of the [Moondust Project](https://wohlsoft.ru/projects/Moondust/) developed and maintained in parallel with it.
 
-| <!-- -->      | <!-- -->        |
-|:-------------:|:---------------:|
-| English | [Русский](README.RUS.md) |
+| <!-- -->      | <!-- -->        | <!-- -->        |
+|:-------------:|:---------------:|:---------------:|
+| English | [Русский](README.RUS.md) | [Español](README.ESP.md) |
 
 -----------
 
@@ -37,7 +37,7 @@ To translate content such as levels and episodes, please follow this manual: htt
 * GCC, MinGW-w64, and Clang - main compilers used during the development of the game. The MSVC is used sometimes, primarily for Windows builds targeted to ARM64 processors.
 * [Qt Creator](https://www.qt.io/product/development-tools) - IDE from the Qt toolkit, mainly used during the development.
 * [JetBrans CLion](https://www.jetbrains.com/ru-ru/clion/) - Intelliji Idea based C/C++ IDE, free for the [Open Source development](https://www.jetbrains.com/ru-ru/community/opensource/).
-* [PVS-Studio](https://pvs-studio.com/pvs-studio/?utm_source=website&utm_medium=github&utm_campaign=open_source) - static analyzer for C, C++, C#, and Java code. Is used for periodical checking of the code for possible bugs. It's free for the [Open Source development](https://pvs-studio.com/en/order/open-source-license/).
+* [PVS-Studio](https://pvs-studio.com/pvs-studio/?utm_source=website&utm_medium=github&utm_campaign=open_source) - static code analyser for Enterprise (C, C++, C#, Go, and Java) and Web (JS and TS) development. Is used for periodical checking of the code for possible bugs. It's free for the [Open Source development](https://pvs-studio.com/en/order/open-source-license/).
 
 
 ## Code signing
