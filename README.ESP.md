@@ -36,7 +36,7 @@ Para traducir contenido, como niveles y episodios, consulta esta guía: https://
 - GCC, MinGW-w64 y Clang: los principales compiladores utilizados durante el desarrollo del juego. MSVC se utiliza ocasionalmente, sobre todo para compilaciones de Windows destinadas a procesadores ARM64.
 - [Qt Creator](https://www.qt.io/product/development-tools): entorno de desarrollo integrado (IDE) del conjunto de herramientas Qt, utilizado principalmente durante el desarrollo.
 - [JetBrains CLion](https://www.jetbrains.com/ru-ru/clion/): IDE para C y C++ basado en IntelliJ IDEA, gratuito para el [desarrollo de código abierto](https://www.jetbrains.com/ru-ru/community/opensource/).
-- [PVS-Studio](https://pvs-studio.com/es/pvs-studio/?utm_source=website&utm_medium=github&utm_campaign=open_source): analizador estático para código C, C++, C# y Java. Se utiliza periódicamente para detectar posibles errores. Es gratuito para el [desarrollo de código abierto](https://pvs-studio.com/es/order/open-source-license/).
+- [PVS-Studio](https://pvs-studio.com/es/pvs-studio/?utm_source=website&utm_medium=github&utm_campaign=open_source): Analizador estático de código para el desarrollo empresarial (C, C++, C#, Go y Java) y el desarrollo web (JS y TS). Se utiliza para revisar periódicamente el código en busca de posibles errores. Es gratuito para el [desarrollo de código abierto](https://pvs-studio.com/es/order/open-source-license/).
 
 ## Firma de código
 La firma gratuita de los archivos binarios para Windows es proporcionada por [SignPath.io](https://about.signpath.io/), con un certificado de [SignPath Foundation](https://signpath.org/).
