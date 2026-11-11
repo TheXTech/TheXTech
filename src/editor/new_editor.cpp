@@ -4415,11 +4415,13 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
             SuperPrintR(mode, fmt::format_ne(g_editorStrings.warpTo, g_editorStrings.levelStartPos), 3, 10 + 44, e_ScreenH - 180 + 40 + 12);
         else
             SuperPrintR(mode, fmt::format_ne(g_editorStrings.warpTo, fmt::format_ne(g_editorStrings.phraseWarpIndex, EditorCursor.WorldLevel.StartWarp)), 3, 10 + 44, e_ScreenH - 180 + 40 + 12);
+    }
+
+    {
+        using Controls::PlayerControls::Buttons;
 
         // exits
         SuperPrintR(mode, g_editorStrings.levelPathUnlocks, 3, 10 + 44, e_ScreenH - 180 + 80 + 2);
-
-        using Controls::PlayerControls::Buttons;
 
         if(UpdateButton(mode, 10 + 4, e_ScreenH - 180 + 100 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         {
