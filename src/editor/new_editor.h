@@ -125,6 +125,7 @@ private:
         BROWSER_MODE_SAVE_NEW,
         BROWSER_MODE_SAVE,
         BROWSER_MODE_OPEN,
+        BROWSER_MODE_OPEN_OPTIONAL,
     } BrowserMode_t;
     typedef enum
     {
