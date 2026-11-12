@@ -27,6 +27,10 @@
 #include "core/render.h"
 
 #include <Utils/files.h>
+#include <Logger/logger.h>
+#include <fmt_format_ne.h>
+#include <inttypes.h>
+#include <Utils/elapsed_timer.h>
 #include <AppPath/app_path.h>
 
 enum FileTaskType
@@ -51,6 +55,7 @@ static SDL_atomic_t s_queueIsActive = {0};
 static int s_fileQueue(void *)
 {
     FileTask task;
+    ElapsedTimer timer;
 
     while(true)
     {
@@ -66,21 +71,43 @@ static int s_fileQueue(void *)
         {
         case FILE_TASK_WRITE:
         {
+            std::string log_out;
+            timer.restart();
             SDL_RWops *dst = SDL_RWFromFile(task.out_path.c_str(), "wb");
+            log_out += fmt::sprintf_ne("- File Queue: FILE_TASK_WRITE: SDL_RWFromFile [%s]: %d ms (%" PRId64 " ns)\n", task.out_path.c_str(), timer.elapsed(), timer.nanoelapsed());
+
             if(dst)
             {
+                timer.restart();
                 SDL_RWwrite(dst, task.out_data, 1, task.out_data_size);
+                log_out += fmt::sprintf_ne("- File Queue: FILE_TASK_WRITE: SDL_RWwrite: %d ms (%" PRId64 " ns)\n", timer.elapsed(), timer.nanoelapsed());
+
+                timer.restart();
                 SDL_RWclose(dst);
+                log_out += fmt::sprintf_ne("- File Queue: FILE_TASK_WRITE: SDL_RWclose: %d ms (%" PRId64 " ns)\n", timer.elapsed(), timer.nanoelapsed());
+
                 SDL_free(task.out_data);
             }
 
             AppPathManager::syncFs();
+            pLogDebug("Log messages:\n%s", log_out.c_str());
             break;
         }
         case FILE_TASK_DELETE:
         {
+            timer.restart();
             if(Files::fileExists(task.out_path))
+            {
+                pLogDebug("File Queue: FILE_TASK_DELETE: fileExists (ret true): %d ms (%" PRId64 " ns)", timer.elapsed(), timer.nanoelapsed());
+
+                timer.restart();
                 Files::deleteFile(task.out_path);
+                pLogDebug("File Queue: FILE_TASK_DELETE: deleteFile: %d ms (%" PRId64 " ns)", timer.elapsed(), timer.nanoelapsed());
+            }
+            else
+            {
+                pLogDebug("File Queue: FILE_TASK_DELETE: fileExists (ret false): %d ms (%" PRId64 " ns)", timer.elapsed(), timer.nanoelapsed());
+            }
 
             AppPathManager::syncFs();
             break;
@@ -88,7 +115,6 @@ static int s_fileQueue(void *)
         }
     }
 
-    s_queueThread = NULL;
     SDL_AtomicSet(&s_queueIsActive, 0);
     s_tasksQueueMutex.unlock();
 
@@ -102,7 +128,7 @@ bool FileProc::isActive()
 
 void FileProc::waitFinished()
 {
-    if(s_queueThread)
+    if(s_queueThread && SDL_AtomicGet(&s_queueIsActive))
         SDL_WaitThread(s_queueThread, NULL);
 }
 
