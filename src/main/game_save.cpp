@@ -29,6 +29,7 @@
 
 #ifdef PGE_FILE_PROC_SUPPORT
 #   include "main/file_proc.h"
+#   include <Utils/elapsed_timer.h>
 #endif
 
 #include <Utils/files.h>
@@ -360,12 +361,20 @@ void SaveGame()
 #ifdef PGE_FILE_PROC_SUPPORT
     // Perform the actual data write in a parallel queue thread
     PGESTRING saveRaw;
+    ElapsedTimer timer;
 
+    timer.restart();
     FileFormats::WriteExtendedSaveFileRaw(sav, saveRaw);
+    pLogDebug("Generate save file data [%s]: %d ms (%" PRId64 " ns)\n", savePath.c_str(), timer.elapsed(), timer.nanoelapsed());
+
+    timer.restart();
     FileProc::addFileSave((uint8_t*)saveRaw.c_str(), saveRaw.size(), savePath);
+    pLogDebug("Queuing save file data dump [%s]: %d ms (%" PRId64 " ns)\n", savePath.c_str(), timer.elapsed(), timer.nanoelapsed());
 
     // Remove the gamesave locker of legacy file
+    timer.restart();
     FileProc::addDeleteFile(legacyGamesaveLocker);
+    pLogDebug("Queuing deletion of junk [%s]: %d ms (%" PRId64 " ns)\n", legacyGamesaveLocker.c_str(), timer.elapsed(), timer.nanoelapsed());
 #else
     FileFormats::WriteExtendedSaveFileF(savePath, sav);
 

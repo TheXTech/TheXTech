@@ -78,6 +78,11 @@ static int s_fileQueue(void *)
 
             if(dst)
             {
+#if defined(__3DS__)
+                char buffer[65536];
+                setvbuf(dst->hidden.stdio.fp, buffer, _IOFBF, sizeof(buffer));
+#endif
+
                 timer.restart();
                 SDL_RWwrite(dst, task.out_data, 1, task.out_data_size);
                 log_out += fmt::sprintf_ne("- File Queue: FILE_TASK_WRITE: SDL_RWwrite: %d ms (%" PRId64 " ns)\n", timer.elapsed(), timer.nanoelapsed());
