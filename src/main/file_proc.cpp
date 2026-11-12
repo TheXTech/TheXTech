@@ -141,7 +141,7 @@ void FileProc::waitFinished()
 void FileProc::drawDisquette()
 {
     const int w = 32, h = 32;
-    const int dstX = XRender::TargetW - w;
+    const int dstX = XRender::TargetW - (w + XRender::TargetCameraOverscanX);
     const int dstY = XRender::TargetH - h;
     static bool alpha = false;
 
