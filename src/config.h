@@ -887,8 +887,9 @@ public:
         "fix-npc55-kick-ice-blocks", "NPC55 kick ice blocks", "NPC55 should kick ice blocks like NPC119"};
     opt<bool> fix_climb_invisible_fences{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-climb-invisible-fences", "Don't climb hidden fences", nullptr};
+    // required for enable_climb_bgo_layer_move to work; fixes vanilla bug where the speed of a player climbing a BGO was set to the speed of the most recent moving platform P1 was on
     opt<bool> fix_climb_bgo_speed_adding{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
-        "fix-climb-bgo-speed-adding", "Climb BGO speed adding", nullptr};
+        "fix-climb-bgo-speed-adding", "Fix climb BGO speed", "Fixes bug where player on BGO had speed of most recent moving platform"};
     opt<bool> enable_climb_bgo_layer_move{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "enable-climb-bgo-layer-move", "Move with climbable BGOs", "Player will move together with the climbable BGO on the moving layer as on vines"};
     opt<bool> fix_skull_raft{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
