@@ -82,6 +82,12 @@ static int s_fileQueue(void *)
                 SDL_RWwrite(dst, task.out_data, 1, task.out_data_size);
                 log_out += fmt::sprintf_ne("- File Queue: FILE_TASK_WRITE: SDL_RWwrite: %d ms (%" PRId64 " ns)\n", timer.elapsed(), timer.nanoelapsed());
 
+#if defined(__3DS__)
+                timer.restart();
+                std::fflush(dst->hidden.stdio.fp);
+                log_out += fmt::sprintf_ne("- File Queue: FILE_TASK_WRITE: fflush: %d ms (%" PRId64 " ns)\n", timer.elapsed(), timer.nanoelapsed());
+#endif
+
                 timer.restart();
                 SDL_RWclose(dst);
                 log_out += fmt::sprintf_ne("- File Queue: FILE_TASK_WRITE: SDL_RWclose: %d ms (%" PRId64 " ns)\n", timer.elapsed(), timer.nanoelapsed());
