@@ -18,7 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <inttypes.h>
 #include <Utils/files.h>
+#include <Utils/elapsed_timer.h>
 #include <Logger/logger.h>
 #include <fmt_format_ne.h>
 
@@ -304,13 +306,17 @@ void DeathCounter::WriteRecords(SDL_RWops *statsfile)
 // TRY SAVE - Externally callable, safe auto-save function
 void DeathCounter::TrySave()
 {
+    ElapsedTimer timer;
+
     if(mStatFileOK && mEnabled && m_openFile)
     {
         if(SDL_RWseek(m_openFile, 0, RW_SEEK_SET))
         {
             // attempt to reopen the file
             SDL_RWclose(m_openFile);
+            timer.restart();
             m_openFile = Files::open_file(counterFile, "wb");
+            pLogDebug("DeathCounter: TrySave: open_file [%s]: %d ms (%" PRId64 " ns)", counterFile.c_str(), timer.elapsed(), timer.nanoelapsed());
         }
 
         if(m_openFile)
