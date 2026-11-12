@@ -64,6 +64,10 @@
 #include "graphics/gfx_camera.h"
 #include "graphics/gfx_keyhole.h"
 
+#ifdef PGE_FILE_PROC_SUPPORT
+#   include "main/file_proc.h"
+#endif
+
 #ifdef THEXTECH_BUILD_GL_MODERN
 #    include "core/opengl/gl_program_bank.h"
 #endif
@@ -3126,6 +3130,11 @@ void UpdateGraphicsMeta()
     DrawDeviceBattery();
 
     speedRun_renderTimer();
+
+#ifdef PGE_FILE_PROC_SUPPORT
+    if(FileProc::isActive())
+        FileProc::drawDisquette();
+#endif
 
     if(PrintFPS > 0 && g_config.show_fps)
         SuperPrint(std::to_string(PrintFPS), 1, XRender::TargetOverscanX + 8, 8, {0, 255, 0});

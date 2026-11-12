@@ -27,6 +27,10 @@
 #include "../script/luna/lunavarbank.h"
 #endif
 
+#ifdef PGE_FILE_PROC_SUPPORT
+#   include "main/file_proc.h"
+#endif
+
 #include <Utils/files.h>
 #include <DirManager/dirman.h>
 #include <AppPath/app_path.h>
@@ -39,6 +43,7 @@
 #include "main/game_save.h"
 #include "main/level_save_info.h"
 #include "menu_main.h"
+
 
 std::string makeGameSavePath(std::string episode, std::string world, std::string saveFile)
 {
@@ -352,10 +357,21 @@ void SaveGame()
 
     ExportLevelSaveInfo(sav);
 
+#ifdef PGE_FILE_PROC_SUPPORT
+    // Perform the actual data write in a parallel queue thread
+    PGESTRING saveRaw;
+
+    FileFormats::WriteExtendedSaveFileRaw(sav, saveRaw);
+    FileProc::addFileSave((uint8_t*)saveRaw.c_str(), saveRaw.size(), savePath);
+
+    // Remove the gamesave locker of legacy file
+    FileProc::addDeleteFile(legacyGamesaveLocker);
+#else
     FileFormats::WriteExtendedSaveFileF(savePath, sav);
 
     if(Files::fileExists(legacyGamesaveLocker))
         Files::deleteFile(legacyGamesaveLocker); // Remove the gamesave locker of legacy file
+#endif
 
     // Also, save the speed-running states
     speedRun_saveStats();

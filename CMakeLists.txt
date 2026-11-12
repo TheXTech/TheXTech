@@ -1119,6 +1119,8 @@ if(NINTENDO_3DS)
         src/core/sdl/sdl_core.cpp
         src/core/power/power_3ds.cpp
     )
+
+    set(PGE_FILE_PROC_SUPPORT ON)
 elseif(NINTENDO_WII)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
     list(APPEND THEXTECH_SRC
@@ -1181,6 +1183,10 @@ else()
         src/core/sdl/sdl_core.cpp
         src/core/power/power_sdl.cpp
     )
+
+    if(NOT EMSCRIPTEN)
+        set(PGE_FILE_PROC_SUPPORT ON)
+    endif()
 
     if(NOT THEXTECH_FORCE_FULLSCREEN AND NOT EMSCRIPTEN)
         add_definitions(-DRENDER_FULLSCREEN_TYPES_SUPPORTED)
@@ -1266,6 +1272,14 @@ elseif(UNIX)
 else()
     add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)
     list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
+endif()
+
+if(PGE_FILE_PROC_SUPPORT)
+    add_definitions(-DPGE_FILE_PROC_SUPPORT)
+    list(APPEND THEXTECH_SRC
+        src/main/file_proc.h
+        src/main/file_proc.cpp
+    )
 endif()
 
 
@@ -1584,7 +1598,7 @@ if(WIN32 AND WINDOWS_STORE)
 endif()
 
 if(NINTENDO_3DS)
-    target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__3DS__)
+    target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__3DS__)
 elseif(NINTENDO_WII)
     target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__WII__)
 elseif(NINTENDO_WIIU)
