@@ -1841,10 +1841,18 @@ void PlayerFrame(Player_t &p)
 
         if(g_config.fix_climb_bgo_speed_adding && p.VineBGO > 0)
         {
-            const Layer_t& layer = Layer[Background[p.VineBGO].Layer];
+            double ApplySpeedX = 0;
+            double ApplySpeedY = 0;
 
-            doesPlayerMoves = !fEqual(p.Location.SpeedX,  (double)layer.ApplySpeedX) ||
-                               p.Location.SpeedY < layer.ApplySpeedY - 0.1;
+            if(g_config.enable_climb_bgo_layer_move)
+            {
+                const Layer_t& layer = Layer[Background[p.VineBGO].Layer];
+                ApplySpeedX = (double)layer.ApplySpeedX;
+                ApplySpeedY = (double)layer.ApplySpeedY;
+            }
+
+            doesPlayerMoves = !fEqual(p.Location.SpeedX,  ApplySpeedX) ||
+                               p.Location.SpeedY < ApplySpeedY - 0.1;
         }
         else
         {

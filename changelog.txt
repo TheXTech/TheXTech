@@ -7,6 +7,7 @@ Changelog for 1.7.4.3
 -Fix TheXTech 1.7.4.1 bug affecting TheXTech-exclusive content, where custom-height BGOs might disappear when partially offscreen (@ds-sloth, thanks to @Adynargir for the report)
 -Editor: fix inability to set path unlocks on world map levels without level files (@ds-sloth, thanks to @Jolt for the report)
 -Editor: fix inability to disable world's intro level option, and the inability to unset the file of a world map level (@ds-sloth)
+-Adjusted the condition for drawing the climb animation when "fix-climb-bgo-speed-adding" is enabled and "enable-climb-bgo-layer-move" is disabled [Classic Mode] (@ds-sloth)
 
 Changelog for 1.7.4.2 (hotfix)
 -3DS / Wii: fix TheXTech 1.7.4.1 bug where NPC death effects would not display incorrectly. (@ds-sloth, thanks to @Wohlstand for the report)
