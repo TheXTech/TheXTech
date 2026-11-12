@@ -2015,10 +2015,18 @@ void PlayerFrame(Player_t &p)
 
         if(g_config.fix_climb_bgo_speed_adding && p.VineBGO > 0)
         {
-            const Layer_t& layer = Layer[Background[p.VineBGO].Layer];
+            num_t ApplySpeedX = 0;
+            num_t ApplySpeedY = 0;
 
-            doesPlayerMoves = !num_t::fEqual_d(p.Location.SpeedX, (num_t)layer.ApplySpeedX) ||
-                               p.Location.SpeedY < (num_t)layer.ApplySpeedY - 0.1_n;
+            if(g_config.enable_climb_bgo_layer_move)
+            {
+                const Layer_t& layer = Layer[Background[p.VineBGO].Layer];
+                ApplySpeedX = (num_t)layer.ApplySpeedX;
+                ApplySpeedY = (num_t)layer.ApplySpeedY;
+            }
+
+            doesPlayerMoves = !num_t::fEqual_d(p.Location.SpeedX, ApplySpeedX) ||
+                               p.Location.SpeedY < ApplySpeedY - 0.1_n;
         }
         else
         {
