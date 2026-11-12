@@ -887,7 +887,7 @@ public:
         "fix-npc55-kick-ice-blocks", "NPC55 kick ice blocks", "NPC55 should kick ice blocks like NPC119"};
     opt<bool> fix_climb_invisible_fences{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-climb-invisible-fences", "Don't climb hidden fences", nullptr};
-    opt<bool> fix_climb_bgo_speed_adding{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
+    opt<bool> fix_climb_bgo_speed_adding{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-climb-bgo-speed-adding", "Climb BGO speed adding", nullptr};
     opt<bool> enable_climb_bgo_layer_move{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "enable-climb-bgo-layer-move", "Move with climbable BGOs", "Player will move together with the climbable BGO on the moving layer as on vines"};
