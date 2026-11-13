@@ -25,6 +25,10 @@
 #include "../config.h"
 #include "../controls.h"
 
+#ifdef PGE_FILE_PROC_SUPPORT
+#   include "main/file_proc.h"
+#endif
+
 #include "core/render.h"
 
 #include "speedrunner.h"
@@ -180,8 +184,14 @@ void SaveConfig()
 
     g_config_game_user.SaveToIni(&config);
 
+#ifdef PGE_FILE_PROC_SUPPORT
+    std::string outData;
+    config.writeIniMemory(outData);
+    FileProc::addFileSave((uint8_t*)outData.c_str(), outData.size(), configPath);
+#else
     config.writeIniFile();
     AppPathManager::syncFs();
+#endif
 
     pLogDebug("Saved config: %s", configPath.c_str());
 }

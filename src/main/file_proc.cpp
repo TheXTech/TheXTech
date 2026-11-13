@@ -25,12 +25,8 @@
 #include <SDL_thread.h>
 #include <SDL_atomic.h>
 #include "core/render.h"
-
 #include <Utils/files.h>
 #include <Logger/logger.h>
-#include <fmt_format_ne.h>
-#include <inttypes.h>
-#include <Utils/elapsed_timer.h>
 #include <AppPath/app_path.h>
 
 enum FileTaskType
@@ -55,7 +51,6 @@ static SDL_atomic_t s_queueIsActive = {0};
 static int s_fileQueue(void *)
 {
     FileTask task;
-    ElapsedTimer timer;
 
     while(true)
     {
@@ -71,55 +66,46 @@ static int s_fileQueue(void *)
         {
         case FILE_TASK_WRITE:
         {
-            // std::string log_out;
-            timer.restart();
-            SDL_RWops *dst = SDL_RWFromFile(task.out_path.c_str(), "wb");
-            pLogDebug("- File Queue: FILE_TASK_WRITE: SDL_RWFromFile [%s]: %d ms (%" PRId64 " ns)\n", task.out_path.c_str(), timer.elapsed(), timer.nanoelapsed());
+            std::string tmpPath = task.out_path + ".new.tmp";
+            SDL_RWops *dst = SDL_RWFromFile(tmpPath.c_str(), "wb");
 
             if(dst)
             {
+                size_t wrote = SDL_RWwrite(dst, task.out_data, 1, task.out_data_size);
+
+                if(wrote < task.out_data_size)
+                    pLogWarning("Failed to write data into file: %s", tmpPath.c_str());
 #if defined(__3DS__)
-                char buffer[65536];
-                setvbuf(dst->hidden.stdio.fp, buffer, _IOFBF, sizeof(buffer));
+                else
+                    std::fflush(dst->hidden.stdio.fp);
 #endif
 
-                timer.restart();
-                SDL_RWwrite(dst, task.out_data, 1, task.out_data_size);
-                pLogDebug("- File Queue: FILE_TASK_WRITE: SDL_RWwrite: %d ms (%" PRId64 " ns)\n", timer.elapsed(), timer.nanoelapsed());
-
-#if defined(__3DS__)
-                timer.restart();
-                std::fflush(dst->hidden.stdio.fp);
-                pLogDebug("- File Queue: FILE_TASK_WRITE: fflush: %d ms (%" PRId64 " ns)\n", timer.elapsed(), timer.nanoelapsed());
-#endif
-
-                timer.restart();
                 SDL_RWclose(dst);
-                /*log_out += fmt::sprintf_ne*/
-                pLogDebug("- File Queue: FILE_TASK_WRITE: SDL_RWclose: %d ms (%" PRId64 " ns)\n", timer.elapsed(), timer.nanoelapsed());
-
                 SDL_free(task.out_data);
-            }
 
-            AppPathManager::syncFs();
-            // pLogDebug("Log messages:\n%s", log_out.c_str());
+                if(wrote == task.out_data_size)
+                {
+                    if(Files::fileExists(task.out_path))
+                        Files::deleteFile(task.out_path);
+
+                    // Put a new file instead of old one, but only valid one!
+                    Files::moveFile(task.out_path, tmpPath, true);
+                    AppPathManager::syncFs();
+                }
+                else
+                    Files::deleteFile(tmpPath); // Delete invalid temp file
+            }
+            else
+                pLogWarning("Unable to open file for write: %s", tmpPath.c_str());
+
             break;
         }
         case FILE_TASK_DELETE:
         {
-            timer.restart();
             if(Files::fileExists(task.out_path))
-            {
-                pLogDebug("File Queue: FILE_TASK_DELETE: fileExists (ret true): %d ms (%" PRId64 " ns)", timer.elapsed(), timer.nanoelapsed());
-
-                timer.restart();
                 Files::deleteFile(task.out_path);
-                pLogDebug("File Queue: FILE_TASK_DELETE: deleteFile: %d ms (%" PRId64 " ns)", timer.elapsed(), timer.nanoelapsed());
-            }
             else
-            {
-                pLogDebug("File Queue: FILE_TASK_DELETE: fileExists (ret false): %d ms (%" PRId64 " ns)", timer.elapsed(), timer.nanoelapsed());
-            }
+                pLogWarning("Unable to delete a file: %s", task.out_path.c_str());
 
             AppPathManager::syncFs();
             break;

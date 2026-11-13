@@ -38,6 +38,10 @@
 #include "controls.h"
 #include <AppPath/app_path.h>
 
+#ifdef PGE_FILE_PROC_SUPPORT
+#   include "main/file_proc.h"
+#endif
+
 #if defined(THEXTECH_IOS) || defined(THEXTECH_TVOS)
 #   include "core/ios/extras.h"
 #endif
@@ -826,6 +830,11 @@ int main(int argc, char**argv)
 
     Controls::Quit();
     QuitMixerX();
+
+#ifdef PGE_FILE_PROC_SUPPORT
+    // Wait for any unfinished leftovers in the queue
+    FileProc::waitFinished();
+#endif
 
     g_frmMain.freeSystem();
 

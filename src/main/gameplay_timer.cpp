@@ -24,7 +24,6 @@
 
 #ifdef PGE_FILE_PROC_SUPPORT
 #   include "main/file_proc.h"
-#   include <Utils/elapsed_timer.h>
 #endif
 
 #include "sdl_proxy/sdl_stdinc.h"
@@ -208,11 +207,8 @@ void GameplayTimer::save()
     o.endGroup();
 #ifdef PGE_FILE_PROC_SUPPORT
     std::string outData;
-    ElapsedTimer timer;
-    timer.restart();
     o.writeIniMemory(outData);
     FileProc::addFileSave((uint8_t*)outData.c_str(), outData.size(), savePath);
-    pLogDebug("Queuing timer file data dump [%s]: %d ms (%" PRId64 " ns)\n", savePath.c_str(), timer.elapsed(), timer.nanoelapsed());
 #else
     o.writeIniFile();
 #endif
