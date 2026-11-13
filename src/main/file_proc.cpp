@@ -71,10 +71,10 @@ static int s_fileQueue(void *)
         {
         case FILE_TASK_WRITE:
         {
-            std::string log_out;
+            // std::string log_out;
             timer.restart();
             SDL_RWops *dst = SDL_RWFromFile(task.out_path.c_str(), "wb");
-            log_out += fmt::sprintf_ne("- File Queue: FILE_TASK_WRITE: SDL_RWFromFile [%s]: %d ms (%" PRId64 " ns)\n", task.out_path.c_str(), timer.elapsed(), timer.nanoelapsed());
+            pLogDebug("- File Queue: FILE_TASK_WRITE: SDL_RWFromFile [%s]: %d ms (%" PRId64 " ns)\n", task.out_path.c_str(), timer.elapsed(), timer.nanoelapsed());
 
             if(dst)
             {
@@ -85,23 +85,24 @@ static int s_fileQueue(void *)
 
                 timer.restart();
                 SDL_RWwrite(dst, task.out_data, 1, task.out_data_size);
-                log_out += fmt::sprintf_ne("- File Queue: FILE_TASK_WRITE: SDL_RWwrite: %d ms (%" PRId64 " ns)\n", timer.elapsed(), timer.nanoelapsed());
+                pLogDebug("- File Queue: FILE_TASK_WRITE: SDL_RWwrite: %d ms (%" PRId64 " ns)\n", timer.elapsed(), timer.nanoelapsed());
 
 #if defined(__3DS__)
                 timer.restart();
                 std::fflush(dst->hidden.stdio.fp);
-                log_out += fmt::sprintf_ne("- File Queue: FILE_TASK_WRITE: fflush: %d ms (%" PRId64 " ns)\n", timer.elapsed(), timer.nanoelapsed());
+                pLogDebug("- File Queue: FILE_TASK_WRITE: fflush: %d ms (%" PRId64 " ns)\n", timer.elapsed(), timer.nanoelapsed());
 #endif
 
                 timer.restart();
                 SDL_RWclose(dst);
-                log_out += fmt::sprintf_ne("- File Queue: FILE_TASK_WRITE: SDL_RWclose: %d ms (%" PRId64 " ns)\n", timer.elapsed(), timer.nanoelapsed());
+                /*log_out += fmt::sprintf_ne*/
+                pLogDebug("- File Queue: FILE_TASK_WRITE: SDL_RWclose: %d ms (%" PRId64 " ns)\n", timer.elapsed(), timer.nanoelapsed());
 
                 SDL_free(task.out_data);
             }
 
             AppPathManager::syncFs();
-            pLogDebug("Log messages:\n%s", log_out.c_str());
+            // pLogDebug("Log messages:\n%s", log_out.c_str());
             break;
         }
         case FILE_TASK_DELETE:
