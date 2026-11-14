@@ -1776,10 +1776,24 @@ bool PSwitch(bool enabled)
                         nb.tempBlockNpcType = NPCID_NULL;
                         nb.tempBlockVehiclePlr = 0;
                         nb.tempBlockVehicleYOffset = 0;
+
+                        // fixes a bug where the block would respawn as Type 0 in battle mode
+                        nb.DefaultType = nb.Type;
+
+                        // fixes a bug where the block would reappear immediately for a collected coin waiting to respawn
+                        if(NPC[A].RespawnDelay)
+                        {
+                            nb.RespawnDelay_ScreensLeft = NPC[A].Effect2;
+                            nb.Hidden = true;
+                        }
                     }
 
                     syncLayersTrees_Block(numBlock);
                 }
+
+                // NEW LOGIC: prevent NPC array from growing -- this forces the NPC to actually be removed from the array
+                if(BattleMode || GameMenu)
+                    NPC[A].DefaultType = NPCID_NULL;
 
                 NPC[A].Killed = 9;
                 NPCQueues::Killed.push_back(A);
@@ -1794,7 +1808,7 @@ bool PSwitch(bool enabled)
         // make the NPCs and kill the blocks
         for(A = numBlock; A >= 1; A--)
         {
-            if(BlockPSwitch[Block[A].Type] && Block[A].Special == 0 && Block[A].coinSwitchNpcType == 0 && !Block[A].Hidden)
+            if(BlockPSwitch[Block[A].Type] && Block[A].Special == 0 && Block[A].coinSwitchNpcType == 0 && (!Block[A].Hidden || (BattleMode && Block[A].RespawnDelay_ScreensLeft)))
             {
                 if(numNPCs < maxNPCs)
                 {
@@ -1839,6 +1853,17 @@ bool PSwitch(bool enabled)
                         nn.Direction = 1;
                         nn.Frame = EditorNPCFrame(nn.Type, nn.Direction);
                         nn.DefaultDirection = nn.Direction;
+                    }
+
+                    // special logic for battle-mode converted destroyed blocks
+                    if(Block[A].Hidden)
+                    {
+                        nn.Active = false;
+                        nn.TimeLeft = -1;
+                        nn.RespawnDelay = true;
+                        nn.Effect2 = Block[A].RespawnDelay_ScreensLeft;
+                        nn.Reset[1] = false;
+                        nn.Reset[2] = false;
                     }
 
                     syncLayers_NPC(numNPCs);
@@ -1897,10 +1922,25 @@ bool PSwitch(bool enabled)
                         nb.tempBlockNpcType = NPCID_NULL;
                         nb.tempBlockVehiclePlr = 0;
                         nb.tempBlockVehicleYOffset = 0;
+
+                        // fixes a bug where the block would respawn as Type 0 in battle mode
+                        nb.DefaultType = nb.Type;
+
+                        // fixes a bug where the block would reappear immediately for a collected coin waiting to respawn
+                        if(NPC[A].RespawnDelay)
+                        {
+                            nb.RespawnDelay_ScreensLeft = NPC[A].Effect2;
+                            nb.Hidden = true;
+                        }
                     }
 
                     syncLayersTrees_Block(numBlock);
                 }
+
+                // NEW LOGIC: prevent NPC array from growing -- this forces the NPC to actually be removed from the array
+                if(BattleMode || GameMenu)
+                    NPC[A].DefaultType = NPCID_NULL;
+
                 NPC[A].Killed = 9;
                 NPCQueues::Killed.push_back(A);
             }
@@ -1912,7 +1952,7 @@ bool PSwitch(bool enabled)
         // restore the NPCs
         for(A = numBlock; A >= 1; A--)
         {
-            if(Block[A].coinSwitchNpcType > 0 && !Block[A].Hidden)
+            if(Block[A].coinSwitchNpcType > 0 && (!Block[A].Hidden || (BattleMode && Block[A].RespawnDelay_ScreensLeft)))
             {
                 if(numNPCs >= maxNPCs)
                     break;
@@ -1926,7 +1966,7 @@ bool PSwitch(bool enabled)
                     nn.TriggerLast = Block[A].TriggerLast;
                     nn.Active = true;
                     nn.TimeLeft = 1;
-                    nn.Hidden = Block[A].Hidden;
+                    nn.Hidden = false; // previously Block[A].Hidden, which was checked to be false
                     nn.Type = Block[A].coinSwitchNpcType;
                     nn.Location = Block[A].Location;
                     nn.Location.SpeedX = 0;
@@ -1947,6 +1987,17 @@ bool PSwitch(bool enabled)
                         nn.DefaultDirection = nn.Direction;
                     }
 
+                    // special logic for battle-mode converted destroyed blocks
+                    if(Block[A].Hidden)
+                    {
+                        nn.Active = false;
+                        nn.TimeLeft = -1;
+                        nn.RespawnDelay = true;
+                        nn.Effect2 = Block[A].RespawnDelay_ScreensLeft;
+                        nn.Reset[1] = false;
+                        nn.Reset[2] = false;
+                    }
+
                     syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
                     nn.Killed = 0;
@@ -1965,10 +2016,31 @@ resume_KillBlock:
                     return true;
                 }
 
-                Block[A].Layer = LAYER_USED_P_SWITCH;
-                syncLayersTrees_Block(A);
-                // this is as close to a permanent death as blocks get in the game,
-                // because this layer usually doesn't exist
+                // prevent respawn or future coin switches in Battle Mode and modern mode
+                if(BattleMode || !g_config.emulate_classic_block_order)
+                {
+                    Block[A] = Block[numBlock];
+                    Block[numBlock] = blankBlock;
+                    numBlock--;
+
+                    // make sure that iBlock isn't forgotten (this is done for all blocks below if the compat flag is set)
+                    if(!g_config.emulate_classic_block_order && iBlocks <= maxBlocks)
+                    {
+                        iBlocks++;
+                        iBlock[iBlocks] = A;
+                    }
+
+                    syncLayersTrees_Block(A);
+                    syncLayersTrees_Block(numBlock + 1);
+                }
+                // old logic: send the blocks to a special layer -- still a nearly permanent death, but not fully so
+                else
+                {
+                    // this is as close to a permanent death as you can get without removing from array,
+                    // because this layer usually doesn't exist
+                    Block[A].Layer = LAYER_USED_P_SWITCH;
+                    syncLayersTrees_Block(A);
+                }
             }
         }
 

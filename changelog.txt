@@ -38,6 +38,7 @@ Changelog for 1.7.5-dev
 -Editor: adjust controls for placing items -- most items are now placed when the mouse/finger is released (@ds-sloth)
 -Editor: add a grid to aid the user in placing items (@ds-sloth)
 -Editor: in touch mode, show a preview of items covered by the user's finger (@ds-sloth)
+-Battle mode: fix a bug where coin switch might duplicate coins or blocks (@ds-sloth, thanks to @Shadowblitz16 for the report)
 
 Changelog for 1.7.4.3-dev
 -Wii: disable smoothing filter on 480i TVs, improving image clarity (@ds-sloth, thanks to @mahougomi for the report)
