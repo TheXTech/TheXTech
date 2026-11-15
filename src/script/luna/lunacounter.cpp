@@ -195,7 +195,7 @@ void DeathCounter::MarkDeath(bool write_save)
 
             if(!failed && info)
             {
-                strcpy(buf.data(), "LEVEL_INFO\nL:\"");
+                strncpy(buf.data(), "LEVEL_INFO\nL:\"", 384);
                 char* dest = &buf[14];
                 char* buf_end = &buf[0] + buf.size();
                 dest = s_escaped_strcpy(dest, buf_end, FileNameFull);
