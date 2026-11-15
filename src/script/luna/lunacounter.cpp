@@ -160,6 +160,8 @@ bool DeathCounter::TryLoadStats()
 
     ReadRecords(openFile);
 
+    SDL_RWclose(openFile);
+
     return (g_totalFails != -1);
 }
 
