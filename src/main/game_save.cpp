@@ -370,16 +370,7 @@ void SaveGame()
 
     ExportLevelSaveInfo(sav);
 
-    time_prepare = meter.nanoelapsed();
-    meter.start();
-
-    time_open = meter.nanoelapsed();
-    meter.start();
-
     FileFormats::WriteExtendedSaveFileF(savePath, sav);
-
-    time_write = meter.nanoelapsed();
-    meter.start();
 
     if(Files::fileExists(legacyGamesaveLocker))
         Files::deleteFile(legacyGamesaveLocker); // Remove the gamesave locker of legacy file
