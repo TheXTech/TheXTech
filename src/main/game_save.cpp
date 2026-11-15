@@ -274,8 +274,6 @@ void SaveGame()
     if(Cheater || !selSave)
         return;
 
-    meter.start();
-
     for(A = numPlayers; A >= 1; A--)
         SavedChar[Player[A].Character] = Player[A];
 
