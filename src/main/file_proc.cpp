@@ -20,10 +20,10 @@
 
 #include <deque>
 #include <mutex>
+#include <atomic>
 #include "file_proc.h"
 #include <SDL_stdinc.h>
 #include <SDL_thread.h>
-#include <SDL_atomic.h>
 #include "core/render.h"
 #include <Utils/files.h>
 #include <Logger/logger.h>
@@ -52,13 +52,13 @@ struct FileTask
 static std::deque<FileTask> s_tasksQueue;
 static std::mutex s_tasksQueueMutex;
 static SDL_Thread *s_queueThread = NULL;
-static SDL_atomic_t s_queueIsActive = {0};
+static std::atomic_bool s_queueIsActive(false);
 
 static int s_fileQueue(void *)
 {
     FileTask task;
 
-    SDL_AtomicSet(&s_queueIsActive, 1);
+    s_queueIsActive = true;
 
     while(true)
     {
@@ -145,7 +145,7 @@ static int s_fileQueue(void *)
         }
     }
 
-    SDL_AtomicSet(&s_queueIsActive, 0);
+    s_queueIsActive = false;
     s_tasksQueueMutex.unlock();
 
     return 0;
@@ -153,12 +153,12 @@ static int s_fileQueue(void *)
 
 bool FileProc::isActive()
 {
-    return SDL_AtomicGet(&s_queueIsActive);
+    return s_queueIsActive;
 }
 
 void FileProc::waitFinished()
 {
-    if(s_queueThread && SDL_AtomicGet(&s_queueIsActive))
+    if(s_queueThread && s_queueIsActive)
         SDL_WaitThread(s_queueThread, NULL);
 }
 
@@ -209,8 +209,16 @@ void FileProc::drawDisquette()
 
 static void s_launch()
 {
-    if(!SDL_AtomicGet(&s_queueIsActive))
+    if(!s_queueIsActive)
+    {
+        if(s_queueThread)
+            SDL_WaitThread(s_queueThread, NULL); // Finalise previous thread
+
         s_queueThread = SDL_CreateThread(&s_fileQueue, "FileSaveQueue", NULL);
+
+        if(s_queueThread)
+            s_queueIsActive = true;
+    }
 }
 
 void FileProc::addFileSave(const uint8_t *data, size_t size, const std::string &outPath)
