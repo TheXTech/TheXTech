@@ -62,7 +62,7 @@ static int s_fileQueue(void *)
     {
         s_tasksQueueMutex.lock();
         if(s_tasksQueue.empty())
-            break;
+            break; // Will be unlocked outside
 
         task = s_tasksQueue.front();
         s_tasksQueue.pop_front();
@@ -88,6 +88,8 @@ static int s_fileQueue(void *)
             }
             else
                 pLogWarning("Unable to open file for write: %s", task.out_path.c_str());
+
+            SDL_free(task.out_data);
 #else
             std::string tmpPath = task.out_path + ".new.tmp";
             SDL_RWops *dst = SDL_RWFromFile(tmpPath.c_str(), "wb");
