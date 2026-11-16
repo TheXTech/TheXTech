@@ -170,10 +170,10 @@ void FileProc::drawDisquette()
     alpha = !alpha;
 
     // Colours
-    XTColor c_blue(0, 0, 255, alpha ? 255 : 0);
-    XTColor c_black(0, 0, 0, alpha ? 255 : 0);
-    XTColor c_grey(175, 175, 175, alpha ? 255 : 0);
-    XTColor c_white(255, 255, 255, alpha ? 255 : 0);
+    XTColor c_blue(0, 0, 255, alpha ? 255 : 128);
+    XTColor c_black(0, 0, 0, alpha ? 255 : 128);
+    XTColor c_grey(175, 175, 175, alpha ? 255 : 128);
+    XTColor c_white(255, 255, 255, alpha ? 255 : 128);
 
     // Draw the blue surface
     XRender::renderRect(dstX, dstY, w - 4, h, c_blue, true);
