@@ -145,8 +145,8 @@ static int s_fileQueue(void *)
         }
     }
 
-    s_tasksQueueMutex.unlock();
     SDL_AtomicSet(&s_queueIsActive, 0);
+    s_tasksQueueMutex.unlock();
 
     return 0;
 }
