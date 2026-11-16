@@ -28,6 +28,12 @@
 #include <Utils/files.h>
 #include <Logger/logger.h>
 #include <AppPath/app_path.h>
+#ifdef __3DS__
+#   include <unistd.h>
+#   include <sys/types.h>
+#   include <sys/stat.h>
+#   include <fcntl.h>
+#endif
 
 enum FileTaskType
 {
@@ -66,6 +72,23 @@ static int s_fileQueue(void *)
         {
         case FILE_TASK_WRITE:
         {
+#ifdef __3DS__
+            int dst = open(task.out_path.c_str(), O_WRONLY | O_CREAT | O_DIRECT);
+
+            if(dst)
+            {
+                ssize_t wrote = write(dst, task.out_data, task.out_data_size);
+
+                if(wrote < (ssize_t)task.out_data_size)
+                    pLogWarning("Failed to write data into file: %s", task.out_path.c_str());
+                else
+                    ftruncate(dst, wrote);
+
+                close(dst);
+            }
+            else
+                pLogWarning("Unable to open file for write: %s", task.out_path.c_str());
+#else
             std::string tmpPath = task.out_path + ".new.tmp";
             SDL_RWops *dst = SDL_RWFromFile(tmpPath.c_str(), "wb");
 
@@ -97,16 +120,21 @@ static int s_fileQueue(void *)
             }
             else
                 pLogWarning("Unable to open file for write: %s", tmpPath.c_str());
-
+#endif
             break;
         }
         case FILE_TASK_DELETE:
         {
+#ifdef __3DS__
+            if(access(task.out_path.c_str(), F_OK) == 0)
+            {
+                if(unlink(task.out_path.c_str()) < 0)
+                    pLogWarning("Unable to delete a file: %s", task.out_path.c_str());
+            }
+#else
             if(Files::fileExists(task.out_path))
                 Files::deleteFile(task.out_path);
-            else
-                pLogWarning("Unable to delete a file: %s", task.out_path.c_str());
-
+#endif
             AppPathManager::syncFs();
             break;
         }
