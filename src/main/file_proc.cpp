@@ -58,6 +58,8 @@ static int s_fileQueue(void *)
 {
     FileTask task;
 
+    SDL_AtomicSet(&s_queueIsActive, 1);
+
     while(true)
     {
         s_tasksQueueMutex.lock();
@@ -143,8 +145,8 @@ static int s_fileQueue(void *)
         }
     }
 
-    SDL_AtomicSet(&s_queueIsActive, 0);
     s_tasksQueueMutex.unlock();
+    SDL_AtomicSet(&s_queueIsActive, 0);
 
     return 0;
 }
@@ -208,10 +210,7 @@ void FileProc::drawDisquette()
 static void s_launch()
 {
     if(!SDL_AtomicGet(&s_queueIsActive))
-    {
-        SDL_AtomicSet(&s_queueIsActive, 1);
         s_queueThread = SDL_CreateThread(&s_fileQueue, "FileSaveQueue", NULL);
-    }
 }
 
 void FileProc::addFileSave(const uint8_t *data, size_t size, const std::string &outPath)
