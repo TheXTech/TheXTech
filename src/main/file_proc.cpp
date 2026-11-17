@@ -158,7 +158,7 @@ bool FileProc::isActive()
 
 void FileProc::waitFinished()
 {
-    if(s_queueThread && s_queueIsActive)
+    if(s_queueThread)
         SDL_WaitThread(s_queueThread, NULL);
 }
 
