@@ -32,8 +32,14 @@
 // IWYU pragma: end_exports
 #elif defined(__WII__)
 // IWYU pragma: begin_exports
-#   include <tuxedo/ppc/clock.h>
-#   define PGE_Delay(x) PPCBusyWaitMs(x)
+#   include <ogc/libversion.h>
+#   if ((_V_MAJOR_ << 16) | (_V_MINOR_ << 8) | (_V_PATCH_)) >= 0x030200
+#       include <tuxedo/ppc/clock.h>
+#       define PGE_Delay(x) PPCBusyWaitMs(x)
+#   else
+extern "C" void udelay(unsigned us);
+#       define PGE_Delay(x) udelay((x) * 1000)
+#   endif
 // IWYU pragma: end_exports
 #else
 // IWYU pragma: begin_exports
