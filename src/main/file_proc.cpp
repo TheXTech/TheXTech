@@ -102,10 +102,6 @@ static int s_fileQueue(void *)
 
                 if(wrote < task.out_data_size)
                     pLogWarning("Failed to write data into file: %s", tmpPath.c_str());
-#if defined(__3DS__)
-                else
-                    std::fflush(dst->hidden.stdio.fp);
-#endif
 
                 SDL_RWclose(dst);
                 SDL_free(task.out_data);

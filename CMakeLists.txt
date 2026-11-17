@@ -1109,6 +1109,7 @@ endif()
 
 if(NINTENDO_3DS)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
+
     list(APPEND THEXTECH_SRC
         src/control/input_3ds.cpp
         src/core/3ds/render_3ds.cpp
@@ -1121,8 +1122,10 @@ if(NINTENDO_3DS)
     )
 
     set(PGE_FILE_PROC_SUPPORT ON)
+
 elseif(NINTENDO_WII)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
+
     list(APPEND THEXTECH_SRC
         src/control/input_wii.cpp
         src/control/input_wii_gc.cpp
@@ -1133,6 +1136,9 @@ elseif(NINTENDO_WII)
         src/core/sdl/sdl_core.cpp
         src/core/power/power_wii.cpp
     )
+
+    set(PGE_FILE_PROC_SUPPORT ON)
+
 elseif(NINTENDO_DS)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DTHEXTECH_NO_SDL_CORE)
     list(REMOVE_ITEM THEXTECH_SRC src/sound.cpp src/sound/sound_msgsnd.cpp)
@@ -1147,8 +1153,10 @@ elseif(NINTENDO_DS)
         src/core/16m/sound_stream_16m.cpp
         src/core/power/power_16m.cpp
     )
+
 elseif(THEXTECH_NO_SDL_BUILD)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DTHEXTECH_NO_SDL_CORE)
+
     list(APPEND THEXTECH_SRC
         src/core/null/render_null.cpp
         src/core/null/window_null.cpp
@@ -1156,8 +1164,10 @@ elseif(THEXTECH_NO_SDL_BUILD)
         src/core/null/events_null.cpp
         src/core/power/power_null.cpp
     )
+
 elseif(THEXTECH_CLI_BUILD)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
+
     list(APPEND THEXTECH_SRC
         src/core/null/render_null.cpp
         src/core/null/window_null.cpp
@@ -1166,8 +1176,10 @@ elseif(THEXTECH_CLI_BUILD)
         src/core/sdl/sdl_core.cpp
         src/core/power/power_null.cpp
     )
+
 else()
     add_definitions(-DCORE_EVERYTHING_SDL)
+
     list(APPEND THEXTECH_SRC
         src/control/joystick.cpp
         src/control/keyboard.cpp
