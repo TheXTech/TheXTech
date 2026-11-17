@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <inttypes.h>
 #include <Utils/files.h>
 #include <Logger/logger.h>
 #include <fmt_format_ne.h>

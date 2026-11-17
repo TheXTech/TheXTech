@@ -22,6 +22,10 @@
 #include <fmt_format_ne.h>
 #include <IniProcessor/ini_processing.h>
 
+#ifdef PGE_FILE_PROC_SUPPORT
+#   include "main/file_proc.h"
+#endif
+
 #include "sdl_proxy/sdl_stdinc.h"
 
 #include "core/render.h"
@@ -201,8 +205,13 @@ void GameplayTimer::save()
     o.setValue("total", m_cyclesTotal);
     o.setValue("win", m_cyclesAtWin);
     o.endGroup();
-
+#ifdef PGE_FILE_PROC_SUPPORT
+    std::string outData;
+    o.writeIniMemory(outData);
+    FileProc::addFileSave((uint8_t*)outData.c_str(), outData.size(), savePath);
+#else
     o.writeIniFile();
+#endif
 }
 
 void GameplayTimer::tick()

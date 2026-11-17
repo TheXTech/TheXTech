@@ -24,6 +24,10 @@
 #include <Utils/files.h>
 #include <IniProcessor/ini_processing.h>
 
+#ifdef PGE_FILE_PROC_SUPPORT
+#   include "main/file_proc.h"
+#endif
+
 #include "../config.h"
 #include "../controls.h"
 #include "../main/record.h"
@@ -1065,8 +1069,15 @@ void SaveConfig()
     std::string controlsPath = AppPathManager::settingsControlsFileSTD();
     IniProcessing controls(controlsPath);
     SaveConfig(&controls);
+
+#ifdef PGE_FILE_PROC_SUPPORT
+    std::string outData;
+    controls.writeIniMemory(outData);
+    FileProc::addFileSave((uint8_t*)outData.c_str(), outData.size(), controlsPath);
+#else
     controls.writeIniFile();
     AppPathManager::syncFs();
+#endif
 
     pLogDebug("Saved control mappings: %s", controlsPath.c_str());
 }
