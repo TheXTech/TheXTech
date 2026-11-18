@@ -18,22 +18,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <deque>
-#include <mutex>
-#include <atomic>
-#include "file_proc.h"
-#include <SDL_stdinc.h>
-#include <SDL_thread.h>
-#include "core/render.h"
-#include <Utils/files.h>
-#include <Logger/logger.h>
-#include <AppPath/app_path.h>
 #ifdef __3DS__
 #   include <unistd.h>
 #   include <sys/types.h>
 #   include <sys/stat.h>
 #   include <fcntl.h>
 #endif
+#include <mutex>
+#include <memory>
+#include "file_proc.h"
+#include <SDL_stdinc.h>
+#include <SDL_thread.h>
+#include <SDL_atomic.h>
+#include "core/render.h"
+#include <Utils/files.h>
+#include <Logger/logger.h>
+#include <AppPath/app_path.h>
+
 
 enum FileTaskType
 {
@@ -44,75 +45,103 @@ enum FileTaskType
 struct FileTask
 {
     FileTaskType    type;
-    uint8_t         *out_data;
-    size_t          out_data_size;
+    uint8_t         *out_data = NULL;
+    size_t          out_data_size = 0;
     std::string     out_path;
+
+    struct FileTask *next = NULL;
 };
 
-static std::deque<FileTask> s_tasksQueue;
+static FileTask *s_tasksQueue = NULL;
+static FileTask *s_tasksQueueTail = NULL;
+
+static void s_tasksEnque(FileTask *in)
+{
+    if(!s_tasksQueue)
+        s_tasksQueueTail = s_tasksQueue = in;
+    else
+    {
+        s_tasksQueueTail->next = in;
+        s_tasksQueueTail = in;
+    }
+}
+
+static FileTask *s_tasksDeque(void)
+{
+    FileTask *ret = s_tasksQueue;
+
+    if(!ret)
+        return NULL;
+
+    s_tasksQueue = ret->next;
+    ret->next = NULL;
+
+    if(!s_tasksQueue)
+        s_tasksQueueTail = NULL; // Last item was taken!
+
+    return ret;
+}
+
 static std::mutex s_tasksQueueMutex;
 static SDL_Thread *s_queueThread = NULL;
-static std::atomic_bool s_queueIsActive(false);
+static SDL_atomic_t s_queueIsActive = {0};
 
 static int s_fileQueue(void *)
 {
-    FileTask task;
+    FileTask *task;
 
-    s_queueIsActive = true;
+    SDL_AtomicSet(&s_queueIsActive, 1);
 
     while(true)
     {
         s_tasksQueueMutex.lock();
-        if(s_tasksQueue.empty())
+        task = s_tasksDeque();
+
+        if(!task)
             break; // Will be unlocked outside
 
-        task = s_tasksQueue.front();
-        s_tasksQueue.pop_front();
         s_tasksQueueMutex.unlock();
 
-        switch(task.type)
+        switch(task->type)
         {
         case FILE_TASK_WRITE:
         {
 #ifdef __3DS__
-            int dst = open(task.out_path.c_str(), O_WRONLY | O_CREAT | O_DIRECT);
+            int dst = open(task->out_path.c_str(), O_WRONLY | O_CREAT | O_DIRECT);
 
             if(dst)
             {
-                ssize_t wrote = write(dst, task.out_data, task.out_data_size);
+                ssize_t wrote = write(dst, task->out_data, task->out_data_size);
 
-                if(wrote < (ssize_t)task.out_data_size)
-                    pLogWarning("Failed to write data into file: %s", task.out_path.c_str());
+                if(wrote < (ssize_t)task->out_data_size)
+                    pLogWarning("Failed to write data into file: %s", task->out_path.c_str());
                 else
                     ftruncate(dst, wrote);
 
                 close(dst);
             }
             else
-                pLogWarning("Unable to open file for write: %s", task.out_path.c_str());
-
-            SDL_free(task.out_data);
+                pLogWarning("Unable to open file for write: %s", task->out_path.c_str());
 #else
-            std::string tmpPath = task.out_path + ".new.tmp";
+            std::string tmpPath = task->out_path + ".new.tmp";
             SDL_RWops *dst = SDL_RWFromFile(tmpPath.c_str(), "wb");
 
             if(dst)
             {
-                size_t wrote = SDL_RWwrite(dst, task.out_data, 1, task.out_data_size);
+                size_t wrote = SDL_RWwrite(dst, task->out_data, 1, task->out_data_size);
 
-                if(wrote < task.out_data_size)
+                if(wrote < task->out_data_size)
                     pLogWarning("Failed to write data into file: %s", tmpPath.c_str());
 
                 SDL_RWclose(dst);
-                SDL_free(task.out_data);
 
-                if(wrote == task.out_data_size)
+                if(wrote == task->out_data_size)
                 {
-                    if(Files::fileExists(task.out_path))
-                        Files::deleteFile(task.out_path);
+                    if(Files::fileExists(task->out_path))
+                        Files::deleteFile(task->out_path);
 
                     // Put a new file instead of old one, but only valid one!
-                    Files::moveFile(task.out_path, tmpPath, true);
+                    Files::moveFile(task->out_path, tmpPath, true);
                     AppPathManager::syncFs();
                 }
                 else
@@ -126,22 +155,30 @@ static int s_fileQueue(void *)
         case FILE_TASK_DELETE:
         {
 #ifdef __3DS__
-            if(access(task.out_path.c_str(), F_OK) == 0)
+            if(access(task->out_path.c_str(), F_OK) == 0)
             {
-                if(unlink(task.out_path.c_str()) < 0)
-                    pLogWarning("Unable to delete a file: %s", task.out_path.c_str());
+                if(unlink(task->out_path.c_str()) < 0)
+                    pLogWarning("Unable to delete a file: %s", task->out_path.c_str());
             }
 #else
-            if(Files::fileExists(task.out_path))
-                Files::deleteFile(task.out_path);
+            if(Files::fileExists(task->out_path))
+                Files::deleteFile(task->out_path);
 #endif
             AppPathManager::syncFs();
             break;
         }
         }
+
+        if(task)
+        {
+            if(task->out_data)
+                SDL_free(task->out_data);
+
+            delete task;
+        }
     }
 
-    s_queueIsActive = false;
+    SDL_AtomicSet(&s_queueIsActive, 0);
     s_tasksQueueMutex.unlock();
 
     return 0;
@@ -149,7 +186,7 @@ static int s_fileQueue(void *)
 
 bool FileProc::isActive()
 {
-    return s_queueIsActive;
+    return SDL_AtomicGet(&s_queueIsActive);
 }
 
 void FileProc::waitFinished()
@@ -205,7 +242,7 @@ void FileProc::drawDisquette()
 
 static void s_launch()
 {
-    if(!s_queueIsActive)
+    if(!SDL_AtomicGet(&s_queueIsActive))
     {
         if(s_queueThread)
             SDL_WaitThread(s_queueThread, NULL); // Finalise previous thread
@@ -213,7 +250,7 @@ static void s_launch()
         s_queueThread = SDL_CreateThread(&s_fileQueue, "FileSaveQueue", NULL);
 
         if(s_queueThread)
-            s_queueIsActive = true;
+            SDL_AtomicSet(&s_queueIsActive, 1);
     }
 }
 
@@ -221,13 +258,13 @@ void FileProc::addFileSave(const uint8_t *data, size_t size, const std::string &
 {
     s_tasksQueueMutex.lock();
 
-    FileTask task;
-    task.out_data = (uint8_t*)SDL_malloc(size);
-    SDL_memcpy(task.out_data, data, size);
-    task.out_data_size = size;
-    task.out_path = outPath;
-    task.type = FILE_TASK_WRITE;
-    s_tasksQueue.push_back(std::move(task));
+    FileTask *task = new FileTask;
+    task->out_data = (uint8_t*)SDL_malloc(size);
+    SDL_memcpy(task->out_data, data, size);
+    task->out_data_size = size;
+    task->out_path = outPath;
+    task->type = FILE_TASK_WRITE;
+    s_tasksEnque(task);
     s_launch();
 
     s_tasksQueueMutex.unlock();
@@ -237,10 +274,10 @@ void FileProc::addDeleteFile(const std::string &outPath)
 {
     s_tasksQueueMutex.lock();
 
-    FileTask task;
-    task.out_path = outPath;
-    task.type = FILE_TASK_DELETE;
-    s_tasksQueue.push_back(std::move(task));
+    FileTask *task = new FileTask;
+    task->out_path = outPath;
+    task->type = FILE_TASK_DELETE;
+    s_tasksEnque(task);
     s_launch();
 
     s_tasksQueueMutex.unlock();
