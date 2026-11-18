@@ -305,6 +305,9 @@ bool Files::fileExists(const std::string &path)
     std::wstring wpath = Str2WStr(path);
     return PathFileExistsW(wpath.c_str()) == TRUE;
 
+#elif defined(__3DS__)
+    return ::access(path.c_str(), F_OK) == 0;
+
 #else
     SDL_RWops *ops = Files::open_file(path, "rb");
     if(ops)
