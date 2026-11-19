@@ -106,6 +106,11 @@ static void s_LoadCharacter(SavedChar_t& dest, const saveCharState& s)
 
 void FindSaves()
 {
+#ifdef PGE_FILE_PROC_SUPPORT
+    // avoid any access while saving is still in progress
+    FileProc::waitFinished();
+#endif
+
 //    std::string newInput;
     const auto &w = SelectWorld[selWorld];
     const std::string& episode = w.WorldPath;
