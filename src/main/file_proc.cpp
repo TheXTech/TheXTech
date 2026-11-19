@@ -55,6 +55,7 @@ struct FileTask
 
 static FileTask *s_tasksQueue = NULL;
 
+// receives ownership of in
 static void s_tasksEnque(FileTask *in)
 {
     FileTask** tail = &s_tasksQueue;
@@ -64,6 +65,7 @@ static void s_tasksEnque(FileTask *in)
     *tail = in;
 }
 
+// yields ownership of return value
 static FileTask *s_tasksDeque(void)
 {
     FileTask *ret = s_tasksQueue;
@@ -77,25 +79,29 @@ static FileTask *s_tasksDeque(void)
     return ret;
 }
 
-static std::mutex s_tasksQueueMutex;
+static std::mutex s_tasksQueueMutex; // protects s_tasksQueue and s_queueThreadCheckingEntries
+static bool s_queueThreadCheckingEntries = false;
 static SDL_Thread *s_queueThread = NULL;
-static SDL_atomic_t s_queueIsActive = {0};
 
 static int s_fileQueue(void *)
 {
     FileTask *task;
 
-    SDL_AtomicSet(&s_queueIsActive, 1);
-
     while(true)
     {
+        // SYNCHRONIZED SECTION: find task, or if no tasks are present, signal shutdown to main thread
         s_tasksQueueMutex.lock();
         task = s_tasksDeque();
 
         if(!task)
-            break; // Will be unlocked outside
+            s_queueThreadCheckingEntries = false;
 
         s_tasksQueueMutex.unlock();
+
+        if(!task)
+            break;
+
+        // END SYNCHRONIZED SECTION
 
         switch(task->type)
         {
@@ -168,21 +174,21 @@ static int s_fileQueue(void *)
             delete task;
     }
 
-    SDL_AtomicSet(&s_queueIsActive, 0);
-    s_tasksQueueMutex.unlock();
-
     return 0;
 }
 
 bool FileProc::isActive()
 {
-    return SDL_AtomicGet(&s_queueIsActive);
+    return s_queueThreadCheckingEntries;
 }
 
 void FileProc::waitFinished()
 {
     if(s_queueThread)
+    {
         SDL_WaitThread(s_queueThread, NULL);
+        s_queueThread = NULL;
+    }
 }
 
 void FileProc::drawDisquette()
@@ -230,43 +236,51 @@ void FileProc::drawDisquette()
     XRender::renderRect(dstX + 8, dstY + 12, 16, 2, c_black, true);
 }
 
-static void s_launch()
+// TO BE CALLED FROM MAIN THREAD
+static void s_enqueueAndRun(FileTask* task) // receives ownership of task
 {
-    if(!SDL_AtomicGet(&s_queueIsActive))
+    // SYNCHRONIZED SECTION
+    s_tasksQueueMutex.lock();
+
+    s_tasksEnque(task); // OWNERSHIP TRANSFER
+
+    // IMPORTANT: this is called while s_tasksQueueMutex is held, so
+    // if s_queueThreadCheckingEntries is true, the added entry WILL be checked
+    if(!s_queueThreadCheckingEntries)
     {
         if(s_queueThread)
             SDL_WaitThread(s_queueThread, NULL); // Finalise previous thread
 
         s_queueThread = SDL_CreateThread(&s_fileQueue, "FileSaveQueue", NULL);
 
+        // no race condition: the thread won't enter its first synchronized section
+        // until after s_tasksQueueMutex is released
         if(s_queueThread)
-            SDL_AtomicSet(&s_queueIsActive, 1);
+            s_queueThreadCheckingEntries = true;
     }
+
+    s_tasksQueueMutex.unlock();
+
+    // force the task to run synchronously if thread creation failed
+    if(!s_queueThread)
+        s_fileQueue(NULL);
 }
 
 void FileProc::addFileSave(std::string&& data, const std::string &outPath)
 {
-    s_tasksQueueMutex.lock();
-
     FileTask *task = new FileTask;
     task->out_data = std::move(data);
-    task->out_path = outPath;
+    task->out_path = outPath; // NOTE: memory leak if this throws
     task->type = FILE_TASK_WRITE;
-    s_tasksEnque(task);
-    s_launch();
 
-    s_tasksQueueMutex.unlock();
+    s_enqueueAndRun(task);
 }
 
 void FileProc::addDeleteFile(const std::string &outPath)
 {
-    s_tasksQueueMutex.lock();
-
     FileTask *task = new FileTask;
-    task->out_path = outPath;
+    task->out_path = outPath; // NOTE: memory leak if this throws
     task->type = FILE_TASK_DELETE;
-    s_tasksEnque(task);
-    s_launch();
 
-    s_tasksQueueMutex.unlock();
+    s_enqueueAndRun(task);
 }
