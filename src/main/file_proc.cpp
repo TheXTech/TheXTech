@@ -165,13 +165,14 @@ static int s_fileQueue(void *)
             if(Files::fileExists(task->out_path))
                 Files::deleteFile(task->out_path);
 #endif
-            AppPathManager::syncFs();
             break;
         }
         }
 
         if(task)
             delete task;
+
+        AppPathManager::syncFs();
     }
 
     return 0;
