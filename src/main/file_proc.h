@@ -21,9 +21,7 @@
 #ifndef FILE_PROC_H
 #define FILE_PROC_H
 
-#include <cstdint>
 #include <string>
-#include <SDL2/SDL_rwops.h>
 
 namespace FileProc
 {
@@ -33,7 +31,7 @@ void waitFinished();
 
 void drawDisquette();
 
-void addFileSave(const uint8_t *data, size_t size, const std::string &outPath);
+void addFileSave(std::string&& data, const std::string &outPath);
 void addDeleteFile(const std::string &outPath);
 
 }

@@ -1073,7 +1073,7 @@ void SaveConfig()
 #ifdef PGE_FILE_PROC_SUPPORT
     std::string outData;
     controls.writeIniMemory(outData);
-    FileProc::addFileSave((uint8_t*)outData.c_str(), outData.size(), controlsPath);
+    FileProc::addFileSave(std::move(outData), controlsPath);
 #else
     controls.writeIniFile();
     AppPathManager::syncFs();

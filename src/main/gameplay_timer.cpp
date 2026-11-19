@@ -208,7 +208,7 @@ void GameplayTimer::save()
 #ifdef PGE_FILE_PROC_SUPPORT
     std::string outData;
     o.writeIniMemory(outData);
-    FileProc::addFileSave((uint8_t*)outData.c_str(), outData.size(), savePath);
+    FileProc::addFileSave(std::move(outData), savePath);
 #else
     o.writeIniFile();
 #endif

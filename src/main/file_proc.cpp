@@ -24,12 +24,14 @@
 #   include <sys/stat.h>
 #   include <fcntl.h>
 #endif
+
 #include <mutex>
 #include <memory>
 #include "file_proc.h"
-#include <SDL_stdinc.h>
-#include <SDL_thread.h>
-#include <SDL_atomic.h>
+#include <SDL2/SDL_stdinc.h>
+#include <SDL2/SDL_thread.h>
+#include <SDL2/SDL_atomic.h>
+#include <SDL2/SDL_rwops.h>
 #include "core/render.h"
 #include <Utils/files.h>
 #include <Logger/logger.h>
@@ -45,8 +47,7 @@ enum FileTaskType
 struct FileTask
 {
     FileTaskType    type;
-    uint8_t         *out_data = NULL;
-    size_t          out_data_size = 0;
+    std::string     out_data; // NOTE: may store binary data
     std::string     out_path;
 
     struct FileTask *next = NULL;
@@ -111,9 +112,9 @@ static int s_fileQueue(void *)
 
             if(dst)
             {
-                ssize_t wrote = write(dst, task->out_data, task->out_data_size);
+                ssize_t wrote = write(dst, task->out_data.c_str(), task->out_data.size());
 
-                if(wrote < (ssize_t)task->out_data_size)
+                if(wrote < (ssize_t)task->out_data.size())
                     pLogWarning("Failed to write data into file: %s", task->out_path.c_str());
                 else
                     ftruncate(dst, wrote);
@@ -128,14 +129,14 @@ static int s_fileQueue(void *)
 
             if(dst)
             {
-                size_t wrote = SDL_RWwrite(dst, task->out_data, 1, task->out_data_size);
+                size_t wrote = SDL_RWwrite(dst, task->out_data.c_str(), 1, task->out_data.size());
 
-                if(wrote < task->out_data_size)
+                if(wrote < task->out_data.size())
                     pLogWarning("Failed to write data into file: %s", tmpPath.c_str());
 
                 SDL_RWclose(dst);
 
-                if(wrote == task->out_data_size)
+                if(wrote == task->out_data.size())
                 {
                     if(Files::fileExists(task->out_path))
                         Files::deleteFile(task->out_path);
@@ -170,12 +171,7 @@ static int s_fileQueue(void *)
         }
 
         if(task)
-        {
-            if(task->out_data)
-                SDL_free(task->out_data);
-
             delete task;
-        }
     }
 
     SDL_AtomicSet(&s_queueIsActive, 0);
@@ -254,14 +250,12 @@ static void s_launch()
     }
 }
 
-void FileProc::addFileSave(const uint8_t *data, size_t size, const std::string &outPath)
+void FileProc::addFileSave(std::string&& data, const std::string &outPath)
 {
     s_tasksQueueMutex.lock();
 
     FileTask *task = new FileTask;
-    task->out_data = (uint8_t*)SDL_malloc(size);
-    SDL_memcpy(task->out_data, data, size);
-    task->out_data_size = size;
+    task->out_data = std::move(data);
     task->out_path = outPath;
     task->type = FILE_TASK_WRITE;
     s_tasksEnque(task);

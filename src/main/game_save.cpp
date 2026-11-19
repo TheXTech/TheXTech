@@ -362,7 +362,7 @@ void SaveGame()
     PGESTRING saveRaw;
     FileFormats::WriteExtendedSaveFileRaw(sav, saveRaw);
     // Write the new gamesave file
-    FileProc::addFileSave((uint8_t*)saveRaw.c_str(), saveRaw.size(), savePath);
+    FileProc::addFileSave(std::move(saveRaw), savePath);
     // Remove the gamesave locker of legacy file
     FileProc::addDeleteFile(legacyGamesaveLocker);
 #else
