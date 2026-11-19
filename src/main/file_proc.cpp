@@ -54,31 +54,25 @@ struct FileTask
 };
 
 static FileTask *s_tasksQueue = NULL;
-static FileTask *s_tasksQueueTail = NULL;
 
 static void s_tasksEnque(FileTask *in)
 {
-    if(!s_tasksQueue)
-        s_tasksQueueTail = s_tasksQueue = in;
-    else
-    {
-        s_tasksQueueTail->next = in;
-        s_tasksQueueTail = in;
-    }
+    FileTask** tail = &s_tasksQueue;
+    while(*tail)
+        tail = &((*tail)->next);
+
+    *tail = in;
 }
 
 static FileTask *s_tasksDeque(void)
 {
     FileTask *ret = s_tasksQueue;
 
-    if(!ret)
-        return NULL;
-
-    s_tasksQueue = ret->next;
-    ret->next = NULL;
-
-    if(!s_tasksQueue)
-        s_tasksQueueTail = NULL; // Last item was taken!
+    if(ret)
+    {
+        s_tasksQueue = ret->next;
+        ret->next = NULL;
+    }
 
     return ret;
 }
