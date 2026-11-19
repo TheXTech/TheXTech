@@ -37,6 +37,9 @@
 #include <Logger/logger.h>
 #include <AppPath/app_path.h>
 
+#include "gfx.h" // GFX.EIcons
+#include "editor/new_editor.h" // Icon enum
+
 
 enum FileTaskType
 {
@@ -201,46 +204,10 @@ void FileProc::waitFinished()
 void FileProc::drawDisquette()
 {
     const int w = 32, h = 32;
-    const int dstX = XRender::TargetW - (w + XRender::TargetCameraOverscanX);
-    const int dstY = XRender::TargetH - h;
-    static bool alpha = false;
+    const int dstX = XRender::TargetW - (w + XRender::TargetCameraOverscanX) - 4;
+    const int dstY = XRender::TargetH - h - 4;
 
-    alpha = !alpha;
-
-    // Colours
-    XTColor c_blue(0, 0, 255, alpha ? 255 : 128);
-    XTColor c_black(0, 0, 0, alpha ? 255 : 128);
-    XTColor c_grey(175, 175, 175, alpha ? 255 : 128);
-    XTColor c_white(255, 255, 255, alpha ? 255 : 128);
-
-    // Draw the blue surface
-    XRender::renderRect(dstX, dstY, w - 4, h, c_blue, true);
-    XRender::renderRect(dstX + w - 4, dstY + 2, 2, h - 2, c_blue, true);
-
-    // Draw the metallic protector
-    XRender::renderRect(dstX + 8, dstY, 16, 12, c_grey, true);
-    XRender::renderRect(dstX + 18, dstY + 4, 4, 6, c_blue, true);
-
-    // Draw the paper sticker
-    XRender::renderRect(dstX + 4, dstY + 16, 24, 16, c_white, true);
-    // Imitation of the text label
-    XRender::renderRect(dstX + 6, dstY + 18, 20, 2, c_grey, true);
-    XRender::renderRect(dstX + 6, dstY + 22, 20, 2, c_grey, true);
-    XRender::renderRect(dstX + 6, dstY + 26, 20, 2, c_grey, true);
-
-    // Draw borders
-
-    // Borders of disquette itself
-    XRender::renderRect(dstX, dstY, w - 4, 2, c_black, true);
-    XRender::renderRect(dstX + w - 4, dstY + 2, 2, 2, c_black, true);
-    XRender::renderRect(dstX + w - 2, dstY + 4, 2, h - 4, c_black, true);
-    XRender::renderRect(dstX, dstY, 2, h, c_black, true);
-    XRender::renderRect(dstX, dstY + h - 2, w, 2, c_black, true);
-
-    // Borders of Metallic protector
-    XRender::renderRect(dstX + 6, dstY + 2, 2, 10, c_black, true);
-    XRender::renderRect(dstX + 24, dstY + 2, 2, 10, c_black, true);
-    XRender::renderRect(dstX + 8, dstY + 12, 16, 2, c_black, true);
+    XRender::renderTexture(dstX, dstY, 32, 32, GFX.EIcons, 0, Icon::save * 32, XTAlpha(128));
 }
 
 // TO BE CALLED FROM MAIN THREAD
