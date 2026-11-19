@@ -39,6 +39,7 @@
 
 #include "gfx.h" // GFX.EIcons
 #include "editor/new_editor.h" // Icon enum
+#include "globals.h" // CommonFrame for icon animation
 
 
 enum FileTaskType
@@ -207,7 +208,9 @@ void FileProc::drawDisquette()
     const int dstX = XRender::TargetW - (w + XRender::TargetCameraOverscanX) - 4;
     const int dstY = XRender::TargetH - h - 4;
 
-    XRender::renderTexture(dstX, dstY, 32, 32, GFX.EIcons, 0, Icon::save * 32, XTAlpha(128));
+    XTColor alpha = (CommonFrame & 16) ? XTAlpha(192) : XTAlpha(128);
+
+    XRender::renderTexture(dstX, dstY, 32, 32, GFX.EIcons, 0, Icon::save * 32, alpha);
 }
 
 // TO BE CALLED FROM MAIN THREAD
