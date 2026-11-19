@@ -9,6 +9,7 @@ Changelog for 1.7.4.3
 -Editor: fix inability to disable world's intro level option, and the inability to unset the file of a world map level (@ds-sloth)
 -Adjusted the condition for drawing the climb animation when "fix-climb-bgo-speed-adding" is enabled and "enable-climb-bgo-layer-move" is disabled [Classic Mode] (@ds-sloth)
 -Compat change: compat flag "fix-climb-bgo-speed-adding" is now enabled in Classic Mode. This fixes "Murder Death Place Zone" by Raocow. (@ds-sloth, thanks to @BabyPinkSnail for the report)
+-Fix TheXTech 1.3.1 inaccuracy where a poison NPC disappeared instead of being spit out if a player got hurt while eating it on a pet mount. (@ds-sloth, thanks to @Liebning for the report)
 -Added asynchronious game saving process to resolve the hanging problem on systems with slow file systems. (@Wohlstand)
 
 Changelog for 1.7.4.2 (hotfix)

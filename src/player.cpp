@@ -4149,7 +4149,15 @@ void YoshiEatCode(const int A)
             {
                 if(NPC[p.YoshiNPC]->IsABonus)
                 {
+                    vbint_t old_YoshiNPC = p.YoshiNPC;
+                    vbint_t old_Killed = NPC[old_YoshiNPC].Killed;
                     TouchBonus(A, p.YoshiNPC);
+
+                    // [FIX POISON DISAPPEAR]: In VB6, p.YoshiNPC was passed as reference, and Killed was set at the very end of the subroutine.
+                    // So if p.YoshiNPC changed during the sub (caused when player is hurt by NPCID_POISON), it shouldn't have been killed.
+                    if(p.YoshiNPC != old_YoshiNPC)
+                        NPC[old_YoshiNPC].Killed = old_Killed;
+
                     p.YoshiNPC = 0;
                 }
                 else

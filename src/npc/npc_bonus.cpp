@@ -394,6 +394,9 @@ void TouchBonus(int A, int B)
     else if(NPC[B].Type == NPCID_POISON) // Bonus is a POISON mushroom
     {
         PlayerHurt(A);
+        // Note: in VB6, if this was called at the callsite with the comment tag [FIX POISON DISAPPEAR],
+        // B was a reference to Player[A].YoshiNPC, and may have been reset to 0 during PlayerHurt(A).
+        // For efficiency, NPC[B].Killed is reset at that callsite, not here.
     }
     else if(NPC[B].Type == NPCID_POWER_S3 || NPC[B].Type == NPCID_POWER_S1 || NPC[B].Type == NPCID_POWER_S4 || NPC[B].Type == NPCID_POWER_S2 || NPC[B].Type == NPCID_POWER_S5) // Bonus is a mushroom
     {
