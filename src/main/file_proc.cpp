@@ -79,7 +79,7 @@ static FileTask *s_tasksDeque(void)
     return ret;
 }
 
-static std::mutex s_tasksQueueMutex; // protects s_tasksQueue and s_queueThreadCheckingEntries
+static SDL_mutex* s_tasksQueueMutex = nullptr;
 static bool s_queueThreadCheckingEntries = false;
 static SDL_Thread *s_queueThread = NULL;
 
@@ -90,13 +90,13 @@ static int s_fileQueue(void *)
     while(true)
     {
         // SYNCHRONIZED SECTION: find task, or if no tasks are present, signal shutdown to main thread
-        s_tasksQueueMutex.lock();
+        SDL_LockMutex(s_tasksQueueMutex);
         task = s_tasksDeque();
 
         if(!task)
             s_queueThreadCheckingEntries = false;
 
-        s_tasksQueueMutex.unlock();
+        SDL_UnlockMutex(s_tasksQueueMutex);
 
         if(!task)
             break;
@@ -190,6 +190,12 @@ void FileProc::waitFinished()
         SDL_WaitThread(s_queueThread, NULL);
         s_queueThread = NULL;
     }
+
+    if(s_tasksQueueMutex)
+    {
+        SDL_DestroyMutex(s_tasksQueueMutex);
+        s_tasksQueueMutex = nullptr;
+    }
 }
 
 void FileProc::drawDisquette()
@@ -241,7 +247,10 @@ void FileProc::drawDisquette()
 static void s_enqueueAndRun(FileTask* task) // receives ownership of task
 {
     // SYNCHRONIZED SECTION
-    s_tasksQueueMutex.lock();
+    if(!s_tasksQueueMutex)
+        s_tasksQueueMutex = SDL_CreateMutex();
+
+    SDL_LockMutex(s_tasksQueueMutex);
 
     s_tasksEnque(task); // OWNERSHIP TRANSFER
 
@@ -260,7 +269,7 @@ static void s_enqueueAndRun(FileTask* task) // receives ownership of task
             s_queueThreadCheckingEntries = true;
     }
 
-    s_tasksQueueMutex.unlock();
+    SDL_UnlockMutex(s_tasksQueueMutex);
 
     // force the task to run synchronously if thread creation failed
     if(!s_queueThread)
