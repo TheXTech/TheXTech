@@ -34,6 +34,10 @@
 #include "core/opengl/gl_light_info.h"
 #endif
 
+#if defined(__PSP__)
+#   define THEXTECH_LAZYLOAD_FROM_DISK
+#endif
+
 /*!
  * \brief Generic image loading store.
  *
@@ -44,10 +48,16 @@ struct StdPictureLoad
     //! Is this a lazy-loaded texture?
     bool lazyLoaded = false;
 
+#ifdef THEXTECH_LAZYLOAD_FROM_DISK
+    //! When lazy-load is done from disk rather than from memory
+    std::string path;
+    std::string pathMask;
+#else
     //! Original compressed data of the front image
     Files::Data raw;
     //! Original compressed data of the mask image (if presented)
     Files::Data rawMask;
+#endif
     //! Was mask restored from the PNG at default graphics?
     bool isMaskPng = false;
 

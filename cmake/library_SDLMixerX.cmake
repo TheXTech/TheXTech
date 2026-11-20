@@ -9,7 +9,7 @@ set(SDL_GIT_BRANCH "origin/release-2.0.12")
 
 if(APPLE)
     set(PGE_SHARED_SDLMIXER_DEFAULT OFF)
-elseif(EMSCRIPTEN OR ANDROID OR IOS OR TVOS OR VITA OR NINTENDO_SWITCH OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_3DS)
+elseif(EMSCRIPTEN OR ANDROID OR IOS OR TVOS OR VITA OR PSP OR NINTENDO_SWITCH OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_3DS)
     set(PGE_SHARED_SDLMIXER_FORCE_OFF ON)
 else()
     set(PGE_SHARED_SDLMIXER_DEFAULT ON)
@@ -35,7 +35,8 @@ set(MIXER_USE_OGG_VORBIS_STB ON)
 set(MIXER_USE_OGG_VORBIS_TREMOR OFF)
 set(AUDIOCODECS_OGG_UNSAFE_DISABLE_CRC OFF)
 
-if(NINTENDO_3DS)
+# tweaks for extremely weak devices using MixerX
+if(NINTENDO_3DS OR PSP)
     set(MIXER_USE_OGG_VORBIS_STB OFF)
     set(MIXER_USE_OGG_VORBIS_TREMOR ON)
     set(AUDIOCODECS_OGG_UNSAFE_DISABLE_CRC ON)
@@ -163,6 +164,49 @@ if(WIN32)
     )
 endif()
 
+if(PSP)
+    list(APPEND XTECH_PLATFORM_AUDIOCODECS_CMAKE_FLAGS
+        "-DBUILD_OGG_VORBIS=ON"
+        "-DBUILD_FLAC=OFF"
+        "-DBUILD_OPUS=ON"
+    )
+
+    list(APPEND XTECH_PLATFORM_MIXERX_CMAKE_FLAGS
+        "-DUSE_OGG_VORBIS_TREMOR=ON"
+        "-DUSE_SYSTEM_AUDIO_LIBRARIES_DEFAULT=ON"
+        "-DSDL_MIXER_X_SHARED=OFF"
+        "-DFLAC_LIBRARIES=FLAC"
+        "-DOGG_LIBRARIES=ogg"
+        "-DLIBOPUSFILE_LIB=opusfile"
+        "-DLIBOPUS_LIB=opus"
+        "-DCMAKE_C_FLAGS=-I$ENV{VITASDK}/arm-vita-eabi/include/opus"
+        "-DLIBVORBISIDEC_LIB=vorbisidec"
+        "-DLIBVORBIS_LIB=vorbis"
+        "-DLIBVORBISFILE_LIB=vorbisfile"
+    )
+
+    # Minimal list of libraries to link
+    set(MixerX_CodecLibs "${AC_FLUIDLITE}")
+
+    if(MIXERX_ENABLE_WAVPACK)
+        list(append MixerX_CodecLibs "${AC_WAVPACK}")
+    endif()
+
+    list(APPEND MixerX_CodecLibs
+        "${AC_ADLMIDI}"
+        "${AC_OPNMIDI}"
+        "${AC_EDMIDI}"
+        "${AC_TIMIDITYSDL}"
+        "${AC_GME}"
+        "${AC_LIBXMP}"
+        "${AC_MODPLUG}"
+        "${AC_OPUSFILE}"
+        "${AC_OPUS}"
+        "${AC_VORBISIDEC}"
+        "${AC_OGG}"
+    )
+endif()
+
 if(VITA)
     list(APPEND XTECH_PLATFORM_AUDIOCODECS_CMAKE_FLAGS
         "-DBUILD_OGG_VORBIS=OFF"
@@ -262,7 +306,7 @@ if(AUDIOCODECS_DISABLE_ASM_OPTIMIZATIONS)
     )
 endif()
 
-if(VITA OR NINTENDO_DS OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH)
+if(VITA OR PSP OR NINTENDO_DS OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH)
     list(APPEND XTECH_PLATFORM_AUDIOCODECS_CMAKE_FLAGS
         -DENABLE_FPIC=OFF
     )
@@ -383,7 +427,7 @@ if(USE_SYSTEM_SDL2)
     target_link_libraries(PGE_SDLMixerX_static INTERFACE ${SDL2_LIBRARIES})
 elseif(WIN32 AND MINGW)
     target_link_libraries(PGE_SDLMixerX_static INTERFACE mingw32 "${SDL2_main_A_Lib}" "${SDL2_A_Lib}" )
-elseif((WIN32 AND MSVC) OR NINTENDO_3DS OR VITA OR IOS OR TVOS)
+elseif((WIN32 AND MSVC) OR NINTENDO_3DS OR VITA OR PSP OR IOS OR TVOS)
     target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDL2_main_A_Lib}" "${SDL2_A_Lib}")
 else()
     target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDL2_A_Lib}")

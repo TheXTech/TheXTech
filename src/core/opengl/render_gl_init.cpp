@@ -766,9 +766,34 @@ void RenderGL::destroyFramebuffer(BufferIndex_t buffer)
 
 bool RenderGL::initFramebuffers()
 {
+#ifndef RENDERGL_HAS_FBO
+    // half-pixel mode is meaningless if FBOs do not exist
+    m_halfPixelMode = false;
+    m_is_cur_halfpixel = false;
+#endif
+
 #ifdef RENDERGL_HAS_FBO
     if(!m_has_fbo)
+    {
+        // half-pixel mode is unsupported if FBOs can't be used
+        m_halfPixelMode = false;
+        m_is_cur_halfpixel = false;
         return true;
+    }
+
+    m_is_cur_halfpixel = m_halfPixelMode;
+
+    if(m_halfPixelMode)
+        m_render_scale_factor = 0.5f;
+    else
+        m_render_scale_factor = 1.0f;
+
+    // safety: limit TargetW based on texture size constraints
+    if(XRender::TargetW > m_maxTextureWidth / m_render_scale_factor)
+        XRender::TargetW = m_maxTextureWidth / m_render_scale_factor;
+
+    if(XRender::TargetH > m_maxTextureHeight / m_render_scale_factor)
+        XRender::TargetH = m_maxTextureHeight / m_render_scale_factor;
 
     // try to allocate each texture / framebuffer that would be useful
     for(int i = BUFFER_GAME; i < BUFFER_MAX; i++)
