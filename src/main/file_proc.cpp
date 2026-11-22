@@ -45,7 +45,8 @@
 enum FileTaskType
 {
     FILE_TASK_WRITE,
-    FILE_TASK_DELETE
+    FILE_TASK_DELETE,
+    FILE_TASK_COPY
 };
 
 struct FileTask
@@ -171,6 +172,13 @@ static int s_fileQueue(void *)
 #endif
             break;
         }
+        case FILE_TASK_COPY:
+        {
+            if(!Files::copyFile(task->out_path, task->out_data, true))
+                pLogWarning("Unable to copy a file %s to %s", task->out_data.c_str(), task->out_path.c_str());
+
+            break;
+        }
         }
 
         if(task)
@@ -250,7 +258,24 @@ void FileProc::addFileSave(std::string&& data, const std::string &outPath)
 {
     FileTask *task = new FileTask;
     task->out_data = std::move(data);
-    task->out_path = outPath; // NOTE: memory leak if this throws
+
+    try
+    {
+        task->out_path = outPath;
+    }
+    catch(const std::bad_alloc &e)
+    {
+        pLogCritical("FileProc::addFileSave: Failed to copy the outPath string! %s", e.what());
+        delete task;
+        return;
+    }
+    catch(...)
+    {
+        pLogCritical("FileProc::addFileSave: Failed to copy the outPath string! (Unknown error)");
+        delete task;
+        return;
+    }
+
     task->type = FILE_TASK_WRITE;
 
     s_enqueueAndRun(task);
@@ -259,8 +284,52 @@ void FileProc::addFileSave(std::string&& data, const std::string &outPath)
 void FileProc::addDeleteFile(const std::string &outPath)
 {
     FileTask *task = new FileTask;
-    task->out_path = outPath; // NOTE: memory leak if this throws
+
+    try
+    {
+        task->out_path = outPath;
+    }
+    catch(const std::bad_alloc &e)
+    {
+        pLogCritical("FileProc::addDeleteFile: Failed to copy the outPath string! %s", e.what());
+        delete task;
+        return;
+    }
+    catch(...)
+    {
+        pLogCritical("FileProc::addDeleteFile: Failed to copy the outPath string! (Unknown error)");
+        delete task;
+        return;
+    }
+
     task->type = FILE_TASK_DELETE;
+
+    s_enqueueAndRun(task);
+}
+
+void FileProc::addCopyFile(const std::string &inPath, const std::string &outPath)
+{
+    FileTask *task = new FileTask;
+
+    try
+    {
+        task->out_data = inPath;
+        task->out_path = outPath;
+    }
+    catch(const std::bad_alloc &e)
+    {
+        pLogCritical("FileProc::addCopyFile: Failed to copy the inPath or outPath string! %s", e.what());
+        delete task;
+        return;
+    }
+    catch(...)
+    {
+        pLogCritical("FileProc::addCopyFile: Failed to copy the inPath or outPath string! (Unknown error)");
+        delete task;
+        return;
+    }
+
+    task->type = FILE_TASK_COPY;
 
     s_enqueueAndRun(task);
 }

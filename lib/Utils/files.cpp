@@ -348,21 +348,42 @@ bool Files::copyFile(const std::string &to, const std::string &from, bool overri
     char    buf[BUFSIZ];
     ssize_t size;
     ssize_t sizeOut;
+#ifdef __3DS__
+    size_t finalSize = 0;
+#endif
 
     int source  = open(from.c_str(), O_RDONLY, 0);
+
     if(source == -1)
         return false;
 
+#ifdef __3DS__
+    int dest    = open(to.c_str(), O_WRONLY | O_CREAT | O_DIRECT, 0640);
+#else
     int dest    = open(to.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0640);
+#endif
+
     if(dest == -1)
     {
         close(source);
         return false;
     }
 
+#ifdef __3DS__
+    struct stat src_stat;
+    int statret = fstat(source, &src_stat);
+
+    if(statret == 0 && src_stat.st_size > 0)
+        ftruncate(dest, src_stat.st_size);
+#endif
+
     while((size = read(source, buf, BUFSIZ)) > 0)
     {
         sizeOut = write(dest, buf, static_cast<size_t>(size));
+#ifdef __3DS__
+        finalSize += sizeOut;
+#endif
+
         if(sizeOut != size)
         {
             ret = false;
@@ -411,8 +432,10 @@ std::string Files::basenameNoSuffix(std::string path)
     path = d;
     free(p);
     std::string::size_type dot = path.find_last_of('.');
+
     if(dot != std::string::npos)
         path.resize(dot);
+
     return path;
 }
 
@@ -420,10 +443,12 @@ std::string Files::basenameNoSuffix(std::string path)
 std::string Files::changeSuffix(std::string path, const std::string &suffix)
 {
     size_t pos = path.find_last_of('.');// Find dot
+
     if((path.size() < suffix.size()) || (pos == std::string::npos))
         path.append(suffix);
     else
         path.replace(pos, suffix.size(), suffix);
+
     return path;
 }
 
@@ -434,8 +459,10 @@ bool Files::hasSuffix(const std::string &path, const std::string &suffix)
 
     std::locale loc;
     std::string f = path.substr(path.size() - suffix.size(), suffix.size());
+
     for(char &c : f)
         c = std::tolower(c, loc);
+
     return (f.compare(suffix) == 0);
 }
 
@@ -445,10 +472,10 @@ bool Files::isAbsolute(const std::string& path)
     bool firstCharIsSlash = (path.size() > 0) ? path[0] == '/' : false;
 #ifdef _WIN32
     bool containsWinChars = (path.size() > 2) ? (path[1] == ':') && ((path[2] == '\\') || (path[2] == '/')) : false;
+
     if(firstCharIsSlash || containsWinChars)
-    {
         return true;
-    }
+
     return false;
 #else
     return firstCharIsSlash;
@@ -460,6 +487,7 @@ void Files::getGifMask(std::string& mask, const std::string& front)
     mask = front;
     //Make mask filename
     size_t dotPos = mask.find_last_of('.');
+
     if(dotPos == std::string::npos)
         mask.push_back('m');
     else

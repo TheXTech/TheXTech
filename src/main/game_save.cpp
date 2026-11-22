@@ -601,8 +601,12 @@ void DeleteSave(int world, int save)
     // Clear all files in list
     for(auto &s : deleteList)
     {
+#ifdef PGE_FILE_PROC_SUPPORT
+        FileProc::addDeleteFile(s);
+#else
         if(Files::fileExists(s))
             Files::deleteFile(s);
+#endif
     }
 
     std::string legacySave = w.WorldPath + fmt::format_ne("save{0}.sav", save);
@@ -613,13 +617,18 @@ void DeleteSave(int world, int save)
     // If legacy gamesave file exists, make the locker file to make illusion that old file got been removed
     if(Files::fileExists(legacySave))
     {
+        const char s[] = "If this file exists, the Vanilla \"save*.sav\" inside the episode folder is ignored.";
+#ifdef PGE_FILE_PROC_SUPPORT
+        std::string out(s);
+        FileProc::addFileSave(std::move(out), legacySaveLocker);
+#else
         auto *f = Files::open_file(legacySaveLocker, "wb");
         if(f)
         {
-            const char s[] = "If this file exists, the Vanilla \"save*.sav\" inside the episode folder is ignored.";
             SDL_RWwrite(f, s, 1, sizeof(s) - 1);
             SDL_RWclose(f);
         }
+#endif
     }
 
 #undef AddFile
@@ -638,7 +647,12 @@ static void copySaveFile(const SelectWorld_t& w, const char*file_mask, int src, 
     std::string filePathDst = makeGameSavePath(w.WorldPath,
                                                w.WorldFile,
                                                fmt::format_ne(file_mask, dst));
+
+#ifdef PGE_FILE_PROC_SUPPORT
+    FileProc::addCopyFile(filePathSrc, filePathDst);
+#else
     Files::copyFile(filePathDst, filePathSrc, true);
+#endif
 }
 
 void CopySave(int world, int src, int dst)
@@ -667,20 +681,36 @@ void CopySave(int world, int src, int dst)
             succ = FileFormats::ReadSMBX64SavFileF(savePathOld, sav);
 
         if(succ)
+        {
+#ifdef PGE_FILE_PROC_SUPPORT
+            std::string out_data;
+            FileFormats::WriteExtendedSaveFileRaw(sav, out_data);
+            FileProc::addFileSave(std::move(out_data), savePathSrc);
+#else
             FileFormats::WriteExtendedSaveFileF(savePathSrc, sav);
+#endif
+        }
 
+#ifdef PGE_FILE_PROC_SUPPORT
+        FileProc::addDeleteFile(legacySaveLocker);
+#else
         if(Files::fileExists(legacySaveLocker))
             Files::deleteFile(legacySaveLocker);
+#endif
     }
 
+#ifdef PGE_FILE_PROC_SUPPORT
+    FileProc::addCopyFile(savePathSrc, savePathDst);
+#else
     Files::copyFile(savePathDst, savePathSrc, true);
+#endif
 
     copySaveFile(w, "timers{0}.ini", src, dst);
     copySaveFile(w, "fails-{0}.rip", src, dst);
     copySaveFile(w, "deaths-{0}.rip", src, dst);
     copySaveFile(w, "demos-{0}.dmo", src, dst);
 
-#ifdef __EMSCRIPTEN__
+#ifndef PGE_FILE_PROC_SUPPORT
     AppPathManager::syncFs();
 #endif
 }

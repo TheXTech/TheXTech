@@ -33,6 +33,7 @@ void drawDisquette();
 
 void addFileSave(std::string&& data, const std::string &outPath);
 void addDeleteFile(const std::string &outPath);
+void addCopyFile(const std::string &inPath, const std::string &outPath);
 
 }
 

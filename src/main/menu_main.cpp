@@ -34,6 +34,10 @@
 #include <PGE_File_Formats/file_formats.h>
 #include <Integrator/integrator.h>
 
+#ifdef PGE_FILE_PROC_SUPPORT
+#   include "main/file_proc.h"
+#endif
+
 #include "menu_main.h"
 #include "game_info.h"
 #include "../version.h"
@@ -362,6 +366,19 @@ static int FindWorldsThread(void *)
     FindWorlds();
     return 0;
 }
+
+#   if defined(PGE_FILE_PROC_SUPPORT)
+static int FindSavesThread(void *)
+{
+    while(FileProc::isActive())
+        PGE_Delay(1);
+
+    FindSaves();
+
+    SDL_AtomicSet(&loading, 0);
+    return 0;
+}
+#   endif
 #endif
 
 #if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH) || defined(__EMSCRIPTEN__)
@@ -1802,7 +1819,15 @@ bool mainMenuUpdate()
                         PlaySoundMenu(SFX_Transform);
                         menuCopySaveDst = slot;
                         CopySave(selWorld, menuCopySaveSrc, menuCopySaveDst);
+#if !defined(PGE_NO_THREADING) && defined(PGE_FILE_PROC_SUPPORT)
+                        SDL_AtomicSet(&loadingProgrssMax, 0);
+                        SDL_AtomicSet(&loading, 1);
+                        loadingThread = SDL_CreateThread(FindSavesThread, "FindSaves", nullptr);
+                        SDL_DetachThread(loadingThread);
+#else
+
                         FindSaves();
+#endif
                         MenuMode -= MENU_SELECT_SLOT_COPY_S2_ADD;
                         MenuCursor = c_menuItemSavesCopy;
                         MenuCursorCanMove = false;
@@ -1838,7 +1863,14 @@ bool mainMenuUpdate()
                 {
                     MenuMode -= MENU_SELECT_SLOT_DELETE_ADD;
                     DeleteSave(selWorld, (MenuCursor + 1));
+#if !defined(PGE_NO_THREADING) && defined(PGE_FILE_PROC_SUPPORT)
+                    SDL_AtomicSet(&loadingProgrssMax, 0);
+                    SDL_AtomicSet(&loading, 1);
+                    loadingThread = SDL_CreateThread(FindSavesThread, "FindSaves", nullptr);
+                    SDL_DetachThread(loadingThread);
+#else
                     FindSaves();
+#endif
                     MenuCursor = c_menuItemSavesDelete;
                     PlaySoundMenu(SFX_LavaMonster);
                     MenuCursorCanMove = false;
