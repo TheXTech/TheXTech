@@ -125,8 +125,8 @@ extern int Mix_HaltChannel(int channel);
 extern int Mix_PlayChannel(int channel, Mix_Chunk *chunk, int loops);
 extern int Mix_PlayChannelVol(int which, Mix_Chunk *chunk, int loops, int volume);
 
-extern int Mix_Pause(int channel);
-extern int Mix_Resume(int channel);
+extern void Mix_Pause(int channel);
+extern void Mix_Resume(int channel);
 
 extern int Mix_SetPanning(int which, uint8_t left, uint8_t right);
 
@@ -167,8 +167,8 @@ typedef void( *  Mix_EffectFunc_t) (int chan, void *stream, int len, void *udata
 typedef void( *  Mix_EffectDone_t) (int chan, void *udata);
 
 extern void Mix_GME_SetSpcEchoDisabled(Mix_Music* music, int disable);
-extern void Mix_RegisterEffect(int chan, Mix_EffectFunc_t f, Mix_EffectDone_t d, void *arg);
-extern void Mix_UnregisterEffect(int chan, Mix_EffectFunc_t f);
+extern int Mix_RegisterEffect(int chan, Mix_EffectFunc_t f, Mix_EffectDone_t d, void *arg);
+extern int Mix_UnregisterEffect(int chan, Mix_EffectFunc_t f);
 
 extern void Mix_ADLMIDI_setEmulator(int emu);
 extern void Mix_ADLMIDI_setChipsCount(int chips);

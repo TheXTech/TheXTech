@@ -102,16 +102,14 @@ int Mix_PlayChannel(int channel, Mix_Chunk* chunk, int loops)
     return 0;
 }
 
-int Mix_Pause(int channel)
+void Mix_Pause(int channel)
 {
     UNUSED(channel);
-    return 0;
 }
 
-int Mix_Resume(int channel)
+void Mix_Resume(int channel)
 {
     UNUSED(channel);
-    return 0;
 }
 
 #ifndef Mix_PlayChannelVol
@@ -312,18 +310,20 @@ void Mix_GME_SetSpcEchoDisabled(Mix_Music* music, int disable)
 }
 
 #ifdef THEXTECH_ENABLE_AUDIO_FX
-void Mix_RegisterEffect(int chan, Mix_EffectFunc_t f, Mix_EffectDone_t d, void* arg)
+int Mix_RegisterEffect(int chan, Mix_EffectFunc_t f, Mix_EffectDone_t d, void* arg)
 {
     (void)chan;
     (void)f;
     (void)d;
     (void)arg;
+    return -1;
 }
 
-void Mix_UnregisterEffect(int chan, Mix_EffectFunc_t f)
+int Mix_UnregisterEffect(int chan, Mix_EffectFunc_t f)
 {
     (void)chan;
     (void)f;
+    return -1;
 }
 #endif
 
