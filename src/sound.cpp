@@ -1796,6 +1796,9 @@ void PlayExtSound(const std::string &path, int loops, int volume, bool pausable,
 
     if(f->music)
     {
+        if(Mix_PlayingMusicStream(f->music))
+            Mix_RewindMusicStream(f->music);
+
         Mix_VolumeMusicStream(f->music, volume * g_config.audio_sfx_volume / 100);
 
         if(Mix_PlayMusicStream(f->music, loops >= 0 ? loops + 1 : loops) == 0)
