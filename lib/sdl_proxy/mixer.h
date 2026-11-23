@@ -155,6 +155,8 @@ extern int Mix_SetMusicTrackMute(Mix_Music* music, int track, int mute);
 extern void Mix_FreeMusic(Mix_Music* music);
 extern void Mix_FreeChunk(Mix_Chunk* chunk);
 
+extern void Mix_HookMusicStreamFinished(Mix_Music*, void (*callback)(Mix_Music *, void *), void*);
+
 extern void Mix_ChannelFinished(void (*callback)(int));
 
 #ifdef THEXTECH_ENABLE_AUDIO_FX

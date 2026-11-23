@@ -221,10 +221,14 @@ static SDL_atomic_t                   extSfxBusy;
 static x_map<std::string, SFXExt_t>   extSfx;
 static x_map<int, ExtSfxPlaying_t>    extSfxPlaying;
 static x_map<Mix_Music*, ExtSfxPlaying_t> extSfxMusPlaying;
+#ifndef THEXTECH_NO_SDL_BUILD
 static void extSfxStopCallback(int channel);
+#endif
 static void extSfxStopCallbackMus(Mix_Music *mus, void *userdata);
 
+#ifndef THEXTECH_NO_SDL_BUILD
 static const int maxSfxChannels = 91;
+#endif
 
 #ifdef LOW_MEM
 static const double c_max_chunk_duration = 1.25; // max length of an in-memory chunk in seconds
@@ -1834,6 +1838,7 @@ void PlayExtSound(const std::string &path, int loops, int volume, bool pausable,
     }
 }
 
+#ifndef THEXTECH_NO_SDL_BUILD
 static void extSfxStopCallback(int channel)
 {
     if(SDL_AtomicGet(&extSfxBusy) == 1)
@@ -1843,6 +1848,7 @@ static void extSfxStopCallback(int channel)
     if(i != extSfxPlaying.end())
         extSfxPlaying.erase(i);
 }
+#endif
 
 static void extSfxStopCallbackMus(Mix_Music *mus, void * /*userdata*/)
 {

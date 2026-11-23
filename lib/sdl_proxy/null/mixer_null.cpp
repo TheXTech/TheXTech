@@ -23,8 +23,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <string>
-#include <set>
+// #include <string>
+// #include <set>
 
 #include <cstring>
 #include <cstdlib>
@@ -326,6 +326,11 @@ void Mix_UnregisterEffect(int chan, Mix_EffectFunc_t f)
     (void)f;
 }
 #endif
+
+void Mix_HookMusicStreamFinished(Mix_Music*, void (*callback)(Mix_Music *, void *), void*)
+{
+    UNUSED(callback);
+}
 
 void Mix_ChannelFinished(void (*cb)(int))
 {
