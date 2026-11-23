@@ -200,6 +200,12 @@ struct SFX_t
     int channel = -1;
 };
 
+struct SFXExt_t
+{
+    Mix_Chunk *chunk = nullptr;
+    Mix_Music *music = nullptr;
+};
+
 struct ExtSfxPlaying_t
 {
     std::string path;
@@ -212,9 +218,11 @@ static x_map<int, SFX_t>           sound;
 
 //! Sounds played by scripts
 static SDL_atomic_t                   extSfxBusy;
-static x_map<std::string, Mix_Chunk*> extSfx;
+static x_map<std::string, SFXExt_t>   extSfx;
 static x_map<int, ExtSfxPlaying_t>    extSfxPlaying;
+static x_map<Mix_Music*, ExtSfxPlaying_t> extSfxMusPlaying;
 static void extSfxStopCallback(int channel);
+static void extSfxStopCallbackMus(Mix_Music *mus, void *userdata);
 
 static const int maxSfxChannels = 91;
 
@@ -1698,22 +1706,56 @@ void UpdateAudioSection(int recentSection)
     UpdateSoundFX(recentSection);
 }
 
+static SFXExt_t *s_getExtSound(const std::string& path)
+{
+    auto f = extSfx.find(path);
+
+    if(f == extSfx.end())
+    {
+        SFXExt_t sfx;
+        sfx.chunk = nullptr;
+        sfx.music = Mix_LoadMUS(path.c_str());
+
+        if(sfx.music)
+        {
+            double duration = Mix_MusicDuration(sfx.music);
+
+            if(duration >= 0 && duration < c_max_chunk_duration)
+            {
+                Mix_FreeMusic(sfx.music);
+                sfx.music = nullptr;
+            }
+            else
+            {
+                Mix_HookMusicStreamFinished(sfx.music, &extSfxStopCallbackMus, nullptr);
+                pLogInfo("PreloadExtSound: Will load SFX %s as a multi-music", path.c_str());
+            }
+        }
+
+        if(!sfx.music)
+            sfx.chunk = Mix_LoadWAV(path.c_str());
+
+        if(!sfx.music && !sfx.chunk)
+        {
+            pLogWarning("PreloadExtSound: Can't load custom sound [%s]: %s", path.c_str(), Mix_GetError());
+            return nullptr;
+        }
+
+        extSfx.insert({path, sfx});
+
+        f = extSfx.find(path);
+        SDL_assert(f != extSfx.end());
+    }
+
+    return &f->second;
+}
+
 void PreloadExtSound(const std::string& path)
 {
     if(!g_mixerLoaded)
         return;
 
-    auto f = extSfx.find(path);
-    if(f == extSfx.end())
-    {
-        auto *ch = Mix_LoadWAV(path.c_str());
-        if(!ch)
-        {
-            pLogWarning("Can't load custom sound [%s]: %s", path.c_str(), Mix_GetError());
-            return;
-        }
-        extSfx.insert({path, ch});
-    }
+    s_getExtSound(path);
 }
 
 void UnloadExtSounds()
@@ -1724,10 +1766,17 @@ void UnloadExtSounds()
     SDL_AtomicSet(&extSfxBusy, 1);
 
     for(auto &f : extSfx)
-        Mix_FreeChunk(f.second);
+    {
+        if(f.second.music)
+            Mix_FreeMusic(f.second.music);
+
+        if(f.second.chunk)
+            Mix_FreeChunk(f.second.chunk);
+    }
 
     extSfx.clear();
     extSfxPlaying.clear();
+    extSfxMusPlaying.clear();
 
     SDL_AtomicSet(&extSfxBusy, 0);
 }
@@ -1739,39 +1788,50 @@ void PlayExtSound(const std::string &path, int loops, int volume, bool pausable,
     if(!g_mixerLoaded || (int)g_config.audio_sfx_volume == 0)
         return;
 
-    auto f = extSfx.find(path);
-    if(f == extSfx.end())
+    SFXExt_t *f = s_getExtSound(path);
+
+    if(f->music)
     {
-        auto *ch = Mix_LoadWAV(path.c_str());
-        if(!ch)
+        Mix_VolumeMusicStream(f->music, volume * g_config.audio_sfx_volume / 100);
+
+        if(Mix_PlayMusicStream(f->music, loops >= 0 ? loops + 1 : loops) == 0)
         {
-            pLogWarning("Can't load custom sound %s: %s", path.c_str(), Mix_GetError());
-            return;
+            if(section >= 0 && !s_anyPlayerInSection(section))
+                Mix_PauseMusicStream(f->music); // Don't loop that!
+
+            SDL_AtomicSet(&extSfxBusy, 1);
+            ExtSfxPlaying_t playing;
+            playing.path = path;
+            playing.pausable = pausable;
+            playing.section = section;
+            extSfxMusPlaying.insert({f->music, playing});
+            SDL_AtomicSet(&extSfxBusy, 0);
         }
-
-        extSfx.insert({path, ch});
-        play_ch = Mix_PlayChannelVol(-1, ch, loops, volume * g_config.audio_sfx_volume / 100);
+        else
+            pLogWarning("Can't play custom sound as music %s: %s", path.c_str(), Mix_GetError());
     }
     else
-        play_ch = Mix_PlayChannelVol(-1, f->second, loops, volume * g_config.audio_sfx_volume / 100);
-
-    if(play_ch >= 0)
     {
-        if(section >= 0 && !s_anyPlayerInSection(section))
-            Mix_Pause(play_ch); // Don't loop that!
+        play_ch = Mix_PlayChannelVol(-1, f->chunk, loops, volume * g_config.audio_sfx_volume / 100);
 
-        SDL_AtomicSet(&extSfxBusy, 1);
-        // Never re-use the same channel!
-        SDL_assert_release(extSfxPlaying.find(play_ch) == extSfxPlaying.end());
-        ExtSfxPlaying_t playing;
-        playing.path = path;
-        playing.pausable = pausable;
-        playing.section = section;
-        extSfxPlaying.insert({play_ch, playing});
-        SDL_AtomicSet(&extSfxBusy, 0);
+        if(play_ch >= 0)
+        {
+            if(section >= 0 && !s_anyPlayerInSection(section))
+                Mix_Pause(play_ch); // Don't loop that!
+
+            SDL_AtomicSet(&extSfxBusy, 1);
+            // Never re-use the same channel!
+            SDL_assert_release(extSfxPlaying.find(play_ch) == extSfxPlaying.end());
+            ExtSfxPlaying_t playing;
+            playing.path = path;
+            playing.pausable = pausable;
+            playing.section = section;
+            extSfxPlaying.insert({play_ch, playing});
+            SDL_AtomicSet(&extSfxBusy, 0);
+        }
+        else
+            pLogWarning("Can't play custom sound %s: %s", path.c_str(), Mix_GetError());
     }
-    else
-        pLogWarning("Can't play custom sound %s: %s", path.c_str(), Mix_GetError());
 }
 
 static void extSfxStopCallback(int channel)
@@ -1782,6 +1842,16 @@ static void extSfxStopCallback(int channel)
     auto i = extSfxPlaying.find(channel);
     if(i != extSfxPlaying.end())
         extSfxPlaying.erase(i);
+}
+
+static void extSfxStopCallbackMus(Mix_Music *mus, void * /*userdata*/)
+{
+    if(SDL_AtomicGet(&extSfxBusy) == 1)
+        return; // Do nothing!
+
+    auto i = extSfxMusPlaying.find(mus);
+    if(i != extSfxMusPlaying.end())
+        extSfxMusPlaying.erase(i);
 }
 
 void StopExtSound(const std::string& path)
@@ -1797,6 +1867,17 @@ void StopExtSound(const std::string& path)
         {
             Mix_HaltChannel(i->first);
             i = extSfxPlaying.erase(i);
+        }
+        else
+            ++i;
+    }
+
+    for(auto i = extSfxMusPlaying.begin(); i != extSfxMusPlaying.end();)
+    {
+        if(i->second.path == path)
+        {
+            Mix_HaltMusicStream(i->first);
+            i = extSfxMusPlaying.erase(i);
         }
         else
             ++i;
@@ -1823,6 +1904,17 @@ void SuspendExtSound(bool pause)
         }
     }
 
+    for(auto i = extSfxMusPlaying.begin(); i != extSfxMusPlaying.end(); ++i)
+    {
+        if(i->second.pausable)
+        {
+            if(pause)
+                Mix_PauseMusicStream(i->first);
+            else
+                Mix_ResumeMusicStream(i->first);
+        }
+    }
+
     SDL_AtomicSet(&extSfxBusy, 0);
 }
 
@@ -1844,6 +1936,17 @@ void UpdateExtSoundSections()
         }
     }
 
+    for(auto i = extSfxMusPlaying.begin(); i != extSfxMusPlaying.end(); ++i)
+    {
+        if(i->second.section >= 0)
+        {
+            if(s_anyPlayerInSection(i->second.section))
+                Mix_ResumeMusicStream(i->first);
+            else
+                Mix_PauseMusicStream(i->first);
+        }
+    }
+
     SDL_AtomicSet(&extSfxBusy, 0);
 }
 
@@ -1857,7 +1960,11 @@ void StopAllExtSounds()
     for(auto i = extSfxPlaying.begin(); i != extSfxPlaying.end(); ++i)
         Mix_HaltChannel(i->first);
 
+    for(auto i = extSfxMusPlaying.begin(); i != extSfxMusPlaying.end(); ++i)
+        Mix_HaltMusicStream(i->first);
+
     extSfxPlaying.clear();
+    extSfxMusPlaying.clear();
 
     SDL_AtomicSet(&extSfxBusy, 0);
 }
@@ -1869,7 +1976,12 @@ void StopAllSounds()
 
     SDL_AtomicSet(&extSfxBusy, 1);
     Mix_HaltChannel(-1);
+
+    for(auto i = extSfxMusPlaying.begin(); i != extSfxMusPlaying.end(); ++i)
+        Mix_HaltMusicStream(i->first);
+
     extSfxPlaying.clear();
+    extSfxMusPlaying.clear();
     SDL_AtomicSet(&extSfxBusy, 0);
 }
 
