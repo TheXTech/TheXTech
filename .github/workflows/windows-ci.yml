@@ -201,12 +201,10 @@ jobs:
         file build/output/bin/thextech
         ldd build/output/bin/thextech
 
+    # ================================================================================================
 
-
-
-
-    - name: [SIGNING] Upload binaries
-      if: github.event_name != 'pull_request' # Only manual builds
+    - name: "[SIGNING] Upload binaries"
+      if: github.event_name != 'pull_request'   # Everything but pull-requests
       id: upload-binaries
       uses: actions/upload-artifact@v7
       with:
@@ -216,7 +214,7 @@ jobs:
         name: Binaries
         retention-days: 1
 
-    - name: [SIGNING] [RELEASE] Sign binaries with SignPath
+    - name: "[SIGNING] [RELEASE] Sign binaries with SignPath"
       if: github.event_name == 'workflow_dispatch'  # Only manual builds
         uses: signpath/github-action-submit-signing-request@v2
         with:
@@ -229,8 +227,8 @@ jobs:
           wait-for-completion: true
           output-artifact-directory: 'build/output/bin/'
 
-    - name: [SIGNING] [TEST] Sign binaries with SignPath
-      if: github.event_name == 'push' && github.event_name != 'pull_request'
+    - name: "[SIGNING] [TEST] Sign binaries with SignPath"
+      if: github.event_name == 'push' && github.event_name != 'pull_request'   # Push and not pull-requests
         uses: signpath/github-action-submit-signing-request@v2
         with:
           api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
@@ -242,9 +240,7 @@ jobs:
           wait-for-completion: true
           output-artifact-directory: 'build/output/bin/'
 
-
-
-
+    # ================================================================================================
 
     - name: Create Package
       if: success()
