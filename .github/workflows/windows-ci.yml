@@ -201,7 +201,10 @@ jobs:
         file build/output/bin/thextech
         ldd build/output/bin/thextech
 
-# =============Code Signing===========================================================
+
+
+
+
     - name: [SIGNING] Upload binaries
       if: github.event_name != 'pull_request' # Only manual builds
       id: upload-binaries
@@ -239,7 +242,9 @@ jobs:
           wait-for-completion: true
           output-artifact-directory: 'build/output/bin/'
 
-# ====================================================================================
+
+
+
 
     - name: Create Package
       if: success()
