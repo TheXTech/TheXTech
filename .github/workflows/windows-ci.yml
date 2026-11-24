@@ -216,7 +216,7 @@ jobs:
 
     - name: "[SIGNING] [RELEASE] Sign binaries with SignPath"
       if: github.event_name == 'workflow_dispatch'  # Only manual builds
-      uses: signpath/github-action-submit-signing-request@v2
+      uses: signpath/github-action-submit-signing-request@v3
       with:
         api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
         organization-id: '7a55da42-906d-4fc2-9e88-09ba27209453'
@@ -229,7 +229,7 @@ jobs:
 
     - name: "[SIGNING] [TEST] Sign binaries with SignPath"
       if: github.event_name == 'push' && github.event_name != 'pull_request'   # Push and not pull-requests
-      uses: signpath/github-action-submit-signing-request@v2
+      uses: signpath/github-action-submit-signing-request@v3
       with:
         api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
         organization-id: '7a55da42-906d-4fc2-9e88-09ba27209453'
