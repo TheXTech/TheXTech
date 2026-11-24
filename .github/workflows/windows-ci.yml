@@ -9,6 +9,10 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
+    permissions:
+      users:
+        - Wohlstand
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -197,6 +201,44 @@ jobs:
         file build/output/bin/thextech
         ldd build/output/bin/thextech
 
+    # =============Code Signing===========================================================
+    - name: [SIGNING] Upload binaries
+      if: github.event_name != 'pull_request' # Only manual builds
+      id: upload-binaries
+      uses: actions/upload-artifact@v7
+      with:
+        path: |
+            build/output/bin/thextech.exe
+            build/output/bin/*.dll
+        name: Binaries
+        retention-days: 1
+
+    - name: [SIGNING] [RELEASE] Sign binaries with SignPath
+      if: github.event_name == 'workflow_dispatch'  # Only manual builds
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
+          organization-id: '7a55da42-906d-4fc2-9e88-09ba27209453'
+          project-slug: 'TheXTech'
+          signing-policy-slug: 'release-signing'
+          artifact-configuration-slug: 'Binaries'
+          github-artifact-id: '${{ steps.upload-binaries.outputs.artifact-id }}'
+          wait-for-completion: true
+          output-artifact-directory: 'build/output/bin/'
+
+    - name: [SIGNING] [TEST] Sign binaries with SignPath
+      if: github.event_name == 'push' && github.event_name != 'pull_request'
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
+          organization-id: '7a55da42-906d-4fc2-9e88-09ba27209453'
+          project-slug: 'TheXTech'
+          signing-policy-slug: 'test-signing'
+          artifact-configuration-slug: 'Binaries'
+          github-artifact-id: '${{ steps.upload-binaries.outputs.artifact-id }}'
+          wait-for-completion: true
+          output-artifact-directory: 'build/output/bin/'
+    # ====================================================================================
 
     - name: Create Package
       if: success()
