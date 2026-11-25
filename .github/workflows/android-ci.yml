@@ -134,14 +134,14 @@ jobs:
 
       - name: Upload APK
         if: success() && steps.signing-check.outputs.available == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: thextech-android-${{steps.apk-filename.outputs.branch_name}}
           path: android-project/thextech-android-*.apk
 
       - name: Upload APK (unsigned)
         if: success() && steps.signing-check.outputs.available != 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         continue-on-error: true
         with:
           name: thextech-android-${{steps.apk-filename.outputs.branch_name}}-unsigned
