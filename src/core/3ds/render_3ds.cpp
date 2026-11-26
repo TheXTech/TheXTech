@@ -23,6 +23,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <inttypes.h>
 #include <3ds.h>
 #include <citro2d.h>
 
@@ -805,6 +806,12 @@ void repaint()
 
     g_microStats.start_task(MicroStats::Graphics);
     C3D_FrameEnd(0);
+}
+
+void getMaxLogicSize(int *w, int *h)
+{
+    *w = 2048;
+    *h = 2048;
 }
 
 void mapToScreen(int x, int y, int* dx, int* dy)

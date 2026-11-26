@@ -274,8 +274,6 @@ void SaveGame()
     if(Cheater || !selSave)
         return;
 
-    CloseSave();
-
     for(A = numPlayers; A >= 1; A--)
         SavedChar[Player[A].Character] = Player[A];
 
@@ -372,12 +370,7 @@ void SaveGame()
 
     ExportLevelSaveInfo(sav);
 
-    FILE* gamesave = Files::utf8_fopen(savePath.c_str(), "w+");
-    PGE_FileFormats_misc::TextFileOutput output(gamesave);
-    FileFormats::WriteExtendedSaveFile(output, sav);
-
-    s_open_gamesave = SDL_RWFromFP(gamesave, SDL_TRUE);
-    Files::flush_file(s_open_gamesave);
+    FileFormats::WriteExtendedSaveFileF(savePath, sav);
 
     if(Files::fileExists(legacyGamesaveLocker))
         Files::deleteFile(legacyGamesaveLocker); // Remove the gamesave locker of legacy file

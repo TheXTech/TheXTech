@@ -23,7 +23,7 @@
 
 #include <cstddef>
 
-#if defined(VITA)
+#if defined(VITA) || defined(__PSP__)
 // Under certain circumstances, this function cannot be found on PS Vita.
 // Seems to only happen on a CI build.
 // extern double strtod_l(const char* _a, const char ** _b, locale_t c);
@@ -311,6 +311,7 @@ long getpagesize();
 #if (defined(LC_NUMERIC_MASK) || defined(_MSC_VER)) && \
     !defined(__ANDROID__) && !defined(__CYGWIN__) && \
     !defined(VITA) && \
+    !defined(__PSP__) && \
     !defined(__HAIKU__) && \
     !defined(__SWITCH__) && !defined(__3DS__) && !defined(__WII__) && !defined(__WIIU__) && \
     !defined(PGE_MIN_PORT)
